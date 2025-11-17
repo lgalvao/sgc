@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useUnidadesStore} from '../unidades';
 import {initPinia} from '@/test-utils/helpers';
 import {expectContainsAll} from '@/test-utils/uiHelpers';
-import {UnidadesService} from "@/services/unidadesService";
+import * as unidadesService from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
 
 const mockUnidades: Unidade[] = [
@@ -28,7 +28,10 @@ const mockUnidades: Unidade[] = [
                     "ramal": "1313",
                     "usuarioTitulo": "Servidor Responsável 13",
                     "unidadeCodigo": 1,
-                    "tipo": "SERVIDOR"
+                    "tipo": "SERVIDOR",
+                    "idServidor": 13,
+                    "dataInicio": "2023-01-01",
+                    "dataFim": null
                 },
                 "filhas": [
                     {
@@ -82,7 +85,10 @@ const mockUnidades: Unidade[] = [
                                     "ramal": "8888",
                                     "usuarioTitulo": "Servidor Responsável 8",
                                     "unidadeCodigo": 1,
-                                    "tipo": "SERVIDOR"
+                                    "tipo": "SERVIDOR",
+                                    "idServidor": 8,
+                                    "dataInicio": "2023-01-01",
+                                    "dataFim": null
                                 },
                                 "filhas": [],
                                 "codigo": 8
@@ -162,9 +168,9 @@ const mockUnidades: Unidade[] = [
 ];
 
 vi.mock('@/services/unidadesService', () => ({
-    UnidadesService: {
-        buscarTodasUnidades: vi.fn(() => Promise.resolve({ data: mockUnidades }))
-    }
+    buscarTodasUnidades: vi.fn(() => Promise.resolve(mockUnidades)),
+    buscarUnidadePorSigla: vi.fn(),
+    buscarArvoreComElegibilidade: vi.fn(() => Promise.resolve(mockUnidades))
 }));
 
 describe('useUnidadesStore', () => {
@@ -185,30 +191,30 @@ describe('useUnidadesStore', () => {
     describe('actions', () => {
         it('should fetch and set unidades', async () => {
             unidadesStore.unidades = [];
-            await unidadesStore.fetchUnidades();
-            expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
+            await unidadesStore.fetchUnidadesParaProcesso('MAPEAMENTO');
+            expect(unidadesService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
             expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         });
-        it('pesquisarUnidade should find SEDOC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDOC');
+        it('pesquisarUnidadePorSigla should find SEDOC unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('SEDOC');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Seção de Desenvolvimento Organizacional e Capacitação');
         });
 
-        it('pesquisarUnidade should find STIC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('STIC');
+        it('pesquisarUnidadePorSigla should find STIC unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('STIC');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Secretaria de Informática e Comunicações');
         });
 
-        it('pesquisarUnidade should find nested SEDESENV unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDESENV');
+        it('pesquisarUnidadePorSigla should find nested SEDESENV unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('SEDESENV');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Seção de Desenvolvimento de Sistemas');
         });
 
-        it('pesquisarUnidade should return null if unit not found', () => {
-            const unidade = unidadesStore.pesquisarUnidade('NONEXISTENT');
+        it('pesquisarUnidadePorSigla should return null if unit not found', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('NONEXISTENT');
             expect(unidade).toBeNull();
         });
 

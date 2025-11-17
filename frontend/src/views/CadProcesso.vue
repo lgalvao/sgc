@@ -8,13 +8,13 @@
           class="form-label"
           for="descricao"
         >Descrição</label>
-        <input
+        <b-form-input
           id="descricao"
           v-model="descricao"
-          class="form-control"
           placeholder="Descreva o processo"
           type="text"
-        >
+          data-testid="input-descricao"
+        />
       </div>
 
       <div class="mb-3">
@@ -22,102 +22,28 @@
           class="form-label"
           for="tipo"
         >Tipo</label>
-        <select
+        <b-form-select
           id="tipo"
           v-model="tipo"
-          class="form-select"
-        >
-          <option
-            v-for="tipoOption in TipoProcesso"
-            :key="tipoOption"
-            :value="tipoOption"
-          >
-            {{ tipoOption }}
-          </option>
-        </select>
+          data-testid="select-tipo"
+          :options="Object.values(TipoProcesso)"
+        />
       </div>
 
       <div class="mb-3">
         <label class="form-label">Unidades participantes</label>
         <div class="border rounded p-3">
-          <div>
-            <template
-              v-for="unidade in unidadesStore.unidades"
-              :key="unidade.sigla"
-            >
-              <div
-                :style="{ marginLeft: '0' }"
-                class="form-check"
-              >
-                <!--suppress HtmlUnknownAttribute -->
-                <input
-                  :id="`chk-${unidade.sigla}`"
-                  :checked="getEstadoSelecao(unidade) === true"
-                  class="form-check-input"
-                  type="checkbox"
-                  :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-                  @change="() => toggleUnidade(unidade)"
-                >
-                <label
-                  :for="`chk-${unidade.sigla}`"
-                  class="form-check-label ms-2"
-                >
-                  <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-                </label>
-              </div>
-              <div
-                v-if="unidade.filhas && unidade.filhas.length"
-                class="ms-4"
-              >
-                <template
-                  v-for="filha in unidade.filhas"
-                  :key="filha.sigla"
-                >
-                  <div class="form-check">
-                    <!--suppress HtmlUnknownAttribute -->
-                    <input
-                      :id="`chk-${filha.sigla}`"
-                      :checked="getEstadoSelecao(filha) === true"
-                      class="form-check-input"
-                      type="checkbox"
-                      :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                      @change="() => toggleUnidade(filha)"
-                    >
-                    <label
-                      :for="`chk-${filha.sigla}`"
-                      class="form-check-label ms-2"
-                    >
-                      <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-                    </label>
-                  </div>
-
-                  <div
-                    v-if="filha.filhas && filha.filhas.length"
-                    class="ms-4"
-                  >
-                    <div
-                      v-for="neta in filha.filhas"
-                      :key="neta.sigla"
-                      class="form-check"
-                    >
-                      <input
-                        :id="`chk-${neta.sigla}`"
-                        :checked="isChecked(neta.codigo)"
-                        class="form-check-input"
-                        type="checkbox"
-                        @change="() => toggleUnidade(neta)"
-                      >
-                      <label
-                        :for="`chk-${neta.sigla}`"
-                        class="form-check-label ms-2"
-                      >
-                        <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                      </label>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </template>
+          <ArvoreUnidades
+            v-if="!unidadesStore.isLoading"
+            v-model="unidadesSelecionadas"
+            :unidades="unidadesStore.unidades"
+          />
+          <div
+            v-else
+            class="text-center py-3"
+          >
+            <span class="spinner-border spinner-border-sm me-2" />
+            Carregando unidades...
           </div>
         </div>
       </div>
@@ -127,12 +53,12 @@
           class="form-label"
           for="dataLimite"
         >Data limite</label>
-        <input
+        <b-form-input
           id="dataLimite"
           v-model="dataLimite"
-          class="form-control"
           type="date"
-        >
+          data-testid="input-dataLimite"
+        />
       </div>
       <button
         class="btn btn-primary"
@@ -267,7 +193,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {nextTick, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -276,17 +202,15 @@ import {
   type CriarProcessoRequest,
   type Processo as ProcessoModel,
   TipoProcesso,
-  type Unidade
 } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
-import * as SubprocessoService from '@/services/subprocessoService';
-import {ServidoresService} from "@/services/servidoresService";
+import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 
-const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
+const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')
-const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
+const tipo = ref<string>('MAPEAMENTO')
 const dataLimite = ref<string>('')
 const router = useRouter()
 const route = useRoute()
@@ -297,28 +221,34 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
 
-// Carregar processo se estiver editando
 onMounted(async () => {
-  const idProcesso = route.query.idProcesso;
-  if (idProcesso) {
+  const codProcesso = route.query.codProcesso;
+  if (codProcesso) {
     try {
-      await processosStore.fetchProcessoDetalhe(Number(idProcesso));
-      const processo = processosStore.processoDetalhe; // Obter o processo detalhado da store
+      await processosStore.fetchProcessoDetalhe(Number(codProcesso));
+      const processo = processosStore.processoDetalhe;
       if (processo) {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
-
-        // Carregar unidades participantes do processo detalhe
-        unidadesSelecionadas.value = processo.unidades.map(up => up.codUnidade);
+        dataLimite.value = processo.dataLimite.split('T')[0];
+        unidadesSelecionadas.value = processo.unidades.map(u => u.codUnidade);
+        await unidadesStore.fetchUnidadesParaProcesso(processo.tipo, processo.codigo);
+        await nextTick();
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
       console.error('Erro ao carregar processo:', error);
     }
+  } else {
+    await unidadesStore.fetchUnidadesParaProcesso(tipo.value);
   }
 })
+
+watch(tipo, async (novoTipo) => {
+  const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
+  await unidadesStore.fetchUnidadesParaProcesso(novoTipo, codProcesso);
+});
 
 function limparCampos() {
   descricao.value = ''
@@ -327,95 +257,38 @@ function limparCampos() {
   unidadesSelecionadas.value = []
 }
 
-function isUnidadeIntermediaria(codigo: number): boolean {
-  const unidade = unidadesStore.unidades.find(u => u.codigo === codigo);
-  return unidade?.tipo === 'INTERMEDIARIA';
-}
-
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
-async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
-  return await SubprocessoService.verificarMapaVigente(codigo);
-}
-
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
-async function unidadeTemServidores(codigo: number): Promise<boolean> {
-  const servidores = await ServidoresService.buscarServidoresPorUnidade(codigo);
-  return servidores.length > 0;
-}
-
-async function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecionadas: number[]): Promise<number[]> {
-  let unidadesValidas = unidadesSelecionadas.filter(codigo => !isUnidadeIntermediaria(codigo));
-
-  if (tipoProcesso === 'REVISAO' || tipoProcesso === 'DIAGNOSTICO') {
-    const resultados = await Promise.all(unidadesValidas.map(async codigo => ({
-      codigo,
-      temMapaVigente: await unidadeTemMapaVigente(codigo)
-    })));
-    unidadesValidas = resultados.filter(res => res.temMapaVigente).map(res => res.codigo);
-  }
-
-  if (tipoProcesso === 'DIAGNOSTICO') {
-    const resultadosServidores = await Promise.all(unidadesValidas.map(async codigo => ({
-      codigo,
-      temServidores: await unidadeTemServidores(codigo)
-    })));
-    unidadesValidas = resultadosServidores.filter(res => res.temServidores).map(res => res.codigo);
-  }
-
-  return unidadesValidas;
-}
-
 async function salvarProcesso() {
   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
         'Dados incompletos',
         'Preencha todos os campos e selecione ao menos uma unidade.'
     );
-    return
-  }
-
-  const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-
-  if (unidadesFiltradas.length === 0) {
-    notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
-    );
-    return
+    return;
   }
 
   try {
     if (processoEditando.value) {
-      // Editando processo existente
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
-        unidades: unidadesFiltradas
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesSelecionadas.value
       };
-      await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-
-      notificacoesStore.sucesso(
-          'Processo alterado',
-          'O processo foi alterado com sucesso!'
-      );
+      await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
+      notificacoesStore.sucesso('Processo alterado', 'O processo foi alterado!');
+      await router.push('/painel');
     } else {
-      // Criando novo processo
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
-        unidades: unidadesFiltradas
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesSelecionadas.value
       };
-      await processoService.criarProcesso(request);
-
-      notificacoesStore.sucesso(
-          'Processo salvo',
-          'O processo foi salvo com sucesso!'
-      );
+      await processosStore.criarProcesso(request);
+      notificacoesStore.sucesso('Processo criado', 'O processo foi criado!');
+      await router.push('/painel');
     }
-    await router.push('/painel');
     limparCampos();
   } catch (error) {
     notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
@@ -431,12 +304,13 @@ async function abrirModalConfirmacao() {
     );
     return
   }
-  const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
 
-  if (unidadesFiltradas.length === 0) {
+  // A validação de unidades agora é feita no backend,
+  // mas uma verificação simples de seleção pode ser mantida.
+  if (unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+        'Nenhuma unidade selecionada',
+        'Selecione ao menos uma unidade para iniciar o processo.'
     );
     return
   }
@@ -450,26 +324,28 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (processoEditando.value) {
-    try {
-      // Usa a action da store, passando os parâmetros necessários
-      await processosStore.iniciarProcesso(
-          processoEditando.value.codigo,
-          tipo.value as TipoProcesso, // Garante a tipagem correta
-          unidadesSelecionadas.value
-      );
-      notificacoesStore.sucesso(
-          'Processo iniciado',
-          'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
-      );
-      await router.push('/painel');
-      limparCampos();
-    } catch (error) {
-      notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
-      console.error('Erro ao iniciar processo:', error);
-    }
-  } else {
+  if (!processoEditando.value) {
     notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
+    return;
+  }
+
+  try {
+    await processosStore.iniciarProcesso(
+        processoEditando.value.codigo,
+        tipo.value as TipoProcesso,
+        unidadesSelecionadas.value
+    );
+    notificacoesStore.sucesso(
+        'Processo iniciado',
+        'O processo foi iniciado! Notificações enviadas às unidades.'
+    );
+    await router.push('/painel');
+    if (!processoEditando.value) { // Only clear fields if it was a new process
+      limparCampos();
+    }
+  } catch (error) {
+    notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
+    console.error('Erro ao iniciar processo:', error);
   }
 }
 
@@ -492,70 +368,14 @@ async function confirmarRemocao() {
         testId: 'notificacao-remocao'
       });
       await router.push('/painel');
+      if (!processoEditando.value) { // Only clear fields if it was a new process
+        limparCampos();
+      }
     } catch (error) {
       notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
       console.error('Erro ao remover processo:', error);
     }
   }
   fecharModalRemocao();
-}
-
-// Funções de manipulação de unidades (serão ajustadas em uma etapa posterior)
-function getTodasSubunidades(unidade: Unidade): number[] {
-  let subunidades: number[] = [];
-  if (unidade.filhas) {
-    for (const filha of unidade.filhas) {
-      subunidades.push(filha.codigo);
-      subunidades = subunidades.concat(getTodasSubunidades(filha));
-    }
-  }
-  return subunidades;
-}
-
-function isFolha(unidade: Unidade): boolean {
-  return !unidade.filhas || unidade.filhas.length === 0;
-}
-
-function isChecked(codigo: number): boolean {
-  return unidadesSelecionadas.value.includes(codigo);
-}
-
-function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
-  const selfSelected = isChecked(unidade.codigo);
-
-  if (isFolha(unidade)) {
-    return selfSelected;
-  }
-
-  const subunidades = getTodasSubunidades(unidade);
-  if (subunidades.length === 0) {
-    return selfSelected;
-  }
-  const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length;
-
-  if (selecionadas === 0 && !selfSelected) {
-    return false;
-  }
-  if (selecionadas === subunidades.length && selfSelected) {
-    return true;
-  }
-  return 'indeterminate';
-}
-
-function toggleUnidade(unidade: Unidade) {
-  const todasSubunidades = [unidade.codigo, ...getTodasSubunidades(unidade)];
-  const todasEstaoSelecionadas = todasSubunidades.every(codigo => isChecked(codigo));
-
-  if (todasEstaoSelecionadas) {
-    unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
-        codigo => !todasSubunidades.includes(codigo)
-    );
-  } else {
-    todasSubunidades.forEach(codigo => {
-      if (!unidadesSelecionadas.value.includes(codigo)) {
-        unidadesSelecionadas.value.push(codigo);
-      }
-    });
-  }
 }
 </script>

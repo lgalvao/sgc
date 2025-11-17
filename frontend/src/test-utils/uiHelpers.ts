@@ -60,7 +60,7 @@ export function assertUnidadeOptions(wrapper: any, labels: string[]) {
  * expectedLabels é um array com os labels (excluindo 'Home' que sempre é o primeiro crumb).
  */
 export async function navigateAndAssertBreadcrumbs(router: any, mountFn: () => Promise<any>, path: string, expectedLabels: string[]) {
-  await router.push(path);
+  router.push(path);
   const wrapper = await mountFn();
   const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
  

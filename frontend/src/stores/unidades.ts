@@ -1,42 +1,67 @@
 import {defineStore} from 'pinia';
 import type {Unidade} from '@/types/tipos';
 import {mapUnidadesArray} from '@/mappers/unidades';
-import {UnidadesService} from "@/services/unidadesService";
+import {buscarUnidadePorSigla, buscarArvoreComElegibilidade} from "@/services/unidadesService";
 
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
         unidades: [] as Unidade[],
+        unidade: null as Unidade | null,
         isLoading: false,
         error: null as string | null
     }),
     actions: {
-        async fetchUnidades() {
+        async fetchUnidadesParaProcesso(tipoProcesso: string, codProcesso?: number) {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await UnidadesService.buscarTodasUnidades();
-                this.unidades = mapUnidadesArray((response as any).data as any) as Unidade[];
+                const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
+                this.unidades = mapUnidadesArray(response as any) as Unidade[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar unidades: ' + err.message;
             } finally {
                 this.isLoading = false;
             }
         },
-        pesquisarUnidade(this: ReturnType<typeof useUnidadesStore>, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
+        async fetchUnidade(sigla: string) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await buscarUnidadePorSigla(sigla);
+                this.unidade = response.data as Unidade;
+            } catch (err: any) {
+                this.error = 'Falha ao carregar unidade: ' + err.message;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        pesquisarUnidadePorCodigo(this: ReturnType<typeof useUnidadesStore>, codigo: number, units: Unidade[] = this.unidades): Unidade | null {
             for (const unit of units) {
-                if (unit.sigla === sigla) return unit
+                if (unit.codigo === codigo) return unit
                 if (unit.filhas) {
-                    const found = this.pesquisarUnidade(sigla, unit.filhas)
+                    const found = this.pesquisarUnidadePorCodigo(codigo, unit.filhas)
                     if (found) return found
                 }
             }
             return null
         },
+
+        pesquisarUnidadePorSigla(this: ReturnType<typeof useUnidadesStore>, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
+            for (const unit of units) {
+                if (unit.sigla === sigla) return unit
+                if (unit.filhas) {
+                    const found = this.pesquisarUnidadePorSigla(sigla, unit.filhas)
+                    if (found) return found
+                }
+            }
+            return null
+        },
+
         getUnidadesSubordinadas(siglaUnidade: string): string[] {
             const unidadesEncontradas: string[] = [];
             const stack: Unidade[] = [];
 
-            const unidadeRaiz = this.pesquisarUnidade(siglaUnidade);
+            const unidadeRaiz = this.pesquisarUnidadePorSigla(siglaUnidade);
             if (unidadeRaiz) {
                 stack.push(unidadeRaiz);
                 while (stack.length > 0) {

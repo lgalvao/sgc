@@ -12,8 +12,8 @@ class AtividadeDtoTest {
         AtividadeDto dto = new AtividadeDto(1L, 100L, "Test Description");
 
         // Test getters (accessors)
-        assertEquals(1L, dto.codigo());
-        assertEquals(100L, dto.mapaCodigo());
-        assertEquals("Test Description", dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(100L, dto.getMapaCodigo());
+        assertEquals("Test Description", dto.getDescricao());
     }
 }

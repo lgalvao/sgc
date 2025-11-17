@@ -17,7 +17,7 @@ export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
         codigo: obj.codigo ?? obj.id ?? 0,
         nome: obj.nome ?? obj.nome_unidade ?? '',
         sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? '',
-        filhas: Array.isArray(obj.filhas) ? obj.filhas.map(mapUnidadeSnapshot) : []
+        filhas: Array.isArray(obj.filhas || obj.subunidades) ? (obj.filhas || obj.subunidades).map(mapUnidadeSnapshot) : []
     };
 }
 
@@ -42,7 +42,7 @@ export function mapUnidade(obj: any): Unidade {
             dataInicio: obj.responsavel.dataInicio ?? '',
             dataFim: obj.responsavel.dataFim ?? null,
         } : null,
-        filhas: Array.isArray(obj.filhas) ? obj.filhas.map(mapUnidade) : []
+        filhas: Array.isArray(obj.filhas || obj.subunidades) ? (obj.filhas || obj.subunidades).map(mapUnidade) : []
     };
 }
 

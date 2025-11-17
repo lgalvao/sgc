@@ -21,7 +21,7 @@
           :disabled="competencias.length === 0"
           class="btn btn-outline-success"
           data-testid="btn-disponibilizar-page"
-          @click="finalizarEdicao"
+          @click="abrirModalDisponibilizar"
         >
           Disponibilizar
         </button>
@@ -117,6 +117,7 @@
     <!-- Modal de Criar Nova Competência -->
     <div
       v-if="mostrarModalCriarNovaCompetencia"
+      data-testid="criar-competencia-modal"
       aria-labelledby="criarCompetenciaModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -145,9 +146,8 @@
             <div class="mb-4">
               <h5>Descrição</h5>
               <div class="mb-2">
-                <textarea
+                <b-form-textarea
                   v-model="novaCompetencia.descricao"
-                  class="form-control"
                   data-testid="input-nova-competencia"
                   placeholder="Descreva a competência"
                   rows="3"
@@ -164,19 +164,14 @@
                   :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
                   class="card atividade-card-item"
                   :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.codigo)"
                 >
                   <div class="card-body d-flex align-items-center">
-                    <input
+                    <b-form-checkbox
                       :id="`atv-${atividade.codigo}`"
                       v-model="atividadesSelecionadas"
                       :value="atividade.codigo"
-                      class="form-check-input me-2"
                       data-testid="atividade-checkbox"
-                      hidden
-                      type="checkbox"
                     >
-                    <label class="form-check-label mb-0 d-flex align-items-center">
                       {{ atividade.descricao }}
                       <span
                         v-if="atividade.conhecimentos.length > 0"
@@ -190,7 +185,7 @@
                       >
                         {{ atividade.conhecimentos.length }}
                       </span>
-                    </label>
+                    </b-form-checkbox>
                   </div>
                 </div>
               </div>
@@ -230,6 +225,7 @@
     <!-- Modal de Disponibilizar -->
     <div
       v-if="mostrarModalDisponibilizar"
+      data-testid="disponibilizar-modal"
       aria-labelledby="disponibilizarModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -259,24 +255,22 @@
                 class="form-label"
                 for="dataLimite"
               >Data limite para validação</label>
-              <input
+              <b-form-input
                 id="dataLimite"
                 v-model="dataLimiteValidacao"
                 data-testid="input-data-limite"
-                class="form-control"
                 type="date"
-              >
+              />
             </div>
             <div class="mb-3">
               <label
                 class="form-label"
                 for="observacoes"
               >Observações</label>
-              <textarea
+              <b-form-textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes"
-                class="form-control"
+                data-testid="input-observacoes-disponibilizacao"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
               />
@@ -373,7 +367,7 @@
     />
 
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :sigla-unidade="siglaUnidade"
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
@@ -387,11 +381,9 @@ import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
 import {useAtividadesStore} from '@/stores/atividades'
-import {useNotificacoesStore} from '@/stores/notificacoes'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
-import {useRevisaoStore} from '@/stores/revisao'
-import {useUnidadesStore} from '@/stores/unidades'
+import {usePerfil} from '@/composables/usePerfil'
 import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
@@ -399,14 +391,11 @@ const route = useRoute()
 const mapasStore = useMapasStore()
 const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
-const notificacoesStore = useNotificacoesStore()
 const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
-const revisaoStore = useRevisaoStore()
-const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
+usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
@@ -432,17 +421,17 @@ function abrirModalImpacto() {
   // Segue o comportamento esperado pelos testes:
   // - Sem mudanças: não abre o modal e exibe notificação "Nenhum impacto..."
   // - Com mudanças: abre o modal de impactos
-  if (revisaoStore.mudancasRegistradas.length === 0) {
-    notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
-    return;
-  }
-  revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
+  // if (revisaoStore.mudancasRegistradas.length === 0) {
+  //   notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
+  //   return;
+  // }
+  // revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  revisaoStore.setMudancasParaImpacto([]);
+  // revisaoStore.setMudancasParaImpacto([]);
 }
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
@@ -456,42 +445,41 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   return null
 }
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const unidade = computed<Unidade | null>(() => {
+  // TODO: Fix unidades source
+  const unidadesData = processosStore.processoDetalhe?.unidades || [];
+  return buscarUnidade(unidadesData as unknown as Unidade[], siglaUnidade.value);
+})
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await mapasStore.fetchMapaCompleto(idSubprocesso.value as number);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  if (codSubrocesso.value) {
+    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
   }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new Tooltip(tooltipTriggerEl)
-    })
+    if (typeof document !== 'undefined') {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipTriggerList.forEach(tooltipTriggerEl => {
+        new Tooltip(tooltipTriggerEl)
+      })
+    }
   })
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
-function toggleAtividade(codigo: number) {
-  const index = atividadesSelecionadas.value.indexOf(codigo);
-  if (index > -1) {
-    atividadesSelecionadas.value.splice(index, 1);
-  } else {
-    atividadesSelecionadas.value.push(codigo);
-  }
-}
+
 
 
 const competenciaSendoEditada = ref<Competencia | null>(null)
@@ -504,6 +492,10 @@ const competenciaParaExcluir = ref<Competencia | null>(null)
 const dataLimiteValidacao = ref('')
 const observacoesDisponibilizacao = ref('')
 const notificacaoDisponibilizacao = ref('')
+
+function abrirModalDisponibilizar() {
+  mostrarModalDisponibilizar.value = true;
+}
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
@@ -518,14 +510,18 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   }
 
   // Inicializar tooltips do modal
-  setTimeout(() => {
-    import('bootstrap').then(({Tooltip}) => {
-      const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
-      modalTooltips.forEach(tooltipEl => {
-        new Tooltip(tooltipEl)
+  if (typeof document !== 'undefined') {
+    setTimeout(() => {
+      import('bootstrap').then(({Tooltip}) => {
+        if (typeof document !== 'undefined') {
+          const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
+          modalTooltips.forEach(tooltipEl => {
+            new Tooltip(tooltipEl)
+          })
+        }
       })
-    })
-  }, 100)
+    }, 100)
+  }
 }
 
 function fecharModalCriarNovaCompetencia() {
@@ -583,9 +579,9 @@ function adicionarCompetenciaEFecharModal() {
   };
 
   if (competenciaSendoEditada.value) {
-    mapasStore.atualizarCompetencia(idSubprocesso.value as number, competencia);
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
   } else {
-    mapasStore.adicionarCompetencia(idSubprocesso.value as number, competencia);
+    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
   }
 
   // Limpar formulário
@@ -606,7 +602,7 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapasStore.removerCompetencia(idSubprocesso.value as number, competenciaParaExcluir.value.codigo);
+    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
     fecharModalExcluirCompetencia();
   }
 }
@@ -623,88 +619,23 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       ...competencia,
       atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
     };
-    mapasStore.atualizarCompetencia(idSubprocesso.value as number, competenciaAtualizada);
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
   }
 }
 
-function formatarData(data: string): string {
-  if (!data) return ''
-  const [ano, mes, dia] = data.split('-')
-  return `${dia}/${mes}/${ano}`
-}
+async function disponibilizarMapa() {
+  if (!codSubrocesso.value) return
 
-function disponibilizarMapa() {
-  if (!mapaCompleto.value || !unidade.value) {
-    notificacaoDisponibilizacao.value = 'Erro: Mapa ou unidade não encontrados.'
-    return
+  try {
+    await mapasStore.disponibilizarMapa(codSubrocesso.value, {
+      dataLimite: dataLimiteValidacao.value,
+      observacoes: observacoesDisponibilizacao.value,
+    })
+    fecharModalDisponibilizar()
+    // TODO: Adicionar redirecionamento para o painel
+  } catch {
+    // O erro já é tratado e notificado pelo store
   }
-
-  const currentUnidade = unidade.value;
-
-  // Validações conforme plano
-  const competenciasSemAtividades = mapaCompleto.value.competencias.filter(comp => comp.atividadesAssociadas.length === 0);
-  if (competenciasSemAtividades.length > 0) {
-    notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
-    return;
-  }
-
-  const atividadesIds = atividades.value.map(a => a.codigo);
-  const atividadesAssociadas = mapaCompleto.value.competencias.flatMap(comp => comp.atividadesAssociadas);
-  const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
-
-  if (atividadesNaoAssociadas.length > 0) {
-    const descricoesNaoAssociadas = atividadesNaoAssociadas.map(id => descricaoAtividade(id)).join(', ');
-    notificacaoDisponibilizacao.value = `Erro: As seguintes atividades não estão associadas a nenhuma competência: ${descricoesNaoAssociadas}`;
-    return;
-  }
-
-  // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
-  const sub = subprocesso.value;
-  if (sub) {
-    sub.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO;
-    sub.dataLimite = dataLimiteValidacao.value;
-    if (observacoesDisponibilizacao.value) {
-      // O DTO não tem mais um campo de observações direto, isso precisaria ser tratado
-      // em uma movimentação ou em um campo específico se existir no backend.
-    }
-
-    // Registrar movimentação
-    processosStore.addMovement({
-      usuario: `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`,
-      unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
-      unidadeDestino: currentUnidade,
-      descricao: 'Disponibilização do mapa de competências'
-    });
-  }
-
-
-  // Simular notificações por e-mail
-  const notificacoesStore = useNotificacoesStore();
-  notificacoesStore.email(
-      'SGC: Mapa de competências disponibilizado',
-      `Responsável pela ${currentUnidade.sigla}`,
-      `Prezado(a) responsável pela ${currentUnidade.sigla},\n\nO mapa de competências foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.\n\nAcompanhe o processo no sistema SGC.`
-  );
-
-  // Simular notificações para superiores
-  notificacoesStore.email(
-      `SGC: Mapa de competências disponibilizado - ${currentUnidade.sigla}`,
-      'Unidades superiores',
-      `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
-  );
-
-  // A criação de alertas agora é responsabilidade do backend
-
-  // Excluir sugestões e histórico de análise (CDU-17 item 19)
-  // A ser implementado no backend
-
-  notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
-
-  // Fechar modal e redirecionar para Painel
-  setTimeout(() => {
-    fecharModalDisponibilizar();
-    // Aqui seria o redirecionamento para Painel, mas como é simulação, apenas fechamos o modal
-  }, 2000);
 }
 
 function fecharModalDisponibilizar() {
@@ -716,10 +647,12 @@ function fecharModalDisponibilizar() {
 onMounted(() => {
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new Tooltip(tooltipTriggerEl)
-    })
+    if (typeof document !== 'undefined') {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipTriggerList.forEach(tooltipTriggerEl => {
+        new Tooltip(tooltipTriggerEl)
+      })
+    }
   })
 })
 

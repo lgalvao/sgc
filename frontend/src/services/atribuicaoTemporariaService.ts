@@ -1,8 +1,16 @@
-import apiClient from '../axios-setup'; // Importar a instância configurada do axios
+import apiClient from '../axios-setup';
 
-export const AtribuicaoTemporariaService = {
-    async buscarTodasAtribuicoes() {
-         // Usar apiClient e o endpoint correto
-        return await apiClient.get('/atribuicoes'); // Retornar a resposta completa do axios
-    }
-};
+export interface CriarAtribuicaoTemporariaRequest {
+    tituloEleitoralServidor: string;
+    dataTermino: string;
+    justificativa: string;
+}
+
+export async function buscarTodasAtribuicoes() {
+    const response = await apiClient.get('/atribuicoes');
+    return response.data;
+}
+
+export async function criarAtribuicaoTemporaria(idUnidade: number, request: CriarAtribuicaoTemporariaRequest): Promise<void> {
+    await apiClient.post(`/unidades/${idUnidade}/atribuicoes-temporarias`, request);
+}

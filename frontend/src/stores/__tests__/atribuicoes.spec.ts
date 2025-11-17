@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {initPinia} from '@/test-utils/helpers';
 import {useAtribuicaoTemporariaStore} from '../atribuicoes';
 import type {AtribuicaoTemporaria} from '@/types/tipos';
-import {AtribuicaoTemporariaService} from "@/services/atribuicaoTemporariaService";
+import * as atribuicaoTemporariaService from "@/services/atribuicaoTemporariaService";
 
 const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {
@@ -35,9 +35,7 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
 ];
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
-    AtribuicaoTemporariaService: {
-        buscarTodasAtribuicoes: vi.fn(() => Promise.resolve({ data: mockAtribuicoes }))
-    }
+    buscarTodasAtribuicoes: vi.fn(() => Promise.resolve({ data: mockAtribuicoes }))
 }));
 
 describe('useAtribuicaoTemporariaStore', () => {
@@ -59,12 +57,12 @@ describe('useAtribuicaoTemporariaStore', () => {
         it('fetchAtribuicoes should fetch and set atribuicoes', async () => {
             atribuicaoTemporariaStore.atribuicoes = [];
             await atribuicaoTemporariaStore.fetchAtribuicoes();
-            expect(AtribuicaoTemporariaService.buscarTodasAtribuicoes).toHaveBeenCalledTimes(1);
+            expect(atribuicaoTemporariaService.buscarTodasAtribuicoes).toHaveBeenCalledTimes(1);
             expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
         });
 
         it('fetchAtribuicoes should handle errors', async () => {
-            (AtribuicaoTemporariaService.buscarTodasAtribuicoes as any).mockRejectedValue(new Error('Failed'));
+            (atribuicaoTemporariaService.buscarTodasAtribuicoes as any).mockRejectedValue(new Error('Failed'));
             await atribuicaoTemporariaStore.fetchAtribuicoes();
             expect(atribuicaoTemporariaStore.error).toContain('Falha ao carregar atribuições');
         });

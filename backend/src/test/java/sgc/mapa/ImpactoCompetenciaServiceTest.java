@@ -8,18 +8,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.TipoImpactoAtividade;
+import sgc.mapa.service.ImpactoCompetenciaService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
@@ -32,12 +34,12 @@ class ImpactoCompetenciaServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
+
     @Mock
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    private AtividadeRepo atividadeRepo;
 
     private Mapa mapa;
     private Competencia competencia;
-    private CompetenciaAtividade competenciaAtividade;
 
     @BeforeEach
     void setUp() {
@@ -47,9 +49,6 @@ class ImpactoCompetenciaServiceTest {
         competencia = new Competencia();
         competencia.setCodigo(1L);
         competencia.setMapa(mapa);
-
-        competenciaAtividade = new CompetenciaAtividade();
-        competenciaAtividade.setId(new CompetenciaAtividade.Id(1L, 1L));
     }
 
     @Nested
@@ -65,11 +64,19 @@ class ImpactoCompetenciaServiceTest {
         @Test
         @DisplayName("Deve identificar competências impactadas por atividades removidas")
         void identificarCompetenciasImpactadas_AtividadesRemovidas_RetornaImpactos() {
-            AtividadeImpactadaDto atividadeRemovida = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
-            when(competenciaAtividadeRepo.findByAtividadeCodigo(1L)).thenReturn(Collections.singletonList(competenciaAtividade));
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
+            Atividade atividade = new Atividade();
+            atividade.setCodigo(1L);
 
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovida), Collections.emptyList());
+            // Establish the bidirectional relationship for the mock
+            competencia.setAtividades(Set.of(atividade));
+            atividade.setCompetencias(Set.of(competencia));
+
+            // Mock the repository calls
+            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+
+            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovidaDto), Collections.emptyList());
 
             assertFalse(result.isEmpty());
         }

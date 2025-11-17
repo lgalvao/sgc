@@ -3,9 +3,9 @@
 Ator: Usuário (todos os perfis)
 
 Pré-condições:
-● Usuário logado com qualquer perfil.
-● Processo de mapeamento ou de revisão iniciado ou finalizado, que tenha a unidade como participante
-● Subprocesso da unidade com mapa de competência já disponibilizado.
+- Usuário logado com qualquer perfil.
+- Processo de mapeamento ou de revisão iniciado ou finalizado, que tenha a unidade como participante
+- Subprocesso da unidade com mapa de competência já disponibilizado.
 
 Fluxo principal:
 

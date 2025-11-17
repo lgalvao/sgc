@@ -1,5 +1,19 @@
 # Componentes do Frontend
 
+Este documento fornece uma visão geral dos componentes Vue.js reutilizáveis desenvolvidos para o projeto SGC.
+
+## Princípios dos Componentes
+
+Para manter a arquitetura do projeto limpa e manutenível, os componentes neste diretório devem seguir os seguintes princípios:
+
+-   **Reutilizáveis e Agnósticos:** Componentes devem ser projetados para serem reutilizáveis em diferentes partes da aplicação. Eles não devem ter conhecimento do contexto específico da página (view) em que estão inseridos.
+-   **Controlados por Props e Eventos:** A comunicação com um componente deve ser feita primariamente através de `props` (para passar dados para dentro) e `emits` (para comunicar eventos para fora).
+-   **Evitar Lógica de Negócio:** Componentes de UI não devem conter lógica de negócio complexa, chamadas de API (serviços) ou manipulação direta do estado global (stores). Essa responsabilidade pertence às `views` e `stores`.
+
+---
+
+Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend. Abaixo, uma descrição de cada componente:
+
 Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend. Abaixo, uma descrição de cada componente:
 
 ---
@@ -16,9 +30,15 @@ Este componente é um diálogo modal utilizado para realizar ações em massa (a
 
 ---
 
+## ArvoreUnidades.vue
+
+Este componente implementa uma árvore hierárquica de seleção de unidades com suporte a checkboxes com três estados (marcado, desmarcado, indeterminado). Ele é totalmente controlado via `v-model` e permite filtragem customizada de unidades através de uma função. A seleção é hierárquica: marcar uma unidade marca todas suas filhas automaticamente, e desmarcar remove todas as filhas. Unidades do tipo `INTEROPERACIONAL` podem permanecer marcadas mesmo quando nem todas suas filhas estão selecionadas, diferentemente de unidades `INTERMEDIARIA` que ficam em estado indeterminado nessa situação. O componente aceita as propriedades: `unidades` (array hierárquico de unidades), `modelValue` (array de códigos selecionados para v-model), `desabilitadas` (array de códigos de unidades desabilitadas) e `filtrarPor` (função para filtrar quais unidades são elegíveis). Emite `update:modelValue` quando a seleção muda. A hierarquia é exibida com indentação visual usando classes Bootstrap.
+
+---
+
 ## BarraNavegacao.vue
 
-Este componente fornece elementos de navegação, incluindo um botão "Voltar" e breadcrumbs dinâmicos. O botão "Voltar" é exibido em todas as páginas, exceto '/login' e '/painel', e aciona a função `router.back()`. Os breadcrumbs também são ocultados nas páginas '/login' e '/painel'. Os breadcrumbs são gerados dinamicamente com base na rota atual, incluindo parâmetros como `idProcesso` e `siglaUnidade`, e o `perfilSelecionado` do usuário. Ele também considera metadados `breadcrumb` definidos na configuração da rota para exibir o rótulo da página atual.
+Este componente fornece elementos de navegação, incluindo um botão "Voltar" e breadcrumbs dinâmicos. O botão "Voltar" é exibido em todas as páginas, exceto '/login' e '/painel', e aciona a função `router.back()`. Os breadcrumbs também são ocultados nas páginas '/login' e '/painel'. Os breadcrumbs são gerados dinamicamente com base na rota atual, incluindo parâmetros como `codProcesso` e `siglaUnidade`, e o `perfilSelecionado` do usuário. Ele também considera metadados `breadcrumb` definidos na configuração da rota para exibir o rótulo da página atual.
 
 ---
 
@@ -48,7 +68,7 @@ Este componente é um diálogo modal projetado para editar a descrição de um i
 
 ## HistoricoAnaliseModal.vue
 
-Este componente é um diálogo modal que exibe um histórico de análises para um determinado subprocesso. Ele busca dados de análise do `useAnalisesStore` com base na propriedade `idSubprocesso`. Se nenhuma análise for encontrada, ele exibe uma mensagem indicando isso. Caso contrário, ele apresenta as análises em uma tabela listrada com colunas para "Data/Hora", "Unidade", "Resultado" e "Observação". As datas são formatadas usando `date-fns`. Ele emite um evento `fechar` quando o botão de fechar é clicado.
+Este componente é um diálogo modal que exibe um histórico de análises para um determinado subprocesso. Ele busca dados de análise do `useAnalisesStore` com base na propriedade `codSubrocesso`. Se nenhuma análise for encontrada, ele exibe uma mensagem indicando isso. Caso contrário, ele apresenta as análises em uma tabela listrada com colunas para "Data/Hora", "Unidade", "Resultado" e "Observação". As datas são formatadas usando `date-fns`. Ele emite um evento `fechar` quando o botão de fechar é clicado.
 
 ---
 
@@ -64,7 +84,7 @@ Este componente é um diálogo modal que facilita a importação de atividades d
 
 ---
 
-## Navbar.vue
+## MainNavbar.vue
 
 Este componente implementa a barra de navegação principal da aplicação. Ele inclui links para várias seções como "Painel", "Minha unidade", "Relatórios" e "Histórico". Ele também apresenta um mecanismo dinâmico de seleção de perfil, permitindo aos usuários alternar entre diferentes perfis (por exemplo, ADMIN, GESTOR, SERVIDOR) associados à sua conta e unidade logadas. O perfil e a unidade selecionados são exibidos, e clicar neles revela um menu suspenso para alterar o perfil ativo. Um link "Configurações do sistema" é visível apenas para usuários ADMIN, e um link "Sair" está sempre presente para logout. As ações de navegação são tratadas por `navigateFromNavbar`, que define um item de armazenamento de sessão antes de rotear.
 

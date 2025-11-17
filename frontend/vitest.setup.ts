@@ -1,22 +1,19 @@
-import {vi} from 'vitest';
+import { config } from '@vue/test-utils';
+import { vi } from 'vitest';
 
-// Mock global do sessionStorage
-const mockSessionStorage = (() => {
-    let store: { [key: string]: string } = {};
-    return {
-        getItem: vi.fn((key: string) => store[key] || null),
-        setItem: vi.fn((key: string, value: string) => {
-            store[key] = value.toString();
-        }),
-        removeItem: vi.fn((key: string) => {
-            delete store[key];
-        }),
-        clear: vi.fn(() => {
-            store = {};
-        }),
-    };
-})();
+vi.mock('bootstrap', () => ({
+  Tooltip: class Tooltip {
+    constructor() {}
+    dispose() {}
+  },
+}));
 
-Object.defineProperty(window, 'sessionStorage', {
-    value: mockSessionStorage,
-});
+config.global.stubs['b-modal'] = {
+  props: ['modelValue'],
+  template: `
+    <div v-if="modelValue">
+      <slot />
+      <slot name="footer" />
+    </div>
+  `,
+};

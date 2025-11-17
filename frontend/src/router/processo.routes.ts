@@ -1,4 +1,4 @@
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
+import type {RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const processoRoutes: RouteRecordRaw[] = [
   {
@@ -8,78 +8,78 @@ const processoRoutes: RouteRecordRaw[] = [
     meta: { title: 'Novo Processo' },
   },
   {
-    path: '/processo/:idProcesso',
+    path: '/processo/:codProcesso',
     name: 'Processo',
-    component: () => import('@/views/Processo.vue'),
+    component: () => import('@/views/ProcessoView.vue'),
     props: true,
     meta: { title: 'Unidades do Processo' },
   },
   {
-    path: '/processo/:idProcesso/:siglaUnidade',
+    path: '/processo/:codProcesso/:siglaUnidade',
     name: 'Subprocesso',
-    component: () => import('@/views/Subprocesso.vue'),
+    component: () => import('@/views/SubprocessoView.vue'),
     props: (route: RouteLocationNormalized) => ({
-      idProcesso: Number(route.params.idProcesso),
+      codProcesso: Number(route.params.codProcesso),
       siglaUnidade: route.params.siglaUnidade,
     }),
     meta: { title: 'Processos da Unidade' },
   },
   {
-    path: '/processo/:idProcesso/:siglaUnidade/mapa',
+    path: '/processo/:codProcesso/:siglaUnidade/mapa',
     name: 'SubprocessoMapa',
     component: () => import('@/views/CadMapa.vue'),
     props: (route: RouteLocationNormalized) => ({
       sigla: route.params.siglaUnidade,
-      idProcesso: Number(route.params.idProcesso),
+      codProcesso: Number(route.params.codProcesso),
     }),
     meta: { title: 'Mapa' },
   },
   {
-        path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
+        path: '/processo/:codProcesso/:siglaUnidade/vis-mapa',
         name: 'SubprocessoVisMapa',
         component: () => import('@/views/VisMapa.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Visualização de Mapa'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/cadastro',
+        path: '/processo/:codProcesso/:siglaUnidade/cadastro',
         name: 'SubprocessoCadastro',
         component: () => import('@/views/CadAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Cadastro'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
+        path: '/processo/:codProcesso/:siglaUnidade/vis-cadastro',
         name: 'SubprocessoVisCadastro',
         component: () => import('@/views/VisAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Visualização de Atividades'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/diagnostico-equipe',
+        path: '/processo/:codProcesso/:siglaUnidade/diagnostico-equipe',
         name: 'DiagnosticoEquipe',
         component: () => import('@/views/DiagnosticoEquipe.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
         meta: {title: 'Diagnóstico da Equipe'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/ocupacoes-criticas',
+        path: '/processo/:codProcesso/:siglaUnidade/ocupacoes-criticas',
         name: 'OcupacoesCriticas',
         component: () => import('@/views/OcupacoesCriticas.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
         meta: {title: 'Ocupações Críticas'},

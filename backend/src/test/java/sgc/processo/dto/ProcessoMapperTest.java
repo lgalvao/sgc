@@ -2,9 +2,10 @@ package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ class ProcessoMapperTest {
     private final ProcessoMapper mapper = Mappers.getMapper(ProcessoMapper.class);
 
     @Test
-    void testToDTO() {
+    void testToDto() {
         // Create a Processo entity
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -28,7 +29,7 @@ class ProcessoMapperTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         // Map to DTO
-        ProcessoDto dto = mapper.toDTO(processo);
+        ProcessoDto dto = mapper.toDto(processo);
 
         // Verify mapping
         assertEquals(1L, dto.getCodigo());

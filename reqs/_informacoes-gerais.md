@@ -1,7 +1,0 @@
-# Informações gerais
-
-O Sistema de Gestão de Competências (SGC) visa gerenciar sistematicamente as competências técnicas das unidades organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica onde a SEDOC (Seção de Desenvolvimento Organizacional e Capacitação) exerce o papel de unidade raiz para todos os processos de mapeamento, de revisão e de diagnóstico de competências.
-
-Os componentes essenciais do sistema incluem atividades, que são ações específicas desempenhadas por cada unidade no exercício de suas funções; conhecimentos, que representam o conjunto de conhecimentos técnicos necessários para executar cada atividade; competências, que são elementos sintetizantes agrupando atividades relacionadas e são definidos e mantidos apenas pela SEDOC; e mapas de competências, que constituem o conjunto consolidado de competências associadas a uma unidade, resultante do processo de mapeamento.
-
-O sistema suporta três tipos principais de processos: mapeamento, que representa o processo inicial de coleta sistemática das atividades e conhecimentos necessários para cada unidade operacional; revisão, que consiste na atualização periódica dos mapas de competências vigentes considerando mudanças organizacionais; e diagnóstico, que avalia a importância e domínio das competências pelos servidores, identificando lacunas (gaps) e necessidades de capacitação.

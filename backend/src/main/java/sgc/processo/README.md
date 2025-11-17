@@ -11,7 +11,7 @@ O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve com
 ```mermaid
 graph TD
     subgraph "Clientes do Módulo"
-        Controle(ProcessoControle)
+        Controle(ProcessoController)
     end
 
     subgraph "Módulo Processo"
@@ -49,13 +49,14 @@ graph TD
 - **`ProcessoNotificacaoService`**: Centraliza a lógica para enviar notificações específicas do processo.
 
 ### Outros Componentes
-- **`ProcessoControle`**: Expõe a API REST e delega todas as chamadas para o `ProcessoService`.
+
+- **`ProcessoController`**: Expõe a API REST e delega todas as chamadas para o `ProcessoService`.
 - **`eventos/`**: Define os eventos de domínio (`ProcessoIniciadoEvento`, etc.) que são publicados para desacoplar a comunicação com outros módulos.
-- **`modelo/`**: Contém as entidades JPA, como `Processo` e `UnidadeProcesso`.
-- **`ProcessoSeguranca`**: Centraliza as regras de verificação de permissões.
+- **`model/`**: Contém as entidades JPA, como `Processo` e `UnidadeProcesso`.
 
 ## Fluxo de Iniciação de um Processo
-1.  O `ProcessoControle` recebe a requisição para iniciar um processo.
+
+1. O `ProcessoController` recebe a requisição para iniciar um processo.
 2.  Ele chama o `ProcessoService.iniciarProcesso(...)`.
 3.  O `ProcessoService`, dentro de uma transação, executa toda a lógica de criação de subprocessos e mapas.
 4.  Ao final, ele publica um `ProcessoIniciadoEvento` usando o `ApplicationEventPublisher`.

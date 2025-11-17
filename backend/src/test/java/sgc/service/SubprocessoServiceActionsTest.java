@@ -11,27 +11,26 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.mapa.ImpactoMapaService;
+import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class SubprocessoServiceActionsTest {
     private static final String OBSERVACOES = "Observações de teste";
 
     @Autowired
-    private sgc.subprocesso.SubprocessoWorkflowService subprocessoWorkflowService;
+    private SubprocessoWorkflowService subprocessoWorkflowService;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;
@@ -68,16 +67,16 @@ public class SubprocessoServiceActionsTest {
     private AlertaRepo alertaRepo;
 
     @Autowired
-    private sgc.mapa.modelo.MapaRepo mapaRepo;
+    private sgc.mapa.model.MapaRepo mapaRepo;
 
     @Autowired
-    private sgc.subprocesso.modelo.MovimentacaoRepo movimentacaoRepo;
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private EntityManager entityManager;
 
     @MockitoBean
-    private NotificacaoService notificacaoService;
+    private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
     private ApplicationEventPublisher eventPublisher;
@@ -85,30 +84,19 @@ public class SubprocessoServiceActionsTest {
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
 
+    @MockitoBean
+    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
+
     private Unidade unidade;
-    private Unidade unidadeSuperior;
     private Usuario usuario;
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "US");
-        unidadeRepo.save(unidadeSuperior);
+        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
 
-        unidade = new Unidade("Unidade Teste", "UT");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidadeRepo.save(unidade);
-
-        Usuario chefe = new Usuario();
-        chefe.setTituloEleitoral(111122223333L);
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
-
-        usuario = new Usuario();
-        usuario.setTituloEleitoral(444455556666L);
-        usuario.setUnidade(unidade);
-        usuarioRepo.save(usuario);
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        usuario = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
     }
 
     private Processo criarProcesso(TipoProcesso tipo) {
@@ -140,7 +128,7 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
@@ -150,11 +138,7 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, movimentacoes.size());
             assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().getDescricao());
 
-            List<Alerta> alertas = alertaRepo.findAll();
-            assertEquals(1, alertas.size());
-            assertTrue(alertas.getFirst().getDescricao().contains("submetido para análise"));
-
-            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteCadastro(any(Subprocesso.class), any(Unidade.class));
         }
     }
 
@@ -167,10 +151,9 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            Unidade sedoc = new Unidade("SEDOC", "SEDOC");
-            unidadeRepo.save(sedoc);
+            Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
 
-            subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação."));
             assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
@@ -196,12 +179,12 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, movimentacoes.size());
             assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().getDescricao());
 
-            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteRevisaoCadastro(any(Subprocesso.class), any(Unidade.class));
         }
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -240,7 +223,7 @@ public class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test

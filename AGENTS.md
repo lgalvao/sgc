@@ -1,61 +1,73 @@
-# Orientações para Agentes
+# Guia para Agentes de Desenvolvimento
 
-Este documento fornece instruções e dicas para agentes de IA que trabalham neste repositório.
+Este documento estabelece diretrizes e boas práticas para agentes de desenvolvimento que trabalham no projeto SGC. O objetivo é garantir consistência, eficiência e alinhamento com as convenções do projeto.
 
-## Para executar o Backend
+## 1. Conhecimento do Projeto
 
-Para executar o backend em modo de desenvolvimento, use o seguinte comando a partir do diretório raiz:
+É fundamental que o agente se familiarize com a estrutura e as especificidades de cada módulo do projeto.
 
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local'
-```
+-   **Visão Geral:** Consulte o `README.md` na raiz do repositório para uma visão geral do projeto.
+-   **Backend:** Cada pacote principal do backend possui um `README.md` detalhando suas responsabilidades e tecnologias específicas.
+-   **Frontend:** Cada diretório principal do frontend também contém um `README.md` com informações sobre sua finalidade, tecnologias e como interagir com ele.
 
-Este comando utiliza o perfil `local` do Spring, que configura a aplicação para usar um banco de dados H2 em memória,
-não exigindo um PostgreSQL externo.
+## 2. Regras Gerais de Desenvolvimento
 
-Para manter o backend em execução sem bloquear o terminal, adicione `&` ao final do comando.
+### 2.1. Idioma
 
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local' &
-```
+-   Todo o sistema, incluindo nomes de variáveis, mensagens de erro, logs e documentação voltada ao usuário, deve estar em **Português Brasileiro**.
 
-## Executando o Frontend
+### 2.2. Convenções de Nomenclatura
 
-Para executar o frontend em modo de desenvolvimento, navegue até o diretório `frontend` e use o seguinte comando:
+-   **Exceções:** Nomes de classes de exceção devem seguir o padrão `ErroXxxx`, por exemplo, `ErroEntidadeNaoEncontrada`.
+-   **Repositórios JPA:** Nomes de interfaces de repositório JPA devem seguir o padrão `XxxxRepo`, por exemplo, `SubprocessoRepo`.
+- As classes de serviço usam o sufixo padrão 'Service'
+- As classes de controle usam o sufixo padrão 'Controller'
 
-```bash
-npm run dev
-```
+## 3. Backend (Java com Spring Boot)
 
-Perceba que isso irá 'travar' o console, adicione '&' ao final para rodar em segundo plano.
+- O Backend usa a versão mais recente do Spring Boot, além de Hibernate, Lombok e MapStruct.
+- Os testes são criados com JUnit e o mais possível das facilidades oferecidas pelo Spring Boot para testes.
 
-## Testes de Frontend
+## 4. Frontend (Vue.js com TypeScript)
 
-### Testes de Unidade
+-   **Arquitetura:** Siga o padrão `Views -> Stores -> Services` conforme detalhado no `frontend/README.md`.
+-   **Componentes:** Ao criar ou modificar componentes, adira aos "Princípios dos Componentes" descritos em `frontend/src/components/README.md` (reutilizáveis, controlados por props/eventos, sem lógica de negócio complexa).
+-   **Gerenciamento de Estado:** Utilize Pinia para gerenciamento de estado, organizando as stores de forma modular.
+-   **Comunicação com API:** Utilize a instância configurada do Axios (`axios-setup.ts`) para todas as chamadas de API.
 
-Para executar os testes de unidade do frontend, navegue até o diretório `frontend` e use o seguinte comando:
+## 5. Uso de Ferramentas
 
-```bash
-npm run test:unit
-```
+### 5.1. Gradle
 
-### Testes E2E
+-   Evite usar a flag `--no-daemon` ao executar comandos Gradle, a menos que seja estritamente necessário, para otimizar o tempo de build.
 
-Para executar os testes end-to-end (E2E) do frontend, primeiro garanta que o backend está em execução.
-Depois navegue até o diretório `frontend` e use o seguinte comando:
+### 5.2. Playwright (Testes E2E)
 
-```bash
-npm run test:e2e
-```
+Siga estas diretrizes para executar e manter testes e2e:
 
-## Informações Gerais do Backend
+-   **Execução Otimizada:**
+    -   **Inicialização Automática:** Ao executar `npx playwright test`, o frontend e o backend são iniciados automaticamente. O backend usa o perfil `e2e` com um banco de dados H2 em memória, e o frontend é iniciado via `npm run dev`.
+    -   Sempre execute o mínimo de testes possível para o contexto da sua alteração.
+    -   Para rodar apenas os testes que falharam na última execução:
+        ```bash
+        npx playwright test --last-failed
+        ```
+    -   Para rodar um subconjunto de testes (ex: os primeiros 5 CDUs):
+        ```bash
+        npx playwright test e2e/cdu/cdu-0[1-5].spec.ts
+        ```
+-   **Evitar Timeouts Explícitos:**
+    -   Não utilize `page.waitForTimeout()` ou outros timeouts explícitos. Timeouts geralmente indicam que os elementos não estão visíveis ou interativos como esperado, seja por um problema no teste (ex: seletor incorreto) ou um defeito no sistema. O Playwright possui mecanismos de auto-espera que devem ser suficientes.
+-   **Seletores Robustos:**
+    -   Prefira o uso de atributos `data-testid` para identificar elementos na interface do usuário. Isso torna os testes mais resilientes a mudanças na estrutura HTML ou CSS.
+-   **Reutilização de Código:**
+    -   Utilize as funções auxiliares (`helpers/acoes`, `helpers/dados`, `helpers/verificacoes`) para padronizar interações, dados e verificações, evitando duplicação e melhorando a legibilidade.
 
-O backend utiliza **Java 21**.
+### 5.3. Verificações de Qualidade de Código
 
-## Testes de Backend
+O projeto está configurado com um conjunto de scripts para garantir a qualidade e a integridade do código.
 
-Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest` que filtra os stack traces)  
-
-```bash
-./gradlew :backend:test
-```
+-   **`npm run validate`**: Executa todas as verificações de qualidade de código em um único comando.
+-   **`npm run typecheck`**: Verifica a consistência de tipos do TypeScript.
+-   **`npm run check:ts-unused`**: Identifica e relata exportações de TypeScript não utilizadas.
+-   **`npm run lint`**: Executa o ESLint para identificar e corrigir problemas de estilo e erros de código.

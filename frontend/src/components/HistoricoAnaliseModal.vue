@@ -1,79 +1,59 @@
 <template>
-  <div
-    v-if="mostrar"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
+  <b-modal
+    :model-value="mostrar"
+    title="Histórico de Análises"
+    size="lg"
+    centered
+    @hidden="emit('fechar')"
   >
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            Histórico de Análises
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="emit('fechar')"
-          />
-        </div>
-        <div
-          class="modal-body"
-          data-testid="modal-historico-body"
-        >
-          <div
-            v-if="analises.length === 0"
-            class="alert alert-info"
-          >
-            Nenhuma análise registrada para este subprocesso.
-          </div>
-          <div v-else>
-            <table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>Data/Hora</th>
-                  <th>Unidade</th>
-                  <th>Resultado</th>
-                  <th>Observação</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(analise, index) in analises"
-                  :key="index"
-                >
-                  <td>{{ formatarData(analise.dataHora) }}</td>
-                  <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
-                  <td>{{ analise.resultado }}</td>
-                  <td>{{ analise.observacoes || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-testid="btn-modal-fechar"
-            @click="emit('fechar')"
-          >
-            Fechar
-          </button>
-        </div>
+    <div data-testid="modal-historico-body">
+      <div
+        v-if="analises.length === 0"
+        class="alert alert-info"
+      >
+        Nenhuma análise registrada para este subprocesso.
+      </div>
+      <div v-else>
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Unidade</th>
+              <th>Resultado</th>
+              <th>Observação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(analise, index) in analises"
+              :key="index"
+            >
+              <td>{{ formatarData(analise.dataHora) }}</td>
+              <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
+              <td>{{ analise.resultado }}</td>
+              <td>{{ analise.observacoes || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
-  <div
-    v-if="mostrar"
-    class="modal-backdrop fade show"
-  />
+    <template #footer>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-testid="btn-modal-fechar"
+        @click="emit('fechar')"
+      >
+        Fechar
+      </button>
+    </template>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
 import {useAnalisesStore} from '@/stores/analises';
-import type {AnaliseValidacao, AnaliseCadastro} from '@/types/tipos';
+import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
 
@@ -81,7 +61,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   mostrar: boolean;
-  idSubprocesso: number | undefined;
+  codSubrocesso: number | undefined;
 }>();
 
 const emit = defineEmits(['fechar']);
@@ -92,8 +72,8 @@ const analises = ref<Analise[]>([]);
 watch(
   () => props.mostrar,
   newVal => {
-    if (newVal && props.idSubprocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
+    if (newVal && props.codSubrocesso) {
+      analises.value = analisesStore.getAnalisesPorSubprocesso(props.codSubrocesso);
     }
   },
   { immediate: true },

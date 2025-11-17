@@ -1,4 +1,4 @@
-import type { Processo, ProcessoDetalhe, ProcessoResumo, UnidadeParticipante } from '@/types/tipos';
+import type {Processo, ProcessoResumo, UnidadeParticipante} from '@/types/tipos';
 
 
 export function mapProcessoResumoDtoToFrontend(dto: any): ProcessoResumo {
@@ -21,7 +21,7 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: any): UnidadeParticipan
     };
 }
 
-export function mapProcessoDetalheDtoToFrontend(dto: any): ProcessoDetalhe {
+export function mapProcessoDetalheDtoToFrontend(dto: any): Processo {
     return {
         ...dto,
         unidades: dto.unidades ? dto.unidades.map(mapUnidadeParticipanteDtoToFrontend) : [],

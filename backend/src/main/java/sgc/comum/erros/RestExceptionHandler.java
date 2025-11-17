@@ -16,7 +16,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import sgc.processo.modelo.ErroProcesso;
+import sgc.alerta.erros.ErroAlerta;
+import sgc.painel.erros.ErroParametroPainelInvalido;
+import sgc.processo.erros.ErroProcesso;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
+import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 
 import java.util.stream.Collectors;
 
@@ -25,15 +33,21 @@ import java.util.stream.Collectors;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
-    private String sanitize(String untrustedText) {
-        if (untrustedText == null) {
-            return null;
-        }
-        return SANITIZER_POLICY.sanitize(untrustedText);
+    private String sanitizar(String texto) {
+        return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {
         return new ResponseEntity<>(erroApi, HttpStatus.valueOf(erroApi.getStatus()));
+    }
+
+    private ResponseEntity<Object> handleBusinessException(Exception ex, HttpStatus status, String logLevel) {
+        if ("error".equals(logLevel)) {
+            log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        } else {
+            log.warn("{}: {}", ex.getClass().getSimpleName(), ex.getMessage());
+        }
+        return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage())));
     }
 
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
@@ -51,7 +65,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         error.getObjectName(),
                         error.getField(),
                         error.getRejectedValue(),
-                        sanitize(error.getDefaultMessage())))
+                        sanitizar(error.getDefaultMessage())))
                 .collect(Collectors.toList()) : null;
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -59,8 +73,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroValidacao.class)
     protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage()));
+        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage()));
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+            log.warn("Detalhes da validação: {}", ex.getDetails());
             erroApi.setDetails(ex.getDetails());
         }
         return buildResponseEntity(erroApi);
@@ -75,21 +90,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 violation.getRootBeanClass().getSimpleName(),
                 violation.getPropertyPath().toString(),
                 violation.getInvalidValue(),
-                sanitize(violation.getMessage())))
+                sanitizar(violation.getMessage())))
             .collect(Collectors.toList());
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
-    @ExceptionHandler(ErroDominioNaoEncontrado.class)
-    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
-        log.warn("Entidade não encontrada: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitize(ex.getMessage())));
+    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
+    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroEntidadeNaoEncontrada ex) {
+        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn");
     }
 
-    @ExceptionHandler(ErroDominioAccessoNegado.class)
-    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
-        log.warn("Acesso negado: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitize(ex.getMessage())));
+    @ExceptionHandler(ErroUnidadeNaoEncontrada.class)
+    protected ResponseEntity<Object> handleErroUnidadeNaoEncontrada(ErroUnidadeNaoEncontrada ex) {
+        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn");
+    }
+
+    @ExceptionHandler(ErroAccessoNegado.class)
+    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroAccessoNegado ex) {
+        return handleBusinessException(ex, HttpStatus.FORBIDDEN, "warn");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -115,14 +133,38 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ErroProcesso.class)
     protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
-        log.error("Erro de negócio no processo: {}", ex.getMessage(), ex);
-        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitize(ex.getMessage())));
+        return handleBusinessException(ex, HttpStatus.CONFLICT, "error");
+    }
+
+    @ExceptionHandler(ErroRequisicaoSemCorpo.class)
+    protected ResponseEntity<Object> handleErroRequisicaoSemCorpo(ErroRequisicaoSemCorpo ex) {
+        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn");
+    }
+
+    @ExceptionHandler(ErroParametroPainelInvalido.class)
+    protected ResponseEntity<Object> handleErroParametroPainelInvalido(ErroParametroPainelInvalido ex) {
+        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn");
+    }
+
+    @ExceptionHandler({
+        ErroProcessoEmSituacaoInvalida.class,
+        ErroUnidadesNaoDefinidas.class,
+        ErroMapaEmSituacaoInvalida.class,
+        ErroAtividadesEmSituacaoInvalida.class,
+        ErroMapaNaoAssociado.class
+    })
+    protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
+        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_ENTITY, "warn");
+    }
+
+    @ExceptionHandler(ErroAlerta.class)
+    protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(ErroAlerta ex) {
+        return handleBusinessException(ex, HttpStatus.CONFLICT, "error");
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
-        log.error("Erro inesperado na aplicação: {}", ex.getMessage(), ex);
-        String message = "Ocorreu um erro inesperado. Contate o suporte.";
-        return buildResponseEntity(new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message));
+        log.error("Erro inesperado na aplicação", ex);
+        return buildResponseEntity(new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado"));
     }
 }

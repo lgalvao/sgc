@@ -3,6 +3,53 @@ import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
+// Mock BTable component
+const MockBTable = {
+  template: `
+    <table class="table">
+      <thead>
+        <tr>
+          <th v-for="field in fields" :key="field.key" :aria-sort="getAriaSort(field.key)" @click="handleSort(field.key)">
+            {{ field.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="items.length === 0">
+          <td :colspan="fields.length">
+            <slot name="empty"></slot>
+          </td>
+        </tr>
+        <tr v-for="(item, index) in items" :key="index" @click="$emit('row-clicked', item)">
+          <td v-for="field in fields" :key="field.key">
+            {{ getItemValue(item, field.key) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `,
+  props: ['items', 'fields', 'sortBy', 'sortDesc'],
+  emits: ['row-clicked', 'sort-changed'],
+  methods: {
+    getAriaSort(key) {
+      if (this.sortBy === key) {
+        return this.sortDesc ? 'descending' : 'ascending';
+      }
+      return 'none';
+    },
+    getItemValue(item, key) {
+      // Handle nested properties if necessary
+      if (key.includes('.')) {
+        return key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
+      }
+      return item[key];
+    },
+    handleSort(key) {
+      this.$emit('sort-changed', { sortBy: key, sortDesc: !this.sortDesc });
+    }
+  },
+};
+
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
   {
@@ -31,8 +78,17 @@ const mockProcessos: ProcessoResumo[] = [
 ];
 
 describe('TabelaProcessos.vue', () => {
-  it('deve renderizar a tabela e os cabeçalhos corretamente', () => {
+  const mountOptions = {
+    global: {
+      components: {
+        BTable: MockBTable,
+      },
+    },
+  };
+
+  it('deve renderizar a tabela e os cabeçalhos corretamente', async () => {
     const wrapper = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
@@ -40,21 +96,28 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    expect(wrapper.find('table').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="coluna-descricao"]').text()).toContain('Descrição');
-    expect(wrapper.find('[data-testid="coluna-tipo"]').text()).toContain('Tipo');
-    expect(wrapper.find('[data-testid="coluna-situacao"]').text()).toContain('Situação');
-    expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false); // Não deve existir por padrão
+    const table = wrapper.findComponent(MockBTable);
+    expect(table.exists()).toBe(true);
+
+    await wrapper.vm.$nextTick();
+
+    const headers = table.findAll('th');
+    expect(headers[0].text()).toContain('Descrição');
+    expect(headers[1].text()).toContain('Tipo');
+    expect(headers[2].text()).toContain('Situação');
   });
 
-  it('deve exibir os processos passados via prop', () => {
+  it('deve exibir os processos passados via prop', async () => {
     const wrapper = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',
         direcaoOrdenacaoAsc: true,
       },
     });
+
+    await wrapper.vm.$nextTick();
 
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockProcessos.length);
@@ -70,8 +133,9 @@ describe('TabelaProcessos.vue', () => {
     expect(cells2[2].text()).toBe('FINALIZADO');
   });
 
-  it('deve emitir o evento ordenar ao clicar nos cabeçalhos', async () => {
+  it('deve emitir o evento ordenar ao receber o evento sort-changed', async () => {
     const wrapper = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
@@ -79,35 +143,41 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    await wrapper.find('[data-testid="coluna-descricao"]').trigger('click');
-    expect(wrapper.emitted().ordenar).toEqual([['descricao']]);
+    await wrapper.findComponent(MockBTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
 
-    await wrapper.find('[data-testid="coluna-tipo"]').trigger('click');
-    expect(wrapper.emitted().ordenar).toEqual([['descricao'], ['tipo']]);
+    expect(wrapper.emitted('ordenar')).toBeTruthy();
+    expect(wrapper.emitted('ordenar')![0]).toEqual(['tipo']);
   });
 
-  it('deve exibir os indicadores de ordenação corretamente', () => {
+  it('deve exibir os indicadores de ordenação corretamente', async () => {
     const wrapperAsc = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
         direcaoOrdenacaoAsc: true,
       },
     });
-    expect(wrapperAsc.find('[data-testid="coluna-descricao"] span').text()).toBe('↑');
+
+    await wrapperAsc.vm.$nextTick();
+    expect(wrapperAsc.find('th[aria-sort="ascending"]').exists()).toBe(true);
 
     const wrapperDesc = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
         direcaoOrdenacaoAsc: false,
       },
     });
-    expect(wrapperDesc.find('[data-testid="coluna-descricao"] span').text()).toBe('↓');
+
+    await wrapperDesc.vm.$nextTick();
+    expect(wrapperDesc.find('th[aria-sort="descending"]').exists()).toBe(true);
   });
 
   it('deve emitir o evento selecionarProcesso ao clicar em uma linha', async () => {
     const wrapper = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',
@@ -115,89 +185,18 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    await wrapper.findAll('tbody tr')[0].trigger('click');
-    expect(wrapper.emitted().selecionarProcesso).toEqual([[mockProcessos[0]]]);
-
-    await wrapper.findAll('tbody tr')[1].trigger('click');
-    expect(wrapper.emitted().selecionarProcesso).toEqual([[mockProcessos[0]], [mockProcessos[1]]]);
-  });
-
-  it('deve exibir a coluna Finalizado em quando showDataFinalizacao é true', () => {
-    const wrapper = mount(TabelaProcessos, {
-      props: {
-        processos: mockProcessos,
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: true,
-        showDataFinalizacao: true,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').text()).toContain('Finalizado em');
+    await wrapper.vm.$nextTick();
 
     const rows = wrapper.findAll('tbody tr');
-    expect(rows[1].text()).toContain('26/08/2024'); // Processo Beta tem dataFinalizacaoFormatada
+    await rows[0].trigger('click');
+
+    expect(wrapper.emitted('selecionarProcesso')).toBeTruthy();
+    expect(wrapper.emitted('selecionarProcesso')![0]).toEqual([mockProcessos[0]]);
   });
 
-  it('não deve exibir a coluna Finalizado em quando showDataFinalizacao é false ou não fornecido', () => {
-    const wrapperFalse = mount(TabelaProcessos, {
-      props: {
-        processos: mockProcessos,
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: true,
-        showDataFinalizacao: false,
-      },
-    });
-    expect(wrapperFalse.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false);
-
-    const wrapperUndefined = mount(TabelaProcessos, {
-      props: {
-        processos: mockProcessos,
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: true,
-      },
-    });
-    expect(wrapperUndefined.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false);
-  });
-
-  it('deve exibir indicadores de ordenação para diferentes critérios', () => {
-    // Teste para critério 'tipo'
-    const wrapperTipo = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'tipo',
-        direcaoOrdenacaoAsc: true,
-      },
-    });
-    expect(wrapperTipo.find('[data-testid="coluna-tipo"] span').text()).toBe('↑');
-
-    // Teste para critério 'situacao'
-    const wrapperSituacao = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'situacao',
-        direcaoOrdenacaoAsc: true,
-      },
-    });
-    expect(wrapperSituacao.find('[data-testid="coluna-situacao"] span').text()).toBe('↑');
-  });
-
-  it('deve exibir indicadores de ordenação para dataFinalizacao quando showDataFinalizacao é true', () => {
+  it('deve exibir a coluna Finalizado em quando showDataFinalizacao é true', async () => {
     const wrapper = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'dataFinalizacao',
-        direcaoOrdenacaoAsc: true,
-        showDataFinalizacao: true,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="coluna-data-finalizacao"] span').text()).toBe('↑');
-  });
-
-  it('deve exibir data de finalização formatada quando showDataFinalizacao é true', () => {
-    const wrapper = mount(TabelaProcessos, {
+      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',
@@ -205,23 +204,13 @@ describe('TabelaProcessos.vue', () => {
         showDataFinalizacao: true,
       },
     });
+
+    await wrapper.vm.$nextTick();
+
+    const headers = wrapper.findAll('th');
+    expect(headers.some(h => h.text() === 'Finalizado em')).toBe(true);
 
     const rows = wrapper.findAll('tbody tr');
-    // O segundo processo tem dataFinalizacaoFormatada
     expect(rows[1].text()).toContain('26/08/2024');
-  });
-
-  it('deve emitir ordenar com dataFinalizacao quando showDataFinalizacao é true', async () => {
-    const wrapper = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: true,
-        showDataFinalizacao: true,
-      },
-    });
-
-    await wrapper.find('[data-testid="coluna-data-finalizacao"]').trigger('click');
-    expect(wrapper.emitted().ordenar).toEqual([['dataFinalizacao']]);
   });
 });

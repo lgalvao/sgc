@@ -8,18 +8,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.atividade.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.service.MapaService;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,20 +31,16 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MapaServiceTest {
     @Mock
-    private MapaRepo repositorioMapa;
+    private MapaRepo mapaRepo;
 
     @Mock
-    private CompetenciaRepo repositorioCompetencia;
-
-    @Mock
-    private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
+    private CompetenciaRepo competenciaRepo;
 
     @InjectMocks
-    private MapaService mapaServico;
+    private MapaService mapaService;
 
     private Mapa mapa;
     private Competencia competencia;
-    private CompetenciaAtividade competenciaAtividade;
 
     @BeforeEach
     void setUp() {
@@ -60,33 +57,32 @@ class MapaServiceTest {
         competencia.setDescricao("Competência 1");
         competencia.setMapa(mapa);
 
-        competenciaAtividade = new CompetenciaAtividade();
-        competenciaAtividade.setId(new CompetenciaAtividade.Id(1L, 1L));
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(1L);
+        competencia.setAtividades(Set.of(atividade));
     }
 
     @Test
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        // Não precisamos mais mockar repositorioSubprocesso.findByMapaCodigo(1L) aqui, pois MapaService não o usa mais.
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
+        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
 
-        MapaCompletoDto mapaCompleto = mapaServico.obterMapaCompleto(1L, 100L); // Passando idSubprocesso
+        MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
         assertThat(mapaCompleto).isNotNull();
-        assertThat(mapaCompleto.codigo()).isEqualTo(1L);
-        assertThat(mapaCompleto.subprocessoCodigo()).isEqualTo(100L); // Este valor agora vem do parâmetro
-        assertThat(mapaCompleto.observacoes()).isEqualTo("Observações do Mapa");
-        assertThat(mapaCompleto.competencias()).hasSize(1);
-        assertThat(mapaCompleto.competencias().getFirst().descricao()).isEqualTo("Competência 1");
+        assertThat(mapaCompleto.getCodigo()).isEqualTo(1L);
+        assertThat(mapaCompleto.getSubprocessoCodigo()).isEqualTo(100L);
+        assertThat(mapaCompleto.getObservacoes()).isEqualTo("Observações do Mapa");
+        assertThat(mapaCompleto.getCompetencias()).hasSize(1);
+        assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao()).isEqualTo("Competência 1");
     }
 
     @Test
     void obterMapaCompleto_deveLancarErro_quandoMapaNaoEncontrado() {
-        when(repositorioMapa.findById(anyLong())).thenReturn(Optional.empty());
+        when(mapaRepo.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L, 100L)) // Passando idSubprocesso
-                .isInstanceOf(ErroDominioNaoEncontrado.class)
+        assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessage("Mapa não encontrado: 1");
     }
 }

@@ -73,7 +73,7 @@
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :mostrar="mostrarModalImpacto"
       :sigla-unidade="siglaUnidade"
       @fechar="fecharModalImpacto"
@@ -81,7 +81,7 @@
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-      :id-subprocesso="idSubprocesso"
+      :cod-subrocesso="codSubrocesso"
       :mostrar="mostrarModalHistoricoAnalise"
       @fechar="fecharModalHistoricoAnalise"
     />
@@ -115,10 +115,9 @@
                 class="form-label"
                 for="observacaoValidacao"
               >Observação</label>
-              <textarea
+              <b-form-textarea
                 id="observacaoValidacao"
                 v-model="observacaoValidacao"
-                class="form-control"
                 data-testid="input-observacao-aceite"
                 rows="3"
               />
@@ -171,10 +170,9 @@
                 class="form-label"
                 for="observacaoDevolucao"
               >Observação</label>
-              <textarea
+              <b-form-textarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"
-                class="form-control"
                 data-testid="input-observacao-devolucao"
                 rows="3"
               />
@@ -230,12 +228,12 @@ import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
 import {useSubprocessosStore} from "@/stores/subprocessos";
 
 const props = defineProps<{
-  idProcesso: number | string,
+  codProcesso: number | string,
   sigla: string
 }>()
 
 const unidadeId = computed(() => props.sigla)
-const idProcesso = computed(() => Number(props.idProcesso))
+const codProcesso = computed(() => Number(props.codProcesso))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -288,20 +286,20 @@ const podeVerImpacto = computed(() => {
   return podeVer && situacaoCorreta;
 });
 
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
-  if (idSubprocesso.value === undefined) return []
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  if (codSubrocesso.value === undefined) return []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  if (codSubrocesso.value) {
+    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
   }
 });
 
@@ -314,7 +312,7 @@ function devolverCadastro() {
 }
 
 async function confirmarValidacao() {
-  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+  if (!codSubrocesso.value || !perfilSelecionado.value) return;
 
   const commonRequest = {
     observacoes: observacaoValidacao.value,
@@ -323,16 +321,16 @@ async function confirmarValidacao() {
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = { ...commonRequest };
     if (isRevisao.value) {
-        await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, req);
+        await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, req);
     } else {
-        await subprocessosStore.homologarCadastro(idSubprocesso.value, req);
+        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
     }
   } else {
       const req: AceitarCadastroRequest = { ...commonRequest };
       if (isRevisao.value) {
-          await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, req);
+          await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
       } else {
-          await subprocessosStore.aceitarCadastro(idSubprocesso.value, req);
+          await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
       }
   }
 
@@ -341,16 +339,16 @@ async function confirmarValidacao() {
 }
 
 async function confirmarDevolucao() {
-  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+  if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
     motivo: '', // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 
   if (isRevisao.value) {
-      await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, req);
+      await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
   } else {
-      await subprocessosStore.devolverCadastro(idSubprocesso.value, req);
+      await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
   }
 
   fecharModalDevolver();

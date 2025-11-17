@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {AtribuicaoTemporaria} from "@/types/tipos";
-import {AtribuicaoTemporariaService} from "@/services/atribuicaoTemporariaService";
+import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 
 export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', {
     state: () => ({
@@ -21,7 +21,7 @@ export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', 
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await AtribuicaoTemporariaService.buscarTodasAtribuicoes();
+                const response = await buscarTodasAtribuicoes();
                 this.atribuicoes = (response as any).data.map(a => ({
                     ...a,
                     dataInicio: new Date(a.dataInicio).toISOString(),
@@ -29,7 +29,7 @@ export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', 
                     dataTermino: new Date(a.dataTermino).toISOString(),
                     servidor: a.servidor,
                     unidade: a.unidade
-                })) as unknown as AtribuicaoTemporaria[];
+                })) as any as AtribuicaoTemporaria[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar atribuições: ' + err.message;
             } finally {

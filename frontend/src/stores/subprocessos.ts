@@ -1,19 +1,19 @@
 import {defineStore} from 'pinia'
-import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest, ProcessoDetalhe} from '@/types/tipos'
+import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest, SubprocessoDetalhe} from '@/types/tipos'
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {fetchSubprocessoDetalhe} from "@/services/subprocessoService";
 import {
-    aceitarRevisaoCadastro,
-    devolverRevisaoCadastro,
-    disponibilizarRevisaoCadastro,
-    fetchSubprocessoDetalhe,
-    homologarRevisaoCadastro,
-    disponibilizarCadastro,
-    devolverCadastro,
     aceitarCadastro,
-    homologarCadastro
-} from "@/services/subprocessoService";
+    aceitarRevisaoCadastro,
+    devolverCadastro,
+    devolverRevisaoCadastro,
+    disponibilizarCadastro,
+    disponibilizarRevisaoCadastro,
+    homologarCadastro,
+    homologarRevisaoCadastro
+} from "@/services/cadastroService";
 
 async function _executarAcao(
     acao: () => Promise<any>,
@@ -23,7 +23,7 @@ async function _executarAcao(
     const notificacoes = useNotificacoesStore();
     try {
         await acao();
-        notificacoes.sucesso(sucessoMsg, `${sucessoMsg} com sucesso.`);
+        notificacoes.sucesso(sucessoMsg, `${sucessoMsg}.`);
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
             await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
@@ -37,21 +37,25 @@ async function _executarAcao(
 
 export const useSubprocessosStore = defineStore('subprocessos', {
     state: () => ({
-        subprocessoDetalhe: null as ProcessoDetalhe | null,
+        subprocessoDetalhe: null as SubprocessoDetalhe | null,
     }),
     actions: {
+        async alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
+            const processosStore = useProcessosStore();
+            await processosStore.alterarDataLimiteSubprocesso(id, dados);
+        },
         async fetchSubprocessoDetalhe(id: number) {
             const notificacoes = useNotificacoesStore();
             const perfilStore = usePerfilStore(); // Adicionar esta linha
             try {
-                // Obter perfil e unidadeCodigo do perfilStore
+                // Obter perfil e codUnidade do perfilStore
                 const perfil = perfilStore.perfilSelecionado;
-                const unidadeSelecionadaSigla = perfilStore.unidadeSelecionada;
+                const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
                 let unidadeCodigo: number | null = null;
 
-                if (perfil && unidadeSelecionadaSigla) {
+                if (perfil && unidadeSelecionadaCodigo) {
                     const perfilUnidade = perfilStore.perfisUnidades.find(pu =>
-                        pu.perfil === perfil && pu.unidade.sigla === unidadeSelecionadaSigla
+                        pu.perfil === perfil && pu.unidade.codigo === unidadeSelecionadaCodigo
                     );
                     if (perfilUnidade) {
                         unidadeCodigo = perfilUnidade.unidade.codigo;
@@ -68,74 +72,68 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             }
         },
 
-        async disponibilizarCadastro(idSubprocesso: number) {
+        async disponibilizarCadastro(codSubrocesso: number) {
             return _executarAcao(
-                () => disponibilizarCadastro(idSubprocesso),
+                () => disponibilizarCadastro(codSubrocesso),
                 'Cadastro disponibilizado',
                 'Erro ao disponibilizar'
             );
         },
 
-        async disponibilizarRevisaoCadastro(idSubprocesso: number) {
+        async disponibilizarRevisaoCadastro(codSubrocesso: number) {
             return _executarAcao(
-                () => disponibilizarRevisaoCadastro(idSubprocesso),
+                () => disponibilizarRevisaoCadastro(codSubrocesso),
                 'Revisão disponibilizada',
                 'Erro ao disponibilizar'
             );
         },
 
-        async devolverCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+        async devolverCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
             return _executarAcao(
-                () => devolverCadastro(idSubprocesso, req),
+                () => devolverCadastro(codSubrocesso, req),
                 'Cadastro devolvido',
                 'Erro ao devolver'
             );
         },
 
-        async aceitarCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+        async aceitarCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
             return _executarAcao(
-                () => aceitarCadastro(idSubprocesso, req),
+                () => aceitarCadastro(codSubrocesso, req),
                 'Cadastro aceito',
                 'Erro ao aceitar'
             );
         },
 
-        async homologarCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+        async homologarCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
             return _executarAcao(
-                () => homologarCadastro(idSubprocesso, req),
+                () => homologarCadastro(codSubrocesso, req),
                 'Cadastro homologado',
                 'Erro ao homologar'
             );
         },
 
-        async devolverRevisaoCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+        async devolverRevisaoCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
             return _executarAcao(
-                () => devolverRevisaoCadastro(idSubprocesso, req),
+                () => devolverRevisaoCadastro(codSubrocesso, req),
                 'Revisão devolvida',
                 'Erro ao devolver'
             );
         },
 
-        async aceitarRevisaoCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+        async aceitarRevisaoCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
             return _executarAcao(
-                () => aceitarRevisaoCadastro(idSubprocesso, req),
+                () => aceitarRevisaoCadastro(codSubrocesso, req),
                 'Revisão aceita',
                 'Erro ao aceitar'
             );
         },
 
-        async homologarRevisaoCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+        async homologarRevisaoCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
             return _executarAcao(
-                () => homologarRevisaoCadastro(idSubprocesso, req),
+                () => homologarRevisaoCadastro(codSubrocesso, req),
                 'Revisão homologada',
                 'Erro ao homologar'
             );
-        },
-
-        reset() {
-            this.subprocessoDetalhe = null;
-        },
-
-
+        }
     }
 });

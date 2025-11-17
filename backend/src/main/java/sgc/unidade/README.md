@@ -1,9 +1,10 @@
-# Pacote Unidade (Modelo de Dados)
+# Pacote Unidade
 
 ## Visão Geral
-Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que representa uma unidade organizacional (secretaria, seção, etc.), e seu repositório.
 
-**Nota Arquitetural Importante:** Este pacote é estritamente um **módulo de modelo de dados**. Ele **não contém lógica de negócio, serviços ou controllers**. Sua única responsabilidade é definir a estrutura da entidade `Unidade` e como ela é persistida.
+Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que
+representa uma unidade organizacional (secretaria, seção, etc.), seu repositório e uma camada de serviço para operações
+básicas.
 
 ## Arquitetura e Propósito
 A entidade `Unidade` serve como a "fonte da verdade" para a hierarquia organizacional dentro do SGC. Outros módulos consomem os dados deste pacote para executar seus fluxos de trabalho.
@@ -13,6 +14,8 @@ graph TD
     subgraph "Pacote Unidade (este pacote)"
         Modelo(Unidade)
         Repo[UnidadeRepo]
+        Controller[UnidadeController]
+        Service[UnidadeService]
     end
 
     subgraph "Módulos Consumidores"
@@ -29,12 +32,16 @@ graph TD
 
     SgrhService -- Alimenta/Atualiza dados em --> Repo
 
+    Controller -- Usa --> Service
+    Service -- Gerencia --> Repo
     Repo -- Gerencia --> Modelo
 ```
 
 ## Componentes Principais
 - **`Unidade`**: A entidade JPA principal que representa uma unidade organizacional.
 - **`UnidadeRepo`**: O repositório Spring Data JPA para acessar a entidade `Unidade`.
+- **`UnidadeService`**: Camada de serviço para operações básicas relacionadas a unidades.
+- **`UnidadeController`**: Expõe endpoints REST para consulta de unidades.
 - **`AtribuicaoTemporaria` / `VinculacaoUnidade`**: Entidades relacionadas que modelam outras características da estrutura organizacional.
 - **`TipoUnidade`**: Enum que classifica a unidade (ex: `OPERACIONAL`, `INTERMEDIARIA`), usado para direcionar a lógica em outros módulos.
 - **`SituacaoUnidade`**: Enum que define a situação de uma unidade (ex: `ATIVA`, `EXTINTA`).

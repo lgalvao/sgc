@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.subprocesso.modelo.Movimentacao;
+import sgc.subprocesso.model.Movimentacao;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Movimentacao e seu DTO.

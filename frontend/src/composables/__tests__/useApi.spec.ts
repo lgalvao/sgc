@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { useApi } from '../useApi';
-import { nextTick } from 'vue';
+import {describe, expect, it, vi} from 'vitest';
+import {useApi} from '../useApi';
 
 describe('useApi', () => {
   it('should set isLoading to true while the api call is in progress', async () => {
@@ -31,7 +30,7 @@ describe('useApi', () => {
 
     try {
       await execute();
-    } catch (e) {
+    } catch {
       // a
     }
 
@@ -44,7 +43,7 @@ describe('useApi', () => {
 
     try {
       await execute();
-    } catch (e) {
+    } catch {
       // a
     }
 

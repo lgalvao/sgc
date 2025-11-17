@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, Mocked, vi} from 'vitest';
 import {initPinia} from '@/test-utils/helpers';
 import {useAlertasStore} from '../alertas';
+import {Alerta} from '@/types/tipos';
 
 // Mock dos serviços
 vi.mock('@/services/painelService');
@@ -19,6 +20,21 @@ describe('useAlertasStore', () => {
     let alertasStore: ReturnType<typeof useAlertasStore>;
     let painelService: Mocked<typeof import('@/services/painelService')>;
     let alertaService: Mocked<typeof import('@/services/alertaService')>;
+
+    const mockAlerta: Alerta = {
+        codigo: 1,
+        codProcesso: 1,
+        unidadeOrigem: 'Origem',
+        unidadeDestino: 'Destino',
+        descricao: 'Alerta Teste',
+        dataHora: '2025-01-01T10:00:00',
+        dataHoraLeitura: null,
+        linkDestino: '/destino',
+        mensagem: 'Mensagem Teste',
+        dataHoraFormatada: '01/01/2025 10:00',
+        origem: 'Origem',
+        processo: 'Processo Teste',
+    };
 
     beforeEach(async () => {
         initPinia();
@@ -43,15 +59,7 @@ describe('useAlertasStore', () => {
     describe('actions', () => {
         it('fetchAlertas should call painelService and update state', async () => {
             const mockPage = {
-                content: [{
-                    codigo: 1,
-                    descricao: 'Alerta Teste',
-                    dataHora: '2025-01-01T10:00:00',
-                    processoCodigo: 1,
-                    unidadeOrigemCodigo: 1,
-                    unidadeDestinoCodigo: 2,
-                    usuarioDestinoTitulo: '123'
-                }],
+                content: [mockAlerta],
                 totalPages: 1,
                 totalElements: 1,
                 number: 0,
@@ -64,7 +72,7 @@ describe('useAlertasStore', () => {
 
             await alertasStore.fetchAlertas('123', 456, 0, 10);
 
-            expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 10);
+            expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 10, undefined, undefined);
             expect(alertasStore.alertas).toEqual(mockPage.content);
             expect(alertasStore.alertasPage).toEqual(mockPage);
         });
@@ -72,17 +80,8 @@ describe('useAlertasStore', () => {
         describe('marcarAlertaComoLido', () => {
             it('should call alertaService and reload alerts on success', async () => {
                 alertaService.marcarComoLido.mockResolvedValue();
-                // Mock para o fetchAlerts que é chamado internamente
                 const mockReloadPage = {
-                    content: [{
-                        codigo: 2,
-                        descricao: 'Alerta Recarregado',
-                        dataHora: '2025-01-01T10:00:00',
-                        processoCodigo: 1,
-                        unidadeOrigemCodigo: 1,
-                        unidadeDestinoCodigo: 2,
-                        usuarioDestinoTitulo: '123'
-                    }],
+                    content: [{...mockAlerta, codigo: 2, descricao: 'Alerta Recarregado'}],
                     totalPages: 1,
                     totalElements: 1,
                     number: 0,
@@ -97,7 +96,7 @@ describe('useAlertasStore', () => {
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 20);
+                expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 20, undefined, undefined);
                 expect(alertasStore.alertas).toEqual(mockReloadPage.content);
             });
 
@@ -111,7 +110,6 @@ describe('useAlertasStore', () => {
             });
 
             it('should handle missing perfilStore data', async () => {
-                // Configurar o mock para retornar null
                 mockPerfilStoreValues.servidorId = null;
                 mockPerfilStoreValues.unidadeSelecionada = null;
 
@@ -121,7 +119,6 @@ describe('useAlertasStore', () => {
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                // Não deve tentar recarregar os alertas se os dados do perfil não estiverem disponíveis
                 expect(painelService.listarAlertas).not.toHaveBeenCalled();
             });
         });

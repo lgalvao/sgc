@@ -1,59 +1,47 @@
 <template>
-  <table
-    class="table"
+  <b-table
+    :items="alertas"
+    :fields="fields"
+    hover
+    striped
+    responsive
     data-testid="tabela-alertas"
+    @row-clicked="emit('selecionar-alerta', $event)"
+    @sort-changed="handleSortChange"
   >
-    <thead>
-      <tr>
-        <th
-          style="cursor: pointer;"
-          @click="emit('ordenar', 'data')"
-        >
-          Data/Hora
-        </th>
-        <th>Descrição</th>
-        <th
-          style="cursor: pointer;"
-          @click="emit('ordenar', 'processo')"
-        >
-          Processo
-        </th>
-        <th>Origem</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(alerta, index) in alertas"
-        :key="index"
-        style="cursor: pointer;"
-        @click="emit('marcarComoLido', alerta.codigo)"
-      >
-        <td>{{ alerta.dataFormatada }}</td>
-        <td>{{ alerta.descricao }}</td>
-        <td>{{ alerta.processoCodigo }}</td>
-        <td>{{ alerta.unidadeOrigemCodigo }}</td>
-      </tr>
-      <tr v-if="!alertas || alertas.length === 0">
-        <td
-          class="text-center text-muted"
-          colspan="4"
-        >
-          Nenhum alerta no momento.
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <template #empty>
+      <div class="text-center text-muted">
+        Nenhum alerta no momento.
+      </div>
+    </template>
+  </b-table>
 </template>
 
 <script lang="ts" setup>
-import type { AlertaFormatado } from '@/types/tipos';
+import type {Alerta} from '@/types/tipos';
+import { ref } from 'vue';
 
-defineProps<{
-  alertas: AlertaFormatado[]
+const props = defineProps<{
+  alertas: Alerta[]
 }>();
 
 const emit = defineEmits<{
   (e: 'ordenar', criterio: 'data' | 'processo'): void
-  (e: 'marcarComoLido', id: number): void
+  (e: 'selecionar-alerta', alerta: Alerta): void
 }>();
+
+const fields = [
+  { key: 'dataHoraFormatada', label: 'Data/Hora', sortable: true },
+  { key: 'mensagem', label: 'Descrição' },
+  { key: 'processo', label: 'Processo', sortable: true },
+  { key: 'origem', label: 'Origem' }
+];
+
+const handleSortChange = (ctx: any) => {
+  if (ctx.sortBy === 'dataHoraFormatada') {
+    emit('ordenar', 'data');
+  } else if (ctx.sortBy === 'processo') {
+    emit('ordenar', 'processo');
+  }
+};
 </script>

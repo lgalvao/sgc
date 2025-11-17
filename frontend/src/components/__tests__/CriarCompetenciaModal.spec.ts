@@ -1,0 +1,132 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { mount } from '@vue/test-utils';
+import CriarCompetenciaModal from '../CriarCompetenciaModal.vue';
+import { setActivePinia, createPinia } from 'pinia';
+import { BFormTextarea, BFormCheckbox } from 'bootstrap-vue-next';
+
+const BModalStub = {
+  template: `
+    <div v-if="modelValue">
+      <h5 class="modal-title">{{ title }}</h5>
+      <slot />
+      <slot name="footer" />
+    </div>
+  `,
+  props: ['modelValue', 'title'],
+};
+
+describe('CriarCompetenciaModal', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  const atividades = [
+    { codigo: 1, descricao: 'Atividade 1', conhecimentos: [] },
+    { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }] },
+  ];
+
+  const globalConfig = {
+    global: {
+      components: {
+        BFormTextarea,
+        BFormCheckbox,
+      },
+      stubs: {
+        'b-modal': BModalStub,
+      },
+    },
+  };
+
+  it('não deve renderizar o modal quando mostrar for falso', () => {
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: false,
+        atividades: [],
+      },
+      ...globalConfig,
+    });
+    expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
+  });
+
+  it('deve renderizar o modal no modo de criação', () => {
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: true,
+        atividades,
+      },
+      ...globalConfig,
+    });
+
+    expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('');
+    expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeDefined();
+  });
+
+  it('deve renderizar o modal no modo de edição', async () => {
+    const competenciaParaEditar = {
+      codigo: 1,
+      descricao: 'Competência existente',
+      atividadesAssociadas: [1],
+    };
+
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: true,
+        atividades,
+        competenciaParaEditar,
+      },
+      ...globalConfig,
+    });
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('Competência existente');
+  });
+
+  it('deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas', async () => {
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: true,
+        atividades,
+      },
+      ...globalConfig,
+    });
+
+    await wrapper.find('textarea').setValue('Nova competência');
+    await wrapper.find('input[type="checkbox"]').setValue(true);
+
+    expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeUndefined();
+  });
+
+  it('deve emitir o evento fechar ao clicar no botão de cancelar', async () => {
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: true,
+        atividades,
+      },
+      ...globalConfig,
+    });
+
+    await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
+    expect(wrapper.emitted('fechar')).toBeTruthy();
+  });
+
+  it('deve emitir o evento salvar com os dados corretos', async () => {
+    const wrapper = mount(CriarCompetenciaModal, {
+      props: {
+        mostrar: true,
+        atividades,
+      },
+      ...globalConfig,
+    });
+
+    const descricao = 'Competência de teste';
+    await wrapper.find('textarea').setValue(descricao);
+    await wrapper.find('input[type="checkbox"]').setValue(true);
+    await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
+
+    expect(wrapper.emitted('salvar')).toBeTruthy();
+    const payload = wrapper.emitted('salvar')![0][0] as any;
+    expect(payload.descricao).toBe(descricao);
+    expect(payload.atividadesSelecionadas).toEqual([atividades[0].codigo]);
+  });
+});

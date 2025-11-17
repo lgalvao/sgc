@@ -10,32 +10,33 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
-import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.processo.dto.IniciarProcessoReq;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,11 +46,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockAdmin
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
-    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{id}/iniciar?tipo=REVISAO";
+    private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
 
     @Autowired
     private MockMvc mockMvc;
@@ -62,9 +63,6 @@ public class CDU05IntegrationTest {
 
     @Autowired
     private MapaRepo mapaRepo;
-
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;
@@ -86,8 +84,7 @@ public class CDU05IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade("Test Unit", "TU");
-        unidadeRepo.save(unidade);
+        unidade = unidadeRepo.findById(13L).orElseThrow(); // SEPRO
 
         // Cria um mapa detalhado para ser copiado
         mapaOriginal = new Mapa();
@@ -103,13 +100,12 @@ public class CDU05IntegrationTest {
         conhecimentoRepo.save(conhecimentoOriginal);
 
         // Define o mapa como vigente para a unidade
-        UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo());
-        unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
-        unidadeMapaRepo.save(unidadeMapa);
+        unidade.setMapaVigente(mapaOriginal);
+        unidadeRepo.save(unidade);
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO.name(), dataLimiteEtapa1, unidades);
+        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
     }
 
     @Test
@@ -130,43 +126,43 @@ public class CDU05IntegrationTest {
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
 
         // 2. Iniciar o processo de revisão
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 3. Buscar o subprocesso criado e verificar a cópia do mapa
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
-        Subprocesso subprocessoCriado = subprocessos.get(0);
+        Subprocesso subprocessoCriado = subprocessos.getFirst();
         Mapa mapaCopiado = subprocessoCriado.getMapa();
 
-        // 3.1. Verificar se o mapa copiado é uma nova instância (ID diferente)
+        // 3.1. Verificar se o mapa copiado é uma nova instância (código diferente)
         assertThat(mapaCopiado.getCodigo()).isNotNull();
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
         // 3.2. Verificar se o conteúdo foi copiado
         List<Competencia> competenciasCopiadas = competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(competenciasCopiadas).hasSize(1);
-        assertThat(competenciasCopiadas.get(0).getDescricao()).isEqualTo(competenciaOriginal.getDescricao());
+        assertThat(competenciasCopiadas.getFirst().getDescricao()).isEqualTo(competenciaOriginal.getDescricao());
 
         List<Atividade> atividadesCopiadas = atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(atividadesCopiadas).hasSize(1);
-        assertThat(atividadesCopiadas.get(0).getDescricao()).isEqualTo(atividadeOriginal.getDescricao());
+        assertThat(atividadesCopiadas.getFirst().getDescricao()).isEqualTo(atividadeOriginal.getDescricao());
 
-        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.get(0).getCodigo());
+        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.getFirst().getCodigo());
         assertThat(conhecimentosCopiados).hasSize(1);
-        assertThat(conhecimentosCopiados.get(0).getDescricao()).isEqualTo(conhecimentoOriginal.getDescricao());
+        assertThat(conhecimentosCopiados.getFirst().getDescricao()).isEqualTo(conhecimentoOriginal.getDescricao());
     }
 
 
     @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
-        // 1. Criar uma unidade e um processo sem associar um mapa vigente
-        Unidade unidadeSemMapa = new Unidade("Unidade Sem Mapa", "USM");
-        unidadeRepo.save(unidadeSemMapa);
+        // 1. Use existing unit without mapa vigente
+        Unidade unidadeSemMapa = unidadeRepo.findById(14L).orElseThrow(); // COJUR
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());
@@ -183,17 +179,21 @@ public class CDU05IntegrationTest {
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
 
         // 2. Tentar iniciar o processo de revisão (deve falhar)
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isConflict()); // Espera-se um erro de negócio
     }
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())) // ID que não existe
+        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L).with(csrf()) // código que não existe
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isNotFound());
     }
 
@@ -215,17 +215,18 @@ public class CDU05IntegrationTest {
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
 
         // Inicia o processo a primeira vez
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
-                .andExpect(status().isConflict()); // Espera-se um erro de negócio
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

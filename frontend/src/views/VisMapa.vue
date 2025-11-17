@@ -24,7 +24,6 @@
           Validar
         </button>
 
-        <!-- Botão Histórico de análise para CHEFE (CDU-19) -->
         <button
           v-if="podeValidar && temHistoricoAnalise"
           class="btn btn-outline-secondary"
@@ -35,7 +34,6 @@
           Histórico de análise
         </button>
 
-        <!-- Botões para GESTOR/ADMIN (CDU-20 - Analisar validação) -->
         <button
           v-if="podeAnalisar"
           v-show="podeVerSugestoes"
@@ -87,11 +85,11 @@
       </div>
 
       <div class="mb-4 mt-3">
-        <div v-if="competencias.length === 0">
+        <div v-if="!mapa || mapa.competencias.length === 0">
           Nenhuma competência cadastrada.
         </div>
         <div
-          v-for="comp in competencias"
+          v-for="comp in mapa?.competencias"
           :key="comp.codigo"
           class="card mb-3 competencia-card"
           data-testid="competencia-block"
@@ -107,21 +105,20 @@
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
               <div
-                v-for="atvId in comp.atividadesAssociadas"
-                :key="atvId"
+                v-for="atv in comp.atividades"
+                :key="atv.codigo"
               >
                 <div
-                  v-if="getAtividadeCompleta(atvId)"
                   class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
                   data-testid="atividade-item"
                 >
                   <div class="card-body d-flex align-items-center py-1 px-2">
-                    <span class="atividade-associada-descricao me-2">{{ getAtividadeCompleta(atvId)?.descricao }}</span>
+                    <span class="atividade-associada-descricao me-2">{{ atv.descricao }}</span>
                   </div>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
-                      v-for="conhecimento in getConhecimentosAtividade(atvId)"
-                      :key="conhecimento.id"
+                      v-for="conhecimento in atv.conhecimentos"
+                      :key="conhecimento.descricao"
                       class="me-3 mb-1"
                       data-testid="conhecimento-item"
                     >
@@ -146,7 +143,6 @@
       @confirmar-aceitacao="confirmarAceitacao"
     />
 
-    <!-- Modal para apresentar sugestões (CDU-19) -->
     <div
       class="modal fade"
       :class="{ 'show': mostrarModalSugestoes }"
@@ -176,10 +172,9 @@
                 for="sugestoesTextarea"
                 class="form-label"
               >Sugestões para o mapa de competências:</label>
-              <textarea
+              <b-form-textarea
                 id="sugestoesTextarea"
                 v-model="sugestoes"
-                class="form-control"
                 rows="5"
                 placeholder="Digite suas sugestões para o mapa de competências..."
                 data-testid="sugestoes-textarea"
@@ -208,7 +203,6 @@
       </div>
     </div>
 
-    <!-- Modal para ver sugestões (CDU-20) -->
     <div
       class="modal fade"
       :class="{ 'show': mostrarModalVerSugestoes }"
@@ -238,9 +232,8 @@
           >
             <div class="mb-3">
               <label class="form-label">Sugestões registradas para o mapa de competências:</label>
-              <textarea
+              <b-form-textarea
                 v-model="sugestoesVisualizacao"
-                class="form-control"
                 rows="5"
                 readonly
                 data-testid="sugestoes-visualizacao-textarea"
@@ -261,7 +254,6 @@
       </div>
     </div>
 
-    <!-- Modal para validar mapa (CDU-19) -->
     <div
       class="modal fade"
       :class="{ 'show': mostrarModalValidar }"
@@ -313,7 +305,6 @@
       </div>
     </div>
 
-    <!-- Modal para devolver para ajustes (CDU-20) -->
     <div
       class="modal fade"
       :class="{ 'show': mostrarModalDevolucao }"
@@ -347,10 +338,9 @@
                 for="observacaoDevolucao"
                 class="form-label"
               >Observação:</label>
-              <textarea
+              <b-form-textarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"
-                class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a devolução..."
                 data-testid="observacao-devolucao-textarea"
@@ -379,7 +369,6 @@
       </div>
     </div>
 
-    <!-- Modal para histórico de análise (CDU-20) -->
     <div
       class="modal fade"
       :class="{ 'show': mostrarModalHistorico }"
@@ -455,29 +444,29 @@ import {useRoute, useRouter} from 'vue-router'
 
 import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
 import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {Atividade, Competencia, Conhecimento, SituacaoSubprocesso, Unidade} from '@/types/tipos';
+import {SituacaoSubprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
+import {storeToRefs} from "pinia";
 
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.siglaUnidade as string)
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
-const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
 const analisesStore = useAnalisesStore()
 const subprocessosStore = useSubprocessosStore()
 const {perfilSelecionado} = usePerfil()
 
-// Estados reativos para o modal
+const {mapaVisualizacao: mapa} = storeToRefs(mapaStore)
+
 const mostrarModalAceitar = ref(false)
 const mostrarModalSugestoes = ref(false)
 const mostrarModalVerSugestoes = ref(false)
@@ -503,39 +492,20 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
-
-onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-});
-
-const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
-    return []
-  }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
-})
-
-onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
-  await mapaStore.fetchMapaCompleto(idProcesso.value);
-});
-
-const mapa = computed(() => {
-  if (unidade.value?.codigo) {
-    return mapaStore.mapaCompleto;
-  }
-  return null;
-})
-const competencias = computed<Competencia[]>(() => mapa.value ? mapa.value.competencias : [])
-
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
   return processosStore.processoDetalhe.unidades.find(u => u.sigla === sigla.value);
 })
 
-// Computed para determinar quais botões mostrar baseado no perfil e situação
+const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  if (codSubprocesso.value) {
+    await mapaStore.fetchMapaVisualizacao(codSubprocesso.value);
+  }
+});
+
 const podeValidar = computed(() => {
   return perfilSelecionado.value === 'CHEFE' &&
       subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
@@ -555,9 +525,9 @@ const temHistoricoAnalise = computed(() => {
 })
 
 const historicoAnalise = computed(() => {
-  if (!idSubprocesso.value) return []
+  if (!codSubprocesso.value) return []
 
-  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
+  return analisesStore.getAnalisesPorSubprocesso(codSubprocesso.value).map(analise => ({
     codigo: analise.codigo,
     data: new Date(analise.dataHora).toLocaleString('pt-BR'),
     unidade: (analise as any).unidadeSigla || (analise as any).unidade,
@@ -565,15 +535,6 @@ const historicoAnalise = computed(() => {
     observacoes: analise.observacoes || ''
   }))
 })
-
-function getAtividadeCompleta(id: number): Atividade | undefined {
-  return atividades.value.find(a => a.codigo === id);
-}
-
-function getConhecimentosAtividade(id: number): Conhecimento[] {
-  const atividade = getAtividadeCompleta(id)
-  return atividade ? atividade.conhecimentos : []
-}
 
 function abrirModalAceitar() {
   mostrarModalAceitar.value = true
@@ -584,10 +545,9 @@ function fecharModalAceitar() {
 }
 
 function abrirModalSugestoes() {
-  // Pré-preencher com sugestões existentes se houver
-  if ((mapa.value as any)?.sugestoes) {
-    sugestoes.value = (mapa.value as any).sugestoes
-  }
+  // if (mapa.value?.sugestoes) {
+  //   sugestoes.value = mapa.value.sugestoes
+  // }
   mostrarModalSugestoes.value = true
 }
 
@@ -627,22 +587,19 @@ function fecharModalHistorico() {
 }
 
 function verSugestoes() {
-  // Buscar sugestões do subprocesso
-  const sugestoes = (mapa.value as any)?.sugestoes || "Nenhuma sugestão registrada.";
-
-  // Mostrar modal de visualização com sugestões
+  // TODO: Fix sugestoes access - property doesn't exist on MapaVisualizacao
+  // sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
   mostrarModalVerSugestoes.value = true;
-  sugestoesVisualizacao.value = sugestoes;
 }
 
 function verHistorico() {
-  // Abrir modal de histórico
   abrirModalHistorico();
 }
 
 async function confirmarSugestoes() {
+  if (!codSubprocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes()
+    await processosStore.apresentarSugestoes(codSubprocesso.value, { sugestoes: sugestoes.value });
 
     fecharModalSugestoes()
 
@@ -653,7 +610,7 @@ async function confirmarSugestoes() {
 
     await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -665,8 +622,9 @@ async function confirmarSugestoes() {
 }
 
 async function confirmarValidacao() {
+  if (!codSubprocesso.value) return;
   try {
-    await processosStore.validarMapa()
+    await processosStore.validarMapa(codSubprocesso.value);
 
     fecharModalValidar()
 
@@ -677,7 +635,7 @@ async function confirmarValidacao() {
 
     await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -689,15 +647,15 @@ async function confirmarValidacao() {
 }
 
 async function confirmarAceitacao(observacoes?: string) {
-  if (!idSubprocesso.value) return;
+  if (!codSubprocesso.value) return;
 
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === 'ADMIN';
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
   }
 
   fecharModalAceitar();
@@ -706,10 +664,10 @@ async function confirmarAceitacao(observacoes?: string) {
 
 
 async function confirmarDevolucao() {
-  if (!idSubprocesso.value) return;
+  if (!codSubprocesso.value) return;
 
-  await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, {
-    motivo: '', // Adicionar motivo
+  await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
+    motivo: '',
     observacoes: observacaoDevolucao.value,
   });
 

@@ -41,57 +41,36 @@
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
-              <select
+              <b-form-select
                 v-model="avaliacoes[competencia.codigo].importancia"
-                class="form-select"
-              >
-                <option value="1">
-                  1 - Muito baixa
-                </option>
-                <option value="2">
-                  2 - Baixa
-                </option>
-                <option value="3">
-                  3 - Média
-                </option>
-                <option value="4">
-                  4 - Alta
-                </option>
-                <option value="5">
-                  5 - Muito alta
-                </option>
-              </select>
+                :options="[
+                  { value: 1, text: '1 - Muito baixa' },
+                  { value: 2, text: '2 - Baixa' },
+                  { value: 3, text: '3 - Média' },
+                  { value: 4, text: '4 - Alta' },
+                  { value: 5, text: '5 - Muito alta' },
+                ]"
+              />
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
-              <select
+              <b-form-select
                 v-model="avaliacoes[competencia.codigo].dominio"
-                class="form-select"
-              >
-                <option value="1">
-                  1 - Muito baixo
-                </option>
-                <option value="2">
-                  2 - Baixo
-                </option>
-                <option value="3">
-                  3 - Médio
-                </option>
-                <option value="4">
-                  4 - Alto
-                </option>
-                <option value="5">
-                  5 - Muito alto
-                </option>
-              </select>
+                :options="[
+                  { value: 1, text: '1 - Muito baixo' },
+                  { value: 2, text: '2 - Baixo' },
+                  { value: 3, text: '3 - Médio' },
+                  { value: 4, text: '4 - Alto' },
+                  { value: 5, text: '5 - Muito alto' },
+                ]"
+              />
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Observações:</label>
-              <textarea
+              <b-form-textarea
                 v-model="avaliacoes[competencia.codigo].observacoes"
-                class="form-control"
                 rows="2"
                 placeholder="Comentários sobre esta competência..."
               />
@@ -178,8 +157,8 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {usePerfilStore} from '@/stores/perfil'
-import {Competencia, MapaCompleto} from '@/types/tipos'
+import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
+import {usePerfil} from '@/composables/usePerfil'
 
 const route = useRoute()
 const router = useRouter()
@@ -187,9 +166,9 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const perfilStore = usePerfilStore()
+const { servidorLogado } = usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
@@ -198,9 +177,9 @@ const nomeUnidade = computed(() => unidade.value?.nome || '')
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
-  await mapasStore.fetchMapaCompleto(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  // Correção temporária: usando codProcesso como codSubrocesso
+  await mapasStore.fetchMapaCompleto(codProcesso.value);
   competencias.value.forEach(comp => {
     if (!avaliacoes.value[comp.codigo]) {
       avaliacoes.value[comp.codigo] = {
@@ -263,13 +242,26 @@ function confirmarFinalizacao() {
 
   // Registrar movimentação
   const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
-  if (subprocesso && unidade.value) {
-    const usuario = `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`;
+  if (subprocesso && unidade.value && servidorLogado.value) {
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: unidade.value
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...subprocesso,
+      codigo: subprocesso.codSubprocesso,
+      unidade: unidade.value,
+      situacao: subprocesso.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
     processosStore.addMovement({
-      usuario: usuario,
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
       unidadeOrigem: unidade.value,
-      unidadeDestino: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
-      descricao: 'Diagnóstico da equipe finalizado'
+      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      descricao: 'Diagnóstico da equipe finalizado',
     });
   }
 
@@ -277,7 +269,7 @@ function confirmarFinalizacao() {
 
   notificacoesStore.sucesso(
       'Diagnóstico finalizado',
-      'O diagnóstico da equipe foi concluído com sucesso!'
+      'O diagnóstico da equipe foi concluído!'
   )
 
   fecharModalConfirmacao()

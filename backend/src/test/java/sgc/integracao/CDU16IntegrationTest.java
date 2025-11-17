@@ -10,37 +10,31 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.ConhecimentoAjusteDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,11 +42,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
+@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
@@ -84,26 +76,12 @@ public class CDU16IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
 
-    @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
-    @Autowired
-    private UsuarioRepo usuarioRepo;
-
     private Subprocesso subprocesso;
     private Atividade atividade1;
-    private Atividade atividade2;
 
     @BeforeEach
     void setUp() {
-        var admin = new Usuario();
-        admin.setTituloEleitoral(111111111111L);
-        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
-        usuarioRepo.save(admin);
-        unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
-
-        Unidade unidade = new Unidade("Unidade Teste", "UT");
-        unidadeRepo.save(unidade);
+        Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
 
         Processo processo = new Processo(
                 "Processo de Revisão",
@@ -118,16 +96,20 @@ public class CDU16IntegrationTest {
                 processo,
                 unidade,
                 mapa,
-                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                SituacaoSubprocesso.MAPA_AJUSTADO,
                 processo.getDataLimite()
         );
         subprocessoRepo.save(subprocesso);
 
-        Competencia c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
-        atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade1.getCodigo()), c1, atividade1));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade2.getCodigo()), c1, atividade2));
+        var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        atividade1 = new Atividade(mapa, "Atividade 1");
+        var atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade1.getCompetencias().add(c1);
+        atividade2.getCompetencias().add(c1);
+        c1.getAtividades().add(atividade1);
+        c1.getAtividades().add(atividade2);
+        atividadeRepo.saveAll(List.of(atividade1, atividade2));
+        competenciaRepo.save(c1);
     }
 
     @Test
@@ -142,6 +124,7 @@ public class CDU16IntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
@@ -155,27 +138,27 @@ public class CDU16IntegrationTest {
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")
         void deveSalvarAjustesComSucesso() throws Exception {
-            Competencia c1 = competenciaRepo.findAll().get(0);
+            Competencia c1 = competenciaRepo.findAll().getFirst();
 
             var request = new SalvarAjustesReq(List.of(
-                CompetenciaAjusteDto.builder()
-                    .competenciaId(c1.getCodigo())
-                    .nome("Competência Ajustada")
-                    .atividades(List.of(
-                        AtividadeAjusteDto.builder()
-                            .atividadeId(atividade1.getCodigo())
-                            .nome("Atividade 1 Ajustada")
-                            .conhecimentos(List.of())
+                    CompetenciaAjusteDto.builder()
+                            .codCompetencia(c1.getCodigo())
+                            .nome("Competência Ajustada")
+                            .atividades(List.of(
+                                    AtividadeAjusteDto.builder()
+                                            .codAtividade(atividade1.getCodigo())
+                                            .nome("Atividade 1 Ajustada")
+                                            .conhecimentos(List.of())
+                                            .build()
+                            ))
                             .build()
-                    ))
-                    .build()
             ));
 
             mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_AJUSTADO);
@@ -194,10 +177,10 @@ public class CDU16IntegrationTest {
             var request = new SalvarAjustesReq(List.of());
 
             mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableEntity());
         }
     }
 }

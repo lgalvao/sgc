@@ -15,31 +15,40 @@ import {
     mapMapaDtoToModel,
     mapMapaVisualizacaoToAtividades,
 } from '../mapas';
-import {Mapa, MapaAjuste, MapaVisualizacao} from '@/types/tipos';
+import {Alerta, Mapa, MapaAjuste, MapaVisualizacao} from '@/types/tipos';
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from '../processos';
 import {mapPerfilUnidadeToFrontend, mapUsuarioToFrontend} from '../sgrh';
 
 describe('mappers/alertas', () => {
     it('mapAlertaDtoToFrontend should map all fields correctly', () => {
-      const dto = {
-        codigo: 1,
-        processoCodigo: 10,
-        descricao: 'Test Alert',
-        dataHora: '2025-10-18T10:00:00',
-        unidadeOrigemCodigo: 100,
-        unidadeDestinoCodigo: 200,
-        usuarioDestinoTitulo: '123456789012',
-      };
+        const dto = {
+            codigo: 1,
+            codProcesso: 10,
+            descricao: 'Test Alert',
+            dataHora: '2025-10-18T10:00:00',
+            unidadeOrigem: 'UO',
+            unidadeDestino: 'UD',
+            dataHoraLeitura: null,
+            linkDestino: '/test',
+            mensagem: 'Test Message',
+            dataHoraFormatada: '18/10/2025 10:00',
+            origem: 'UO',
+            processo: 'Test Process',
+        };
 
-      const mapped = mapAlertaDtoToFrontend(dto);
+        const mapped: Alerta = mapAlertaDtoToFrontend(dto);
 
-      expect(mapped.codigo).toBe(1);
-      expect(mapped.processoCodigo).toBe(10);
-      expect(mapped.descricao).toBe('Test Alert');
-      expect(mapped.dataHora).toBe('2025-10-18T10:00:00');
-      expect(mapped.unidadeOrigemCodigo).toBe(100);
-      expect(mapped.unidadeDestinoCodigo).toBe(200);
-      expect(mapped.usuarioDestinoTitulo).toBe('123456789012');
+        expect(mapped.codigo).toBe(1);
+        expect(mapped.codProcesso).toBe(10);
+        expect(mapped.descricao).toBe('Test Alert');
+        expect(mapped.dataHora).toBe('2025-10-18T10:00:00');
+        expect(mapped.unidadeOrigem).toBe('UO');
+        expect(mapped.unidadeDestino).toBe('UD');
+        expect(mapped.linkDestino).toBe('/test');
+        expect(mapped.mensagem).toBe('Test Message');
+        expect(mapped.dataHoraFormatada).toBe('18/10/2025 10:00');
+        expect(mapped.origem).toBe('UO');
+        expect(mapped.processo).toBe('Test Process');
     });
 });
 
@@ -64,11 +73,11 @@ describe('mappers/atividades', () => {
         expect(model.descricao).toBe('Conhecimento Teste');
     });
 
-    it('mapCriarAtividadeRequestToDto should add idSubprocesso', () => {
+    it('mapCriarAtividadeRequestToDto should add codSubrocesso', () => {
         const request = { descricao: 'Nova Atividade' };
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe('Nova Atividade');
-        expect(dto.idSubprocesso).toBe(123);
+        expect(dto.codSubrocesso).toBe(123);
     });
 
     it('mapCriarConhecimentoRequestToDto should map correctly', () => {

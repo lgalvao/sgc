@@ -7,33 +7,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -43,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest {
@@ -50,42 +38,33 @@ class CDU19IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
 
-    private Processo processo;
     private Unidade unidade;
     private Unidade unidadeSuperior;
     private Subprocesso subprocesso;
-    private Mapa mapa;
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
-        unidadeRepo.save(unidadeSuperior);
+        // Use dados pré-carregados do data-h2.sql (CDU-19 test data)
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+        subprocesso = subprocessoRepo.findById(1900L).orElseThrow();
 
-        unidade = new Unidade("Unidade Subprocesso", "UNISUB");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidadeRepo.save(unidade);
+        // Limpa movimentações e alertas relacionados ao subprocesso de teste
+        movimentacaoRepo.deleteAll(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1900L));
+        alertaRepo.deleteAll(alertaRepo.findByProcessoCodigo(1900L));
 
-        Usuario chefe = usuarioRepo.save(new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE)));
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
-
-        processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
-        mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());
+        // Garante que o subprocesso está no estado correto
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        subprocesso.getMapa().setSugestoes(null);
+        subprocesso.getMapa().setSugestoesApresentadas(false);
         subprocessoRepo.save(subprocesso);
     }
 
@@ -97,17 +76,14 @@ class CDU19IntegrationTest {
         @DisplayName("Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
         @WithMockChefe
         void testApresentarSugestoes_Sucesso() throws Exception {
-            // Cenário
             String sugestoes = "Minha sugestão de teste";
 
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/apresentar-sugestoes", subprocesso.getCodigo())
                     .with(csrf())
                     .contentType("application/json")
                     .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
@@ -117,7 +93,7 @@ class CDU19IntegrationTest {
             assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Sugestões apresentadas para o mapa de competências");
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-            List<Alerta> alertas = alertaRepo.findAll();
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
         }
     }
@@ -130,12 +106,10 @@ class CDU19IntegrationTest {
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")
         @WithMockChefe
         void testValidarMapa_Sucesso() throws Exception {
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
                     .with(csrf()))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
 
@@ -145,9 +119,9 @@ class CDU19IntegrationTest {
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-            List<Alerta> alertas = alertaRepo.findAll();
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
-            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da UNISUB aguardando análise");
+            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da SEDIA aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }

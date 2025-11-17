@@ -1,0 +1,1 @@
+gradle :backend:test | Where-Object { $_ -notmatch "at java\.base|junit|org\.springframework\.test|gradle|hamcrest|> Task|SpringApplicationShutdownHook" }

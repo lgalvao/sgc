@@ -12,30 +12,22 @@
               class="form-label"
               for="servidor"
             >Servidor</label>
-            <select
+            <b-form-select
               id="servidor"
               v-model="servidorSelecionado"
-              class="form-select"
               data-testid="select-servidor"
               required
+              :options="servidores"
+              value-field="codigo"
+              text-field="nome"
             >
-              <option
-                :value="null"
-                disabled
-              >
-                Selecione um servidor
-              </option>
-              <option
-                v-for="servidor in servidoresElegiveis"
-                :key="servidor.codigo"
-                :value="servidor.codigo"
-              >
-                {{ servidor.nome }}
-              </option>
-            </select>
+              <template #first>
+                <b-form-select-option :value="null" disabled>Selecione um servidor</b-form-select-option>
+              </template>
+            </b-form-select>
             <div
               v-if="erroServidor"
-              class="text-danger small"
+              class="text-danger small mt-1"
             >
               {{ erroServidor }}
             </div>
@@ -46,14 +38,13 @@
               class="form-label"
               for="dataTermino"
             >Data de término</label>
-            <input
+            <b-form-input
               id="dataTermino"
               v-model="dataTermino"
-              class="form-control"
               data-testid="input-data-termino"
               required
               type="date"
-            >
+            />
           </div>
 
           <div class="mb-3">
@@ -61,10 +52,9 @@
               class="form-label"
               for="justificativa"
             >Justificativa</label>
-            <textarea
+            <b-form-textarea
               id="justificativa"
               v-model="justificativa"
-              class="form-control"
               data-testid="textarea-justificativa"
               required
             />
@@ -90,7 +80,13 @@
           v-if="sucesso"
           class="alert alert-success mt-3"
         >
-          Atribuição criada com sucesso!
+          Atribuição criada!
+        </div>
+        <div
+          v-if="erroApi"
+          class="alert alert-danger mt-3"
+        >
+          {{ erroApi }}
         </div>
       </div>
     </div>
@@ -98,82 +94,62 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import {useServidoresStore} from "@/stores/servidores";
-import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { buscarUnidadePorSigla } from '@/services/unidadesService'
+import { buscarUsuariosPorUnidade } from '@/services/usuarioService'
+import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService'
+import type { Unidade, Usuario } from '@/types/tipos'
 
 const props = defineProps<{ sigla: string }>()
 
 const router = useRouter()
 const sigla = computed(() => props.sigla)
-const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
-const atribuicaoStore = useAtribuicaoTemporariaStore()
-const servidoresStore = useServidoresStore()
 
-function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return null
-}
+const unidade = ref<Unidade | null>(null)
+const servidores = ref<Usuario[]>([])
+const servidorSelecionado = ref<string | null>(null)
+const dataTermino = ref('')
+const justificativa = ref('')
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
-const atribuicoes = computed<AtribuicaoTemporaria[]>(() =>
-    atribuicaoStore.atribuicoes
-        ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade.sigla === sigla.value)
-        : []
-)
-
-const servidorSelecionado = ref<number | null>(null)
-const dataTermino = ref("")
-const justificativa = ref("")
 const sucesso = ref(false)
-const erroServidor = ref("")
+const erroServidor = ref('')
+const erroApi = ref('')
 
-const servidores = computed(() => servidoresStore.servidores);
-
-const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade?.sigla === sigla.value)
+onMounted(async () => {
+  try {
+    unidade.value = await buscarUnidadePorSigla(sigla.value)
+    if (unidade.value) {
+      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo)
+    }
+  } catch (error) {
+    erroServidor.value = 'Falha ao carregar dados da unidade ou servidores.'
+    console.error(error)
+  }
 })
 
-const servidoresElegiveis = computed<Servidor[]>(() => {
-  const titularId = unidade.value?.idServidorTitular
-  return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === servidor.codigo)
-    return servidor.codigo !== titularId && !jaTemAtribuicao
-  })
-})
-
-function criarAtribuicao() {
-  erroServidor.value = ""
-  if (!servidorSelecionado.value) {
-    erroServidor.value = "Selecione um servidor elegível."
+async function criarAtribuicao() {
+  if (!unidade.value || !servidorSelecionado.value) {
     return
   }
 
-  if (atribuicoes.value.some(a => a.servidor.codigo === servidorSelecionado.value)) {
-    erroServidor.value = "Este servidor já possui atribuição temporária nesta unidade."
-    return
+  erroApi.value = ''
+  sucesso.value = false
+
+  try {
+    await criarAtribuicaoTemporaria(unidade.value.codigo, {
+      tituloEleitoralServidor: servidorSelecionado.value,
+      dataTermino: dataTermino.value,
+      justificativa: justificativa.value,
+    })
+    sucesso.value = true
+    // Reset form
+    servidorSelecionado.value = null
+    dataTermino.value = ''
+    justificativa.value = ''
+  } catch (error) {
+    erroApi.value = 'Falha ao criar atribuição. Tente novamente.'
+    console.error(error)
   }
-  atribuicaoStore.criarAtribuicao({
-    unidade: unidade.value as Unidade,
-    servidor: servidores.value.find(s => s.codigo === servidorSelecionado.value) as Servidor,
-    dataInicio: new Date().toISOString(),
-    dataFim: new Date(dataTermino.value).toISOString(),
-    dataTermino: new Date(dataTermino.value).toISOString(),
-    justificativa: justificativa.value,
-    codigo: 0
-  })
-  sucesso.value = true
-  router.push(`/unidade/${sigla.value}`)
 }
 </script>

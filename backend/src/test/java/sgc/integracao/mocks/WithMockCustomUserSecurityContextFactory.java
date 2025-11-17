@@ -4,26 +4,31 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.comum.BeanUtil;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import org.springframework.stereotype.Component;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Component
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
+
+    private final UnidadeRepo unidadeRepo;
+
+    public WithMockCustomUserSecurityContextFactory(UnidadeRepo unidadeRepo) {
+        this.unidadeRepo = unidadeRepo;
+    }
+
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        UnidadeRepo unidadeRepo = BeanUtil.getBean(UnidadeRepo.class);
-
-        // A responsabilidade de criar a Unidade agora é do próprio teste.
         Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "A Unidade de teste com ID %d não foi encontrada. Garanta quefoi criada no @BeforeEach do teste."
+                        "A Unidade de teste com código %d não foi encontrada. Garanta quefoi criada no @BeforeEach do teste."
                         .formatted(customUser.unidadeId()))
                 );
 

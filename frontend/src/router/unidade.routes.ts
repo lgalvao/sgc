@@ -1,31 +1,31 @@
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
+import type {RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const unidadeRoutes: RouteRecordRaw[] = [
   {
-    path: '/unidade/:siglaUnidade',
+    path: '/unidade/:codUnidade',
     name: 'Unidade',
-    component: () => import('@/views/Unidade.vue'),
-    props: true,
+    component: () => import('@/views/UnidadeView.vue'),
+    props: (route: RouteLocationNormalized) => ({ codUnidade: Number(route.params.codUnidade) }),
     meta: {
       title: 'Unidade',
-      breadcrumb: (route: RouteLocationNormalized) => `${route.params.siglaUnidade ?? ''}`,
+      breadcrumb: (route: RouteLocationNormalized) => `${route.params.codUnidade ?? ''}`,
     },
   },
   {
-    path: '/unidade/:siglaUnidade/mapa',
+    path: '/unidade/:codUnidade/mapa',
     name: 'Mapa',
     component: () => import('@/views/CadMapa.vue'),
     props: (route: RouteLocationNormalized) => ({
-      sigla: route.params.siglaUnidade,
-      idProcesso: Number(route.query.idProcesso),
+      codUnidade: Number(route.params.codUnidade),
+      codProcesso: Number(route.query.codProcesso),
     }),
     meta: { title: 'Mapa' },
   },
   {
-    path: '/unidade/:siglaUnidade/atribuicao',
+    path: '/unidade/:codUnidade/atribuicao',
     name: 'AtribuicaoTemporariaForm',
     component: () => import('@/views/CadAtribuicao.vue'),
-    props: (route: RouteLocationNormalized) => ({ sigla: route.params.siglaUnidade }),
+    props: (route: RouteLocationNormalized) => ({ codUnidade: Number(route.params.codUnidade) }),
     meta: { title: 'Atribuição Temporária' },
   },
 ];

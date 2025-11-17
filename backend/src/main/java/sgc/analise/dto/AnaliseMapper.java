@@ -1,12 +1,12 @@
 package sgc.analise.dto;
 
 import org.mapstruct.Mapper;
-import sgc.analise.modelo.Analise;
+import sgc.analise.model.Analise;
 
-@Mapper(componentModel = "spring")
 /**
  * Mapper para converter a entidade {@link Analise} em DTOs.
  */
+@Mapper(componentModel = "spring")
 public interface AnaliseMapper {
     /**
      * Converte uma entidade {@link Analise} em um DTO {@link AnaliseHistoricoDto}.

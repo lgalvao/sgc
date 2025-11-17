@@ -13,7 +13,7 @@ graph TD
     subgraph "Clientes"
         ProcessoService
         SubprocessoService
-        Controle(MapaControle)
+        Controle(MapaController)
     end
 
     subgraph "Módulo Mapa"
@@ -52,14 +52,16 @@ graph TD
 - **`MapaVinculoService`**: Gerencia os vínculos entre as entidades do mapa.
 
 ### Outros Componentes
-- **`MapaControle`**: Expõe a API REST. Delega todas as suas operações para o `MapaService`.
-- **`modelo/`**: Contém as entidades JPA, como `Mapa` e `UnidadeMapa`.
+
+- **`MapaController`**: Expõe a API REST. Delega todas as suas operações para o `MapaService`.
+- **`model/`**: Contém as entidades JPA, como `Mapa` e `UnidadeMapa`.
 - **`dto/`**: Contém os Data Transfer Objects.
 
 ## Fluxos de Trabalho Notáveis
 
 ### Salvando um Mapa (CRUD)
-1.  O `MapaControle` recebe uma requisição com os dados do mapa.
+
+1. O `MapaController` recebe uma requisição com os dados do mapa.
 2.  Ele chama o `MapaService.criar(...)` ou `atualizar(...)`.
 
 ### Copiando um Mapa para Revisão

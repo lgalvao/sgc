@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Navbar from './components/Navbar.vue'
+import MainNavbar from './components/MainNavbar.vue'
 import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
 import BarraNavegacao from './components/BarraNavegacao.vue';
@@ -7,7 +7,7 @@ import pkg from '../package.json';
 
 interface PackageJson {
   version: string;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 const route = useRoute()
@@ -40,7 +40,7 @@ const shouldShowNavBarExtras = computed(() => {
 </script>
 
 <template>
-  <Navbar v-if="route.path !== '/login'" />
+  <MainNavbar v-if="route.path !== '/login'" />
   <div
     v-if="shouldShowNavBarExtras"
     class="bg-light border-bottom"

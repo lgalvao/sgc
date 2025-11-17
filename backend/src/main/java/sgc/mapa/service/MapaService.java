@@ -1,0 +1,173 @@
+package sgc.mapa.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.atividade.model.Atividade;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+@Slf4j
+@RequiredArgsConstructor
+public class MapaService {
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
+
+    private final MapaVinculoService mapaVinculoService;
+    private final MapaIntegridadeService mapaIntegridadeService;
+
+    private final MapaRepo mapaRepo;
+    private final CompetenciaRepo competenciaRepo;
+
+    @Transactional(readOnly = true)
+    public List<Mapa> listar() {
+        return mapaRepo.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Mapa obterPorCodigo(Long codigo) {
+        return mapaRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
+    }
+
+    public Mapa criar(Mapa mapa) {
+        return mapaRepo.save(mapa);
+    }
+
+    public Mapa atualizar(Long codigo, Mapa mapa) {
+        return mapaRepo.findById(codigo)
+                .map(existente -> {
+                    existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
+                    existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
+                    existente.setSugestoesApresentadas(mapa.getSugestoesApresentadas());
+                    existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
+                    return mapaRepo.save(existente);
+                })
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
+    }
+
+    public void excluir(Long codigo) {
+        if (!mapaRepo.existsById(codigo)) {
+            throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
+        }
+        mapaRepo.deleteById(codigo);
+    }
+
+    @Transactional(readOnly = true)
+    public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
+        log.debug("Obtendo mapa completo: codigo={}, codSubprocesso={}", codMapa, codSubprocesso);
+
+        Mapa mapa = mapaRepo.findById(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
+
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+
+        List<CompetenciaMapaDto> competenciasDto = competencias.stream()
+                .map(c -> {
+                    List<Long> idsAtividades = c.getAtividades().stream()
+                            .map(Atividade::getCodigo)
+                            .toList();
+
+                    return new CompetenciaMapaDto(
+                            c.getCodigo(),
+                            c.getDescricao(),
+                            idsAtividades
+                    );
+                })
+                .toList();
+
+        return new MapaCompletoDto(
+                mapa.getCodigo(),
+                codSubprocesso,
+                mapa.getObservacoesDisponibilizacao(),
+                competenciasDto
+        );
+    }
+
+    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
+        log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
+
+        Mapa mapa = mapaRepo.findById(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
+
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
+        mapa = mapaRepo.save(mapa);
+
+        List<Competencia> competenciasAtuais = competenciaRepo.findByMapaCodigo(codMapa);
+        Set<Long> idsAtuais = competenciasAtuais.stream()
+                .map(Competencia::getCodigo)
+                .collect(Collectors.toSet());
+
+        Set<Long> idsNovos = request.getCompetencias().stream()
+                .map(CompetenciaMapaDto::getCodigo)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Set<Long> codsParaRemover = new HashSet<>(idsAtuais);
+        codsParaRemover.removeAll(idsNovos);
+
+        for (Long codParaRemover : codsParaRemover) {
+            competenciaRepo.deleteById(codParaRemover);
+            log.debug("Competência {} removida do mapa {}", codParaRemover, codMapa);
+        }
+
+        for (CompetenciaMapaDto compDto : request.getCompetencias()) {
+            Competencia competencia;
+            if (compDto.getCodigo() == null) {
+                competencia = new Competencia();
+                competencia.setMapa(mapa);
+                competencia.setDescricao(compDto.getDescricao());
+                competencia = competenciaRepo.save(competencia);
+                log.debug("Nova competência criada: {}", competencia.getCodigo());
+            } else {
+                competencia = competenciaRepo.findById(compDto.getCodigo())
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.getCodigo())));
+
+                competencia.setDescricao(compDto.getDescricao());
+                competencia = competenciaRepo.save(competencia);
+                log.debug("Competência atualizada: {}", competencia.getCodigo());
+            }
+            mapaVinculoService.atualizarVinculosAtividades(competencia.getCodigo(), compDto.getAtividadesCodigos());
+        }
+
+        mapaIntegridadeService.validarIntegridadeMapa(codMapa);
+
+        List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
+        List<CompetenciaMapaDto> competenciasDtoFinais = competenciasFinais.stream()
+                .map(c -> {
+                    List<Long> idsAtividades = c.getAtividades().stream()
+                            .map(Atividade::getCodigo)
+                            .toList();
+
+                    return new CompetenciaMapaDto(
+                            c.getCodigo(),
+                            c.getDescricao(),
+                            idsAtividades
+                    );
+                })
+                .toList();
+
+        return new MapaCompletoDto(
+                mapa.getCodigo(),
+                null,
+                mapa.getObservacoesDisponibilizacao(),
+                competenciasDtoFinais
+        );
+    }
+}
