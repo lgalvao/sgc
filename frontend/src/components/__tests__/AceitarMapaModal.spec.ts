@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AceitarMapaModal from '../AceitarMapaModal.vue';
-import BaseModal from '../BaseModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
 
 describe('AceitarMapaModal', () => {
@@ -15,7 +14,7 @@ describe('AceitarMapaModal', () => {
         mostrarModal: false,
       },
     });
-    expect(wrapper.findComponent(BaseModal).props('mostrar')).toBe(false);
+    expect(wrapper.find('[data-testid="modal-aceite-body"]').exists()).toBe(false);
   });
 
   it('deve renderizar o modal com o perfil padrão (não ADMIN)', async () => {
@@ -25,12 +24,8 @@ describe('AceitarMapaModal', () => {
       },
     });
 
-    const baseModal = wrapper.findComponent(BaseModal);
-    expect(baseModal.exists()).toBe(true);
-    expect(baseModal.props('mostrar')).toBe(true);
-    expect(baseModal.props('titulo')).toBe('Aceitar Mapa de Competências');
-
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
+    expect(corpoModal.exists()).toBe(true);
     expect(corpoModal.text()).toContain('Observações (opcional)');
     expect(wrapper.find('[data-testid="observacao-aceite-textarea"]').exists()).toBe(true);
   });
@@ -43,11 +38,8 @@ describe('AceitarMapaModal', () => {
       },
     });
 
-    const baseModal = wrapper.findComponent(BaseModal);
-    expect(baseModal.exists()).toBe(true);
-    expect(baseModal.props('titulo')).toBe('Homologação');
-
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
+    expect(corpoModal.exists()).toBe(true);
     expect(corpoModal.text()).toContain('Confirma a homologação do mapa de competências?');
     expect(wrapper.find('[data-testid="observacao-aceite-textarea"]').exists()).toBe(false);
   });

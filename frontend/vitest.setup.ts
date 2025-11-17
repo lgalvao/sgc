@@ -1,3 +1,4 @@
+import { config } from '@vue/test-utils';
 import { vi } from 'vitest';
 
 vi.mock('bootstrap', () => ({
@@ -6,3 +7,13 @@ vi.mock('bootstrap', () => ({
     dispose() {}
   },
 }));
+
+config.global.stubs['b-modal'] = {
+  props: ['modelValue'],
+  template: `
+    <div v-if="modelValue">
+      <slot />
+      <slot name="footer" />
+    </div>
+  `,
+};

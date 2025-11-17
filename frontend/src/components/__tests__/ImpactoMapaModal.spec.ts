@@ -67,7 +67,7 @@ describe('ImpactoMapaModal', () => {
     const wrapper = mount(ImpactoMapaModal, {
       props: { mostrar: false, idProcesso: 1, siglaUnidade: 'UT' },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="secao-atividades-inseridas"]').exists()).toBe(false);
   });
 
   it('deve renderizar a seção de atividades inseridas corretamente', () => {

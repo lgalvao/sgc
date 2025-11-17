@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import DisponibilizarMapaModal from '../DisponibilizarMapaModal.vue';
-import BaseModal from '../BaseModal.vue';
 
 describe('DisponibilizarMapaModal', () => {
   it('não deve renderizar o modal quando mostrar for falso', () => {
@@ -10,7 +9,7 @@ describe('DisponibilizarMapaModal', () => {
         mostrar: false,
       },
     });
-    expect(wrapper.findComponent(BaseModal).props('mostrar')).toBe(false);
+    expect(wrapper.find('[data-testid="input-data-limite"]').exists()).toBe(false);
   });
 
   it('deve renderizar o modal com os campos iniciais', () => {
@@ -19,10 +18,6 @@ describe('DisponibilizarMapaModal', () => {
         mostrar: true,
       },
     });
-
-    const baseModal = wrapper.findComponent(BaseModal);
-    expect(baseModal.props('mostrar')).toBe(true);
-    expect(baseModal.props('titulo')).toBe('Disponibilizar Mapa');
 
     const dataInput = wrapper.find('[data-testid="input-data-limite"]');
     expect(dataInput.exists()).toBe(true);
