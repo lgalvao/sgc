@@ -1,9 +1,10 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrarModal"
     title="Alterar data limite"
     centered
-    @hidden="$emit('fecharModal')"
+    hide-footer
+    @hide="$emit('fecharModal')"
   >
     <div class="mb-3">
       <label class="form-label">Nova data limite</label>
@@ -40,11 +41,12 @@
         Confirmar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
+import {BModal} from 'bootstrap-vue-next';
 import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils';
 
 interface Props {

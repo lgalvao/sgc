@@ -1,13 +1,13 @@
 <template>
   <div>
-    <b-table
+    <BTable
       :items="processos"
       :fields="fields"
       hover
       responsive
       data-testid="tabela-processos"
-      :sort-by="criterioOrdenacao"
-      :sort-desc="!direcaoOrdenacaoAsc"
+      :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
+      :sort-desc="[!direcaoOrdenacaoAsc]"
       @row-clicked="handleSelecionarProcesso"
       @sort-changed="handleSortChange"
     >
@@ -16,12 +16,13 @@
           Nenhum processo encontrado.
         </div>
       </template>
-    </b-table>
+    </BTable>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ProcessoResumo} from '@/types/tipos';
+import {BTable} from 'bootstrap-vue-next';
 import { computed } from 'vue';
 
 const props = defineProps<{

@@ -4,7 +4,7 @@
       v-if="mostrarBotoesBloco"
       class="mt-3 d-flex gap-2"
     >
-      <b-button
+      <BButton
         v-if="perfil === 'GESTOR'"
         variant="outline-primary"
         data-testid="btn-aceitar-em-bloco"
@@ -12,8 +12,8 @@
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar em bloco
-      </b-button>
-      <b-button
+      </BButton>
+      <BButton
         v-if="perfil === 'ADMIN'"
         variant="outline-success"
         data-testid="btn-abrir-modal-homologar-bloco"
@@ -21,9 +21,9 @@
       >
         <i class="bi bi-check-all me-1" />
         Homologar em bloco
-      </b-button>
+      </BButton>
     </div>
-    <b-button
+    <BButton
       v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
       variant="danger"
       class="mt-3"
@@ -31,12 +31,13 @@
       @click="emit('finalizar')"
     >
       Finalizar processo
-    </b-button>
+    </BButton>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type {Perfil, SituacaoProcesso} from '@/types/tipos';
+import {BButton} from 'bootstrap-vue-next';
 
 defineProps<{
   mostrarBotoesBloco: boolean;

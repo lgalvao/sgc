@@ -62,8 +62,7 @@ describe('MainNavbar.vue', () => {
         expect(userInfo.text()).toContain('CHEFE - TRE-PR');
     });
 
-    // TODO: Re-enable this test after fixing the test environment
-    it.skip('deve exibir o ícone de configurações para o perfil ADMIN', async () => {
+    it('deve exibir o ícone de configurações para o perfil ADMIN', async () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             perfilSelecionado: 'ADMIN',
         } as any);
@@ -71,7 +70,7 @@ describe('MainNavbar.vue', () => {
         const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
 
-        const settingsIcon = wrapper.find('[title="Configurações do sistema"]');
+        const settingsIcon = wrapper.find('[data-testid="btn-configuracoes"]');
         expect(settingsIcon.exists()).toBe(true);
     });
 

@@ -1,5 +1,5 @@
 <template>
-  <b-table
+  <BTable
     :items="alertas"
     :fields="fields"
     hover
@@ -14,12 +14,13 @@
         Nenhum alerta no momento.
       </div>
     </template>
-  </b-table>
+  </BTable>
 </template>
 
 <script lang="ts" setup>
 import type {Alerta} from '@/types/tipos';
 import { ref } from 'vue';
+import {BTable} from 'bootstrap-vue-next';
 
 const props = defineProps<{
   alertas: Alerta[]

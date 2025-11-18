@@ -1,10 +1,11 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrarModal"
     title="Sistema de Notificações"
     size="xl"
     centered
-    @hidden="fecharModal"
+    hide-footer
+    @hide="fecharModal"
   >
     <div class="mb-3">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -89,14 +90,15 @@
         Fechar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 
   <!-- Modal para visualizar e-mail completo -->
-  <b-modal
+  <BModal
     v-model="emailModalVisivel"
     title="E-mail Simulado"
     size="lg"
     centered
+    hide-footer
   >
     <div v-if="emailAtual">
       <div class="mb-3">
@@ -122,11 +124,12 @@
         Fechar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
+import {BModal} from 'bootstrap-vue-next'
 import {storeToRefs} from 'pinia'
 import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes'
 import {formatDateTimeBR} from '@/utils'

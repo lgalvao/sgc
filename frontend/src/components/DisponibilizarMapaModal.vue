@@ -1,18 +1,19 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Disponibilizar Mapa"
     header-bg-variant="primary"
     header-text-variant="white"
     centered
-    @hidden="fechar"
+    hide-footer
+    @hide="fechar"
   >
         <div class="mb-3">
           <label
             class="form-label"
             for="dataLimite"
           >Data limite para validação</label>
-          <b-form-input
+          <BFormInput
             id="dataLimite"
             v-model="dataLimiteValidacao"
             type="date"
@@ -44,11 +45,12 @@
         Disponibilizar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
+import {BModal, BFormInput} from 'bootstrap-vue-next'
 
 const props = defineProps<{
   mostrar: boolean

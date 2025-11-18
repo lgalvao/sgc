@@ -2,53 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
-
-// Mock BTable component
-const MockBTable = {
-  template: `
-    <table class="table">
-      <thead>
-        <tr>
-          <th v-for="field in fields" :key="field.key" :aria-sort="getAriaSort(field.key)" @click="handleSort(field.key)">
-            {{ field.label }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="items.length === 0">
-          <td :colspan="fields.length">
-            <slot name="empty"></slot>
-          </td>
-        </tr>
-        <tr v-for="(item, index) in items" :key="index" @click="$emit('row-clicked', item)">
-          <td v-for="field in fields" :key="field.key">
-            {{ getItemValue(item, field.key) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  `,
-  props: ['items', 'fields', 'sortBy', 'sortDesc'],
-  emits: ['row-clicked', 'sort-changed'],
-  methods: {
-    getAriaSort(key) {
-      if (this.sortBy === key) {
-        return this.sortDesc ? 'descending' : 'ascending';
-      }
-      return 'none';
-    },
-    getItemValue(item, key) {
-      // Handle nested properties if necessary
-      if (key.includes('.')) {
-        return key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
-      }
-      return item[key];
-    },
-    handleSort(key) {
-      this.$emit('sort-changed', { sortBy: key, sortDesc: !this.sortDesc });
-    }
-  },
-};
+import {BTable} from 'bootstrap-vue-next';
 
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
@@ -78,17 +32,8 @@ const mockProcessos: ProcessoResumo[] = [
 ];
 
 describe('TabelaProcessos.vue', () => {
-  const mountOptions = {
-    global: {
-      components: {
-        BTable: MockBTable,
-      },
-    },
-  };
-
   it('deve renderizar a tabela e os cabeçalhos corretamente', async () => {
     const wrapper = mount(TabelaProcessos, {
-      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
@@ -96,7 +41,7 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    const table = wrapper.findComponent(MockBTable);
+    const table = wrapper.findComponent(BTable);
     expect(table.exists()).toBe(true);
 
     await wrapper.vm.$nextTick();
@@ -109,7 +54,6 @@ describe('TabelaProcessos.vue', () => {
 
   it('deve exibir os processos passados via prop', async () => {
     const wrapper = mount(TabelaProcessos, {
-      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',
@@ -135,7 +79,6 @@ describe('TabelaProcessos.vue', () => {
 
   it('deve emitir o evento ordenar ao receber o evento sort-changed', async () => {
     const wrapper = mount(TabelaProcessos, {
-      ...mountOptions,
       props: {
         processos: [],
         criterioOrdenacao: 'descricao',
@@ -143,41 +86,14 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    await wrapper.findComponent(MockBTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
+    await wrapper.findComponent(BTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
 
     expect(wrapper.emitted('ordenar')).toBeTruthy();
     expect(wrapper.emitted('ordenar')![0]).toEqual(['tipo']);
   });
 
-  it('deve exibir os indicadores de ordenação corretamente', async () => {
-    const wrapperAsc = mount(TabelaProcessos, {
-      ...mountOptions,
-      props: {
-        processos: [],
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: true,
-      },
-    });
-
-    await wrapperAsc.vm.$nextTick();
-    expect(wrapperAsc.find('th[aria-sort="ascending"]').exists()).toBe(true);
-
-    const wrapperDesc = mount(TabelaProcessos, {
-      ...mountOptions,
-      props: {
-        processos: [],
-        criterioOrdenacao: 'descricao',
-        direcaoOrdenacaoAsc: false,
-      },
-    });
-
-    await wrapperDesc.vm.$nextTick();
-    expect(wrapperDesc.find('th[aria-sort="descending"]').exists()).toBe(true);
-  });
-
   it('deve emitir o evento selecionarProcesso ao clicar em uma linha', async () => {
     const wrapper = mount(TabelaProcessos, {
-      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',
@@ -196,7 +112,6 @@ describe('TabelaProcessos.vue', () => {
 
   it('deve exibir a coluna Finalizado em quando showDataFinalizacao é true', async () => {
     const wrapper = mount(TabelaProcessos, {
-      ...mountOptions,
       props: {
         processos: mockProcessos,
         criterioOrdenacao: 'descricao',

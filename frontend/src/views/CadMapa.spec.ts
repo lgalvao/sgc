@@ -97,7 +97,7 @@
             await wrapper.vm.$nextTick()
     
             await wrapper.find('[data-testid="btn-disponibilizar-page"]').trigger('click')
-            await wrapper.find('[data-testid="input-data-limite"]').trigger('update:modelValue', '2025-12-31')
+            await wrapper.find('[data-testid="input-data-limite"]').setValue('2025-12-31')
             await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click')
     
             expect(mapasStore.disponibilizarMapa).toHaveBeenCalled()

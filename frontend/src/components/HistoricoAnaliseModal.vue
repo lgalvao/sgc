@@ -1,10 +1,11 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Histórico de Análises"
     size="lg"
     centered
-    @hidden="emit('fechar')"
+    hide-footer
+    @hide="emit('fechar')"
   >
     <div data-testid="modal-historico-body">
       <div
@@ -47,11 +48,12 @@
         Fechar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
+import {BModal} from 'bootstrap-vue-next';
 import {useAnalisesStore} from '@/stores/analises';
 import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';

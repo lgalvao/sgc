@@ -172,7 +172,7 @@
                 for="sugestoesTextarea"
                 class="form-label"
               >Sugestões para o mapa de competências:</label>
-              <b-form-textarea
+              <BFormTextarea
                 id="sugestoesTextarea"
                 v-model="sugestoes"
                 rows="5"
@@ -232,7 +232,7 @@
           >
             <div class="mb-3">
               <label class="form-label">Sugestões registradas para o mapa de competências:</label>
-              <b-form-textarea
+              <BFormTextarea
                 v-model="sugestoesVisualizacao"
                 rows="5"
                 readonly
@@ -338,7 +338,7 @@
                 for="observacaoDevolucao"
                 class="form-label"
               >Observação:</label>
-              <b-form-textarea
+              <BFormTextarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"
                 rows="3"
@@ -452,6 +452,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {SituacaoSubprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 import {storeToRefs} from "pinia";
+import {BFormTextarea} from 'bootstrap-vue-next';
 
 const route = useRoute()
 const router = useRouter()

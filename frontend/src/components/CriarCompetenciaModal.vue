@@ -1,15 +1,16 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
     size="lg"
     centered
-    @hidden="fechar"
+    hide-footer
+    @hide="fechar"
   >
     <div class="mb-4">
       <h5>Descrição</h5>
       <div class="mb-2">
-        <b-form-textarea
+        <BFormTextarea
           v-model="novaCompetencia.descricao"
           placeholder="Descreva a competência"
           rows="3"
@@ -28,7 +29,7 @@
           class="card atividade-card-item"
         >
           <div class="card-body d-flex align-items-center py-2">
-            <b-form-checkbox
+            <BFormCheckbox
               :id="`atv-${atividade.codigo}`"
               v-model="atividadesSelecionadas"
               :value="atividade.codigo"
@@ -46,7 +47,7 @@
               >
                 {{ atividade.conhecimentos.length }}
               </span>
-            </b-form-checkbox>
+            </BFormCheckbox>
           </div>
         </div>
       </div>
@@ -71,11 +72,12 @@
         <i class="bi bi-save" /> Salvar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
+import {BModal, BFormTextarea, BFormCheckbox} from 'bootstrap-vue-next'
 import {Atividade, Competencia} from '@/types/tipos'
 
 const props = defineProps<{

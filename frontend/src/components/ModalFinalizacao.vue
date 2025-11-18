@@ -1,12 +1,13 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Finalização de processo"
     header-bg-variant="success"
     header-text-variant="white"
     size="lg"
     centered
-    @hidden="emit('fechar')"
+    hide-footer
+    @hide="emit('fechar')"
   >
     <div class="alert alert-info">
       <i class="bi bi-info-circle" />
@@ -33,10 +34,12 @@
         Confirmar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
+import {BModal} from 'bootstrap-vue-next';
+
 defineProps<{
   mostrar: boolean;
   processoDescricao: string;
