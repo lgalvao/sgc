@@ -12,7 +12,7 @@
               class="form-label"
               for="servidor"
             >Servidor</label>
-            <b-form-select
+            <BFormSelect
               id="servidor"
               v-model="servidorSelecionado"
               data-testid="select-servidor"
@@ -22,9 +22,9 @@
               text-field="nome"
             >
               <template #first>
-                <b-form-select-option :value="null" disabled>Selecione um servidor</b-form-select-option>
+                <BFormSelectOption :value="null" disabled>Selecione um servidor</BFormSelectOption>
               </template>
-            </b-form-select>
+            </BFormSelect>
             <div
               v-if="erroServidor"
               class="text-danger small mt-1"
@@ -38,7 +38,7 @@
               class="form-label"
               for="dataTermino"
             >Data de término</label>
-            <b-form-input
+            <BFormInput
               id="dataTermino"
               v-model="dataTermino"
               data-testid="input-data-termino"
@@ -52,7 +52,7 @@
               class="form-label"
               for="justificativa"
             >Justificativa</label>
-            <b-form-textarea
+            <BFormTextarea
               id="justificativa"
               v-model="justificativa"
               data-testid="textarea-justificativa"
@@ -96,6 +96,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import {BFormSelect, BFormSelectOption, BFormInput, BFormTextarea} from 'bootstrap-vue-next'
 import { buscarUnidadePorSigla } from '@/services/unidadesService'
 import { buscarUsuariosPorUnidade } from '@/services/usuarioService'
 import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService'

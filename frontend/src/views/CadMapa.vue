@@ -146,7 +146,7 @@
             <div class="mb-4">
               <h5>Descrição</h5>
               <div class="mb-2">
-                <b-form-textarea
+                <BFormTextarea
                   v-model="novaCompetencia.descricao"
                   data-testid="input-nova-competencia"
                   placeholder="Descreva a competência"
@@ -166,7 +166,7 @@
                   :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
                 >
                   <div class="card-body d-flex align-items-center">
-                    <b-form-checkbox
+                    <BFormCheckbox
                       :id="`atv-${atividade.codigo}`"
                       v-model="atividadesSelecionadas"
                       :value="atividade.codigo"
@@ -185,7 +185,7 @@
                       >
                         {{ atividade.conhecimentos.length }}
                       </span>
-                    </b-form-checkbox>
+                    </BFormCheckbox>
                   </div>
                 </div>
               </div>
@@ -255,7 +255,7 @@
                 class="form-label"
                 for="dataLimite"
               >Data limite para validação</label>
-              <b-form-input
+              <BFormInput
                 id="dataLimite"
                 v-model="dataLimiteValidacao"
                 data-testid="input-data-limite"
@@ -267,7 +267,7 @@
                 class="form-label"
                 for="observacoes"
               >Observações</label>
-              <b-form-textarea
+              <BFormTextarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
                 data-testid="input-observacoes-disponibilizacao"
@@ -377,6 +377,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue'
+import {BFormTextarea, BFormCheckbox, BFormInput} from 'bootstrap-vue-next'
 import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'

@@ -1,16 +1,17 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Editar Conhecimento"
     centered
-    @hidden="$emit('fechar')"
+    hide-footer
+    @hide="$emit('fechar')"
   >
     <div class="mb-3">
       <label
         for="descricaoConhecimento"
         class="form-label"
       >Descrição do Conhecimento</label>
-      <b-form-textarea
+      <BFormTextarea
         id="descricaoConhecimento"
         v-model="descricaoEditada"
         data-testid="input-conhecimento-modal"
@@ -37,11 +38,12 @@
         Salvar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
+import {BModal, BFormTextarea} from 'bootstrap-vue-next'
 
 interface Props {
   mostrar: boolean

@@ -1,11 +1,12 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrarModal"
     :title="tituloModal"
     :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
     header-text-variant="white"
     centered
-    @hidden="$emit('fecharModal')"
+    hide-footer
+    @hide="$emit('fecharModal')"
   >
     <div data-testid="modal-aceite-body">
       <p v-if="perfil === 'ADMIN'">
@@ -21,7 +22,7 @@
         >
           Observações <span class="text-muted small">(opcional)</span>
         </label>
-        <b-form-textarea
+        <BFormTextarea
           id="observacao-textarea"
           v-model="observacao"
           rows="4"
@@ -54,11 +55,12 @@
         Aceitar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
+import {BModal, BFormTextarea} from 'bootstrap-vue-next';
 
 interface Props {
   mostrarModal: boolean;

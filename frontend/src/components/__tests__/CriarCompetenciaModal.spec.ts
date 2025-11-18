@@ -65,8 +65,8 @@ describe('CriarCompetenciaModal', () => {
     });
 
     await wrapper.findComponent(BFormTextarea).setValue('Nova competência');
-    await wrapper.find('input[type="checkbox"]').setChecked(true);
-    expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeUndefined();
+    await wrapper.find('input[type="checkbox"]').trigger('click');
+    expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeFalsy();
   });
 
   it('deve emitir o evento fechar ao clicar no botão de cancelar', async () => {
@@ -91,7 +91,7 @@ describe('CriarCompetenciaModal', () => {
 
     const descricao = 'Competência de teste';
     await wrapper.findComponent(BFormTextarea).setValue(descricao);
-    await wrapper.find('input[type="checkbox"]').setChecked(true);
+    await wrapper.find('input[type="checkbox"]').trigger('click');
     await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();

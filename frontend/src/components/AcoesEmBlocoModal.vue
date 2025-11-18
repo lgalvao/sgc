@@ -1,10 +1,11 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     :title="tipoAcao === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
     size="lg"
     centered
-    @hidden="fechar"
+    hide-footer
+    @hide="fechar"
   >
     <div class="alert alert-info">
       <i class="bi bi-info-circle" />
@@ -27,7 +28,7 @@
             :key="unidade.sigla"
           >
             <td>
-              <b-form-checkbox
+              <BFormCheckbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
                 :data-testid="'chk-unidade-' + unidade.sigla"
@@ -60,11 +61,12 @@
         {{ tipoAcao === 'aceitar' ? 'Aceitar' : 'Homologar' }}
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
+import {BModal, BFormCheckbox} from 'bootstrap-vue-next'
 
 interface UnidadeBloco {
   sigla: string

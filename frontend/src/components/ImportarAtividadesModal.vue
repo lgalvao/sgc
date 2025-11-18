@@ -1,10 +1,11 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Importação de atividades"
     size="lg"
     centered
-    @hidden="fechar"
+    hide-footer
+    @hide="fechar"
   >
     <div
       v-if="erroImportacao"
@@ -25,7 +26,7 @@
           class="form-label"
           for="processo-select"
         >Processo</label>
-        <b-form-select
+        <BFormSelect
           id="processo-select"
           v-model="processoSelecionadoId"
           data-testid="select-processo"
@@ -34,14 +35,14 @@
           text-field="descricao"
         >
           <template #first>
-            <b-form-select-option
+            <BFormSelectOption
               disabled
               value=""
             >
               Selecione
-            </b-form-select-option>
+            </BFormSelectOption>
           </template>
-        </b-form-select>
+        </BFormSelect>
         <div
           v-if="!processosDisponiveis.length"
           class="text-center text-muted mt-3"
@@ -55,7 +56,7 @@
           class="form-label"
           for="unidade-select"
         >Unidade</label>
-        <b-form-select
+        <BFormSelect
           id="unidade-select"
           v-model="unidadeSelecionadaId"
           :disabled="!processoSelecionado"
@@ -65,14 +66,14 @@
           text-field="sigla"
         >
           <template #first>
-            <b-form-select-option
+            <BFormSelectOption
               disabled
               value=""
             >
               Selecione
-            </b-form-select-option>
+            </BFormSelectOption>
           </template>
-        </b-form-select>
+        </BFormSelect>
       </div>
 
       <div v-if="unidadeSelecionada">
@@ -86,14 +87,14 @@
             :key="ativ.codigo"
             class="form-check"
           >
-            <b-form-checkbox
+            <BFormCheckbox
               :id="`ativ-check-${ativ.codigo}`"
               v-model="atividadesSelecionadas"
               :value="ativ"
               :data-testid="`checkbox-atividade-${ativ.codigo}`"
             >
               {{ ativ.descricao }}
-            </b-form-checkbox>
+            </BFormCheckbox>
           </div>
         </div>
         <div
@@ -129,11 +130,12 @@
         {{ importando ? 'Importando...' : 'Importar' }}
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
+import {BModal, BFormSelect, BFormSelectOption, BFormCheckbox} from 'bootstrap-vue-next'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
 import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante} from '@/types/tipos'

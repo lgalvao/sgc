@@ -64,14 +64,16 @@ describe('ImportarAtividadesModal', () => {
     expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
     // Simulate user selecting a process and unit
-    await wrapper.findComponent(BFormSelect).setValue('1');
+    const selects = wrapper.findAllComponents(BFormSelect);
+    await selects[0].setValue('1');
     await nextTick();
-    await wrapper.findAllComponents(BFormSelect)[1].setValue('100');
+    await selects[1].setValue('100');
     await nextTick();
 
     // Find and check the checkbox for the activity
-    await wrapper.find('input[type="checkbox"]').setChecked(true);
     await nextTick();
+    await nextTick();
+    await wrapper.findComponent(BFormCheckbox).trigger('click');
 
     // Now, the button should be enabled
     expect((importButton.element as HTMLButtonElement).disabled).toBe(false);

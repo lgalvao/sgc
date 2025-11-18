@@ -63,6 +63,7 @@
             <BNavLink
               href="#"
               title="Configurações do sistema"
+              data-testid="btn-configuracoes"
               @click.prevent="navigateFromNavbar('/configuracoes')"
             >
               <i class="bi bi-gear fs-5" />

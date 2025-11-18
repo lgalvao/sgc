@@ -7,7 +7,7 @@
     >
       Nenhuma movimentação registrada para este subprocesso.
     </div>
-    <b-table
+    <BTable
       v-else
       striped
       :items="movimentacoes"
@@ -17,7 +17,7 @@
       <template #cell(dataHora)="data">
         {{ formatDateTimeBR(data.item.dataHora) }}
       </template>
-    </b-table>
+    </BTable>
   </div>
 </template>
 
@@ -25,6 +25,7 @@
 import type {Movimentacao} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
 import {ref} from 'vue';
+import {BTable} from 'bootstrap-vue-next';
 
 defineProps<{
   movimentacoes: Movimentacao[]

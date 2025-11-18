@@ -5,7 +5,7 @@
       :key="unidade.sigla"
     >
       <div class="form-check">
-        <b-form-checkbox
+        <BFormCheckbox
           :id="`chk-${unidade.sigla}`"
           v-model="unidadesSelecionadasLocal"
           :value="unidade.codigo"
@@ -26,7 +26,7 @@
               Não elegível
             </span>
           </label>
-        </b-form-checkbox>
+        </BFormCheckbox>
       </div>
 
       <!-- Mostrar filhas se a unidade tem filhas (mesmo que a unidade pai não seja) -->
@@ -39,7 +39,7 @@
           :key="filha.sigla"
         >
           <div class="form-check">
-            <b-form-checkbox
+            <BFormCheckbox
               :id="`chk-${filha.sigla}`"
               v-model="unidadesSelecionadasLocal"
               :value="filha.codigo"
@@ -59,7 +59,7 @@
                   Não elegível
                 </span>
               </label>
-            </b-form-checkbox>
+            </BFormCheckbox>
           </div>
 
           <div
@@ -71,7 +71,7 @@
               :key="neta.sigla"
             >
               <div class="form-check">
-                <b-form-checkbox
+                <BFormCheckbox
                   :id="`chk-${neta.sigla}`"
                   v-model="unidadesSelecionadasLocal"
                   :value="neta.codigo"
@@ -90,7 +90,7 @@
                       Não elegível
                     </span>
                   </label>
-                </b-form-checkbox>
+                </BFormCheckbox>
               </div>
             </template>
           </div>
@@ -102,6 +102,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
+import {BFormCheckbox} from 'bootstrap-vue-next';
 import logger from '@/utils/logger';
 import type {Unidade} from '@/types/tipos';
 

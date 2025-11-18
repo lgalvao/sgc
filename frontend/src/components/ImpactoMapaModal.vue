@@ -1,10 +1,11 @@
 <template>
-  <b-modal
+  <BModal
     :model-value="mostrar"
     title="Impacto no Mapa de Competências"
     size="lg"
     centered
-    @hidden="fechar"
+    hide-footer
+    @hide="fechar"
   >
     <template v-if="unidade && processo">
       <div class="mt-3">
@@ -156,11 +157,12 @@
         Fechar
       </button>
     </template>
-  </b-modal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, watch} from 'vue';
+import {BModal} from 'bootstrap-vue-next';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
