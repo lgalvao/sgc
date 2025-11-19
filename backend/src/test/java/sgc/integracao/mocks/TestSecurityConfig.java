@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @TestConfiguration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class TestSecurityConfig {
 
     @Bean
