@@ -44,10 +44,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = Sgc.class, excludeAutoConfiguration = {ConfigSeguranca.class, ConfigSegurancaE2E.class})
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockChefe
+@WithMockChefe("333333333333")
 @Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
