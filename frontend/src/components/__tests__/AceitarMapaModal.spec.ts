@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 import { BFormTextarea, BButton, BModal } from 'bootstrap-vue-next';
+import { createTestingPinia } from '@pinia/testing';
 
 // Função fábrica para criar o wrapper
 const createWrapper = (propsOverride = {}) => {
@@ -11,13 +12,14 @@ const createWrapper = (propsOverride = {}) => {
       ...propsOverride,
     },
     global: {
+      plugins: [createTestingPinia({ stubActions: false })],
       components: {
         BFormTextarea,
         BButton,
         BModal
       },
       stubs: {
-        // Stubbing BModal to focus on content and events
+        // Stubbing BModal para focar no conteúdo e eventos
         BModal: {
             template: `
                 <div v-if="modelValue" data-testid="modal-stub">
@@ -40,7 +42,7 @@ describe('AceitarMapaModal.vue', () => {
   });
 
   it('deve renderizar o modal com o perfil padrão (não ADMIN)', () => {
-    const wrapper = createWrapper({ perfil: 'CHEFE' }); // Default behavior
+    const wrapper = createWrapper({ perfil: 'CHEFE' });
 
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
     expect(corpoModal.exists()).toBe(true);

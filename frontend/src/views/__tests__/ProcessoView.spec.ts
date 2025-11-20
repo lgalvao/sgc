@@ -5,7 +5,6 @@ import { createTestingPinia } from '@pinia/testing'
 import { useProcessosStore } from '@/stores/processos'
 import { usePerfilStore } from '@/stores/perfil'
 import { useNotificacoesStore } from '@/stores/notificacoes'
-import { defineComponent } from 'vue'
 
 // Mock services
 import * as processoService from '@/services/processoService'
@@ -37,7 +36,7 @@ vi.mock('@/services/processoService', () => ({
     fetchSubprocessosElegiveis: vi.fn(),
     finalizarProcesso: vi.fn(),
     processarAcaoEmBloco: vi.fn(),
-    fetchProcessosFinalizados: vi.fn() // used by store initial state or other actions
+    fetchProcessosFinalizados: vi.fn()
 }))
 
 // Stubs
@@ -75,25 +74,8 @@ const TreeTableStub = {
     emits: ['row-click']
 }
 
-describe('ProcessoView.vue', () => {
-  let wrapper: any
-
-  const mockProcesso = {
-      codigo: 1,
-      descricao: 'Test Process',
-      tipo: 'MAPEAMENTO',
-      situacao: 'EM_ANDAMENTO',
-      unidades: [
-          { codUnidade: 10, sigla: 'U1', nome: 'Unidade 1', situacaoSubprocesso: 'EM_ANDAMENTO', dataLimite: '2023-01-01', filhos: [] }
-      ],
-      resumoSubprocessos: []
-  }
-
-  const mockSubprocessosElegiveis = [
-      { codSubprocesso: 1, unidadeNome: 'Test Unit', unidadeSigla: 'TU', situacao: 'NAO_INICIADO' }
-  ]
-
-  function createWrapper(customState = {}) {
+// Função fábrica para criar o wrapper
+const createWrapper = (customState = {}) => {
     const wrapper = mount(ProcessoView, {
       global: {
         plugins: [
@@ -125,7 +107,25 @@ describe('ProcessoView.vue', () => {
     const notificacoesStore = useNotificacoesStore()
 
     return { wrapper, processosStore, perfilStore, notificacoesStore }
+}
+
+describe('ProcessoView.vue', () => {
+  let wrapper: ReturnType<typeof createWrapper>['wrapper']
+
+  const mockProcesso = {
+      codigo: 1,
+      descricao: 'Test Process',
+      tipo: 'MAPEAMENTO',
+      situacao: 'EM_ANDAMENTO',
+      unidades: [
+          { codUnidade: 10, sigla: 'U1', nome: 'Unidade 1', situacaoSubprocesso: 'EM_ANDAMENTO', dataLimite: '2023-01-01', filhos: [] }
+      ],
+      resumoSubprocessos: []
   }
+
+  const mockSubprocessosElegiveis = [
+      { codSubprocesso: 1, unidadeNome: 'Test Unit', unidadeSigla: 'TU', situacao: 'NAO_INICIADO' }
+  ]
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -167,9 +167,10 @@ describe('ProcessoView.vue', () => {
 
       const treeTable = wrapper.findComponent(TreeTableStub)
 
-      // Emulate row click
+      // Simulando evento row-click
       const item = { id: 10, unidadeAtual: 'U1', clickable: true };
-      await treeTable.vm.$emit('row-click', item);
+      // Disparar evento diretamente no componente filho
+      treeTable.vm.$emit('row-click', item);
 
       expect(pushMock).toHaveBeenCalledWith({
           name: 'Subprocesso',
@@ -183,9 +184,11 @@ describe('ProcessoView.vue', () => {
       await flushPromises()
 
       const acoes = wrapper.findComponent(ProcessoAcoesStub)
-      await acoes.vm.$emit('finalizar')
+      acoes.vm.$emit('finalizar')
+      await flushPromises() // Aguardar reatividade
 
       const modal = wrapper.findComponent(ModalFinalizacaoStub)
+      expect(modal.exists()).toBe(true)
       expect(modal.props('mostrar')).toBe(true)
   })
 
@@ -195,7 +198,7 @@ describe('ProcessoView.vue', () => {
       await flushPromises()
 
       const modal = wrapper.findComponent(ModalFinalizacaoStub)
-      await modal.vm.$emit('confirmar')
+      modal.vm.$emit('confirmar')
       await flushPromises()
 
       expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1)
@@ -209,7 +212,8 @@ describe('ProcessoView.vue', () => {
       await flushPromises()
 
       const acoes = wrapper.findComponent(ProcessoAcoesStub)
-      await acoes.vm.$emit('aceitarBloco')
+      acoes.vm.$emit('aceitar-bloco')
+      await flushPromises()
 
       const modal = wrapper.findComponent(ModalAcaoBlocoStub)
       expect(modal.props('mostrar')).toBe(true)
@@ -222,7 +226,8 @@ describe('ProcessoView.vue', () => {
       await flushPromises()
 
       const modal = wrapper.findComponent(ModalAcaoBlocoStub)
-      await modal.vm.$emit('confirmar', [{sigla: 'TU', selecionada: true}])
+      modal.vm.$emit('confirmar', [{sigla: 'TU', selecionada: true}])
+      await flushPromises()
 
       expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(expect.objectContaining({
           codProcesso: 1,
@@ -230,8 +235,7 @@ describe('ProcessoView.vue', () => {
           tipoAcao: 'aceitar'
       }))
 
-      // Verify re-fetch happens
-      // It's called inside processarCadastroBloco which is awaited.
-      expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2) // One initial, one after action
+      // Verificar se a busca foi realizada novamente
+      expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2)
   })
 })
