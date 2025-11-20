@@ -52,8 +52,6 @@ import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
-import {useUsuariosStore} from '@/stores/usuarios'
-import {useUnidadesStore} from '@/stores/unidades'
 import {useRouter} from 'vue-router'
 import {type Alerta, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
@@ -62,8 +60,6 @@ import TabelaAlertas from '@/components/TabelaAlertas.vue';
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
 const alertasStore = useAlertasStore()
-const usuariosStore = useUsuariosStore()
-const unidadesStore = useUnidadesStore()
 
 const { processosPainel } = storeToRefs(processosStore)
 const { alertas } = storeToRefs(alertasStore)
@@ -74,17 +70,9 @@ const criterio = ref<keyof ProcessoResumo>('descricao')
 const asc = ref(true)
 
 onMounted(async () => {
-  // Carrega dados básicos necessários para a exibição
-  if (usuariosStore.usuarios.length === 0) {
-    await usuariosStore.fetchUsuarios();
-  }
-  if (unidadesStore.unidades.length === 0) {
-    await unidadesStore.fetchUnidades();
-  }
-  
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
     processosStore.fetchProcessosPainel(perfil.perfilSelecionado, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
-    alertasStore.fetchAlertas(perfil.servidorId?.toString() || '', Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
+    alertasStore.fetchAlertas(Number(perfil.servidorId) || 0, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
   }
 });
 
@@ -131,7 +119,7 @@ function ordenarAlertasPor(campo: 'data' | 'processo') {
     alertaAsc.value = campo === 'data' ? false : true;
   }
   alertasStore.fetchAlertas(
-    perfil.servidorId?.toString() || '',
+    Number(perfil.servidorId) || 0,
     Number(perfil.unidadeSelecionada),
     0,
     10,

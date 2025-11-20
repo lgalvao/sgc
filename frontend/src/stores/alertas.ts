@@ -18,7 +18,7 @@ export const useAlertasStore = defineStore('alertas', {
     },
     actions: {
         async fetchAlertas(
-            usuarioTitulo: string,
+            usuarioTitulo: number,
             unidade: number,
             page: number,
             size: number,
@@ -35,7 +35,7 @@ export const useAlertasStore = defineStore('alertas', {
                 await alertaService.marcarComoLido(idAlerta);
                 const perfilStore = usePerfilStore();
                 if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
-                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20, undefined, undefined);
+                    await this.fetchAlertas(Number(perfilStore.servidorId), Number(perfilStore.unidadeSelecionada), 0, 20, undefined, undefined);
                 }
                 return true;
             } catch {

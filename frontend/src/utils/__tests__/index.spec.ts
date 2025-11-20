@@ -6,23 +6,12 @@ import {
     formatDateBR,
     formatDateForInput,
     formatDateTimeBR,
-    generateUniqueId,
     iconeTipo,
     isDateValidAndFuture,
     parseDate
 } from '@/utils';
 
 describe('utilitários', () => {
-    describe('generateUniqueId', () => {
-        it('deve gerar IDs únicos', () => {
-            const id1 = generateUniqueId();
-            const id2 = generateUniqueId();
-            expect(id1).not.toBe(id2);
-            expect(typeof id1).toBe('number');
-            expect(typeof id2).toBe('number');
-        });
-    });
-
     describe('badgeClass', () => {
         it('deve retornar a classe de badge correta para situações conhecidas', () => {
             expect(badgeClass('Finalizado')).toBe('bg-success');

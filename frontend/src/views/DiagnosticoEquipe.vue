@@ -157,8 +157,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
-import {usePerfil} from '@/composables/usePerfil'
+import {Competencia, MapaCompleto} from '@/types/tipos'
 
 const route = useRoute()
 const router = useRouter()
@@ -166,12 +165,11 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const { servidorLogado } = usePerfil()
 
 const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 
-const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
+const unidade = computed(() => unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -240,32 +238,8 @@ function fecharModalConfirmacao() {
 function confirmarFinalizacao() {
   if (!processoAtual.value) return
 
-  // Registrar movimentação
-  const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
-  if (subprocesso && unidade.value && servidorLogado.value) {
-    const MOCK_SERVER: Servidor = {
-      ...servidorLogado.value,
-      unidade: unidade.value
-    }
-    const MOCK_SUBPROCESSO: Subprocesso = {
-      ...subprocesso,
-      codigo: subprocesso.codSubprocesso,
-      unidade: unidade.value,
-      situacao: subprocesso.situacaoSubprocesso,
-      dataFimEtapa1: '',
-      dataLimiteEtapa2: '',
-      atividades: []
-    }
-    processosStore.addMovement({
-      subprocesso: MOCK_SUBPROCESSO,
-      usuario: MOCK_SERVER,
-      unidadeOrigem: unidade.value,
-      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
-      descricao: 'Diagnóstico da equipe finalizado',
-    });
-  }
-
-  // A criação de alertas agora é responsabilidade do backend
+  // TODO: Implementar chamada real ao backend para finalizar diagnóstico
+  // Registrar movimentação e alertas é responsabilidade do backend
 
   notificacoesStore.sucesso(
       'Diagnóstico finalizado',

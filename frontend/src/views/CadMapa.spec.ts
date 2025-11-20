@@ -5,7 +5,7 @@
     import CadMapa from './CadMapa.vue'
     import { useMapasStore } from '@/stores/mapas'
     import { useRoute } from 'vue-router'
-    import { BFormTextarea, BFormCheckbox, BFormInput } from 'bootstrap-vue-next';
+    import { BFormTextarea, BFormCheckbox, BFormInput, BModal, BButton, vBTooltip } from 'bootstrap-vue-next';
     
     vi.mock('vue-router', () => ({
         useRoute: vi.fn(),
@@ -40,6 +40,11 @@
                     BFormTextarea,
                     BFormCheckbox,
                     BFormInput,
+                    BModal,
+                    BButton,
+                },
+                directives: {
+                    'b-tooltip': vBTooltip,
                 },
             },
         };
@@ -92,6 +97,11 @@
                         BFormTextarea,
                         BFormCheckbox,
                         BFormInput,
+                        BModal,
+                        BButton,
+                    },
+                    directives: {
+                        'b-tooltip': vBTooltip,
                     },
                 },
             })

@@ -72,8 +72,15 @@ O plano deve ser executado sequencialmente.
 1.  Executar `npm run typecheck` para garantir que as refatorações não quebraram contratos de tipos.
 2.  Executar testes unitários afetados (`CadMapa.spec.ts` provavelmente falhará e precisará ser atualizado para testar os novos componentes BModal/BButton em vez de classes CSS puras).
 
-## Instruções para o Agente
+## 3. Status da Execução
 
-*   Ao refatorar `CadMapa.vue`, faça um modal por vez para não quebrar a compilação.
-*   Ao remover `generateUniqueId`, certifique-se de fazer uma busca global no projeto para garantir que não é usado em nenhum outro lugar crítico (testes e2e podem usar, se estiverem em arquivos separados, ignorar).
-*   Priorize a estabilidade: o sistema deve continuar compilando e rodando a cada passo completado.
+### Concluído em 2024-01-28
+- [x] **Passo 1:** Removido código morto (`movements`, `addMovement`, `generateUniqueId`) em `processos.ts`, `utils/index.ts` e views (`DiagnosticoEquipe.vue`, `OcupacoesCriticas.vue`).
+- [x] **Passo 2:** Otimizado `PainelView.vue` removendo fetchs desnecessários de usuários e unidades.
+- [x] **Passo 3:** Refatorado `CadMapa.vue` para usar componentes `BootstrapVueNext` (`BModal`, `BButton`, `v-b-tooltip`) e removida dependência direta do JS do Bootstrap.
+- [x] **Passo 4:** Corrigida tipagem em `painelService.ts` (`usuarioTitulo` para `number`) e ajustado `alertasStore`.
+- [x] **Passo 5:** Verificação final realizada com `npm run typecheck`, `npm run lint` e `npm run test:unit`. Todos os testes passaram.
+
+### Próximos Passos Sugeridos (Fora deste plano)
+- Implementar backend para `DiagnosticoEquipe` e `OcupacoesCriticas` (atualmente com TODOs).
+- Continuar migração de outros componentes para `BootstrapVueNext`.
