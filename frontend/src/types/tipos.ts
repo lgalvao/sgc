@@ -266,6 +266,7 @@ export interface SubprocessoPermissoes {
     podeAceitarCadastro: boolean;
     podeVisualizarDiagnostico: boolean;
     podeAlterarDataLimite: boolean;
+    podeVisualizarImpacto: boolean;
 }
 
 export interface SubprocessoDetalhe {
@@ -362,19 +363,6 @@ export interface MapaAjuste {
     codigo: number;
     descricao: string;
     competencias: Competencia[];
-}
-
-export interface ImpactoMapa {
-    temImpactos: boolean;
-    totalAtividadesInseridas: number;
-    totalAtividadesRemovidas: number;
-
-    totalAtividadesAlteradas: number;
-    totalCompetenciasImpactadas: number;
-    atividadesInseridas: Atividade[];
-    atividadesRemovidas: Atividade[];
-    atividadesAlteradas: Atividade[];
-    competenciasImpactadas: Competencia[];
 }
 
 export interface DisponibilizarMapaRequest {

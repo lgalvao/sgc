@@ -129,11 +129,11 @@ describe('mappers/mapas', () => {
     it('mapImpactoMapaDtoToModel should map impact fields', () => {
         const dto = {
             temImpactos: true,
-            competenciasImpactadas: [{ codigo: 1, atividadesAssociadas: ['A1'] }],
+            competenciasImpactadas: [{ codigo: 1, atividadesAfetadas: ['A1'] }],
         };
         const model = mapImpactoMapaDtoToModel(dto);
         expect(model.temImpactos).toBe(true);
-        expect(model.competenciasImpactadas[0].atividadesAssociadas).toContain('A1');
+        expect(model.competenciasImpactadas[0].atividadesAfetadas).toContain('A1');
     });
 
     it('mapMapaAjusteDtoToModel should map ajuste fields', () => {

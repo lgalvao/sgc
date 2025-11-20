@@ -21,6 +21,7 @@
     
     import { useUnidadesStore } from '@/stores/unidades'
     import { useProcessosStore } from '@/stores/processos'
+    import { useSubprocessosStore } from '@/stores/subprocessos'
     
     describe('CadMapa.vue', () => {
         beforeEach(() => {
@@ -54,8 +55,13 @@
             const unidadesStore = useUnidadesStore()
             unidadesStore.unidades = [{ sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] }]
             const processosStore = useProcessosStore()
-            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1 }] } as any
-    
+            // Added codSubprocesso
+            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1, codSubprocesso: 10 }] } as any
+
+            const subprocessosStore = useSubprocessosStore()
+            // Mock fetchSubprocessoDetalhe
+            subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({})
+
             await wrapper.vm.$nextTick()
     
             await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click')
@@ -90,9 +96,12 @@
             const unidadesStore = useUnidadesStore()
             unidadesStore.unidades = [{ sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] }]
             const processosStore = useProcessosStore()
-            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1 }] } as any
+            // Added codSubprocesso
+            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1, codSubprocesso: 10 }] } as any
     
             const mapasStore = useMapasStore()
+            const subprocessosStore = useSubprocessosStore()
+            subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({})
     
             await wrapper.vm.$nextTick()
     

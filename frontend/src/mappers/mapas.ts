@@ -4,12 +4,12 @@ import type {
     Competencia,
     Conhecimento,
     ConhecimentoVisualizacao,
-    ImpactoMapa,
     Mapa,
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,
 } from '@/types/tipos';
+import type { ImpactoMapa, AtividadeImpactada, CompetenciaImpactada } from '@/types/impacto';
 
 function mapConhecimentoVisualizacaoToModel(dto: ConhecimentoVisualizacao): Conhecimento {
   return {
@@ -76,13 +76,20 @@ export function mapImpactoMapaDtoToModel(dto: any): ImpactoMapa {
     totalAtividadesRemovidas: dto.totalAtividadesRemovidas,
     totalAtividadesAlteradas: dto.totalAtividadesAlteradas,
     totalCompetenciasImpactadas: dto.totalCompetenciasImpactadas,
-    atividadesInseridas: dto.atividadesInseridas || [],
-    atividadesRemovidas: dto.atividadesRemovidas || [],
-    atividadesAlteradas: dto.atividadesAlteradas || [],
-    competenciasImpactadas: (dto.competenciasImpactadas || []).map((c: any): Competencia => ({
+    atividadesInseridas: (dto.atividadesInseridas || []).map((a: any) : AtividadeImpactada => ({
+        ...a
+    })),
+    atividadesRemovidas: (dto.atividadesRemovidas || []).map((a: any) : AtividadeImpactada => ({
+        ...a
+    })),
+    atividadesAlteradas: (dto.atividadesAlteradas || []).map((a: any) : AtividadeImpactada => ({
+        ...a
+    })),
+    competenciasImpactadas: (dto.competenciasImpactadas || []).map((c: any): CompetenciaImpactada => ({
       codigo: c.codigo,
       descricao: c.descricao,
-      atividadesAssociadas: c.atividadesAssociadas || [],
+      atividadesAfetadas: c.atividadesAfetadas || [],
+      tipoImpacto: c.tipoImpacto
     })),
   };
 }

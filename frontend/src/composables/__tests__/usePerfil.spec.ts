@@ -70,6 +70,7 @@ describe('usePerfil', () => {
         vi.mocked(useUnidadesStore).mockReturnValue({
             unidades: mockUnidades,
             pesquisarUnidade: (sigla: string) => mockUnidades.find(u => u.sigla === sigla),
+            pesquisarUnidadePorSigla: (sigla: string) => mockUnidades.find(u => u.sigla === sigla),
         } as any);
 
         vi.mocked(useAtribuicaoTemporariaStore).mockReturnValue({

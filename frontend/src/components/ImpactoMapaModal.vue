@@ -7,151 +7,149 @@
     hide-footer
     @hide="fechar"
   >
-    <template v-if="unidade && processo">
-      <div class="mt-3">
-        <!-- Seção de Atividades Inseridas -->
-        <div
-          v-if="atividadesInseridas.length > 0"
-          data-testid="secao-atividades-inseridas"
-        >
-          <h5
-            class="mb-3"
-            data-testid="titulo-atividades-inseridas"
-          >
-            <i class="bi bi-plus-circle me-2" />Atividades
-            inseridas
-          </h5>
-          <div class="list-group mb-4">
-            <div
-              v-for="atividade in atividadesInseridas"
-              :key="atividade.id"
-              class="list-group-item flex-column align-items-start"
-            >
-              <div class="d-flex w-100 justify-content-start align-items-start">
-                <i
-                  class="bi fs-5 me-3 bi-plus-circle-fill text-success"
-                  style="margin-top: 0.125rem;"
-                />
-                <div class="flex-grow-1">
-                  <p class="mb-1">
-                    <strong>{{ atividade.descricaoAtividade }}</strong>
-                  </p>
-                  <!-- Conhecimentos da atividade inserida -->
-                  <div
-                    v-if="conhecimentosAtividade(atividade.idAtividade).length > 0"
-                    class="mt-2 ms-3"
-                  >
-                    <small
-                      class="text-muted"
-                      data-testid="label-conhecimentos-adicionados"
-                    >Conhecimentos
-                      adicionados:</small>
-                    <ul class="list-unstyled mt-1">
-                      <li
-                        v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)"
-                        :key="conhecimento.id"
-                        class="d-flex align-items-center mb-1"
-                      >
-                        <i
-                          class="bi bi-plus-circle-fill text-success me-2"
-                          style="font-size: 0.875rem;"
-                        />
-                        <small><strong>{{ conhecimento.descricaoConhecimento }}</strong></small>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Seção de Competências Impactadas -->
-        <h5
-          class="mb-3"
-          data-testid="titulo-competencias-impactadas"
-        >
-          <i class="bi bi-bullseye me-2" />Competências
-          impactadas
-        </h5>
-        <div v-if="competenciasImpactadas.size === 0">
-          <p
-            class="text-muted"
-            data-testid="msg-nenhuma-competencia"
-          >
-            Nenhuma competência foi impactada.
-          </p>
-        </div>
-        <div v-else>
-          <div
-            v-for="[comp_id, { competencia, mudancas: mudancasCompetencia }] in competenciasImpactadas"
-            :key="comp_id"
-            class="card mb-3"
-          >
-            <div class="card-header bg-light">
-              <h6 class="card-title mb-0">
-                {{ competencia.descricao }}
-              </h6>
-            </div>
-            <ul class="list-group list-group-flush">
-              <li
-                v-for="mudanca in mudancasCompetencia"
-                :key="mudanca.id"
-                class="list-group-item d-flex align-items-center"
-              >
-                <i
-                  :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"
-                  class="bi me-3"
-                />
-                <small>
-                  <template
-                    v-if="mudanca.tipo === TipoMudanca.AtividadeAdicionada || mudanca.tipo === TipoMudanca.AtividadeRemovida"
-                  >
-                    {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoAtividade }}</strong>
-                  </template>
-                  <template v-else-if="mudanca.tipo === TipoMudanca.AtividadeAlterada">
-                    {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoAtividade }}</strong>
-                    <small class="d-block text-muted">De "{{ mudanca.valorAntigo }}" para "{{
-                      mudanca.valorNovo
-                    }}"</small>
-                  </template>
-                  <template
-                    v-else-if="mudanca.tipo === TipoMudanca.ConhecimentoAdicionado || mudanca.tipo === TipoMudanca.ConhecimentoRemovido"
-                  >
-                    {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoConhecimento }}</strong>
-                  </template>
-                  <template v-else-if="mudanca.tipo === TipoMudanca.ConhecimentoAlterado">
-                    {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoConhecimento }}</strong>
-                    <small class="d-block text-muted">De "{{ mudanca.valorAntigo }}" para "{{
-                      mudanca.valorNovo
-                    }}"</small>
-                  </template>
-                </small>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </template>
     <div
-      v-else
-      class="text-center"
+      v-if="carregando"
+      class="text-center p-4"
     >
       <div
-        class="spinner-border"
+        class="spinner-border text-primary"
         role="status"
       >
         <span class="visually-hidden">Carregando...</span>
       </div>
       <p class="mt-2">
-        Carregando informações do processo e unidade...
+        Verificando impactos...
       </p>
     </div>
+
+    <div v-else-if="impacto">
+      <div
+        v-if="!impacto.temImpactos"
+        class="alert alert-success"
+      >
+        <i class="bi bi-check-circle me-2" /> Nenhum impacto detectado no mapa.
+      </div>
+
+      <div
+        v-else
+        class="mt-3"
+      >
+        <!-- Inseridas -->
+        <div
+          v-if="impacto.atividadesInseridas.length > 0"
+          class="mb-4"
+        >
+          <h5 class="text-success mb-3">
+            <i class="bi bi-plus-circle me-2" />Atividades Inseridas
+          </h5>
+          <ul class="list-group">
+            <li
+              v-for="ativ in impacto.atividadesInseridas"
+              :key="ativ.codigo"
+              class="list-group-item"
+            >
+              <strong>{{ ativ.descricao }}</strong>
+              <div
+                v-if="ativ.competenciasVinculadas && ativ.competenciasVinculadas.length > 0"
+                class="mt-1"
+              >
+                <small class="text-muted">Vinculada a: {{ ativ.competenciasVinculadas.join(', ') }}</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Removidas -->
+        <div
+          v-if="impacto.atividadesRemovidas.length > 0"
+          class="mb-4"
+        >
+          <h5 class="text-danger mb-3">
+            <i class="bi bi-dash-circle me-2" />Atividades Removidas
+          </h5>
+          <ul class="list-group">
+            <li
+              v-for="ativ in impacto.atividadesRemovidas"
+              :key="ativ.codigo"
+              class="list-group-item"
+            >
+              <strong class="text-decoration-line-through text-muted">{{ ativ.descricao }}</strong>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Alteradas -->
+        <div
+          v-if="impacto.atividadesAlteradas.length > 0"
+          class="mb-4"
+        >
+          <h5 class="text-primary mb-3">
+            <i class="bi bi-pencil me-2" />Atividades Alteradas
+          </h5>
+          <ul class="list-group">
+            <li
+              v-for="ativ in impacto.atividadesAlteradas"
+              :key="ativ.codigo"
+              class="list-group-item"
+            >
+              <div class="d-flex flex-column">
+                <strong>{{ ativ.descricao }}</strong>
+                <small
+                  v-if="ativ.descricaoAnterior"
+                  class="text-muted"
+                >Anterior: {{ ativ.descricaoAnterior }}</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Competencias -->
+        <div
+          v-if="impacto.competenciasImpactadas.length > 0"
+          class="mb-4"
+        >
+          <h5 class="text-warning mb-3">
+            <i class="bi bi-exclamation-triangle me-2" />Competências Impactadas
+          </h5>
+          <div
+            v-for="comp in impacto.competenciasImpactadas"
+            :key="comp.codigo"
+            class="card mb-3"
+          >
+            <div class="card-header bg-light">
+              <strong>{{ comp.descricao }}</strong>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li
+                v-for="(ativ, idx) in comp.atividadesAfetadas"
+                :key="idx"
+                class="list-group-item text-muted small"
+              >
+                <i class="bi bi-dot me-1" /> Impactada por: {{ ativ }}
+              </li>
+              <li
+                v-if="comp.tipoImpacto"
+                class="list-group-item text-muted small fst-italic"
+              >
+                Tipo de Impacto: {{ formatTipoImpacto(comp.tipoImpacto) }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="alert alert-danger"
+    >
+      Não foi possível carregar os dados de impacto.
+    </div>
+
     <template #footer>
       <button
         class="btn btn-secondary"
         type="button"
-        data-testid="fechar-impactos-mapa-button"
         @click="fechar"
       >
         Fechar
@@ -161,126 +159,59 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, watch} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {BModal} from 'bootstrap-vue-next';
-import {useUnidadesStore} from '@/stores/unidades';
-import {useProcessosStore} from '@/stores/processos';
+import {storeToRefs} from 'pinia';
 import {useMapasStore} from '@/stores/mapas';
-import {type Mudanca, TipoMudanca, useRevisaoStore} from '@/stores/revisao';
-import type {Competencia} from '@/types/tipos';
+import {useProcessosStore} from '@/stores/processos';
+import {TipoImpactoCompetencia} from '@/types/impacto';
 
 const props = defineProps<{
   mostrar: boolean;
-  idProcesso: number;
+  idProcesso: number; // codProcesso
   siglaUnidade: string;
 }>();
 
 const emit = defineEmits<{ (e: 'fechar'): void }>();
 
-const unidadesStore = useUnidadesStore();
-const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
-const revisaoStore = useRevisaoStore();
+const processosStore = useProcessosStore();
+const { impactoMapa: impacto } = storeToRefs(mapasStore);
 
-const changeDetails = {
-  [TipoMudanca.AtividadeAdicionada]: { icon: 'bi-plus-circle-fill', color: 'text-success', text: 'Atividade adicionada' },
-  [TipoMudanca.AtividadeRemovida]: { icon: 'bi-dash-circle-fill', color: 'text-danger', text: 'Atividade removida' },
-  [TipoMudanca.AtividadeAlterada]: {
-    icon: 'bi-arrow-right-circle-fill',
-    color: 'text-primary',
-    text: 'Atividade alterada',
-  },
-  [TipoMudanca.ConhecimentoAdicionado]: {
-    icon: 'bi-plus-circle-fill',
-    color: 'text-success',
-    text: 'Conhecimento adicionado',
-  },
-  [TipoMudanca.ConhecimentoRemovido]: {
-    icon: 'bi-dash-circle-fill',
-    color: 'text-danger',
-    text: 'Conhecimento removido',
-  },
-  [TipoMudanca.ConhecimentoAlterado]: {
-    icon: 'bi-arrow-right-circle-fill',
-    color: 'text-primary',
-    text: 'Conhecimento alterado',
-  },
-};
-
-const unidade = computed(() => unidadesStore.pesquisarUnidade(props.siglaUnidade));
-const processo = computed(() => processosStore.processoDetalhe);
+const carregando = ref(false);
 
 watch(
   () => props.mostrar,
-  async novoValor => {
+  async (novoValor) => {
     if (novoValor) {
-      await processosStore.fetchProcessoDetalhe(props.idProcesso);
-      // Supondo que idProcesso pode ser usado como codSubrocesso para fins de teste/compilação
-      await mapasStore.fetchMapaCompleto(props.idProcesso);
+      carregando.value = true;
+      try {
+        // Encontrar o subprocesso correspondente à unidade
+        const unidadeParticipante = processosStore.processoDetalhe?.unidades.find(
+            u => u.sigla === props.siglaUnidade
+        );
+
+        if (unidadeParticipante && unidadeParticipante.codSubprocesso) {
+            await mapasStore.fetchImpactoMapa(unidadeParticipante.codSubprocesso);
+        } else {
+            // Fallback ou erro se não encontrar subprocesso
+            console.error("Subprocesso não encontrado para unidade", props.siglaUnidade);
+        }
+      } finally {
+        carregando.value = false;
+      }
     }
-  },
+  }
 );
 
-const mapa = computed(() => {
-  return mapasStore.mapaCompleto;
-});
-
-const mudancas = computed(() => {
-  return revisaoStore.mudancasParaImpacto;
-});
-
-const atividadesInseridas = computed(() => {
-  return mudancas.value.filter(m => m.tipo === TipoMudanca.AtividadeAdicionada);
-});
-
-const conhecimentosAtividade = (idAtividade: number | undefined) => {
-  if (!idAtividade) return [];
-  return mudancas.value.filter(
-    m => m.tipo === TipoMudanca.ConhecimentoAdicionado && m.idAtividade === idAtividade,
-  );
-};
-
-const competenciasImpactadas = computed<Map<number, { competencia: Competencia; mudancas: Mudanca[] }>>(() => {
-  const competenciasImpactadasMap = new Map<number, { competencia: Competencia; mudancas: Mudanca[] }>();
-
-  if (!mapa.value) {
-    return competenciasImpactadasMap;
-  }
-  const mapaAtual = mapa.value;
-
-  mudancas.value
-    .filter(m => m.tipo !== TipoMudanca.AtividadeAdicionada)
-    .forEach(mudanca => {
-      // Verifica competências explicitamente marcadas como impactadas
-      if (mudanca.competenciasImpactadasIds && mudanca.competenciasImpactadasIds.length > 0) {
-        mudanca.competenciasImpactadasIds.forEach(idCompetenciaImpactada => {
-          const competencia = mapaAtual.competencias.find(c => c.codigo === idCompetenciaImpactada);
-          if (competencia) {
-            if (!competenciasImpactadasMap.has(competencia.codigo)) {
-              competenciasImpactadasMap.set(competencia.codigo, { competencia, mudancas: [] });
-            }
-            competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
-          }
-        });
-      }
-
-      // Verifica competências que têm a atividade associada
-      if (mudanca.idAtividade) {
-        mapaAtual.competencias.forEach(competencia => {
-          if (competencia.atividadesAssociadas.includes(mudanca.idAtividade as number)) {
-            if (!competenciasImpactadasMap.has(competencia.codigo)) {
-              competenciasImpactadasMap.set(competencia.codigo, { competencia, mudancas: [] });
-            }
-            const mudancasExistentes = competenciasImpactadasMap.get(competencia.codigo)?.mudancas || [];
-            if (!mudancasExistentes.some(m => m.id === mudanca.id)) {
-              competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
-            }
-          }
-        });
-      }
-    });
-  return competenciasImpactadasMap;
-});
+function formatTipoImpacto(tipo: TipoImpactoCompetencia): string {
+    switch (tipo) {
+        case TipoImpactoCompetencia.ATIVIDADE_REMOVIDA: return 'Atividade Removida';
+        case TipoImpactoCompetencia.ATIVIDADE_ALTERADA: return 'Atividade Alterada';
+        case TipoImpactoCompetencia.IMPACTO_GENERICO: return 'Alteração no Mapa';
+        default: return tipo;
+    }
+}
 
 function fechar() {
   emit('fechar');

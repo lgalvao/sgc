@@ -384,8 +384,9 @@ import {useMapasStore} from '@/stores/mapas'
 import {useAtividadesStore} from '@/stores/atividades'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
+import {useSubprocessosStore} from '@/stores/subprocessos'
 import {usePerfil} from '@/composables/usePerfil'
-import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Competencia, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
@@ -394,6 +395,7 @@ const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
 const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 usePerfil()
 
 const codProcesso = computed(() => Number(route.params.codProcesso))
@@ -405,34 +407,17 @@ const subprocesso = computed(() => {
 });
 
 const podeVerImpacto = computed(() => {
-  if (!perfilStore.perfilSelecionado || !subprocesso.value) return false;
-
-  const perfil = perfilStore.perfilSelecionado;
-  const situacao = subprocesso.value.situacaoSubprocesso;
-
-  const isPermittedProfile = perfil === Perfil.ADMIN;
-  const isCorrectSituation = situacao === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS || situacao === SituacaoSubprocesso.MAPA_AJUSTADO;
-
-  return isPermittedProfile && isCorrectSituation;
+  return subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto || false;
 });
 
 const mostrarModalImpacto = ref(false);
 
 function abrirModalImpacto() {
-  // Segue o comportamento esperado pelos testes:
-  // - Sem mudanças: não abre o modal e exibe notificação "Nenhum impacto..."
-  // - Com mudanças: abre o modal de impactos
-  // if (revisaoStore.mudancasRegistradas.length === 0) {
-  //   notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
-  //   return;
-  // }
-  // revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  // revisaoStore.setMudancasParaImpacto([]);
 }
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
@@ -451,12 +436,13 @@ const unidade = computed<Unidade | null>(() => {
   const unidadesData = processosStore.processoDetalhe?.unidades || [];
   return buscarUnidade(unidadesData as unknown as Unidade[], siglaUnidade.value);
 })
-const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
+    await subprocessosStore.fetchSubprocessoDetalhe(codSubrocesso.value as number);
   }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
