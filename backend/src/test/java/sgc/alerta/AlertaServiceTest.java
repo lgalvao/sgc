@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
+import sgc.alerta.erros.ErroAlerta;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -152,6 +154,61 @@ class AlertaServiceTest {
         service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
         verify(alertaRepo).save(argThat(a -> a.getDescricao().contains("Aguarde a disponibilização")));
+    }
+
+    @Test
+    @DisplayName("criarAlertasProcessoIniciado interoperacional")
+    void criarAlertasProcessoIniciadoInteroperacional() {
+        Processo p = new Processo();
+        p.setDescricao("Proc");
+        Long unidadeId = 1L;
+
+        UnidadeDto uDto = new UnidadeDto();
+        uDto.setTipo(TipoUnidade.INTEROPERACIONAL.name());
+
+        when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
+        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
+        when(alertaRepo.save(any())).thenReturn(new Alerta());
+
+        service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+
+        // Should save 2 alerts
+        verify(alertaRepo, times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("criarAlertasProcessoIniciado falha lança ErroAlerta")
+    void criarAlertasProcessoIniciadoFalha() {
+        Processo p = new Processo();
+        Long unidadeId = 1L;
+
+        when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenThrow(new RuntimeException("Erro SGRH"));
+
+        assertThatThrownBy(() -> service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of()))
+            .isInstanceOf(ErroAlerta.class);
+    }
+
+    @Test
+    @DisplayName("criarAlertaUsuario captura excecao e loga")
+    void criarAlertaUsuarioExcecao() {
+        Processo p = new Processo();
+        Long unidadeId = 1L;
+        Unidade u = new Unidade();
+        u.setCodigo(unidadeId);
+        ResponsavelDto resp = new ResponsavelDto();
+        resp.setTitularTitulo("123");
+
+        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
+        when(alertaRepo.save(any())).thenReturn(new Alerta());
+        when(sgrhService.buscarResponsavelUnidade(unidadeId)).thenReturn(Optional.of(resp));
+        when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+
+        doThrow(new RuntimeException("DB Error")).when(alertaUsuarioRepo).save(any());
+
+        // Should not throw exception
+        service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", null);
+
+        verify(alertaUsuarioRepo).save(any());
     }
 
     @Test

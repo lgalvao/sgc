@@ -74,6 +74,16 @@ class AtividadeServiceTest {
     }
 
     @Test
+    @DisplayName("obterPorCodigo deve lançar exceção se não existir")
+    void obterPorCodigoNaoEncontrado() {
+        Long id = 1L;
+        when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> atividadeService.obterPorCodigo(id))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("criar deve salvar e retornar atividade se usuario autorizado")
     void criar() {
         Long mapaId = 10L;
@@ -99,6 +109,34 @@ class AtividadeServiceTest {
 
         assertThat(result).isNotNull();
         verify(atividadeRepo).save(any());
+    }
+
+    @Test
+    @DisplayName("criar falha se subprocesso nao encontrado")
+    void criarSubprocessoNaoEncontrado() {
+        Long mapaId = 10L;
+        AtividadeDto dto = new AtividadeDto();
+        dto.setMapaCodigo(mapaId);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("criar falha se usuario nao encontrado")
+    void criarUsuarioNaoEncontrado() {
+        Long mapaId = 10L;
+        AtividadeDto dto = new AtividadeDto();
+        dto.setMapaCodigo(mapaId);
+        Subprocesso sp = new Subprocesso();
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(sp));
+        when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -148,6 +186,14 @@ class AtividadeServiceTest {
     }
 
     @Test
+    @DisplayName("atualizar falha se nao encontrado")
+    void atualizarNaoEncontrado() {
+        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> atividadeService.atualizar(1L, new AtividadeDto()))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("excluir deve remover atividade e conhecimentos")
     void excluir() {
         Long id = 1L;
@@ -164,6 +210,14 @@ class AtividadeServiceTest {
     }
 
     @Test
+    @DisplayName("excluir falha se nao encontrado")
+    void excluirNaoEncontrado() {
+        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> atividadeService.excluir(1L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("listarConhecimentos deve retornar lista")
     void listarConhecimentos() {
         Long id = 1L;
@@ -174,6 +228,14 @@ class AtividadeServiceTest {
         var result = atividadeService.listarConhecimentos(id);
 
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("listarConhecimentos falha se atividade nao existe")
+    void listarConhecimentosNaoEncontrada() {
+        when(atividadeRepo.existsById(1L)).thenReturn(false);
+        assertThatThrownBy(() -> atividadeService.listarConhecimentos(1L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -191,6 +253,14 @@ class AtividadeServiceTest {
         var result = atividadeService.criarConhecimento(id, dto);
 
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("criarConhecimento falha se atividade nao existe")
+    void criarConhecimentoAtividadeNaoEncontrada() {
+        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> atividadeService.criarConhecimento(1L, new ConhecimentoDto()))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -218,6 +288,24 @@ class AtividadeServiceTest {
     }
 
     @Test
+    @DisplayName("atualizarConhecimento falha se nao pertence a atividade")
+    void atualizarConhecimentoErrado() {
+        Long ativId = 1L;
+        Long conId = 2L;
+
+        Atividade atividadeOutra = new Atividade();
+        atividadeOutra.setCodigo(99L);
+
+        Conhecimento conhecimento = new Conhecimento();
+        conhecimento.setAtividade(atividadeOutra);
+
+        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
+
+        assertThatThrownBy(() -> atividadeService.atualizarConhecimento(ativId, conId, new ConhecimentoDto()))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("excluirConhecimento deve excluir se pertencer a atividade")
     void excluirConhecimento() {
         Long ativId = 1L;
@@ -234,5 +322,23 @@ class AtividadeServiceTest {
         atividadeService.excluirConhecimento(ativId, conId);
 
         verify(conhecimentoRepo).delete(conhecimento);
+    }
+
+    @Test
+    @DisplayName("excluirConhecimento falha se nao pertence a atividade")
+    void excluirConhecimentoErrado() {
+        Long ativId = 1L;
+        Long conId = 2L;
+
+        Atividade atividadeOutra = new Atividade();
+        atividadeOutra.setCodigo(99L);
+
+        Conhecimento conhecimento = new Conhecimento();
+        conhecimento.setAtividade(atividadeOutra);
+
+        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
+
+        assertThatThrownBy(() -> atividadeService.excluirConhecimento(ativId, conId))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

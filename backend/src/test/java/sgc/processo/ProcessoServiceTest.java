@@ -11,6 +11,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
@@ -19,9 +23,12 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -31,6 +38,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.processo.service.ProcessoService;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.TipoUnidade;
@@ -92,6 +100,24 @@ class ProcessoServiceTest {
     }
 
     @Test
+    @DisplayName("Criar deve lançar exceção se lista de unidades vazia")
+    void criarSemUnidades() {
+        CriarProcessoReq req = new CriarProcessoReq("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of());
+        assertThatThrownBy(() -> processoService.criar(req))
+            .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @Test
+    @DisplayName("Criar deve lançar exceção se unidade não encontrada")
+    void criarUnidadeNaoEncontrada() {
+        CriarProcessoReq req = new CriarProcessoReq("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
+        when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> processoService.criar(req))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("Atualizar deve modificar processo se estiver CRIADO")
     void atualizar() {
         Long id = 100L;
@@ -137,6 +163,28 @@ class ProcessoServiceTest {
     }
 
     @Test
+    @DisplayName("Atualizar deve falhar se unidade não encontrada")
+    void atualizarUnidadeNaoEncontrada() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        AtualizarProcessoReq req = AtualizarProcessoReq.builder()
+            .codigo(id)
+            .descricao("Desc")
+            .tipo(TipoProcesso.MAPEAMENTO)
+            .unidades(List.of(99L))
+            .build();
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+        when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> processoService.atualizar(id, req))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("Apagar deve remover se estiver CRIADO")
     void apagar() {
         Long id = 100L;
@@ -147,6 +195,26 @@ class ProcessoServiceTest {
         processoService.apagar(id);
 
         verify(processoRepo).deleteById(id);
+    }
+
+    @Test
+    @DisplayName("Apagar falha se processo não encontrado")
+    void apagarNaoEncontrado() {
+        when(processoRepo.findById(99L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> processoService.apagar(99L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("Apagar falha se processo não estiver CRIADO")
+    void apagarSituacaoInvalida() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+
+        assertThatThrownBy(() -> processoService.apagar(id))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -187,6 +255,104 @@ class ProcessoServiceTest {
     }
 
     @Test
+    @DisplayName("IniciarMapeamento deve falhar se não houver participantes")
+    void iniciarProcessoMapeamentoSemParticipantes() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setParticipantes(Set.of());
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+
+        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(id, List.of()))
+            .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+    }
+
+    @Test
+    @DisplayName("IniciarMapeamento deve falhar se unidade já participa de outro processo")
+    void iniciarProcessoMapeamentoUnidadeJaEmUso() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        processo.setParticipantes(Set.of(u1));
+
+        Processo outroProcesso = new Processo();
+        outroProcesso.setParticipantes(Set.of(u1));
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(outroProcesso));
+
+        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(id, List.of(1L)))
+            .isInstanceOf(ErroProcesso.class)
+            .hasMessageContaining("já participam de outro processo");
+    }
+
+    @Test
+    @DisplayName("IniciarProcessoRevisao sucesso")
+    void iniciarProcessoRevisao() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.REVISAO);
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(10L);
+        u1.setMapaVigente(mapaVigente);
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+        when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(10L, 1L)).thenReturn(new Mapa());
+        when(subprocessoRepo.save(any())).thenReturn(new Subprocesso());
+
+        processoService.iniciarProcessoRevisao(id, List.of(1L));
+
+        assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+        verify(publicadorEventos).publishEvent(any(EventoProcessoIniciado.class));
+    }
+
+    @Test
+    @DisplayName("IniciarProcessoRevisao falha se unidade sem mapa vigente")
+    void iniciarProcessoRevisaoUnidadeSemMapa() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setMapaVigente(null);
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+        when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
+        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
+
+        assertThatThrownBy(() -> processoService.iniciarProcessoRevisao(id, List.of(1L)))
+            .isInstanceOf(ErroProcesso.class)
+            .hasMessageContaining("não possuem mapa vigente");
+    }
+
+    @Test
+    @DisplayName("IniciarProcessoRevisao falha se lista vazia")
+    void iniciarProcessoRevisaoListaVazia() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+
+        assertThatThrownBy(() -> processoService.iniciarProcessoRevisao(id, List.of()))
+            .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+    }
+
+    @Test
     @DisplayName("Finalizar deve falhar se houver subprocessos não homologados")
     void finalizarFalha() {
         Long id = 100L;
@@ -202,6 +368,19 @@ class ProcessoServiceTest {
 
         assertThatThrownBy(() -> processoService.finalizar(id))
             .isInstanceOf(ErroProcesso.class);
+    }
+
+    @Test
+    @DisplayName("Finalizar deve falhar se processo não está em andamento")
+    void finalizarNaoEmAndamento() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+
+        assertThatThrownBy(() -> processoService.finalizar(id))
+            .isInstanceOf(ErroProcesso.class)
+            .hasMessageContaining("Apenas processos 'EM ANDAMENTO'");
     }
 
     @Test
@@ -233,6 +412,26 @@ class ProcessoServiceTest {
     }
 
     @Test
+    @DisplayName("Finalizar deve falhar se subprocesso sem unidade")
+    void finalizarSubprocessoSemUnidade() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        sp.setUnidade(null);
+
+        when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
+
+        assertThatThrownBy(() -> processoService.finalizar(id))
+            .isInstanceOf(ErroProcesso.class)
+            .hasMessageContaining("sem unidade associada");
+    }
+
+    @Test
     @DisplayName("listarFinalizados e listarAtivos devem chamar repo")
     void listagens() {
         when(processoRepo.findBySituacao(any())).thenReturn(List.of(new Processo()));
@@ -249,5 +448,149 @@ class ProcessoServiceTest {
         when(auth.isAuthenticated()).thenReturn(false);
 
         assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Checar acesso deve retornar false se usuário não tiver role adequada")
+    void checarAcessoSemRole() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("user");
+
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        doReturn(authorities).when(auth).getAuthorities(); // Safe unchecked cast workaround
+
+        assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Checar acesso retorna false se usuário sem unidade")
+    void checarAcessoSemUnidade() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("gestor");
+
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+        doReturn(authorities).when(auth).getAuthorities();
+
+        when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
+
+        assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Checar acesso retorna true se gestor da unidade participante")
+    void checarAcessoParticipante() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        when(auth.getName()).thenReturn("gestor");
+
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+        doReturn(authorities).when(auth).getAuthorities();
+
+        PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
+        when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+        when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
+
+        assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Listar Unidades Bloqueadas")
+    void listarUnidadesBloqueadas() {
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        p.setParticipantes(Set.of(u));
+
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(p));
+
+        List<Long> bloqueadas = processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+        assertThat(bloqueadas).contains(1L);
+    }
+
+    @Test
+    @DisplayName("Listar Subprocessos Elegiveis para Admin")
+    void listarSubprocessosElegiveisAdmin() {
+        Authentication auth = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(auth.getName()).thenReturn("admin");
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        doReturn(authorities).when(auth).getAuthorities();
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+        Unidade u = new Unidade();
+        u.setNome("U1");
+        u.setSigla("S1");
+        sp.setUnidade(u);
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));
+
+        List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getCodSubprocesso()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Listar Subprocessos Elegiveis para Gestor")
+    void listarSubprocessosElegiveisGestor() {
+        Authentication auth = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(auth.getName()).thenReturn("gestor");
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+        doReturn(authorities).when(auth).getAuthorities();
+
+        PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
+        when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setNome("U1");
+        u.setSigla("S1");
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setUnidade(u);
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));
+
+        List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+        assertThat(res).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Listar Subprocessos Elegiveis retorna vazio se usuário sem unidade")
+    void listarSubprocessosElegiveisUsuarioSemUnidade() {
+        Authentication auth = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(auth.getName()).thenReturn("gestor");
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+        doReturn(authorities).when(auth).getAuthorities();
+
+        when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of());
+
+        List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(100L);
+        assertThat(res).isEmpty();
     }
 }
