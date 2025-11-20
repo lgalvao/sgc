@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import SubprocessoCards from '../SubprocessoCards.vue';
 import { type Mapa, TipoProcesso, type Unidade, SubprocessoPermissoes } from '@/types/tipos';
-import { situacaoLabel } from '@/utils';
+import { createTestingPinia } from '@pinia/testing';
 
 const pushMock = vi.fn();
 
@@ -36,12 +36,15 @@ describe('SubprocessoCards.vue', () => {
     podeVisualizarImpacto: true,
   };
 
-  const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: Mapa | null; situacao?: string; permissoes?: SubprocessoPermissoes }) => {
+  const createWrapper = (propsOverride: any = {}) => {
     return mount(SubprocessoCards, {
       props: {
         permissoes: defaultPermissoes,
-        ...props,
+        ...propsOverride,
       },
+      global: {
+        plugins: [createTestingPinia({ stubActions: false })]
+      }
     });
   };
 
@@ -57,9 +60,9 @@ describe('SubprocessoCards.vue', () => {
     dataFinalizacao: null,
   };
 
-  describe('Navigation Logic', () => {
+  describe('Lógica de Navegação', () => {
     it('deve navegar para SubprocessoCadastro ao clicar no card de atividades (edição)', async () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: null,
         situacao: 'Mapa disponibilizado',
@@ -76,7 +79,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('deve navegar para SubprocessoVisCadastro ao clicar no card de atividades (visualização)', async () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: null,
         situacao: 'Mapa disponibilizado',
@@ -93,7 +96,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('deve navegar para SubprocessoMapa ao clicar no card de mapa', async () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: mockMapa,
         situacao: 'Mapa disponibilizado',
@@ -110,7 +113,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('deve navegar para DiagnosticoEquipe ao clicar no card de diagnostico', async () => {
-        const wrapper = mountComponent({
+        const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
             situacao: 'Em andamento',
@@ -127,7 +130,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('deve navegar para OcupacoesCriticas ao clicar no card de ocupações', async () => {
-        const wrapper = mountComponent({
+        const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
             situacao: 'Em andamento',
@@ -143,9 +146,9 @@ describe('SubprocessoCards.vue', () => {
     });
   });
 
-  describe('Rendering Logic', () => {
+  describe('Lógica de Renderização', () => {
       it('não deve renderizar card de mapa se não puder visualizar', () => {
-           const wrapper = mountComponent({
+           const wrapper = createWrapper({
               tipoProcesso: TipoProcesso.MAPEAMENTO,
               mapa: mockMapa,
               situacao: 'Mapa disponibilizado',
