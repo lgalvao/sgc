@@ -47,4 +47,4 @@ O projeto já utiliza BootstrapVueNext, mas a migração está incompleta em com
 ### Passo 4: Frontend - Integração de Permissões e Limpeza
 - [x] 1.  Em `CadMapa.vue`, substituir a computed `podeVerImpacto` pela propriedade vinda do backend `subprocesso.permissoes.podeVisualizarImpacto`.
 - [x] 2.  Remover lógica de cálculo de impacto de `frontend/src/stores/revisao.ts`.
-- [ ] 3.  Executar `npm run typecheck` e garantir integridade.
+- [x] 3.  Executar `npm run typecheck` e garantir integridade.
