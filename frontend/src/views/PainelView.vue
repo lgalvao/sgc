@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <!-- Tabela de Processos -->
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -9,14 +9,14 @@
         >
           Processos
         </div>
-        <router-link
+        <BButton
           v-if="perfil.perfilSelecionado === 'ADMIN'"
           :to="{ name: 'CadProcesso' }"
-          class="btn btn-outline-primary"
+          variant="outline-primary"
           data-testid="btn-criar-processo"
         >
           <i class="bi bi-plus-lg" /> Criar processo
-        </router-link>
+        </BButton>
       </div>
       <TabelaProcessos
         :processos="processosOrdenados"
@@ -42,11 +42,12 @@
         @selecionar-alerta="abrirDetalhesAlerta"
       />
     </div>
-  </div>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue'
+import {BContainer, BButton} from 'bootstrap-vue-next'
 import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'

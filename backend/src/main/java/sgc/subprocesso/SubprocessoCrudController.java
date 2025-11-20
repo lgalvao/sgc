@@ -9,6 +9,8 @@ import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
+import sgc.unidade.service.UnidadeService;
+import sgc.sgrh.dto.UnidadeDto;
 
 import java.net.URI;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class SubprocessoCrudController {
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
+    private final UnidadeService unidadeService;
 
     /**
      * Lista todos os subprocessos.
@@ -44,6 +47,22 @@ public class SubprocessoCrudController {
                                                 @RequestParam(required = false) sgc.sgrh.model.Perfil perfil,
                                                 @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoDtoService.obterDetalhes(codigo, perfil, unidadeUsuario);
+    }
+
+    /**
+     * Busca um subprocesso por código do processo e sigla da unidade.
+     *
+     * @param codProcesso  O código do processo.
+     * @param siglaUnidade A sigla da unidade.
+     * @return O {@link SubprocessoDto} encontrado.
+     */
+    @GetMapping("/buscar")
+    public ResponseEntity<SubprocessoDto> buscarPorProcessoEUnidade(
+            @RequestParam Long codProcesso,
+            @RequestParam String siglaUnidade) {
+        UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        SubprocessoDto dto = subprocessoDtoService.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        return ResponseEntity.ok(dto);
     }
 
     /**

@@ -1,120 +1,111 @@
 <template>
-  <div class="row">
+  <BRow>
     <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
-      <section class="col-md-4 mb-3">
-        <div
+      <BCol md="4" class="mb-3">
+        <BCard
           v-if="permissoes.podeEditarMapa"
-          class="card h-100 card-actionable"
+          class="h-100 card-actionable"
           data-testid="atividades-card"
           @click="navegarPara('SubprocessoCadastro')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Atividades e conhecimentos
-            </h5>
-            <p class="card-text text-muted">
-              Cadastro de atividades e conhecimentos da unidade
-            </p>
-            <span
-              :class="badgeClass(situacao)"
-              class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
-          </div>
-        </div>
-        <div
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Cadastro de atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+        <BCard
           v-else-if="permissoes.podeVisualizarMapa"
-          class="card h-100 card-actionable"
+          class="h-100 card-actionable"
           data-testid="atividades-card-vis"
           @click="navegarPara('SubprocessoVisCadastro')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Atividades e conhecimentos
-            </h5>
-            <p class="card-text text-muted">
-              Visualização das atividades e conhecimentos da unidade
-            </p>
-            <span
-              :class="badgeClass(situacao)"
-              class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização das atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
+      <BCol md="4" class="mb-3">
+        <BCard
           v-if="permissoes.podeVisualizarMapa"
           :class="{ 'disabled-card': !mapa }"
-          class="card h-100 card-actionable"
+          class="h-100 card-actionable"
           data-testid="mapa-card"
           @click="navegarPara('SubprocessoMapa')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Mapa de Competências
-            </h5>
-            <p class="card-text text-muted">
-              Mapa de competências técnicas da unidade
-            </p>
-            <span
-              :class="badgeClass(mapa?.situacao)"
-              class="badge"
-            >{{ situacaoLabel(mapa?.situacao) }}</span>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Mapa de competências técnicas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(mapa?.situacao)"
+            class="badge"
+          >{{ situacaoLabel(mapa?.situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
 
     <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
-      <section class="col-md-4 mb-3">
-        <div
+      <BCol md="4" class="mb-3">
+        <BCard
           v-if="permissoes.podeVisualizarDiagnostico"
-          class="card h-100 card-actionable"
+          class="h-100 card-actionable"
           data-testid="diagnostico-card"
           @click="navegarPara('DiagnosticoEquipe')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Diagnóstico da Equipe
-            </h5>
-            <p class="card-text text-muted">
-              Diagnóstico das competências pelos servidores da unidade
-            </p>
-            <span
-              :class="badgeClass(situacao)"
-              class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Diagnóstico da Equipe
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Diagnóstico das competências pelos servidores da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
+      <BCol md="4" class="mb-3">
+        <BCard
+          class="h-100 card-actionable"
           data-testid="ocupacoes-card"
           @click="navegarPara('OcupacoesCriticas')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Ocupações Críticas
-            </h5>
-            <p class="card-text text-muted">
-              Identificação das ocupações críticas da unidade
-            </p>
-            <span
-              :class="badgeClass(situacao)"
-              class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Ocupações Críticas
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Identificação das ocupações críticas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
-  </div>
+  </BRow>
 </template>
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
+import { BRow, BCol, BCard, BCardTitle, BCardText } from 'bootstrap-vue-next';
 import { Mapa, MapaCompleto, SubprocessoPermissoes, TipoProcesso } from '@/types/tipos';
 import { badgeClass, situacaoLabel } from '@/utils';
 

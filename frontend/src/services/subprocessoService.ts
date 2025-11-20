@@ -18,6 +18,13 @@ export async function fetchSubprocessoDetalhe(id: number, perfil: string, unidad
   return response.data;
 }
 
+export async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
+    const response = await apiClient.get('/subprocessos/buscar', {
+        params: { codProcesso, siglaUnidade }
+    });
+    return response.data;
+}
+
 export async function adicionarCompetencia(codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> {
     const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias`, competencia);
     return mapMapaCompletoDtoToModel(response.data);

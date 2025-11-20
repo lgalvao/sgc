@@ -150,4 +150,20 @@ public class UnidadeService {
             new ArrayList<>()
         );
     }
+
+    public UnidadeDto buscarPorId(Long id) {
+        Unidade unidade = unidadeRepo.findById(id)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + id + " não encontrada"));
+
+        Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
+
+        return new UnidadeDto(
+            unidade.getCodigo(),
+            unidade.getNome(),
+            unidade.getSigla(),
+            codigoPai,
+            unidade.getTipo().name(),
+            new ArrayList<>()
+        );
+    }
 }

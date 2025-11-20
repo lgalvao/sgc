@@ -3,7 +3,7 @@ import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroReques
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
-import {fetchSubprocessoDetalhe} from "@/services/subprocessoService";
+import {fetchSubprocessoDetalhe, buscarSubprocessoPorProcessoEUnidade} from "@/services/subprocessoService";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -70,6 +70,17 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             } catch {
                 notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Não foi possível carregar as informações.');
             }
+        },
+
+        async fetchSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string): Promise<number | null> {
+             const notificacoes = useNotificacoesStore();
+             try {
+                const dto = await buscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                return dto.codigo;
+             } catch {
+                 notificacoes.erro('Erro', 'Não foi possível encontrar o subprocesso para esta unidade.');
+                 return null;
+             }
         },
 
         async disponibilizarCadastro(codSubrocesso: number) {
