@@ -14,37 +14,29 @@
         is-nav
       >
         <BNavbarNav class="me-auto mb-2 mb-lg-0 left-nav">
-          <BNavItem>
-            <BNavLink
-              href="#"
-              @click.prevent="navigateFromNavbar('/painel')"
-            >
-              <i class="bi bi-house-door" /> Painel
-            </BNavLink>
+          <BNavItem
+            href="#"
+            @click.prevent="navigateFromNavbar('/painel')"
+          >
+            <i class="bi bi-house-door" /> Painel
           </BNavItem>
-          <BNavItem>
-            <BNavLink
-              href="#"
-              @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
-            >
-              <i class="bi bi-person" /> Minha unidade
-            </BNavLink>
+          <BNavItem
+            href="#"
+            @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
+          >
+            <i class="bi bi-person" /> Minha unidade
           </BNavItem>
-          <BNavItem>
-            <BNavLink
-              href="#"
-              @click.prevent="navigateFromNavbar('/relatorios')"
-            >
-              <i class="bi bi-bar-chart-line" /> Relatórios
-            </BNavLink>
+          <BNavItem
+            href="#"
+            @click.prevent="navigateFromNavbar('/relatorios')"
+          >
+            <i class="bi bi-bar-chart-line" /> Relatórios
           </BNavItem>
-          <BNavItem>
-            <BNavLink
-              href="#"
-              @click.prevent="navigateFromNavbar('/historico')"
-            >
-              <i class="bi bi-clock-history" /> Histórico
-            </BNavLink>
+          <BNavItem
+            href="#"
+            @click.prevent="navigateFromNavbar('/historico')"
+          >
+            <i class="bi bi-clock-history" /> Histórico
           </BNavItem>
         </BNavbarNav>
 
@@ -59,24 +51,19 @@
           <BNavItem
             v-if="perfilStore.perfilSelecionado === 'ADMIN'"
             class="me-2"
+            href="#"
+            title="Configurações do sistema"
+            data-testid="btn-configuracoes"
+            @click.prevent="navigateFromNavbar('/configuracoes')"
           >
-            <BNavLink
-              href="#"
-              title="Configurações do sistema"
-              data-testid="btn-configuracoes"
-              @click.prevent="navigateFromNavbar('/configuracoes')"
-            >
-              <i class="bi bi-gear fs-5" />
-            </BNavLink>
+            <i class="bi bi-gear fs-5" />
           </BNavItem>
 
-          <BNavItem>
-            <BNavLink
-              title="Sair"
-              to="/login"
-            >
-              <i class="bi bi-box-arrow-right fs-5" />
-            </BNavLink>
+          <BNavItem
+            title="Sair"
+            to="/login"
+          >
+            <i class="bi bi-box-arrow-right fs-5" />
           </BNavItem>
         </BNavbarNav>
       </BCollapse>
@@ -93,7 +80,6 @@ import {
   BNavbarNav,
   BNavbarToggle,
   BNavItem,
-  BNavLink,
 } from 'bootstrap-vue-next';
 import {useRouter} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';

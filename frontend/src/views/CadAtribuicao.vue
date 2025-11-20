@@ -22,7 +22,12 @@
               text-field="nome"
             >
               <template #first>
-                <BFormSelectOption :value="null" disabled>Selecione um servidor</BFormSelectOption>
+                <BFormSelectOption
+                  :value="null"
+                  disabled
+                >
+                  Selecione um servidor
+                </BFormSelectOption>
               </template>
             </BFormSelect>
             <div

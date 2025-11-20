@@ -120,13 +120,14 @@
                   :key="competencia.codigo"
                   class="form-check"
                 >
-                                  <b-form-checkbox
-                                    :id="'comp-' + competencia.codigo"
-                                    v-model="novaOcupacao.competenciasCriticas"
-                                    :value="competencia.descricao"
-                                  >
-                                    {{ competencia.descricao }}
-                                  </b-form-checkbox>                </div>
+                  <b-form-checkbox
+                    :id="'comp-' + competencia.codigo"
+                    v-model="novaOcupacao.competenciasCriticas"
+                    :value="competencia.descricao"
+                  >
+                    {{ competencia.descricao }}
+                  </b-form-checkbox>
+                </div>
               </div>
             </div>
             <div class="col-12">
@@ -211,7 +212,7 @@ const { servidorLogado } = usePerfil()
 const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 
-const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
+const unidade = computed(() => unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
