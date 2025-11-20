@@ -43,6 +43,8 @@ public class SubprocessoPermissoesService {
                 isAdmin || isGestor || isChefeDaUnidade)
             .podeAlterarDataLimite(
                 isAdmin || (isGestor && subprocesso.isEmAndamento()))
+            .podeVisualizarImpacto(
+                isAdmin && (situacao == SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS || situacao == SituacaoSubprocesso.MAPA_AJUSTADO))
             .build();
     }
 
@@ -56,6 +58,7 @@ public class SubprocessoPermissoesService {
             .podeAceitarCadastro(false)
             .podeVisualizarDiagnostico(false)
             .podeAlterarDataLimite(false)
+            .podeVisualizarImpacto(false)
             .build();
     }
 }

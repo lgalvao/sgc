@@ -3,7 +3,8 @@ import {createPinia, setActivePinia} from 'pinia';
 import {useMapasStore} from '../mapas';
 import * as mapaService from '@/services/mapaService';
 import * as subprocessoService from '@/services/subprocessoService';
-import {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
+import {MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
+import {ImpactoMapa} from "@/types/impacto";
 
 vi.mock('@/services/mapaService', () => ({
     obterMapaCompleto: vi.fn(),

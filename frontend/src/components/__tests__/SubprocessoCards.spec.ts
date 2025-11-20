@@ -27,6 +27,7 @@ describe('SubprocessoCards.vue', () => {
     podeAceitarCadastro: true,
     podeVisualizarDiagnostico: true,
     podeAlterarDataLimite: true,
+    podeVisualizarImpacto: true,
   };
 
   const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: Mapa | null; situacao?: string; permissoes?: SubprocessoPermissoes }) => {
