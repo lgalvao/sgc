@@ -116,4 +116,15 @@ public class UnidadeController {
         UnidadeDto unidade = unidadeService.buscarPorSigla(sigla);
         return ResponseEntity.ok(unidade);
     }
+
+    /**
+     * Busca uma unidade específica pelo seu ID.
+     * @param id O ID da unidade.
+     * @return Os dados da unidade.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<UnidadeDto> buscarUnidadePorId(@PathVariable Long id) {
+        UnidadeDto unidade = unidadeService.buscarPorId(id);
+        return ResponseEntity.ok(unidade);
+    }
 }

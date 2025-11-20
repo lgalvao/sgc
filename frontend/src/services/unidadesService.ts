@@ -10,6 +10,11 @@ export async function buscarUnidadePorSigla(sigla: string) {
     return response.data;
 }
 
+export async function buscarUnidadePorCodigo(codigo: number) {
+    const response = await apiClient.get(`/unidades/${codigo}`);
+    return response.data;
+}
+
 export async function buscarArvoreComElegibilidade(tipoProcesso: string, codProcesso?: number) {
     let url = `/unidades/arvore-com-elegibilidade?tipoProcesso=${tipoProcesso}`;
     if (codProcesso) {

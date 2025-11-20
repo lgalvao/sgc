@@ -48,3 +48,17 @@ O projeto já utiliza BootstrapVueNext, mas a migração está incompleta em com
 - [x] 1.  Em `CadMapa.vue`, substituir a computed `podeVerImpacto` pela propriedade vinda do backend `subprocesso.permissoes.podeVisualizarImpacto`.
 - [x] 2.  Remover lógica de cálculo de impacto de `frontend/src/stores/revisao.ts`.
 - [x] 3.  Executar `npm run typecheck` e garantir integridade.
+
+## 4. Registro de Execução
+
+- **Data:** 20/11/2025
+- **Ações Realizadas:**
+    - Verificação de integridade dos tipos com `npm run typecheck` (Sucesso).
+    - Execução de testes de unidade do frontend (`npm run test:unit`) com 100% de sucesso.
+    - Execução de testes de backend (`./gradlew :backend:test`) com sucesso.
+    - Confirmação da remoção de `revisao.ts` e refatoração de `CadMapa.vue` e `ImpactoMapaModal.vue`.
+    - Refatoração de `CadMapa.vue` para remover recursão e carregamento pesado de árvore de processos (Item 1.3).
+    - Implementação de endpoint `GET /api/unidades/{id}` no Backend.
+    - Implementação de endpoint `GET /api/subprocessos/buscar?codProcesso={p}&siglaUnidade={u}` no Backend.
+    - Migração de componentes para BootstrapVueNext: `SubprocessoModal.vue`, `SubprocessoCards.vue`, `PainelView.vue` (Item 2).
+    - Atualização dos testes unitários frontend afetados (`CadMapa.spec.ts`).

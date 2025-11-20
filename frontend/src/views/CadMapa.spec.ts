@@ -20,8 +20,8 @@
     }));
     
     import { useUnidadesStore } from '@/stores/unidades'
-    import { useProcessosStore } from '@/stores/processos'
     import { useSubprocessosStore } from '@/stores/subprocessos'
+    import { useAtividadesStore } from '@/stores/atividades'
     
     describe('CadMapa.vue', () => {
         beforeEach(() => {
@@ -53,15 +53,18 @@
             const wrapper = mount(CadMapa, globalComponents)
     
             const unidadesStore = useUnidadesStore()
-            unidadesStore.unidades = [{ sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] }]
-            const processosStore = useProcessosStore()
-            // Added codSubprocesso
-            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1, codSubprocesso: 10 }] } as any
+            unidadesStore.unidade = { sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] } as any
 
             const subprocessosStore = useSubprocessosStore()
-            // Mock fetchSubprocessoDetalhe
+            subprocessosStore.fetchSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10)
             subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({})
 
+            const atividadesStore = useAtividadesStore()
+            atividadesStore.fetchAtividadesParaSubprocesso = vi.fn().mockResolvedValue({})
+
+            await wrapper.vm.$nextTick()
+            // Wait for async onMounted
+            await new Promise(resolve => setTimeout(resolve, 10))
             await wrapper.vm.$nextTick()
     
             await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click')
@@ -94,15 +97,18 @@
             })
     
             const unidadesStore = useUnidadesStore()
-            unidadesStore.unidades = [{ sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] }]
-            const processosStore = useProcessosStore()
-            // Added codSubprocesso
-            processosStore.processoDetalhe = { unidades: [{ sigla: 'TEST', codUnidade: 1, codSubprocesso: 10 }] } as any
+            unidadesStore.unidade = { sigla: 'TEST', nome: 'Test Unit', codigo: 1, filhas: [] } as any
     
             const mapasStore = useMapasStore()
             const subprocessosStore = useSubprocessosStore()
+            subprocessosStore.fetchSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10)
             subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({})
+
+            const atividadesStore = useAtividadesStore()
+            atividadesStore.fetchAtividadesParaSubprocesso = vi.fn().mockResolvedValue({})
     
+            await wrapper.vm.$nextTick()
+            await new Promise(resolve => setTimeout(resolve, 10))
             await wrapper.vm.$nextTick()
     
             await wrapper.find('[data-testid="btn-disponibilizar-page"]').trigger('click')

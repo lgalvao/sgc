@@ -169,4 +169,11 @@ public class SubprocessoDtoService {
                 .map(subprocessoMapper::toDTO)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
+        Subprocesso sp = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+        return subprocessoMapper.toDTO(sp);
+    }
 }

@@ -384,6 +384,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
+import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfil} from '@/composables/usePerfil'
 import {Atividade, Competencia, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
@@ -392,17 +393,13 @@ const route = useRoute()
 const mapasStore = useMapasStore()
 const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
-const processosStore = useProcessosStore()
+const processosStore = useProcessosStore() // Mantido por compatibilidade se necessário, mas não usado para fetch
 const subprocessosStore = useSubprocessosStore()
+const unidadesStore = useUnidadesStore()
 usePerfil()
 
 const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
-
-const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaUnidade.value);
-});
 
 const podeVerImpacto = computed(() => {
   return subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto || false;
@@ -418,30 +415,25 @@ function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
 }
 
-function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return null
-}
-
-const unidade = computed<Unidade | null>(() => {
-  // TODO: Fix unidades source
-  const unidadesData = processosStore.processoDetalhe?.unidades || [];
-  return buscarUnidade(unidadesData as unknown as Unidade[], siglaUnidade.value);
-})
-const codSubrocesso = computed(() => subprocesso.value?.codSubprocesso);
+const unidade = computed(() => unidadesStore.unidade);
+const codSubrocesso = ref<number | null>(null);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
-  if (codSubrocesso.value) {
-    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
-    await subprocessosStore.fetchSubprocessoDetalhe(codSubrocesso.value as number);
+  // Carrega unidade diretamente
+  await unidadesStore.fetchUnidade(siglaUnidade.value);
+
+  // Busca ID do subprocesso
+  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
+
+  if (id) {
+    codSubrocesso.value = id;
+    await Promise.all([
+      mapasStore.fetchMapaCompleto(id),
+      subprocessosStore.fetchSubprocessoDetalhe(id),
+      atividadesStore.fetchAtividadesParaSubprocesso(id)
+    ]);
   }
+
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
     if (typeof document !== 'undefined') {

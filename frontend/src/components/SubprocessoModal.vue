@@ -6,47 +6,46 @@
     hide-footer
     @hide="$emit('fecharModal')"
   >
-    <div class="mb-3">
-      <label class="form-label">Nova data limite</label>
-      <input
+    <BFormGroup
+      label="Nova data limite"
+      description="Selecione uma data futura"
+    >
+      <BFormInput
         v-model="novaDataLimite"
         type="date"
-        class="form-control"
         :min="dataLimiteMinima"
         data-testid="input-nova-data-limite"
-      >
-      <div class="form-text">
+      />
+      <template #description>
         Data limite atual: {{ dataLimiteAtualFormatada }}
-      </div>
-    </div>
+      </template>
+    </BFormGroup>
 
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="btn-modal-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
         Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary"
+      </BButton>
+      <BButton
+        variant="primary"
         :disabled="!novaDataLimite || !isDataValida"
         data-testid="btn-modal-confirmar"
         @click="$emit('confirmarAlteracao', novaDataLimite)"
       >
         <i class="bi bi-check-circle me-1" />
         Confirmar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
-import {BModal} from 'bootstrap-vue-next';
+import {BModal, BButton, BFormInput, BFormGroup} from 'bootstrap-vue-next';
 import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils';
 
 interface Props {
