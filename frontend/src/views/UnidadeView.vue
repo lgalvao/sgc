@@ -76,7 +76,7 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
 import {useUsuariosStore} from '@/stores/usuarios'
 import {useMapasStore} from '@/stores/mapas'
-import TreeTable from '../components/TreeTable.vue'
+import TreeTable from '../components/TreeTableView.vue'
 import {MapaCompleto, Usuario, Unidade, Responsavel} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 import {

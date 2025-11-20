@@ -1,22 +1,32 @@
-import {mount} from '@vue/test-utils'
+import {mount, flushPromises} from '@vue/test-utils'
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import CadAtividades from '@/views/CadAtividades.vue'
 import {createTestingPinia} from '@pinia/testing'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
-import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos'
-import { BFormInput } from 'bootstrap-vue-next';
+import {SituacaoSubprocesso, TipoProcesso, Perfil} from '@/types/tipos'
+import { BFormInput, BButton, BModal } from 'bootstrap-vue-next';
+import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue';
+import EditarConhecimentoModal from '@/components/EditarConhecimentoModal.vue';
+import * as usePerfilModule from '@/composables/usePerfil';
+
+const pushMock = vi.fn();
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: pushMock,
   }),
   createRouter: () => ({
     beforeEach: vi.fn(),
     afterEach: vi.fn(),
   }),
   createWebHistory: () => ({}),
+}));
+
+// Mock usePerfil
+vi.mock('@/composables/usePerfil', () => ({
+    usePerfil: vi.fn()
 }));
 
 const mockAtividades = [
@@ -36,13 +46,18 @@ const mockAtividades = [
 ];
 
 describe('CadAtividades.vue', () => {
-  let wrapper;
-  let atividadesStore;
-  let processosStore;
-  let subprocessosStore;
+  let wrapper: any;
 
   function createWrapper(isRevisao = false) {
-    return mount(CadAtividades, {
+    // Setup usePerfil mock per test
+    vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
+        perfilSelecionado: { value: Perfil.CHEFE },
+        servidorLogado: { value: null },
+        unidadeSelecionada: { value: null },
+        getPerfisDoServidor: vi.fn()
+    } as any);
+
+    const wrapper = mount(CadAtividades, {
       props: {
         codProcesso: 1,
         sigla: 'TESTE',
@@ -51,9 +66,6 @@ describe('CadAtividades.vue', () => {
         plugins: [
           createTestingPinia({
             initialState: {
-              perfil: {
-                perfilSelecionado: 'CHEFE',
-              },
               processos: {
                 processoDetalhe: {
                   codigo: 1,
@@ -69,40 +81,60 @@ describe('CadAtividades.vue', () => {
               },
               unidades: {
                 unidade: {codigo: 1, nome: 'Unidade de Teste', sigla: 'TESTE'}
+              },
+              atividades: {
+                  atividadesPorSubprocesso: new Map()
               }
-            },
-            stubActions: false,
+            }
           }),
         ],
-        components: {
-          BFormInput,
+        stubs: {
+             ImportarAtividadesModal: true,
+             EditarConhecimentoModal: true,
+             BModal: {
+                template: `
+                   <div class="b-modal-stub">
+                     <slot />
+                     <slot name="footer" />
+                   </div>
+                `,
+                props: ['modelValue']
+             }
         },
       },
       attachTo: document.body,
     });
+
+    const atividadesStore = useAtividadesStore();
+    const processosStore = useProcessosStore();
+    const subprocessosStore = useSubprocessosStore();
+
+    return { wrapper, atividadesStore, processosStore, subprocessosStore };
   }
 
   beforeEach(async () => {
-    wrapper = createWrapper();
-    atividadesStore = useAtividadesStore();
-    processosStore = useProcessosStore();
-    subprocessosStore = useSubprocessosStore();
-    // unidadesStore = useUnidadesStore();
-    // analisesStore = useAnalisesStore();
-    // notificacoesStore = useNotificacoesStore();
-
-    atividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue(mockAtividades);
-    processosStore.fetchProcessoDetalhe = vi.fn().mockResolvedValue(undefined);
+    vi.clearAllMocks();
     window.confirm = vi.fn(() => true);
-    
-    await wrapper.vm.$nextTick();
   });
 
   afterEach(() => {
     wrapper?.unmount();
   });
 
+  it('deve carregar atividades no mount', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    expect(atividadesStore.fetchAtividadesParaSubprocesso).toHaveBeenCalledWith(123);
+  });
+
   it('deve adicionar uma atividade', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
     const inputWrapper = wrapper.findComponent(BFormInput);
     const nativeInput = inputWrapper.find('input');
     await nativeInput.setValue('Nova Atividade');
@@ -115,12 +147,22 @@ describe('CadAtividades.vue', () => {
   });
 
   it('deve remover uma atividade', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
     await wrapper.find('[data-testid="btn-remover-atividade"]').trigger('click');
     expect(window.confirm).toHaveBeenCalled();
     expect(atividadesStore.removerAtividade).toHaveBeenCalledWith(123, 1);
   });
 
   it('deve adicionar um conhecimento', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
     const form = wrapper.find('[data-testid="form-novo-conhecimento"]');
     const inputWrapper = form.findComponent(BFormInput);
     const nativeInput = inputWrapper.find('input');
@@ -135,18 +177,83 @@ describe('CadAtividades.vue', () => {
   });
 
   it('deve remover um conhecimento', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
     await wrapper.find('[data-testid="btn-remover-conhecimento"]').trigger('click');
     expect(window.confirm).toHaveBeenCalled();
     expect(atividadesStore.removerConhecimento).toHaveBeenCalledWith(123, 1, 101);
   });
 
   it('deve disponibilizar o cadastro', async () => {
+    const { wrapper: w, atividadesStore, subprocessosStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
-    // Modal is teleported to body, so we need to search in document
-    const confirmBtn = document.body.querySelector('[data-testid="btn-confirmar-disponibilizacao"]');
-    if (confirmBtn) {
-        await confirmBtn.dispatchEvent(new Event('click'));
-    }
+
+    const confirmBtn = wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]');
+    await confirmBtn.trigger('click');
+
     expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
+    expect(pushMock).toHaveBeenCalledWith('/painel');
+  });
+
+  it('deve abrir modal de importar atividades', async () => {
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper.find('[title="Importar"]').trigger('click'); // Use title selector if data-testid missing
+
+    const modal = wrapper.findComponent(ImportarAtividadesModal);
+    expect(modal.props('mostrar')).toBe(true);
+  });
+
+  it('deve permitir edição inline de atividade', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
+
+    // Check if input appears
+    expect(wrapper.find('[data-testid="input-editar-atividade"]').exists()).toBe(true);
+
+    await wrapper.find('[data-testid="input-editar-atividade"]').setValue('Atividade Editada');
+    await wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
+
+    expect(atividadesStore.atualizarAtividade).toHaveBeenCalled();
+  });
+
+  it('deve abrir modal de editar conhecimento', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-editar-conhecimento"]').trigger('click');
+
+    const modal = wrapper.findComponent(EditarConhecimentoModal);
+    expect(modal.props('mostrar')).toBe(true);
+    expect(modal.props('conhecimento')).toBeTruthy();
+  });
+
+  it('deve tratar disponibilizacao de revisao', async () => {
+      const { wrapper: w, atividadesStore, subprocessosStore } = createWrapper(true); // isRevisao = true
+      wrapper = w;
+      atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+      await flushPromises();
+
+      await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
+
+      const confirmBtn = wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]');
+      await confirmBtn.trigger('click');
+
+      expect(subprocessosStore.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(123);
   });
 });
