@@ -29,22 +29,22 @@ O projeto já utiliza BootstrapVueNext, mas a migração está incompleta em com
 ## 3. Plano de Execução Detalhado
 
 ### Passo 1: Backend - Permissões de Impacto
-1.  Adicionar campo `podeVisualizarImpacto` (boolean) ao `SubprocessoPermissoesDto`.
-2.  Implementar lógica no `SubprocessoPermissoesService`: `(isAdmin) && (situacao == ATIVIDADES_HOMOLOGADAS || situacao == MAPA_AJUSTADO)`.
-3.  Verificar testes backend.
+- [x] 1.  Adicionar campo `podeVisualizarImpacto` (boolean) ao `SubprocessoPermissoesDto`.
+- [x] 2.  Implementar lógica no `SubprocessoPermissoesService`: `(isAdmin) && (situacao == ATIVIDADES_HOMOLOGADAS || situacao == MAPA_AJUSTADO)`.
+- [x] 3.  Verificar testes backend.
 
 ### Passo 2: Frontend - Tipagem e Serviço de Impacto
-1.  Criar interfaces TypeScript em `frontend/src/types/impacto.ts` espelhando `ImpactoMapaDto`, `AtividadeImpactadaDto`, `CompetenciaImpactadaDto`.
-2.  Adicionar método `verificarImpactos(idSubprocesso: number): Promise<ImpactoMapa>` em `frontend/src/services/mapaService.ts`.
+- [x] 1.  Criar interfaces TypeScript em `frontend/src/types/impacto.ts` espelhando `ImpactoMapaDto`, `AtividadeImpactadaDto`, `CompetenciaImpactadaDto`.
+- [x] 2.  Adicionar método `verificarImpactos(idSubprocesso: number): Promise<ImpactoMapa>` em `frontend/src/services/mapaService.ts`.
 
 ### Passo 3: Frontend - Refatoração do Modal de Impacto
-1.  Alterar `ImpactoMapaModal.vue`:
+- [x] 1.  Alterar `ImpactoMapaModal.vue`:
     -   Remover dependência de `revisaoStore.mudancasParaImpacto`.
     -   Adicionar chamada a `mapaService.verificarImpactos` ao abrir o modal.
     -   Atualizar template para consumir a estrutura do `ImpactoMapa`.
-2.  Testar o componente refatorado.
+- [x] 2.  Testar o componente refatorado.
 
 ### Passo 4: Frontend - Integração de Permissões e Limpeza
-1.  Em `CadMapa.vue`, substituir a computed `podeVerImpacto` pela propriedade vinda do backend `subprocesso.permissoes.podeVisualizarImpacto`.
-2.  Remover lógica de cálculo de impacto de `frontend/src/stores/revisao.ts`.
-3.  Executar `npm run typecheck` e garantir integridade.
+- [x] 1.  Em `CadMapa.vue`, substituir a computed `podeVerImpacto` pela propriedade vinda do backend `subprocesso.permissoes.podeVisualizarImpacto`.
+- [x] 2.  Remover lógica de cálculo de impacto de `frontend/src/stores/revisao.ts`.
+- [ ] 3.  Executar `npm run typecheck` e garantir integridade.

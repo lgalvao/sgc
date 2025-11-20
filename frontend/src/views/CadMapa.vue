@@ -382,7 +382,6 @@ import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
 import {useAtividadesStore} from '@/stores/atividades'
-import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
 import {usePerfil} from '@/composables/usePerfil'
@@ -393,7 +392,6 @@ const route = useRoute()
 const mapasStore = useMapasStore()
 const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
-const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
 const subprocessosStore = useSubprocessosStore()
 usePerfil()
