@@ -2,7 +2,7 @@ import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import TreeRowItem from '../TreeRowItem.vue';
 
-describe('TreeRow.vue', () => {
+describe('TreeRowItem.vue', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -37,7 +37,7 @@ describe('TreeRow.vue', () => {
         });
 
         expect(wrapper.find('.toggle-icon').exists()).toBe(true);
-        expect(wrapper.find('.bi-chevron-right').exists()).toBe(true); // Ícone inicial
+        expect(wrapper.find('.bi-chevron-right').exists()).toBe(true);
     });
 
     it('não deve exibir o toggle-icon se não houver children', () => {
@@ -60,21 +60,36 @@ describe('TreeRow.vue', () => {
         const toggleIcon = wrapper.find('.toggle-icon');
         expect(toggleIcon.exists()).toBe(true);
         
-        // Verify the function exists and is callable
-        const toggleExpand = (wrapper.vm as any).toggleExpand;
-        expect(typeof toggleExpand).toBe('function');
+        await toggleIcon.trigger('click');
+
+        expect(wrapper.emitted('toggle')).toHaveLength(1);
+        expect(wrapper.emitted('toggle')![0]).toEqual([1]);
     });
 
-    it('deve emitir o evento row-click ao clicar na linha se clickable for true', async () => {
+    it('deve emitir o evento row-click ao clicar na linha se clickable for true (padrao)', async () => {
         const item = {id: 1, nome: 'Item 1', clickable: true};
         const columns = [{key: 'nome', label: 'Nome'}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 0},
         });
 
-        // Verify the function exists and is callable
-        const handleRowClick = (wrapper.vm as any).handleRowClick;
-        expect(typeof handleRowClick).toBe('function');
+        await wrapper.find('tr').trigger('click');
+
+        expect(wrapper.emitted('row-click')).toHaveLength(1);
+        expect(wrapper.emitted('row-click')![0]).toEqual([item]);
+    });
+
+    it('deve emitir o evento row-click ao clicar na linha se clickable for undefined (default true logic check)', async () => {
+        // Since clickable? is optional, if it's undefined, the check `props.item.clickable === false` is false, so it should emit.
+        const item = {id: 1, nome: 'Item 1'};
+        const columns = [{key: 'nome', label: 'Nome'}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        await wrapper.find('tr').trigger('click');
+
+        expect(wrapper.emitted('row-click')).toHaveLength(1);
     });
 
     it('não deve emitir o evento row-click ao clicar na linha se clickable for false', async () => {
@@ -85,8 +100,8 @@ describe('TreeRow.vue', () => {
         });
 
         await wrapper.find('tr').trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(wrapper.emitted()['row-click']).toBeUndefined();
+
+        expect(wrapper.emitted('row-click')).toBeUndefined();
     });
 
     it('deve exibir o ícone chevron-down quando item está expandido', () => {
@@ -99,17 +114,5 @@ describe('TreeRow.vue', () => {
         expect(wrapper.find('.toggle-icon').exists()).toBe(true);
         expect(wrapper.find('.bi-chevron-down').exists()).toBe(true);
         expect(wrapper.find('.bi-chevron-right').exists()).toBe(false);
-    });
-
-    it('deve exibir o ícone chevron-right quando item não está expandido', () => {
-        const item = {id: 1, nome: 'Item 1', children: [{id: 2, nome: 'Child 1'}], expanded: false};
-        const columns = [{key: 'nome', label: 'Nome'}];
-        const wrapper = mount(TreeRowItem, {
-            props: {item, columns, level: 0},
-        });
-
-        expect(wrapper.find('.toggle-icon').exists()).toBe(true);
-        expect(wrapper.find('.bi-chevron-right').exists()).toBe(true);
-        expect(wrapper.find('.bi-chevron-down').exists()).toBe(false);
     });
 });

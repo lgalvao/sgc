@@ -5,6 +5,7 @@ import {createTestingPinia} from '@pinia/testing'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
+import {useAnalisesStore} from '@/stores/analises'
 import {SituacaoSubprocesso, TipoProcesso, Perfil} from '@/types/tipos'
 import { BFormInput, BButton, BModal } from 'bootstrap-vue-next';
 import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue';
@@ -48,7 +49,7 @@ const mockAtividades = [
 describe('CadAtividades.vue', () => {
   let wrapper: any;
 
-  function createWrapper(isRevisao = false) {
+  function createWrapper(isRevisao = false, customState = {}) {
     // Setup usePerfil mock per test
     vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
         perfilSelecionado: { value: Perfil.CHEFE },
@@ -84,7 +85,11 @@ describe('CadAtividades.vue', () => {
               },
               atividades: {
                   atividadesPorSubprocesso: new Map()
-              }
+              },
+              analises: {
+                  analisesPorSubprocesso: new Map()
+              },
+              ...customState
             }
           }),
         ],
@@ -92,13 +97,16 @@ describe('CadAtividades.vue', () => {
              ImportarAtividadesModal: true,
              EditarConhecimentoModal: true,
              BModal: {
+                name: 'BModal',
                 template: `
-                   <div class="b-modal-stub">
+                   <div v-if="modelValue" class="b-modal-stub" :aria-label="title">
+                     <div class="stub-title">{{ title }}</div>
                      <slot />
                      <slot name="footer" />
                    </div>
                 `,
-                props: ['modelValue']
+                props: ['modelValue', 'title'],
+                emits: ['update:modelValue']
              }
         },
       },
@@ -108,8 +116,9 @@ describe('CadAtividades.vue', () => {
     const atividadesStore = useAtividadesStore();
     const processosStore = useProcessosStore();
     const subprocessosStore = useSubprocessosStore();
+    const analisesStore = useAnalisesStore();
 
-    return { wrapper, atividadesStore, processosStore, subprocessosStore };
+    return { wrapper, atividadesStore, processosStore, subprocessosStore, analisesStore };
   }
 
   beforeEach(async () => {
@@ -207,7 +216,7 @@ describe('CadAtividades.vue', () => {
     wrapper = w;
     await flushPromises();
 
-    await wrapper.find('[title="Importar"]').trigger('click'); // Use title selector if data-testid missing
+    await wrapper.find('[title="Importar"]').trigger('click');
 
     const modal = wrapper.findComponent(ImportarAtividadesModal);
     expect(modal.props('mostrar')).toBe(true);
@@ -255,5 +264,47 @@ describe('CadAtividades.vue', () => {
       await confirmBtn.trigger('click');
 
       expect(subprocessosStore.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(123);
+  });
+
+  it('deve abrir modal de historico de analise se houver analises', async () => {
+    const { wrapper: w, analisesStore } = createWrapper();
+    wrapper = w;
+
+    // Setup state directly
+    analisesStore.analisesPorSubprocesso.set(123, [{
+        codigo: 1,
+        dataHora: '2023-10-10T10:00:00',
+        unidadeSigla: 'TESTE',
+        resultado: 'REJEITADO',
+        observacoes: 'Obs'
+    }]);
+
+    await flushPromises();
+
+    const buttons = wrapper.findAll('button');
+    const btn = buttons.find((b: any) => b.text().includes('Histórico de análise'));
+    expect(btn.exists()).toBe(true);
+
+    await btn.trigger('click');
+    await flushPromises();
+
+    // Check for table headers and data which confirms modal is open
+    expect(wrapper.text()).toContain('Data/Hora');
+    expect(wrapper.text()).toContain('REJEITADO');
+  });
+
+  it('deve exibir alerta de atividades sem conhecimento ao disponibilizar', async () => {
+    const { wrapper: w, atividadesStore } = createWrapper();
+    wrapper = w;
+
+    // Activity 2 has empty knowledge
+    atividadesStore.atividadesPorSubprocesso.set(123, [...mockAtividades]);
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('As seguintes atividades não têm conhecimentos associados');
+    expect(wrapper.text()).toContain('Atividade 2');
   });
 });

@@ -504,13 +504,6 @@ const podeVerImpacto = computed(() => {
   return subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 });
 
-const processoSelecionado = ref<ProcessoResumo | null>(null)
-const processoSelecionadoId = ref<number | null>(null)
-const unidadesParticipantes = ref<UnidadeParticipante[]>([])
-const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
-const unidadeSelecionadaId = ref<number | null>(null)
-const atividadesParaImportar = ref<Atividade[]>([])
-
 const mostrarModalImpacto = ref(false)
 const mostrarModalImportar = ref(false)
 const mostrarModalConfirmacao = ref(false)
@@ -527,57 +520,6 @@ onMounted(async () => {
     await analisesStore.fetchAnalisesCadastro(codSubrocesso.value)
   }
 });
-
-watch(processoSelecionadoId, (newId) => {
-  if (newId) {
-    const processo = processosDisponiveis.value.find(p => p.codigo === newId)
-    if (processo) {
-      selecionarProcesso(processo)
-    }
-  } else {
-    selecionarProcesso(null)
-  }
-})
-
-watch(unidadeSelecionadaId, (newId) => {
-  if (newId) {
-    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === newId)
-    if (unidade) {
-      selecionarUnidade(unidade)
-    }
-  } else {
-    selecionarUnidade(null)
-  }
-})
-
-const processosDisponiveis = computed<ProcessoResumo[]>(() => {
-  return processosStore.processosPainel.filter(p =>
-      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'FINALIZADO'
-  )
-})
-
-async function selecionarProcesso(processo: ProcessoResumo | null) {
-  processoSelecionado.value = processo
-  if (processo) {
-    await processosStore.fetchProcessoDetalhe(processo.codigo);
-    unidadesParticipantes.value = processosStore.processoDetalhe?.unidades || [];
-  } else {
-    unidadesParticipantes.value = [];
-  }
-  unidadeSelecionada.value = null
-  unidadeSelecionadaId.value = null
-}
-
-async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
-  unidadeSelecionada.value = unidadePu
-  if (unidadePu) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade)
-    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade)
-    atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : []
-  } else {
-    atividadesParaImportar.value = []
-  }
-}
 
 function validarAtividades(): Atividade[] {
   return atividades.value.filter(atividade => atividade.conhecimentos.length === 0);
