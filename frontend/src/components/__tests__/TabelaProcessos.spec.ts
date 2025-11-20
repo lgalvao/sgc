@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {mount, VueWrapper} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import {BTable} from 'bootstrap-vue-next';
@@ -86,7 +86,7 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    await wrapper.findComponent(BTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
+    await (wrapper.findComponent(BTable) as unknown as VueWrapper<any>).vm.$emit('sort-changed', { sortBy: 'tipo' });
 
     expect(wrapper.emitted('ordenar')).toBeTruthy();
     expect(wrapper.emitted('ordenar')![0]).toEqual(['tipo']);

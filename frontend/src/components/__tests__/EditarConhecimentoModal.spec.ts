@@ -42,7 +42,6 @@ describe('EditarConhecimentoModal', () => {
       ...globalComponents,
     });
 
-    const textarea = wrapper.find('[data-testid="input-conhecimento-modal"]');
     expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe(conhecimento.descricao);
   });
 

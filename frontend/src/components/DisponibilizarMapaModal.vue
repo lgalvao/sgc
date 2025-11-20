@@ -8,18 +8,18 @@
     hide-footer
     @hide="fechar"
   >
-        <div class="mb-3">
-          <label
-            class="form-label"
-            for="dataLimite"
-          >Data limite para validação</label>
-          <BFormInput
-            id="dataLimite"
-            v-model="dataLimiteValidacao"
-            type="date"
-            data-testid="input-data-limite"
-          />
-        </div>    <div
+    <div class="mb-3">
+      <label
+        class="form-label"
+        for="dataLimite"
+      >Data limite para validação</label>
+      <BFormInput
+        id="dataLimite"
+        v-model="dataLimiteValidacao"
+        type="date"
+        data-testid="input-data-limite"
+      />
+    </div>    <div
       v-if="notificacao"
       class="alert alert-info mt-3"
     >

@@ -4,7 +4,9 @@
       variant="secondary"
       class="mb-2"
       style="border-radius: 0"
-    >Detalhes do processo</BBadge>
+    >
+      Detalhes do processo
+    </BBadge>
     <h2
       class="display-6"
       data-testid="processo-info"

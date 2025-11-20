@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
+import { mount, VueWrapper, flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
 import { Atividade, ProcessoResumo, TipoProcesso } from '@/types/tipos';
-import { nextTick, ref } from 'vue';
-import { BFormSelect, BFormCheckbox } from 'bootstrap-vue-next';
+import { ref } from 'vue';
+import { BFormSelect } from 'bootstrap-vue-next';
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
@@ -64,16 +64,14 @@ describe('ImportarAtividadesModal', () => {
     expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
     // Simulate user selecting a process and unit
-    const selects = wrapper.findAllComponents(BFormSelect);
+    const selects = wrapper.findAllComponents(BFormSelect as any);
     await selects[0].setValue('1');
-    await nextTick();
-    await selects[1].setValue('100');
-    await nextTick();
+    await flushPromises();
+    await selects[1].setValue('10');
+    await flushPromises();
 
     // Find and check the checkbox for the activity
-    await nextTick();
-    await nextTick();
-    await wrapper.findComponent(BFormCheckbox).trigger('click');
+    await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
 
     // Now, the button should be enabled
     expect((importButton.element as HTMLButtonElement).disabled).toBe(false);

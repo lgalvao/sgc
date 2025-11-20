@@ -75,7 +75,12 @@
               data-testid="select-perfil-unidade"
             >
               <template #first>
-                <b-form-select-option :value="null" disabled>-- Selecione uma opção --</b-form-select-option>
+                <b-form-select-option
+                  :value="null"
+                  disabled
+                >
+                  -- Selecione uma opção --
+                </b-form-select-option>
               </template>
             </b-form-select>
           </div>

@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import CriarCompetenciaModal from '../CriarCompetenciaModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
-import { BFormTextarea, BFormCheckbox } from 'bootstrap-vue-next';
+import { BFormTextarea } from 'bootstrap-vue-next';
 
 describe('CriarCompetenciaModal', () => {
   beforeEach(() => {
@@ -91,7 +91,8 @@ describe('CriarCompetenciaModal', () => {
 
     const descricao = 'Competência de teste';
     await wrapper.findComponent(BFormTextarea).setValue(descricao);
-    await wrapper.find('input[type="checkbox"]').trigger('click');
+    await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
+    await flushPromises();
     await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();

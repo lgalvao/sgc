@@ -19,10 +19,9 @@
 
 <script lang="ts" setup>
 import type {Alerta} from '@/types/tipos';
-import { ref } from 'vue';
 import {BTable} from 'bootstrap-vue-next';
 
-const props = defineProps<{
+defineProps<{
   alertas: Alerta[]
 }>();
 
