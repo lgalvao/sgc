@@ -143,9 +143,9 @@ function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-      router.push({ name: 'Subprocesso', params: { codProcesso: codProcesso.value.toString(), siglaUnidade: String(item.sigla) } })
-    } else if ((perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') && perfilStore.unidadeSelecionada === item.codUnidade) {
-      router.push({ name: 'Subprocesso', params: { codProcesso: String(codProcesso.value), siglaUnidade: String(item.sigla) } })
+      router.push({ name: 'Subprocesso', params: { codProcesso: codProcesso.value.toString(), siglaUnidade: String(item.unidadeAtual) } })
+    } else if ((perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') && perfilStore.unidadeSelecionada === item.id) {
+      router.push({ name: 'Subprocesso', params: { codProcesso: String(codProcesso.value), siglaUnidade: String(item.unidadeAtual) } })
     }
   }
 }
