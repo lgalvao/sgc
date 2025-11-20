@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2 class="display-6 mb-4">
       Relatórios
     </h2>
@@ -11,7 +11,7 @@
           for="filtroTipo"
           class="form-label"
         >Tipo de Processo</label>
-        <b-form-select
+        <BFormSelect
           id="filtroTipo"
           v-model="filtroTipo"
           :options="[
@@ -27,7 +27,7 @@
           for="filtroDataInicio"
           class="form-label"
         >Data Início</label>
-        <b-form-input
+        <BFormInput
           id="filtroDataInicio"
           v-model="filtroDataInicio"
           type="date"
@@ -38,7 +38,7 @@
           for="filtroDataFim"
           class="form-label"
         >Data Fim</label>
-        <b-form-input
+        <BFormInput
           id="filtroDataFim"
           v-model="filtroDataFim"
           type="date"
@@ -48,248 +48,194 @@
 
     <div class="row">
       <div class="col-md-4 mb-4">
-        <div
-          class="card h-100"
+        <BCard
+          class="h-100"
           style="cursor: pointer;"
           @click="abrirModalMapasVigentes"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Mapas Vigentes
-            </h5>
-            <p class="card-text">
-              Visualize os mapas de competências atualmente vigentes em todas as unidades.
-            </p>
-            <small class="text-muted">{{ mapasVigentes.length }} mapas encontrados</small>
-          </div>
-        </div>
+          <h5 class="card-title">
+            Mapas Vigentes
+          </h5>
+          <p class="card-text">
+            Visualize os mapas de competências atualmente vigentes em todas as unidades.
+          </p>
+          <small class="text-muted">{{ mapasVigentes.length }} mapas encontrados</small>
+        </BCard>
       </div>
       <div class="col-md-4 mb-4">
-        <div
-          class="card h-100"
+        <BCard
+          class="h-100"
           style="cursor: pointer;"
           @click="abrirModalDiagnosticosGaps"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Diagnósticos de Gaps
-            </h5>
-            <p class="card-text">
-              Analise os gaps de competências identificados nos processos de diagnóstico.
-            </p>
-            <small class="text-muted">{{ diagnosticosGaps.length }} diagnósticos encontrados</small>
-          </div>
-        </div>
+          <h5 class="card-title">
+            Diagnósticos de Gaps
+          </h5>
+          <p class="card-text">
+            Analise os gaps de competências identificados nos processos de diagnóstico.
+          </p>
+          <small class="text-muted">{{ diagnosticosGaps.length }} diagnósticos encontrados</small>
+        </BCard>
       </div>
       <div class="col-md-4 mb-4">
-        <div
-          class="card h-100"
+        <BCard
+          class="h-100"
           style="cursor: pointer;"
           @click="abrirModalAndamentoGeral"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Andamento Geral
-            </h5>
-            <p class="card-text">
-              Acompanhe o andamento de todos os processos de mapeamento e revisão.
-            </p>
-            <small class="text-muted">{{ processosFiltrados.length }} processos encontrados</small>
-          </div>
-        </div>
+          <h5 class="card-title">
+            Andamento Geral
+          </h5>
+          <p class="card-text">
+            Acompanhe o andamento de todos os processos de mapeamento e revisão.
+          </p>
+          <small class="text-muted">{{ processosFiltrados.length }} processos encontrados</small>
+        </BCard>
       </div>
     </div>
 
     <!-- Modal Mapas Vigentes -->
-    <div
-      id="modalMapasVigentes"
-      class="modal fade"
-      :class="{ show: mostrarModalMapasVigentes }"
-      :style="{ display: mostrarModalMapasVigentes ? 'block' : 'none' }"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalMapasVigentes"
+      title="Mapas Vigentes"
+      size="xl"
+      hide-footer
     >
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Mapas Vigentes
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalMapasVigentes = false"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-mapas"
-                @click="exportarMapasVigentes"
-              >
-                <i class="bi bi-download" /> Exportar CSV
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Unidade</th>
-                    <th>Competências</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="mapa in mapasVigentes"
-                    :key="mapa.id"
-                  >
-                    <td>{{ mapa.unidade }}</td>
-                    <td>{{ mapa.competencias?.length || 0 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div class="mb-3">
+        <BButton
+          variant="outline-primary"
+          size="sm"
+          data-testid="export-csv-mapas"
+          @click="exportarMapasVigentes"
+        >
+          <i class="bi bi-download" /> Exportar CSV
+        </BButton>
       </div>
-    </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Unidade</th>
+              <th>Competências</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="mapa in mapasVigentes"
+              :key="mapa.id"
+            >
+              <td>{{ mapa.unidade }}</td>
+              <td>{{ mapa.competencias?.length || 0 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </BModal>
 
     <!-- Modal Diagnósticos de Gaps -->
-    <div
-      id="modalDiagnosticosGaps"
-      class="modal fade"
-      :class="{ show: mostrarModalDiagnosticosGaps }"
-      :style="{ display: mostrarModalDiagnosticosGaps ? 'block' : 'none' }"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalDiagnosticosGaps"
+      title="Diagnósticos de Gaps"
+      size="xl"
+      hide-footer
     >
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Diagnósticos de Gaps
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalDiagnosticosGaps = false"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-diagnosticos"
-                @click="exportarDiagnosticosGaps"
-              >
-                <i class="bi bi-download" /> Exportar CSV
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Processo</th>
-                    <th>Unidade</th>
-                    <th>Gaps Identificados</th>
-                    <th>Importância Média</th>
-                    <th>Dominio Médio</th>
-                    <th>Competências Críticas</th>
-                    <th>Status</th>
-                    <th>Data Diagnóstico</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="diagnostico in diagnosticosGapsFiltrados"
-                    :key="diagnostico.id"
-                  >
-                    <td>{{ diagnostico.processo }}</td>
-                    <td>{{ diagnostico.unidade }}</td>
-                    <td>{{ diagnostico.gaps }}</td>
-                    <td>{{ diagnostico.importanciaMedia }}/5</td>
-                    <td>{{ diagnostico.dominioMedio }}/5</td>
-                    <td>
-                      <small class="text-muted">
-                        {{ diagnostico.competenciasCriticas.join(', ') }}
-                      </small>
-                    </td>
-                    <td>
-                      <span :class="getClasseStatus(diagnostico.status)">
-                        {{ diagnostico.status }}
-                      </span>
-                    </td>
-                    <td>{{ formatarData(diagnostico.data) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div class="mb-3">
+        <BButton
+          variant="outline-primary"
+          size="sm"
+          data-testid="export-csv-diagnosticos"
+          @click="exportarDiagnosticosGaps"
+        >
+          <i class="bi bi-download" /> Exportar CSV
+        </BButton>
       </div>
-    </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Processo</th>
+              <th>Unidade</th>
+              <th>Gaps Identificados</th>
+              <th>Importância Média</th>
+              <th>Dominio Médio</th>
+              <th>Competências Críticas</th>
+              <th>Status</th>
+              <th>Data Diagnóstico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="diagnostico in diagnosticosGapsFiltrados"
+              :key="diagnostico.id"
+            >
+              <td>{{ diagnostico.processo }}</td>
+              <td>{{ diagnostico.unidade }}</td>
+              <td>{{ diagnostico.gaps }}</td>
+              <td>{{ diagnostico.importanciaMedia }}/5</td>
+              <td>{{ diagnostico.dominioMedio }}/5</td>
+              <td>
+                <small class="text-muted">
+                  {{ diagnostico.competenciasCriticas.join(', ') }}
+                </small>
+              </td>
+              <td>
+                <span :class="getClasseStatus(diagnostico.status)">
+                  {{ diagnostico.status }}
+                </span>
+              </td>
+              <td>{{ formatarData(diagnostico.data) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </BModal>
 
     <!-- Modal Andamento Geral -->
-    <div
-      id="modalAndamentoGeral"
-      class="modal fade"
-      :class="{ show: mostrarModalAndamentoGeral }"
-      :style="{ display: mostrarModalAndamentoGeral ? 'block' : 'none' }"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalAndamentoGeral"
+      title="Andamento Geral dos Processos"
+      size="xl"
+      hide-footer
     >
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Andamento Geral dos Processos
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalAndamentoGeral = false"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-andamento"
-                @click="exportarAndamentoGeral"
-              >
-                <i class="bi bi-download" /> Exportar CSV
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Situação</th>
-                    <th>Data Limite</th>
-                    <th>Unidade</th>
-                    <th>% Concluído</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="processo in processosFiltrados"
-                    :key="processo.codigo"
-                  >
-                    <td>{{ processo.descricao }}</td>
-                    <td>{{ processo.tipo }}</td>
-                    <td>{{ processo.situacao }}</td>
-                    <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
-                    <td>{{ processo.unidadeNome }}</td>
-                    <td>{{ calcularPercentualConcluido }}%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div class="mb-3">
+        <BButton
+          variant="outline-primary"
+          size="sm"
+          data-testid="export-csv-andamento"
+          @click="exportarAndamentoGeral"
+        >
+          <i class="bi bi-download" /> Exportar CSV
+        </BButton>
       </div>
-    </div>
-  </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Tipo</th>
+              <th>Situação</th>
+              <th>Data Limite</th>
+              <th>Unidade</th>
+              <th>% Concluído</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="processo in processosFiltrados"
+              :key="processo.codigo"
+            >
+              <td>{{ processo.descricao }}</td>
+              <td>{{ processo.tipo }}</td>
+              <td>{{ processo.situacao }}</td>
+              <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+              <td>{{ processo.unidadeNome }}</td>
+              <td>{{ calcularPercentualConcluido }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </BModal>
+  </BContainer>
 </template>
 
 <script setup lang="ts">
@@ -298,6 +244,14 @@ import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
 import {TipoProcesso} from '@/types/tipos';
 import {formatDateBR} from '@/utils'
+import {
+  BContainer,
+  BButton,
+  BCard,
+  BModal,
+  BFormInput,
+  BFormSelect
+} from 'bootstrap-vue-next';
 
 type CSVData = Record<string, string | number | undefined>;
 

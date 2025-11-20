@@ -8,12 +8,13 @@
     @hide="emit('fechar')"
   >
     <div data-testid="modal-historico-body">
-      <div
+      <BAlert
         v-if="analises.length === 0"
-        class="alert alert-info"
+        variant="info"
+        :model-value="true"
       >
         Nenhuma análise registrada para este subprocesso.
-      </div>
+      </BAlert>
       <div v-else>
         <table class="table table-striped table-hover">
           <thead>
@@ -39,21 +40,20 @@
       </div>
     </div>
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="btn-modal-fechar"
         @click="emit('fechar')"
       >
         Fechar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
-import {BModal} from 'bootstrap-vue-next';
+import {BModal, BButton, BAlert} from 'bootstrap-vue-next';
 import {useAnalisesStore} from '@/stores/analises';
 import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';

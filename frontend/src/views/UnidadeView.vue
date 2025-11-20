@@ -1,23 +1,23 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
-        <button
+        <BButton
           v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-          class="btn btn-outline-primary"
+          variant="outline-primary"
           data-testid="btn-criar-atribuicao"
           @click="irParaCriarAtribuicao"
         >
           Criar atribuição
-        </button>
+        </BButton>
       </div>
     </div>
 
-    <div
+    <BCard
       v-if="unidadeComResponsavelDinamico"
-      class="card mb-4"
+      class="mb-4"
     >
-      <div class="card-body">
+      <BCardBody>
         <h2 class="display-6 mb-3">
           {{ unidadeComResponsavelDinamico.sigla }} - {{
             unidadeComResponsavelDinamico.nome
@@ -39,17 +39,17 @@
             <i class="bi bi-envelope-fill ms-3 me-2" />{{ responsavelDetalhes?.email }}
           </p>
         </template>
-        <button
+        <BButton
           v-if="mapaVigente"
-          class="btn btn-outline-success"
+          variant="outline-success"
           @click="visualizarMapa"
         >
           <i
             class="bi bi-file-earmark-spreadsheet me-2"
           />Mapa vigente
-        </button>
-      </div>
-    </div>
+        </BButton>
+      </BCardBody>
+    </BCard>
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
@@ -66,7 +66,7 @@
         @row-click="navegarParaUnidadeSubordinada"
       />
     </div>
-  </div>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -79,6 +79,12 @@ import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
 import {MapaCompleto, Usuario, Unidade, Responsavel} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
+import {
+  BContainer,
+  BButton,
+  BCard,
+  BCardBody
+} from 'bootstrap-vue-next';
 
 const props = defineProps<{ codUnidade: number }>();
 

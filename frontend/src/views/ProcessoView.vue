@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div v-if="processo">
       <ProcessoDetalhes
         :descricao="processo.descricao"
@@ -40,20 +40,19 @@
     />
 
     <!-- Alerta de sucesso -->
-    <div
+    <BAlert
       v-if="mostrarAlertaSucesso"
-      class="alert alert-success alert-dismissible fade show position-fixed"
+      variant="success"
+      class="position-fixed"
       style="top: 20px; right: 20px; z-index: 9999;"
+      dismissible
+      :model-value="true"
+      @dismissed="mostrarAlertaSucesso = false"
     >
       <i class="bi bi-check-circle" />
       Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco!
-      <button
-        type="button"
-        class="btn-close"
-        @click="mostrarAlertaSucesso = false"
-      />
-    </div>
-  </div>
+    </BAlert>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -69,6 +68,7 @@ import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
 import ModalAcaoBloco, { type UnidadeSelecao } from '@/components/ModalAcaoBloco.vue'
 import ModalFinalizacao from '@/components/ModalFinalizacao.vue'
 import { Processo, UnidadeParticipante } from '@/types/tipos'
+import { BContainer, BAlert } from 'bootstrap-vue-next'
 
 interface TreeTableItem {
   id: number | string

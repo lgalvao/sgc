@@ -7,19 +7,15 @@
     hide-footer
     @hide="fechar"
   >
-    <div
+    <BAlert
       v-if="erroImportacao"
-      class="alert alert-danger alert-dismissible"
-      role="alert"
+      variant="danger"
+      dismissible
+      :model-value="true"
+      @dismissed="limparErroImportacao"
     >
-      <div>{{ erroImportacao }}</div>
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        @click="limparErroImportacao"
-      />
-    </div>
+      {{ erroImportacao }}
+    </BAlert>
     <fieldset :disabled="importando">
       <div class="mb-3">
         <label
@@ -106,17 +102,17 @@
       </div>
     </fieldset>
     <template #footer>
-      <button
-        class="btn btn-outline-secondary"
+      <BButton
+        variant="outline-secondary"
         type="button"
         data-testid="btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
-      </button>
-      <button
+      </BButton>
+      <BButton
         :disabled="!atividadesSelecionadas.length || importando"
-        class="btn btn-outline-primary"
+        variant="outline-primary"
         type="button"
         data-testid="btn-importar"
         @click="importar"
@@ -128,14 +124,14 @@
           aria-hidden="true"
         />
         {{ importando ? 'Importando...' : 'Importar' }}
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
-import {BModal, BFormSelect, BFormSelectOption, BFormCheckbox} from 'bootstrap-vue-next'
+import {BModal, BFormSelect, BFormSelectOption, BFormCheckbox, BButton, BAlert} from 'bootstrap-vue-next'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
 import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante} from '@/types/tipos'

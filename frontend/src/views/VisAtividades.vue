@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
@@ -10,45 +10,46 @@
         Atividades e conhecimentos
       </h2>
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeVerImpacto"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
-        </button>
-        <button
-          class="btn btn-outline-info"
+        </BButton>
+        <BButton
+          variant="outline-info"
           @click="abrirModalHistoricoAnalise"
         >
           Histórico de análise
-        </button>
-        <button
-          class="btn btn-secondary"
+        </BButton>
+        <BButton
+          variant="secondary"
           data-testid="btn-devolver"
           title="Devolver para ajustes"
           @click="devolverCadastro"
         >
           Devolver para ajustes
-        </button>
-        <button
-          class="btn btn-success"
+        </BButton>
+        <BButton
+          variant="success"
           data-testid="btn-acao-principal-analise"
           title="Validar"
           @click="validarCadastro"
         >
           {{ perfilSelecionado === Perfil.ADMIN ? 'Homologar' : 'Registrar aceite' }}
-        </button>
+        </BButton>
       </div>
     </div>
 
     <!-- Lista de atividades -->
-    <div
+    <BCard
       v-for="(atividade) in atividades"
       :key="atividade.codigo"
-      class="card mb-3 atividade-card"
+      class="mb-3 atividade-card"
+      no-body
     >
-      <div class="card-body py-2">
+      <BCardBody class="py-2">
         <div
           class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
@@ -68,8 +69,8 @@
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
         </div>
-      </div>
-    </div>
+      </BCardBody>
+    </BCard>
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
@@ -87,123 +88,82 @@
     />
 
     <!-- Modal de Validação -->
-    <div
-      v-if="mostrarModalValidar"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalValidar"
+      :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro') }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalValidar"
-            />
-          </div>
-          <div class="modal-body">
-            <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
-            <div
-              v-if="!isHomologacao"
-              class="mb-3"
-            >
-              <label
-                class="form-label"
-                for="observacaoValidacao"
-              >Observação</label>
-              <b-form-textarea
-                id="observacaoValidacao"
-                v-model="observacaoValidacao"
-                data-testid="input-observacao-aceite"
-                rows="3"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalValidar"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="btn-modal-confirmar-aceite"
-              @click="confirmarValidacao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
+      <div
+        v-if="!isHomologacao"
+        class="mb-3"
+      >
+        <label
+          class="form-label"
+          for="observacaoValidacao"
+        >Observação</label>
+        <BFormTextarea
+          id="observacaoValidacao"
+          v-model="observacaoValidacao"
+          data-testid="input-observacao-aceite"
+          rows="3"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalValidar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          data-testid="btn-modal-confirmar-aceite"
+          @click="confirmarValidacao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de Devolução -->
-    <div
-      v-if="mostrarModalDevolver"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalDevolver"
+      :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalDevolver"
-            />
-          </div>
-          <div class="modal-body">
-            <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="observacaoDevolucao"
-              >Observação</label>
-              <b-form-textarea
-                id="observacaoDevolucao"
-                v-model="observacaoDevolucao"
-                data-testid="input-observacao-devolucao"
-                rows="3"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalDevolver"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-testid="btn-modal-confirmar-devolucao"
-              @click="confirmarDevolucao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
+      <div class="mb-3">
+        <label
+          class="form-label"
+          for="observacaoDevolucao"
+        >Observação</label>
+        <BFormTextarea
+          id="observacaoDevolucao"
+          v-model="observacaoDevolucao"
+          data-testid="input-observacao-devolucao"
+          rows="3"
+        />
       </div>
-    </div>
-
-    <div
-      v-if="mostrarModalValidar || mostrarModalDevolver"
-      class="modal-backdrop fade show"
-    />
-  </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalDevolver"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          data-testid="btn-modal-confirmar-devolucao"
+          @click="confirmarDevolucao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -226,6 +186,14 @@ import {
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {
+  BContainer,
+  BButton,
+  BCard,
+  BCardBody,
+  BModal,
+  BFormTextarea
+} from 'bootstrap-vue-next';
 
 const props = defineProps<{
   codProcesso: number | string,

@@ -1,76 +1,76 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6">
         Mapa de competências técnicas
       </div>
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeValidar"
-          class="btn btn-outline-warning"
+          variant="outline-warning"
           title="Apresentar sugestões"
           data-testid="apresentar-sugestoes-btn"
           @click="abrirModalSugestoes"
         >
           Apresentar sugestões
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeValidar"
-          class="btn btn-outline-success"
+          variant="outline-success"
           title="Validar mapa"
           data-testid="validar-btn"
           @click="abrirModalValidar"
         >
           Validar
-        </button>
+        </BButton>
 
-        <button
+        <BButton
           v-if="podeValidar && temHistoricoAnalise"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           title="Histórico de análise"
           data-testid="historico-analise-btn"
           @click="verHistorico"
         >
           Histórico de análise
-        </button>
+        </BButton>
 
-        <button
+        <BButton
           v-if="podeAnalisar"
           v-show="podeVerSugestoes"
-          class="btn btn-outline-info"
+          variant="outline-info"
           title="Ver sugestões"
           data-testid="ver-sugestoes-btn"
           @click="verSugestoes"
         >
           Ver sugestões
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           title="Histórico de análise"
           data-testid="historico-analise-btn-gestor"
           @click="verHistorico"
         >
           Histórico de análise
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-danger"
+          variant="outline-danger"
           title="Devolver para ajustes"
           data-testid="devolver-ajustes-btn"
           @click="abrirModalDevolucao"
         >
           Devolver para ajustes
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-success"
+          variant="outline-success"
           data-testid="btn-registrar-aceite-homologar"
           title="Aceitar"
           @click="abrirModalAceitar"
         >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
-        </button>
+        </BButton>
       </div>
     </div>
 
@@ -88,13 +88,14 @@
         <div v-if="!mapa || mapa.competencias.length === 0">
           Nenhuma competência cadastrada.
         </div>
-        <div
+        <BCard
           v-for="comp in mapa?.competencias"
           :key="comp.codigo"
-          class="card mb-3 competencia-card"
+          class="mb-3 competencia-card"
           data-testid="competencia-block"
+          no-body
         >
-          <div class="card-body py-2">
+          <BCardBody class="py-2">
             <div
               class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
             >
@@ -108,13 +109,14 @@
                 v-for="atv in comp.atividades"
                 :key="atv.codigo"
               >
-                <div
-                  class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
+                <BCard
+                  class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
                   data-testid="atividade-item"
+                  no-body
                 >
-                  <div class="card-body d-flex align-items-center py-1 px-2">
+                  <BCardBody class="d-flex align-items-center py-1 px-2">
                     <span class="atividade-associada-descricao me-2">{{ atv.descricao }}</span>
-                  </div>
+                  </BCardBody>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
                       v-for="conhecimento in atv.conhecimentos"
@@ -125,11 +127,11 @@
                       {{ conhecimento.descricao }}
                     </span>
                   </div>
-                </div>
+                </BCard>
               </div>
             </div>
-          </div>
-        </div>
+          </BCardBody>
+        </BCard>
       </div>
     </div>
     <div v-else>
@@ -143,299 +145,175 @@
       @confirmar-aceitacao="confirmarAceitacao"
     />
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalSugestoes }"
-      :style="{ display: mostrarModalSugestoes ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-apresentar-sugestoes"
+    <BModal
+      v-model="mostrarModalSugestoes"
+      title="Apresentar Sugestões"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-apresentar-sugestoes-title"
-            >
-              Apresentar Sugestões
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-apresentar-sugestoes-close"
-              @click="fecharModalSugestoes"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label
-                for="sugestoesTextarea"
-                class="form-label"
-              >Sugestões para o mapa de competências:</label>
-              <BFormTextarea
-                id="sugestoesTextarea"
-                v-model="sugestoes"
-                rows="5"
-                placeholder="Digite suas sugestões para o mapa de competências..."
-                data-testid="sugestoes-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-apresentar-sugestoes-cancelar"
-              @click="fecharModalSugestoes"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-testid="modal-apresentar-sugestoes-confirmar"
-              @click="confirmarSugestoes"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <div class="mb-3">
+        <label
+          for="sugestoesTextarea"
+          class="form-label"
+        >Sugestões para o mapa de competências:</label>
+        <BFormTextarea
+          id="sugestoesTextarea"
+          v-model="sugestoes"
+          rows="5"
+          placeholder="Digite suas sugestões para o mapa de competências..."
+          data-testid="sugestoes-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-apresentar-sugestoes-cancelar"
+          @click="fecharModalSugestoes"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="primary"
+          data-testid="modal-apresentar-sugestoes-confirmar"
+          @click="confirmarSugestoes"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalVerSugestoes }"
-      :style="{ display: mostrarModalVerSugestoes ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-sugestoes"
+    <BModal
+      v-model="mostrarModalVerSugestoes"
+      title="Sugestões"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-sugestoes-title"
-            >
-              Sugestões
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-sugestoes-close"
-              @click="fecharModalVerSugestoes"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-sugestoes-body"
-          >
-            <div class="mb-3">
-              <label class="form-label">Sugestões registradas para o mapa de competências:</label>
-              <BFormTextarea
-                v-model="sugestoesVisualizacao"
-                rows="5"
-                readonly
-                data-testid="sugestoes-visualizacao-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-sugestoes-fechar"
-              @click="fecharModalVerSugestoes"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
+      <div class="mb-3">
+        <label class="form-label">Sugestões registradas para o mapa de competências:</label>
+        <BFormTextarea
+          v-model="sugestoesVisualizacao"
+          rows="5"
+          readonly
+          data-testid="sugestoes-visualizacao-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-sugestoes-fechar"
+          @click="fecharModalVerSugestoes"
+        >
+          Fechar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalValidar }"
-      :style="{ display: mostrarModalValidar ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-validar"
+    <BModal
+      v-model="mostrarModalValidar"
+      title="Validar Mapa de Competências"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-validar-title"
-            >
-              Validar Mapa de Competências
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-validar-close"
-              @click="fecharModalValidar"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-validar-body"
-          >
-            <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-validar-cancelar"
-              @click="fecharModalValidar"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="modal-validar-confirmar"
-              @click="confirmarValidacao"
-            >
-              Validar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-validar-cancelar"
+          @click="fecharModalValidar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          data-testid="modal-validar-confirmar"
+          @click="confirmarValidacao"
+        >
+          Validar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalDevolucao }"
-      :style="{ display: mostrarModalDevolucao ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-devolucao"
+    <BModal
+      v-model="mostrarModalDevolucao"
+      title="Devolução"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-devolucao-title"
-            >
-              Devolução
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-devolucao-close"
-              @click="fecharModalDevolucao"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-devolucao-body"
-          >
-            <p>Confirma a devolução da validação do mapa para ajustes?</p>
-            <div class="mb-3">
-              <label
-                for="observacaoDevolucao"
-                class="form-label"
-              >Observação:</label>
-              <BFormTextarea
-                id="observacaoDevolucao"
-                v-model="observacaoDevolucao"
-                rows="3"
-                placeholder="Digite observações sobre a devolução..."
-                data-testid="observacao-devolucao-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-devolucao-cancelar"
-              @click="fecharModalDevolucao"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-testid="modal-devolucao-confirmar"
-              @click="confirmarDevolucao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>Confirma a devolução da validação do mapa para ajustes?</p>
+      <div class="mb-3">
+        <label
+          for="observacaoDevolucao"
+          class="form-label"
+        >Observação:</label>
+        <BFormTextarea
+          id="observacaoDevolucao"
+          v-model="observacaoDevolucao"
+          rows="3"
+          placeholder="Digite observações sobre a devolução..."
+          data-testid="observacao-devolucao-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-devolucao-cancelar"
+          @click="fecharModalDevolucao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          data-testid="modal-devolucao-confirmar"
+          @click="confirmarDevolucao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalHistorico }"
-      :style="{ display: mostrarModalHistorico ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-historico"
+    <BModal
+      v-model="mostrarModalHistorico"
+      title="Histórico de Análise"
+      centered
+      size="lg"
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-historico-title"
-            >
-              Histórico de Análise
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-historico-close"
-              @click="fecharModalHistorico"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-historico-body"
+      <table
+        class="table table-striped"
+        data-testid="tabela-historico"
+      >
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Unidade</th>
+            <th>Resultado</th>
+            <th>Observações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in historicoAnalise"
+            :key="item.codigo"
+            data-testid="historico-item"
           >
-            <table
-              class="table table-striped"
-              data-testid="tabela-historico"
-            >
-              <thead>
-                <tr>
-                  <th>Data/Hora</th>
-                  <th>Unidade</th>
-                  <th>Resultado</th>
-                  <th>Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="item in historicoAnalise"
-                  :key="item.codigo"
-                  data-testid="historico-item"
-                >
-                  <td>{{ item.data }}</td>
-                  <td>{{ item.unidade }}</td>
-                  <td>{{ item.resultado }}</td>
-                  <td>{{ item.observacoes }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-historico-fechar"
-              @click="fecharModalHistorico"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <td>{{ item.data }}</td>
+            <td>{{ item.unidade }}</td>
+            <td>{{ item.resultado }}</td>
+            <td>{{ item.observacoes }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-historico-fechar"
+          @click="fecharModalHistorico"
+        >
+          Fechar
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -452,7 +330,14 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {SituacaoSubprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 import {storeToRefs} from "pinia";
-import {BFormTextarea} from 'bootstrap-vue-next';
+import {
+  BContainer,
+  BButton,
+  BCard,
+  BCardBody,
+  BModal,
+  BFormTextarea
+} from 'bootstrap-vue-next';
 
 const route = useRoute()
 const router = useRouter()
