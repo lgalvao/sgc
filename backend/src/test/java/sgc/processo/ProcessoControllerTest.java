@@ -323,4 +323,64 @@ public class ProcessoControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
     }
+
+    @Test
+    void listarFinalizados_RetornaLista() throws Exception {
+        when(processoService.listarFinalizados()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+
+        mockMvc.perform(get("/api/processos/finalizados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+    }
+
+    @Test
+    void listarAtivos_RetornaLista() throws Exception {
+        when(processoService.listarAtivos()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+
+        mockMvc.perform(get("/api/processos/ativos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+    }
+
+    @Test
+    void obterStatusUnidades_RetornaMap() throws Exception {
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+
+        mockMvc.perform(get("/api/processos/status-unidades").param("tipo", "MAPEAMENTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
+                .andExpect(jsonPath("$.unidadesDesabilitadas[0]").value(100L));
+    }
+
+    @Test
+    void listarUnidadesBloqueadas_RetornaLista() throws Exception {
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+
+        mockMvc.perform(get("/api/processos/unidades-bloqueadas").param("tipo", "MAPEAMENTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").value(100L));
+    }
+
+    @Test
+    void listarSubprocessosElegiveis_RetornaLista() throws Exception {
+        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+
+        mockMvc.perform(get("/api/processos/1/subprocessos-elegiveis"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codSubprocesso").value(10L));
+    }
+
+    @Test
+    void listarSubprocessos_RetornaLista() throws Exception {
+        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+
+        mockMvc.perform(get("/api/processos/1/subprocessos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codSubprocesso").value(10L));
+    }
 }

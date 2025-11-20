@@ -414,21 +414,21 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
 
-        analiseService.criarAnalise(CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
-                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(null)
-                .build());
-
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
         if (unidadeDestino == null) {
             throw new IllegalStateException("Não foi possível identificar a unidade superior para enviar a análise.");
         }
+
+        analiseService.criarAnalise(CriarAnaliseRequest.builder()
+                .codSubprocesso(codSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .siglaUnidade(unidadeDestino.getSigla())
+                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(null)
+                .build());
 
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Cadastro de atividades e conhecimentos aceito", usuario));
 

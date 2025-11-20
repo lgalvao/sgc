@@ -8,7 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
 import sgc.alerta.AlertaService;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -43,26 +45,15 @@ class EventoProcessoListenerTest {
     private static final String RAMAL_SUBSTITUTO = "67890";
     private static final String TECNICO = "Tecnico";
 
-    @Mock
-    private AlertaService alertaService;
+    @Mock private AlertaService alertaService;
+    @Mock private NotificacaoEmailService notificacaoEmailService;
+    @Mock private NotificacaoModelosService notificacaoModelosService;
+    @Mock private SgrhService sgrhService;
+    @Mock private ProcessoRepo processoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private Environment environment;
 
-    @Mock
-    private NotificacaoEmailService notificacaoEmailService;
-
-    @Mock
-    private NotificacaoModelosService notificacaoModelosService;
-
-    @Mock
-    private SgrhService sgrhService;
-
-    @Mock
-    private ProcessoRepo processoRepo;
-
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-
-    @InjectMocks
-    private EventoProcessoListener ouvinteDeEvento;
+    @InjectMocks private EventoProcessoListener ouvinteDeEvento;
 
     private Processo processo;
     private Subprocesso subprocessoOperacional;
@@ -256,5 +247,62 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Exception geral captura")
+    void exceptionGeral() {
+        when(processoRepo.findById(1L)).thenThrow(new RuntimeException("Erro DB"));
+        ouvinteDeEvento.aoIniciarProcesso(evento);
+        verify(subprocessoRepo, never()).findByProcessoCodigoWithUnidade(any());
+    }
+
+    @Test
+    @DisplayName("Erro ao buscar unidade no SGRH e nao eh e2e")
+    void erroUnidadeSgrhNaoE2E() {
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.empty());
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"dev"});
+
+        ouvinteDeEvento.aoIniciarProcesso(evento);
+
+        // Should catch ErroEntidadeNaoEncontrada and log
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Erro ao buscar unidade no SGRH e eh e2e")
+    void erroUnidadeSgrhE2E() {
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.empty());
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"e2e"});
+
+        ouvinteDeEvento.aoIniciarProcesso(evento);
+
+        // Should return early without exception logic
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Erro ao enviar email substituto")
+    void erroEmailSubstituto() {
+        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL");
+        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, String.valueOf(S456), SUBSTITUTO_TESTE);
+        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+        when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
+
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456))).thenThrow(new RuntimeException("Erro SGRH"));
+
+        ouvinteDeEvento.aoIniciarProcesso(evento);
+
+        verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq(TITULAR_EMAIL), any(), any());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), any(), any());
     }
 }

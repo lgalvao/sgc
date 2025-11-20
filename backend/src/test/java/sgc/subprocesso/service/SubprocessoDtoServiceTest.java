@@ -26,6 +26,7 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
@@ -106,6 +107,24 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
+    @DisplayName("obterDetalhes falha se perfil null")
+    void obterDetalhesPerfilNull() {
+        assertThatThrownBy(() -> service.obterDetalhes(1L, null, null))
+            .isInstanceOf(ErroAccessoNegado.class);
+    }
+
+    @Test
+    @DisplayName("obterDetalhes falha se perfil invalido")
+    void obterDetalhesPerfilInvalido() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.SERVIDOR, null))
+            .isInstanceOf(ErroAccessoNegado.class);
+    }
+
+    @Test
     @DisplayName("obterDetalhes sucesso gestor unidade correta")
     void obterDetalhesGestor() {
         Long id = 1L;
@@ -151,6 +170,31 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
+    @DisplayName("obterDetalhes com mapa null e conhecimentos")
+    void obterDetalhesMapaNull() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(new Unidade());
+        sp.setMapa(null);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("admin");
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+
+        var res = service.obterDetalhes(id, Perfil.ADMIN, null);
+
+        assertThat(res).isNotNull();
+        assertThat(res.getElementosProcesso()).isEmpty();
+    }
+
+    @Test
     @DisplayName("obterCadastro sucesso")
     void obterCadastro() {
         Long id = 1L;
@@ -173,6 +217,21 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
+    @DisplayName("obterCadastro com mapa null")
+    void obterCadastroMapaNull() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setMapa(null);
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        var res = service.obterCadastro(id);
+
+        assertThat(res.getAtividades()).isEmpty();
+    }
+
+    @Test
     @DisplayName("obterSugestoes sucesso")
     void obterSugestoes() {
         Long id = 1L;
@@ -185,6 +244,14 @@ class SubprocessoDtoServiceTest {
         var res = service.obterSugestoes(id);
 
         assertThat(res.getSugestoes()).isEqualTo("sug");
+    }
+
+    @Test
+    @DisplayName("obterSugestoes nao encontrado")
+    void obterSugestoesNaoEncontrado() {
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.obterSugestoes(1L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -204,6 +271,19 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
+    @DisplayName("obterMapaParaAjuste falha sem mapa")
+    void obterMapaParaAjusteSemMapa() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(null);
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+
+        assertThatThrownBy(() -> service.obterMapaParaAjuste(id))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     @DisplayName("listar e obterPorProcessoEUnidade")
     void outrosMetodos() {
         when(repositorioSubprocesso.findAll()).thenReturn(List.of(new Subprocesso()));
@@ -213,5 +293,13 @@ class SubprocessoDtoServiceTest {
 
         when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L)).thenReturn(Optional.of(new Subprocesso()));
         assertThat(service.obterPorProcessoEUnidade(1L, 1L)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("obterPorProcessoEUnidade falha se nao encontrado")
+    void obterPorProcessoEUnidadeNaoEncontrado() {
+        when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.obterPorProcessoEUnidade(1L, 1L))
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }
