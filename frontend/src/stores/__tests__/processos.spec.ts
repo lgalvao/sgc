@@ -209,14 +209,5 @@ describe('useProcessosStore', () => {
                 expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
             });
         });
-
-        describe('addMovement', () => {
-            it('deve adicionar um movimento', () => {
-                const movement = { descricao: 'movimento' };
-                store.addMovement(movement as any);
-                expect(store.movements).toHaveLength(1);
-                expect(store.movements[0].descricao).toBe('movimento');
-            });
-        });
     });
 });

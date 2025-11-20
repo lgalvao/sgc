@@ -76,10 +76,10 @@ describe('painelService', () => {
           }
         mockApi.get.mockResolvedValueOnce({ data: responseData })
 
-        const result = await service.listarAlertas('123', 1)
+        const result = await service.listarAlertas(123, 1)
 
         expect(mockApi.get).toHaveBeenCalledWith('/painel/alertas', {
-          params: { usuarioTitulo: '123', unidade: 1, page: 0, size: 20 },
+          params: { usuarioTitulo: 123, unidade: 1, page: 0, size: 20 },
         })
         expect(mockAlertaMappers.mapAlertaDtoToFrontend).toHaveBeenCalled()
         expect(mockAlertaMappers.mapAlertaDtoToFrontend.mock.calls[0][0]).toEqual(dtoList[0])
@@ -89,7 +89,7 @@ describe('painelService', () => {
 
       it('should throw an error on failure', async () => {
         mockApi.get.mockRejectedValueOnce(new Error('Failed'))
-        await expect(service.listarAlertas('123')).rejects.toThrow()
+        await expect(service.listarAlertas(123)).rejects.toThrow()
       })
   })
 })

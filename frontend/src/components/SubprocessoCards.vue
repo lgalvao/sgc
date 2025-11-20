@@ -1,7 +1,10 @@
 <template>
   <BRow>
     <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
-      <BCol md="4" class="mb-3">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
         <BCard
           v-if="permissoes.podeEditarMapa"
           class="h-100 card-actionable"
@@ -38,7 +41,10 @@
         </BCard>
       </BCol>
 
-      <BCol md="4" class="mb-3">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
         <BCard
           v-if="permissoes.podeVisualizarMapa"
           :class="{ 'disabled-card': !mapa }"
@@ -61,7 +67,10 @@
     </template>
 
     <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
-      <BCol md="4" class="mb-3">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
         <BCard
           v-if="permissoes.podeVisualizarDiagnostico"
           class="h-100 card-actionable"
@@ -81,7 +90,10 @@
         </BCard>
       </BCol>
 
-      <BCol md="4" class="mb-3">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
         <BCard
           class="h-100 card-actionable"
           data-testid="ocupacoes-card"

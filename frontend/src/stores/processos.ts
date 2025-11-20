@@ -2,13 +2,11 @@ import {defineStore} from 'pinia'
 import {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
-    Movimentacao,
     Processo,
     ProcessoResumo,
     SubprocessoElegivel,
     TipoProcesso
 } from '@/types/tipos'
-import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
 import {Page} from '@/services/painelService'
 import * as processoService from '../services/processoService'
@@ -21,7 +19,6 @@ export const useProcessosStore = defineStore('processos', {
         processoDetalhe: null as Processo | null,
         subprocessosElegiveis: [] as SubprocessoElegivel[],
         processosFinalizados: [] as ProcessoResumo[],
-        movements: [] as Movimentacao[],
     }),
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoResumo[] => {
@@ -30,10 +27,6 @@ export const useProcessosStore = defineStore('processos', {
             }
             return [];
         },
-        getMovementsForSubprocesso: (state) => (codSubrocesso: number) => {
-            return state.movements.filter(m => (m as any).codSubrocesso === codSubrocesso)
-                .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
-        }
     },
     actions: {
         async fetchProcessosPainel(
@@ -107,13 +100,5 @@ export const useProcessosStore = defineStore('processos', {
             await processoService.validarMapa(id);
             await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
-        addMovement(movement: Omit<Movimentacao, 'codigo' | 'dataHora'>) {
-            const newMovement: Movimentacao = {
-                codigo: generateUniqueId(),
-                dataHora: new Date().toISOString(),
-                ...movement
-            };
-            this.movements.push(newMovement);
-        }
     }
 })

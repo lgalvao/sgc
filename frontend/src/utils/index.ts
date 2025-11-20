@@ -5,12 +5,6 @@
 import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from '@/constants/situacoes';
 import {TipoNotificacao} from '@/stores/notificacoes';
 
-// ===== GERAÇÃO DE IDs =====
-let counter = 0;
-export function generateUniqueId(): number {
-  return Date.now() * 1000 + (counter++ % 1000);
-}
-
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
   return CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] || 'bg-secondary';
