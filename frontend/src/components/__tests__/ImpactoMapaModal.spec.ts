@@ -3,7 +3,6 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { ref } from 'vue';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
-import { TipoImpactoAtividade, TipoImpactoCompetencia } from '@/types/impacto';
 
 const mocks = vi.hoisted(() => {
     const mockImpacto = {
@@ -53,8 +52,8 @@ describe('ImpactoMapaModal', () => {
     mocks.fetchImpactoMapa.mockClear();
   });
 
-  it('não deve renderizar o conteúdo quando mostrar for falso', () => {
-    const wrapper = mount(ImpactoMapaModal, {
+  it('não deve buscar impactos quando mostrar for falso', () => {
+    mount(ImpactoMapaModal, {
       props: { mostrar: false, idProcesso: 1, siglaUnidade: 'UT' },
       global: {
           stubs: { BModal: true }
@@ -110,12 +109,5 @@ describe('ImpactoMapaModal', () => {
     expect(wrapper.text()).toContain('Competências Impactadas');
     expect(wrapper.text()).toContain('Competência A');
     expect(wrapper.text()).toContain('Atividade Removida');
-  });
-
-  it('deve emitir o evento fechar ao clicar no botão de fechar', async () => {
-     // Skip this test or improve stubbing as previously discussed
-     // We can manually verify the method call if we expose it, but testing emits on stubbed components is tricky
-     // without proper template rendering.
-     // I'll skip for now to focus on data rendering.
   });
 });

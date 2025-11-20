@@ -159,7 +159,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import {BModal} from 'bootstrap-vue-next';
 import {storeToRefs} from 'pinia';
 import {useMapasStore} from '@/stores/mapas';

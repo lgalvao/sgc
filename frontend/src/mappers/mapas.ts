@@ -1,7 +1,6 @@
 import type {
     Atividade,
     AtividadeVisualizacao,
-    Competencia,
     Conhecimento,
     ConhecimentoVisualizacao,
     Mapa,
