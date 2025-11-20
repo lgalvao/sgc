@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import VisMapa from '../VisMapa.vue'
 import { useMapasStore } from '@/stores/mapas'
 import { useProcessosStore } from '@/stores/processos'
 import { useSubprocessosStore } from '@/stores/subprocessos'
 import { useNotificacoesStore } from '@/stores/notificacoes'
+import { useAnalisesStore } from '@/stores/analises'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { SituacaoSubprocesso } from '@/types/tipos'
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue'
@@ -28,7 +29,10 @@ describe('VisMapa.vue', () => {
     await router.isReady()
   })
 
-  const mountComponent = (initialState = {}) => {
+  const mountComponent = (initialState = {}, siglaUnidade = 'TEST') => {
+    // If testing nested units, we might need to push a different route or just rely on the fact that component reads param.
+    // Since router is global in this test file setup, we should push before mount if sigla changes.
+
     return mount(VisMapa, {
       global: {
         plugins: [
@@ -53,20 +57,22 @@ describe('VisMapa.vue', () => {
                         }
                       ]
                     }
-                  ]
+                  ],
+                  sugestoes: 'Sugestoes do mapa'
                 },
                 ...initialState['mapas']
               },
               unidades: {
                 unidades: [
                   { sigla: 'TEST', nome: 'Unidade de Teste', filhas: [] }
-                ]
+                ],
+                ...initialState['unidades']
               },
               processos: {
                   processoDetalhe: {
                       unidades: [
                           {
-                              sigla: 'TEST',
+                              sigla: siglaUnidade,
                               codUnidade: 10,
                               situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
                           }
@@ -77,6 +83,10 @@ describe('VisMapa.vue', () => {
               perfil: {
                   perfilSelecionado: 'CHEFE',
                   ...initialState['perfil']
+              },
+              analises: {
+                 analisesPorSubprocesso: new Map(),
+                 ...initialState['analises']
               }
             }
           }),
@@ -84,17 +94,11 @@ describe('VisMapa.vue', () => {
         ],
         stubs: {
             AceitarMapaModal: true,
-            // BModal stubs to ensure we can find buttons in footer/body if they are rendered in slots
-            // But actually, if we don't stub BModal, we need to wait for it to open (it might use Teleport).
-            // Best to stub BModal to render content inline or similar.
-            // Or use a real BModal but we need to handle async.
-            // Let's stub BModal to be a simple div that renders slots always?
-            // No, BModal has v-model="modelValue".
-            // Let's stub it manually.
             BModal: {
                 props: ['modelValue', 'title'],
                 template: `
                     <div v-if="modelValue" class="custom-modal-stub" :data-title="title">
+                        <div class="modal-title">{{ title }}</div>
                         <slot />
                         <div class="modal-footer">
                             <slot name="footer" />
@@ -114,6 +118,33 @@ describe('VisMapa.vue', () => {
     expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe('Competencia 1')
     expect(wrapper.find('.atividade-associada-descricao').text()).toBe('Atividade 1')
     expect(wrapper.find('[data-testid="conhecimento-item"]').text()).toBe('Conhecimento 1')
+  })
+
+  it('resolves nested unit from store', async () => {
+      await router.push('/processo/1/CHILD/vis-mapa')
+      const wrapper = mountComponent({
+          unidades: {
+              unidades: [
+                  {
+                      sigla: 'PARENT',
+                      nome: 'Parent Unit',
+                      filhas: [
+                          { sigla: 'CHILD', nome: 'Child Unit', filhas: [] }
+                      ]
+                  }
+              ]
+          },
+          processos: {
+            processoDetalhe: {
+                unidades: [
+                    { sigla: 'CHILD', codUnidade: 11, situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO }
+                ]
+            }
+          }
+      }, 'CHILD')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="unidade-info"]').text()).toContain('CHILD - Child Unit')
   })
 
   it('shows buttons for CHEFE when MAPEAMENTO_CONCLUIDO', async () => {
@@ -252,5 +283,55 @@ describe('VisMapa.vue', () => {
       await modal.vm.$emit('confirmar-aceitacao', 'Obs homolog')
 
       expect(store.homologarRevisaoCadastro).toHaveBeenCalledWith(10, { observacoes: 'Obs homolog' })
+  })
+
+  it('shows historico de analise', async () => {
+      const analisesData = [{
+          codigo: 1,
+          dataHora: '2023-01-01T12:00:00',
+          unidadeSigla: 'UNIT',
+          resultado: 'APROVADO',
+          observacoes: 'Bom'
+      }];
+
+      const wrapper = mountComponent({
+          analises: {
+             analisesPorSubprocesso: new Map([[10, analisesData]])
+          }
+      })
+
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      const btn = wrapper.find('[data-testid="historico-analise-btn"]')
+      expect(btn.exists()).toBe(true)
+
+      await btn.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.text()).toContain('Data/Hora')
+      expect(wrapper.text()).toContain('APROVADO')
+  })
+
+  it('view suggestions (GESTOR)', async () => {
+      const wrapper = mountComponent({
+        perfil: { perfilSelecionado: 'GESTOR' },
+        processos: {
+            processoDetalhe: {
+                unidades: [
+                    { sigla: 'TEST', codUnidade: 10, situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA }
+                ]
+            }
+        }
+      })
+      await wrapper.vm.$nextTick()
+
+      const btn = wrapper.find('[data-testid="ver-sugestoes-btn"]')
+      expect(btn.exists()).toBe(true)
+
+      await btn.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.text()).toContain('Sugestões registradas')
   })
 })

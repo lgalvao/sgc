@@ -88,19 +88,39 @@ describe('mappers/atividades', () => {
 });
 
 describe('mappers/mapas', () => {
-    it('mapMapaVisualizacaoToAtividades should extract and map all activities', () => {
+    it('mapMapaVisualizacaoToAtividades should extract and map all activities including knowledge', () => {
         const dto: MapaVisualizacao = {
             codigo: 1,
             descricao: 'mapa',
             competencias: [
-                { codigo: 1, descricao: "c1", atividades: [{ codigo: 1, descricao: 'A1', conhecimentos: [] }] },
-                { codigo: 2, descricao: "c2", atividades: [{ codigo: 2, descricao: 'A2', conhecimentos: [] }, { codigo: 3, descricao: 'A3', conhecimentos: [] }] },
+                {
+                    codigo: 1,
+                    descricao: "c1",
+                    atividades: [{
+                        codigo: 1,
+                        descricao: 'A1',
+                        conhecimentos: [{id: 10, descricao: 'K1'}]
+                    }]
+                },
+                {
+                    codigo: 2,
+                    descricao: "c2",
+                    atividades: [{ codigo: 2, descricao: 'A2', conhecimentos: [] }, { codigo: 3, descricao: 'A3', conhecimentos: [] }]
+                },
             ]
         };
         const atividades = mapMapaVisualizacaoToAtividades(dto);
         expect(atividades).toHaveLength(3);
         expect(atividades[0].codigo).toBe(1);
+        expect(atividades[0].conhecimentos).toHaveLength(1);
+        expect(atividades[0].conhecimentos[0].id).toBe(10);
         expect(atividades[2].codigo).toBe(3);
+    });
+
+    it('mapMapaVisualizacaoToAtividades should handle null or missing competencias', () => {
+        expect(mapMapaVisualizacaoToAtividades(null as any)).toEqual([]);
+        expect(mapMapaVisualizacaoToAtividades({} as any)).toEqual([]);
+        expect(mapMapaVisualizacaoToAtividades({ competencias: null } as any)).toEqual([]);
     });
 
     it('mapMapaDtoToModel should map fields and handle dates', () => {
@@ -126,14 +146,27 @@ describe('mappers/mapas', () => {
         expect((model.competencias[0] as any).atividades[0].conhecimentos[0].id).toBe(1000);
     });
 
-    it('mapImpactoMapaDtoToModel should map impact fields', () => {
+    it('mapImpactoMapaDtoToModel should map impact fields including activity changes', () => {
         const dto = {
             temImpactos: true,
             competenciasImpactadas: [{ codigo: 1, atividadesAfetadas: ['A1'] }],
+            atividadesInseridas: [{ codigo: 1, descricao: 'New' }],
+            atividadesRemovidas: [{ codigo: 2, descricao: 'Old' }],
+            atividadesAlteradas: [{ codigo: 3, descricao: 'Changed' }],
+            totalAtividadesInseridas: 1,
+            totalAtividadesRemovidas: 1,
+            totalAtividadesAlteradas: 1,
+            totalCompetenciasImpactadas: 1
         };
         const model = mapImpactoMapaDtoToModel(dto);
         expect(model.temImpactos).toBe(true);
         expect(model.competenciasImpactadas[0].atividadesAfetadas).toContain('A1');
+        expect(model.atividadesInseridas).toHaveLength(1);
+        expect(model.atividadesInseridas[0].descricao).toBe('New');
+        expect(model.atividadesRemovidas).toHaveLength(1);
+        expect(model.atividadesRemovidas[0].codigo).toBe(2);
+        expect(model.atividadesAlteradas).toHaveLength(1);
+        expect(model.atividadesAlteradas[0].descricao).toBe('Changed');
     });
 
     it('mapMapaAjusteDtoToModel should map ajuste fields', () => {
