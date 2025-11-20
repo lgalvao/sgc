@@ -1,12 +1,12 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2>Criar atribuição temporária</h2>
-    <div class="card mb-4 mt-4">
-      <div class="card-body">
+    <BCard class="mb-4 mt-4">
+      <BCardBody>
         <h5 class="card-title mb-3">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
         </h5>
-        <form @submit.prevent="criarAtribuicao">
+        <BForm @submit.prevent="criarAtribuicao">
           <div class="mb-3">
             <label
               class="form-label"
@@ -64,44 +64,60 @@
               required
             />
           </div>
-          <button
-            class="btn btn-primary"
+          <BButton
+            variant="primary"
             data-testid="btn-criar-atribuicao"
             type="submit"
           >
             Criar
-          </button>
-          <button
-            class="btn btn-secondary ms-2"
+          </BButton>
+          <BButton
+            variant="secondary"
+            class="ms-2"
             data-testid="btn-cancelar-atribuicao"
             type="button"
             @click="router.push(`/unidade/${sigla}`)"
           >
             Cancelar
-          </button>
-        </form>
+          </BButton>
+        </BForm>
 
-        <div
+        <BAlert
           v-if="sucesso"
-          class="alert alert-success mt-3"
+          variant="success"
+          class="mt-3"
+          :model-value="true"
         >
           Atribuição criada!
-        </div>
-        <div
+        </BAlert>
+        <BAlert
           v-if="erroApi"
-          class="alert alert-danger mt-3"
+          variant="danger"
+          class="mt-3"
+          :model-value="true"
         >
           {{ erroApi }}
-        </div>
-      </div>
-    </div>
-  </div>
+        </BAlert>
+      </BCardBody>
+    </BCard>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {BFormSelect, BFormSelectOption, BFormInput, BFormTextarea} from 'bootstrap-vue-next'
+import {
+  BContainer,
+  BCard,
+  BCardBody,
+  BForm,
+  BFormSelect,
+  BFormSelectOption,
+  BFormInput,
+  BFormTextarea,
+  BButton,
+  BAlert
+} from 'bootstrap-vue-next'
 import { buscarUnidadePorSigla } from '@/services/unidadesService'
 import { buscarUsuariosPorUnidade } from '@/services/usuarioService'
 import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService'

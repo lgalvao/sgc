@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2 class="display-6">
       Histórico de processos
     </h2>
@@ -12,13 +12,15 @@
       @selecionar-processo="abrirProcesso"
     />
 
-    <div
+    <BAlert
       v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
-      class="alert alert-info mt-4"
+      variant="info"
+      class="mt-4"
+      :model-value="true"
     >
       Nenhum processo finalizado.
-    </div>
-  </div>
+    </BAlert>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -31,6 +33,7 @@ import {usePerfil} from '@/composables/usePerfil'
 import {Perfil, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {formatDateTimeBR} from '@/utils';
+import {BContainer, BAlert} from 'bootstrap-vue-next';
 
 type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';
 

@@ -1,7 +1,10 @@
 <template>
   <div class="login-bg">
     <div class="login-center-wrapper">
-      <div class="card login-card p-4 shadow-lg">
+      <BCard
+        class="login-card p-4 shadow-lg"
+        no-body
+      >
         <h2
           class="mb-2 text-center"
           data-testid="titulo-sgc"
@@ -14,7 +17,7 @@
         >
           Sistema de Gestão de Competências
         </h5>
-        <form
+        <BForm
           class="p-0"
           data-testid="form-login"
           @submit.prevent="handleLogin"
@@ -27,7 +30,7 @@
             >
               <i class="bi bi-person-circle me-2" />
               Título eleitoral</label>
-            <b-form-input
+            <BFormInput
               id="titulo"
               v-model="titulo"
               :disabled="loginStep > 1"
@@ -45,7 +48,7 @@
             >
               <i class="bi bi-key me-2" />
               Senha</label>
-            <b-form-input
+            <BFormInput
               id="senha"
               v-model="senha"
               :disabled="loginStep > 1"
@@ -66,7 +69,7 @@
               for="par"
               data-testid="label-perfil-unidade"
             >Selecione o Perfil e a Unidade</label>
-            <b-form-select
+            <BFormSelect
               id="par"
               v-model="parSelecionado"
               :options="perfisUnidadesOptions"
@@ -75,27 +78,28 @@
               data-testid="select-perfil-unidade"
             >
               <template #first>
-                <b-form-select-option
+                <BFormSelectOption
                   :value="null"
                   disabled
                 >
                   -- Selecione uma opção --
-                </b-form-select-option>
+                </BFormSelectOption>
               </template>
-            </b-form-select>
+            </BFormSelect>
           </div>
 
-          <button
-            class="btn btn-primary w-100 login-btn"
+          <BButton
+            variant="primary"
+            class="w-100 login-btn"
             type="submit"
             data-testid="botao-entrar"
             aria-label="Entrar"
           >
             <i class="bi bi-box-arrow-in-right me-2" />
             Entrar
-          </button>
-        </form>
-      </div>
+          </BButton>
+        </BForm>
+      </BCard>
     </div>
   </div>
 </template>
@@ -106,6 +110,14 @@ import {useRouter} from 'vue-router'
 import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {PerfilUnidade} from '@/mappers/sgrh';
+import {
+  BCard,
+  BForm,
+  BFormInput,
+  BFormSelect,
+  BFormSelectOption,
+  BButton
+} from 'bootstrap-vue-next';
 
 const router = useRouter()
 const perfilStore = usePerfilStore()

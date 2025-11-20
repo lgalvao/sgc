@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
     </div>
@@ -39,13 +39,14 @@
           <i class="bi bi-plus-lg" /> Criar competência
         </BButton>
 
-        <div
+        <BCard
           v-for="comp in competencias"
           :key="comp.codigo"
-          class="card mb-2 competencia-card"
+          class="mb-2 competencia-card"
           data-testid="competencia-item"
+          no-body
         >
-          <div class="card-body">
+          <BCardBody>
             <div
               class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
             >
@@ -79,12 +80,13 @@
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
-              <div
+              <BCard
                 v-for="atvId in comp.atividadesAssociadas"
                 :key="atvId"
-                class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                no-body
               >
-                <div class="card-body d-flex align-items-center">
+                <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
@@ -106,11 +108,11 @@
                   >
                     <i class="bi bi-trash" />
                   </BButton>
-                </div>
-              </div>
+                </BCardBody>
+              </BCard>
             </div>
-          </div>
-        </div>
+          </BCardBody>
+        </BCard>
       </div>
     </div>
     <div v-else>
@@ -142,14 +144,15 @@
       <div class="mb-4">
         <h5>Atividades</h5>
         <div class="d-flex flex-wrap gap-2">
-          <div
+          <BCard
             v-for="atividade in atividades"
             :key="atividade.codigo"
             :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-            class="card atividade-card-item"
+            class="atividade-card-item"
             :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
+            no-body
           >
-            <div class="card-body d-flex align-items-center">
+            <BCardBody class="d-flex align-items-center">
               <BFormCheckbox
                 :id="`atv-${atividade.codigo}`"
                 v-model="atividadesSelecionadas"
@@ -166,8 +169,8 @@
                   {{ atividade.conhecimentos.length }}
                 </span>
               </BFormCheckbox>
-            </div>
-          </div>
+            </BCardBody>
+          </BCard>
         </div>
       </div>
       <template #footer>
@@ -223,13 +226,15 @@
           placeholder="Digite observações sobre a disponibilização..."
         />
       </div>
-      <div
+      <BAlert
         v-if="notificacaoDisponibilizacao"
-        class="alert alert-info mt-3"
+        variant="info"
+        class="mt-3"
+        :model-value="true"
         data-testid="notificacao-disponibilizacao"
       >
         {{ notificacaoDisponibilizacao }}
-      </div>
+      </BAlert>
       <template #footer>
         <BButton
           variant="secondary"
@@ -269,12 +274,12 @@
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
     />
-  </div>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue'
-import {BFormTextarea, BFormCheckbox, BFormInput, BModal, BButton} from 'bootstrap-vue-next'
+import {BFormTextarea, BFormCheckbox, BFormInput, BModal, BButton, BContainer, BCard, BCardBody, BAlert} from 'bootstrap-vue-next'
 import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'

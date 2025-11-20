@@ -10,14 +10,15 @@
     <div class="mb-3">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h6>Notificações do Sistema</h6>
-        <button
-          class="btn btn-sm btn-outline-danger"
+        <BButton
+          variant="outline-danger"
+          size="sm"
           data-testid="btn-limpar-notificacoes"
           @click="limparTodas"
         >
           <i class="bi bi-trash me-1" />
           Limpar Todas
-        </button>
+        </BButton>
       </div>
 
       <div
@@ -52,13 +53,14 @@
             </div>
             <div class="d-flex align-items-center">
               <small class="text-muted me-2">{{ formatarDataHora(notificacao.timestamp) }}</small>
-              <button
-                class="btn btn-sm btn-outline-secondary"
+              <BButton
+                variant="outline-secondary"
+                size="sm"
                 title="Remover notificação"
                 @click="removerNotificacao(notificacao.id)"
               >
                 <i class="bi bi-x" />
-              </button>
+              </BButton>
             </div>
           </div>
           <p class="mb-1">
@@ -68,27 +70,27 @@
             v-if="notificacao.tipo === 'email' && notificacao.emailContent"
             class="mt-2"
           >
-            <button
-              class="btn btn-sm btn-outline-primary"
+            <BButton
+              variant="outline-primary"
+              size="sm"
               data-testid="btn-ver-email"
               @click="mostrarEmail(notificacao)"
             >
               <i class="bi bi-envelope me-1" />
               Ver e-mail completo
-            </button>
+            </BButton>
           </div>
         </div>
       </div>
     </div>
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="btn-modal-fechar"
         @click="fecharModal"
       >
         Fechar
-      </button>
+      </BButton>
     </template>
   </BModal>
 
@@ -115,21 +117,20 @@
       </div>
     </div>
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="btn-modal-fechar"
         @click="fecharEmailModal"
       >
         Fechar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
-import {BModal} from 'bootstrap-vue-next'
+import {BModal, BButton} from 'bootstrap-vue-next'
 import {storeToRefs} from 'pinia'
 import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes'
 import {formatDateTimeBR} from '@/utils'

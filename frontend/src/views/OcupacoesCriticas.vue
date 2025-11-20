@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <h2 class="mb-0">
@@ -8,187 +8,165 @@
         <small class="text-muted">{{ siglaUnidade }} - {{ nomeUnidade }}</small>
       </div>
       <div class="d-flex gap-2">
-        <button
-          class="btn btn-outline-success"
+        <BButton
+          variant="outline-success"
           @click="finalizarIdentificacao"
         >
           <i class="bi bi-check-circle me-2" />Finalizar Identificação
-        </button>
+        </BButton>
       </div>
     </div>
 
-    <div class="alert alert-info">
+    <BAlert
+      variant="info"
+      :model-value="true"
+    >
       <i class="bi bi-info-circle me-2" />
       Identifique as ocupações críticas da unidade baseadas nas competências avaliadas no diagnóstico.
-    </div>
+    </BAlert>
 
     <!-- Lista de ocupações críticas identificadas -->
-    <div class="card mb-4">
-      <div class="card-header">
+    <BCard class="mb-4">
+      <template #header>
         <h5 class="card-title mb-0">
           Ocupações Críticas Identificadas
         </h5>
+      </template>
+      <div
+        v-if="ocupacoesCriticas.length === 0"
+        class="text-muted"
+      >
+        Nenhuma ocupação crítica identificada ainda.
       </div>
-      <div class="card-body">
-        <div
-          v-if="ocupacoesCriticas.length === 0"
-          class="text-muted"
-        >
-          Nenhuma ocupação crítica identificada ainda.
-        </div>
-        <div
-          v-for="(ocupacao, index) in ocupacoesCriticas"
-          :key="index"
-          class="border rounded p-3 mb-3"
-        >
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <h6 class="mb-2">
-                {{ ocupacao.nome }}
-              </h6>
-              <p class="mb-2 text-muted">
-                {{ ocupacao.descricao }}
-              </p>
-              <div class="mb-2">
-                <strong>Competências críticas associadas:</strong>
-                <div class="d-flex flex-wrap gap-1 mt-1">
-                  <span
-                    v-for="comp in ocupacao.competenciasCriticas"
-                    :key="comp"
-                    class="badge bg-warning text-dark"
-                  >{{ comp }}</span>
-                </div>
+      <div
+        v-for="(ocupacao, index) in ocupacoesCriticas"
+        :key="index"
+        class="border rounded p-3 mb-3"
+      >
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <h6 class="mb-2">
+              {{ ocupacao.nome }}
+            </h6>
+            <p class="mb-2 text-muted">
+              {{ ocupacao.descricao }}
+            </p>
+            <div class="mb-2">
+              <strong>Competências críticas associadas:</strong>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <span
+                  v-for="comp in ocupacao.competenciasCriticas"
+                  :key="comp"
+                  class="badge bg-warning text-dark"
+                >{{ comp }}</span>
               </div>
-              <small class="text-muted">Nível de criticidade: {{ ocupacao.nivelCriticidade }}/5</small>
             </div>
-            <button
-              class="btn btn-sm btn-outline-danger"
-              @click="removerOcupacao(index)"
-            >
-              <i class="bi bi-trash" />
-            </button>
+            <small class="text-muted">Nível de criticidade: {{ ocupacao.nivelCriticidade }}/5</small>
           </div>
+          <BButton
+            variant="outline-danger"
+            size="sm"
+            @click="removerOcupacao(index)"
+          >
+            <i class="bi bi-trash" />
+          </BButton>
         </div>
       </div>
-    </div>
+    </BCard>
 
     <!-- Formulário para adicionar ocupação crítica -->
-    <div class="card">
-      <div class="card-header">
+    <BCard>
+      <template #header>
         <h5 class="card-title mb-0">
           Adicionar Ocupação Crítica
         </h5>
-      </div>
-      <div class="card-body">
-        <form @submit.prevent="adicionarOcupacao">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Nome da Ocupação</label>
-              <b-form-input
-                v-model="novaOcupacao.nome"
-                type="text"
-                required
-              />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Nível de Criticidade</label>
-              <b-form-select
-                v-model="novaOcupacao.nivelCriticidade"
-                required
-                :options="[
-                  { value: 1, text: '1 - Baixo' },
-                  { value: 2, text: '2 - Baixo-Médio' },
-                  { value: 3, text: '3 - Médio' },
-                  { value: 4, text: '4 - Alto' },
-                  { value: 5, text: '5 - Muito Alto' },
-                ]"
-              />
-            </div>
-            <div class="col-12">
-              <label class="form-label">Descrição</label>
-              <b-form-textarea
-                v-model="novaOcupacao.descricao"
-                rows="3"
-                required
-              />
-            </div>
-            <div class="col-12">
-              <label class="form-label">Competências Críticas Associadas</label>
-              <div class="border rounded p-3">
-                <div
-                  v-for="competencia in competencias"
-                  :key="competencia.codigo"
-                  class="form-check"
-                >
-                  <b-form-checkbox
-                    :id="'comp-' + competencia.codigo"
-                    v-model="novaOcupacao.competenciasCriticas"
-                    :value="competencia.descricao"
-                  >
-                    {{ competencia.descricao }}
-                  </b-form-checkbox>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <button
-                type="submit"
-                class="btn btn-primary"
-              >
-                <i class="bi bi-plus-circle me-2" />Adicionar Ocupação
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal de confirmação -->
-    <div
-      v-if="mostrarModalConfirmacao"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Finalizar Identificação
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalConfirmacao"
+      </template>
+      <BForm @submit.prevent="adicionarOcupacao">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nome da Ocupação</label>
+            <BFormInput
+              v-model="novaOcupacao.nome"
+              type="text"
+              required
             />
           </div>
-          <div class="modal-body">
-            <p>Confirma a finalização da identificação de ocupações críticas? Esta ação não poderá ser desfeita.</p>
+          <div class="col-md-6">
+            <label class="form-label">Nível de Criticidade</label>
+            <BFormSelect
+              v-model="novaOcupacao.nivelCriticidade"
+              required
+              :options="[
+                { value: 1, text: '1 - Baixo' },
+                { value: 2, text: '2 - Baixo-Médio' },
+                { value: 3, text: '3 - Médio' },
+                { value: 4, text: '4 - Alto' },
+                { value: 5, text: '5 - Muito Alto' },
+              ]"
+            />
           </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalConfirmacao"
+          <div class="col-12">
+            <label class="form-label">Descrição</label>
+            <BFormTextarea
+              v-model="novaOcupacao.descricao"
+              rows="3"
+              required
+            />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Competências Críticas Associadas</label>
+            <div class="border rounded p-3">
+              <div
+                v-for="competencia in competencias"
+                :key="competencia.codigo"
+                class="form-check"
+              >
+                <BFormCheckbox
+                  :id="'comp-' + competencia.codigo"
+                  v-model="novaOcupacao.competenciasCriticas"
+                  :value="competencia.descricao"
+                >
+                  {{ competencia.descricao }}
+                </BFormCheckbox>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <BButton
+              type="submit"
+              variant="primary"
             >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              @click="confirmarFinalizacao"
-            >
-              Confirmar
-            </button>
+              <i class="bi bi-plus-circle me-2" />Adicionar Ocupação
+            </BButton>
           </div>
         </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalConfirmacao"
-      class="modal-backdrop fade show"
-    />
-  </div>
+      </BForm>
+    </BCard>
+
+    <!-- Modal de confirmação -->
+    <BModal
+      v-model="mostrarModalConfirmacao"
+      title="Finalizar Identificação"
+      centered
+      hide-footer
+    >
+      <p>Confirma a finalização da identificação de ocupações críticas? Esta ação não poderá ser desfeita.</p>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalConfirmacao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          @click="confirmarFinalizacao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -199,6 +177,18 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {Competencia, MapaCompleto} from '@/types/tipos'
+import {
+  BContainer,
+  BButton,
+  BAlert,
+  BCard,
+  BForm,
+  BFormInput,
+  BFormSelect,
+  BFormTextarea,
+  BFormCheckbox,
+  BModal
+} from 'bootstrap-vue-next';
 
 const route = useRoute()
 const router = useRouter()

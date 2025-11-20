@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="fs-5 w-100 mb-3">
       {{ siglaUnidade }} - {{ nomeUnidade }}
     </div>
@@ -10,59 +10,58 @@
       </h1>
 
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeVerImpacto"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="isChefe && historicoAnalises.length > 0"
-          class="btn btn-outline-info"
+          variant="outline-info"
           @click="abrirModalHistorico"
         >
           Histórico de análise
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="isChefe"
-          class="btn btn-outline-primary"
+          variant="outline-primary"
           title="Importar"
           @click="mostrarModalImportar = true"
         >
           Importar atividades
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="isChefe"
-          class="btn btn-outline-success"
+          variant="outline-success"
           data-testid="btn-disponibilizar"
-          data-bs-toggle="tooltip"
           title="Disponibilizar"
           @click="disponibilizarCadastro"
         >
           Disponibilizar
-        </button>
+        </BButton>
       </div>
     </div>
 
-    <form
+    <BForm
       class="row g-2 align-items-center mb-4"
       data-testid="form-nova-atividade"
       @submit.prevent="adicionarAtividade"
     >
-      <div class="col">
-        <b-form-input
+      <BCol>
+        <BFormInput
           v-model="novaAtividade"
           data-testid="input-nova-atividade"
           placeholder="Nova atividade"
           type="text"
           aria-label="Nova atividade"
         />
-      </div>
-      <div class="col-auto">
-        <button
-          class="btn btn-outline-primary btn-sm"
-          data-bs-toggle="tooltip"
+      </BCol>
+      <BCol cols="auto">
+        <BButton
+          variant="outline-primary"
+          size="sm"
           data-testid="btn-adicionar-atividade"
           title="Adicionar atividade"
           type="submit"
@@ -70,44 +69,47 @@
           <i
             class="bi bi-save"
           />
-        </button>
-      </div>
-    </form>
+        </BButton>
+      </BCol>
+    </BForm>
 
-    <div
+    <BCard
       v-for="(atividade, idx) in atividades"
       :key="atividade.codigo || idx"
-      class="card mb-3 atividade-card"
+      class="mb-3 atividade-card"
+      no-body
     >
-      <div class="card-body py-2">
+      <BCardBody class="py-2">
         <div
           class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
           <template v-if="editandoAtividade === atividade.codigo">
-            <b-form-input
+            <BFormInput
               v-model="atividadeEditada"
               class="me-2 atividade-edicao-input"
               data-testid="input-editar-atividade"
               aria-label="Editar atividade"
             />
-            <button
-              class="btn btn-sm btn-outline-success me-1 botao-acao"
-              data-bs-toggle="tooltip"
+            <BButton
+              variant="outline-success"
+              size="sm"
+              class="me-1 botao-acao"
               data-testid="btn-salvar-edicao-atividade"
               title="Salvar"
               @click="salvarEdicaoAtividade(atividade.codigo)"
             >
               <i class="bi bi-save" />
-            </button>
-            <button
-              class="btn btn-sm btn-outline-secondary botao-acao"
-              data-bs-toggle="tooltip"
+            </BButton>
+            <BButton
+              variant="outline-secondary"
+              size="sm"
+              class="botao-acao"
               data-testid="btn-cancelar-edicao-atividade"
               title="Cancelar"
               @click="cancelarEdicaoAtividade()"
             >
               <i class="bi bi-x" />
-            </button>
+            </BButton>
           </template>
 
           <template v-else>
@@ -116,9 +118,10 @@
               data-testid="atividade-descricao"
             >{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
-              <button
-                class="btn btn-sm btn-outline-primary botao-acao"
-                data-bs-toggle="tooltip"
+              <BButton
+                variant="outline-primary"
+                size="sm"
+                class="botao-acao"
                 data-testid="btn-editar-atividade"
                 title="Editar"
                 @click="iniciarEdicaoAtividade(atividade.codigo, atividade.descricao)"
@@ -126,10 +129,11 @@
                 <i
                   class="bi bi-pencil"
                 />
-              </button>
-              <button
-                class="btn btn-sm btn-outline-danger botao-acao"
-                data-bs-toggle="tooltip"
+              </BButton>
+              <BButton
+                variant="outline-danger"
+                size="sm"
+                class="botao-acao"
                 data-testid="btn-remover-atividade"
                 title="Remover"
                 @click="removerAtividade(idx)"
@@ -137,7 +141,7 @@
                 <i
                   class="bi bi-trash"
                 />
-              </button>
+              </BButton>
             </div>
           </template>
         </div>
@@ -150,45 +154,47 @@
           >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-              <button
-                class="btn btn-sm btn-outline-primary botao-acao"
-                data-bs-toggle="tooltip"
+              <BButton
+                variant="outline-primary"
+                size="sm"
+                class="botao-acao"
                 data-testid="btn-editar-conhecimento"
                 title="Editar"
                 @click="abrirModalEdicaoConhecimento(conhecimento)"
               >
                 <i class="bi bi-pencil" />
-              </button>
-              <button
-                class="btn btn-sm btn-outline-danger botao-acao"
-                data-bs-toggle="tooltip"
+              </BButton>
+              <BButton
+                variant="outline-danger"
+                size="sm"
+                class="botao-acao"
                 data-testid="btn-remover-conhecimento"
                 title="Remover"
                 @click="removerConhecimento(idx, cidx)"
               >
                 <i class="bi bi-trash" />
-              </button>
+              </BButton>
             </div>
           </div>
-          <form
+          <BForm
             class="row g-2 align-items-center"
             data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento(idx)"
           >
-            <div class="col">
-              <b-form-input
+            <BCol>
+              <BFormInput
                 v-model="atividade.novoConhecimento"
-                class="form-control-sm"
+                size="sm"
                 data-testid="input-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 type="text"
                 aria-label="Novo conhecimento"
               />
-            </div>
-            <div class="col-auto">
-              <button
-                class="btn btn-outline-secondary btn-sm"
-                data-bs-toggle="tooltip"
+            </BCol>
+            <BCol cols="auto">
+              <BButton
+                variant="outline-secondary"
+                size="sm"
                 data-testid="btn-adicionar-conhecimento"
                 title="Adicionar Conhecimento"
                 type="submit"
@@ -196,12 +202,12 @@
                 <i
                   class="bi bi-save"
                 />
-              </button>
-            </div>
-          </form>
+              </BButton>
+            </BCol>
+          </BForm>
         </div>
-      </div>
-    </div>
+      </BCardBody>
+    </BCard>
 
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
@@ -217,135 +223,93 @@
       @fechar="fecharModalImpacto"
     />
 
-    <div
-      v-if="mostrarModalConfirmacao"
-      ref="confirmacaoModalRef"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalConfirmacao"
+      :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro' }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalConfirmacao"
-            />
-          </div>
-          <div class="modal-body">
-            <p>
-              {{
-                isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
-              }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
-            </p>
-            <div
-              v-if="atividadesSemConhecimento.length > 0"
-              class="alert alert-warning"
+      <template #default>
+        <p>
+          {{
+            isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
+          }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
+        </p>
+        <BAlert
+          v-if="atividadesSemConhecimento.length > 0"
+          variant="warning"
+          :model-value="true"
+        >
+          <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
+          <ul>
+            <li
+              v-for="atividade in atividadesSemConhecimento"
+              :key="atividade.codigo"
             >
-              <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
-              <ul>
-                <li
-                  v-for="atividade in atividadesSemConhecimento"
-                  :key="atividade.codigo"
-                >
-                  {{ atividade.descricao }}
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalConfirmacao"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              @click="confirmarDisponibilizacao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalConfirmacao"
-      class="modal-backdrop fade show"
-    />
+              {{ atividade.descricao }}
+            </li>
+          </ul>
+        </BAlert>
+      </template>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalConfirmacao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          data-testid="btn-confirmar-disponibilizacao"
+          @click="confirmarDisponibilizacao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      v-if="mostrarModalHistorico"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalHistorico"
+      title="Histórico de Análise"
+      centered
+      size="lg"
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-historico-analise-titulo"
+      <div class="table-responsive">
+        <table
+          class="table table-striped"
+          data-testid="historico-analise-tabela"
+        >
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Unidade</th>
+              <th>Resultado</th>
+              <th>Observações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="analise in historicoAnalises"
+              :key="analise.codigo"
             >
-              Histórico de Análise
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalHistorico"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="table-responsive">
-              <table
-                class="table table-striped"
-                data-testid="historico-analise-tabela"
-              >
-                <thead>
-                  <tr>
-                    <th>Data/Hora</th>
-                    <th>Unidade</th>
-                    <th>Resultado</th>
-                    <th>Observações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="analise in historicoAnalises"
-                    :key="analise.codigo"
-                  >
-                    <td>{{ formatarData(analise.dataHora) }}</td>
-                    <td>{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
-                    <td>{{ analise.resultado }}</td>
-                    <td>{{ analise.observacoes || '-' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalHistorico"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
+              <td>{{ formatarData(analise.dataHora) }}</td>
+              <td>{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
+              <td>{{ analise.resultado }}</td>
+              <td>{{ analise.observacoes || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-    <div
-      v-if="mostrarModalHistorico"
-      class="modal-backdrop fade show"
-    />
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalHistorico"
+        >
+          Fechar
+        </BButton>
+      </template>
+    </BModal>
 
     <EditarConhecimentoModal
       :mostrar="mostrarModalEdicaoConhecimento"
@@ -353,12 +317,11 @@
       @fechar="fecharModalEdicaoConhecimento"
       @salvar="salvarEdicaoConhecimento"
     />
-  </div>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
-import {Modal} from 'bootstrap'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -382,6 +345,17 @@ import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue'
 import EditarConhecimentoModal from '@/components/EditarConhecimentoModal.vue'
+import {
+  BContainer,
+  BButton,
+  BForm,
+  BFormInput,
+  BCol,
+  BCard,
+  BCardBody,
+  BModal,
+  BAlert
+} from 'bootstrap-vue-next';
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -645,10 +619,6 @@ function disponibilizarCadastro() {
 }
 
 function fecharModalConfirmacao() {
-  if (confirmacaoModalRef.value) {
-    const modalInstance = Modal.getInstance(confirmacaoModalRef.value);
-    modalInstance?.hide();
-  }
   mostrarModalConfirmacao.value = false;
   atividadesSemConhecimento.value = [];
 }

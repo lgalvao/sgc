@@ -9,19 +9,22 @@
       </h4>
 
       <div>
-        <button
-          class="btn btn-outline-primary btn-sm me-2"
+        <BButton
+          variant="outline-primary"
+          size="sm"
+          class="me-2"
           data-testid="btn-expandir-todas"
           @click="expandAll"
         >
           <i class="bi bi-arrows-expand" />
-        </button>
-        <button
-          class="btn btn-outline-secondary btn-sm"
+        </BButton>
+        <BButton
+          variant="outline-secondary"
+          size="sm"
           @click="collapseAll"
         >
           <i class="bi bi-arrows-collapse" />
-        </button>
+        </BButton>
       </div>
     </div>
 
@@ -65,6 +68,7 @@
 <script lang="ts" setup>
 import {computed, nextTick, ref, watch} from 'vue'
 import TreeRowItem from './TreeRowItem.vue'
+import {BButton} from 'bootstrap-vue-next'
 
 interface TreeItem {
   id: number | string;

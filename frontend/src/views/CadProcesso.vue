@@ -1,37 +1,39 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2>Cadastro de processo</h2>
 
-    <form class="mt-4 col-md-6 col-sm-8 col-12">
-      <div class="mb-3">
-        <label
-          class="form-label"
-          for="descricao"
-        >Descrição</label>
-        <b-form-input
+    <BForm class="mt-4 col-md-6 col-sm-8 col-12">
+      <BFormGroup
+        label="Descrição"
+        label-for="descricao"
+        class="mb-3"
+      >
+        <BFormInput
           id="descricao"
           v-model="descricao"
           placeholder="Descreva o processo"
           type="text"
           data-testid="input-descricao"
         />
-      </div>
+      </BFormGroup>
 
-      <div class="mb-3">
-        <label
-          class="form-label"
-          for="tipo"
-        >Tipo</label>
-        <b-form-select
+      <BFormGroup
+        label="Tipo"
+        label-for="tipo"
+        class="mb-3"
+      >
+        <BFormSelect
           id="tipo"
           v-model="tipo"
           data-testid="select-tipo"
           :options="Object.values(TipoProcesso)"
         />
-      </div>
+      </BFormGroup>
 
-      <div class="mb-3">
-        <label class="form-label">Unidades participantes</label>
+      <BFormGroup
+        label="Unidades participantes"
+        class="mb-3"
+      >
         <div class="border rounded p-3">
           <ArvoreUnidades
             v-if="!unidadesStore.isLoading"
@@ -46,150 +48,111 @@
             Carregando unidades...
           </div>
         </div>
-      </div>
+      </BFormGroup>
 
-      <div class="mb-3">
-        <label
-          class="form-label"
-          for="dataLimite"
-        >Data limite</label>
-        <b-form-input
+      <BFormGroup
+        label="Data limite"
+        label-for="dataLimite"
+        class="mb-3"
+      >
+        <BFormInput
           id="dataLimite"
           v-model="dataLimite"
           type="date"
           data-testid="input-dataLimite"
         />
-      </div>
-      <button
-        class="btn btn-primary"
-        type="button"
+      </BFormGroup>
+
+      <BButton
+        variant="primary"
         @click="salvarProcesso"
       >
         Salvar
-      </button>
-      <button
-        class="btn btn-success ms-2"
+      </BButton>
+      <BButton
+        variant="success"
+        class="ms-2"
         data-testid="btn-iniciar-processo"
-        type="button"
         @click="abrirModalConfirmacao"
       >
         Iniciar processo
-      </button>
-      <button
+      </BButton>
+      <BButton
         v-if="processoEditando"
-        class="btn btn-danger ms-2"
-        type="button"
+        variant="danger"
+        class="ms-2"
         @click="abrirModalRemocao"
       >
         Remover
-      </button>
-      <router-link
-        class="btn btn-secondary ms-2"
+      </BButton>
+      <BButton
+        variant="secondary"
+        class="ms-2"
         to="/painel"
       >
         Cancelar
-      </router-link>
-    </form>
+      </BButton>
+    </BForm>
 
     <!-- Modal de confirmação CDU-05 -->
-    <div
-      v-if="mostrarModalConfirmacao"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalConfirmacao"
+      title="Iniciar processo"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Iniciar processo
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalConfirmacao"
-            />
-          </div>
-          <div class="modal-body">
-            <p><strong>Descrição:</strong> {{ descricao }}</p>
-            <p><strong>Tipo:</strong> {{ tipo }}</p>
-            <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
-            <hr>
-            <p>
-              Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
-              serão notificadas por e-mail.
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalConfirmacao"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="confirmarIniciarProcesso"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalConfirmacao"
-      class="modal-backdrop fade show"
-    />
+      <template #default>
+        <p><strong>Descrição:</strong> {{ descricao }}</p>
+        <p><strong>Tipo:</strong> {{ tipo }}</p>
+        <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
+        <hr>
+        <p>
+          Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
+          serão notificadas por e-mail.
+        </p>
+      </template>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalConfirmacao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="primary"
+          @click="confirmarIniciarProcesso"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de confirmação de remoção -->
-    <div
-      v-if="mostrarModalRemocao"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalRemocao"
+      title="Remover processo"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Iniciar processo
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalRemocao"
-            />
-          </div>
-          <div class="modal-body">
-            <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalRemocao"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              @click="confirmarRemocao"
-            >
-              Remover
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalRemocao"
-      class="modal-backdrop fade show"
-    />
-  </div>
+      <template #default>
+        <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
+      </template>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalRemocao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          @click="confirmarRemocao"
+        >
+          Remover
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
@@ -207,6 +170,15 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
+import {
+  BContainer,
+  BForm,
+  BFormGroup,
+  BFormInput,
+  BFormSelect,
+  BButton,
+  BModal
+} from 'bootstrap-vue-next';
 
 const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')

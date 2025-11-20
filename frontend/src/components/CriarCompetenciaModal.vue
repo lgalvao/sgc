@@ -22,13 +22,14 @@
     <div class="mb-4">
       <h5>Atividades</h5>
       <div class="d-flex flex-wrap gap-2">
-        <div
+        <BCard
           v-for="atividade in atividades"
           :key="atividade.codigo"
           :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-          class="card atividade-card-item"
+          class="atividade-card-item"
+          no-body
         >
-          <div class="card-body d-flex align-items-center py-2">
+          <BCardBody class="d-flex align-items-center py-2">
             <BFormCheckbox
               :id="`atv-${atividade.codigo}`"
               v-model="atividadesSelecionadas"
@@ -48,36 +49,34 @@
                 {{ atividade.conhecimentos.length }}
               </span>
             </BFormCheckbox>
-          </div>
-        </div>
+          </BCardBody>
+        </BCard>
       </div>
     </div>
 
     <template #footer>
-      <button
-        class="btn btn-secondary"
-        type="button"
+      <BButton
+        variant="secondary"
         data-testid="btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
-      </button>
-      <button
+      </BButton>
+      <BButton
         :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-        class="btn btn-primary"
-        type="button"
+        variant="primary"
         data-testid="btn-modal-confirmar"
         @click="salvar"
       >
         <i class="bi bi-save" /> Salvar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
-import {BModal, BFormTextarea, BFormCheckbox} from 'bootstrap-vue-next'
+import {BModal, BFormTextarea, BFormCheckbox, BButton, BCard, BCardBody} from 'bootstrap-vue-next'
 import {Atividade, Competencia} from '@/types/tipos'
 
 const props = defineProps<{

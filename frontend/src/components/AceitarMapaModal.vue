@@ -36,31 +36,29 @@
     </div>
 
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="modal-aceite-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
         Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-success"
+      </BButton>
+      <BButton
+        variant="success"
         data-testid="modal-aceite-confirmar"
         @click="$emit('confirmarAceitacao', observacao)"
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
-import {BModal, BFormTextarea} from 'bootstrap-vue-next';
+import {BModal, BFormTextarea, BButton} from 'bootstrap-vue-next';
 
 interface Props {
   mostrarModal: boolean;
@@ -97,14 +95,5 @@ computed(() => {
   box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
 }
 
-.btn-success {
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
-  border: none;
-  transition: transform 0.2s ease;
-}
-
-.btn-success:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
-}
+/* BButton handles variants, but custom gradients might still be desired or need removal for Bootstrap standard look */
 </style>

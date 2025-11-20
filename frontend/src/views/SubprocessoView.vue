@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <SubprocessoHeader
       v-if="subprocesso"
       :processo-descricao="subprocesso.processoDescricao || ''"
@@ -29,7 +29,7 @@
     />
 
     <TabelaMovimentacoes :movimentacoes="movimentacoes" />
-  </div>
+  </BContainer>
 
   <SubprocessoModal
     :mostrar-modal="mostrarModalAlterarDataLimite"
@@ -51,6 +51,7 @@ import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import SubprocessoModal from '@/components/SubprocessoModal.vue';
 import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
+import { BContainer } from 'bootstrap-vue-next';
 
 defineProps<{ codProcesso: number; siglaUnidade: string }>();
 

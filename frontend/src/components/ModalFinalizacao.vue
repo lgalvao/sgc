@@ -9,36 +9,37 @@
     hide-footer
     @hide="emit('fechar')"
   >
-    <div class="alert alert-info">
+    <BAlert
+      variant="info"
+      :model-value="true"
+    >
       <i class="bi bi-info-circle" />
       Confirma a finalização do processo <strong>{{ processoDescricao }}</strong>?<br>
       Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
       participantes do processo.
-    </div>
+    </BAlert>
     <template #footer>
-      <button
-        type="button"
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         data-testid="btn-cancelar-finalizacao"
         @click="emit('fechar')"
       >
         <i class="bi bi-x-circle" /> Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-success"
+      </BButton>
+      <BButton
+        variant="success"
         data-testid="btn-confirmar-finalizacao"
         @click="emit('confirmar')"
       >
         <i class="bi bi-check-circle" />
         Confirmar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
-import {BModal} from 'bootstrap-vue-next';
+import {BModal, BButton, BAlert} from 'bootstrap-vue-next';
 
 defineProps<{
   mostrar: boolean;

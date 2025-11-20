@@ -23,12 +23,13 @@
     </div>
 
     <div v-else-if="impacto">
-      <div
+      <BAlert
         v-if="!impacto.temImpactos"
-        class="alert alert-success"
+        variant="success"
+        :model-value="true"
       >
         <i class="bi bi-check-circle me-2" /> Nenhum impacto detectado no mapa.
-      </div>
+      </BAlert>
 
       <div
         v-else
@@ -111,14 +112,15 @@
           <h5 class="text-warning mb-3">
             <i class="bi bi-exclamation-triangle me-2" />Competências Impactadas
           </h5>
-          <div
+          <BCard
             v-for="comp in impacto.competenciasImpactadas"
             :key="comp.codigo"
-            class="card mb-3"
+            class="mb-3"
+            no-body
           >
-            <div class="card-header bg-light">
+            <template #header>
               <strong>{{ comp.descricao }}</strong>
-            </div>
+            </template>
             <ul class="list-group list-group-flush">
               <li
                 v-for="(ativ, idx) in comp.atividadesAfetadas"
@@ -134,33 +136,34 @@
                 Tipo de Impacto: {{ formatTipoImpacto(comp.tipoImpacto) }}
               </li>
             </ul>
-          </div>
+          </BCard>
         </div>
       </div>
     </div>
 
-    <div
+    <BAlert
       v-else
-      class="alert alert-danger"
+      variant="danger"
+      :model-value="true"
     >
       Não foi possível carregar os dados de impacto.
-    </div>
+    </BAlert>
 
     <template #footer>
-      <button
-        class="btn btn-secondary"
+      <BButton
+        variant="secondary"
         type="button"
         @click="fechar"
       >
         Fechar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
-import {BModal} from 'bootstrap-vue-next';
+import {BModal, BButton, BAlert, BCard} from 'bootstrap-vue-next';
 import {storeToRefs} from 'pinia';
 import {useMapasStore} from '@/stores/mapas';
 import {useProcessosStore} from '@/stores/processos';

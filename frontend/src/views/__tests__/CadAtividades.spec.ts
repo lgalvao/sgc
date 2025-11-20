@@ -142,7 +142,11 @@ describe('CadAtividades.vue', () => {
 
   it('deve disponibilizar o cadastro', async () => {
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
-    await wrapper.find('.modal-footer .btn-success').trigger('click');
+    // Modal is teleported to body, so we need to search in document
+    const confirmBtn = document.body.querySelector('[data-testid="btn-confirmar-disponibilizacao"]');
+    if (confirmBtn) {
+        await confirmBtn.dispatchEvent(new Event('click'));
+    }
     expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
   });
 });

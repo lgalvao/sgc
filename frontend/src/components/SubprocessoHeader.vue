@@ -1,9 +1,10 @@
 <template>
-  <div
-    class="card mb-4"
+  <BCard
+    class="mb-4"
     data-testid="subprocesso-header"
+    no-body
   >
-    <div class="card-body">
+    <BCardBody>
       <p
         class="text-muted small mb-1"
         data-testid="processo-info"
@@ -48,20 +49,21 @@
         v-if="podeAlterarDataLimite"
         class="mt-3"
       >
-        <button
-          class="btn btn-outline-primary"
+        <BButton
+          variant="outline-primary"
           @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1" />
           Alterar data limite
-        </button>
+        </BButton>
       </div>
-    </div>
-  </div>
+    </BCardBody>
+  </BCard>
 </template>
 
 <script lang="ts" setup>
 import { badgeClass } from '@/utils';
+import { BButton, BCard, BCardBody } from 'bootstrap-vue-next';
 
 interface Props {
   processoDescricao: string;
