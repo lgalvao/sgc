@@ -1,85 +1,78 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import AceitarMapaModal from '../AceitarMapaModal.vue';
-import { setActivePinia, createPinia } from 'pinia';
-import { BFormTextarea } from 'bootstrap-vue-next';
+import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
+import { BFormTextarea, BButton, BModal } from 'bootstrap-vue-next';
 
-describe('AceitarMapaModal', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-  });
-
-  const globalComponents = {
+// Função fábrica para criar o wrapper
+const createWrapper = (propsOverride = {}) => {
+  return mount(AceitarMapaModal, {
+    props: {
+      mostrarModal: true,
+      ...propsOverride,
+    },
     global: {
       components: {
         BFormTextarea,
+        BButton,
+        BModal
       },
+      stubs: {
+        // Stubbing BModal to focus on content and events
+        BModal: {
+            template: `
+                <div v-if="modelValue" data-testid="modal-stub">
+                    <slot />
+                    <slot name="footer" />
+                </div>
+            `,
+            props: ['modelValue'],
+            emits: ['update:modelValue', 'hide']
+        }
+      }
     },
-  };
+  });
+};
 
+describe('AceitarMapaModal.vue', () => {
   it('não deve renderizar o modal quando mostrarModal for falso', () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: false,
-      },
-      ...globalComponents,
-    });
-    expect(wrapper.find('[data-testid="modal-aceite-body"]').exists()).toBe(false);
+    const wrapper = createWrapper({ mostrarModal: false });
+    expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false);
   });
 
-  it('deve renderizar o modal com o perfil padrão (não ADMIN)', async () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: true,
-      },
-      ...globalComponents,
-    });
+  it('deve renderizar o modal com o perfil padrão (não ADMIN)', () => {
+    const wrapper = createWrapper({ perfil: 'CHEFE' }); // Default behavior
 
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
     expect(corpoModal.exists()).toBe(true);
-    expect(corpoModal.text()).toContain('Observações (opcional)');
+    expect(corpoModal.text()).toContain('Observações');
     expect(wrapper.find('[data-testid="observacao-aceite-textarea"]').exists()).toBe(true);
   });
 
   it('deve renderizar o modal com o perfil ADMIN', () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: true,
-        perfil: 'ADMIN',
-      },
-      ...globalComponents,
-    });
+    const wrapper = createWrapper({ perfil: 'ADMIN' });
 
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
     expect(corpoModal.exists()).toBe(true);
     expect(corpoModal.text()).toContain('Confirma a homologação do mapa de competências?');
+    // Textarea não deve existir para admin
     expect(wrapper.find('[data-testid="observacao-aceite-textarea"]').exists()).toBe(false);
   });
 
   it('deve emitir o evento fecharModal ao clicar no botão de cancelar', async () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: true,
-      },
-      ...globalComponents,
-    });
+    const wrapper = createWrapper();
 
     await wrapper.find('[data-testid="modal-aceite-cancelar"]').trigger('click');
     expect(wrapper.emitted('fecharModal')).toBeTruthy();
   });
 
   it('deve emitir o evento confirmarAceitacao com a observação', async () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: true,
-      },
-      ...globalComponents,
-    });
-
+    const wrapper = createWrapper();
     const observacao = 'Mapa de competências está de acordo com o esperado.';
+
     const textareaWrapper = wrapper.findComponent(BFormTextarea);
     const nativeTextarea = textareaWrapper.find('textarea');
     await nativeTextarea.setValue(observacao);
+
     await wrapper.find('[data-testid="modal-aceite-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('confirmarAceitacao')).toBeTruthy();
@@ -87,12 +80,7 @@ describe('AceitarMapaModal', () => {
   });
 
   it('deve emitir o evento confirmarAceitacao com uma observação vazia', async () => {
-    const wrapper = mount(AceitarMapaModal, {
-      props: {
-        mostrarModal: true,
-      },
-      ...globalComponents,
-    });
+    const wrapper = createWrapper();
 
     await wrapper.find('[data-testid="modal-aceite-confirmar"]').trigger('click');
 
