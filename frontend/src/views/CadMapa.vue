@@ -258,6 +258,7 @@
     <BModal
       v-model="mostrarModalExcluirCompetencia"
       title="Exclusão de competência"
+      data-testid="excluir-competencia-modal"
       ok-title="Confirmar"
       cancel-title="Cancelar"
       ok-variant="danger"

@@ -1,178 +1,237 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import ProcessoView from '@/views/ProcessoView.vue'
 import { createTestingPinia } from '@pinia/testing'
-import ProcessoView from '../ProcessoView.vue'
 import { useProcessosStore } from '@/stores/processos'
+import { usePerfilStore } from '@/stores/perfil'
 import { useNotificacoesStore } from '@/stores/notificacoes'
-import { createRouter, createWebHistory } from 'vue-router'
-import ModalAcaoBloco from '@/components/ModalAcaoBloco.vue'
-import ModalFinalizacao from '@/components/ModalFinalizacao.vue'
-import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
+import { defineComponent } from 'vue'
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
-    { path: '/painel', name: 'Painel', component: { template: '<div>Painel</div>' } },
-    { path: '/processo/:codProcesso', name: 'Processo', component: ProcessoView },
-    { path: '/processo/:codProcesso/:siglaUnidade', name: 'Subprocesso', component: { template: '<div>Subprocesso</div>' } },
-  ],
+// Mock services
+import * as processoService from '@/services/processoService'
+
+const { pushMock } = vi.hoisted(() => {
+  return { pushMock: vi.fn() }
 })
 
-describe('Processo.vue', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+vi.mock('vue-router', () => ({
+  useRoute: () => ({
+    params: {
+      codProcesso: '1'
+    }
+  }),
+  useRouter: () => ({
+    push: pushMock
+  }),
+  createRouter: () => ({
+    beforeEach: vi.fn(),
+    afterEach: vi.fn(),
+    push: pushMock
+  }),
+  createWebHistory: vi.fn(),
+  createMemoryHistory: vi.fn()
+}))
 
-  const mountComponent = (initialState = {}) => {
-    return mount(ProcessoView, {
+vi.mock('@/services/processoService', () => ({
+    obterDetalhesProcesso: vi.fn(),
+    fetchSubprocessosElegiveis: vi.fn(),
+    finalizarProcesso: vi.fn(),
+    processarAcaoEmBloco: vi.fn(),
+    fetchProcessosFinalizados: vi.fn() // used by store initial state or other actions
+}))
+
+// Stubs
+const ProcessoDetalhesStub = {
+    name: 'ProcessoDetalhes',
+    props: ['descricao', 'tipo', 'situacao'],
+    template: '<div data-testid="processo-detalhes">{{ descricao }}</div>'
+}
+
+const ProcessoAcoesStub = {
+    name: 'ProcessoAcoes',
+    props: ['mostrarBotoesBloco', 'perfil', 'situacaoProcesso'],
+    template: '<div data-testid="processo-acoes"></div>',
+    emits: ['aceitar-bloco', 'homologar-bloco', 'finalizar']
+}
+
+const ModalFinalizacaoStub = {
+    name: 'ModalFinalizacao',
+    props: ['mostrar', 'processoDescricao'],
+    template: '<div v-if="mostrar" data-testid="modal-finalizacao"></div>',
+    emits: ['fechar', 'confirmar']
+}
+
+const ModalAcaoBlocoStub = {
+    name: 'ModalAcaoBloco',
+    props: ['mostrar', 'tipo', 'unidades'],
+    template: '<div v-if="mostrar" data-testid="modal-acao-bloco"></div>',
+    emits: ['fechar', 'confirmar']
+}
+
+const TreeTableStub = {
+    name: 'TreeTable',
+    props: ['columns', 'data', 'title'],
+    template: '<div data-testid="tree-table"></div>',
+    emits: ['row-click']
+}
+
+describe('ProcessoView.vue', () => {
+  let wrapper: any
+
+  const mockProcesso = {
+      codigo: 1,
+      descricao: 'Test Process',
+      tipo: 'MAPEAMENTO',
+      situacao: 'EM_ANDAMENTO',
+      unidades: [
+          { codUnidade: 10, sigla: 'U1', nome: 'Unidade 1', situacaoSubprocesso: 'EM_ANDAMENTO', dataLimite: '2023-01-01', filhos: [] }
+      ],
+      resumoSubprocessos: []
+  }
+
+  const mockSubprocessosElegiveis = [
+      { codSubprocesso: 1, unidadeNome: 'Test Unit', unidadeSigla: 'TU', situacao: 'NAO_INICIADO' }
+  ]
+
+  function createWrapper(customState = {}) {
+    const wrapper = mount(ProcessoView, {
       global: {
         plugins: [
           createTestingPinia({
-            createSpy: vi.fn,
+            stubActions: false,
             initialState: {
-              processos: {
-                processoDetalhe: {
-                  codigo: 1,
-                  descricao: 'Test Process',
-                  tipo: 'MAPEAMENTO',
-                  situacao: 'EM_ANDAMENTO',
-                  unidades: [
-                      { codUnidade: 10, sigla: 'U1', nome: 'Unidade 1', situacaoSubprocesso: 'EM_ANDAMENTO', dataLimite: '2023-01-01', filhos: [] }
-                  ],
-                },
-                subprocessosElegiveis: [
-                  { codSubprocesso: 1, unidadeNome: 'Test Unit', unidadeSigla: 'TU', situacao: 'NAO_INICIADO' },
-                ],
-                ...initialState['processos']
-              },
               perfil: {
                 perfilSelecionado: 'ADMIN',
                 unidadeSelecionada: 99,
-                ...initialState['perfil']
               },
+              ...customState
             },
           }),
-          router,
         ],
         stubs: {
-            TreeTable: true,
-            ProcessoDetalhes: true,
-            ModalAcaoBloco: true,
-            ModalFinalizacao: true
+            ProcessoDetalhes: ProcessoDetalhesStub,
+            ProcessoAcoes: ProcessoAcoesStub,
+            ModalFinalizacao: ModalFinalizacaoStub,
+            ModalAcaoBloco: ModalAcaoBlocoStub,
+            TreeTable: TreeTableStub,
+            BContainer: { template: '<div><slot /></div>' },
+            BAlert: { template: '<div><slot /></div>' }
         }
       },
     })
+
+    const processosStore = useProcessosStore()
+    const perfilStore = usePerfilStore()
+    const notificacoesStore = useNotificacoesStore()
+
+    return { wrapper, processosStore, perfilStore, notificacoesStore }
   }
 
-  it('renders process details', async () => {
-    const wrapper = mountComponent()
-    await router.push('/processo/1')
-    await router.isReady()
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(mockProcesso as any)
+    vi.mocked(processoService.fetchSubprocessosElegiveis).mockResolvedValue(mockSubprocessosElegiveis as any)
+  })
 
-    const detalhes = wrapper.findComponent({ name: 'ProcessoDetalhes' })
+  afterEach(() => {
+      wrapper?.unmount()
+  })
+
+  it('deve renderizar detalhes do processo e buscar dados no mount', async () => {
+    const { wrapper: w } = createWrapper()
+    wrapper = w
+    await flushPromises()
+
+    expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1)
+    expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(1)
+
+    const detalhes = wrapper.findComponent(ProcessoDetalhesStub)
     expect(detalhes.props('descricao')).toBe('Test Process')
   })
 
-  it('fetches process details on mount', async () => {
-    const pinia = createTestingPinia({ createSpy: vi.fn })
-    const processosStore = useProcessosStore(pinia)
-    processosStore.fetchProcessoDetalhe = vi.fn()
-    processosStore.fetchSubprocessosElegiveis = vi.fn()
+  it('deve mostrar botões de ação quando houver subprocessos elegíveis', async () => {
+    const { wrapper: w } = createWrapper()
+    wrapper = w
+    await flushPromises()
 
-    mount(ProcessoView, {
-      global: {
-        plugins: [pinia, router],
-      },
-    })
-
-    await router.push('/processo/1')
-    await router.isReady()
-
-    expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1)
-    expect(processosStore.fetchSubprocessosElegiveis).toHaveBeenCalledWith(1)
-  })
-
-  it('shows action buttons when there are eligible subprocesses', async () => {
-    const wrapper = mountComponent()
-    await router.push('/processo/1')
-    await router.isReady()
-
-    expect(wrapper.findComponent(ProcessoAcoes).props('mostrarBotoesBloco')).toBe(true)
+    const acoes = wrapper.findComponent(ProcessoAcoesStub)
+    expect(acoes.props('mostrarBotoesBloco')).toBe(true)
   })
 
   it('deve navegar para detalhes da unidade ao clicar na tabela (ADMIN)', async () => {
-      const wrapper = mountComponent({
-          perfil: { perfilSelecionado: 'ADMIN' }
+      const { wrapper: w } = createWrapper({
+          perfil: { perfilSelecionado: 'ADMIN', unidadeSelecionada: 99 }
       })
-      await router.push('/processo/1')
-      await router.isReady()
+      wrapper = w
+      await flushPromises()
 
-      const treeTable = wrapper.findComponent({ name: 'TreeTable' })
+      const treeTable = wrapper.findComponent(TreeTableStub)
 
-      const pushSpy = vi.spyOn(router, 'push')
-
-      // Emulate row click with item structure used in ProcessoView logic
+      // Emulate row click
       const item = { id: 10, unidadeAtual: 'U1', clickable: true };
-      treeTable.vm.$emit('row-click', item);
+      await treeTable.vm.$emit('row-click', item);
 
-      expect(pushSpy).toHaveBeenCalledWith({
+      expect(pushMock).toHaveBeenCalledWith({
           name: 'Subprocesso',
           params: { codProcesso: '1', siglaUnidade: 'U1' }
       })
   });
 
   it('deve abrir modal de finalização', async () => {
-      const wrapper = mountComponent()
-      await router.push('/processo/1')
-      await router.isReady()
+      const { wrapper: w } = createWrapper()
+      wrapper = w
+      await flushPromises()
 
-      const acoes = wrapper.findComponent(ProcessoAcoes)
-      acoes.vm.$emit('finalizar')
-      await wrapper.vm.$nextTick()
+      const acoes = wrapper.findComponent(ProcessoAcoesStub)
+      await acoes.vm.$emit('finalizar')
 
-      expect(wrapper.findComponent(ModalFinalizacao).props('mostrar')).toBe(true)
+      const modal = wrapper.findComponent(ModalFinalizacaoStub)
+      expect(modal.props('mostrar')).toBe(true)
   })
 
   it('deve confirmar finalização', async () => {
-      const wrapper = mountComponent()
-      const store = useProcessosStore()
-      const notificacoes = useNotificacoesStore()
+      const { wrapper: w, notificacoesStore } = createWrapper()
+      wrapper = w
+      await flushPromises()
 
-      await router.push('/processo/1')
-      await router.isReady()
-
-      const modal = wrapper.findComponent(ModalFinalizacao)
+      const modal = wrapper.findComponent(ModalFinalizacaoStub)
       await modal.vm.$emit('confirmar')
+      await flushPromises()
 
-      expect(store.finalizarProcesso).toHaveBeenCalledWith(1)
-      expect(notificacoes.sucesso).toHaveBeenCalled()
+      expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1)
+      expect(notificacoesStore.sucesso).toHaveBeenCalled()
+      expect(pushMock).toHaveBeenCalledWith('/painel')
   })
 
   it('deve abrir modal de ação em bloco', async () => {
-      const wrapper = mountComponent()
-      await router.push('/processo/1')
-      await router.isReady()
+      const { wrapper: w } = createWrapper()
+      wrapper = w
+      await flushPromises()
 
-      const acoes = wrapper.findComponent(ProcessoAcoes)
-      acoes.vm.$emit('aceitarBloco')
-      await wrapper.vm.$nextTick()
+      const acoes = wrapper.findComponent(ProcessoAcoesStub)
+      await acoes.vm.$emit('aceitarBloco')
 
-      const modal = wrapper.findComponent(ModalAcaoBloco)
+      const modal = wrapper.findComponent(ModalAcaoBlocoStub)
       expect(modal.props('mostrar')).toBe(true)
       expect(modal.props('tipo')).toBe('aceitar')
   })
 
   it('deve confirmar ação em bloco', async () => {
-      const wrapper = mountComponent()
-      const store = useProcessosStore()
+      const { wrapper: w } = createWrapper()
+      wrapper = w
+      await flushPromises()
 
-      await router.push('/processo/1')
-      await router.isReady()
-
-      const modal = wrapper.findComponent(ModalAcaoBloco)
+      const modal = wrapper.findComponent(ModalAcaoBlocoStub)
       await modal.vm.$emit('confirmar', [{sigla: 'TU', selecionada: true}])
 
-      expect(store.processarCadastroBloco).toHaveBeenCalled()
+      expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(expect.objectContaining({
+          codProcesso: 1,
+          unidades: ['TU'],
+          tipoAcao: 'aceitar'
+      }))
+
+      // Verify re-fetch happens
+      // It's called inside processarCadastroBloco which is awaited.
+      expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2) // One initial, one after action
   })
 })
