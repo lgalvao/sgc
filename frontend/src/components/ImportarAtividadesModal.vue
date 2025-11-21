@@ -130,115 +130,127 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue'
-import {BModal, BFormSelect, BFormSelectOption, BFormCheckbox, BButton, BAlert} from 'bootstrap-vue-next'
-import {useProcessosStore} from '@/stores/processos'
-import {useAtividadesStore} from '@/stores/atividades'
-import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante} from '@/types/tipos'
-import {useApi} from '@/composables/useApi';
+import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal,} from "bootstrap-vue-next";
+import {computed, onMounted, ref, watch} from "vue";
+import {useApi} from "@/composables/useApi";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useProcessosStore} from "@/stores/processos";
+import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante,} from "@/types/tipos";
 
 const props = defineProps<{
-  mostrar: boolean,
-  codSubrocessoDestino: number | undefined
-}>()
+  mostrar: boolean;
+  codSubrocessoDestino: number | undefined;
+}>();
 
 const emit = defineEmits<{
-  fechar: []
-  importar: []
-}>()
+  fechar: [];
+  importar: [];
+}>();
 
-const processosStore = useProcessosStore()
-const atividadesStore = useAtividadesStore()
+const processosStore = useProcessosStore();
+const atividadesStore = useAtividadesStore();
 
 const {
   execute: executarImportacao,
   error: erroImportacao,
   isLoading: importando,
-  clearError: limparErroImportacao
+  clearError: limparErroImportacao,
 } = useApi(atividadesStore.importarAtividades);
 
-const processoSelecionado = ref<ProcessoResumo | null>(null)
-const processoSelecionadoId = ref<number | null>(null)
-const unidadesParticipantes = ref<UnidadeParticipante[]>([])
-const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
-const unidadeSelecionadaId = ref<number | null>(null)
-const atividadesParaImportar = ref<Atividade[]>([])
-const atividadesSelecionadas = ref<Atividade[]>([])
+const processoSelecionado = ref<ProcessoResumo | null>(null);
+const processoSelecionadoId = ref<number | null>(null);
+const unidadesParticipantes = ref<UnidadeParticipante[]>([]);
+const unidadeSelecionada = ref<UnidadeParticipante | null>(null);
+const unidadeSelecionadaId = ref<number | null>(null);
+const atividadesParaImportar = ref<Atividade[]>([]);
+const atividadesSelecionadas = ref<Atividade[]>([]);
 
 const processosDisponiveis = computed<ProcessoResumo[]>(() => {
-  return processosStore.processosPainel.filter(p =>
-      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'FINALIZADO'
-  )
-})
-
-onMounted(() => {
-  processosStore.fetchProcessosPainel('ADMIN', 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+  return processosStore.processosPainel.filter(
+      (p) =>
+          (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) &&
+          p.situacao === "FINALIZADO",
+  );
 });
 
+onMounted(() => {
+  processosStore.fetchProcessosPainel("ADMIN", 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+});
 
-watch(() => props.mostrar, (mostrar) => {
-  if (mostrar) {
-    resetModal()
-  }
-})
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (mostrar) {
+        resetModal();
+      }
+    },
+);
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosDisponiveis.value.find(p => p.codigo === Number(newId))
+    const processo = processosDisponiveis.value.find(
+        (p) => p.codigo === Number(newId),
+    );
     if (processo) {
-      await selecionarProcesso(processo)
+      await selecionarProcesso(processo);
     }
   } else {
-    await selecionarProcesso(null)
+    await selecionarProcesso(null);
   }
-})
+});
 
 watch(unidadeSelecionadaId, (newId) => {
   if (newId) {
-    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === Number(newId))
+    const unidade = unidadesParticipantes.value.find(
+        (u) => u.codUnidade === Number(newId),
+    );
     if (unidade) {
-      selecionarUnidade(unidade)
+      selecionarUnidade(unidade);
     }
   } else {
-    selecionarUnidade(null)
+    selecionarUnidade(null);
   }
-})
+});
 
 function resetModal() {
-  processoSelecionado.value = null
-  processoSelecionadoId.value = null
-  unidadesParticipantes.value = []
-  unidadeSelecionada.value = null
-  unidadeSelecionadaId.value = null
-  atividadesParaImportar.value = []
-  atividadesSelecionadas.value = []
+  processoSelecionado.value = null;
+  processoSelecionadoId.value = null;
+  unidadesParticipantes.value = [];
+  unidadeSelecionada.value = null;
+  unidadeSelecionadaId.value = null;
+  atividadesParaImportar.value = [];
+  atividadesSelecionadas.value = [];
 }
 
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   if (processo) {
     await processosStore.fetchProcessoDetalhe(processo.codigo);
-    unidadesParticipantes.value = processosStore.processoDetalhe?.unidades || [];
+    unidadesParticipantes.value =
+        processosStore.processoDetalhe?.unidades || [];
   } else {
     unidadesParticipantes.value = [];
   }
-  unidadeSelecionada.value = null
-  unidadeSelecionadaId.value = null
+  unidadeSelecionada.value = null;
+  unidadeSelecionadaId.value = null;
 }
 
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
-  unidadeSelecionada.value = unidadePu
+  unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
     await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade);
-    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
-    atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
+    const atividadesDaOutraUnidade =
+        atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
+    atividadesParaImportar.value = atividadesDaOutraUnidade
+        ? [...atividadesDaOutraUnidade]
+        : [];
   } else {
     atividadesParaImportar.value = [];
   }
 }
 
 function fechar() {
-  emit('fechar')
+  emit("fechar");
 }
 
 async function importar() {
@@ -247,15 +259,19 @@ async function importar() {
     return;
   }
   if (atividadesSelecionadas.value.length === 0) {
-    erroImportacao.value = 'Selecione ao menos uma atividade para importar.';
+    erroImportacao.value = "Selecione ao menos uma atividade para importar.";
     return;
   }
 
-  const idsAtividades = atividadesSelecionadas.value.map(a => a.codigo);
+  const idsAtividades = atividadesSelecionadas.value.map((a) => a.codigo);
 
   try {
-    await executarImportacao(props.codSubrocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
-    emit('importar');
+    await executarImportacao(
+        props.codSubrocessoDestino,
+        unidadeSelecionada.value.codSubprocesso,
+        idsAtividades,
+    );
+    emit("importar");
     fechar();
   } catch {
     // O erro já está sendo tratado pelo useApi, não é necessário fazer nada aqui

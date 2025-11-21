@@ -75,62 +75,68 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {BModal, BFormTextarea, BFormCheckbox, BButton, BCard, BCardBody} from 'bootstrap-vue-next'
-import {Atividade, Competencia} from '@/types/tipos'
+import {BButton, BCard, BCardBody, BFormCheckbox, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {ref, watch} from "vue";
+import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
-  mostrar: boolean
-  atividades: Atividade[]
-  competenciaParaEditar?: Competencia | null
-}>()
+  mostrar: boolean;
+  atividades: Atividade[];
+  competenciaParaEditar?: Competencia | null;
+}>();
 
 const emit = defineEmits<{
-  fechar: []
-  salvar: [competencia: { descricao: string, atividadesSelecionadas: number[] }]
-}>()
+  fechar: [];
+  salvar: [
+    competencia: { descricao: string; atividadesSelecionadas: number[] },
+  ];
+}>();
 
-const novaCompetencia = ref({descricao: ''})
-const atividadesSelecionadas = ref<number[]>([])
-const competenciaSendoEditada = ref<Competencia | null>(null)
+const novaCompetencia = ref({descricao: ""});
+const atividadesSelecionadas = ref<number[]>([]);
+const competenciaSendoEditada = ref<Competencia | null>(null);
 
-watch(() => props.mostrar, (mostrar) => {
-  if (mostrar) {
-    if (props.competenciaParaEditar) {
-      novaCompetencia.value.descricao = props.competenciaParaEditar.descricao
-      atividadesSelecionadas.value = [...props.competenciaParaEditar.atividadesAssociadas]
-      competenciaSendoEditada.value = props.competenciaParaEditar
-    } else {
-      novaCompetencia.value.descricao = ''
-      atividadesSelecionadas.value = []
-      competenciaSendoEditada.value = null
-    }
-  }
-}, { immediate: true })
-
-
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (mostrar) {
+        if (props.competenciaParaEditar) {
+          novaCompetencia.value.descricao = props.competenciaParaEditar.descricao;
+          atividadesSelecionadas.value = [
+            ...props.competenciaParaEditar.atividadesAssociadas,
+          ];
+          competenciaSendoEditada.value = props.competenciaParaEditar;
+        } else {
+          novaCompetencia.value.descricao = "";
+          atividadesSelecionadas.value = [];
+          competenciaSendoEditada.value = null;
+        }
+      }
+    },
+    {immediate: true},
+);
 
 function getConhecimentosModal(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento'
+    return "Nenhum conhecimento";
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
+      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join("");
 
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function fechar() {
-  emit('fechar')
+  emit("fechar");
 }
 
 function salvar() {
-  emit('salvar', {
+  emit("salvar", {
     descricao: novaCompetencia.value.descricao,
-    atividadesSelecionadas: atividadesSelecionadas.value
-  })
+    atividadesSelecionadas: atividadesSelecionadas.value,
+  });
 }
 </script>
 

@@ -1,2 +1,2 @@
-export * from './textos';
-export * from './situacoes';
+export * from "./situacoes";
+export * from "./textos";

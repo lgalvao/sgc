@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BModal, BFormCheckbox, BButton, BAlert} from 'bootstrap-vue-next';
+import {BAlert, BButton, BFormCheckbox, BModal} from "bootstrap-vue-next";
 
 export interface UnidadeSelecao {
   sigla: string;
@@ -76,12 +76,12 @@ export interface UnidadeSelecao {
 
 defineProps<{
   mostrar: boolean;
-  tipo: 'aceitar' | 'homologar';
+  tipo: "aceitar" | "homologar";
   unidades: UnidadeSelecao[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'fechar'): void
-  (e: 'confirmar', unidades: UnidadeSelecao[]): void
+  (e: "fechar"): void;
+  (e: "confirmar", unidades: UnidadeSelecao[]): void;
 }>();
 </script>

@@ -1,24 +1,34 @@
-import {defineStore} from 'pinia';
-import type {Unidade} from '@/types/tipos';
-import {mapUnidadesArray} from '@/mappers/unidades';
-import {buscarUnidadePorSigla, buscarUnidadePorCodigo, buscarArvoreComElegibilidade} from "@/services/unidadesService";
+import {defineStore} from "pinia";
+import {mapUnidadesArray} from "@/mappers/unidades";
+import {
+    buscarArvoreComElegibilidade,
+    buscarUnidadePorCodigo,
+    buscarUnidadePorSigla,
+} from "@/services/unidadesService";
+import type {Unidade} from "@/types/tipos";
 
-export const useUnidadesStore = defineStore('unidades', {
+export const useUnidadesStore = defineStore("unidades", {
     state: () => ({
         unidades: [] as Unidade[],
         unidade: null as Unidade | null,
         isLoading: false,
-        error: null as string | null
+        error: null as string | null,
     }),
     actions: {
-        async fetchUnidadesParaProcesso(tipoProcesso: string, codProcesso?: number) {
+        async fetchUnidadesParaProcesso(
+            tipoProcesso: string,
+            codProcesso?: number,
+        ) {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
+                const response = await buscarArvoreComElegibilidade(
+                    tipoProcesso,
+                    codProcesso,
+                );
                 this.unidades = mapUnidadesArray(response as any) as Unidade[];
             } catch (err: any) {
-                this.error = 'Falha ao carregar unidades: ' + err.message;
+                this.error = "Falha ao carregar unidades: " + err.message;
             } finally {
                 this.isLoading = false;
             }
@@ -30,7 +40,7 @@ export const useUnidadesStore = defineStore('unidades', {
                 const response = await buscarUnidadePorSigla(sigla);
                 this.unidade = response as unknown as Unidade; // O service retorna data ou objeto direto? Ver service.
             } catch (err: any) {
-                this.error = 'Falha ao carregar unidade: ' + err.message;
+                this.error = "Falha ao carregar unidade: " + err.message;
             } finally {
                 this.isLoading = false;
             }
@@ -42,31 +52,39 @@ export const useUnidadesStore = defineStore('unidades', {
                 const response = await buscarUnidadePorCodigo(codigo);
                 this.unidade = response as unknown as Unidade;
             } catch (err: any) {
-                this.error = 'Falha ao carregar unidade: ' + err.message;
+                this.error = "Falha ao carregar unidade: " + err.message;
             } finally {
                 this.isLoading = false;
             }
         },
-        pesquisarUnidadePorCodigo(this: ReturnType<typeof useUnidadesStore>, codigo: number, units: Unidade[] = this.unidades): Unidade | null {
+        pesquisarUnidadePorCodigo(
+            this: ReturnType<typeof useUnidadesStore>,
+            codigo: number,
+            units: Unidade[] = this.unidades,
+        ): Unidade | null {
             for (const unit of units) {
-                if (unit.codigo === codigo) return unit
+                if (unit.codigo === codigo) return unit;
                 if (unit.filhas) {
-                    const found = this.pesquisarUnidadePorCodigo(codigo, unit.filhas)
-                    if (found) return found
+                    const found = this.pesquisarUnidadePorCodigo(codigo, unit.filhas);
+                    if (found) return found;
                 }
             }
-            return null
+            return null;
         },
 
-        pesquisarUnidadePorSigla(this: ReturnType<typeof useUnidadesStore>, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
+        pesquisarUnidadePorSigla(
+            this: ReturnType<typeof useUnidadesStore>,
+            sigla: string,
+            units: Unidade[] = this.unidades,
+        ): Unidade | null {
             for (const unit of units) {
-                if (unit.sigla === sigla) return unit
+                if (unit.sigla === sigla) return unit;
                 if (unit.filhas) {
-                    const found = this.pesquisarUnidadePorSigla(sigla, unit.filhas)
-                    if (found) return found
+                    const found = this.pesquisarUnidadePorSigla(sigla, unit.filhas);
+                    if (found) return found;
                 }
             }
-            return null
+            return null;
         },
 
         getUnidadesSubordinadas(siglaUnidade: string): string[] {
@@ -89,14 +107,15 @@ export const useUnidadesStore = defineStore('unidades', {
             return unidadesEncontradas;
         },
         getUnidadeSuperior(siglaUnidade: string): string | null {
-            const stack: { unit: Unidade, parentSigla: string | null }[] = [];
+            const stack: { unit: Unidade; parentSigla: string | null }[] = [];
 
             for (const unidade of this.unidades) {
                 stack.push({unit: unidade, parentSigla: null});
             }
 
             while (stack.length > 0) {
-                const {unit: currentUnidade, parentSigla: currentParentSigla} = stack.pop()!;
+                const {unit: currentUnidade, parentSigla: currentParentSigla} =
+                    stack.pop()!;
 
                 if (currentUnidade.sigla === siglaUnidade) {
                     return currentParentSigla;
@@ -104,7 +123,10 @@ export const useUnidadesStore = defineStore('unidades', {
 
                 if (currentUnidade.filhas) {
                     for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                        stack.push({unit: currentUnidade.filhas[i], parentSigla: currentUnidade.sigla});
+                        stack.push({
+                            unit: currentUnidade.filhas[i],
+                            parentSigla: currentUnidade.sigla,
+                        });
                     }
                 }
             }
@@ -112,6 +134,6 @@ export const useUnidadesStore = defineStore('unidades', {
         },
         getUnidadeImediataSuperior(siglaUnidade: string): string | null {
             return this.getUnidadeSuperior(siglaUnidade);
-        }
-    }
-})
+        },
+    },
+});

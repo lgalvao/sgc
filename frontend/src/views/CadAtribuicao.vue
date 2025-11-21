@@ -104,74 +104,74 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import {
-  BContainer,
+  BAlert,
+  BButton,
   BCard,
   BCardBody,
+  BContainer,
   BForm,
+  BFormInput,
   BFormSelect,
   BFormSelectOption,
-  BFormInput,
   BFormTextarea,
-  BButton,
-  BAlert
-} from 'bootstrap-vue-next'
-import { buscarUnidadePorSigla } from '@/services/unidadesService'
-import { buscarUsuariosPorUnidade } from '@/services/usuarioService'
-import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService'
-import type { Unidade, Usuario } from '@/types/tipos'
+} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
+import {buscarUnidadePorSigla} from "@/services/unidadesService";
+import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
+import type {Unidade, Usuario} from "@/types/tipos";
 
-const props = defineProps<{ sigla: string }>()
+const props = defineProps<{ sigla: string }>();
 
-const router = useRouter()
-const sigla = computed(() => props.sigla)
+const router = useRouter();
+const sigla = computed(() => props.sigla);
 
-const unidade = ref<Unidade | null>(null)
-const servidores = ref<Usuario[]>([])
-const servidorSelecionado = ref<string | null>(null)
-const dataTermino = ref('')
-const justificativa = ref('')
+const unidade = ref<Unidade | null>(null);
+const servidores = ref<Usuario[]>([]);
+const servidorSelecionado = ref<string | null>(null);
+const dataTermino = ref("");
+const justificativa = ref("");
 
-const sucesso = ref(false)
-const erroServidor = ref('')
-const erroApi = ref('')
+const sucesso = ref(false);
+const erroServidor = ref("");
+const erroApi = ref("");
 
 onMounted(async () => {
   try {
-    unidade.value = await buscarUnidadePorSigla(sigla.value)
+    unidade.value = await buscarUnidadePorSigla(sigla.value);
     if (unidade.value) {
-      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo)
+      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }
   } catch (error) {
-    erroServidor.value = 'Falha ao carregar dados da unidade ou servidores.'
-    console.error(error)
+    erroServidor.value = "Falha ao carregar dados da unidade ou servidores.";
+    console.error(error);
   }
-})
+});
 
 async function criarAtribuicao() {
   if (!unidade.value || !servidorSelecionado.value) {
-    return
+    return;
   }
 
-  erroApi.value = ''
-  sucesso.value = false
+  erroApi.value = "";
+  sucesso.value = false;
 
   try {
     await criarAtribuicaoTemporaria(unidade.value.codigo, {
       tituloEleitoralServidor: servidorSelecionado.value,
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
-    })
-    sucesso.value = true
+    });
+    sucesso.value = true;
     // Reset form
-    servidorSelecionado.value = null
-    dataTermino.value = ''
-    justificativa.value = ''
+    servidorSelecionado.value = null;
+    dataTermino.value = "";
+    justificativa.value = "";
   } catch (error) {
-    erroApi.value = 'Falha ao criar atribuição. Tente novamente.'
-    console.error(error)
+    erroApi.value = "Falha ao criar atribuição. Tente novamente.";
+    console.error(error);
   }
 }
 </script>

@@ -129,89 +129,94 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
-import {BModal, BButton} from 'bootstrap-vue-next'
-import {storeToRefs} from 'pinia'
-import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes'
-import {formatDateTimeBR} from '@/utils'
+import {BButton, BModal} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {computed, ref} from "vue";
+import {
+  type EmailContent,
+  type Notificacao,
+  type TipoNotificacao,
+  useNotificacoesStore,
+} from "@/stores/notificacoes";
+import {formatDateTimeBR} from "@/utils";
 
 interface Props {
-  mostrarModal: boolean
+  mostrarModal: boolean;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 
 const emit = defineEmits<{
-  fecharModal: []
-}>()
+  fecharModal: [];
+}>();
 
-const notificacoesStore = useNotificacoesStore()
-const {notificacoes} = storeToRefs(notificacoesStore)
-const {removerNotificacao, limparTodas} = notificacoesStore
+const notificacoesStore = useNotificacoesStore();
+const {notificacoes} = storeToRefs(notificacoesStore);
+const {removerNotificacao, limparTodas} = notificacoesStore;
 
 // Estado para modal de email
-const emailModalVisivel = ref(false)
-const emailAtual = ref<EmailContent | null>(null)
+const emailModalVisivel = ref(false);
+const emailAtual = ref<EmailContent | null>(null);
 
 const notificacoesOrdenadas = computed(() => {
-  return [...notificacoes.value].sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  )
-})
+  return [...notificacoes.value].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
+});
 
 const classeNotificacao = (notificacao: Notificacao): string => {
   switch (notificacao.tipo) {
-    case 'success':
-      return 'border-success'
-    case 'error':
-      return 'border-danger'
-    case 'warning':
-      return 'border-warning'
-    case 'info':
-      return 'border-info'
-    case 'email':
-      return 'border-primary'
+    case "success":
+      return "border-success";
+    case "error":
+      return "border-danger";
+    case "warning":
+      return "border-warning";
+    case "info":
+      return "border-info";
+    case "email":
+      return "border-primary";
     default:
-      return ''
+      return "";
   }
-}
+};
 
 const iconeTipo = (tipo: TipoNotificacao): string => {
   switch (tipo) {
-    case 'success':
-      return 'bi bi-check-circle-fill text-success'
-    case 'error':
-      return 'bi bi-exclamation-triangle-fill text-danger'
-    case 'warning':
-      return 'bi bi-exclamation-triangle-fill text-warning'
-    case 'info':
-      return 'bi bi-info-circle-fill text-info'
-    case 'email':
-      return 'bi bi-envelope-fill text-primary'
+    case "success":
+      return "bi bi-check-circle-fill text-success";
+    case "error":
+      return "bi bi-exclamation-triangle-fill text-danger";
+    case "warning":
+      return "bi bi-exclamation-triangle-fill text-warning";
+    case "info":
+      return "bi bi-info-circle-fill text-info";
+    case "email":
+      return "bi bi-envelope-fill text-primary";
     default:
-      return 'bi bi-bell-fill'
+      return "bi bi-bell-fill";
   }
-}
+};
 
 const formatarDataHora = (date: Date): string => {
-  return formatDateTimeBR(date)
-}
+  return formatDateTimeBR(date);
+};
 
 const mostrarEmail = (notificacao: Notificacao) => {
   if (notificacao.emailContent) {
-    emailAtual.value = notificacao.emailContent
-    emailModalVisivel.value = true
+    emailAtual.value = notificacao.emailContent;
+    emailModalVisivel.value = true;
   }
-}
+};
 
 const fecharEmailModal = () => {
-  emailModalVisivel.value = false
-  emailAtual.value = null
-}
+  emailModalVisivel.value = false;
+  emailAtual.value = null;
+};
 
 const fecharModal = () => {
-  emit('fecharModal')
-}
+  emit("fecharModal");
+};
 </script>
 
 <style scoped>

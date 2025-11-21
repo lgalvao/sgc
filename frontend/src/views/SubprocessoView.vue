@@ -41,45 +41,59 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useSubprocessosStore } from '@/stores/subprocessos'
-import { useMapasStore } from '@/stores/mapas'
-import { Movimentacao, SubprocessoDetalhe, TipoProcesso } from "@/types/tipos";
-import { useNotificacoesStore } from '@/stores/notificacoes';
-import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
-import SubprocessoCards from '@/components/SubprocessoCards.vue';
-import SubprocessoModal from '@/components/SubprocessoModal.vue';
-import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
-import { BContainer } from 'bootstrap-vue-next';
+import {BContainer} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRoute} from "vue-router";
+import SubprocessoCards from "@/components/SubprocessoCards.vue";
+import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
+import SubprocessoModal from "@/components/SubprocessoModal.vue";
+import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {
+  type Movimentacao,
+  type SubprocessoDetalhe,
+  TipoProcesso,
+} from "@/types/tipos";
 
 defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
-const route = useRoute()
-const subprocessosStore = useSubprocessosStore()
-const notificacoesStore = useNotificacoesStore()
-const mapaStore = useMapasStore()
+const route = useRoute();
+const subprocessosStore = useSubprocessosStore();
+const notificacoesStore = useNotificacoesStore();
+const mapaStore = useMapasStore();
 
-const mostrarModalAlterarDataLimite = ref(false)
+const mostrarModalAlterarDataLimite = ref(false);
 
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
 
-const subprocesso = computed<SubprocessoDetalhe | null>(() => subprocessosStore.subprocessoDetalhe);
+const subprocesso = computed<SubprocessoDetalhe | null>(
+    () => subprocessosStore.subprocessoDetalhe,
+);
 const mapa = computed(() => mapaStore.mapaCompleto);
-const movimentacoes = computed<Movimentacao[]>(() => subprocesso.value?.movimentacoes || []);
-const dataLimite = computed(() => subprocesso.value?.prazoEtapaAtual ? new Date(subprocesso.value.prazoEtapaAtual) : new Date());
+const movimentacoes = computed<Movimentacao[]>(
+    () => subprocesso.value?.movimentacoes || [],
+);
+const dataLimite = computed(() =>
+    subprocesso.value?.prazoEtapaAtual
+        ? new Date(subprocesso.value.prazoEtapaAtual)
+        : new Date(),
+);
 
 onMounted(async () => {
   await subprocessosStore.fetchSubprocessoDetalhe(codSubprocesso.value);
   await mapaStore.fetchMapaCompleto(codSubprocesso.value);
 });
 
-
 function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
     mostrarModalAlterarDataLimite.value = true;
   } else {
-    notificacoesStore.erro('Ação não permitida', 'Você não tem permissão para alterar a data limite.');
+    notificacoesStore.erro(
+        "Ação não permitida",
+        "Você não tem permissão para alterar a data limite.",
+    );
   }
 }
 
@@ -93,11 +107,20 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
   }
 
   try {
-    await subprocessosStore.alterarDataLimiteSubprocesso(subprocesso.value.unidade.codigo, { novaData });
+    await subprocessosStore.alterarDataLimiteSubprocesso(
+        subprocesso.value.unidade.codigo,
+        {novaData},
+    );
     fecharModalAlterarDataLimite();
-    notificacoesStore.sucesso('Data limite alterada', 'A data limite foi alterada com sucesso!');
+    notificacoesStore.sucesso(
+        "Data limite alterada",
+        "A data limite foi alterada com sucesso!",
+    );
   } catch {
-    notificacoesStore.erro('Erro ao alterar data limite', 'Não foi possível alterar a data limite.');
+    notificacoesStore.erro(
+        "Erro ao alterar data limite",
+        "Não foi possível alterar a data limite.",
+    );
   }
 }
 </script>

@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.mjs,.ts --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
     "test:unit": "vitest --run --reporter=dot",
-    "coverage:unit": "vitest run --coverage"
+    "coverage:unit": "vitest run --coverage --reporter=dot"
   },
   "dependencies": {
     "axios": "^1.13.2",

@@ -132,35 +132,29 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useMapasStore} from '@/stores/mapas'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from '@/stores/processos'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {Competencia, MapaCompleto} from '@/types/tipos'
-import {
-  BContainer,
-  BButton,
-  BAlert,
-  BCard,
-  BFormSelect,
-  BFormTextarea,
-  BModal
-} from 'bootstrap-vue-next';
+import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
+import type {Competencia, MapaCompleto} from "@/types/tipos";
 
-const route = useRoute()
-const router = useRouter()
-const mapasStore = useMapasStore()
-const unidadesStore = useUnidadesStore()
-const processosStore = useProcessosStore()
-const notificacoesStore = useNotificacoesStore()
+const route = useRoute();
+const router = useRouter();
+const mapasStore = useMapasStore();
+const unidadesStore = useUnidadesStore();
+const processosStore = useProcessosStore();
+const notificacoesStore = useNotificacoesStore();
 
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const siglaUnidade = computed(() => route.params.siglaUnidade as string)
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const siglaUnidade = computed(() => route.params.siglaUnidade as string);
 
-const unidade = computed(() => unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value))
-const nomeUnidade = computed(() => unidade.value?.nome || '')
+const unidade = computed(() =>
+    unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value),
+);
+const nomeUnidade = computed(() => unidade.value?.nome || "");
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
@@ -168,76 +162,81 @@ onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(codProcesso.value);
   // Correção temporária: usando codProcesso como codSubrocesso
   await mapasStore.fetchMapaCompleto(codProcesso.value);
-  competencias.value.forEach(comp => {
+  competencias.value.forEach((comp) => {
     if (!avaliacoes.value[comp.codigo]) {
       avaliacoes.value[comp.codigo] = {
         importancia: 3,
         dominio: 3,
-        observacoes: ''
-      }
+        observacoes: "",
+      };
     }
-  })
+  });
 });
 
 const mapa = computed<MapaCompleto | null>(() => {
   return mapasStore.mapaCompleto;
-})
+});
 
 const competencias = computed<Competencia[]>(() => {
-  return mapa.value?.competencias || []
-})
+  return mapa.value?.competencias || [];
+});
 
 // Estado das avaliações
-const avaliacoes = ref<Record<string, {
-  importancia: number
-  dominio: number
-  observacoes: string
-}>>({})
+const avaliacoes = ref<
+    Record<
+        string,
+        {
+          importancia: number;
+          dominio: number;
+          observacoes: string;
+        }
+    >
+>({});
 
 // Modal
-const mostrarModalConfirmacao = ref(false)
+const mostrarModalConfirmacao = ref(false);
 
 // Inicializar avaliações
 onMounted(() => {
-  competencias.value.forEach(comp => {
+  competencias.value.forEach((comp) => {
     if (!avaliacoes.value[comp.codigo]) {
       avaliacoes.value[comp.codigo] = {
         importancia: 3,
         dominio: 3,
-        observacoes: ''
-      }
+        observacoes: "",
+      };
     }
-  })
-})
+  });
+});
 
 const avaliacoesPendentes = computed(() => {
-  return competencias.value.filter(comp => {
-    const aval = avaliacoes.value[comp.codigo]
-    return !aval || aval.importancia === 0 || aval.dominio === 0
-  })
-})
+  return competencias.value.filter((comp) => {
+    const aval = avaliacoes.value[comp.codigo];
+    return !aval || aval.importancia === 0 || aval.dominio === 0;
+  });
+});
 
 function finalizarDiagnostico() {
-  mostrarModalConfirmacao.value = true
+  mostrarModalConfirmacao.value = true;
 }
 
 function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false
+  mostrarModalConfirmacao.value = false;
 }
 
 function confirmarFinalizacao() {
-  if (!processoAtual.value) return
+  if (!processoAtual.value) return;
 
   // TODO: Implementar chamada real ao backend para finalizar diagnóstico
   // Registrar movimentação e alertas é responsabilidade do backend
 
   notificacoesStore.sucesso(
-      'Diagnóstico finalizado',
-      'O diagnóstico da equipe foi concluído!'
-  )
+      "Diagnóstico finalizado",
+      "O diagnóstico da equipe foi concluído!",
+  );
 
-  fecharModalConfirmacao()
-  router.push('/painel')
+  fecharModalConfirmacao();
+  router.push("/painel");
 }
 </script>
 

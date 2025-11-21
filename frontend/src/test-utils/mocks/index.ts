@@ -1,22 +1,36 @@
 import type {SubprocessoDetalhe, Unidade} from "@/types/tipos";
-import {TipoProcesso, SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 export const mockUnidade: Unidade = {
     codigo: 1,
-    nome: 'Unidade Mock',
-    sigla: 'UNID',
+    nome: "Unidade Mock",
+    sigla: "UNID",
 };
 
 export const mockProcessoDetalhe: SubprocessoDetalhe = {
-    unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' },
-    titular: { codigo: 1, nome: 'Titular Teste', tituloEleitoral: '123', email: 't@t.com', ramal: '123', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
-    responsavel: { codigo: 1, nome: 'Responsável Teste', tituloEleitoral: '456', email: 'r@r.com', ramal: '456', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
+    unidade: {codigo: 1, nome: "Teste", sigla: "TST"},
+    titular: {
+        codigo: 1,
+        nome: "Titular Teste",
+        tituloEleitoral: "123",
+        email: "t@t.com",
+        ramal: "123",
+        unidade: {codigo: 1, nome: "Teste", sigla: "TST"},
+    },
+    responsavel: {
+        codigo: 1,
+        nome: "Responsável Teste",
+        tituloEleitoral: "456",
+        email: "r@r.com",
+        ramal: "456",
+        unidade: {codigo: 1, nome: "Teste", sigla: "TST"},
+    },
     situacao: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
-    situacaoLabel: 'Em Andamento',
-    localizacaoAtual: 'Na unidade',
-    processoDescricao: 'Processo Teste',
+    situacaoLabel: "Em Andamento",
+    localizacaoAtual: "Na unidade",
+    processoDescricao: "Processo Teste",
     tipoProcesso: TipoProcesso.MAPEAMENTO,
-    prazoEtapaAtual: '2025-12-31',
+    prazoEtapaAtual: "2025-12-31",
     isEmAndamento: true,
     etapaAtual: 1,
     movimentacoes: [],

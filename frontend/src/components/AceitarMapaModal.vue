@@ -57,8 +57,8 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
-import {BModal, BFormTextarea, BButton} from 'bootstrap-vue-next';
+import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {computed, ref} from "vue";
 
 interface Props {
   mostrarModal: boolean;
@@ -72,20 +72,22 @@ defineEmits<{
   confirmarAceitacao: [observacao: string];
 }>();
 
-const observacao = ref('');
+const observacao = ref("");
 
 const tituloModal = computed(() => {
-  return props.perfil === 'ADMIN' ? 'Homologação' : 'Aceitar Mapa de Competências';
+  return props.perfil === "ADMIN"
+      ? "Homologação"
+      : "Aceitar Mapa de Competências";
 });
 
 const corpoModal = computed(() => {
-  return props.perfil === 'ADMIN'
-    ? 'Confirma a homologação do mapa de competências?'
-    : 'Observações';
+  return props.perfil === "ADMIN"
+      ? "Confirma a homologação do mapa de competências?"
+      : "Observações";
 });
 
 computed(() => {
-  return props.perfil !== 'ADMIN';
+  return props.perfil !== "ADMIN";
 });
 </script>
 

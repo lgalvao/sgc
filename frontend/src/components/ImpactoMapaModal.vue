@@ -162,12 +162,12 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue';
-import {BModal, BButton, BAlert, BCard} from 'bootstrap-vue-next';
-import {storeToRefs} from 'pinia';
-import {useMapasStore} from '@/stores/mapas';
-import {useProcessosStore} from '@/stores/processos';
-import {TipoImpactoCompetencia} from '@/types/impacto';
+import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {ref, watch} from "vue";
+import {useMapasStore} from "@/stores/mapas";
+import {useProcessosStore} from "@/stores/processos";
+import {TipoImpactoCompetencia} from "@/types/impacto";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -175,7 +175,7 @@ const props = defineProps<{
   siglaUnidade: string;
 }>();
 
-const emit = defineEmits<{ (e: 'fechar'): void }>();
+const emit = defineEmits<(e: "fechar") => void>();
 
 const mapasStore = useMapasStore();
 const processosStore = useProcessosStore();
@@ -190,33 +190,41 @@ watch(
       carregando.value = true;
       try {
         // Encontrar o subprocesso correspondente à unidade
-        const unidadeParticipante = processosStore.processoDetalhe?.unidades.find(
-            u => u.sigla === props.siglaUnidade
-        );
+        const unidadeParticipante =
+            processosStore.processoDetalhe?.unidades.find(
+                (u) => u.sigla === props.siglaUnidade,
+            );
 
         if (unidadeParticipante && unidadeParticipante.codSubprocesso) {
-            await mapasStore.fetchImpactoMapa(unidadeParticipante.codSubprocesso);
+          await mapasStore.fetchImpactoMapa(unidadeParticipante.codSubprocesso);
         } else {
-            // Fallback ou erro se não encontrar subprocesso
-            console.error("Subprocesso não encontrado para unidade", props.siglaUnidade);
+          // Fallback ou erro se não encontrar subprocesso
+          console.error(
+              "Subprocesso não encontrado para unidade",
+              props.siglaUnidade,
+          );
         }
       } finally {
         carregando.value = false;
       }
     }
-  }
+  },
 );
 
 function formatTipoImpacto(tipo: TipoImpactoCompetencia): string {
-    switch (tipo) {
-        case TipoImpactoCompetencia.ATIVIDADE_REMOVIDA: return 'Atividade Removida';
-        case TipoImpactoCompetencia.ATIVIDADE_ALTERADA: return 'Atividade Alterada';
-        case TipoImpactoCompetencia.IMPACTO_GENERICO: return 'Alteração no Mapa';
-        default: return tipo;
-    }
+  switch (tipo) {
+    case TipoImpactoCompetencia.ATIVIDADE_REMOVIDA:
+      return "Atividade Removida";
+    case TipoImpactoCompetencia.ATIVIDADE_ALTERADA:
+      return "Atividade Alterada";
+    case TipoImpactoCompetencia.IMPACTO_GENERICO:
+      return "Alteração no Mapa";
+    default:
+      return tipo;
+  }
 }
 
 function fechar() {
-  emit('fechar');
+  emit("fechar");
 }
 </script>

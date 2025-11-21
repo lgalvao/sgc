@@ -49,33 +49,36 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {BModal, BFormInput} from 'bootstrap-vue-next'
+import {BFormInput, BModal} from "bootstrap-vue-next";
+import {ref, watch} from "vue";
 
 const props = defineProps<{
-  mostrar: boolean
-}>()
+  mostrar: boolean;
+}>();
 
 const emit = defineEmits<{
-  fechar: []
-  disponibilizar: [dataLimite: string]
-}>()
+  fechar: [];
+  disponibilizar: [dataLimite: string];
+}>();
 
-const dataLimiteValidacao = ref('')
-const notificacao = ref('')
+const dataLimiteValidacao = ref("");
+const notificacao = ref("");
 
-watch(() => props.mostrar, (mostrar) => {
-  if (mostrar) {
-    dataLimiteValidacao.value = ''
-    notificacao.value = ''
-  }
-})
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (mostrar) {
+        dataLimiteValidacao.value = "";
+        notificacao.value = "";
+      }
+    },
+);
 
 function fechar() {
-  emit('fechar')
+  emit("fechar");
 }
 
 function disponibilizar() {
-  emit('disponibilizar', dataLimiteValidacao.value)
+  emit("disponibilizar", dataLimiteValidacao.value);
 }
 </script>

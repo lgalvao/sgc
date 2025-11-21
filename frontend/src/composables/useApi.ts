@@ -1,6 +1,6 @@
-import type {Ref} from 'vue';
-import {ref} from 'vue';
-import type {AxiosError} from 'axios';
+import type {AxiosError} from "axios";
+import type {Ref} from "vue";
+import {ref} from "vue";
 
 // Define a type for the error structure we expect from the API
 interface ApiError {
@@ -8,9 +8,7 @@ interface ApiError {
   // Add other fields if your API returns more structured errors
 }
 
-export function useApi<T>(
-  apiCall: (...args: any[]) => Promise<T>
-) {
+export function useApi<T>(apiCall: (...args: any[]) => Promise<T>) {
   const data: Ref<T | null> = ref(null);
   const isLoading = ref(false);
   const error: Ref<string | null> = ref(null);
@@ -26,10 +24,11 @@ export function useApi<T>(
       const axiosError = err as AxiosError<ApiError>;
       if (axiosError.response && axiosError.response.data) {
         // Use the specific error message from the API response
-        error.value = axiosError.response.data.message || 'Ocorreu um erro desconhecido.';
+          error.value =
+              axiosError.response.data.message || "Ocorreu um erro desconhecido.";
       } else {
         // Fallback for network errors or other issues
-        error.value = 'Não foi possível conectar ao servidor.';
+          error.value = "Não foi possível conectar ao servidor.";
       }
       // Re-throw the error so that the component can optionally handle it further
       throw err;

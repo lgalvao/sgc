@@ -1,4 +1,4 @@
-import {Unidade, UnidadeSnapshot} from '@/types/tipos';
+import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 
 /**
  * src/mappers/unidades.ts
@@ -15,34 +15,41 @@ import {Unidade, UnidadeSnapshot} from '@/types/tipos';
 export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
     return {
         codigo: obj.codigo ?? obj.id ?? 0,
-        nome: obj.nome ?? obj.nome_unidade ?? '',
-        sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? '',
-        filhas: Array.isArray(obj.filhas || obj.subunidades) ? (obj.filhas || obj.subunidades).map(mapUnidadeSnapshot) : []
+        nome: obj.nome ?? obj.nome_unidade ?? "",
+        sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? "",
+        filhas: Array.isArray(obj.filhas || obj.subunidades)
+            ? (obj.filhas || obj.subunidades).map(mapUnidadeSnapshot)
+            : [],
     };
 }
 
 export function mapUnidade(obj: any): Unidade {
     return {
         codigo: obj.id ?? obj.codigo ?? obj.codigo_unidade ?? 0,
-        sigla: obj.sigla ?? obj.sigla_unidade ?? '',
-        tipo: obj.tipo ?? obj.tipo_unidade ?? '',
-        nome: obj.nome ?? obj.nome_unidade ?? '',
-        idServidorTitular: obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
-        responsavel: obj.responsavel ? {
-            codigo: obj.responsavel.codigo ?? 0,
-            nome: obj.responsavel.nome ?? '',
-            tituloEleitoral: obj.responsavel.tituloEleitoral ?? '',
-            unidade: obj.responsavel.unidade ?? {} as Unidade,
-            email: obj.responsavel.email ?? '',
-            ramal: obj.responsavel.ramal ?? '',
-            usuarioTitulo: obj.responsavel.usuarioTitulo ?? '',
-            unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
-            idServidor: obj.responsavel.idServidorResponsavel ?? 0,
-            tipo: obj.responsavel.tipo ?? '',
-            dataInicio: obj.responsavel.dataInicio ?? '',
-            dataFim: obj.responsavel.dataFim ?? null,
-        } : null,
-        filhas: Array.isArray(obj.filhas || obj.subunidades) ? (obj.filhas || obj.subunidades).map(mapUnidade) : []
+        sigla: obj.sigla ?? obj.sigla_unidade ?? "",
+        tipo: obj.tipo ?? obj.tipo_unidade ?? "",
+        nome: obj.nome ?? obj.nome_unidade ?? "",
+        idServidorTitular:
+            obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
+        responsavel: obj.responsavel
+            ? {
+                codigo: obj.responsavel.codigo ?? 0,
+                nome: obj.responsavel.nome ?? "",
+                tituloEleitoral: obj.responsavel.tituloEleitoral ?? "",
+                unidade: obj.responsavel.unidade ?? ({} as Unidade),
+                email: obj.responsavel.email ?? "",
+                ramal: obj.responsavel.ramal ?? "",
+                usuarioTitulo: obj.responsavel.usuarioTitulo ?? "",
+                unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
+                idServidor: obj.responsavel.idServidorResponsavel ?? 0,
+                tipo: obj.responsavel.tipo ?? "",
+                dataInicio: obj.responsavel.dataInicio ?? "",
+                dataFim: obj.responsavel.dataFim ?? null,
+            }
+            : null,
+        filhas: Array.isArray(obj.filhas || obj.subunidades)
+            ? (obj.filhas || obj.subunidades).map(mapUnidade)
+            : [],
     };
 }
 

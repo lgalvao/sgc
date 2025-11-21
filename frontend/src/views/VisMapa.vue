@@ -317,71 +317,72 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-
-import {useMapasStore} from '@/stores/mapas'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from "@/stores/processos";
-import {useNotificacoesStore} from "@/stores/notificacoes";
-import {useAnalisesStore} from "@/stores/analises";
-import {usePerfil} from "@/composables/usePerfil";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {SituacaoSubprocesso, Unidade} from '@/types/tipos';
-import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
-import {storeToRefs} from "pinia";
 import {
-  BContainer,
   BButton,
   BCard,
   BCardBody,
+  BContainer,
+  BFormTextarea,
   BModal,
-  BFormTextarea
-} from 'bootstrap-vue-next';
+} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAnalisesStore} from "@/stores/analises";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {SituacaoSubprocesso, type Unidade} from "@/types/tipos";
 
-const route = useRoute()
-const router = useRouter()
-const sigla = computed(() => route.params.siglaUnidade as string)
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const unidadesStore = useUnidadesStore()
-const mapaStore = useMapasStore()
-const processosStore = useProcessosStore()
-const notificacoesStore = useNotificacoesStore()
-const analisesStore = useAnalisesStore()
-const subprocessosStore = useSubprocessosStore()
-const {perfilSelecionado} = usePerfil()
+const route = useRoute();
+const router = useRouter();
+const sigla = computed(() => route.params.siglaUnidade as string);
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const unidadesStore = useUnidadesStore();
+const mapaStore = useMapasStore();
+const processosStore = useProcessosStore();
+const notificacoesStore = useNotificacoesStore();
+const analisesStore = useAnalisesStore();
+const subprocessosStore = useSubprocessosStore();
+const {perfilSelecionado} = usePerfil();
 
-const {mapaVisualizacao: mapa} = storeToRefs(mapaStore)
+const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
 
-const mostrarModalAceitar = ref(false)
-const mostrarModalSugestoes = ref(false)
-const mostrarModalVerSugestoes = ref(false)
-const mostrarModalValidar = ref(false)
-const mostrarModalDevolucao = ref(false)
-const mostrarModalHistorico = ref(false)
-const sugestoes = ref('')
-const sugestoesVisualizacao = ref('')
-const observacaoDevolucao = ref('')
+const mostrarModalAceitar = ref(false);
+const mostrarModalSugestoes = ref(false);
+const mostrarModalVerSugestoes = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolucao = ref(false);
+const mostrarModalHistorico = ref(false);
+const sugestoes = ref("");
+const sugestoesVisualizacao = ref("");
+const observacaoDevolucao = ref("");
 
 const unidade = computed<Unidade | null>(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
     for (const unidade of unidades) {
-      if (unidade.sigla === sigla) return unidade
+      if (unidade.sigla === sigla) return unidade;
       if (unidade.filhas && unidade.filhas.length) {
-        const encontrada = buscarUnidade(unidade.filhas, sigla)
-        if (encontrada) return encontrada
+        const encontrada = buscarUnidade(unidade.filhas, sigla);
+        if (encontrada) return encontrada;
       }
     }
-    return null
+    return null;
   }
 
-  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
-})
+  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value);
+});
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === sigla.value);
-})
+  return processosStore.processoDetalhe.unidades.find(
+      (u) => u.sigla === sigla.value,
+  );
+});
 
 const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
@@ -393,83 +394,97 @@ onMounted(async () => {
 });
 
 const podeValidar = computed(() => {
-  return perfilSelecionado.value === 'CHEFE' &&
-      subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
-})
+  return (
+      perfilSelecionado.value === "CHEFE" &&
+      subprocesso.value?.situacaoSubprocesso ===
+      SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
+  );
+});
 
 const podeAnalisar = computed(() => {
-  return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
-      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_VALIDADO || subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
-})
+  return (
+      (perfilSelecionado.value === "GESTOR" ||
+          perfilSelecionado.value === "ADMIN") &&
+      (subprocesso.value?.situacaoSubprocesso ===
+          SituacaoSubprocesso.MAPA_VALIDADO ||
+          subprocesso.value?.situacaoSubprocesso ===
+          SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
+  );
+});
 
 const podeVerSugestoes = computed(() => {
-  return subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
-})
+  return (
+      subprocesso.value?.situacaoSubprocesso ===
+      SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
+  );
+});
 
 const temHistoricoAnalise = computed(() => {
-  return historicoAnalise.value.length > 0
-})
+  return historicoAnalise.value.length > 0;
+});
 
 const historicoAnalise = computed(() => {
-  if (!codSubprocesso.value) return []
+  if (!codSubprocesso.value) return [];
 
-  return analisesStore.getAnalisesPorSubprocesso(codSubprocesso.value).map(analise => ({
-    codigo: analise.codigo,
-    data: new Date(analise.dataHora).toLocaleString('pt-BR'),
-    unidade: (analise as any).unidadeSigla || (analise as any).unidade,
-    resultado: analise.resultado,
-    observacoes: analise.observacoes || ''
-  }))
-})
+  return analisesStore
+      .getAnalisesPorSubprocesso(codSubprocesso.value)
+      .map((analise) => ({
+        codigo: analise.codigo,
+        data: new Date(analise.dataHora).toLocaleString("pt-BR"),
+        unidade: (analise as any).unidadeSigla || (analise as any).unidade,
+        resultado: analise.resultado,
+        observacoes: analise.observacoes || "",
+      }));
+});
 
 function abrirModalAceitar() {
-  mostrarModalAceitar.value = true
+  mostrarModalAceitar.value = true;
 }
 
 function fecharModalAceitar() {
-  mostrarModalAceitar.value = false
+  mostrarModalAceitar.value = false;
 }
 
 function abrirModalSugestoes() {
   // if (mapa.value?.sugestoes) {
   //   sugestoes.value = mapa.value.sugestoes
   // }
-  mostrarModalSugestoes.value = true
+  mostrarModalSugestoes.value = true;
 }
 
 function fecharModalSugestoes() {
-  mostrarModalSugestoes.value = false
-  sugestoes.value = ''
+  mostrarModalSugestoes.value = false;
+  sugestoes.value = "";
 }
 
 function fecharModalVerSugestoes() {
-  mostrarModalVerSugestoes.value = false
-  sugestoesVisualizacao.value = ''
+  mostrarModalVerSugestoes.value = false;
+  sugestoesVisualizacao.value = "";
 }
 
 function abrirModalValidar() {
-  mostrarModalValidar.value = true
+  mostrarModalValidar.value = true;
 }
 
 function fecharModalValidar() {
-  mostrarModalValidar.value = false
+  mostrarModalValidar.value = false;
 }
 
 function abrirModalDevolucao() {
-  mostrarModalDevolucao.value = true
+  mostrarModalDevolucao.value = true;
 }
 
 function fecharModalDevolucao() {
-  mostrarModalDevolucao.value = false
-  observacaoDevolucao.value = ''
+  mostrarModalDevolucao.value = false;
+  observacaoDevolucao.value = "";
 }
 
 function abrirModalHistorico() {
-  mostrarModalHistorico.value = true
+  mostrarModalHistorico.value = true;
 }
 
 function fecharModalHistorico() {
-  mostrarModalHistorico.value = false
+  mostrarModalHistorico.value = false;
 }
 
 function verSugestoes() {
@@ -485,25 +500,26 @@ function verHistorico() {
 async function confirmarSugestoes() {
   if (!codSubprocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes(codSubprocesso.value, { sugestoes: sugestoes.value });
+    await processosStore.apresentarSugestoes(codSubprocesso.value, {
+      sugestoes: sugestoes.value,
+    });
 
-    fecharModalSugestoes()
+    fecharModalSugestoes();
 
     notificacoesStore.sucesso(
-        'Sugestões apresentadas',
-        'Sugestões submetidas para análise da unidade superior'
-    )
+        "Sugestões apresentadas",
+        "Sugestões submetidas para análise da unidade superior",
+    );
 
     await router.push({
-      name: 'Subprocesso',
-      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
-    })
-
+      name: "Subprocesso",
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
+    });
   } catch {
     notificacoesStore.erro(
-        'Erro ao apresentar sugestões',
-        'Ocorreu um erro. Tente novamente.'
-    )
+        "Erro ao apresentar sugestões",
+        "Ocorreu um erro. Tente novamente.",
+    );
   }
 }
 
@@ -512,23 +528,22 @@ async function confirmarValidacao() {
   try {
     await processosStore.validarMapa(codSubprocesso.value);
 
-    fecharModalValidar()
+    fecharModalValidar();
 
     notificacoesStore.sucesso(
-        'Mapa validado',
-        'Mapa validado e submetido para análise da unidade superior'
-    )
+        "Mapa validado",
+        "Mapa validado e submetido para análise da unidade superior",
+    );
 
     await router.push({
-      name: 'Subprocesso',
-      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
-    })
-
+      name: "Subprocesso",
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
+    });
   } catch {
     notificacoesStore.erro(
-        'Erro ao validar mapa',
-        'Ocorreu um erro. Tente novamente.'
-    )
+        "Erro ao validar mapa",
+        "Ocorreu um erro. Tente novamente.",
+    );
   }
 }
 
@@ -536,29 +551,32 @@ async function confirmarAceitacao(observacoes?: string) {
   if (!codSubprocesso.value) return;
 
   const perfil = perfilSelecionado.value;
-  const isHomologacao = perfil === 'ADMIN';
+  const isHomologacao = perfil === "ADMIN";
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
+    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+      observacoes: observacoes || "",
+    });
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
+    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {
+      observacoes: observacoes || "",
+    });
   }
 
   fecharModalAceitar();
-  await router.push({name: 'Painel'});
+  await router.push({name: "Painel"});
 }
-
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
 
   await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-    motivo: '',
+    motivo: "",
     observacoes: observacaoDevolucao.value,
   });
 
   fecharModalDevolucao();
-  await router.push({name: 'Painel'});
+  await router.push({name: "Painel"});
 }
 </script>
 

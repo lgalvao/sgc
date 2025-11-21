@@ -9,7 +9,7 @@ export interface EntrarRequest {
   unidadeCodigo: number;
 }
 
-export type Perfil = 'ADMIN' | 'GESTOR' | 'CHEFE' | 'SERVIDOR';
+export type Perfil = "ADMIN" | "GESTOR" | "CHEFE" | "SERVIDOR";
 
 export interface Unidade {
   codigo: number;
@@ -33,7 +33,9 @@ export interface PerfilUnidade {
   siglaUnidade: string;
 }
 
-export function mapPerfilUnidadeToFrontend(perfilUnidadeDto: any): PerfilUnidade {
+export function mapPerfilUnidadeToFrontend(
+    perfilUnidadeDto: any,
+): PerfilUnidade {
   return {
     perfil: perfilUnidadeDto.perfil,
     unidade: {

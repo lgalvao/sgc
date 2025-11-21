@@ -1,7 +1,7 @@
-import apiClient from '../axios-setup';
+import apiClient from "../axios-setup";
 
 export async function buscarTodasUnidades() {
-    const response = await apiClient.get('/unidades');
+    const response = await apiClient.get("/unidades");
     return response.data;
 }
 
@@ -15,7 +15,10 @@ export async function buscarUnidadePorCodigo(codigo: number) {
     return response.data;
 }
 
-export async function buscarArvoreComElegibilidade(tipoProcesso: string, codProcesso?: number) {
+export async function buscarArvoreComElegibilidade(
+    tipoProcesso: string,
+    codProcesso?: number,
+) {
     let url = `/unidades/arvore-com-elegibilidade?tipoProcesso=${tipoProcesso}`;
     if (codProcesso) {
         url += `&codProcesso=${codProcesso}`;

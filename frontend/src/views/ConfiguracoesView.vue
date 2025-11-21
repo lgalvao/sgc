@@ -55,18 +55,12 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
-import {useConfiguracoesStore} from '@/stores/configuracoes';
-import {
-  BContainer,
-  BForm,
-  BFormInput,
-  BButton,
-  BAlert
-} from 'bootstrap-vue-next';
+import {BAlert, BButton, BContainer, BForm, BFormInput,} from "bootstrap-vue-next";
+import {onMounted, ref} from "vue";
+import {useConfiguracoesStore} from "@/stores/configuracoes";
 
 const configuracoesStore = useConfiguracoesStore();
-const mensagemSucesso = ref('');
+const mensagemSucesso = ref("");
 
 onMounted(() => {
   configuracoesStore.loadConfiguracoes();
@@ -74,9 +68,9 @@ onMounted(() => {
 
 const salvarConfiguracoes = () => {
   if (configuracoesStore.saveConfiguracoes()) {
-    mensagemSucesso.value = 'Configurações salvas!';
+    mensagemSucesso.value = "Configurações salvas!";
     setTimeout(() => {
-      mensagemSucesso.value = '';
+      mensagemSucesso.value = "";
     }, 3000);
   }
 };

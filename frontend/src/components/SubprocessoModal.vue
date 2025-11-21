@@ -44,24 +44,29 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
-import {BModal, BButton, BFormInput, BFormGroup} from 'bootstrap-vue-next';
-import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils';
+import {BButton, BFormGroup, BFormInput, BModal} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import {
+  formatDateBR,
+  formatDateForInput,
+  isDateValidAndFuture,
+  parseDate,
+} from "@/utils";
 
 interface Props {
-   mostrarModal: boolean;
-   dataLimiteAtual: Date | null;
-   etapaAtual: number | null;
+  mostrarModal: boolean;
+  dataLimiteAtual: Date | null;
+  etapaAtual: number | null;
 }
 
 const props = defineProps<Props>();
 
 defineEmits<{
-   fecharModal: [];
-   confirmarAlteracao: [novaData: string];
+  fecharModal: [];
+  confirmarAlteracao: [novaData: string];
 }>();
 
-const novaDataLimite = ref('');
+const novaDataLimite = ref("");
 
 const dataLimiteMinima = computed(() => {
   return formatDateForInput(new Date());
@@ -77,11 +82,15 @@ const isDataValida = computed(() => {
 });
 
 // Watch para mostrarModal e inicializar quando abrir
-watch(() => props.mostrarModal, (novoValor: boolean) => {
-  if (novoValor && props.dataLimiteAtual) {
-    novaDataLimite.value = formatDateForInput(props.dataLimiteAtual);
-  } else {
-    novaDataLimite.value = '';
-  }
-}, { immediate: true });
+watch(
+    () => props.mostrarModal,
+    (novoValor: boolean) => {
+      if (novoValor && props.dataLimiteAtual) {
+        novaDataLimite.value = formatDateForInput(props.dataLimiteAtual);
+      } else {
+        novaDataLimite.value = "";
+      }
+    },
+    {immediate: true},
+);
 </script>

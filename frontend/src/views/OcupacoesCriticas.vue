@@ -170,38 +170,40 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useMapasStore} from '@/stores/mapas'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from '@/stores/processos'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {Competencia, MapaCompleto} from '@/types/tipos'
 import {
-  BContainer,
-  BButton,
   BAlert,
+  BButton,
   BCard,
+  BContainer,
   BForm,
+  BFormCheckbox,
   BFormInput,
   BFormSelect,
   BFormTextarea,
-  BFormCheckbox,
-  BModal
-} from 'bootstrap-vue-next';
+  BModal,
+} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
+import type {Competencia, MapaCompleto} from "@/types/tipos";
 
-const route = useRoute()
-const router = useRouter()
-const mapasStore = useMapasStore()
-const unidadesStore = useUnidadesStore()
-const processosStore = useProcessosStore()
-const notificacoesStore = useNotificacoesStore()
+const route = useRoute();
+const router = useRouter();
+const mapasStore = useMapasStore();
+const unidadesStore = useUnidadesStore();
+const processosStore = useProcessosStore();
+const notificacoesStore = useNotificacoesStore();
 
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const siglaUnidade = computed(() => route.params.siglaUnidade as string)
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const siglaUnidade = computed(() => route.params.siglaUnidade as string);
 
-const unidade = computed(() => unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value))
-const nomeUnidade = computed(() => unidade.value?.nome || '')
+const unidade = computed(() =>
+    unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value),
+);
+const nomeUnidade = computed(() => unidade.value?.nome || "");
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
@@ -213,80 +215,88 @@ onMounted(async () => {
 
 const mapa = computed<MapaCompleto | null>(() => {
   return mapasStore.mapaCompleto;
-})
+});
 
 const competencias = computed<Competencia[]>(() => {
-  return mapa.value?.competencias || []
-})
+  return mapa.value?.competencias || [];
+});
 
 // Estado das ocupações críticas
-const ocupacoesCriticas = ref<Array<{
-  nome: string
-  descricao: string
-  nivelCriticidade: number
-  competenciasCriticas: string[]
-}>>([])
+const ocupacoesCriticas = ref<
+    Array<{
+      nome: string;
+      descricao: string;
+      nivelCriticidade: number;
+      competenciasCriticas: string[];
+    }>
+>([]);
 
 const novaOcupacao = ref({
-  nome: '',
-  descricao: '',
+  nome: "",
+  descricao: "",
   nivelCriticidade: 3,
-  competenciasCriticas: [] as string[]
-})
+  competenciasCriticas: [] as string[],
+});
 
 // Modal
-const mostrarModalConfirmacao = ref(false)
+const mostrarModalConfirmacao = ref(false);
 
 function adicionarOcupacao() {
   if (!novaOcupacao.value.nome.trim() || !novaOcupacao.value.descricao.trim()) {
-    notificacoesStore.erro('Dados incompletos', 'Preencha nome e descrição da ocupação.')
-    return
+    notificacoesStore.erro(
+        "Dados incompletos",
+        "Preencha nome e descrição da ocupação.",
+    );
+    return;
   }
 
   ocupacoesCriticas.value.push({
     nome: novaOcupacao.value.nome,
     descricao: novaOcupacao.value.descricao,
     nivelCriticidade: novaOcupacao.value.nivelCriticidade,
-    competenciasCriticas: [...novaOcupacao.value.competenciasCriticas]
-  })
+    competenciasCriticas: [...novaOcupacao.value.competenciasCriticas],
+  });
 
   // Limpar formulário
   novaOcupacao.value = {
-    nome: '',
-    descricao: '',
+    nome: "",
+    descricao: "",
     nivelCriticidade: 3,
-    competenciasCriticas: []
-  }
+    competenciasCriticas: [],
+  };
 
-  notificacoesStore.sucesso('Ocupação adicionada', 'Ocupação crítica adicionada!')
+  notificacoesStore.sucesso(
+      "Ocupação adicionada",
+      "Ocupação crítica adicionada!",
+  );
 }
 
 function removerOcupacao(index: number) {
-  ocupacoesCriticas.value.splice(index, 1)
-  notificacoesStore.sucesso('Ocupação removida', 'Ocupação crítica removida!')
+  ocupacoesCriticas.value.splice(index, 1);
+  notificacoesStore.sucesso("Ocupação removida", "Ocupação crítica removida!");
 }
 
 function finalizarIdentificacao() {
-  mostrarModalConfirmacao.value = true
+  mostrarModalConfirmacao.value = true;
 }
 
 function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false
+  mostrarModalConfirmacao.value = false;
 }
 
 function confirmarFinalizacao() {
-  if (!processoAtual.value) return
+  if (!processoAtual.value) return;
 
   // TODO: Implementar chamada real ao backend para finalizar identificação
   // Registrar movimentação e alertas é responsabilidade do backend
 
   notificacoesStore.sucesso(
-      'Identificação finalizada',
-      'A identificação de ocupações críticas foi concluída!'
-  )
+      "Identificação finalizada",
+      "A identificação de ocupações críticas foi concluída!",
+  );
 
-  fecharModalConfirmacao()
-  router.push('/painel')
+  fecharModalConfirmacao();
+  router.push("/painel");
 }
 </script>
 

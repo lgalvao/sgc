@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BModal, BButton, BAlert} from 'bootstrap-vue-next';
+import {BAlert, BButton, BModal} from "bootstrap-vue-next";
 
 defineProps<{
   mostrar: boolean;
@@ -47,7 +47,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'fechar'): void
-  (e: 'confirmar'): void
+  (e: "fechar"): void;
+  (e: "confirmar"): void;
 }>();
 </script>

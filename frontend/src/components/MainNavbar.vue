@@ -72,34 +72,24 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BCollapse,
-  BContainer,
-  BNavbar,
-  BNavbarBrand,
-  BNavbarNav,
-  BNavbarToggle,
-  BNavItem,
-} from 'bootstrap-vue-next';
-import {useRouter} from 'vue-router';
-import {usePerfilStore} from '@/stores/perfil';
-import {usePerfil} from '@/composables/usePerfil';
+import {BCollapse, BContainer, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem,} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
+import {usePerfil} from "@/composables/usePerfil";
+import {usePerfilStore} from "@/stores/perfil";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
 
 const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
-
-
 function navigateFromNavbar(path: string) {
-  sessionStorage.setItem('cameFromNavbar', '1');
+  sessionStorage.setItem("cameFromNavbar", "1");
   router.push(path);
 }
 
 defineExpose({
   navigateFromNavbar,
-})
+});
 </script>
 
 <style scoped>

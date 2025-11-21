@@ -1,7 +1,7 @@
-import apiClient from '../axios-setup';
-import {mapProcessoResumoDtoToFrontend} from '@/mappers/processos';
-import type {Alerta, ProcessoResumo} from '@/types/tipos';
-import {mapAlertaDtoToFrontend} from '@/mappers/alertas';
+import {mapAlertaDtoToFrontend} from "@/mappers/alertas";
+import {mapProcessoResumoDtoToFrontend} from "@/mappers/processos";
+import type {Alerta, ProcessoResumo} from "@/types/tipos";
+import apiClient from "../axios-setup";
 
 export interface Page<T> {
   content: T[];
@@ -20,7 +20,7 @@ export async function listarProcessos(
     page: number = 0,
     size: number = 20,
     sort?: keyof ProcessoResumo,
-    order?: 'asc' | 'desc'
+    order?: "asc" | "desc",
 ): Promise<Page<ProcessoResumo>> {
   const params: any = {
     perfil,
@@ -33,7 +33,7 @@ export async function listarProcessos(
   if (sort) {
     params.sort = `${sort},${order}`;
   }
-  const response = await apiClient.get<Page<any>>('/painel/processos', {
+    const response = await apiClient.get<Page<any>>("/painel/processos", {
     params,
   });
   return {
@@ -47,8 +47,8 @@ export async function listarAlertas(
     unidade?: number,
     page: number = 0,
     size: number = 20,
-    sort?: 'data' | 'processo',
-    order?: 'asc' | 'desc'
+    sort?: "data" | "processo",
+    order?: "asc" | "desc",
 ): Promise<Page<Alerta>> {
   const params: any = {
     page,
@@ -63,7 +63,7 @@ export async function listarAlertas(
   if (sort) {
     params.sort = `${sort},${order}`;
   }
-  const response = await apiClient.get<Page<any>>('/painel/alertas', {
+    const response = await apiClient.get<Page<any>>("/painel/alertas", {
     params,
   });
   return {

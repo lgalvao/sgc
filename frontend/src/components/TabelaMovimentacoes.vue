@@ -22,19 +22,19 @@
 </template>
 
 <script lang="ts" setup>
-import type {Movimentacao} from '@/types/tipos';
-import {formatDateTimeBR} from '@/utils';
-import {ref} from 'vue';
-import {BTable} from 'bootstrap-vue-next';
+import {BTable} from "bootstrap-vue-next";
+import {ref} from "vue";
+import type {Movimentacao} from "@/types/tipos";
+import {formatDateTimeBR} from "@/utils";
 
 defineProps<{
-  movimentacoes: Movimentacao[]
+  movimentacoes: Movimentacao[];
 }>();
 
 const fields = ref([
-  { key: 'dataHora', label: 'Data/Hora' },
-  { key: 'unidadeOrigem', label: 'Unidade Origem' },
-  { key: 'unidadeDestino', label: 'Unidade Destino' },
-  { key: 'descricao', label: 'Descrição' }
+  {key: "dataHora", label: "Data/Hora"},
+  {key: "unidadeOrigem", label: "Unidade Origem"},
+  {key: "unidadeDestino", label: "Unidade Destino"},
+  {key: "descricao", label: "Descrição"},
 ]);
 </script>

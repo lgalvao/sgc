@@ -52,12 +52,12 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue';
-import {BModal, BButton, BAlert} from 'bootstrap-vue-next';
-import {useAnalisesStore} from '@/stores/analises';
-import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
-import {format} from 'date-fns';
-import {ptBR} from 'date-fns/locale';
+import {BAlert, BButton, BModal} from "bootstrap-vue-next";
+import {format} from "date-fns";
+import {ptBR} from "date-fns/locale";
+import {ref, watch} from "vue";
+import {useAnalisesStore} from "@/stores/analises";
+import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
 
@@ -66,23 +66,25 @@ const props = defineProps<{
   codSubrocesso: number | undefined;
 }>();
 
-const emit = defineEmits(['fechar']);
+const emit = defineEmits(["fechar"]);
 
 const analisesStore = useAnalisesStore();
 const analises = ref<Analise[]>([]);
 
 watch(
   () => props.mostrar,
-  newVal => {
+    (newVal) => {
     if (newVal && props.codSubrocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(props.codSubrocesso);
+      analises.value = analisesStore.getAnalisesPorSubprocesso(
+          props.codSubrocesso,
+      );
     }
   },
   { immediate: true },
 );
 
 function formatarData(data: string): string {
-  return format(new Date(data), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR });
+  return format(new Date(data), "dd/MM/yyyy HH:mm:ss", {locale: ptBR});
 }
 </script>
 

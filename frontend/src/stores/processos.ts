@@ -1,18 +1,18 @@
-import {defineStore} from 'pinia'
-import {
+import {defineStore} from "pinia";
+import type {Page} from "@/services/painelService";
+import {usePerfilStore} from "@/stores/perfil";
+import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
     Processo,
     ProcessoResumo,
     SubprocessoElegivel,
-    TipoProcesso
-} from '@/types/tipos'
-import * as painelService from '../services/painelService'
-import {Page} from '@/services/painelService'
-import * as processoService from '../services/processoService'
-import {usePerfilStore} from "@/stores/perfil";
+    TipoProcesso,
+} from "@/types/tipos";
+import * as painelService from "../services/painelService";
+import * as processoService from "../services/processoService";
 
-export const useProcessosStore = defineStore('processos', {
+export const useProcessosStore = defineStore("processos", {
     state: () => ({
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
@@ -21,12 +21,17 @@ export const useProcessosStore = defineStore('processos', {
         processosFinalizados: [] as ProcessoResumo[],
     }),
     getters: {
-        getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoResumo[] => {
-            if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                return state.processoDetalhe.resumoSubprocessos;
-            }
-            return [];
-        },
+        getUnidadesDoProcesso:
+            (state) =>
+                (idProcesso: number): ProcessoResumo[] => {
+                    if (
+                        state.processoDetalhe &&
+                        state.processoDetalhe.codigo === idProcesso
+                    ) {
+                        return state.processoDetalhe.resumoSubprocessos;
+                    }
+                    return [];
+                },
     },
     actions: {
         async fetchProcessosPainel(
@@ -35,40 +40,67 @@ export const useProcessosStore = defineStore('processos', {
             page: number,
             size: number,
             sort?: keyof ProcessoResumo,
-            order?: 'asc' | 'desc'
+            order?: "asc" | "desc",
         ) {
-            const response = await painelService.listarProcessos(perfil, unidade, page, size, sort, order);
+            const response = await painelService.listarProcessos(
+                perfil,
+                unidade,
+                page,
+                size,
+                sort,
+                order,
+            );
             this.processosPainel = response.content;
             this.processosPainelPage = response;
         },
         async fetchProcessosFinalizados() {
-            this.processosFinalizados = await processoService.fetchProcessosFinalizados();
+            this.processosFinalizados =
+                await processoService.fetchProcessosFinalizados();
         },
         async fetchProcessoDetalhe(idProcesso: number) {
-            this.processoDetalhe = await processoService.obterDetalhesProcesso(idProcesso);
+            this.processoDetalhe =
+                await processoService.obterDetalhesProcesso(idProcesso);
         },
         async fetchSubprocessosElegiveis(idProcesso: number) {
-            this.subprocessosElegiveis = await processoService.fetchSubprocessosElegiveis(idProcesso);
+            this.subprocessosElegiveis =
+                await processoService.fetchSubprocessosElegiveis(idProcesso);
         },
         async criarProcesso(payload: CriarProcessoRequest) {
             const novoProcesso = await processoService.criarProcesso(payload);
             const perfilStore = usePerfilStore();
             if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
-                await this.fetchProcessosPainel(perfilStore.perfilSelecionado, Number(perfilStore.unidadeSelecionada), 0, 10);
+                await this.fetchProcessosPainel(
+                    perfilStore.perfilSelecionado,
+                    Number(perfilStore.unidadeSelecionada),
+                    0,
+                    10,
+                );
             }
             return novoProcesso;
         },
-        async atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
+        async atualizarProcesso(
+            idProcesso: number,
+            payload: AtualizarProcessoRequest,
+        ) {
             await processoService.atualizarProcesso(idProcesso, payload);
             const perfilStore = usePerfilStore();
             if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
-                await this.fetchProcessosPainel(perfilStore.perfilSelecionado, Number(perfilStore.unidadeSelecionada), 0, 10);
+                await this.fetchProcessosPainel(
+                    perfilStore.perfilSelecionado,
+                    Number(perfilStore.unidadeSelecionada),
+                    0,
+                    10,
+                );
             }
         },
         async removerProcesso(idProcesso: number) {
             await processoService.excluirProcesso(idProcesso);
         },
-        async iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
+        async iniciarProcesso(
+            idProcesso: number,
+            tipo: TipoProcesso,
+            unidadesIds: number[],
+        ) {
             await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
             // Após iniciar, é uma boa prática recarregar os detalhes para refletir a mudança de estado
             await this.fetchProcessoDetalhe(idProcesso);
@@ -79,16 +111,19 @@ export const useProcessosStore = defineStore('processos', {
             await this.fetchProcessoDetalhe(idProcesso);
         },
         async processarCadastroBloco(payload: {
-            codProcesso: number,
-            unidades: string[],
-            tipoAcao: 'aceitar' | 'homologar',
-            unidadeUsuario: string
+            codProcesso: number;
+            unidades: string[];
+            tipoAcao: "aceitar" | "homologar";
+            unidadeUsuario: string;
         }) {
             await processoService.processarAcaoEmBloco(payload);
             // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
             await this.fetchProcessoDetalhe(payload.codProcesso);
         },
-        async alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
+        async alterarDataLimiteSubprocesso(
+            id: number,
+            dados: { novaData: string },
+        ) {
             await processoService.alterarDataLimiteSubprocesso(id, dados);
             await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
@@ -100,5 +135,5 @@ export const useProcessosStore = defineStore('processos', {
             await processoService.validarMapa(id);
             await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
-    }
-})
+    },
+});

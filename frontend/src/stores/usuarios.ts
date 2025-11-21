@@ -1,17 +1,19 @@
-import {defineStore} from 'pinia'
-import type {Usuario} from '@/types/tipos'
+import {defineStore} from "pinia";
 import {buscarTodosUsuarios} from "@/services/usuarioService";
+import type {Usuario} from "@/types/tipos";
 
-export const useUsuariosStore = defineStore('usuarios', {
+export const useUsuariosStore = defineStore("usuarios", {
     state: () => ({
         usuarios: [] as Usuario[],
         isLoading: false,
-        error: null as string | null
+        error: null as string | null,
     }),
     getters: {
-        getUsuarioById: (state) => (id: number): Usuario | undefined => {
-            return state.usuarios.find(u => u.codigo === id);
-        }
+        getUsuarioById:
+            (state) =>
+                (id: number): Usuario | undefined => {
+                    return state.usuarios.find((u) => u.codigo === id);
+                },
     },
     actions: {
         async fetchUsuarios() {
@@ -19,15 +21,15 @@ export const useUsuariosStore = defineStore('usuarios', {
             this.error = null;
             try {
                 const response = await buscarTodosUsuarios();
-                this.usuarios = (response as any).map(u => ({
+                this.usuarios = (response as any).map((u) => ({
                     ...u,
-                    unidade: {sigla: u.unidade}
+                    unidade: {sigla: u.unidade},
                 })) as any as Usuario[];
             } catch (err: any) {
-                this.error = 'Falha ao carregar usuários: ' + err.message;
+                this.error = "Falha ao carregar usuários: " + err.message;
             } finally {
                 this.isLoading = false;
             }
         },
-    }
-})
+    },
+});

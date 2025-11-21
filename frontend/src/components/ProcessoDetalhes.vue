@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
-import {BBadge} from 'bootstrap-vue-next';
+import {BBadge} from "bootstrap-vue-next";
+import type {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 
 defineProps<{
   descricao: string;

@@ -62,8 +62,8 @@
 </template>
 
 <script lang="ts" setup>
-import { badgeClass } from '@/utils';
-import { BButton, BCard, BCardBody } from 'bootstrap-vue-next';
+import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import {badgeClass} from "@/utils";
 
 interface Props {
   processoDescricao: string;
@@ -87,6 +87,6 @@ const emit = defineEmits({
 });
 
 const handleAlterarDataLimite = () => {
-  emit('alterarDataLimite');
+  emit("alterarDataLimite");
 };
 </script>

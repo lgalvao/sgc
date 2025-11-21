@@ -167,102 +167,118 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {usePerfilStore} from '@/stores/perfil';
-import {useAtividadesStore} from '@/stores/atividades';
-import {useUnidadesStore} from '@/stores/unidades';
-import {useProcessosStore} from '@/stores/processos';
-import {useRouter} from 'vue-router';
 import {
-  AceitarCadastroRequest,
-  Atividade,
-  DevolverCadastroRequest,
-  HomologarCadastroRequest,
-  Perfil,
-  SituacaoSubprocesso,
-  TipoProcesso,
-  Unidade
-} from '@/types/tipos';
-import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
-import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {
-  BContainer,
   BButton,
   BCard,
   BCardBody,
+  BContainer,
+  BFormTextarea,
   BModal,
-  BFormTextarea
-} from 'bootstrap-vue-next';
+} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
+import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import {useAtividadesStore} from "@/stores/atividades";
+import {usePerfilStore} from "@/stores/perfil";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {
+  type AceitarCadastroRequest,
+  type Atividade,
+  type DevolverCadastroRequest,
+  type HomologarCadastroRequest,
+  Perfil,
+  SituacaoSubprocesso,
+  TipoProcesso,
+  type Unidade,
+} from "@/types/tipos";
 
 const props = defineProps<{
-  codProcesso: number | string,
-  sigla: string
-}>()
+  codProcesso: number | string;
+  sigla: string;
+}>();
 
-const unidadeId = computed(() => props.sigla)
-const codProcesso = computed(() => Number(props.codProcesso))
+const unidadeId = computed(() => props.sigla);
+const codProcesso = computed(() => Number(props.codProcesso));
 
-const atividadesStore = useAtividadesStore()
-const unidadesStore = useUnidadesStore()
-const processosStore = useProcessosStore()
-const subprocessosStore = useSubprocessosStore()
-const perfilStore = usePerfilStore()
-const router = useRouter()
+const atividadesStore = useAtividadesStore();
+const unidadesStore = useUnidadesStore();
+const processosStore = useProcessosStore();
+const subprocessosStore = useSubprocessosStore();
+const perfilStore = usePerfilStore();
+const router = useRouter();
 
-const mostrarModalImpacto = ref(false)
-const mostrarModalValidar = ref(false)
-const mostrarModalDevolver = ref(false)
-const mostrarModalHistoricoAnalise = ref(false)
-const observacaoValidacao = ref<string>('')
-const observacaoDevolucao = ref<string>('')
+const mostrarModalImpacto = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolver = ref(false);
+const mostrarModalHistoricoAnalise = ref(false);
+const observacaoValidacao = ref<string>("");
+const observacaoDevolucao = ref<string>("");
 
 const unidade = computed(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
+  function buscarUnidade(
+      unidades: Unidade[],
+      sigla: string,
+  ): Unidade | undefined {
     for (const u of unidades) {
-      if (u.sigla === sigla) return u
+      if (u.sigla === sigla) return u;
       if (u.filhas && u.filhas.length) {
-        const encontrada = buscarUnidade(u.filhas, sigla)
-        if (encontrada) return encontrada
+        const encontrada = buscarUnidade(u.filhas, sigla);
+        if (encontrada) return encontrada;
       }
     }
   }
 
-  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value)
-})
+  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value);
+});
 
-const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
-const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
+const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
+const nomeUnidade = computed(() =>
+    unidade.value?.nome ? `${unidade.value.nome}` : "",
+);
 const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === unidadeId.value);
+  return processosStore.processoDetalhe.unidades.find(
+      (u) => u.sigla === unidadeId.value,
+  );
 });
 
 const isHomologacao = computed(() => {
-    if (!subprocesso.value) return false;
-    const {situacaoSubprocesso} = subprocesso.value;
-    return perfilSelecionado.value === Perfil.ADMIN && (situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES || situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA);
+  if (!subprocesso.value) return false;
+  const {situacaoSubprocesso} = subprocesso.value;
+  return (
+      perfilSelecionado.value === Perfil.ADMIN &&
+      (situacaoSubprocesso ===
+          SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES ||
+          situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA)
+  );
 });
 
 const podeVerImpacto = computed(() => {
   if (!subprocesso.value || !perfilSelecionado.value) return false;
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.ATIVIDADES_REVISADAS;
+  const situacaoCorreta =
+      subprocesso.value.situacaoSubprocesso ===
+      SituacaoSubprocesso.ATIVIDADES_REVISADAS;
   return podeVer && situacaoCorreta;
 });
 
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
-  if (codSubrocesso.value === undefined) return []
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
-})
+  if (codSubrocesso.value === undefined) return [];
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+});
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
-const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
+const isRevisao = computed(
+    () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
+);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(codProcesso.value);
@@ -289,48 +305,51 @@ async function confirmarValidacao() {
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = { ...commonRequest };
     if (isRevisao.value) {
-        await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, req);
+      await subprocessosStore.homologarRevisaoCadastro(
+          codSubrocesso.value,
+          req,
+      );
     } else {
-        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
+      await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
     }
   } else {
-      const req: AceitarCadastroRequest = { ...commonRequest };
-      if (isRevisao.value) {
-          await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
-      } else {
-          await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
-      }
+    const req: AceitarCadastroRequest = {...commonRequest};
+    if (isRevisao.value) {
+      await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
+    } else {
+      await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
+    }
   }
 
   fecharModalValidar();
-  await router.push('/painel');
+  await router.push("/painel");
 }
 
 async function confirmarDevolucao() {
   if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
-    motivo: '', // Adicionar esta linha
+    motivo: "", // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 
   if (isRevisao.value) {
-      await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
   } else {
-      await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
   }
 
   fecharModalDevolver();
-  await router.push('/painel');
+  await router.push("/painel");
 }
 
 function fecharModalValidar() {
   mostrarModalValidar.value = false;
-  observacaoValidacao.value = '';
+  observacaoValidacao.value = "";
 }
 
 function fecharModalDevolver() {
   mostrarModalDevolver.value = false;
-  observacaoDevolucao.value = '';
+  observacaoDevolucao.value = "";
 }
 
 function abrirModalImpacto() {

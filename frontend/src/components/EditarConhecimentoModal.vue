@@ -42,44 +42,52 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {BModal, BFormTextarea} from 'bootstrap-vue-next'
+import {BFormTextarea, BModal} from "bootstrap-vue-next";
+import {ref, watch} from "vue";
 
 interface Props {
-  mostrar: boolean
+  mostrar: boolean;
   conhecimento?: {
-    id: number
-    descricao: string
-  } | null
+    id: number;
+    descricao: string;
+  } | null;
 }
 
 interface Emits {
-  (e: 'fechar'): void
-  (e: 'salvar', conhecimentoId: number, novaDescricao: string): void
+  (e: "fechar"): void;
+
+  (e: "salvar", conhecimentoId: number, novaDescricao: string): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
-const descricaoEditada = ref('')
+const descricaoEditada = ref("");
 
 // Atualizar descrição quando o conhecimento mudar
-watch(() => props.conhecimento, (novoConhecimento) => {
-  if (novoConhecimento) {
-    descricaoEditada.value = novoConhecimento.descricao
-  }
-}, { immediate: true })
+watch(
+    () => props.conhecimento,
+    (novoConhecimento) => {
+      if (novoConhecimento) {
+        descricaoEditada.value = novoConhecimento.descricao;
+      }
+    },
+    {immediate: true},
+);
 
 // Limpar quando fechar
-watch(() => props.mostrar, (mostrar) => {
-  if (!mostrar) {
-    descricaoEditada.value = ''
-  }
-})
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (!mostrar) {
+        descricaoEditada.value = "";
+      }
+    },
+);
 
 function salvar() {
   if (props.conhecimento && descricaoEditada.value?.trim()) {
-    emit('salvar', props.conhecimento.id, descricaoEditada.value.trim())
+    emit("salvar", props.conhecimento.id, descricaoEditada.value.trim());
   }
 }
 </script>

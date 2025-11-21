@@ -1,4 +1,4 @@
-import { createConsola } from 'consola';
+import {createConsola} from "consola";
 
 const logger = createConsola({
   level: 4,

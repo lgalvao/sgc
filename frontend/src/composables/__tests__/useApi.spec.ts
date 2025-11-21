@@ -1,9 +1,11 @@
-import {describe, expect, it, vi} from 'vitest';
-import {useApi} from '../useApi';
+import {describe, expect, it, vi} from "vitest";
+import {useApi} from "../useApi";
 
-describe('useApi', () => {
-  it('should set isLoading to true while the api call is in progress', async () => {
-    const apiCall = vi.fn(() => new Promise(resolve => setTimeout(() => resolve('data'), 10)));
+describe("useApi", () => {
+    it("should set isLoading to true while the api call is in progress", async () => {
+        const apiCall = vi.fn(
+            () => new Promise((resolve) => setTimeout(() => resolve("data"), 10)),
+        );
     const { execute, isLoading } = useApi(apiCall);
 
     const promise = execute();
@@ -15,17 +17,19 @@ describe('useApi', () => {
     expect(isLoading.value).toBe(false);
   });
 
-  it('should set data on successful api call', async () => {
-    const apiCall = vi.fn(() => Promise.resolve('data'));
+    it("should set data on successful api call", async () => {
+        const apiCall = vi.fn(() => Promise.resolve("data"));
     const { execute, data } = useApi(apiCall);
 
     await execute();
 
-    expect(data.value).toBe('data');
+        expect(data.value).toBe("data");
   });
 
-  it('should set error on failed api call', async () => {
-    const apiCall = vi.fn(() => Promise.reject({ response: { data: { message: 'error' } } }));
+    it("should set error on failed api call", async () => {
+        const apiCall = vi.fn(() =>
+            Promise.reject({response: {data: {message: "error"}}}),
+        );
     const { execute, error } = useApi(apiCall);
 
     try {
@@ -34,11 +38,13 @@ describe('useApi', () => {
       // a
     }
 
-    expect(error.value).toBe('error');
+        expect(error.value).toBe("error");
   });
 
-  it('should clear error when clearError is called', async () => {
-    const apiCall = vi.fn(() => Promise.reject({ response: { data: { message: 'error' } } }));
+    it("should clear error when clearError is called", async () => {
+        const apiCall = vi.fn(() =>
+            Promise.reject({response: {data: {message: "error"}}}),
+        );
     const { execute, error, clearError } = useApi(apiCall);
 
     try {
@@ -47,7 +53,7 @@ describe('useApi', () => {
       // a
     }
 
-    expect(error.value).toBe('error');
+        expect(error.value).toBe("error");
 
     clearError();
 

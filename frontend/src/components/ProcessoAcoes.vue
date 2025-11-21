@@ -36,8 +36,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {Perfil, SituacaoProcesso} from '@/types/tipos';
-import {BButton} from 'bootstrap-vue-next';
+import {BButton} from "bootstrap-vue-next";
+import type {Perfil, SituacaoProcesso} from "@/types/tipos";
 
 defineProps<{
   mostrarBotoesBloco: boolean;
@@ -46,8 +46,8 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'aceitarBloco'): void
-  (e: 'homologarBloco'): void
-  (e: 'finalizar'): void
+  (e: "aceitarBloco"): void;
+  (e: "homologarBloco"): void;
+  (e: "finalizar"): void;
 }>();
 </script>

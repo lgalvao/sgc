@@ -65,52 +65,55 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {BModal, BFormCheckbox} from 'bootstrap-vue-next'
+import {BFormCheckbox, BModal} from "bootstrap-vue-next";
+import {ref, watch} from "vue";
 
 interface UnidadeBloco {
-  sigla: string
-  nome: string
-  situacao: string
-  selecionada: boolean
+  sigla: string;
+  nome: string;
+  situacao: string;
+  selecionada: boolean;
 }
 
 const props = defineProps<{
-  mostrar: boolean
-  tipoAcao: 'aceitar' | 'homologar'
-  unidadesDisponiveis: Array<{ sigla: string, nome: string, situacao: string }>
-}>()
+  mostrar: boolean;
+  tipoAcao: "aceitar" | "homologar";
+  unidadesDisponiveis: Array<{ sigla: string; nome: string; situacao: string }>;
+}>();
 
 const emit = defineEmits<{
-  fechar: []
-  confirmar: [unidadesSelecionadas: string[]]
-}>()
+  fechar: [];
+  confirmar: [unidadesSelecionadas: string[]];
+}>();
 
-const unidades = ref<UnidadeBloco[]>([])
+const unidades = ref<UnidadeBloco[]>([]);
 
-watch(() => props.mostrar, (mostrar) => {
-  if (mostrar) {
-    unidades.value = props.unidadesDisponiveis.map(u => ({
-      ...u,
-      selecionada: true
-    }))
-  }
-})
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (mostrar) {
+        unidades.value = props.unidadesDisponiveis.map((u) => ({
+          ...u,
+          selecionada: true,
+        }));
+      }
+    },
+);
 
 function fechar() {
-  emit('fechar')
+  emit("fechar");
 }
 
 function confirmar() {
   const unidadesSelecionadas = unidades.value
-    .filter(u => u.selecionada)
-    .map(u => u.sigla)
-  
+      .filter((u) => u.selecionada)
+      .map((u) => u.sigla);
+
   if (unidadesSelecionadas.length === 0) {
-    alert('Selecione ao menos uma unidade para processar.')
-    return
+    alert("Selecione ao menos uma unidade para processar.");
+    return;
   }
-  
-  emit('confirmar', unidadesSelecionadas)
+
+  emit("confirmar", unidadesSelecionadas);
 }
 </script>

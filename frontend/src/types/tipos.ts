@@ -2,28 +2,28 @@
  * Tipos de situação de um processo.
  */
 export enum SituacaoProcesso {
-    CRIADO = 'CRIADO',
-    FINALIZADO = 'FINALIZADO',
-    EM_ANDAMENTO = 'EM_ANDAMENTO',
+    CRIADO = "CRIADO",
+    FINALIZADO = "FINALIZADO",
+    EM_ANDAMENTO = "EM_ANDAMENTO",
 }
 
 /**
  * Tipos de processo.
  */
 export enum TipoProcesso {
-    MAPEAMENTO = 'MAPEAMENTO',
-    REVISAO = 'REVISAO',
-    DIAGNOSTICO = 'DIAGNOSTICO',
+    MAPEAMENTO = "MAPEAMENTO",
+    REVISAO = "REVISAO",
+    DIAGNOSTICO = "DIAGNOSTICO",
 }
 
 /**
  * Perfis de usuário no sistema.
  */
 export enum Perfil {
-    ADMIN = 'ADMIN',
-    GESTOR = 'GESTOR',
-    CHEFE = 'CHEFE',
-    SERVIDOR = 'SERVIDOR',
+    ADMIN = "ADMIN",
+    GESTOR = "GESTOR",
+    CHEFE = "CHEFE",
+    SERVIDOR = "SERVIDOR",
 }
 
 /**
@@ -69,19 +69,19 @@ export interface PerfilUnidade {
  * Tipos de situação de um subprocesso.
  */
 export enum SituacaoSubprocesso {
-    NAO_INICIADO = 'NAO_INICIADO',
-    ATIVIDADES_REVISADAS = 'ATIVIDADES_REVISADAS',
-    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = 'AGUARDANDO_HOMOLOGACAO_ATIVIDADES',
-    ATIVIDADES_HOMOLOGADAS = 'ATIVIDADES_HOMOLOGADAS',
-    MAPEAMENTO_CONCLUIDO = 'MAPEAMENTO_CONCLUIDO',
-    MAPA_VALIDADO = 'MAPA_VALIDADO',
-    AGUARDANDO_AJUSTES_MAPA = 'AGUARDANDO_AJUSTES_MAPA',
-    MAPA_AJUSTADO = 'MAPA_AJUSTADO',
-    AGUARDANDO_HOMOLOGACAO_MAPA = 'AGUARDANDO_HOMOLOGACAO_MAPA',
-    MAPA_HOMOLOGADO = 'MAPA_HOMOLOGADO',
-    CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
-    CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
+    NAO_INICIADO = "NAO_INICIADO",
+    ATIVIDADES_REVISADAS = "ATIVIDADES_REVISADAS",
+    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = "AGUARDANDO_HOMOLOGACAO_ATIVIDADES",
+    ATIVIDADES_HOMOLOGADAS = "ATIVIDADES_HOMOLOGADAS",
+    MAPEAMENTO_CONCLUIDO = "MAPEAMENTO_CONCLUIDO",
+    MAPA_VALIDADO = "MAPA_VALIDADO",
+    AGUARDANDO_AJUSTES_MAPA = "AGUARDANDO_AJUSTES_MAPA",
+    MAPA_AJUSTADO = "MAPA_AJUSTADO",
+    AGUARDANDO_HOMOLOGACAO_MAPA = "AGUARDANDO_HOMOLOGACAO_MAPA",
+    MAPA_HOMOLOGADO = "MAPA_HOMOLOGADO",
+    CONCLUIDO = "CONCLUIDO",
+    REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
+    CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
 }
 
 export interface Conhecimento {
@@ -92,7 +92,7 @@ export interface Conhecimento {
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: { id: number; descricao: string; }[];
+    conhecimentos: { id: number; descricao: string }[];
 }
 
 export interface Competencia {
@@ -286,7 +286,6 @@ export interface SubprocessoDetalhe {
     permissoes: SubprocessoPermissoes;
 }
 
-
 export interface ConhecimentoVisualizacao {
     id: number;
     descricao: string;
@@ -297,7 +296,6 @@ export interface AtividadeVisualizacao {
     descricao: string;
     conhecimentos: ConhecimentoVisualizacao[];
 }
-
 
 export interface CompetenciaVisualizacao {
     codigo: number;

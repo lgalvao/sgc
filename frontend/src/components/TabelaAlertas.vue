@@ -18,30 +18,30 @@
 </template>
 
 <script lang="ts" setup>
-import type {Alerta} from '@/types/tipos';
-import {BTable} from 'bootstrap-vue-next';
+import {BTable} from "bootstrap-vue-next";
+import type {Alerta} from "@/types/tipos";
 
 defineProps<{
-  alertas: Alerta[]
+  alertas: Alerta[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', criterio: 'data' | 'processo'): void
-  (e: 'selecionar-alerta', alerta: Alerta): void
+  (e: "ordenar", criterio: "data" | "processo"): void;
+  (e: "selecionar-alerta", alerta: Alerta): void;
 }>();
 
 const fields = [
-  { key: 'dataHoraFormatada', label: 'Data/Hora', sortable: true },
-  { key: 'mensagem', label: 'Descrição' },
-  { key: 'processo', label: 'Processo', sortable: true },
-  { key: 'origem', label: 'Origem' }
+  {key: "dataHoraFormatada", label: "Data/Hora", sortable: true},
+  {key: "mensagem", label: "Descrição"},
+  {key: "processo", label: "Processo", sortable: true},
+  {key: "origem", label: "Origem"},
 ];
 
 const handleSortChange = (ctx: any) => {
-  if (ctx.sortBy === 'dataHoraFormatada') {
-    emit('ordenar', 'data');
-  } else if (ctx.sortBy === 'processo') {
-    emit('ordenar', 'processo');
+  if (ctx.sortBy === "dataHoraFormatada") {
+    emit("ordenar", "data");
+  } else if (ctx.sortBy === "processo") {
+    emit("ordenar", "processo");
   }
 };
 </script>

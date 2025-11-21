@@ -1,4 +1,4 @@
-import { Alerta } from '@/types/tipos';
+import type {Alerta} from "@/types/tipos";
 
 export function mapAlertaDtoToFrontend(dto: any): Alerta {
   return {

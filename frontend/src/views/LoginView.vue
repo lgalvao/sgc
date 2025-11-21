@@ -105,35 +105,28 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
-import {useRouter} from 'vue-router'
-import {usePerfilStore} from '@/stores/perfil'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {PerfilUnidade} from '@/mappers/sgrh';
-import {
-  BCard,
-  BForm,
-  BFormInput,
-  BFormSelect,
-  BFormSelectOption,
-  BButton
-} from 'bootstrap-vue-next';
+import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import {useRouter} from "vue-router";
+import type {PerfilUnidade} from "@/mappers/sgrh";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {usePerfilStore} from "@/stores/perfil";
 
-const router = useRouter()
-const perfilStore = usePerfilStore()
-const notificacoesStore = useNotificacoesStore()
+const router = useRouter();
+const perfilStore = usePerfilStore();
+const notificacoesStore = useNotificacoesStore();
 
-const titulo = ref(import.meta.env.DEV ? '1' : '')
-const senha = ref(import.meta.env.DEV ? '123' : '')
-const loginStep = ref(1)
-const parSelecionado = ref<PerfilUnidade | null>(null)
+const titulo = ref(import.meta.env.DEV ? "1" : "");
+const senha = ref(import.meta.env.DEV ? "123" : "");
+const loginStep = ref(1);
+const parSelecionado = ref<PerfilUnidade | null>(null);
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
 const perfisUnidadesOptions = computed(() => {
-  return perfilStore.perfisUnidades.map(par => ({
+  return perfilStore.perfisUnidades.map((par) => ({
     value: par,
-    text: `${par.perfil} - ${par.unidade.sigla}`
+    text: `${par.perfil} - ${par.unidade.sigla}`,
   }));
 });
 
@@ -147,36 +140,42 @@ const handleLogin = async () => {
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
       notificacoesStore.erro(
-        'Dados incompletos',
-        'Por favor, preencha título e senha.'
+          "Dados incompletos",
+          "Por favor, preencha título e senha.",
       );
-      return
+      return;
     }
 
-    const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
+    const sucessoAutenticacao = await perfilStore.loginCompleto(
+        titulo.value,
+        senha.value,
+    );
 
     if (sucessoAutenticacao) {
       if (perfilStore.perfisUnidades.length > 1) {
         loginStep.value = 2;
       } else if (perfilStore.perfisUnidades.length === 1) {
-        await router.push('/painel');
+        await router.push("/painel");
       } else {
         notificacoesStore.erro(
-          'Perfis indisponíveis',
-          'Nenhum perfil/unidade disponível para este usuário.'
+            "Perfis indisponíveis",
+            "Nenhum perfil/unidade disponível para este usuário.",
         );
       }
     } else {
       notificacoesStore.erro(
-        'Falha na autenticação',
-        'Título ou senha inválidos.'
+          "Falha na autenticação",
+          "Título ou senha inválidos.",
       );
     }
   } else {
     if (parSelecionado.value) {
-      await perfilStore.selecionarPerfilUnidade(Number(titulo.value), parSelecionado.value);
-      await router.push('/painel');
+      await perfilStore.selecionarPerfilUnidade(
+          Number(titulo.value),
+          parSelecionado.value,
+      );
+      await router.push("/painel");
     }
   }
-}
+};
 </script>

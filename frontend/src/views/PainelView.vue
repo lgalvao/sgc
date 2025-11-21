@@ -46,33 +46,43 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {BContainer, BButton} from 'bootstrap-vue-next'
-import {storeToRefs} from 'pinia'
-import {usePerfilStore} from '@/stores/perfil'
-import {useProcessosStore} from '@/stores/processos'
-import {useAlertasStore} from '@/stores/alertas'
-import {useRouter} from 'vue-router'
-import {type Alerta, type ProcessoResumo} from '@/types/tipos'
-import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import TabelaAlertas from '@/components/TabelaAlertas.vue';
+import {BButton, BContainer} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import TabelaAlertas from "@/components/TabelaAlertas.vue";
+import TabelaProcessos from "@/components/TabelaProcessos.vue";
+import {useAlertasStore} from "@/stores/alertas";
+import {usePerfilStore} from "@/stores/perfil";
+import {useProcessosStore} from "@/stores/processos";
+import type {Alerta, ProcessoResumo} from "@/types/tipos";
 
-const perfil = usePerfilStore()
-const processosStore = useProcessosStore()
-const alertasStore = useAlertasStore()
+const perfil = usePerfilStore();
+const processosStore = useProcessosStore();
+const alertasStore = useAlertasStore();
 
-const { processosPainel } = storeToRefs(processosStore)
-const { alertas } = storeToRefs(alertasStore)
+const {processosPainel} = storeToRefs(processosStore);
+const {alertas} = storeToRefs(alertasStore);
 
-const router = useRouter()
+const router = useRouter();
 
-const criterio = ref<keyof ProcessoResumo>('descricao')
-const asc = ref(true)
+const criterio = ref<keyof ProcessoResumo>("descricao");
+const asc = ref(true);
 
 onMounted(async () => {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    processosStore.fetchProcessosPainel(perfil.perfilSelecionado, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
-    alertasStore.fetchAlertas(Number(perfil.servidorId) || 0, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
+    processosStore.fetchProcessosPainel(
+        perfil.perfilSelecionado,
+        Number(perfil.unidadeSelecionada),
+        0,
+        10,
+    ); // Paginação inicial
+    alertasStore.fetchAlertas(
+        Number(perfil.servidorId) || 0,
+        Number(perfil.unidadeSelecionada),
+        0,
+        10,
+    ); // Paginação inicial
   }
 });
 
@@ -80,10 +90,10 @@ const processosOrdenados = computed(() => processosPainel.value);
 
 function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
-    asc.value = !asc.value
+    asc.value = !asc.value;
   } else {
-    criterio.value = campo
-    asc.value = true
+    criterio.value = campo;
+    asc.value = true;
   }
   processosStore.fetchProcessosPainel(
     perfil.perfilSelecionado!,
@@ -91,7 +101,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     0,
     10,
     criterio.value,
-    asc.value ? 'asc' : 'desc'
+      asc.value ? "asc" : "desc",
   );
 }
 
@@ -108,15 +118,15 @@ function abrirDetalhesAlerta(alerta: Alerta) {
 }
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
-const alertaCriterio = ref<'data' | 'processo'>('data');
+const alertaCriterio = ref<"data" | "processo">("data");
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 
-function ordenarAlertasPor(campo: 'data' | 'processo') {
+function ordenarAlertasPor(campo: "data" | "processo") {
   if (alertaCriterio.value === campo) {
     alertaAsc.value = !alertaAsc.value;
   } else {
     alertaCriterio.value = campo;
-    alertaAsc.value = campo === 'data' ? false : true;
+    alertaAsc.value = campo === "data" ? false : true;
   }
   alertasStore.fetchAlertas(
     Number(perfil.servidorId) || 0,
@@ -124,7 +134,7 @@ function ordenarAlertasPor(campo: 'data' | 'processo') {
     0,
     10,
     alertaCriterio.value,
-    alertaAsc.value ? 'asc' : 'desc'
+      alertaAsc.value ? "asc" : "desc",
   );
 }
 </script>

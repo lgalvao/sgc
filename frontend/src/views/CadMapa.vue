@@ -279,31 +279,44 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {BFormTextarea, BFormCheckbox, BFormInput, BModal, BButton, BContainer, BCard, BCardBody, BAlert} from 'bootstrap-vue-next'
-import {storeToRefs} from 'pinia'
-import {useRoute} from 'vue-router'
-import {useMapasStore} from '@/stores/mapas'
-import {useAtividadesStore} from '@/stores/atividades'
-import {useSubprocessosStore} from '@/stores/subprocessos'
-import {useUnidadesStore} from '@/stores/unidades'
-import {usePerfil} from '@/composables/usePerfil'
-import {Atividade, Competencia} from '@/types/tipos'
-import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
+import {
+  BAlert,
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BFormCheckbox,
+  BFormInput,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import {useRoute} from "vue-router";
+import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import type {Atividade, Competencia} from "@/types/tipos";
 
-const route = useRoute()
-const mapasStore = useMapasStore()
-const {mapaCompleto} = storeToRefs(mapasStore)
-const atividadesStore = useAtividadesStore()
-const subprocessosStore = useSubprocessosStore()
-const unidadesStore = useUnidadesStore()
-usePerfil()
+const route = useRoute();
+const mapasStore = useMapasStore();
+const {mapaCompleto} = storeToRefs(mapasStore);
+const atividadesStore = useAtividadesStore();
+const subprocessosStore = useSubprocessosStore();
+const unidadesStore = useUnidadesStore();
+usePerfil();
 
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const siglaUnidade = computed(() => String(route.params.siglaUnidade))
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
 const podeVerImpacto = computed(() => {
-  return subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto || false;
+  return (
+      subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto ||
+      false
+  );
 });
 
 const mostrarModalImpacto = ref(false);
@@ -324,43 +337,41 @@ onMounted(async () => {
   await unidadesStore.fetchUnidade(siglaUnidade.value);
 
   // Busca ID do subprocesso
-  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
+  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+      codProcesso.value,
+      siglaUnidade.value,
+  );
 
   if (id) {
     codSubrocesso.value = id;
     await Promise.all([
       mapasStore.fetchMapaCompleto(id),
       subprocessosStore.fetchSubprocessoDetalhe(id),
-      atividadesStore.fetchAtividadesParaSubprocesso(id)
+      atividadesStore.fetchAtividadesParaSubprocesso(id),
     ]);
   }
-
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof codSubrocesso.value !== 'number') {
-    return []
+  if (typeof codSubrocesso.value !== "number") {
+    return [];
   }
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
-})
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+});
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
-const atividadesSelecionadas = ref<number[]>([])
-const novaCompetencia = ref({descricao: ''})
+const atividadesSelecionadas = ref<number[]>([]);
+const novaCompetencia = ref({descricao: ""});
 
+const competenciaSendoEditada = ref<Competencia | null>(null);
 
-
-
-const competenciaSendoEditada = ref<Competencia | null>(null)
-
-
-const mostrarModalCriarNovaCompetencia = ref(false)
-const mostrarModalDisponibilizar = ref(false)
-const mostrarModalExcluirCompetencia = ref(false)
-const competenciaParaExcluir = ref<Competencia | null>(null)
-const dataLimiteValidacao = ref('')
-const observacoesDisponibilizacao = ref('')
-const notificacaoDisponibilizacao = ref('')
+const mostrarModalCriarNovaCompetencia = ref(false);
+const mostrarModalDisponibilizar = ref(false);
+const mostrarModalExcluirCompetencia = ref(false);
+const competenciaParaExcluir = ref<Competencia | null>(null);
+const dataLimiteValidacao = ref("");
+const observacoesDisponibilizacao = ref("");
+const notificacaoDisponibilizacao = ref("");
 
 function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
@@ -370,63 +381,66 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
   if (competenciaParaEditar) {
     novaCompetencia.value.descricao = competenciaParaEditar.descricao;
-    atividadesSelecionadas.value = [...competenciaParaEditar.atividadesAssociadas];
+    atividadesSelecionadas.value = [
+      ...competenciaParaEditar.atividadesAssociadas,
+    ];
     competenciaSendoEditada.value = competenciaParaEditar;
   } else {
-    novaCompetencia.value.descricao = '';
+    novaCompetencia.value.descricao = "";
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
   }
-
 }
 
 function fecharModalCriarNovaCompetencia() {
   mostrarModalCriarNovaCompetencia.value = false;
 }
 
-
 function iniciarEdicaoCompetencia(competencia: Competencia) {
   competenciaSendoEditada.value = competencia;
   abrirModalCriarNovaCompetencia(competencia);
 }
 
-
 function descricaoAtividade(codigo: number): string {
-  const atv = atividades.value.find(a => a.codigo === codigo)
-  return atv ? atv.descricao : 'Atividade não encontrada'
+  const atv = atividades.value.find((a) => a.codigo === codigo);
+  return atv ? atv.descricao : "Atividade não encontrada";
 }
 
 function getConhecimentosTooltip(atividadeId: number): string {
-  const atividade = atividades.value.find(a => a.codigo === atividadeId)
+  const atividade = atividades.value.find((a) => a.codigo === atividadeId);
   if (!atividade || !atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento cadastrado'
+    return "Nenhum conhecimento cadastrado";
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
+      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join("");
 
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function getAtividadeCompleta(codigo: number): Atividade | undefined {
-  return atividades.value.find(a => a.codigo === codigo)
+  return atividades.value.find((a) => a.codigo === codigo);
 }
 
 function getConhecimentosModal(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento'
+    return "Nenhum conhecimento";
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
+      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join("");
 
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function adicionarCompetenciaEFecharModal() {
-  if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
+  if (
+      !novaCompetencia.value.descricao ||
+      atividadesSelecionadas.value.length === 0
+  )
+    return;
 
   const competencia: Competencia = {
     codigo: competenciaSendoEditada.value?.codigo || 0,
@@ -441,7 +455,7 @@ function adicionarCompetenciaEFecharModal() {
   }
 
   // Limpar formulário
-  novaCompetencia.value.descricao = '';
+  novaCompetencia.value.descricao = "";
   atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
 
@@ -449,7 +463,7 @@ function adicionarCompetenciaEFecharModal() {
 }
 
 function excluirCompetencia(codigo: number) {
-  const competencia = competencias.value.find(comp => comp.codigo === codigo);
+  const competencia = competencias.value.find((comp) => comp.codigo === codigo);
   if (competencia) {
     competenciaParaExcluir.value = competencia;
     mostrarModalExcluirCompetencia.value = true;
@@ -458,7 +472,10 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
+    mapasStore.removerCompetencia(
+        codSubrocesso.value as number,
+        competenciaParaExcluir.value.codigo,
+    );
     fecharModalExcluirCompetencia();
   }
 }
@@ -469,25 +486,32 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competencia = competencias.value.find(comp => comp.codigo === competenciaId);
+  const competencia = competencias.value.find(
+      (comp) => comp.codigo === competenciaId,
+  );
   if (competencia) {
     const competenciaAtualizada = {
       ...competencia,
-      atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
+      atividadesAssociadas: competencia.atividadesAssociadas.filter(
+          (id) => id !== atividadeId,
+      ),
     };
-    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
+    mapasStore.atualizarCompetencia(
+        codSubrocesso.value as number,
+        competenciaAtualizada,
+    );
   }
 }
 
 async function disponibilizarMapa() {
-  if (!codSubrocesso.value) return
+  if (!codSubrocesso.value) return;
 
   try {
     await mapasStore.disponibilizarMapa(codSubrocesso.value, {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
-    })
-    fecharModalDisponibilizar()
+    });
+    fecharModalDisponibilizar();
     // TODO: Adicionar redirecionamento para o painel
   } catch {
     // O erro já é tratado e notificado pelo store
@@ -496,12 +520,9 @@ async function disponibilizarMapa() {
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
-  observacoesDisponibilizacao.value = '';
-  notificacaoDisponibilizacao.value = '';
+  observacoesDisponibilizacao.value = "";
+  notificacaoDisponibilizacao.value = "";
 }
-
-
-
 </script>
 
 <style scoped>

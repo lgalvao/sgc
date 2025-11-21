@@ -70,47 +70,51 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted} from 'vue'
-import {useRouter} from 'vue-router'
-import {useUnidadesStore} from '@/stores/unidades'
-import {usePerfilStore} from '@/stores/perfil'
-import {useUsuariosStore} from '@/stores/usuarios'
-import {useMapasStore} from '@/stores/mapas'
-import TreeTable from '../components/TreeTableView.vue'
-import {MapaCompleto, Usuario, Unidade, Responsavel} from '@/types/tipos';
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import {
-  BContainer,
-  BButton,
-  BCard,
-  BCardBody
-} from 'bootstrap-vue-next';
+import {BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
+import {computed, onMounted} from "vue";
+import {useRouter} from "vue-router";
+import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
+import {useMapasStore} from "@/stores/mapas";
+import {usePerfilStore} from "@/stores/perfil";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useUsuariosStore} from "@/stores/usuarios";
+import type {
+  MapaCompleto,
+  Responsavel,
+  Unidade,
+  Usuario,
+} from "@/types/tipos";
+import TreeTable from "../components/TreeTableView.vue";
 
 const props = defineProps<{ codUnidade: number }>();
 
-const router = useRouter()
-const codigo = computed(() => props.codUnidade)
-const unidadesStore = useUnidadesStore()
-const perfilStore = usePerfilStore()
-const usuariosStore = useUsuariosStore()
-const mapasStore = useMapasStore()
-const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
+const router = useRouter();
+const codigo = computed(() => props.codUnidade);
+const unidadesStore = useUnidadesStore();
+const perfilStore = usePerfilStore();
+const usuariosStore = useUsuariosStore();
+const mapasStore = useMapasStore();
+const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
 onMounted(async () => {
-  await unidadesStore.fetchUnidadesParaProcesso('');
+  await unidadesStore.fetchUnidadesParaProcesso("");
 });
 
-const unidadeOriginal = computed<Unidade | null>(() => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null)
+const unidadeOriginal = computed<Unidade | null>(
+    () => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null,
+);
 
 const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   const unidade = unidadeOriginal.value;
   if (!unidade) return null;
 
-  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorUnidade(unidade.sigla);
+  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorUnidade(
+      unidade.sigla,
+  );
   const hoje = new Date();
 
   // Encontrar a atribuição temporária vigente
-  const atribuicaoVigente = atribuicoes.find(atrb => {
+  const atribuicaoVigente = atribuicoes.find((atrb) => {
     const dataInicio = new Date(atrb.dataInicio);
     const dataTermino = new Date(atrb.dataTermino);
     return hoje >= dataInicio && hoje <= dataTermino;
@@ -127,7 +131,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
       usuarioTitulo: atribuicaoVigente.servidor.nome,
       unidadeCodigo: atribuicaoVigente.unidade.codigo,
       idServidor: atribuicaoVigente.servidor.codigo,
-      tipo: 'TEMPORARIO',
+      tipo: "TEMPORARIO",
       dataInicio: atribuicaoVigente.dataInicio,
       dataFim: atribuicaoVigente.dataFim,
     };
@@ -143,32 +147,48 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 });
 const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
-    return usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) || null;
+    return (
+        usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) ||
+        null
+    );
   }
   return null;
 });
 
 const responsavelDetalhes = computed<Usuario | null>(() => {
-  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.codigo) {
+  if (
+      !unidadeComResponsavelDinamico.value ||
+      !unidadeComResponsavelDinamico.value.responsavel ||
+      !unidadeComResponsavelDinamico.value.responsavel.codigo
+  ) {
     return null;
   }
-  return usuariosStore.getUsuarioById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
+  return (
+      usuariosStore.getUsuarioById(
+          unidadeComResponsavelDinamico.value.responsavel.codigo,
+      ) || null
+  );
 });
 
 const mapaVigente = computed<MapaCompleto | null>(() => {
   return mapasStore.mapaCompleto;
-})
+});
 
 function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${codigo.value}/atribuicao`})
+  router.push({path: `/unidade/${codigo.value}/atribuicao`});
 }
 
 const dadosFormatadosSubordinadas = computed(() => {
-  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.filhas || unidadeComResponsavelDinamico.value.filhas.length === 0) return []
-  return formatarDadosParaArvore(unidadeComResponsavelDinamico.value.filhas)
-})
+  if (
+      !unidadeComResponsavelDinamico.value ||
+      !unidadeComResponsavelDinamico.value.filhas ||
+      unidadeComResponsavelDinamico.value.filhas.length === 0
+  )
+    return [];
+  return formatarDadosParaArvore(unidadeComResponsavelDinamico.value.filhas);
+});
 
-const colunasTabela = [{key: 'nome', label: 'Unidade'}]
+const colunasTabela = [{key: "nome", label: "Unidade"}];
 
 interface UnidadeFormatada {
   id: number;
@@ -178,34 +198,33 @@ interface UnidadeFormatada {
 }
 
 function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
-  if (!dados) return []
+  if (!dados) return [];
 
-  return dados.map(item => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
+  return dados.map((item) => {
+    const children = item.filhas ? formatarDadosParaArvore(item.filhas) : [];
     return {
       id: item.codigo,
-      nome: item.sigla + ' - ' + item.nome,
+      nome: item.sigla + " - " + item.nome,
       expanded: true,
-      ...(children.length > 0 && {children})
-    }
-  })
+      ...(children.length > 0 && {children}),
+    };
+  });
 }
 
 function navegarParaUnidadeSubordinada(item: { id: any }) {
-  if (item && typeof item.id === 'number') router.push({path: `/unidade/${item.id}`});
+  if (item && typeof item.id === "number")
+    router.push({path: `/unidade/${item.id}`});
 }
-
 
 function visualizarMapa() {
   if (mapaVigente.value && unidadeOriginal.value) {
     router.push({
-      name: 'SubprocessoVisMapa',
+      name: "SubprocessoVisMapa",
       params: {
         codProcesso: mapaVigente.value.subprocessoCodigo,
-        siglaUnidade: unidadeOriginal.value.sigla
-      }
+        siglaUnidade: unidadeOriginal.value.sigla,
+      },
     });
   }
 }
-
 </script>

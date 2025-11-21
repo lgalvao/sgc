@@ -101,10 +101,10 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
-import {BFormCheckbox} from 'bootstrap-vue-next';
-import logger from '@/utils/logger';
-import type {Unidade} from '@/types/tipos';
+import {BFormCheckbox} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import type {Unidade} from "@/types/tipos";
+import logger from "@/utils/logger";
 
 interface Props {
   unidades: Unidade[];
@@ -113,18 +113,19 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  filtrarPor: () => true
+  filtrarPor: () => true,
 });
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: number[]): void;
-}>();
+const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
-logger.debug('[DEBUG ArvoreUnidades] Initial modelValue:', props.modelValue);
-logger.debug('[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:', unidadesSelecionadasLocal.value);
-logger.debug('[DEBUG ArvoreUnidades] Initial props.unidades:', props.unidades);
+logger.debug("[DEBUG ArvoreUnidades] Initial modelValue:", props.modelValue);
+logger.debug(
+    "[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:",
+    unidadesSelecionadasLocal.value,
+);
+logger.debug("[DEBUG ArvoreUnidades] Initial props.unidades:", props.unidades);
 
 // Filtrar unidades pela função customizada
 const unidadesFiltradas = computed(() => {
@@ -156,7 +157,7 @@ function isChecked(codigo: number): boolean {
 }
 
 // Obtém estado de seleção (true, false ou 'indeterminate')
-function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
+function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   const selfSelected = isChecked(unidade.codigo);
 
   if (isFolha(unidade)) {
@@ -167,7 +168,7 @@ function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
   if (subunidades.length === 0) {
     return selfSelected;
   }
-  const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length;
+  const selecionadas = subunidades.filter((codigo) => isChecked(codigo)).length;
 
   if (selecionadas === 0 && !selfSelected) {
     return false;
@@ -175,28 +176,45 @@ function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
   if (selecionadas === subunidades.length && selfSelected) {
     return true;
   }
-  
+
   // INTEROPERACIONAL marcada sem todas filhas → mostrar como marcada (não indeterminate)
-  if (unidade.tipo === 'INTEROPERACIONAL' && selfSelected) {
+  if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
-  
-  return 'indeterminate';
+
+  return "indeterminate";
 }
 
-watch(() => props.modelValue, (novoValor) => {
-  logger.debug('[DEBUG ArvoreUnidades] modelValue changed:', novoValor);
-  if (JSON.stringify(novoValor.sort()) !== JSON.stringify(unidadesSelecionadasLocal.value.sort())) {
-    unidadesSelecionadasLocal.value = [...novoValor];
-    logger.debug('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:', unidadesSelecionadasLocal.value);
-  }
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (novoValor) => {
+      logger.debug("[DEBUG ArvoreUnidades] modelValue changed:", novoValor);
+      if (
+          JSON.stringify(novoValor.sort()) !==
+          JSON.stringify(unidadesSelecionadasLocal.value.sort())
+      ) {
+        unidadesSelecionadasLocal.value = [...novoValor];
+        logger.debug(
+            "[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:",
+            unidadesSelecionadasLocal.value,
+        );
+      }
+    },
+    {deep: true},
+);
 
 // Watch para reagir a mudanças internas e emitir para o pai
-watch(unidadesSelecionadasLocal, (novoValor) => {
-  logger.debug('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):', novoValor);
-  emit('update:modelValue', novoValor);
-}, { deep: true });
+watch(
+    unidadesSelecionadasLocal,
+    (novoValor) => {
+      logger.debug(
+          "[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):",
+          novoValor,
+      );
+      emit("update:modelValue", novoValor);
+    },
+    {deep: true},
+);
 </script>
 
 <style scoped>
