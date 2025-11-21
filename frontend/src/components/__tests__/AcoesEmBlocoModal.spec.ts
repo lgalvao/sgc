@@ -115,7 +115,5 @@ describe("AcoesEmBlocoModal", () => {
             "Selecione ao menos uma unidade para processar.",
         );
         expect(wrapper.emitted()).not.toHaveProperty("confirmar");
-
-    alertSpy.mockRestore();
   });
 });

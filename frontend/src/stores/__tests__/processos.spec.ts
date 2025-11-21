@@ -37,7 +37,7 @@ describe("useProcessosStore", () => {
         processoService = (await import("@/services/processoService")) as Mocked<
             typeof import("@/services/processoService")
         >;
-        vi.clearAllMocks();
+        vi.restoreAllMocks();
         store.$reset();
     });
 

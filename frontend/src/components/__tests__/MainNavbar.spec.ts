@@ -34,10 +34,10 @@ describe("MainNavbar.vue", () => {
   let pushSpy: MockInstance;
 
   beforeEach(() => {
+    vi.restoreAllMocks();
     initPinia();
     router = createRouter({ history: createWebHistory(), routes });
     pushSpy = vi.spyOn(router, "push");
-    vi.clearAllMocks();
 
     vi.mocked(usePerfil).mockReturnValue({
       servidorLogado: ref({ nome: "Usuario Teste" }),

@@ -60,7 +60,10 @@ describe("axios-setup", () => {
 
     beforeEach(async () => {
         setActivePinia(createPinia());
-        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it("request interceptor should add token if exists", () => {

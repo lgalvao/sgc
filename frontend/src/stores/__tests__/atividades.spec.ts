@@ -25,7 +25,7 @@ describe("useAtividadesStore", () => {
         (useNotificacoesStore as Mocked<any>).mockReturnValue(
             mockNotificacoesStore,
         );
-        vi.clearAllMocks();
+        vi.restoreAllMocks();
     });
 
     describe("fetchAtividadesParaSubprocesso", () => {

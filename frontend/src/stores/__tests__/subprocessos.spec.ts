@@ -28,7 +28,7 @@ vi.mock("@/services/cadastroService", () => ({
 describe("Subprocessos Store", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
-        vi.clearAllMocks();
+        vi.restoreAllMocks();
     });
 
     it("fetchSubprocessoDetalhe deve carregar detalhes com sucesso", async () => {

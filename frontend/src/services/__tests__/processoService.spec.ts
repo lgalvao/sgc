@@ -51,11 +51,7 @@ describe("processoService", () => {
     });
 
     afterEach(() => {
-        vi.clearAllMocks();
-        mockApi.get.mockClear();
-        mockApi.post.mockClear();
-        mockApi.put.mockClear();
-        mockApi.delete.mockClear();
+        vi.restoreAllMocks();
     });
 
     it("iniciarProcesso should post with correct params", async () => {

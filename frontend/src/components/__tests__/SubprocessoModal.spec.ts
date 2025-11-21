@@ -1,9 +1,13 @@
 import {mount} from "@vue/test-utils";
-import {describe, expect, it, vi} from "vitest";
+import {afterEach, describe, expect, it, vi} from "vitest";
 import * as utils from "@/utils";
 import SubprocessoModal from "../SubprocessoModal.vue";
 
 describe("SubprocessoModal", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     const dataLimiteAtual = new Date("2024-10-10T00:00:00");
 
     it("não deve renderizar o modal quando mostrarModal for falso", () => {
