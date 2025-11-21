@@ -10,7 +10,7 @@
           Processos
         </div>
         <BButton
-          v-if="perfil.perfilSelecionado === 'ADMIN'"
+          v-if="perfil.isAdmin"
           :to="{ name: 'CadProcesso' }"
           variant="outline-primary"
           data-testid="btn-criar-processo"

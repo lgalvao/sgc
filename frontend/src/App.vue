@@ -5,6 +5,8 @@ import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
 import MainNavbar from "./components/MainNavbar.vue";
 
+import SistemaNotificacoesToast from "./components/SistemaNotificacoesToast.vue";
+
 interface PackageJson {
   version: string;
   [key: string]: any;
@@ -56,6 +58,7 @@ const shouldShowNavBarExtras = computed(() => {
     </div>
   </div>
   <router-view />
+  <SistemaNotificacoesToast />
   <footer
     v-if="route.path !== '/login'"
     class="bg-light text-muted border-top mt-4"

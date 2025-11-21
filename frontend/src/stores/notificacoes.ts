@@ -24,18 +24,20 @@ export interface Notificacao {
   emailContent?: EmailContent; // Para notificações de email
   duracao?: number; // em milissegundos
   timestamp: Date;
+  mostrar: boolean; // Controla a visibilidade do toast
 }
 
 export const useNotificacoesStore = defineStore("notificacoes", () => {
   const notificacoes = ref<Notificacao[]>([]);
 
     const adicionarNotificacao = (
-        notificacao: Omit<Notificacao, "id" | "timestamp">,
+        notificacao: Omit<Notificacao, "id" | "timestamp" | "mostrar">,
     ) => {
     const novaNotificacao: Notificacao = {
       ...notificacao,
         id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
       timestamp: new Date(),
+      mostrar: true,
       // Preservar testId se fornecido
       testId: (notificacao as any).testId,
       // Duração padrão das notificações de sucesso (3s) — alinhado aos testes unitários

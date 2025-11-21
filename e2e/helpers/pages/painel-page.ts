@@ -17,8 +17,8 @@ export class PaginaPainel {
         await this.page.waitForLoadState('networkidle');
         await this.page.getByTestId('input-titulo').fill(USUARIOS.ADMIN.titulo);
         await this.page.getByTestId('input-senha').fill(USUARIOS.ADMIN.senha);
-        await this.page.getByTestId('botao-entrar').click();
         await this.verificarUrlDoPainel();
+        await this.page.waitForSelector(SELETORES.BTN_CRIAR_PROCESSO, { state: 'visible' });
     }
 
     /**

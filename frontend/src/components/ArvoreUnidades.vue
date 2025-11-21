@@ -120,13 +120,6 @@ const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
-logger.debug("[DEBUG ArvoreUnidades] Initial modelValue:", props.modelValue);
-logger.debug(
-    "[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:",
-    unidadesSelecionadasLocal.value,
-);
-logger.debug("[DEBUG ArvoreUnidades] Initial props.unidades:", props.unidades);
-
 // Filtrar unidades pela função customizada
 const unidadesFiltradas = computed(() => {
   return props.unidades.filter(props.filtrarPor);
@@ -188,16 +181,11 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
 watch(
     () => props.modelValue,
     (novoValor) => {
-      logger.debug("[DEBUG ArvoreUnidades] modelValue changed:", novoValor);
       if (
           JSON.stringify(novoValor.sort()) !==
           JSON.stringify(unidadesSelecionadasLocal.value.sort())
       ) {
         unidadesSelecionadasLocal.value = [...novoValor];
-        logger.debug(
-            "[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:",
-            unidadesSelecionadasLocal.value,
-        );
       }
     },
     {deep: true},
@@ -207,10 +195,6 @@ watch(
 watch(
     unidadesSelecionadasLocal,
     (novoValor) => {
-      logger.debug(
-          "[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):",
-          novoValor,
-      );
       emit("update:modelValue", novoValor);
     },
     {deep: true},

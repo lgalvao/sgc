@@ -16,7 +16,11 @@ export const usePerfilStore = defineStore("perfil", {
         unidadeSelecionadaSigla: (localStorage.getItem("unidadeSelecionadaSigla") ||
             null) as string | null,
         perfisUnidades: [] as PerfilUnidade[],
+        perfis: (JSON.parse(localStorage.getItem("perfis") || "[]")) as Perfil[],
     }),
+    getters: {
+        isAdmin: (state) => state.perfis.includes("ADMIN" as Perfil),
+    },
     actions: {
         setServidorId(novoId: string | number) {
             this.servidorId = Number(novoId);
@@ -31,6 +35,10 @@ export const usePerfilStore = defineStore("perfil", {
         setToken(token: string) {
             localStorage.setItem("jwtToken", token);
         },
+        setPerfis(perfis: Perfil[]) {
+            this.perfis = perfis;
+            localStorage.setItem("perfis", JSON.stringify(perfis));
+        },
         async loginCompleto(tituloEleitoral: string, senha: string) {
             const tituloEleitoralNum = Number(tituloEleitoral);
             const autenticado = await usuarioService.autenticar({
@@ -41,6 +49,9 @@ export const usePerfilStore = defineStore("perfil", {
                 const perfisUnidades =
                     await usuarioService.autorizar(tituloEleitoralNum);
                 this.perfisUnidades = perfisUnidades;
+                
+                const perfis = [...new Set(perfisUnidades.map((p) => p.perfil))];
+                this.setPerfis(perfis);
 
                 // Se houver apenas uma opção, seleciona automaticamente
                 if (perfisUnidades.length === 1) {

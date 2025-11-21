@@ -240,15 +240,20 @@ function limparCampos() {
 }
 
 async function salvarProcesso() {
-  if (
-    !descricao.value ||
-    !dataLimite.value ||
-    unidadesSelecionadas.value.length === 0
-  ) {
+  if (!descricao.value) {
+    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
+    console.log("Validation error in salvarProcesso: Preencha a descrição.");
+    return;
+  }
+  if (unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
       "Dados incompletos",
-      "Preencha todos os campos e selecione ao menos uma unidade.",
+      "Pelo menos uma unidade participante deve ser incluída.",
     );
+    return;
+  }
+  if (!dataLimite.value) {
+    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
     return;
   }
 
@@ -292,25 +297,19 @@ async function salvarProcesso() {
 }
 
 async function abrirModalConfirmacao() {
-  if (
-    !descricao.value ||
-    !dataLimite.value ||
-    unidadesSelecionadas.value.length === 0
-  ) {
+  if (!descricao.value) {
+    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
+    return;
+  }
+  if (unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
       "Dados incompletos",
-      "Preencha todos os campos e selecione ao menos uma unidade.",
+      "Pelo menos uma unidade participante deve ser incluída.",
     );
     return;
   }
-
-  // A validação de unidades agora é feita no backend,
-  // mas uma verificação simples de seleção pode ser mantida.
-  if (unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-      "Nenhuma unidade selecionada",
-      "Selecione ao menos uma unidade para iniciar o processo.",
-    );
+  if (!dataLimite.value) {
+    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
     return;
   }
 
