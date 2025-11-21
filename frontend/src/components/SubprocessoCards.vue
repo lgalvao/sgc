@@ -1,6 +1,6 @@
 <template>
   <BRow>
-    <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
+    <template v-if="tipoProcesso === TipoProcessoEnum.MAPEAMENTO || tipoProcesso === TipoProcessoEnum.REVISAO">
       <BCol
         md="4"
         class="mb-3"
@@ -66,7 +66,7 @@
       </BCol>
     </template>
 
-    <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
+    <template v-else-if="tipoProcesso === TipoProcessoEnum.DIAGNOSTICO">
       <BCol
         md="4"
         class="mb-3"
@@ -116,10 +116,17 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
-import { BRow, BCol, BCard, BCardTitle, BCardText } from 'bootstrap-vue-next';
-import { Mapa, MapaCompleto, SubprocessoPermissoes, TipoProcesso } from '@/types/tipos';
-import { badgeClass, situacaoLabel } from '@/utils';
+import { BCard, BCardText, BCardTitle, BCol, BRow } from "bootstrap-vue-next";
+import { useRouter } from "vue-router";
+import {
+  type Mapa,
+  type MapaCompleto,
+  SubprocessoPermissoes,
+  TipoProcesso,
+} from "@/types/tipos";
+import { badgeClass, situacaoLabel } from "@/utils";
+
+const TipoProcessoEnum = TipoProcesso;
 
 defineProps<{
   tipoProcesso: TipoProcesso;

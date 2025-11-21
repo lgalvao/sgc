@@ -26,7 +26,7 @@
           id="tipo"
           v-model="tipo"
           data-testid="select-tipo"
-          :options="Object.values(TipoProcesso)"
+          :options="Object.values(TipoProcessoEnum)"
         />
       </BFormGroup>
 
@@ -156,42 +156,44 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useProcessosStore} from '@/stores/processos'
-import {useUnidadesStore} from '@/stores/unidades'
 import {
-  type AtualizarProcessoRequest,
-  type CriarProcessoRequest,
-  type Processo as ProcessoModel,
-  TipoProcesso,
-} from '@/types/tipos'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {TEXTOS} from '@/constants';
-import * as processoService from '@/services/processoService';
-import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import {
+  BButton,
   BContainer,
   BForm,
   BFormGroup,
   BFormInput,
   BFormSelect,
-  BButton,
-  BModal
-} from 'bootstrap-vue-next';
+  BModal,
+} from "bootstrap-vue-next";
+import { nextTick, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
+import { TEXTOS } from "@/constants";
+import * as processoService from "@/services/processoService";
+import { useNotificacoesStore } from "@/stores/notificacoes";
+import { useProcessosStore } from "@/stores/processos";
+import { useUnidadesStore } from "@/stores/unidades";
+import {
+  AtualizarProcessoRequest,
+  CriarProcessoRequest,
+  Processo as ProcessoModel,
+  TipoProcesso,
+} from "@/types/tipos";
 
-const unidadesSelecionadas = ref<number[]>([])
-const descricao = ref<string>('')
-const tipo = ref<string>('MAPEAMENTO')
-const dataLimite = ref<string>('')
-const router = useRouter()
-const route = useRoute()
-const processosStore = useProcessosStore()
-const unidadesStore = useUnidadesStore()
-const notificacoesStore = useNotificacoesStore()
-const mostrarModalConfirmacao = ref(false)
-const mostrarModalRemocao = ref(false)
-const processoEditando = ref<ProcessoModel | null>(null)
+const TipoProcessoEnum = TipoProcesso;
+
+const unidadesSelecionadas = ref<number[]>([]);
+const descricao = ref<string>("");
+const tipo = ref<string>("MAPEAMENTO");
+const dataLimite = ref<string>("");
+const router = useRouter();
+const route = useRoute();
+const processosStore = useProcessosStore();
+const unidadesStore = useUnidadesStore();
+const notificacoesStore = useNotificacoesStore();
+const mostrarModalConfirmacao = ref(false);
+const mostrarModalRemocao = ref(false);
+const processoEditando = ref<ProcessoModel | null>(null);
 
 onMounted(async () => {
   const codProcesso = route.query.codProcesso;
@@ -203,37 +205,49 @@ onMounted(async () => {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split('T')[0];
-        unidadesSelecionadas.value = processo.unidades.map(u => u.codUnidade);
-        await unidadesStore.fetchUnidadesParaProcesso(processo.tipo, processo.codigo);
+        dataLimite.value = processo.dataLimite.split("T")[0];
+        unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
+        await unidadesStore.fetchUnidadesParaProcesso(
+          processo.tipo,
+          processo.codigo,
+        );
         await nextTick();
       }
     } catch (error) {
-      notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
-      console.error('Erro ao carregar processo:', error);
+      notificacoesStore.erro(
+        "Erro ao carregar processo",
+        "Não foi possível carregar os detalhes do processo.",
+      );
+      console.error("Erro ao carregar processo:", error);
     }
   } else {
     await unidadesStore.fetchUnidadesParaProcesso(tipo.value);
   }
-})
+});
 
 watch(tipo, async (novoTipo) => {
-  const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
+  const codProcesso = processoEditando.value
+    ? processoEditando.value.codigo
+    : undefined;
   await unidadesStore.fetchUnidadesParaProcesso(novoTipo, codProcesso);
 });
 
 function limparCampos() {
-  descricao.value = ''
-  tipo.value = 'MAPEAMENTO'
-  dataLimite.value = ''
-  unidadesSelecionadas.value = []
+  descricao.value = "";
+  tipo.value = "MAPEAMENTO";
+  dataLimite.value = "";
+  unidadesSelecionadas.value = [];
 }
 
 async function salvarProcesso() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
+  if (
+    !descricao.value ||
+    !dataLimite.value ||
+    unidadesSelecionadas.value.length === 0
+  ) {
     notificacoesStore.erro(
-        'Dados incompletos',
-        'Preencha todos os campos e selecione ao menos uma unidade.'
+      "Dados incompletos",
+      "Preencha todos os campos e selecione ao menos uma unidade.",
     );
     return;
   }
@@ -245,88 +259,108 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value
+        unidades: unidadesSelecionadas.value,
       };
-      await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
-      notificacoesStore.sucesso('Processo alterado', 'O processo foi alterado!');
-      await router.push('/painel');
+      await processosStore.atualizarProcesso(
+        processoEditando.value.codigo,
+        request,
+      );
+      notificacoesStore.sucesso(
+        "Processo alterado",
+        "O processo foi alterado!",
+      );
+      await router.push("/painel");
     } else {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value
+        unidades: unidadesSelecionadas.value,
       };
       await processosStore.criarProcesso(request);
-      notificacoesStore.sucesso('Processo criado', 'O processo foi criado!');
-      await router.push('/painel');
+      notificacoesStore.sucesso("Processo criado", "O processo foi criado!");
+      await router.push("/painel");
     }
     limparCampos();
   } catch (error) {
-    notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
-    console.error('Erro ao salvar processo:', error);
+    notificacoesStore.erro(
+      "Erro ao salvar processo",
+      "Não foi possível salvar o processo. Verifique os dados e tente novamente.",
+    );
+    console.error("Erro ao salvar processo:", error);
   }
 }
 
 async function abrirModalConfirmacao() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
+  if (
+    !descricao.value ||
+    !dataLimite.value ||
+    unidadesSelecionadas.value.length === 0
+  ) {
     notificacoesStore.erro(
-        'Dados incompletos',
-        'Preencha todos os campos e selecione ao menos uma unidade.'
+      "Dados incompletos",
+      "Preencha todos os campos e selecione ao menos uma unidade.",
     );
-    return
+    return;
   }
 
   // A validação de unidades agora é feita no backend,
   // mas uma verificação simples de seleção pode ser mantida.
   if (unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
-        'Nenhuma unidade selecionada',
-        'Selecione ao menos uma unidade para iniciar o processo.'
+      "Nenhuma unidade selecionada",
+      "Selecione ao menos uma unidade para iniciar o processo.",
     );
-    return
+    return;
   }
 
-  mostrarModalConfirmacao.value = true
+  mostrarModalConfirmacao.value = true;
 }
 
 function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false
+  mostrarModalConfirmacao.value = false;
 }
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
   if (!processoEditando.value) {
-    notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
+    notificacoesStore.erro(
+      "Salve o processo",
+      "Você precisa salvar o processo antes de poder iniciá-lo.",
+    );
     return;
   }
 
   try {
     await processosStore.iniciarProcesso(
-        processoEditando.value.codigo,
-        tipo.value as TipoProcesso,
-        unidadesSelecionadas.value
+      processoEditando.value.codigo,
+      tipo.value as TipoProcesso,
+      unidadesSelecionadas.value,
     );
     notificacoesStore.sucesso(
-        'Processo iniciado',
-        'O processo foi iniciado! Notificações enviadas às unidades.'
+      "Processo iniciado",
+      "O processo foi iniciado! Notificações enviadas às unidades.",
     );
-    await router.push('/painel');
-    if (!processoEditando.value) { // Only clear fields if it was a new process
+    await router.push("/painel");
+    if (!processoEditando.value) {
+      // Only clear fields if it was a new process
       limparCampos();
     }
   } catch (error) {
-    notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
-    console.error('Erro ao iniciar processo:', error);
+    notificacoesStore.erro(
+      "Erro ao iniciar processo",
+      "Não foi possível iniciar o processo. Tente novamente.",
+    );
+    console.error("Erro ao iniciar processo:", error);
   }
 }
 
 function abrirModalRemocao() {
-  mostrarModalRemocao.value = true
+  mostrarModalRemocao.value = true;
 }
 
 function fecharModalRemocao() {
-  mostrarModalRemocao.value = false
+  mostrarModalRemocao.value = false;
 }
 
 async function confirmarRemocao() {
@@ -334,18 +368,22 @@ async function confirmarRemocao() {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
       notificacoesStore.adicionarNotificacao({
-        tipo: 'success',
-        titulo: 'Processo removido',
+        tipo: "success",
+        titulo: "Processo removido",
         mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
-        testId: 'notificacao-remocao'
+        testId: "notificacao-remocao",
       });
-      await router.push('/painel');
-      if (!processoEditando.value) { // Only clear fields if it was a new process
+      await router.push("/painel");
+      if (!processoEditando.value) {
+        // Only clear fields if it was a new process
         limparCampos();
       }
     } catch (error) {
-      notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
-      console.error('Erro ao remover processo:', error);
+      notificacoesStore.erro(
+        "Erro ao remover processo",
+        "Não foi possível remover o processo. Tente novamente.",
+      );
+      console.error("Erro ao remover processo:", error);
     }
   }
   fecharModalRemocao();
