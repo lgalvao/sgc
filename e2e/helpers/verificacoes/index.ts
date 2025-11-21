@@ -55,7 +55,20 @@ export {
     verificarModalConfirmacaoIniciarProcessoInvisivel,
     verificarPermanenciaNaPaginaProcesso,
     verificarModalConfirmacaoIniciacaoProcesso,
-    verificarProcessoBloqueadoParaEdicao
+    verificarProcessoBloqueadoParaEdicao,
+    aguardarTabelaProcessosCarregada,
+    verificarQuantidadeProcessosNaTabela,
+    verificarBotaoRemoverVisivel,
+    verificarBotaoRemoverInvisivel,
+    verificarCheckboxUnidadeMarcado,
+    verificarValorCampoDataLimite,
+    verificarCampoTipoVisivel,
+    verificarProcessoNaoVisivel,
+    verificarPaginaDetalheProcesso,
+    verificarCriacaoSubprocessos,
+    verificarCamposProcessoDesabilitados,
+    verificarSituacaoProcesso,
+    verificarBotaoIniciarProcessoInvisivel
 } from './verificacoes-processo';
 
 // Verificações de UI
@@ -108,7 +121,8 @@ export {
     verificarCardAcaoVisivel,
     verificarCardAcaoInvisivel,
     verificarPainelAdminVisivel,
-    verificarPainelChefeVisivel
+    verificarPainelChefeVisivel,
+    verificarAlertaNaTabela
 } from './verificacoes-ui';
 
 export * from './verificacoes-atividades';

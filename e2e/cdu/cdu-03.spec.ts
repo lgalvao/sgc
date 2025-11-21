@@ -1,10 +1,32 @@
 import {vueTest as test} from '../support/vue-specific-setup';
-import {expect} from '@playwright/test';
 import {
+    aguardarProcessoNoPainel,
+    cancelarNoModal,
+    clicarBotaoRemover,
+    clicarBotaoSalvar,
+    clicarProcessoNaTabela,
+    confirmarNoModal,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
+    preencherDataLimite,
+    preencherDescricao,
+    preencherFormularioProcesso,
+    selecionarTipoProcesso,
     selecionarUnidadesPorSigla,
     SELETORES,
+    verificarBotaoRemoverInvisivel,
+    verificarBotaoRemoverVisivel,
+    verificarCampoTipoVisivel,
+    verificarCheckboxUnidadeMarcado,
+    verificarDialogoConfirmacaoRemocao,
+    verificarModalFechado,
+    verificarPaginaCadastroProcesso,
+    verificarPaginaEdicaoProcesso,
+    verificarPermanenciaNaPaginaProcesso,
+    verificarProcessoNaoVisivel,
+    verificarUrlDoPainel,
+    verificarValorCampoDataLimite,
+    verificarValorCampoDescricao,
 } from '~/helpers';
 
 /**
@@ -76,49 +98,49 @@ test.describe('CDU-03: Manter processo', () => {
         await navegarParaCriacaoProcesso(page);
 
         // 2. Preencher formulário
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricao);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
 
         // 3. Selecionar unidades (usando SIGLA)
         await selecionarUnidadesPorSigla(page, ['STIC']);
 
         // 4. Salvar
-        await page.getByRole('button', {name: /Salvar/i}).click();
+        await clicarBotaoSalvar(page);
 
         // 5. Verificar redirecionamento e processo criado
-        await expect(page).toHaveURL(/\/painel/, );
-        await expect(page.getByText(descricao)).toBeVisible();
+        await verificarUrlDoPainel(page);
+        await aguardarProcessoNoPainel(page, descricao);
     });
 
     test('deve validar descrição obrigatória', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
 
         // Preencher tipo e data, mas NÃO descrição
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['STIC']);
 
         // Tentar salvar
-        await page.getByRole('button', {name: /Salvar/i}).click();
+        await clicarBotaoSalvar(page);
 
         // Não deve redirecionar (validação frontend impede)
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await verificarPaginaCadastroProcesso(page);
     });
 
     test('deve validar ao menos uma unidade selecionada', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
 
         // Preencher descrição e tipo, mas NÃO selecionar unidades
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill('Processo sem unidades');
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, 'Processo sem unidades');
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
 
         // Tentar salvar
-        await page.getByRole('button', {name: /Salvar/i}).click();
+        await clicarBotaoSalvar(page);
 
         // Não deve redirecionar
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await verificarPaginaCadastroProcesso(page);
     });
 
     // ===== EDIÇÃO DE PROCESSO =====
@@ -126,28 +148,26 @@ test.describe('CDU-03: Manter processo', () => {
     test('deve editar processo e modificar descrição', async ({page}) => {
         const descricaoOriginal = `Processo para Editar ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricaoOriginal);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricaoOriginal);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['SEDESENV']);
-        await page.getByRole('button', {name: /Salvar/i}).click();
-        await expect(page).toHaveURL(/\/painel/);
+        await clicarBotaoSalvar(page);
+        await verificarUrlDoPainel(page);
 
         // Abrir o processo recém-criado
-        await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricaoOriginal}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
+        await clicarProcessoNaTabela(page, descricaoOriginal);
+        await verificarPaginaEdicaoProcesso(page);
 
         // 2. Verificar que campo está preenchido com valor atual
-        await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(/./);
-        const descricaoAtual = await page.locator(SELETORES.CAMPO_DESCRICAO).inputValue();
-        expect(descricaoAtual).toBeTruthy();
+        await verificarValorCampoDescricao(page, descricaoOriginal);
 
         // 3. Modificar descrição
         const novaDescricao = `Processo Editado ${Date.now()}`;
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(novaDescricao);
+        await preencherDescricao(page, novaDescricao);
 
         // 4. Verificar que campo foi modificado
-        await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(novaDescricao);
+        await verificarValorCampoDescricao(page, novaDescricao);
 
         // NOTA: Salvar e verificar redirecionamento depende de backend estar funcionando
         // Esse teste valida que a UI de edição funciona
@@ -156,21 +176,21 @@ test.describe('CDU-03: Manter processo', () => {
     test('deve exibir botão Remover apenas em modo de edição', async ({page}) => {
         // Criação: NÃO deve ter botão Remover
         await navegarParaCriacaoProcesso(page);
-        await expect(page.getByRole('button', {name: /^Remover$/i})).not.toBeVisible();
+        await verificarBotaoRemoverInvisivel(page);
 
         // Edição: DEVE ter botão Remover
         const descricao = `Processo para Edição ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricao);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['SEDESENV']);
-        await page.getByRole('button', {name: /Salvar/i}).click();
-        await expect(page).toHaveURL(/\/painel/);
+        await clicarBotaoSalvar(page);
+        await verificarUrlDoPainel(page);
 
-        await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricao}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
-        await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
+        await clicarProcessoNaTabela(page, descricao);
+        await verificarPaginaEdicaoProcesso(page);
+        await verificarBotaoRemoverVisivel(page);
     });
 
     // ===== REMOÇÃO DE PROCESSO =====
@@ -178,81 +198,76 @@ test.describe('CDU-03: Manter processo', () => {
     test('deve abrir modal de confirmação ao clicar em Remover', async ({page}) => {
         const descricao = `Processo para Abrir Modal ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricao);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['SEDESENV']);
-        await page.getByRole('button', {name: /Salvar/i}).click();
-        await expect(page).toHaveURL(/\/painel/);
+        await clicarBotaoSalvar(page);
+        await verificarUrlDoPainel(page);
 
         // Abrir para edição
-        await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricao}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
+        await clicarProcessoNaTabela(page, descricao);
+        await verificarPaginaEdicaoProcesso(page);
 
         // 2. Clicar em Remover
-        await page.getByRole('button', {name: /^Remover$/i}).click();
+        await clicarBotaoRemover(page);
 
         // 3. Verificar modal de confirmação
-        const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible();
-        await expect(modal.getByText(/Remover o processo/i)).toBeVisible();
-        await expect(modal.getByText(/Esta ação não poderá ser desfeita/i)).toBeVisible();
+        await verificarDialogoConfirmacaoRemocao(page, descricao);
     });
 
     test('deve cancelar remoção e permanecer na tela de edição', async ({page}) => {
         const descricao = `Processo para Cancelar Remoção ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricao);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['SEDESENV']);
-        await page.getByRole('button', {name: /Salvar/i}).click();
-        await expect(page).toHaveURL(/\/painel/);
+        await clicarBotaoSalvar(page);
+        await verificarUrlDoPainel(page);
 
         // Abrir para edição e clicar em Remover
-        await page.click(`[data-testid=\"tabela-processos\"] tr:has-text(\"${descricao}\")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
-        await page.getByRole('button', {name: /^Remover$/i}).click();
+        await clicarProcessoNaTabela(page, descricao);
+        await verificarPaginaEdicaoProcesso(page);
+        await clicarBotaoRemover(page);
 
         // 2. Cancelar no modal
-        const modal = page.locator('.modal.show');
-        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await cancelarNoModal(page);
 
         // 3. Modal deve fechar e permanecer na mesma página
-        await expect(modal).not.toBeVisible();
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/);
+        await verificarModalFechado(page);
+        await verificarPaginaEdicaoProcesso(page);
     });
 
     test('deve remover processo após confirmação', async ({page}) => {
         // 1. Criar um processo novo para remover
         const descricao = `Processo para Remover ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
+        await preencherDescricao(page, descricao);
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await preencherDataLimite(page, '2025-12-31');
         await selecionarUnidadesPorSigla(page, ['SEDESENV']);
-        await page.getByRole('button', {name: /Salvar/i}).click();
+        await clicarBotaoSalvar(page);
 
         // 2. Aguardar redirecionamento ao painel
-        await expect(page).toHaveURL(/\/painel/, );
+        await verificarUrlDoPainel(page);
 
         // 3. Abrir o processo recém-criado para edição
-        await page.click(`[data-testid=\"tabela-processos\"] tr:has-text(\"${descricao}\")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/);
+        await clicarProcessoNaTabela(page, descricao);
+        await verificarPaginaEdicaoProcesso(page);
 
         // 4. Clicar em Remover
-        await page.getByRole('button', {name: /^Remover$/i}).click();
+        await clicarBotaoRemover(page);
 
         // 5. Confirmar no modal
-        const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible();
-        await modal.getByRole('button', {name: /Remover/i}).click();
+        await verificarDialogoConfirmacaoRemocao(page, descricao);
+        await confirmarNoModal(page);
 
         // 6. Verificar que voltou ao painel
-        await expect(page).toHaveURL(/\/painel/, );
+        await verificarUrlDoPainel(page);
 
         // 7. Verificar que processo não aparece mais
-        await expect(page.getByText(descricao)).not.toBeVisible();
+        await verificarProcessoNaoVisivel(page, descricao);
     });
 
     // ===== COMPORTAMENTO DA ÁRVORE DE UNIDADES =====
@@ -264,7 +279,7 @@ test.describe('CDU-03: Manter processo', () => {
         await selecionarUnidadesPorSigla(page, ['STIC']);
 
         // Verificar que checkbox está marcado
-        await expect(page.locator('#chk-STIC')).toBeChecked();
+        await verificarCheckboxUnidadeMarcado(page, 'STIC');
     });
 
     test('deve selecionar múltiplas unidades', async ({page}) => {
@@ -275,8 +290,8 @@ test.describe('CDU-03: Manter processo', () => {
         await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT', 'GESTOR-UNIT']);
 
         // Verificar que ambas foram marcadas
-        await expect(page.locator('#chk-ADMIN-UNIT')).toBeChecked();
-        await expect(page.locator('#chk-GESTOR-UNIT')).toBeChecked();
+        await verificarCheckboxUnidadeMarcado(page, 'ADMIN-UNIT');
+        await verificarCheckboxUnidadeMarcado(page, 'GESTOR-UNIT');
     });
 
     // ===== CAMPOS E TIPOS =====
@@ -284,26 +299,25 @@ test.describe('CDU-03: Manter processo', () => {
     test('deve preencher data limite', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
 
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-06-30');
+        await preencherDataLimite(page, '2025-06-30');
 
         // Verificar valor preenchido
-        await expect(page.locator(SELETORES.CAMPO_DATA_LIMITE)).toHaveValue('2025-06-30');
+        await verificarValorCampoDataLimite(page, '2025-06-30');
     });
 
     test('deve permitir selecionar diferentes tipos de processo', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
 
         // Verificar que os 3 tipos estão disponíveis
-        const selectTipo = page.locator(SELETORES.CAMPO_TIPO);
-        await expect(selectTipo).toBeVisible();
+        await verificarCampoTipoVisivel(page);
 
-        await selectTipo.selectOption('MAPEAMENTO');
-        await expect(selectTipo).toHaveValue('MAPEAMENTO');
+        await selecionarTipoProcesso(page, 'MAPEAMENTO');
+        await verificarCampoTipoVisivel(page, 'MAPEAMENTO');
 
-        await selectTipo.selectOption('REVISAO');
-        await expect(selectTipo).toHaveValue('REVISAO');
+        await selecionarTipoProcesso(page, 'REVISAO');
+        await verificarCampoTipoVisivel(page, 'REVISAO');
 
-        await selectTipo.selectOption('DIAGNOSTICO');
-        await expect(selectTipo).toHaveValue('DIAGNOSTICO');
+        await selecionarTipoProcesso(page, 'DIAGNOSTICO');
+        await verificarCampoTipoVisivel(page, 'DIAGNOSTICO');
     });
 });

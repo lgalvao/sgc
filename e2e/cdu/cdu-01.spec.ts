@@ -10,6 +10,7 @@ import {
     verificarPainelAdminVisivel,
     verificarPainelChefeVisivel,
     verificarSelecaoPerfilVisivel,
+    verificarUrlDoPainel,
 } from '~/helpers';
 import {USUARIOS} from '~/helpers/dados/constantes';
 
@@ -21,7 +22,7 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await clicarBotaoEntrar(page);
 
             // Aguarda navegação para o painel
-            await page.waitForURL('/painel', );
+            await verificarUrlDoPainel(page);
             await verificarPainelChefeVisivel(page);
         });
 
