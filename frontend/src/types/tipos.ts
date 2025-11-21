@@ -134,6 +134,7 @@ export interface ProcessoResumo {
     dataCriacao: string;
     unidadeCodigo: number;
     unidadeNome: string;
+    unidadesParticipantes?: string;
     dataFinalizacao?: string;
     dataFinalizacaoFormatada?: string;
     linkDestino?: string;

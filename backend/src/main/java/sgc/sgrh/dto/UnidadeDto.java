@@ -1,5 +1,6 @@
 package sgc.sgrh.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,29 +23,22 @@ public class UnidadeDto {
     private Long codigoPai;
     private String tipo;
     private List<UnidadeDto> subunidades;  // Para árvore hierárquica
+    
+    @JsonProperty("isElegivel")
     private boolean isElegivel;
+
 
     /**
      * Construtor sem subunidades.
      */
-    public UnidadeDto(Long codigo, String nome, String sigla, Long codigoPai, String tipo) {
+    public UnidadeDto(Long codigo, String nome, String sigla, Long codigoPai, String tipo, boolean isElegivel) {
         this.codigo = codigo;
         this.nome = nome;
         this.sigla = sigla;
         this.codigoPai = codigoPai;
         this.tipo = tipo;
         this.subunidades = null;
-        this.isElegivel = false;
-    }
-
-    public UnidadeDto(Long codigo, String nome, String sigla, Long codigoPai, String tipo, List<UnidadeDto> subunidades) {
-        this.codigo = codigo;
-        this.nome = nome;
-        this.sigla = sigla;
-        this.codigoPai = codigoPai;
-        this.tipo = tipo;
-        this.subunidades = subunidades;
-        this.isElegivel = false;
+        this.isElegivel = isElegivel;
     }
 
     public void setElegivel(boolean elegivel) {

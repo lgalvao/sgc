@@ -41,6 +41,7 @@ const fields = computed(() => {
   const baseFields = [
     {key: "descricao", label: "Descrição", sortable: true},
     {key: "tipo", label: "Tipo", sortable: true},
+    {key: "unidadesParticipantes", label: "Unidades Participantes", sortable: false},
   ];
 
   if (props.showDataFinalizacao) {

@@ -27,7 +27,10 @@ export async function iniciarProcesso(
     tipo: string,
     unidadesIds: number[],
 ): Promise<void> {
-    await apiClient.post(`/processos/${id}/iniciar?tipo=${tipo}`, unidadesIds);
+    await apiClient.post(`/processos/${id}/iniciar`, {
+        tipo,
+        unidades: unidadesIds
+    });
 }
 
 export async function finalizarProcesso(id: number): Promise<void> {

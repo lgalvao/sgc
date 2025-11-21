@@ -88,7 +88,7 @@ class CDU17IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use dados pré-carregados do data-h2.sql (CDU-17 test data)
+        // Use dados pré-carregados do data.sql (CDU-17 test data)
         unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
         subprocesso = subprocessoRepo.findById(1700L).orElseThrow();
         mapa = mapaRepo.findById(1700L).orElseThrow();

@@ -109,7 +109,7 @@ public class SgrhService {
                 .stream()
                 .map(filho -> construirArvore(filho, subunidadesPorPai))
                 .toList();
-        return new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), unidade.getCodigoPai(), unidade.getTipo(), filhos.isEmpty() ? null : filhos);
+        return new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), unidade.getCodigoPai(), unidade.getTipo(), filhos.isEmpty() ? null : filhos, false);
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
@@ -155,20 +155,20 @@ public class SgrhService {
 
     private Map<Long, UnidadeDto> criarUnidadesMock() {
         Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
-        unidadesDto.put(2L, new UnidadeDto(2L, "Secretaria de Informática e Comunicações", "STIC", null, "INTEROPERACIONAL"));
-        unidadesDto.put(3L, new UnidadeDto(3L, "Secretaria de Gestao de Pessoas", "SGP", 2L, "INTERMEDIARIA"));
-        unidadesDto.put(6L, new UnidadeDto(6L, "Coordenadoria de Sistemas", "COSIS", 2L, "INTERMEDIARIA"));
-        unidadesDto.put(7L, new UnidadeDto(7L, "Coordenadoria de Suporte e Infraestrutura", "COSINF", 2L, "INTERMEDIARIA"));
-        unidadesDto.put(14L, new UnidadeDto(14L, "Coordenadoria Jurídica", "COJUR", 2L, "INTERMEDIARIA"));
-        unidadesDto.put(4L, new UnidadeDto(4L, "Coordenadoria de Educação Especial", "COEDE", 3L, "INTERMEDIARIA"));
-        unidadesDto.put(8L, new UnidadeDto(8L, "Seção de Desenvolvimento de Sistemas", "SEDESENV", 6L, "OPERACIONAL"));
-        unidadesDto.put(9L, new UnidadeDto(9L, "Seção de Dados e Inteligência Artificial", "SEDIA", 6L, "OPERACIONAL"));
-        unidadesDto.put(10L, new UnidadeDto(10L, "Seção de Sistemas Eleitorais", "SESEL", 6L, "OPERACIONAL"));
-        unidadesDto.put(11L, new UnidadeDto(11L, "Seção de Infraestrutura", "SENIC", 7L, "OPERACIONAL"));
-        unidadesDto.put(12L, new UnidadeDto(12L, "Seção Jurídica", "SEJUR", 14L, "OPERACIONAL"));
-        unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL"));
-        unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL"));
-        unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL"));
+        unidadesDto.put(2L, new UnidadeDto(2L, "Secretaria de Informática e Comunicações", "STIC", null, "INTEROPERACIONAL", false));
+        unidadesDto.put(3L, new UnidadeDto(3L, "Secretaria de Gestao de Pessoas", "SGP", 2L, "INTERMEDIARIA", false));
+        unidadesDto.put(6L, new UnidadeDto(6L, "Coordenadoria de Sistemas", "COSIS", 2L, "INTERMEDIARIA", false));
+        unidadesDto.put(7L, new UnidadeDto(7L, "Coordenadoria de Suporte e Infraestrutura", "COSINF", 2L, "INTERMEDIARIA", false));
+        unidadesDto.put(14L, new UnidadeDto(14L, "Coordenadoria Jurídica", "COJUR", 2L, "INTERMEDIARIA", false));
+        unidadesDto.put(4L, new UnidadeDto(4L, "Coordenadoria de Educação Especial", "COEDE", 3L, "INTERMEDIARIA", false));
+        unidadesDto.put(8L, new UnidadeDto(8L, "Seção de Desenvolvimento de Sistemas", "SEDESENV", 6L, "OPERACIONAL", false));
+        unidadesDto.put(9L, new UnidadeDto(9L, "Seção de Dados e Inteligência Artificial", "SEDIA", 6L, "OPERACIONAL", false));
+        unidadesDto.put(10L, new UnidadeDto(10L, "Seção de Sistemas Eleitorais", "SESEL", 6L, "OPERACIONAL", false));
+        unidadesDto.put(11L, new UnidadeDto(11L, "Seção de Infraestrutura", "SENIC", 7L, "OPERACIONAL", false));
+        unidadesDto.put(12L, new UnidadeDto(12L, "Seção Jurídica", "SEJUR", 14L, "OPERACIONAL", false));
+        unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL", false));
+        unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL", false));
+        unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL", false));
         return unidadesDto;
     }
 }

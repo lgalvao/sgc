@@ -111,7 +111,10 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   }
 }
 
-function abrirDetalhesAlerta(alerta: Alerta) {
+async function abrirDetalhesAlerta(alerta: Alerta) {
+  if (!alerta.dataHoraLeitura) {
+    await alertasStore.marcarAlertaComoLido(alerta.codigo);
+  }
   if (alerta.linkDestino) {
     router.push(alerta.linkDestino);
   }

@@ -13,8 +13,10 @@ import { debug, logger } from '../utils/logger';
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        await page.waitForSelector(seletorCheckbox);
-        await page.check(seletorCheckbox);
+        const checkboxLocator = page.locator(seletorCheckbox);
+        await page.waitForSelector(seletorCheckbox, { state: 'visible' });
+        await checkboxLocator.waitFor({ enabled: true });
+        await checkboxLocator.check();
     }
 }
 
@@ -137,7 +139,7 @@ export async function preencherFormularioProcesso(
                 const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"]:not([disabled])');
                 return checkboxes.length > 0;
             },
-            { timeout: 10000 }
+            { timeout: 30000 }
         );
     }
     
@@ -256,14 +258,8 @@ export async function criarProcessoBasico(
     await navegarParaCriacaoProcesso(page);
     debug(`[DEBUG] criarProcessoBasico: Navegou para criação`);
 
-    await preencherCampo([page.locator(SELETORES.CAMPO_DESCRICAO)], descricao);
-    debug(`[DEBUG] criarProcessoBasico: Preencheu descrição`);
-
-    await page.selectOption(SELETORES.CAMPO_TIPO, tipo);
-    debug(`[DEBUG] criarProcessoBasico: Selecionou tipo ${tipo}`);
-
-    await preencherCampo([page.locator(SELETORES.CAMPO_DATA_LIMITE)], dataLimite);
-    debug(`[DEBUG] criarProcessoBasico: Preencheu data limite`);
+    await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
+    debug(`[DEBUG] criarProcessoBasico: Preencheu formulário inicial`);
 
     await selecionarUnidadesPorSigla(page, siglas);
     debug(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);

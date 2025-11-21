@@ -37,9 +37,9 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test.beforeEach(async ({ page }) => {
             await loginComoAdmin(page);
             // Cria um processo visível para o Chefe da STIC (unidade 2)
-            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC']);
+            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC'], '2025-12-31', 'EM_ANDAMENTO');
             // Cria um processo fora da hierarquia da STIC
-            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT']);
+            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT'], '2025-12-31', 'EM_ANDAMENTO');
         });
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {

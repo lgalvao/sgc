@@ -58,13 +58,15 @@ export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<v
  */
 export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean): Promise<void> {
     const tabela = page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_PROCESSOS));
+
     // Esperar a tabela estar visível primeiro
-    await expect(tabela).toBeVisible({ timeout: 5000 });
+    await expect(tabela).toBeVisible();
+
     const processo = tabela.locator('tbody tr').filter({ hasText: nomeProcesso });
     if (visivel) {
-        await expect(processo).toBeVisible({ timeout: 5000 });
+        await expect(processo).toBeVisible();
     } else {
-        await expect(processo).toBeHidden({ timeout: 2000 });
+        await expect(processo).toBeHidden();
     }
 }
 

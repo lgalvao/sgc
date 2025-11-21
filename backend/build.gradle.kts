@@ -28,10 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("jakarta.servlet:jakarta.servlet-api") // Explicitly add Jakarta Servlet API
-
-
-
+    implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -92,11 +89,8 @@ tasks.withType<Test> {
     }
 
     jvmArgs = listOf(
-        "-Dlogging.level.root=ERROR",
+        "-Dlogging.level.root=INFO",
         "-Dlogging.level.sgc=INFO",
-        "-Dlogging.level.org.hibernate=ERROR",
-        "-Dlogging.level.org.springframework=ERROR",
-        "-Dlogging.level.org.springframework.boot.autoconfigure.condition=ERROR",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",

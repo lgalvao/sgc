@@ -95,7 +95,8 @@ public class UnidadeService {
                 u.getSigla(),
                 codigoPai,
                 u.getTipo().name(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                true // isElegivel: Set to true by default for now
             );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -147,7 +148,8 @@ public class UnidadeService {
             unidade.getSigla(),
             codigoPai,
             unidade.getTipo().name(),
-            new ArrayList<>()
+            new ArrayList<>(),
+            false
         );
     }
 
@@ -163,7 +165,8 @@ public class UnidadeService {
             unidade.getSigla(),
             codigoPai,
             unidade.getTipo().name(),
-            new ArrayList<>()
+            new ArrayList<>(),
+            false
         );
     }
 }

@@ -4,12 +4,13 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
-    fullyParallel: true,
+    fullyParallel: false,
+    workers: 1,
     timeout: 10000,
     reporter: "dot",
     expect: {timeout: 5000},
     globalSetup: require.resolve('./e2e/setup/setup-databases'),
-    globalTeardown: require.resolve('./e2e/setup/setup-databases'),
+    globalTeardown: require.resolve('./e2e/setup/global-teardown'),
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
 
     webServer: {

@@ -8,8 +8,6 @@ server:
     whitelabel.enabled: true
 
 spring:
-  # This is the configuration for the ROUTER, not a direct datasource connection for the app.
-  # The 'e2e' properties define the DEFAULT fallback datasource when no X-Test-ID is provided.
   datasource:
     e2e:
       url: jdbc:h2:mem:sgcdb_default;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
@@ -19,13 +17,14 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none # 'create-drop' is the original behavior for the main E2E profile.
+      ddl-auto: none
     properties:
       hibernate.default_schema: SGC
     show-sql: false
   sql:
     init:
-      mode: never # Explicitly disable default SQL initialization for E2E profile
+      mode: always # Explicitly enable default SQL initialization for E2E profile
+      platform: h2
 
   devtools:
     restart:
@@ -49,9 +48,8 @@ management:
 
 logging:
   level:
-    sgc: WARN
-    sgc.notificacao: WARN
-    org.springframework: WARN
+    sgc: INFO
+    org.springframework: INFO
     org.springframework.jdbc: ERROR
     org.springframework.boot.autoconfigure: ERROR
     org.hibernate.SQL: WARN

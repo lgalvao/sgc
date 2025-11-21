@@ -6,6 +6,7 @@
     striped
     responsive
     data-testid="tabela-alertas"
+    :tbody-tr-class="rowClass"
     @row-clicked="emit('selecionar-alerta', $event)"
     @sort-changed="handleSortChange"
   >
@@ -36,6 +37,10 @@ const fields = [
   {key: "processo", label: "Processo", sortable: true},
   {key: "origem", label: "Origem"},
 ];
+
+const rowClass = (item: Alerta) => {
+  return !item.dataHoraLeitura ? "fw-bold" : "";
+};
 
 const handleSortChange = (ctx: any) => {
   if (ctx.sortBy === "dataHoraFormatada") {

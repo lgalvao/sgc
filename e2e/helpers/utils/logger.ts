@@ -3,7 +3,7 @@ import { createConsola } from 'consola';
 export const logger = createConsola({
   level: 4,
   formatOptions: {
-    date: true,
+    date: false,
     columns: 80,
   },
 });

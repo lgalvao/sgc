@@ -134,7 +134,7 @@ public class E2eTestController {
     }
 
     /**
-     * Recarrega os dados de teste a partir do arquivo SQL (data-h2-minimal.sql ou data-h2.sql).
+     * Recarrega os dados de teste a partir do arquivo SQL (data-minimal.sql ou data.sql).
      * Deleta todos os dados primeiro (desabilitando constraints), depois reinsere os dados de teste iniciais.
      * Útil para resetar o estado do banco entre rodadas de testes.
      */
@@ -156,7 +156,7 @@ public class E2eTestController {
             jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
 
             // 4. Executa o arquivo de dados SQL (preferindo minimal se existir)
-            String sqlFilePath = "/data-h2-minimal.sql";
+            String sqlFilePath = "/data-minimal.sql";
             String sql;
             try {
                 sql = new BufferedReader(
@@ -164,8 +164,8 @@ public class E2eTestController {
                         .lines()
                         .collect(Collectors.joining("\n"));
             } catch (Exception e) {
-                // Fallback para data-h2.sql completo se minimal não existir
-                sqlFilePath = "/data-h2.sql";
+                // Fallback para data.sql completo se minimal não existir
+                sqlFilePath = "/data.sql";
                 sql = new BufferedReader(
                         new InputStreamReader(getClass().getResourceAsStream(sqlFilePath)))
                         .lines()

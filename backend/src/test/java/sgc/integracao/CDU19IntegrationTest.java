@@ -52,7 +52,7 @@ class CDU19IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use dados pré-carregados do data-h2.sql (CDU-19 test data)
+        // Use dados pré-carregados do data.sql (CDU-19 test data)
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
         subprocesso = subprocessoRepo.findById(1900L).orElseThrow();

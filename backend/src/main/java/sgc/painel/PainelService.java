@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
@@ -18,8 +20,13 @@ import sgc.sgrh.model.Perfil;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +34,7 @@ import java.util.List;
 public class PainelService {
     private final ProcessoRepo processoRepo;
     private final AlertaRepo alertaRepo;
+    private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UnidadeRepo unidadeRepo;
 
     /**
@@ -56,7 +64,11 @@ public class PainelService {
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-            processos = processoRepo.findDistinctByParticipantes_CodigoIn(unidadeIds, pageable);
+            processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+                unidadeIds, 
+                SituacaoProcesso.CRIADO, 
+                pageable
+            );
         }
 
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
@@ -75,17 +87,26 @@ public class PainelService {
      * @return Uma página {@link Page} de {@link AlertaDto}.
      */
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
+        Page<Alerta> alertasPage;
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-            return alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable)
-                    .map(this::paraAlertaDto);
-        }
-        if (codigoUnidade != null) {
+            alertasPage = alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable);
+        } else if (codigoUnidade != null) {
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
-            return alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, pageable)
-                    .map(this::paraAlertaDto);
+            alertasPage = alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, pageable);
+        } else {
+            alertasPage = alertaRepo.findAll(pageable);
         }
-        return alertaRepo.findAll(pageable).map(this::paraAlertaDto);
+
+        return alertasPage.map(alerta -> {
+            LocalDateTime dataHoraLeitura = null;
+            if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
+                dataHoraLeitura = alertaUsuarioRepo.findById(new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo))
+                        .map(AlertaUsuario::getDataHoraLeitura)
+                        .orElse(null);
+            }
+            return paraAlertaDto(alerta, dataHoraLeitura);
+        });
     }
 
     private List<Long> obterIdsUnidadesSubordinadas(Long codUnidade) {
@@ -103,6 +124,14 @@ public class PainelService {
                 ? processo.getParticipantes().iterator().next()
                 : null;
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
+
+        String unidadesParticipantes = processo.getParticipantes() != null
+            ? processo.getParticipantes().stream()
+                .map(Unidade::getSigla)
+                .sorted()
+                .collect(Collectors.joining(", "))
+            : "";
+
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
@@ -112,27 +141,28 @@ public class PainelService {
                 .dataCriacao(processo.getDataCriacao())
                 .unidadeCodigo(participante != null ? participante.getCodigo() : null)
                 .unidadeNome(participante != null ? participante.getNome() : null)
+                .unidadesParticipantes(unidadesParticipantes)
                 .linkDestino(linkDestino)
                 .build();
     }
 
     private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
         if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
-            return "/processos/cadastro?codProcesso=" + processo.getCodigo();
+            return "/processo/cadastro?codProcesso=" + processo.getCodigo();
         }
         if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
-            return "/processos/" + processo.getCodigo();
+            return "/processo/" + processo.getCodigo();
         }
         // Para CHEFE ou SERVIDOR, precisamos da sigla da unidade
         if (codigoUnidade != null) {
             return unidadeRepo.findById(codigoUnidade)
-                .map(unidade -> "/subprocessos/" + processo.getCodigo() + "/unidade/" + unidade.getSigla())
+                .map(unidade -> "/processo/" + processo.getCodigo() + "/" + unidade.getSigla())
                 .orElse(null);
         }
         return null;
     }
 
-    private AlertaDto paraAlertaDto(Alerta alerta) {
+    private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         String linkDestino = calcularLinkDestinoAlerta(alerta);
         return AlertaDto.builder()
             .codigo(alerta.getCodigo())
@@ -141,13 +171,14 @@ public class PainelService {
             .dataHora(alerta.getDataHora())
             .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
             .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
+            .dataHoraLeitura(dataHoraLeitura)
             .linkDestino(linkDestino)
             .build();
     }
 
     private String calcularLinkDestinoAlerta(Alerta alerta) {
         if (alerta.getProcesso() != null && alerta.getUnidadeDestino() != null) {
-            return "/subprocessos/" + alerta.getProcesso().getCodigo() + "/unidade/" + alerta.getUnidadeDestino().getSigla();
+            return "/processo/" + alerta.getProcesso().getCodigo() + "/" + alerta.getUnidadeDestino().getSigla();
         }
         return null;
     }
