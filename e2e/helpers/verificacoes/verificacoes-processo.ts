@@ -360,6 +360,14 @@ export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<
 }
 
 /**
+ * Verifica se o botão "Iniciar processo" não está visível.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarBotaoIniciarProcessoInvisivel(page: Page): Promise<void> {
+    await expect(page.locator(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`)).not.toBeVisible();
+}
+
+/**
  * Verifica se o modal de confirmação de iniciar processo está visível.
  * @param page A instância da página do Playwright.
  */
@@ -410,4 +418,125 @@ export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<
  */
 export async function verificarPermanenciaNaPaginaProcesso(page: Page, codProcesso: number): Promise<void> {
     await expect(page).toHaveURL(new RegExp(`/processo/${codProcesso}`));
+}
+
+/**
+ * Aguarda que a tabela de processos seja carregada.
+ * @param page A instância da página do Playwright.
+ */
+export async function aguardarTabelaProcessosCarregada(page: Page): Promise<void> {
+    await page.waitForSelector(`${SELETORES.TABELA_PROCESSOS} tbody tr`);
+}
+
+/**
+ * Verifica a quantidade de processos visíveis na tabela.
+ * @param page A instância da página do Playwright.
+ * @param quantidade Esperada.
+ */
+export async function verificarQuantidadeProcessosNaTabela(page: Page, quantidade: number): Promise<void> {
+    const tabela = page.getByTestId('tabela-processos');
+    const linhas = tabela.locator('tbody tr');
+    await expect(linhas).toHaveCount(quantidade);
+}
+
+/**
+ * Verifica se o botão Remover está visível.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarBotaoRemoverVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
+}
+
+/**
+ * Verifica se o botão Remover não está visível.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarBotaoRemoverInvisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: /^Remover$/i})).not.toBeVisible();
+}
+
+/**
+ * Verifica se o checkbox da unidade está marcado.
+ * @param page A instância da página do Playwright.
+ * @param sigla A sigla da unidade.
+ */
+export async function verificarCheckboxUnidadeMarcado(page: Page, sigla: string): Promise<void> {
+     await expect(page.locator(`#chk-${sigla}`)).toBeChecked();
+}
+
+/**
+ * Verifica se o valor do campo Data Limite está correto.
+ * @param page A instância da página do Playwright.
+ * @param data A data esperada.
+ */
+export async function verificarValorCampoDataLimite(page: Page, data: string): Promise<void> {
+    await expect(page.locator(SELETORES.CAMPO_DATA_LIMITE)).toHaveValue(data);
+}
+
+/**
+ * Verifica se o campo Tipo está visível e com valor selecionado.
+ * @param page A instância da página do Playwright.
+ * @param valor O valor esperado (opcional).
+ */
+export async function verificarCampoTipoVisivel(page: Page, valor?: string): Promise<void> {
+    const selectTipo = page.locator(SELETORES.CAMPO_TIPO);
+    await expect(selectTipo).toBeVisible();
+    if (valor) {
+        await expect(selectTipo).toHaveValue(valor);
+    }
+}
+
+/**
+ * Verifica se um processo não está visível no painel.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ */
+export async function verificarProcessoNaoVisivel(page: Page, descricao: string): Promise<void> {
+    await expect(page.getByText(descricao)).not.toBeVisible();
+}
+
+/**
+ * Verifica se a página atual é a de detalhes do processo (visualização somente leitura).
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarPaginaDetalheProcesso(page: Page): Promise<void> {
+    await expect(page).toHaveURL(/\/processo\/\d+$/);
+}
+
+/**
+ * Verifica via API se os subprocessos foram criados.
+ * @param page A instância da página do Playwright.
+ * @param processoId O ID do processo.
+ */
+export async function verificarCriacaoSubprocessos(page: Page, processoId: string): Promise<void> {
+    const response = await page.request.get(`/api/processos/${processoId}/subprocessos`);
+    expect(response.ok()).toBeTruthy();
+    const subprocessos = await response.json();
+    expect(subprocessos.length).toBeGreaterThan(0);
+}
+
+/**
+ * Verifica se os campos do processo estão desabilitados (somente leitura).
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarCamposProcessoDesabilitados(page: Page): Promise<void> {
+    const campoDescricao = page.locator(SELETORES.CAMPO_DESCRICAO);
+    if (await campoDescricao.count() > 0) {
+        const isDisabled = await campoDescricao.isDisabled();
+        const isReadonly = await campoDescricao.getAttribute('readonly');
+        expect(isDisabled || isReadonly !== null).toBeTruthy();
+    }
+}
+
+/**
+ * Verifica a situação de um processo na tabela.
+ * @param page A instância da página do Playwright.
+ * @param nomeProcesso O nome do processo.
+ * @param situacao A situação esperada.
+ */
+export async function verificarSituacaoProcesso(page: Page, nomeProcesso: string, situacao: string | RegExp): Promise<void> {
+    const tabela = page.getByTestId('tabela-processos');
+    const linha = tabela.locator('tr').filter({hasText: nomeProcesso});
+    await expect(linha).toBeVisible();
+    await expect(linha).toContainText(situacao);
 }

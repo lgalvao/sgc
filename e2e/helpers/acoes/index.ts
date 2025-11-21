@@ -42,7 +42,12 @@ export {
     cancelarIniciacaoProcesso,
     criarProcessoBasico,
     abrirProcessoPorNome,
-    selecionarUnidadeDisponivel
+    selecionarUnidadeDisponivel,
+    clicarBotaoSalvar,
+    clicarBotaoRemover,
+    selecionarTipoProcesso,
+    preencherDescricao,
+    preencherDataLimite
 } from './acoes-processo';
 export * from './acoes-mapa';
 export {

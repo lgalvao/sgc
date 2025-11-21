@@ -586,3 +586,14 @@ export async function verificarPainelChefeVisivel(page: Page): Promise<void> {
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByTitle('Configurações do sistema')).not.toBeVisible();
 }
+
+/**
+ * Verifica se um alerta com o texto especificado está visível na tabela de alertas.
+ * @param page A instância da página do Playwright.
+ * @param texto O texto ou regex a ser verificado.
+ */
+export async function verificarAlertaNaTabela(page: Page, texto: string | RegExp): Promise<void> {
+    const tabelaAlertas = page.locator('[data-testid="tabela-alertas"]');
+    const alerta = tabelaAlertas.locator('tr').filter({hasText: texto});
+    await expect(alerta.first()).toBeVisible();
+}

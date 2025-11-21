@@ -36,6 +36,49 @@ export async function selecionarUnidadeDisponivel(page: Page, index: number = 0)
 }
 
 /**
+ * Clica no botão Salvar.
+ * @param page A instância da página do Playwright.
+ */
+export async function clicarBotaoSalvar(page: Page): Promise<void> {
+    await page.getByRole('button', {name: /Salvar/i}).click();
+}
+
+/**
+ * Clica no botão Remover.
+ * @param page A instância da página do Playwright.
+ */
+export async function clicarBotaoRemover(page: Page): Promise<void> {
+    await page.getByRole('button', {name: /^Remover$/i}).click();
+}
+
+/**
+ * Seleciona o tipo de processo.
+ * @param page A instância da página do Playwright.
+ * @param tipo O tipo do processo.
+ */
+export async function selecionarTipoProcesso(page: Page, tipo: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_TIPO).selectOption(tipo);
+}
+
+/**
+ * Preenche o campo descrição.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição.
+ */
+export async function preencherDescricao(page: Page, descricao: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
+}
+
+/**
+ * Preenche o campo data limite.
+ * @param page A instância da página do Playwright.
+ * @param data A data limite.
+ */
+export async function preencherDataLimite(page: Page, data: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill(data);
+}
+
+/**
  * Seleciona unidades na árvore de hierarquia com base em seus IDs.
  * @param page A instância da página do Playwright.
  * @param unidades Um array de IDs das unidades a serem selecionadas.
