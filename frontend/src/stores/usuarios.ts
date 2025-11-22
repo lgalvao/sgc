@@ -1,35 +1,38 @@
-import {defineStore} from "pinia";
-import {buscarTodosUsuarios} from "@/services/usuarioService";
-import type {Usuario} from "@/types/tipos";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { buscarTodosUsuarios } from "@/services/usuarioService";
+import type { Usuario } from "@/types/tipos";
 
-export const useUsuariosStore = defineStore("usuarios", {
-    state: () => ({
-        usuarios: [] as Usuario[],
-        isLoading: false,
-        error: null as string | null,
-    }),
-    getters: {
-        getUsuarioById:
-            (state) =>
-                (id: number): Usuario | undefined => {
-                    return state.usuarios.find((u) => u.codigo === id);
-                },
-    },
-    actions: {
-        async fetchUsuarios() {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const response = await buscarTodosUsuarios();
-                this.usuarios = (response as any).map((u) => ({
-                    ...u,
-                    unidade: {sigla: u.unidade},
-                })) as any as Usuario[];
-            } catch (err: any) {
-                this.error = "Falha ao carregar usuários: " + err.message;
-            } finally {
-                this.isLoading = false;
-            }
-        },
-    },
+export const useUsuariosStore = defineStore("usuarios", () => {
+    const usuarios = ref<Usuario[]>([]);
+    const isLoading = ref(false);
+    const error = ref<string | null>(null);
+
+    const getUsuarioById = computed(() => (id: number): Usuario | undefined => {
+        return usuarios.value.find((u) => u.codigo === id);
+    });
+
+    async function fetchUsuarios() {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await buscarTodosUsuarios();
+            usuarios.value = (response as any).map((u: any) => ({
+                ...u,
+                unidade: { sigla: u.unidade },
+            })) as Usuario[];
+        } catch (err: any) {
+            error.value = "Falha ao carregar usuários: " + err.message;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    return {
+        usuarios,
+        isLoading,
+        error,
+        getUsuarioById,
+        fetchUsuarios,
+    };
 });

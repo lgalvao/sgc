@@ -52,7 +52,6 @@ describe("useAlertasStore", () => {
         >;
 
         vi.clearAllMocks();
-        alertasStore.$reset();
     });
 
     it("should initialize with mock alerts and parsed dates", () => {

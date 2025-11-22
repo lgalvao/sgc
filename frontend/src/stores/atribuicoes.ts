@@ -1,54 +1,65 @@
-import {defineStore} from "pinia";
-import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
-import type {AtribuicaoTemporaria} from "@/types/tipos";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { buscarTodasAtribuicoes } from "@/services/atribuicaoTemporariaService";
+import type { AtribuicaoTemporaria } from "@/types/tipos";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",
-    {
-    state: () => ({
-        atribuicoes: [] as AtribuicaoTemporaria[],
-        isLoading: false,
-        error: null as string | null,
-    }),
-    getters: {
-        getAtribuicoesPorServidor:
-            (state) =>
+    () => {
+        const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
+        const isLoading = ref(false);
+        const error = ref<string | null>(null);
+
+        const getAtribuicoesPorServidor = computed(
+            () =>
                 (servidorId: number): AtribuicaoTemporaria[] => {
-                    return state.atribuicoes.filter(
+                    return atribuicoes.value.filter(
                         (a) => a.servidor.codigo === servidorId,
                     );
-        },
-        getAtribuicoesPorUnidade:
-            (state) =>
+                },
+        );
+
+        const getAtribuicoesPorUnidade = computed(
+            () =>
                 (unidadeSigla: string): AtribuicaoTemporaria[] => {
-                    return state.atribuicoes.filter(
+                    return atribuicoes.value.filter(
                         (a) => a.unidade.sigla === unidadeSigla,
                     );
-        },
-    },
-    actions: {
-        async fetchAtribuicoes() {
-            this.isLoading = true;
-            this.error = null;
+                },
+        );
+
+        async function fetchAtribuicoes() {
+            isLoading.value = true;
+            error.value = null;
             try {
                 const response = await buscarTodasAtribuicoes();
-                this.atribuicoes = (response as any).data.map((a) => ({
+                atribuicoes.value = (response as any).data.map((a: any) => ({
                     ...a,
                     dataInicio: new Date(a.dataInicio).toISOString(),
                     dataFim: new Date(a.dataTermino).toISOString(),
                     dataTermino: new Date(a.dataTermino).toISOString(),
                     servidor: a.servidor,
                     unidade: a.unidade,
-                })) as any as AtribuicaoTemporaria[];
+                })) as AtribuicaoTemporaria[];
             } catch (err: any) {
-                this.error = "Falha ao carregar atribuições: " + err.message;
+                error.value = "Falha ao carregar atribuições: " + err.message;
             } finally {
-                this.isLoading = false;
+                isLoading.value = false;
             }
-        },
-        criarAtribuicao(novaAtribuicao: AtribuicaoTemporaria) {
-            this.atribuicoes.push(novaAtribuicao);
-        },
-    },
+        }
+
+        function criarAtribuicao(novaAtribuicao: AtribuicaoTemporaria) {
+            atribuicoes.value.push(novaAtribuicao);
+        }
+
+        return {
+            atribuicoes,
+            isLoading,
+            error,
+            getAtribuicoesPorServidor,
+            getAtribuicoesPorUnidade,
+            fetchAtribuicoes,
+            criarAtribuicao,
+        };
     },
 );

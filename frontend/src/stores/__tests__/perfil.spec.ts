@@ -36,8 +36,6 @@ describe("usePerfilStore", () => {
 
         initPinia();
         perfilStore = usePerfilStore();
-        // Reset the store state to its initial values based on mocked localStorage
-        perfilStore.$reset();
     });
 
     afterEach(() => {
