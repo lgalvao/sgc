@@ -31,3 +31,4 @@ backend/bin/
 *.class
 /frontend/tsconfig.tsbuildinfo
 /node_modules/
+e2e-log-problems.md
