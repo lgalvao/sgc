@@ -6,7 +6,9 @@ As stores atuam como a "fonte da verdade" para os dados que precisam ser compart
 
 ## Estrutura de uma Store
 
-As stores são definidas usando a sintaxe `defineStore` e, preferencialmente, o estilo "Setup Stores" (similar à Composition API), retornando um objeto com:
+As stores são definidas usando a sintaxe `defineStore` utilizando o estilo **Setup Stores** (similar à Composition API).
+
+A função de setup deve retornar um objeto contendo:
 - **State (`ref`, `reactive`):** Os dados em si.
 - **Getters (`computed`):** Propriedades derivadas ou calculadas a partir do estado.
 - **Actions (`function`):** Métodos para modificar o estado, muitas vezes invocando `services` para buscar dados da API.
