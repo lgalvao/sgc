@@ -43,20 +43,28 @@ graph TD
 
 ### Fluxo de Trabalho:
 1.  **Ação de Negócio:** O `ProcessoService` executa uma ação (ex: inicia um processo).
-2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `EventoProcessoIniciado`).
+2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `ProcessoIniciadoEvento`).
 3.  **Captura do Evento:** O `EventoProcessoListener` captura este evento.
 4.  **Criação de Alertas:** O listener invoca o `AlertaService` para criar os alertas internos.
 5. **Criação do E-mail:** O listener usa o `NotificacaoModelosService` para gerar o conteúdo HTML do e-mail.
 6.  **Envio do E-mail:** O listener invoca o `NotificacaoEmailService` para enviar o e-mail.
 
 ## Componentes Principais
+
 - **`EventoProcessoListener`**: O principal ponto de entrada reativo da aplicação. Ouve os eventos de domínio e orquestra as ações de notificação e alerta.
-- **`NotificacaoEmailService`**: Serviço responsável pela lógica de envio de e-mails.
-  - **Assíncrono (`@Async`):** O envio é executado em uma thread separada.
+
+- **`NotificacaoEmailService`**: Serviço responsável pela lógica de envio de e-mails (perfil de produção).
+  - **Assíncrono (`@Async`):** O envio é executado em uma thread separada para não bloquear a requisição original.
   - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
-  - **Retentativas:** Em caso de falha, tenta reenviar o e-mail.
-- **`NotificacaoModelosService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando Thymeleaf.
-- **`Notificacao`**: A entidade JPA que representa o registro de uma notificação enviada.
+  - **Retentativas:** Em caso de falha, tenta reenviar o e-mail até 3 vezes com backoff exponencial.
+
+- **`NotificacaoEmailServiceMock`**: Implementação "no-op" usada nos perfis `e2e` e `test` para evitar envio real de e-mails durante testes.
+
+- **`NotificacaoModelosService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando templates Thymeleaf.
+
+- **`model/Notificacao`**: A entidade JPA que representa o registro de uma notificação enviada.
+
+- **`dto/EmailDto`**: Objeto de transferência para encapsular dados de envio de e-mail.
 
 ## Benefícios da Arquitetura
 - **Desacoplamento:** O `ProcessoService` não sabe como as notificações ou alertas são tratados. Ele apenas anuncia que "algo aconteceu".
