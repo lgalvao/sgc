@@ -77,8 +77,8 @@ flowchart LR
 -   **Testes:** Devem usar `data-testid` para seletores estáveis.
 
 ### 4.2. Stores (Pinia)
--   **Estilo Identificado:** O projeto utiliza predominantemente **Option Stores** (objeto com `state`, `getters`, `actions`), apesar de algumas documentações mencionarem preferência por Setup Stores.
-    -   *Exemplo:* `export const useProcessosStore = defineStore("processos", { state: () => ({...}), actions: {...} });`
+-   **Estilo:** O projeto utiliza o estilo **Setup Stores** (função de setup que retorna o estado, getters e actions).
+    -   *Exemplo:* `export const useProcessosStore = defineStore("processos", () => { const state = ref(...); function action() {...}; return { state, action }; });`
 -   **Modularidade:** Uma store por domínio/entidade (ex: `useProcessosStore`, `useUnidadesStore`).
 
 ### 4.3. Services
@@ -122,10 +122,5 @@ flowchart LR
 
 Durante a análise, foram identificados os seguintes pontos que merecem atenção:
 
-1.  **Estilo das Stores Pinia:**
-    -   O documento `frontend/src/stores/README.md` menciona uma preferência pelo estilo "Setup Stores" (similar à Composition API).
-    -   **Realidade do Código:** A grande maioria das stores (ex: `processos.ts`, `unidades.ts`, `mapas.ts`) utiliza o estilo **Option Stores** (objeto com state/actions).
-    -   **Recomendação:** Manter o padrão **Option Stores** para consistência com o código existente, ou planejar uma migração gradual se o Setup Store for realmente desejado.
-
-2.  **Biblioteca de UI:**
+1.  **Biblioteca de UI:**
     -   Confirma-se o uso extensivo de `bootstrap-vue-next`. Novos desenvolvimentos devem priorizar o uso dos componentes desta biblioteca (`<BButton>`, `<BCard>`) em vez de elementos HTML nativos com classes CSS do Bootstrap, para manter a consistência visual e funcional.
