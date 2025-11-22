@@ -4,70 +4,66 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 
 ## 1. Conhecimento do Projeto
 
-É fundamental que o agente se familiarize com a estrutura e as especificidades de cada módulo do projeto.
+É fundamental que o agente se familiarize com a estrutura e as especificidades de cada módulo do projeto antes de iniciar qualquer tarefa.
 
--   **Visão Geral:** Consulte o `README.md` na raiz do repositório para uma visão geral do projeto.
--   **Backend:** Cada pacote principal do backend possui um `README.md` detalhando suas responsabilidades e tecnologias específicas.
--   **Frontend:** Cada diretório principal do frontend também contém um `README.md` com informações sobre sua finalidade, tecnologias e como interagir com ele.
+-   **Visão Geral:** Consulte o `README.md` na raiz do repositório.
+-   **Backend:** Cada pacote principal em `backend/src/main/java/sgc/` possui um `README.md` detalhando suas responsabilidades, arquitetura e componentes.
+-   **Frontend:** Cada diretório em `frontend/src/` (components, views, stores, etc.) também contém um `README.md`.
 
 ## 2. Regras Gerais de Desenvolvimento
 
 ### 2.1. Idioma
 
--   Todo o sistema, incluindo nomes de variáveis, mensagens de erro, logs e documentação voltada ao usuário, deve estar em **Português Brasileiro**.
+-   **Português Brasileiro:** Todo o sistema, incluindo nomes de variáveis, métodos, classes, mensagens de erro, logs, comentários e documentação, deve estar em Português Brasileiro.
 
 ### 2.2. Convenções de Nomenclatura
 
--   **Exceções:** Nomes de classes de exceção devem seguir o padrão `ErroXxxx`, por exemplo, `ErroEntidadeNaoEncontrada`.
--   **Repositórios JPA:** Nomes de interfaces de repositório JPA devem seguir o padrão `XxxxRepo`, por exemplo, `SubprocessoRepo`.
-- As classes de serviço usam o sufixo padrão 'Service'
-- As classes de controle usam o sufixo padrão 'Controller'
+-   **Classes:** PascalCase (ex: `UsuarioService`).
+-   **Métodos e Variáveis:** camelCase (ex: `buscarPorId`).
+-   **Exceções:** Prefixo `Erro` (ex: `ErroEntidadeNaoEncontrada`).
+-   **Repositórios JPA:** Sufixo `Repo` (ex: `SubprocessoRepo`).
+-   **Serviços:** Sufixo `Service` (ex: `MapaService`).
+-   **Controladores:** Sufixo `Controller` (ex: `ProcessoController`).
+-   **Testes:** Sufixo `Test` (ex: `MapaServiceTest`).
 
 ## 3. Backend (Java com Spring Boot)
 
-- O Backend usa a versão mais recente do Spring Boot, além de Hibernate, Lombok e MapStruct. 
-- Os testes são criados com JUnit e o mais possível das facilidades oferecidas pelo Spring Boot para testes.
+### 3.1. Arquitetura
+-   **Service Facade:** Cada módulo (pacote) deve ter um serviço principal (Fachada) que orquestra a lógica de negócio e delega para serviços especializados. O Controller deve interagir apenas com essa fachada.
+-   **DTOs:** Nunca exponha entidades JPA diretamente nos Controllers. Utilize DTOs (`dto/`) e Mappers (`MapStruct`).
+-   **Pacote Comum:** Utilize o pacote `sgc.comum` para exceções (`ErroApi`), configurações e utilitários compartilhados.
+
+### 3.2. API REST
+-   **Verbos HTTP:**
+    -   `GET`: Para consultas.
+    -   `POST`: Para criação e, por convenção deste projeto, também para **atualização** e **exclusão** (usando sufixos na URL, ex: `/api/recurso/{id}/atualizar`, `/api/recurso/{id}/excluir`).
+-   **Erros:** Lance exceções da hierarquia de `sgc.comum.erros`. O `RestExceptionHandler` as converterá automaticamente para respostas JSON padronizadas.
+
+### 3.3. Testes
+-   Utilize **JUnit 5** e **Mockito**.
+-   Evite criar dados de teste manualmente se puder usar os builders ou factories existentes.
 
 ## 4. Frontend (Vue.js com TypeScript)
 
--   **Arquitetura:** Siga o padrão `Views -> Stores -> Services` conforme detalhado no `frontend/README.md`.
--   **Componentes:** Ao criar ou modificar componentes, adira aos "Princípios dos Componentes" descritos em `frontend/src/components/README.md` (reutilizáveis, controlados por props/eventos, sem lógica de negócio complexa).
--   **Gerenciamento de Estado:** Utilize Pinia para gerenciamento de estado, organizando as stores de forma modular.
--   **Comunicação com API:** Utilize a instância configurada do Axios (`axios-setup.ts`) para todas as chamadas de API.
+### 4.1. Arquitetura
+-   Siga o fluxo: `View (Página)` -> `Store (Pinia)` -> `Service (Axios)` -> `API`.
+-   **Componentes:** Devem ser "burros" (apresentacionais), recebendo dados via `props` e emitindo eventos via `emits`. Consulte `frontend/src/components/README.md`.
+-   **Views:** Responsáveis por conectar as Stores aos Componentes.
 
-## 5. Uso de Ferramentas
+### 4.2. Tecnologias
+-   **UI:** Utilize componentes da biblioteca **BootstrapVueNext** (`BButton`, `BModal`, etc.) em vez de HTML/Bootstrap puro quando possível.
+-   **Estado:** Utilize **Pinia** com "Setup Stores".
+-   **Roteamento:** Vue Router modularizado.
 
-### 5.1. Gradle
+## 5. Testes e Qualidade
 
--   Evite usar a flag `--no-daemon` ao executar comandos Gradle, a menos que seja estritamente necessário, para otimizar o tempo de build.
+### 5.1. Playwright (E2E)
+-   **Seletores:** Use SEMPRE `data-testid` para selecionar elementos. Isso torna os testes resilientes a mudanças de layout.
+-   **Helpers:** Utilize as funções em `e2e/helpers/` para ações comuns.
+-   **Ambiente:** Os testes E2E rodam com um banco H2 em memória (perfil `e2e`), garantindo isolamento e rapidez.
 
-### 5.2. Playwright (Testes E2E)
-
-Siga estas diretrizes para executar e manter testes e2e:
-
--   **Execução Otimizada:**
-    -   **Inicialização Automática:** Ao executar `npx playwright test`, o frontend e o backend são iniciados automaticamente. O backend usa o perfil `e2e` com um banco de dados H2 em memória, e o frontend é iniciado via `npm run dev`.
-    -   Sempre execute o mínimo de testes possível para o contexto da sua alteração.
-    -   Para rodar apenas os testes que falharam na última execução:
-        ```bash
-        npx playwright test --last-failed
-        ```
-    -   Para rodar um subconjunto de testes (ex: os primeiros 5 CDUs):
-        ```bash
-        npx playwright test e2e/cdu/cdu-0[1-5].spec.ts
-        ```
--   **Evitar Timeouts Explícitos:**
-    -   Não utilize `page.waitForTimeout()` ou outros timeouts explícitos. Timeouts geralmente indicam que os elementos não estão visíveis ou interativos como esperado, seja por um problema no teste (ex: seletor incorreto) ou um defeito no sistema. O Playwright possui mecanismos de auto-espera que devem ser suficientes.
--   **Seletores Robustos:**
-    -   Prefira o uso de atributos `data-testid` para identificar elementos na interface do usuário. Isso torna os testes mais resilientes a mudanças na estrutura HTML ou CSS.
--   **Reutilização de Código:**
-    -   Utilize as funções auxiliares (`helpers/acoes`, `helpers/dados`, `helpers/verificacoes`) para padronizar interações, dados e verificações, evitando duplicação e melhorando a legibilidade.
-
-### 5.3. Verificações de Qualidade de Código
-
-O projeto está configurado com um conjunto de scripts para garantir a qualidade e a integridade do código.
-
--   **`npm run validate`**: Executa todas as verificações de qualidade de código em um único comando.
--   **`npm run typecheck`**: Verifica a consistência de tipos do TypeScript.
--   **`npm run check:ts-unused`**: Identifica e relata exportações de TypeScript não utilizadas.
--   **`npm run lint`**: Executa o ESLint para identificar e corrigir problemas de estilo e erros de código.
+### 5.2. Ferramentas de Verificação
+Antes de submeter alterações, execute:
+-   **`npm run validate`** (na raiz): Roda todas as verificações de qualidade.
+-   **`npm run typecheck`**: Verifica tipagem TypeScript.
+-   **`npm run lint`**: Verifica estilo de código.

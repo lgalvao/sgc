@@ -16,16 +16,16 @@ As stores são definidas usando a sintaxe `defineStore` e, preferencialmente, o 
 - **`alertas.ts`**: Lista de alertas do usuário e contagem de não lidos.
 - **`analises.ts`**: Histórico de análises do subprocesso atual.
 - **`atividades.ts`**: Cache ou gestão de atividades sendo editadas.
+- **`atribuicoes.ts`**: Gerencia o estado das atribuições temporárias de unidades.
 - **`configuracoes.ts`**: Preferências da aplicação.
 - **`mapas.ts`**: Estado do mapa de competências (atividades, conhecimentos) sendo visualizado ou editado. Fundamental para a edição complexa de mapas.
 - **`notificacoes.ts`**: Gerencia notificações toast e modais globais.
-- **`perfil.ts`**: Dados do usuário logado, perfil selecionado e tokens de autenticação. Persiste dados no `localStorage`.
+- **`perfil.ts`**: Dados do usuário logado, perfil selecionado e tokens de autenticação. Persiste dados no `localStorage` para manter a sessão.
 - **`processos.ts`**: Lista de processos e filtros ativos.
 - **`subprocessos.ts`**: Dados do subprocesso atual selecionado.
 - **`unidades.ts`**: Árvore de unidades e dados organizacionais.
-- **`usuarios.ts`**: Gestão de usuários (para telas de administração).
+- **`usuarios.ts`**: Gestão de usuários (para telas de administração e cache).
 
 ## Boas Práticas
 - **Single Source of Truth:** Evite duplicar dados entre stores e componentes.
-- **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante "global".
-- **Persistência:** A store `perfil` é um exemplo crítico que deve sincronizar seu estado com o `localStorage` para manter o login ativo após o refresh da página.
+- **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante.

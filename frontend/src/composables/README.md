@@ -8,11 +8,11 @@ Por convenção, o nome dessas funções começa com `use` (ex: `usePerfil`).
 
 ### `useApi.ts`
 - **Objetivo:** Fornecer um wrapper reativo em torno das chamadas de API, gerenciando estados comuns como `loading` (carregamento), `error` (erro) e `data` (dados).
-- **Uso:** Permite que os componentes façam requisições e exibam spinners ou mensagens de erro de forma padronizada sem repetir a lógica de `try/catch` e gerenciamento de estado.
+- **Uso:** Simplifica o código nos componentes, evitando a repetição de blocos `try/catch` e variáveis de estado para controle de feedback visual.
 
 ### `usePerfil.ts`
-- **Objetivo:** Gerenciar a lógica relacionada ao perfil do usuário logado.
+- **Objetivo:** Centraliza a lógica complexa de cálculo de perfis de acesso do usuário.
 - **Funcionalidades:**
-    - Acesso ao perfil atual (ex: `ADMIN`, `GESTOR`).
-    - Verificação de permissões.
-    - Lógica para alternar entre perfis (se o usuário tiver múltiplos).
+    - **Cálculo de Perfis:** Determina dinamicamente quais perfis (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) um usuário possui com base em sua lotação, titularidade de unidades e atribuições temporárias.
+    - **Estado do Usuário:** Fornece propriedades computadas reativas para o `servidorLogado`, `perfilSelecionado` e `unidadeSelecionada`.
+    - **Integração com Stores:** Orquestra dados das stores `useUsuariosStore`, `useUnidadesStore` e `useAtribuicaoTemporariaStore`.

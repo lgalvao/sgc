@@ -49,10 +49,20 @@ graph TD
     *   Construir a mensagem de alerta apropriada.
     *   Consultar o `SgrhService` para identificar os usuários destinatários (ex: chefe da unidade).
     *   Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
-4.  **Interação do Usuário:** O `AlertaControle` expõe uma API REST para que o frontend possa marcar os alertas do usuário logado como lidos.
+4.  **Interação do Usuário:** O `AlertaController` expõe uma API REST para que o frontend possa listar e marcar os alertas do usuário logado como lidos.
 
 ## Componentes Principais
+
+### Controladores e Serviços
 - **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua leitura. É invocado pelo `EventoProcessoListener` central.
-- **`AlertaController`**: Expõe um endpoint REST para o frontend marcar um alerta como lido.
-- **`Alerta` / `AlertaUsuario`**: Entidades JPA que modelam um alerta e sua associação com um ou mais usuários.
-- **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data para interagir com o banco de dados.
+- **`AlertaController`**: Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para o frontend.
+
+### Modelo de Dados (`model`)
+- **`Alerta`**: Entidade JPA que representa o alerta em si (título, mensagem, data).
+- **`AlertaUsuario`**: Entidade que associa um alerta a um usuário específico, controlando se já foi lido ou não.
+- **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data.
+- **`TipoAlerta`**: Enum que define os tipos de alerta (ex: `INFORMATIVO`, `ACAO_NECESSARIA`).
+
+### DTOs (`dto`)
+- **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
+- **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
