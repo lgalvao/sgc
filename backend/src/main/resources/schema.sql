@@ -2,7 +2,7 @@ create schema if not exists sgc;
 
 create table if not exists sgc.usuario
 (
-    titulo_eleitoral bigint not null,
+    titulo_eleitoral varchar(255) not null,
     unidade_codigo   bigint,
     ramal            varchar(20),
     email            varchar(255),
@@ -12,7 +12,7 @@ create table if not exists sgc.usuario
 
 create table if not exists sgc.usuario_perfil
 (
-    usuario_titulo_eleitoral bigint not null,
+    usuario_titulo_eleitoral varchar(255) not null,
     perfil                   varchar(255) check (perfil in ('ADMIN', 'GESTOR', 'CHEFE', 'SERVIDOR'))
 );
 

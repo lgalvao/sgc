@@ -4,9 +4,7 @@ export const SELETORES = {
     TABELA_ALERTAS: '[data-testid="tabela-alertas"]',
     TITULO_PROCESSOS: '[data-testid="titulo-processos"]',
     TITULO_ALERTAS: '[data-testid="titulo-alertas"]',
-    COLUNA_DESCRICAO: '[data-testid="coluna-descricao"]',
-    COLUNA_TIPO: '[data-testid="coluna-tipo"]',
-    COLUNA_SITUACAO: '[data-testid="coluna-situacao"]',
+
     BTN_CRIAR_PROCESSO: '[data-testid="btn-criar-processo"]',
     BTN_INICIAR_PROCESSO: '[data-testid="btn-iniciar-processo"]',
     BTN_FINALIZAR_PROCESSO: '[data-testid="btn-finalizar-processo"]',

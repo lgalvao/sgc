@@ -14,23 +14,41 @@ let backendProcess: ChildProcess | undefined;
 
 // Function to filter out lines we consider noise
 function shouldDisplayLine(line: string): boolean {
+    const currentTrimmedLine = line.trim();
+
     // Hide lines starting with '>'
-    if (line.startsWith('> ')) {
+    if (currentTrimmedLine.startsWith('> ')) {
         return false;
     }
     // Hide Node.js deprecation warnings
-    if (line.startsWith('(node:') && line.includes('DeprecationWarning')) {
+    if (currentTrimmedLine.startsWith('(node:') && currentTrimmedLine.includes('DeprecationWarning')) {
         return false;
     }
     // Hide Lombok warnings related to sun.misc.Unsafe
-    if (line.startsWith('WARNING:') && line.includes('lombok.permit.Permit') && line.includes('sun.misc.Unsafe')) {
+    if (currentTrimmedLine.startsWith('WARNING:') && currentTrimmedLine.includes('lombok.permit.Permit') && currentTrimmedLine.includes('sun.misc.Unsafe')) {
         return false;
     }
-    if (line.startsWith('WARNING:') && line.includes('sun.misc.Unsafe::objectFieldOffset')) {
+    if (currentTrimmedLine.startsWith('WARNING:') && currentTrimmedLine.includes('sun.misc.Unsafe::objectFieldOffset')) {
         return false;
     }
-    // You can add more filtering rules here if needed
-    return true;
+
+    // Filter Playwright 'list' reporter redundant start lines
+    // A test pass/fail line starts with '✓' or '×'
+    // A test start line (redundant) looks like "     1 … Test name" (has leading spaces, number, ellipsis, and doesn't start with ✓ or ×)
+    // The summary line looks like "  5 passed (16.8s)" or "  1 failed, 4 passed (16.8s)"
+
+    // If the line matches the pattern of a test progress line (e.g., "     1 …" or "  ✓  1 …")
+    // but it does *not* start with '✓' or '×', then it's a redundant test start line.
+    if (currentTrimmedLine.match(/^\d+ \…/) && !currentTrimmedLine.startsWith('✓') && !currentTrimmedLine.startsWith('×')) {
+        return false; // Filter out the redundant test start line
+    }
+
+    // Keep the final summary line, which doesn't start with '✓' or '×' but contains "passed" or "failed"
+    if (currentTrimmedLine.match(/^\d+ (passed|failed)/)) {
+        return true;
+    }
+
+    return true; // Keep all other lines (including actual test results starting with ✓ or ×, and other logs)
 }
 
 async function globalSetup(config: FullConfig) {

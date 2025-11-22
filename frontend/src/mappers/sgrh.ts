@@ -68,3 +68,27 @@ export interface LoginResponse {
   unidadeCodigo: number;
   token: string;
 }
+
+export function LoginResponseToFrontend(response: any): LoginResponse {
+  return {
+    tituloEleitoral: response.tituloEleitoral,
+    perfil: response.perfil,
+    unidadeCodigo: response.unidadeCodigo,
+    token: response.token,
+  };
+}
+
+export function perfisUnidadesParaDominio(
+  perfisUnidadesBackend: any[]
+): PerfilUnidade[] {
+  return perfisUnidadesBackend.map((item) => ({
+    perfil: item.perfil,
+    unidade: {
+      codigo: item.unidade.codigo,
+      nome: item.unidade.nome,
+      sigla: item.unidade.sigla,
+    },
+    siglaUnidade: item.unidade.sigla,
+  }));
+}
+

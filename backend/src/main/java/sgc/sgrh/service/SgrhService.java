@@ -52,9 +52,32 @@ public class SgrhService {
             return perfisMock.get(titulo);
         }
         log.warn("MOCK SGRH: Buscando perfis do usuário (padrão).");
+
+        if ("1".equals(titulo)) { // Servidor Ana Paula Souza (SESEL)
+            return List.of(new PerfilDto(titulo, 10L, "SESEL", "SERVIDOR"));
+        } else if ("6".equals(titulo)) { // Admin Ricardo Alves (STIC)
+            return List.of(new PerfilDto(titulo, 2L, "STIC", "ADMIN"));
+        } else if ("777".equals(titulo)) { // Chefe STIC Teste (STIC)
+            return List.of(new PerfilDto(titulo, 2L, "STIC", "CHEFE"));
+        } else if ("2".equals(titulo)) { // Chefe SGP
+            return List.of(new PerfilDto(titulo, 200L, "SGP", "CHEFE"));
+        } else if ("3".equals(titulo)) { // Chefe SEDESENV
+            return List.of(new PerfilDto(titulo, 8L, "SEDESENV", "CHEFE"));
+        } else if ("8".equals(titulo)) { // Gestor Paulo Horta (SEDESENV)
+            return List.of(new PerfilDto(titulo, 8L, "SEDESENV", "GESTOR"));
+        } else if ("10".equals(titulo)) { // Chefe SEDIA (SEDIA)
+            return List.of(new PerfilDto(titulo, 9L, "SEDIA", "CHEFE"));
+        } else if ("999999999999".equals(titulo)) { // Usuario Multi Perfil (STIC)
+            return List.of(
+                new PerfilDto(titulo, 2L, "STIC", "ADMIN"),
+                new PerfilDto(titulo, 2L, "STIC", "GESTOR")
+            );
+        }
+
+        // Default behavior for other users if not explicitly mocked
         return List.of(
-                new PerfilDto(titulo, 1L, "SEDOC", "ADMIN"),
-                new PerfilDto(titulo, 2L, "SGP", "GESTOR")
+            new PerfilDto(titulo, 1L, "SEDOC", "ADMIN"),
+            new PerfilDto(titulo, 2L, "SGP", "GESTOR")
         );
     }
 

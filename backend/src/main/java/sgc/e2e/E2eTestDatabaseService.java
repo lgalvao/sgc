@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.ResultSet; // Added this import
+import java.sql.SQLException; // Added this import
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +36,12 @@ public class E2eTestDatabaseService {
             for (String statement : sql.split(";")) {
                 String trimmed = statement.trim();
                 if (!trimmed.isEmpty() && !trimmed.startsWith("--")) {
-                    stmt.execute(trimmed);
+                    log.debug("Executing SQL statement: {}", trimmed);
+                    try {
+                        stmt.execute(trimmed);
+                    } catch (SQLException e) {
+                        log.error("Error executing SQL statement: {}", trimmed, e);
+                    }
                 }
             }
         }
@@ -46,7 +53,7 @@ public class E2eTestDatabaseService {
 
             // 1. Create a new H2 in-memory data source with a unique name
             String jdbcUrl = String.format(
-                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC\\;SET SCHEMA SGC",
+                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1",
                     testId
             );
 
@@ -58,6 +65,9 @@ public class E2eTestDatabaseService {
                     .build();
 
             try (Connection conn = dataSource.getConnection()) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute("CREATE SCHEMA SGC");
+                }
                 conn.setSchema("SGC");
                 executeSqlScript(conn, "/schema.sql");
 
@@ -71,6 +81,29 @@ public class E2eTestDatabaseService {
                 try (Statement stmt = conn.createStatement()) {
                     stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
                 }
+
+                // Programmatic insertion of user '1' and 'SERVIDOR' profile for E2E tests
+                try (Statement stmt = conn.createStatement()) {
+                    String insertUserSql = "INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES ('1', 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10)";
+                    log.debug("Programmatically inserting user '1': {}", insertUserSql);
+                    stmt.execute(insertUserSql);
+
+                    String insertProfileSql = "INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES ('1', 'SERVIDOR')";
+                    log.debug("Programmatically inserting profile for user '1': {}", insertProfileSql);
+                    stmt.execute(insertProfileSql);
+
+                    // Verify programmatic insert
+                    try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM SGC.USUARIO WHERE TITULO_ELEITORAL = '1'")) {
+                        if (rs.next()) {
+                            log.info("DEBUG (Programmatic): Count for USUARIO with TITULO_ELEITORAL '1' after programmatic insert: {}", rs.getInt(1));
+                        }
+                    }
+                }
+
+                // Explicitly commit the transaction
+                conn.commit();
+
+
             }
 
             log.debug("Successfully created isolated DB for testId: {}", testId);

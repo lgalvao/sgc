@@ -10,7 +10,7 @@
   "author": "Leonardo Galvao",
   "scripts": {
     "dev:e2e": "concurrently \"./gradlew bootRunE2E\" \"cd frontend && npm run dev\"",
-    "test:e2e": "NODE_OPTIONS=--no-deprecation playwright test --quiet",
+    "test:e2e": "NODE_OPTIONS=--no-deprecation playwright test",
     "typecheck": "tsc --noEmit",
     "validate": "npm run typecheck && npm run check:ts-unused"
   },

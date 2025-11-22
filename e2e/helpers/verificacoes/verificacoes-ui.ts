@@ -36,10 +36,13 @@ export async function verificarConhecimentoVisivel(pageOrCard: Page | Locator, n
 export async function verificarElementosPainel(page: Page): Promise<void> {
     await esperarElementoVisivel(page, SELETORES.TITULO_PROCESSOS);
     await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
-    await esperarElementoVisivel(page, SELETORES.TABELA_PROCESSOS);
-    await esperarElementoVisivel(page, SELETORES.COLUNA_DESCRICAO);
-    await esperarElementoVisivel(page, SELETORES.COLUNA_TIPO);
-    await esperarElementoVisivel(page, SELETORES.COLUNA_SITUACAO);
+
+    // Verificações para a Tabela de Processos
+    const tabelaProcessos = page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_PROCESSOS));
+    await expect(tabelaProcessos).toBeVisible(); // Ensure the table itself is visible
+    await expect(tabelaProcessos.getByRole('columnheader', { name: 'Descrição' })).toBeVisible();
+    await expect(tabelaProcessos.getByRole('columnheader', { name: 'Tipo' })).toBeVisible();
+    await expect(tabelaProcessos.getByRole('columnheader', { name: 'Situação' })).toBeVisible();
 }
 
 /**
