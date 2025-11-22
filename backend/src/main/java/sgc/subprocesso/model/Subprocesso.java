@@ -11,6 +11,8 @@ import sgc.processo.model.Processo;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")
@@ -61,5 +63,27 @@ public class Subprocesso extends EntidadeBase {
 
     public Mapa getMapa() {
         return this.mapa == null ? null : this.mapa;
+    }
+
+    public boolean isEmAndamento() {
+        final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
+            SituacaoSubprocesso.CONCLUIDO,
+            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
+            SituacaoSubprocesso.MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.NAO_INICIADO
+        );
+        return !situacoesFinalizadas.contains(this.situacao);
+    }
+
+    public Integer getEtapaAtual() {
+        final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
+            SituacaoSubprocesso.CONCLUIDO,
+            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
+            SituacaoSubprocesso.MAPA_HOMOLOGADO
+        );
+        if (!situacoesFinalizadas.contains(this.situacao)) {
+            return 1;
+        }
+        return null;
     }
 }

@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("e2e")
 @DisplayName("Testes do E2eTestController")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Import({TestSecurityConfig.class})
 class E2eTestControllerTest {
     @Autowired
@@ -61,9 +60,9 @@ class E2eTestControllerTest {
     void setUp() {
         movimentacaoRepo.deleteAll();
         subprocessoRepo.deleteAll();
-        processoRepo.deleteAll();
         alertaUsuarioRepo.deleteAll();
         alertaRepo.deleteAll();
+        processoRepo.deleteAll();
 
         var processo1 = new Processo();
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
@@ -90,9 +89,9 @@ class E2eTestControllerTest {
     void tearDown() {
         movimentacaoRepo.deleteAll();
         subprocessoRepo.deleteAll();
-        processoRepo.deleteAll();
         alertaUsuarioRepo.deleteAll();
         alertaRepo.deleteAll();
+        processoRepo.deleteAll();
     }
 
     @Nested

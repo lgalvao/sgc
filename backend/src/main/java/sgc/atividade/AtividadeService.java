@@ -79,10 +79,6 @@ public class AtividadeService {
             throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
         }
 
-        if (subprocesso.getSituacao().isFinalizado()) {
-            throw new ErroSituacaoInvalida("Subprocesso já está finalizado.");
-        }
-
         var entidade = atividadeMapper.toEntity(atividadeDto);
         var salvo = atividadeRepo.save(entidade);
 

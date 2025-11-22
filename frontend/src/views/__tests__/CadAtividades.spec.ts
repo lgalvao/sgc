@@ -1,15 +1,30 @@
-import {mount} from '@vue/test-utils'
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
-import CadAtividades from '@/views/CadAtividades.vue'
-import {createTestingPinia} from '@pinia/testing'
-import {useAtividadesStore} from '@/stores/atividades'
-import {useProcessosStore} from '@/stores/processos'
-import {useSubprocessosStore} from '@/stores/subprocessos'
-import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos'
+import { createTestingPinia } from "@pinia/testing";
+import { flushPromises, mount } from "@vue/test-utils";
+import { BFormInput } from "bootstrap-vue-next";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import EditarConhecimentoModal from "@/components/EditarConhecimentoModal.vue";
+import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
+import * as usePerfilModule from "@/composables/usePerfil";
+import * as analiseService from "@/services/analiseService";
+// Import services to mock/spy
+import * as atividadeService from "@/services/atividadeService";
+import * as cadastroService from "@/services/cadastroService";
+import * as mapaService from "@/services/mapaService";
+import * as processoService from "@/services/processoService";
 
-vi.mock('vue-router', () => ({
+import * as unidadesService from "@/services/unidadesService";
+import { useAnalisesStore } from "@/stores/analises";
+import { useAtividadesStore } from "@/stores/atividades";
+import { useProcessosStore } from "@/stores/processos";
+import { useSubprocessosStore } from "@/stores/subprocessos";
+import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import CadAtividades from "@/views/CadAtividades.vue";
+
+const pushMock = vi.fn();
+
+vi.mock("vue-router", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: pushMock,
   }),
   createRouter: () => ({
     beforeEach: vi.fn(),
@@ -18,125 +33,474 @@ vi.mock('vue-router', () => ({
   createWebHistory: () => ({}),
 }));
 
+// Mock usePerfil
+vi.mock("@/composables/usePerfil", () => ({
+  usePerfil: vi.fn(),
+}));
+
+// Mock services
+vi.mock("@/services/atividadeService", () => ({
+  criarAtividade: vi.fn(),
+  excluirAtividade: vi.fn(),
+  criarConhecimento: vi.fn(),
+  excluirConhecimento: vi.fn(),
+  atualizarAtividade: vi.fn(),
+  atualizarConhecimento: vi.fn(),
+}));
+
+vi.mock("@/services/mapaService", () => ({
+  obterMapaVisualizacao: vi.fn(),
+}));
+
+vi.mock("@/services/cadastroService", () => ({
+  disponibilizarCadastro: vi.fn(),
+  disponibilizarRevisaoCadastro: vi.fn(),
+}));
+
+vi.mock("@/services/subprocessoService", () => ({
+  importarAtividades: vi.fn(),
+}));
+
+vi.mock("@/services/processoService", () => ({
+  obterDetalhesProcesso: vi.fn(),
+}));
+
+vi.mock("@/services/unidadesService", () => ({
+  buscarUnidadePorSigla: vi.fn(),
+}));
+
+vi.mock("@/services/analiseService", () => ({
+  listarAnalisesCadastro: vi.fn(),
+}));
+
 const mockAtividades = [
   {
     codigo: 1,
-    descricao: 'Atividade 1',
+    descricao: "Atividade 1",
     conhecimentos: [
-      {id: 101, descricao: 'Conhecimento 1.1'},
-      {id: 102, descricao: 'Conhecimento 1.2'},
+      { id: 101, descricao: "Conhecimento 1.1" },
+      { id: 102, descricao: "Conhecimento 1.2" },
     ],
   },
   {
     codigo: 2,
-    descricao: 'Atividade 2',
+    descricao: "Atividade 2",
     conhecimentos: [],
   },
 ];
 
-describe('CadAtividades.vue', () => {
-  let wrapper;
-  let atividadesStore;
-  let processosStore;
-  let subprocessosStore;
+// Helper to generate map structure
+const mockMapaVisualizacao = (atividades = []) => ({
+  subprocessoCodigo: 123,
+  competencias: [
+    {
+      codigo: 10,
+      descricao: "Competencia Geral",
+      atividades: atividades,
+    },
+  ],
+});
 
-  function createWrapper(isRevisao = false) {
-    return mount(CadAtividades, {
+describe("CadAtividades.vue", () => {
+  let wrapper: any;
+
+  function createWrapper(isRevisao = false, customState = {}) {
+    // Setup usePerfil mock per test
+    vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
+      perfilSelecionado: { value: Perfil.CHEFE },
+      servidorLogado: { value: null },
+      unidadeSelecionada: { value: null },
+      getPerfisDoServidor: vi.fn(),
+    } as any);
+
+    const wrapper = mount(CadAtividades, {
       props: {
         codProcesso: 1,
-        sigla: 'TESTE',
+        sigla: "TESTE",
       },
       global: {
         plugins: [
           createTestingPinia({
+            stubActions: false, // Allow store actions to run and call mocked services
             initialState: {
-              perfil: {
-                perfilSelecionado: 'CHEFE',
-              },
               processos: {
                 processoDetalhe: {
                   codigo: 1,
-                  tipo: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO,
+                  tipo: isRevisao
+                    ? TipoProcesso.REVISAO
+                    : TipoProcesso.MAPEAMENTO,
                   unidades: [
                     {
                       codUnidade: 123,
-                      sigla: 'TESTE',
-                      situacaoSubprocesso: isRevisao ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
+                      sigla: "TESTE",
+                      situacaoSubprocesso: isRevisao
+                        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                        : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
                     },
                   ],
                 },
               },
               unidades: {
-                unidade: {codigo: 1, nome: 'Unidade de Teste', sigla: 'TESTE'}
-              }
+                unidade: {
+                  codigo: 1,
+                  nome: "Unidade de Teste",
+                  sigla: "TESTE",
+                },
+              },
+              atividades: {
+                atividadesPorSubprocesso: new Map(),
+              },
+              analises: {
+                analisesPorSubprocesso: new Map(),
+              },
+              ...customState,
             },
-            stubActions: false,
           }),
         ],
+        stubs: {
+          ImportarAtividadesModal: true,
+          EditarConhecimentoModal: true,
+          BModal: {
+            name: "BModal",
+            template: `
+                   <div v-if="modelValue" class="b-modal-stub" :aria-label="title">
+                     <div class="stub-title">{{ title }}</div>
+                     <slot />
+                     <slot name="footer" />
+                   </div>
+                `,
+            props: ["modelValue", "title"],
+            emits: ["update:modelValue"],
+          },
+        },
       },
       attachTo: document.body,
     });
+
+    const atividadesStore = useAtividadesStore();
+    const processosStore = useProcessosStore();
+    const subprocessosStore = useSubprocessosStore();
+    const analisesStore = useAnalisesStore();
+
+    return {
+      wrapper,
+      atividadesStore,
+      processosStore,
+      subprocessosStore,
+      analisesStore,
+    };
   }
 
   beforeEach(async () => {
-    wrapper = createWrapper();
-    atividadesStore = useAtividadesStore();
-    processosStore = useProcessosStore();
-    subprocessosStore = useSubprocessosStore();
-    // unidadesStore = useUnidadesStore();
-    // analisesStore = useAnalisesStore();
-    // notificacoesStore = useNotificacoesStore();
-
-    atividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue(mockAtividades);
-    processosStore.fetchProcessoDetalhe = vi.fn().mockResolvedValue(undefined);
+    vi.clearAllMocks();
     window.confirm = vi.fn(() => true);
 
-    await wrapper.vm.$nextTick();
+    // Default mocks
+    vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
+      codigo: 1,
+      tipo: TipoProcesso.MAPEAMENTO,
+      unidades: [
+        {
+          codUnidade: 123,
+          sigla: "TESTE",
+          situacaoSubprocesso: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
+        },
+      ],
+    } as any);
+    vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue({
+      codigo: 1,
+      sigla: "TESTE",
+      nome: "Teste",
+    } as any);
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([]) as any,
+    );
+    vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
   });
 
   afterEach(() => {
     wrapper?.unmount();
   });
 
-  it('deve adicionar uma atividade', async () => {
-    const input = wrapper.find('[data-testid="input-nova-atividade"]');
-    await input.setValue('Nova Atividade');
-    await wrapper.find('[data-testid="form-nova-atividade"]').trigger('submit.prevent');
+  it("deve carregar atividades no mount", async () => {
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
 
-    expect(atividadesStore.adicionarAtividade).toHaveBeenCalledWith(
+    expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(123);
+  });
+
+  it("deve adicionar uma atividade", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    const inputWrapper = wrapper.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find("input");
+    await nativeInput.setValue("Nova Atividade");
+
+    vi.mocked(atividadeService.criarAtividade).mockResolvedValue({
+      codigo: 99,
+      descricao: "Nova Atividade",
+      conhecimentos: [],
+    } as any);
+
+    await wrapper
+      .find('[data-testid="form-nova-atividade"]')
+      .trigger("submit.prevent");
+
+    expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
+      { descricao: "Nova Atividade" },
       123,
-      {descricao: 'Nova Atividade'}
     );
   });
 
-  it('deve remover uma atividade', async () => {
-    await wrapper.find('[data-testid="btn-remover-atividade"]').trigger('click');
+  it("deve remover uma atividade", async () => {
+    // Setup mock BEFORE wrapper creation (or mock the fetch response)
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    vi.mocked(atividadeService.excluirAtividade).mockResolvedValue();
+
+    await wrapper
+      .find('[data-testid="btn-remover-atividade"]')
+      .trigger("click");
     expect(window.confirm).toHaveBeenCalled();
-    expect(atividadesStore.removerAtividade).toHaveBeenCalledWith(123, 1);
+    expect(atividadeService.excluirAtividade).toHaveBeenCalledWith(1);
   });
 
-  it('deve adicionar um conhecimento', async () => {
+  it("deve adicionar um conhecimento", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
     const form = wrapper.find('[data-testid="form-novo-conhecimento"]');
-    const input = form.find('[data-testid="input-novo-conhecimento"]');
-    await input.setValue('Novo Conhecimento');
-    await form.trigger('submit.prevent');
+    const inputWrapper = form.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find("input");
+    await nativeInput.setValue("Novo Conhecimento");
 
-    expect(atividadesStore.adicionarConhecimento).toHaveBeenCalledWith(
-      123,
+    vi.mocked(atividadeService.criarConhecimento).mockResolvedValue({
+      id: 99,
+      descricao: "Novo Conhecimento",
+    } as any);
+
+    await form.trigger("submit.prevent");
+
+    expect(atividadeService.criarConhecimento).toHaveBeenCalledWith(1, {
+      descricao: "Novo Conhecimento",
+    });
+  });
+
+  it("deve remover um conhecimento", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue();
+
+    await wrapper
+      .find('[data-testid="btn-remover-conhecimento"]')
+      .trigger("click");
+    expect(window.confirm).toHaveBeenCalled();
+    expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 101);
+  });
+
+  it("deve disponibilizar o cadastro", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue();
+    // Update process status for re-fetch
+    vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
+      codigo: 1,
+      tipo: TipoProcesso.MAPEAMENTO,
+      unidades: [
+        {
+          codUnidade: 123,
+          sigla: "TESTE",
+          situacaoSubprocesso:
+            SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES,
+        },
+      ],
+    } as any);
+
+    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+
+    const confirmBtn = wrapper.find(
+      '[data-testid="btn-confirmar-disponibilizacao"]',
+    );
+    await confirmBtn.trigger("click");
+    await flushPromises();
+
+    expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
+    expect(pushMock).toHaveBeenCalledWith("/painel");
+  });
+
+  it("deve abrir modal de importar atividades", async () => {
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper.find('[title="Importar"]').trigger("click");
+
+    const modal = wrapper.findComponent(ImportarAtividadesModal);
+    expect(modal.props("mostrar")).toBe(true);
+  });
+
+  it("deve permitir edição inline de atividade", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-editar-atividade"]').trigger("click");
+
+    expect(
+      wrapper.find('[data-testid="input-editar-atividade"]').exists(),
+    ).toBe(true);
+
+    await wrapper
+      .find('[data-testid="input-editar-atividade"]')
+      .setValue("Atividade Editada");
+
+    vi.mocked(atividadeService.atualizarAtividade).mockResolvedValue({
+      codigo: 1,
+      descricao: "Atividade Editada",
+    } as any);
+
+    await wrapper
+      .find('[data-testid="btn-salvar-edicao-atividade"]')
+      .trigger("click");
+
+    expect(atividadeService.atualizarAtividade).toHaveBeenCalledWith(
       1,
-      {descricao: 'Novo Conhecimento'}
+      expect.objectContaining({ descricao: "Atividade Editada" }),
     );
   });
 
-  it('deve remover um conhecimento', async () => {
-    await wrapper.find('[data-testid="btn-remover-conhecimento"]').trigger('click');
-    expect(window.confirm).toHaveBeenCalled();
-    expect(atividadesStore.removerConhecimento).toHaveBeenCalledWith(123, 1, 101);
+  it("deve abrir modal de editar conhecimento", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper
+      .find('[data-testid="btn-editar-conhecimento"]')
+      .trigger("click");
+
+    const modal = wrapper.findComponent(EditarConhecimentoModal);
+    expect(modal.props("mostrar")).toBe(true);
+    expect(modal.props("conhecimento")).toBeTruthy();
   });
 
-  it('deve disponibilizar o cadastro', async () => {
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
-    await wrapper.find('.modal-footer .btn-success').trigger('click');
-    expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
+  it("deve tratar disponibilizacao de revisao", async () => {
+    vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
+      codigo: 1,
+      tipo: TipoProcesso.REVISAO,
+      unidades: [
+        {
+          codUnidade: 123,
+          sigla: "TESTE",
+          situacaoSubprocesso:
+            SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+        },
+      ],
+    } as any);
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper(true); // isRevisao = true
+    wrapper = w;
+    await flushPromises();
+
+    vi.mocked(
+      cadastroService.disponibilizarRevisaoCadastro,
+    ).mockResolvedValue();
+
+    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+
+    const confirmBtn = wrapper.find(
+      '[data-testid="btn-confirmar-disponibilizacao"]',
+    );
+    await confirmBtn.trigger("click");
+    await flushPromises();
+
+    expect(cadastroService.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(
+      123,
+    );
+  });
+
+  it("deve abrir modal de historico de analise se houver analises", async () => {
+    vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([
+      {
+        codigo: 1,
+        dataHora: "2023-10-10T10:00:00",
+        unidadeSigla: "TESTE",
+        resultado: "REJEITADO",
+        observacoes: "Obs",
+      },
+    ] as any);
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    const buttons = wrapper.findAll("button");
+    const btn = buttons.find((b: any) =>
+      b.text().includes("Histórico de análise"),
+    );
+    expect(btn.exists()).toBe(true);
+
+    await btn.trigger("click");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Data/Hora");
+    expect(wrapper.text()).toContain("REJEITADO");
+  });
+
+  it("deve exibir alerta de atividades sem conhecimento ao disponibilizar", async () => {
+    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
+      mockMapaVisualizacao([...mockAtividades] as any) as any,
+    );
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain(
+      "As seguintes atividades não têm conhecimentos associados",
+    );
+    expect(wrapper.text()).toContain("Atividade 2");
   });
 });

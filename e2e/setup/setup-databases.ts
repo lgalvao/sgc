@@ -1,71 +1,163 @@
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import axios from 'axios';
 import { FullConfig } from '@playwright/test';
-const debugLog = (...args: any[]) => { if (process.env.E2E_DEBUG === '1') console.log(...args); };
+import { debug as debugLog, logger } from '../helpers/utils/logger';
+import fs from 'fs';
+import path from 'path';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:10000';
+// Use IPv4 explicitly to avoid node/java resolution mismatches (localhost vs ::1)
+const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1:10000';
 const BACKEND_HEALTH_URL = `${BACKEND_URL}/actuator/health`;
+const LOG_FILE = path.join(process.cwd(), 'e2e-backend.log');
 
-let backendProcess: ChildProcessWithoutNullStreams | undefined;
+let backendProcess: ChildProcess | undefined;
 
 async function globalSetup(config: FullConfig) {
     debugLog('Starting E2E backend server...');
 
-    backendProcess = spawn('./gradlew', [':backend:bootRun', "--args='--spring.profiles.active=e2e'"], {
-        stdio: 'inherit',
-        shell: true,
-        cwd: process.cwd()
-    });
+    // Create a write stream for the log file
+    const logStream = fs.createWriteStream(LOG_FILE, { flags: 'w' });
 
-    // Wait for the backend to be healthy
-    let retries = 0;
-    const maxRetries = 60; // 60 retries * 1 second = 60 seconds timeout
-    while (retries < maxRetries) {
-        try {
-            const response = await axios.get(BACKEND_HEALTH_URL);
-            if (response.status === 200 && response.data.status === 'UP') {
-                console.log('Backend server is up and healthy.');
-                break;
+    debugLog(`Backend logs will be written to: ${LOG_FILE}`);
+
+    try {
+        backendProcess = spawn('./gradlew', [':backend:bootRunE2E', "--args='--spring.profiles.active=e2e'"], {
+            stdio: 'pipe', // Capture streams so we can tee them
+            shell: true,
+            cwd: process.cwd()
+        });
+
+        if (backendProcess.stdout) {
+            backendProcess.stdout.on('data', (data) => {
+                process.stdout.write(data); // Write to console
+                logStream.write(data);      // Write to file
+            });
+        }
+
+        if (backendProcess.stderr) {
+            backendProcess.stderr.on('data', (data) => {
+                process.stderr.write(data); // Write to console
+                logStream.write(data);      // Write to file
+            });
+        }
+
+        let backendExited = false;
+        let exitCode: number | null = null;
+
+        backendProcess.on('exit', (code) => {
+            backendExited = true;
+            exitCode = code;
+            if (code !== 0 && code !== null) {
+                logger.error(`Backend process exited prematurely with code ${code}`);
             }
-        } catch (error) {
-            // Ignore connection errors while waiting for server to start
-        }
-        retries++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+        });
 
-    if (retries === maxRetries) {
-        console.error('Backend server did not start within the expected time.');
-        if (backendProcess) {
-            backendProcess.kill();
+        // Wait for the backend to be healthy
+        let retries = 0;
+        const maxRetries = 60; // 60 retries * 1 second = 60 seconds timeout
+        while (retries < maxRetries) {
+            if (backendExited) {
+                logger.error(`Backend failed to start (exited with code ${exitCode}). Check logs above.`);
+                process.exit(1);
+            }
+
+            try {
+                const response = await axios.get(BACKEND_HEALTH_URL);
+                if (response.status === 200 && response.data.status === 'UP') {
+                    logger.success('Backend server is up and healthy.');
+                    break;
+                }
+            } catch (error) {
+                // Ignore connection errors while waiting for server to start
+            }
+            retries++;
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
+
+        if (retries === maxRetries) {
+            logger.error('Backend server did not start within the expected time.');
+            console.log('\n--- BACKEND LOGS (TAIL) ---');
+            // Read the last 50 lines of the log file
+            try {
+                const logs = fs.readFileSync(LOG_FILE, 'utf8');
+                const lines = logs.split('\n');
+                console.log(lines.slice(-50).join('\n'));
+            } catch (e) {
+                console.log('Could not read log file.');
+            }
+            console.log('---------------------------\n');
+
+            if (backendProcess) {
+                backendProcess.kill();
+            }
+            process.exit(1);
+        }
+
+        debugLog('✓ Infraestrutura de testes E2E configurada');
+        debugLog('  - Backend URL:', BACKEND_URL);
+        debugLog('  - Modo de execução: SEQUENCIAL (Banco compartilhado)');
+
+    } catch (e) {
+        logger.error('Failed to spawn backend process', e);
         process.exit(1);
     }
-
-    debugLog('✓ Infraestrutura de testes E2E configurada');
-    debugLog('  - Backend URL:', BACKEND_URL);
-    debugLog('  - Isolamento de banco: ATIVO (por teste)');
 }
 
 async function globalTeardown() {
     debugLog('Stopping E2E backend server gracefully...');
     try {
-        await axios.post(`${BACKEND_URL}/actuator/shutdown`);
-        console.log('Backend shutdown request sent. Waiting for process to exit...');
+        await axios.post(`${BACKEND_URL}/actuator/shutdown`, {}, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        logger.info('Backend shutdown request sent. Waiting for process to exit...');
         // Give some time for the process to shut down
         await new Promise(resolve => setTimeout(resolve, 5000));
     } catch (error: any) {
-        console.error(`Error sending shutdown request to backend: ${error.message}`);
-        if (backendProcess) {
-            console.log('Force killing backend process...');
-            backendProcess.kill();
-        }
+        // It's possible the server is already down or unreachable, which is fine.
+        debugLog(`Shutdown request info: ${error.message}`);
     } finally {
-        if (backendProcess && !backendProcess.killed) {
-            console.log('Backend process still running, force killing...');
-            backendProcess.kill();
+        if (backendProcess) {
+            // Try to kill the gradle wrapper process
+            try {
+                backendProcess.kill();
+            } catch (e) {
+                // ignore
+            }
         }
-        console.log('Backend server stopped.');
+
+        // Ensure the process on the port is killed
+        try {
+            const port = new URL(BACKEND_URL).port;
+            if (port) {
+               // Find PID using lsof and kill it
+               const { execSync } = require('child_process');
+               try {
+                   // Check if lsof is available
+                   try {
+                     execSync('lsof -v', { stdio: 'ignore' });
+                   } catch (e) {
+                     // lsof not available
+                   }
+
+                   // Use lsof to check if port is still in use
+                   try {
+                       const pid = execSync(`lsof -t -i:${port}`).toString().trim();
+                       if (pid) {
+                           logger.warn(`Force killing backend process on port ${port} (PID: ${pid})...`);
+                           process.kill(parseInt(pid), 'SIGKILL');
+                       }
+                   } catch (e) {
+                       // No process on port, all good
+                   }
+               } catch (e) {
+                   // Ignore
+               }
+            }
+        } catch (e) {
+            // Ignore URL parsing errors
+        }
+
+        logger.success('Backend server stopped.');
     }
 }
 

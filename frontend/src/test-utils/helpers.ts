@@ -1,6 +1,6 @@
-import {createPinia, setActivePinia} from 'pinia';
-import {vi} from 'vitest';
-import type {Atividade} from '@/types/tipos';
+import {createPinia, setActivePinia} from "pinia";
+import {vi} from "vitest";
+import type {Atividade} from "@/types/tipos";
 
 /**
  * Dados de mock reutilizáveis para atividades
@@ -10,18 +10,25 @@ export function getMockAtividadesData(): Atividade[] {
         {
             codigo: 1,
             descricao: "Manutenção de sistemas administrativos criados pela unidade",
-            conhecimentos: [{id: 1, descricao: "Criação de testes de integração em Cypress"}]
+            conhecimentos: [
+                {id: 1, descricao: "Criação de testes de integração em Cypress"},
+            ],
         },
         {
             codigo: 2,
             descricao: "Especificação de sistemas administrativos",
-            conhecimentos: [{id: 6, descricao: "Modelagem de dados"}]
+            conhecimentos: [{id: 6, descricao: "Modelagem de dados"}],
         },
         {
             codigo: 3,
             descricao: "Implantação de sistemas externos",
-            conhecimentos: [{id: 40, descricao: "Conhecimento em configuração de APIs de terceiros"}]
-        }
+            conhecimentos: [
+                {
+                    id: 40,
+                    descricao: "Conhecimento em configuração de APIs de terceiros",
+                },
+            ],
+        },
     ];
 }
 
@@ -31,16 +38,23 @@ export function getMockAtividadesData(): Atividade[] {
  */
 export async function prepareFreshAtividadesStore() {
     setActivePinia(createPinia());
-    const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../stores/atividades')) as {
-        useAtividadesStore: () => any;
+    const {useAtividadesStore: useAtividadesStoreActual} =
+        (await vi.importActual("../stores/atividades")) as {
+            useAtividadesStore: () => any;
     };
     const store = useAtividadesStoreActual();
     const initialAtividades = getMockAtividadesData();
     store.atividades = initialAtividades.map((a: Atividade) => ({
         ...a,
-        conhecimentos: a.conhecimentos.map((c: any) => ({...c}))
+        conhecimentos: a.conhecimentos.map((c: any) => ({...c})),
     }));
-    store.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.codigo, ...a.conhecimentos.map((c: any) => c.id)])) + 1;
+    store.nextId =
+        Math.max(
+            ...initialAtividades.flatMap((a: Atividade) => [
+                a.codigo,
+                ...a.conhecimentos.map((c: any) => c.id),
+            ]),
+        ) + 1;
     return store;
 }
 
@@ -53,4 +67,3 @@ export function initPinia() {
     setActivePinia(pinia);
     return pinia;
 }
-

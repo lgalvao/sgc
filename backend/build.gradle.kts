@@ -6,6 +6,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
+    id("jacoco")
     java
 }
 
@@ -27,10 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("jakarta.servlet:jakarta.servlet-api") // Explicitly add Jakarta Servlet API
-
-
-
+    implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -91,11 +89,8 @@ tasks.withType<Test> {
     }
 
     jvmArgs = listOf(
-        "-Dlogging.level.root=ERROR",
+        "-Dlogging.level.root=INFO",
         "-Dlogging.level.sgc=INFO",
-        "-Dlogging.level.org.hibernate=ERROR",
-        "-Dlogging.level.org.springframework=ERROR",
-        "-Dlogging.level.org.springframework.boot.autoconfigure.condition=ERROR",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
@@ -123,6 +118,27 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
     }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
+    }
+    classDirectories.setFrom(
+        sourceSets["main"].output.asFileTree.matching {
+            exclude("**/sgc/e2e/**")
+            exclude("**/sgc/comum/config/**")
+            exclude("**/*MapperImpl*")
+            exclude("**/*Impl_*")
+        }
+    )
 }
 
 tasks.register<BootRun>("bootRunE2E") {

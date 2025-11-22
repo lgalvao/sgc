@@ -1,14 +1,14 @@
-import apiClient from '../axios-setup';
 import {
     mapAtividadeDtoToModel,
     mapConhecimentoDtoToModel,
     mapCriarAtividadeRequestToDto,
-    mapCriarConhecimentoRequestToDto
-} from '@/mappers/atividades';
-import type {Atividade, Conhecimento, CriarConhecimentoRequest} from '@/types/tipos';
+    mapCriarConhecimentoRequestToDto,
+} from "@/mappers/atividades";
+import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
+import apiClient from "../axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
-  const response = await apiClient.get<any[]>('/atividades');
+    const response = await apiClient.get<any[]>("/atividades");
   return response.data.map(mapAtividadeDtoToModel);
 }
 
@@ -17,14 +17,23 @@ export async function obterAtividadePorId(id: number): Promise<Atividade> {
   return mapAtividadeDtoToModel(response.data);
 }
 
-export async function criarAtividade(request: any, codSubrocesso: number): Promise<Atividade> {
+export async function criarAtividade(
+    request: any,
+    codSubrocesso: number,
+): Promise<Atividade> {
     const requestDto = mapCriarAtividadeRequestToDto(request, codSubrocesso);
-    const response = await apiClient.post<any>('/atividades', requestDto);
+    const response = await apiClient.post<any>("/atividades", requestDto);
     return mapAtividadeDtoToModel(response.data);
 }
 
-export async function atualizarAtividade(codAtividade: number, request: Atividade): Promise<Atividade> {
-    const response = await apiClient.post<any>(`/atividades/${codAtividade}/atualizar`, request);
+export async function atualizarAtividade(
+    codAtividade: number,
+    request: Atividade,
+): Promise<Atividade> {
+    const response = await apiClient.post<any>(
+        `/atividades/${codAtividade}/atualizar`,
+        request,
+    );
     return mapAtividadeDtoToModel(response.data);
 }
 
@@ -32,22 +41,44 @@ export async function excluirAtividade(codAtividade: number): Promise<void> {
   await apiClient.post(`/atividades/${codAtividade}/excluir`);
 }
 
-export async function listarConhecimentos(atividadeId: number): Promise<Conhecimento[]> {
-    const response = await apiClient.get<any[]>(`/atividades/${atividadeId}/conhecimentos`);
+export async function listarConhecimentos(
+    atividadeId: number,
+): Promise<Conhecimento[]> {
+    const response = await apiClient.get<any[]>(
+        `/atividades/${atividadeId}/conhecimentos`,
+    );
     return response.data.map(mapConhecimentoDtoToModel);
 }
 
-export async function criarConhecimento(atividadeId: number, request: CriarConhecimentoRequest): Promise<Conhecimento> {
+export async function criarConhecimento(
+    atividadeId: number,
+    request: CriarConhecimentoRequest,
+): Promise<Conhecimento> {
     const requestDto = mapCriarConhecimentoRequestToDto(request);
-    const response = await apiClient.post<any>(`/atividades/${atividadeId}/conhecimentos`, requestDto);
+    const response = await apiClient.post<any>(
+        `/atividades/${atividadeId}/conhecimentos`,
+        requestDto,
+    );
     return mapConhecimentoDtoToModel(response.data);
 }
 
-export async function atualizarConhecimento(codAtividade: number, codConhecimento: number, request: Conhecimento): Promise<Conhecimento> {
-    const response = await apiClient.post<any>(`/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`, request);
+export async function atualizarConhecimento(
+    codAtividade: number,
+    codConhecimento: number,
+    request: Conhecimento,
+): Promise<Conhecimento> {
+    const response = await apiClient.post<any>(
+        `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`,
+        request,
+    );
     return mapConhecimentoDtoToModel(response.data);
 }
 
-export async function excluirConhecimento(codAtividade: number, codConhecimento: number): Promise<void> {
-    await apiClient.post(`/atividades/${codAtividade}/conhecimentos/${codConhecimento}/excluir`);
+export async function excluirConhecimento(
+    codAtividade: number,
+    codConhecimento: number,
+): Promise<void> {
+    await apiClient.post(
+        `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/excluir`,
+    );
 }

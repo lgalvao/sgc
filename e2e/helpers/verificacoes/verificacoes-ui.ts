@@ -58,13 +58,15 @@ export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<v
  */
 export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean): Promise<void> {
     const tabela = page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_PROCESSOS));
+
     // Esperar a tabela estar visível primeiro
-    await expect(tabela).toBeVisible({ timeout: 5000 });
+    await expect(tabela).toBeVisible();
+
     const processo = tabela.locator('tbody tr').filter({ hasText: nomeProcesso });
     if (visivel) {
-        await expect(processo).toBeVisible({ timeout: 5000 });
+        await expect(processo).toBeVisible();
     } else {
-        await expect(processo).toBeHidden({ timeout: 2000 });
+        await expect(processo).toBeHidden();
     }
 }
 
@@ -585,4 +587,15 @@ export async function verificarPainelAdminVisivel(page: Page): Promise<void> {
 export async function verificarPainelChefeVisivel(page: Page): Promise<void> {
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByTitle('Configurações do sistema')).not.toBeVisible();
+}
+
+/**
+ * Verifica se um alerta com o texto especificado está visível na tabela de alertas.
+ * @param page A instância da página do Playwright.
+ * @param texto O texto ou regex a ser verificado.
+ */
+export async function verificarAlertaNaTabela(page: Page, texto: string | RegExp): Promise<void> {
+    const tabelaAlertas = page.locator('[data-testid="tabela-alertas"]');
+    const alerta = tabelaAlertas.locator('tr').filter({hasText: texto});
+    await expect(alerta.first()).toBeVisible();
 }

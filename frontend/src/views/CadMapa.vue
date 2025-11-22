@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
     </div>
@@ -9,42 +9,44 @@
         Mapa de competências técnicas
       </div>
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeVerImpacto"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           data-testid="impactos-mapa-button"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
-        </button>
-        <button
+        </BButton>
+        <BButton
           :disabled="competencias.length === 0"
-          class="btn btn-outline-success"
+          variant="outline-success"
           data-testid="btn-disponibilizar-page"
           @click="abrirModalDisponibilizar"
         >
           Disponibilizar
-        </button>
+        </BButton>
       </div>
     </div>
 
     <div v-if="unidade">
       <div class="mb-4 mt-3">
-        <button
-          class="btn btn-outline-primary mb-3"
+        <BButton
+          variant="outline-primary"
+          class="mb-3"
           data-testid="btn-abrir-criar-competencia"
           @click="() => abrirModalCriarNovaCompetencia()"
         >
           <i class="bi bi-plus-lg" /> Criar competência
-        </button>
+        </BButton>
 
-        <div
+        <BCard
           v-for="comp in competencias"
           :key="comp.codigo"
-          class="card mb-2 competencia-card"
+          class="mb-2 competencia-card"
           data-testid="competencia-item"
+          no-body
         >
-          <div class="card-body">
+          <BCardBody>
             <div
               class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
             >
@@ -53,61 +55,64 @@
                 data-testid="competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
-                <button
-                  class="btn btn-sm btn-outline-primary botao-acao"
-                  data-bs-toggle="tooltip"
+                <BButton
+                  v-b-tooltip.hover
+                  variant="outline-primary"
+                  size="sm"
+                  class="botao-acao"
                   data-testid="btn-editar-competencia"
                   title="Editar"
                   @click="iniciarEdicaoCompetencia(comp)"
                 >
                   <i class="bi bi-pencil" />
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-danger botao-acao"
-                  data-bs-toggle="tooltip"
+                </BButton>
+                <BButton
+                  v-b-tooltip.hover
+                  variant="outline-danger"
+                  size="sm"
+                  class="botao-acao"
                   data-testid="btn-excluir-competencia"
                   title="Excluir"
                   @click="excluirCompetencia(comp.codigo)"
                 >
                   <i class="bi bi-trash" />
-                </button>
+                </BButton>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
-              <div
+              <BCard
                 v-for="atvId in comp.atividadesAssociadas"
                 :key="atvId"
-                class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                no-body
               >
-                <div class="card-body d-flex align-items-center">
+                <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
                       v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
-                      :data-bs-html="true"
-                      :data-bs-title="getConhecimentosTooltip(atvId)"
+                      v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
                       class="badge bg-secondary ms-2"
-                      data-bs-custom-class="conhecimentos-tooltip"
-                      data-bs-placement="top"
-                      data-bs-toggle="tooltip"
                       data-testid="badge-conhecimentos"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
                   </span>
-                  <button
-                    class="btn btn-sm btn-outline-secondary botao-acao-inline"
-                    data-bs-toggle="tooltip"
+                  <BButton
+                    v-b-tooltip.hover
+                    variant="outline-secondary"
+                    size="sm"
+                    class="botao-acao-inline"
                     title="Remover Atividade"
                     @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
                     <i class="bi bi-trash" />
-                  </button>
-                </div>
-              </div>
+                  </BButton>
+                </BCardBody>
+              </BCard>
             </div>
-          </div>
-        </div>
+          </BCardBody>
+        </BCard>
       </div>
     </div>
     <div v-else>
@@ -115,264 +120,154 @@
     </div>
 
     <!-- Modal de Criar Nova Competência -->
-    <div
-      v-if="mostrarModalCriarNovaCompetencia"
+    <BModal
+      v-model="mostrarModalCriarNovaCompetencia"
+      :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
+      size="lg"
+      centered
       data-testid="criar-competencia-modal"
-      aria-labelledby="criarCompetenciaModalLabel"
-      aria-modal="true"
-      class="modal fade show"
-      role="dialog"
-      style="display: block;"
-      tabindex="-1"
+      @hidden="fecharModalCriarNovaCompetencia"
     >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              id="criarCompetenciaModalLabel"
-              class="modal-title"
-            >
-              {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}
-            </h5>
-            <button
-              aria-label="Close"
-              class="btn-close"
-              type="button"
-              @click="fecharModalCriarNovaCompetencia"
-            />
-          </div>
-          <div class="modal-body">
-            <!-- Conteúdo do card movido para cá -->
-            <div class="mb-4">
-              <h5>Descrição</h5>
-              <div class="mb-2">
-                <textarea
-                  v-model="novaCompetencia.descricao"
-                  class="form-control"
-                  data-testid="input-nova-competencia"
-                  placeholder="Descreva a competência"
-                  rows="3"
-                />
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <h5>Atividades</h5>
-              <div class="d-flex flex-wrap gap-2">
-                <div
-                  v-for="atividade in atividades"
-                  :key="atividade.codigo"
-                  :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-                  class="card atividade-card-item"
-                  :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.codigo)"
-                >
-                  <div class="card-body d-flex align-items-center">
-                    <input
-                      :id="`atv-${atividade.codigo}`"
-                      v-model="atividadesSelecionadas"
-                      :value="atividade.codigo"
-                      class="form-check-input me-2"
-                      data-testid="atividade-checkbox"
-                      hidden
-                      type="checkbox"
-                    >
-                    <label class="form-check-label mb-0 d-flex align-items-center">
-                      {{ atividade.descricao }}
-                      <span
-                        v-if="atividade.conhecimentos.length > 0"
-                        :data-bs-html="true"
-                        :data-bs-title="getConhecimentosModal(atividade)"
-                        class="badge bg-secondary ms-2"
-                        data-bs-custom-class="conhecimentos-tooltip"
-                        data-bs-placement="right"
-                        data-bs-toggle="tooltip"
-                        data-testid="badge-conhecimentos"
-                      >
-                        {{ atividade.conhecimentos.length }}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-secondary"
-              type="button"
-              @click="fecharModalCriarNovaCompetencia"
-            >
-              Cancelar
-            </button>
-            <button
-              :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-              class="btn btn-primary"
-              data-bs-toggle="tooltip"
-              data-testid="btn-criar-competencia"
-              title="Criar Competência"
-              type="button"
-              @click="adicionarCompetenciaEFecharModal"
-            >
-              <i
-                class="bi bi-save"
-              /> Salvar
-            </button>
-          </div>
+      <!-- Conteúdo do card movido para cá -->
+      <div class="mb-4">
+        <h5>Descrição</h5>
+        <div class="mb-2">
+          <BFormTextarea
+            v-model="novaCompetencia.descricao"
+            data-testid="input-nova-competencia"
+            placeholder="Descreva a competência"
+            rows="3"
+          />
         </div>
       </div>
-    </div>
 
-    <div
-      v-if="mostrarModalCriarNovaCompetencia"
-      class="modal-backdrop fade show"
-    />
+      <div class="mb-4">
+        <h5>Atividades</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <BCard
+            v-for="atividade in atividades"
+            :key="atividade.codigo"
+            :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
+            class="atividade-card-item"
+            :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
+            no-body
+          >
+            <BCardBody class="d-flex align-items-center">
+              <BFormCheckbox
+                :id="`atv-${atividade.codigo}`"
+                v-model="atividadesSelecionadas"
+                :value="atividade.codigo"
+                data-testid="atividade-checkbox"
+              >
+                {{ atividade.descricao }}
+                <span
+                  v-if="atividade.conhecimentos.length > 0"
+                  v-b-tooltip.html.right="getConhecimentosModal(atividade)"
+                  class="badge bg-secondary ms-2"
+                  data-testid="badge-conhecimentos"
+                >
+                  {{ atividade.conhecimentos.length }}
+                </span>
+              </BFormCheckbox>
+            </BCardBody>
+          </BCard>
+        </div>
+      </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalCriarNovaCompetencia"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          v-b-tooltip.hover
+          variant="primary"
+          :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+          data-testid="btn-criar-competencia"
+          title="Criar Competência"
+          @click="adicionarCompetenciaEFecharModal"
+        >
+          <i class="bi bi-save" /> Salvar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de Disponibilizar -->
-    <div
-      v-if="mostrarModalDisponibilizar"
+    <BModal
+      v-model="mostrarModalDisponibilizar"
+      title="Disponibilização do mapa de competências"
       data-testid="disponibilizar-modal"
-      aria-labelledby="disponibilizarModalLabel"
-      aria-modal="true"
-      class="modal fade show"
-      role="dialog"
-      style="display: block;"
-      tabindex="-1"
+      centered
+      @hidden="fecharModalDisponibilizar"
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              id="disponibilizarModalLabel"
-              class="modal-title"
-            >
-              Disponibilização do mapa de competências
-            </h5>
-            <button
-              aria-label="Close"
-              class="btn-close"
-              type="button"
-              @click="fecharModalDisponibilizar"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="dataLimite"
-              >Data limite para validação</label>
-              <input
-                id="dataLimite"
-                v-model="dataLimiteValidacao"
-                data-testid="input-data-limite"
-                class="form-control"
-                type="date"
-              >
-            </div>
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="observacoes"
-              >Observações</label>
-              <textarea
-                id="observacoes"
-                v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes-disponibilizacao"
-                class="form-control"
-                rows="3"
-                placeholder="Digite observações sobre a disponibilização..."
-              />
-            </div>
-            <div
-              v-if="notificacaoDisponibilizacao"
-              class="alert alert-info mt-3"
-              data-testid="notificacao-disponibilizacao"
-            >
-              {{ notificacaoDisponibilizacao }}
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              class="btn btn-secondary"
-              type="button"
-              data-testid="btn-modal-cancelar"
-              @click="fecharModalDisponibilizar"
-            >
-              Cancelar
-            </button>
-            <button
-              :disabled="!dataLimiteValidacao"
-              class="btn btn-success"
-              type="button"
-              data-testid="btn-disponibilizar"
-              @click="disponibilizarMapa"
-            >
-              Disponibilizar
-            </button>
-          </div>
-        </div>
+      <div class="mb-3">
+        <label
+          class="form-label"
+          for="dataLimite"
+        >Data limite para validação</label>
+        <BFormInput
+          id="dataLimite"
+          v-model="dataLimiteValidacao"
+          data-testid="input-data-limite"
+          type="date"
+        />
       </div>
-    </div>
-
-    <div
-      v-if="mostrarModalDisponibilizar"
-      class="modal-backdrop fade show"
-    />
+      <div class="mb-3">
+        <label
+          class="form-label"
+          for="observacoes"
+        >Observações</label>
+        <BFormTextarea
+          id="observacoes"
+          v-model="observacoesDisponibilizacao"
+          data-testid="input-observacoes-disponibilizacao"
+          rows="3"
+          placeholder="Digite observações sobre a disponibilização..."
+        />
+      </div>
+      <BAlert
+        v-if="notificacaoDisponibilizacao"
+        variant="info"
+        class="mt-3"
+        :model-value="true"
+        data-testid="notificacao-disponibilizacao"
+      >
+        {{ notificacaoDisponibilizacao }}
+      </BAlert>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="btn-modal-cancelar"
+          @click="fecharModalDisponibilizar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          :disabled="!dataLimiteValidacao"
+          data-testid="btn-disponibilizar"
+          @click="disponibilizarMapa"
+        >
+          Disponibilizar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de Exclusão de Competência -->
-    <div
-      v-if="mostrarModalExcluirCompetencia"
-      aria-labelledby="excluirCompetenciaModalLabel"
-      aria-modal="true"
-      class="modal fade show"
-      role="dialog"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalExcluirCompetencia"
+      title="Exclusão de competência"
+      data-testid="excluir-competencia-modal"
+      ok-title="Confirmar"
+      cancel-title="Cancelar"
+      ok-variant="danger"
+      centered
+      @ok="confirmarExclusaoCompetencia"
+      @hidden="fecharModalExcluirCompetencia"
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              id="excluirCompetenciaModalLabel"
-              class="modal-title"
-            >
-              Exclusão de competência
-            </h5>
-            <button
-              aria-label="Close"
-              class="btn-close"
-              type="button"
-              @click="fecharModalExcluirCompetencia"
-            />
-          </div>
-          <div class="modal-body">
-            <p>Confirma a exclusão da competência "{{ competenciaParaExcluir?.descricao }}"?</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-secondary"
-              type="button"
-              @click="fecharModalExcluirCompetencia"
-            >
-              Cancelar
-            </button>
-            <button
-              class="btn btn-danger"
-              type="button"
-              @click="confirmarExclusaoCompetencia"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-if="mostrarModalExcluirCompetencia"
-      class="modal-backdrop fade show"
-    />
+      <p>Confirma a exclusão da competência "{{ competenciaParaExcluir?.descricao }}"?</p>
+    </BModal>
 
     <ImpactoMapaModal
       :id-processo="codProcesso"
@@ -380,133 +275,103 @@
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
     />
-  </div>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {storeToRefs} from 'pinia'
-import {useRoute} from 'vue-router'
-import {useMapasStore} from '@/stores/mapas'
-import {useAtividadesStore} from '@/stores/atividades'
-import {usePerfilStore} from '@/stores/perfil'
-import {useProcessosStore} from '@/stores/processos'
-import {usePerfil} from '@/composables/usePerfil'
-import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
-import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
+import {
+  BAlert,
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BFormCheckbox,
+  BFormInput,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import {useRoute} from "vue-router";
+import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import type {Atividade, Competencia} from "@/types/tipos";
 
-const route = useRoute()
-const mapasStore = useMapasStore()
-const {mapaCompleto} = storeToRefs(mapasStore)
-const atividadesStore = useAtividadesStore()
-const perfilStore = usePerfilStore()
-const processosStore = useProcessosStore()
-usePerfil()
+const route = useRoute();
+const mapasStore = useMapasStore();
+const {mapaCompleto} = storeToRefs(mapasStore);
+const atividadesStore = useAtividadesStore();
+const subprocessosStore = useSubprocessosStore();
+const unidadesStore = useUnidadesStore();
+usePerfil();
 
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const siglaUnidade = computed(() => String(route.params.siglaUnidade))
-
-const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaUnidade.value);
-});
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
 const podeVerImpacto = computed(() => {
-  if (!perfilStore.perfilSelecionado || !subprocesso.value) return false;
-
-  const perfil = perfilStore.perfilSelecionado;
-  const situacao = subprocesso.value.situacaoSubprocesso;
-
-  const isPermittedProfile = perfil === Perfil.ADMIN;
-  const isCorrectSituation = situacao === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS || situacao === SituacaoSubprocesso.MAPA_AJUSTADO;
-
-  return isPermittedProfile && isCorrectSituation;
+  return (
+      subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto ||
+      false
+  );
 });
 
 const mostrarModalImpacto = ref(false);
 
 function abrirModalImpacto() {
-  // Segue o comportamento esperado pelos testes:
-  // - Sem mudanças: não abre o modal e exibe notificação "Nenhum impacto..."
-  // - Com mudanças: abre o modal de impactos
-  // if (revisaoStore.mudancasRegistradas.length === 0) {
-  //   notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
-  //   return;
-  // }
-  // revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  // revisaoStore.setMudancasParaImpacto([]);
 }
 
-function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return null
-}
-
-const unidade = computed<Unidade | null>(() => {
-  // TODO: Fix unidades source
-  const unidadesData = processosStore.processoDetalhe?.unidades || [];
-  return buscarUnidade(unidadesData as unknown as Unidade[], siglaUnidade.value);
-})
-const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+const unidade = computed(() => unidadesStore.unidade);
+const codSubrocesso = ref<number | null>(null);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
-  if (codSubrocesso.value) {
-    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
+  // Carrega unidade diretamente
+  await unidadesStore.fetchUnidade(siglaUnidade.value);
+
+  // Busca ID do subprocesso
+  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+      codProcesso.value,
+      siglaUnidade.value,
+  );
+
+  if (id) {
+    codSubrocesso.value = id;
+    await Promise.all([
+      mapasStore.fetchMapaCompleto(id),
+      subprocessosStore.fetchSubprocessoDetalhe(id),
+      atividadesStore.fetchAtividadesParaSubprocesso(id),
+    ]);
   }
-  // Inicializar tooltips após o componente ser montado
-  import('bootstrap').then(({Tooltip}) => {
-    if (typeof document !== 'undefined') {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      tooltipTriggerList.forEach(tooltipTriggerEl => {
-        new Tooltip(tooltipTriggerEl)
-      })
-    }
-  })
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof codSubrocesso.value !== 'number') {
-    return []
+  if (typeof codSubrocesso.value !== "number") {
+    return [];
   }
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
-})
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+});
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
-const atividadesSelecionadas = ref<number[]>([])
-const novaCompetencia = ref({descricao: ''})
+const atividadesSelecionadas = ref<number[]>([]);
+const novaCompetencia = ref({descricao: ""});
 
-function toggleAtividade(codigo: number) {
-  const index = atividadesSelecionadas.value.indexOf(codigo);
-  if (index > -1) {
-    atividadesSelecionadas.value.splice(index, 1);
-  } else {
-    atividadesSelecionadas.value.push(codigo);
-  }
-}
+const competenciaSendoEditada = ref<Competencia | null>(null);
 
-
-const competenciaSendoEditada = ref<Competencia | null>(null)
-
-
-const mostrarModalCriarNovaCompetencia = ref(false)
-const mostrarModalDisponibilizar = ref(false)
-const mostrarModalExcluirCompetencia = ref(false)
-const competenciaParaExcluir = ref<Competencia | null>(null)
-const dataLimiteValidacao = ref('')
-const observacoesDisponibilizacao = ref('')
-const notificacaoDisponibilizacao = ref('')
+const mostrarModalCriarNovaCompetencia = ref(false);
+const mostrarModalDisponibilizar = ref(false);
+const mostrarModalExcluirCompetencia = ref(false);
+const competenciaParaExcluir = ref<Competencia | null>(null);
+const dataLimiteValidacao = ref("");
+const observacoesDisponibilizacao = ref("");
+const notificacaoDisponibilizacao = ref("");
 
 function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
@@ -516,26 +381,14 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
   if (competenciaParaEditar) {
     novaCompetencia.value.descricao = competenciaParaEditar.descricao;
-    atividadesSelecionadas.value = [...competenciaParaEditar.atividadesAssociadas];
+    atividadesSelecionadas.value = [
+      ...competenciaParaEditar.atividadesAssociadas,
+    ];
     competenciaSendoEditada.value = competenciaParaEditar;
   } else {
-    novaCompetencia.value.descricao = '';
+    novaCompetencia.value.descricao = "";
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
-  }
-
-  // Inicializar tooltips do modal
-  if (typeof document !== 'undefined') {
-    setTimeout(() => {
-      import('bootstrap').then(({Tooltip}) => {
-        if (typeof document !== 'undefined') {
-          const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
-          modalTooltips.forEach(tooltipEl => {
-            new Tooltip(tooltipEl)
-          })
-        }
-      })
-    }, 100)
   }
 }
 
@@ -543,49 +396,51 @@ function fecharModalCriarNovaCompetencia() {
   mostrarModalCriarNovaCompetencia.value = false;
 }
 
-
 function iniciarEdicaoCompetencia(competencia: Competencia) {
   competenciaSendoEditada.value = competencia;
   abrirModalCriarNovaCompetencia(competencia);
 }
 
-
 function descricaoAtividade(codigo: number): string {
-  const atv = atividades.value.find(a => a.codigo === codigo)
-  return atv ? atv.descricao : 'Atividade não encontrada'
+  const atv = atividades.value.find((a) => a.codigo === codigo);
+  return atv ? atv.descricao : "Atividade não encontrada";
 }
 
 function getConhecimentosTooltip(atividadeId: number): string {
-  const atividade = atividades.value.find(a => a.codigo === atividadeId)
+  const atividade = atividades.value.find((a) => a.codigo === atividadeId);
   if (!atividade || !atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento cadastrado'
+    return "Nenhum conhecimento cadastrado";
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
+      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join("");
 
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function getAtividadeCompleta(codigo: number): Atividade | undefined {
-  return atividades.value.find(a => a.codigo === codigo)
+  return atividades.value.find((a) => a.codigo === codigo);
 }
 
 function getConhecimentosModal(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento'
+    return "Nenhum conhecimento";
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
+      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join("");
 
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function adicionarCompetenciaEFecharModal() {
-  if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
+  if (
+      !novaCompetencia.value.descricao ||
+      atividadesSelecionadas.value.length === 0
+  )
+    return;
 
   const competencia: Competencia = {
     codigo: competenciaSendoEditada.value?.codigo || 0,
@@ -600,7 +455,7 @@ function adicionarCompetenciaEFecharModal() {
   }
 
   // Limpar formulário
-  novaCompetencia.value.descricao = '';
+  novaCompetencia.value.descricao = "";
   atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
 
@@ -608,7 +463,7 @@ function adicionarCompetenciaEFecharModal() {
 }
 
 function excluirCompetencia(codigo: number) {
-  const competencia = competencias.value.find(comp => comp.codigo === codigo);
+  const competencia = competencias.value.find((comp) => comp.codigo === codigo);
   if (competencia) {
     competenciaParaExcluir.value = competencia;
     mostrarModalExcluirCompetencia.value = true;
@@ -617,7 +472,10 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
+    mapasStore.removerCompetencia(
+        codSubrocesso.value as number,
+        competenciaParaExcluir.value.codigo,
+    );
     fecharModalExcluirCompetencia();
   }
 }
@@ -628,25 +486,32 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competencia = competencias.value.find(comp => comp.codigo === competenciaId);
+  const competencia = competencias.value.find(
+      (comp) => comp.codigo === competenciaId,
+  );
   if (competencia) {
     const competenciaAtualizada = {
       ...competencia,
-      atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
+      atividadesAssociadas: competencia.atividadesAssociadas.filter(
+          (id) => id !== atividadeId,
+      ),
     };
-    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
+    mapasStore.atualizarCompetencia(
+        codSubrocesso.value as number,
+        competenciaAtualizada,
+    );
   }
 }
 
 async function disponibilizarMapa() {
-  if (!codSubrocesso.value) return
+  if (!codSubrocesso.value) return;
 
   try {
     await mapasStore.disponibilizarMapa(codSubrocesso.value, {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
-    })
-    fecharModalDisponibilizar()
+    });
+    fecharModalDisponibilizar();
     // TODO: Adicionar redirecionamento para o painel
   } catch {
     // O erro já é tratado e notificado pelo store
@@ -655,23 +520,9 @@ async function disponibilizarMapa() {
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
-  observacoesDisponibilizacao.value = '';
-  notificacaoDisponibilizacao.value = '';
+  observacoesDisponibilizacao.value = "";
+  notificacaoDisponibilizacao.value = "";
 }
-
-onMounted(() => {
-  // Inicializar tooltips após o componente ser montado
-  import('bootstrap').then(({Tooltip}) => {
-    if (typeof document !== 'undefined') {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      tooltipTriggerList.forEach(tooltipTriggerEl => {
-        new Tooltip(tooltipTriggerEl)
-      })
-    }
-  })
-})
-
-
 </script>
 
 <style scoped>

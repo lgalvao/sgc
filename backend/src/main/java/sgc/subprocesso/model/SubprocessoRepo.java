@@ -21,6 +21,8 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     boolean existsByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
 
+    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
+
     Optional<Subprocesso> findByMapaCodigo(Long mapaCodigo);
 
     List<Subprocesso> findByUnidadeCodigo(Long unidadeCodigo);

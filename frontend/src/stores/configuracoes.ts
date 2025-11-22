@@ -1,11 +1,11 @@
-import {defineStore} from 'pinia';
+import {defineStore} from "pinia";
 
 interface ConfiguracoesState {
     diasInativacaoProcesso: number;
     diasAlertaNovo: number;
 }
 
-export const useConfiguracoesStore = defineStore('configuracoes', {
+export const useConfiguracoesStore = defineStore("configuracoes", {
     state: (): ConfiguracoesState => ({
         diasInativacaoProcesso: 10,
         diasAlertaNovo: 7,
@@ -13,14 +13,16 @@ export const useConfiguracoesStore = defineStore('configuracoes', {
     actions: {
         loadConfiguracoes() {
             try {
-                const savedConfig = localStorage.getItem('appConfiguracoes');
+                const savedConfig = localStorage.getItem("appConfiguracoes");
                 if (savedConfig) {
                     const parsedConfig = JSON.parse(savedConfig);
-                    this.diasInativacaoProcesso = parsedConfig.diasInativacaoProcesso || this.diasInativacaoProcesso;
-                    this.diasAlertaNovo = parsedConfig.diasAlertaNovo || this.diasAlertaNovo;
+                    this.diasInativacaoProcesso =
+                        parsedConfig.diasInativacaoProcesso || this.diasInativacaoProcesso;
+                    this.diasAlertaNovo =
+                        parsedConfig.diasAlertaNovo || this.diasAlertaNovo;
                 }
             } catch (e) {
-                console.error('Erro ao carregar configurações do localStorage:', e);
+                console.error("Erro ao carregar configurações do localStorage:", e);
             }
         },
         saveConfiguracoes() {
@@ -29,10 +31,10 @@ export const useConfiguracoesStore = defineStore('configuracoes', {
                     diasInativacaoProcesso: this.diasInativacaoProcesso,
                     diasAlertaNovo: this.diasAlertaNovo,
                 };
-                localStorage.setItem('appConfiguracoes', JSON.stringify(configToSave));
+                localStorage.setItem("appConfiguracoes", JSON.stringify(configToSave));
                 return true;
             } catch (e) {
-                console.error('Erro ao salvar configurações no localStorage:', e);
+                console.error("Erro ao salvar configurações no localStorage:", e);
                 return false;
             }
         },

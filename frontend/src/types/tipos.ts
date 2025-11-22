@@ -2,42 +2,33 @@
  * Tipos de situação de um processo.
  */
 export enum SituacaoProcesso {
-    CRIADO = 'CRIADO',
-    FINALIZADO = 'FINALIZADO',
-    EM_ANDAMENTO = 'EM_ANDAMENTO',
+    CRIADO = "CRIADO",
+    FINALIZADO = "FINALIZADO",
+    EM_ANDAMENTO = "EM_ANDAMENTO",
 }
 
 /**
  * Tipos de processo.
  */
 export enum TipoProcesso {
-    MAPEAMENTO = 'MAPEAMENTO',
-    REVISAO = 'REVISAO',
-    DIAGNOSTICO = 'DIAGNOSTICO',
+    MAPEAMENTO = "MAPEAMENTO",
+    REVISAO = "REVISAO",
+    DIAGNOSTICO = "DIAGNOSTICO",
 }
 
 /**
  * Perfis de usuário no sistema.
  */
 export enum Perfil {
-    ADMIN = 'ADMIN',
-    GESTOR = 'GESTOR',
-    CHEFE = 'CHEFE',
-    SERVIDOR = 'SERVIDOR',
+    ADMIN = "ADMIN",
+    GESTOR = "GESTOR",
+    CHEFE = "CHEFE",
+    SERVIDOR = "SERVIDOR",
 }
 
 /**
  * Representa uma unidade organizacional.
  */
-export interface UnidadeResponsavel extends Usuario {
-    usuarioTitulo?: string;
-    unidadeCodigo?: number;
-    tipo?: string;
-    idServidor?: number;
-    dataInicio?: string;
-    dataFim?: string | null;
-}
-
 export interface Unidade {
     codigo: number;
     nome: string;
@@ -46,7 +37,23 @@ export interface Unidade {
     filhas?: Unidade[];
     tipo?: string;
     idServidorTitular?: number;
-    responsavel?: UnidadeResponsavel;
+    isElegivel?: boolean;
+    responsavel?: Responsavel | null;
+}
+
+export interface Responsavel {
+    codigo: number;
+    nome: string;
+    tituloEleitoral: string;
+    unidade: Unidade;
+    email: string;
+    ramal: string;
+    usuarioTitulo: string;
+    unidadeCodigo: number;
+    idServidor: number;
+    tipo: string;
+    dataInicio: string;
+    dataFim: string | null;
 }
 
 /**
@@ -62,19 +69,19 @@ export interface PerfilUnidade {
  * Tipos de situação de um subprocesso.
  */
 export enum SituacaoSubprocesso {
-    NAO_INICIADO = 'NAO_INICIADO',
-    ATIVIDADES_REVISADAS = 'ATIVIDADES_REVISADAS',
-    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = 'AGUARDANDO_HOMOLOGACAO_ATIVIDADES',
-    ATIVIDADES_HOMOLOGADAS = 'ATIVIDADES_HOMOLOGADAS',
-    MAPEAMENTO_CONCLUIDO = 'MAPEAMENTO_CONCLUIDO',
-    MAPA_VALIDADO = 'MAPA_VALIDADO',
-    AGUARDANDO_AJUSTES_MAPA = 'AGUARDANDO_AJUSTES_MAPA',
-    MAPA_AJUSTADO = 'MAPA_AJUSTADO',
-    AGUARDANDO_HOMOLOGACAO_MAPA = 'AGUARDANDO_HOMOLOGACAO_MAPA',
-    MAPA_HOMOLOGADO = 'MAPA_HOMOLOGADO',
-    CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
-    CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
+    NAO_INICIADO = "NAO_INICIADO",
+    ATIVIDADES_REVISADAS = "ATIVIDADES_REVISADAS",
+    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = "AGUARDANDO_HOMOLOGACAO_ATIVIDADES",
+    ATIVIDADES_HOMOLOGADAS = "ATIVIDADES_HOMOLOGADAS",
+    MAPEAMENTO_CONCLUIDO = "MAPEAMENTO_CONCLUIDO",
+    MAPA_VALIDADO = "MAPA_VALIDADO",
+    AGUARDANDO_AJUSTES_MAPA = "AGUARDANDO_AJUSTES_MAPA",
+    MAPA_AJUSTADO = "MAPA_AJUSTADO",
+    AGUARDANDO_HOMOLOGACAO_MAPA = "AGUARDANDO_HOMOLOGACAO_MAPA",
+    MAPA_HOMOLOGADO = "MAPA_HOMOLOGADO",
+    CONCLUIDO = "CONCLUIDO",
+    REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
+    CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
 }
 
 export interface Conhecimento {
@@ -85,7 +92,7 @@ export interface Conhecimento {
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: { id: number; descricao: string; }[];
+    conhecimentos: { id: number; descricao: string }[];
 }
 
 export interface Competencia {
@@ -127,8 +134,10 @@ export interface ProcessoResumo {
     dataCriacao: string;
     unidadeCodigo: number;
     unidadeNome: string;
+    unidadesParticipantes?: string;
     dataFinalizacao?: string;
     dataFinalizacaoFormatada?: string;
+    linkDestino?: string;
 }
 
 export interface Subprocesso {
@@ -151,18 +160,19 @@ export interface Usuario {
     ramal: string;
 }
 
-export interface AlertaFormatado {
+export interface Alerta {
     codigo: number;
-    processo: string;
-    dataHora: string;
-    unidadeOrigem: Unidade;
-    unidadeDestino: Unidade;
-    usuarioDestino: Usuario;
+    codProcesso: number;
+    unidadeOrigem: string;
+    unidadeDestino: string;
     descricao: string;
+    dataHora: string;
+    dataHoraLeitura: string | null;
+    linkDestino: string;
+    mensagem: string;
     dataHoraFormatada: string;
     origem: string;
-    mensagem: string;
-    data: string;
+    processo: string;
 }
 
 export interface Movimentacao {
@@ -248,19 +258,33 @@ export interface UnidadeParticipante {
     filhos: UnidadeParticipante[];
 }
 
-export interface ProcessoDetalhe {
-    codigo: number;
-    descricao: string;
-    tipo: TipoProcesso;
-    situacao: SituacaoProcesso;
-    dataLimite: string;
-    dataCriacao: string;
-    dataFinalizacao?: string;
-    unidades: UnidadeParticipante[];
-    resumoSubprocessos: ProcessoResumo[];
-    podeFinalizar: boolean;
-    podeHomologarCadastro: boolean;
-    podeHomologarMapa: boolean;
+export interface SubprocessoPermissoes {
+    podeVerPagina: boolean;
+    podeEditarMapa: boolean;
+    podeVisualizarMapa: boolean;
+    podeDisponibilizarCadastro: boolean;
+    podeDevolverCadastro: boolean;
+    podeAceitarCadastro: boolean;
+    podeVisualizarDiagnostico: boolean;
+    podeAlterarDataLimite: boolean;
+    podeVisualizarImpacto: boolean;
+}
+
+export interface SubprocessoDetalhe {
+    unidade: Unidade;
+    titular: Usuario;
+    responsavel: Usuario;
+    situacao: SituacaoSubprocesso;
+    situacaoLabel: string;
+    localizacaoAtual: string;
+    processoDescricao: string;
+    tipoProcesso: TipoProcesso;
+    prazoEtapaAtual: string;
+    isEmAndamento: boolean;
+    etapaAtual: number;
+    movimentacoes: Movimentacao[];
+    elementosProcesso: any[];
+    permissoes: SubprocessoPermissoes;
 }
 
 export interface ConhecimentoVisualizacao {
@@ -331,24 +355,13 @@ export interface MapaCompleto {
     subprocessoCodigo: number;
     observacoes: string;
     competencias: Competencia[];
+    situacao: string;
 }
 
 export interface MapaAjuste {
     codigo: number;
     descricao: string;
     competencias: Competencia[];
-}
-
-export interface ImpactoMapa {
-    temImpactos: boolean;
-    totalAtividadesInseridas: number;
-    totalAtividadesRemovidas: number;
-    totalAtividadesAlteradas: number;
-    totalCompetenciasImpactadas: number;
-    atividadesInseridas: Atividade[];
-    atividadesRemovidas: Atividade[];
-    atividadesAlteradas: Atividade[];
-    competenciasImpactadas: Competencia[];
 }
 
 export interface DisponibilizarMapaRequest {

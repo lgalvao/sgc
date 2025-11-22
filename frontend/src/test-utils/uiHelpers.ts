@@ -1,14 +1,18 @@
-import {expect} from 'vitest';
+import {expect} from "vitest";
 
 /**
  * Seleciona processo e unidade nos selects do modal e aguarda atualizações reativas.
  */
-export async function selecionarProcessoEUnidade(wrapper: any, processoId = 1, unidadeId = 1) {
-  const processoSelect = wrapper.find('select#processo-select');
+export async function selecionarProcessoEUnidade(
+    wrapper: any,
+    processoId = 1,
+    unidadeId = 1,
+) {
+    const processoSelect = wrapper.find("select#processo-select");
   await processoSelect.setValue(processoId);
   await wrapper.vm.$nextTick();
 
-  const unidadeSelect = wrapper.find('select#unidade-select');
+    const unidadeSelect = wrapper.find("select#unidade-select");
   await unidadeSelect.setValue(unidadeId);
   await wrapper.vm.$nextTick();
 
@@ -19,13 +23,13 @@ export async function selecionarProcessoEUnidade(wrapper: any, processoId = 1, u
  * Assertions helpers para o botão Importar
  */
 export function expectImportButtonDisabled(wrapper: any) {
-  const importarButton = wrapper.find('.btn-outline-primary');
-  expect(importarButton.attributes('disabled')).toBeDefined();
+    const importarButton = wrapper.find(".btn-outline-primary");
+    expect(importarButton.attributes("disabled")).toBeDefined();
 }
 
 export function expectImportButtonEnabled(wrapper: any) {
-  const importarButton = wrapper.find('.btn-outline-primary');
-  expect(importarButton.attributes('disabled')).toBeUndefined();
+    const importarButton = wrapper.find(".btn-outline-primary");
+    expect(importarButton.attributes("disabled")).toBeUndefined();
 }
 
 /**
@@ -44,10 +48,10 @@ export async function selectFirstCheckbox(wrapper: any) {
  * labels é array de strings esperadas nas options (sem contar a opção disabled)
  */
 export function assertUnidadeOptions(wrapper: any, labels: string[]) {
-  const unidadeSelect = wrapper.find('select#unidade-select');
-  expect(unidadeSelect.attributes('disabled')).toBeUndefined();
+    const unidadeSelect = wrapper.find("select#unidade-select");
+    expect(unidadeSelect.attributes("disabled")).toBeUndefined();
 
-  const options = wrapper.findAll('select#unidade-select option');
+    const options = wrapper.findAll("select#unidade-select option");
   // 1 disabled + labels.length
   expect(options).toHaveLength(1 + labels.length);
   for (let i = 0; i < labels.length; i++) {
@@ -59,12 +63,17 @@ export function assertUnidadeOptions(wrapper: any, labels: string[]) {
  * Navega para uma rota, monta o componente com mountFn e verifica os breadcrumbs esperados.
  * expectedLabels é um array com os labels (excluindo 'Home' que sempre é o primeiro crumb).
  */
-export async function navigateAndAssertBreadcrumbs(router: any, mountFn: () => Promise<any>, path: string, expectedLabels: string[]) {
+export async function navigateAndAssertBreadcrumbs(
+    router: any,
+    mountFn: () => Promise<any>,
+    path: string,
+    expectedLabels: string[],
+) {
   router.push(path);
   const wrapper = await mountFn();
   const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
- 
-  // Home + expectedLabels
+
+    // Home + expectedLabels
   expect(breadcrumbItems.length).toBe(1 + expectedLabels.length);
   for (let i = 0; i < expectedLabels.length; i++) {
     expect(breadcrumbItems[i + 1].text()).toBe(expectedLabels[i]);

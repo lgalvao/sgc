@@ -3,16 +3,15 @@
 ## Visão Geral
 O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência.
 
-Este pacote abriga exclusivamente código de suporte sem lógica de negócio.
+Este pacote abriga exclusivamente código de suporte sem lógica de negócio específica de domínio.
 
 ## Arquitetura e Subpacotes
 
-O `comum` fornece infraestrutura básica, como o tratamento de erros, modelos de dados compartilhados, configurações do
-Spring e suporte para serialização JSON.
+O `comum` fornece infraestrutura básica, como o tratamento de erros, modelos de dados compartilhados, configurações do Spring e suporte para serialização JSON.
 
 ```mermaid
 graph TD
-    subgraph "Módulos de Negócio (ex: processo, mapa, etc.)"
+    subgraph "Módulos de Negócio"
         direction LR
         Controllers
         Services
@@ -37,38 +36,42 @@ graph TD
 ### 1. `erros`
 - **Responsabilidade:** Define a hierarquia de exceções customizadas e o tratador global de erros.
 - **Componentes Notáveis:**
-  - `RestExceptionHandler`: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte em respostas JSON padronizadas para a API.
-  - `ErroEntidadeNaoEncontrada`: Exceção padrão lançada quando uma entidade não é encontrada (resulta em HTTP 404).
-  - `ErroValidacao`: Exceção para erros de validação de negócio (resulta em HTTP 400).
-  - `ErroNegocio`: Exceção base para erros de negócio genéricos.
-  - `ApiError`: Classe que modela a resposta de erro JSON padrão.
+  - **`RestExceptionHandler`**: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte em respostas JSON padronizadas (`ErroApi`).
+  - **`ErroApi`**: Classe que modela a resposta de erro JSON padrão (status, mensagem, timestamp).
+  - **`ErroSubApi`**: Classe para detalhes de erros (ex: campos inválidos na validação).
+  - **Exceções de Negócio:**
+    - `ErroEntidadeNaoEncontrada`: HTTP 404.
+    - `ErroValidacao`: HTTP 400.
+    - `ErroSituacaoInvalida`: HTTP 409 (Conflito de estado).
+    - `ErroRequisicaoSemCorpo`: HTTP 400.
+    - `ErroAccessoNegado`: HTTP 403.
 
 ### 2. `model`
 - **Responsabilidade:** Contém modelos de dados compartilhados.
 - **Componentes Notáveis:**
-  - `EntidadeBase`: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) padronizado para a maioria das entidades JPA do sistema.
+  - **`EntidadeBase`**: Superclasse (`@MappedSuperclass`) que fornece o campo `codigo` (ID) para as entidades JPA.
+  - **`Parametro`**: Entidade para configuração dinâmica de parâmetros do sistema.
 
 ### 3. `config`
-
 - **Responsabilidade:** Centraliza as classes de configuração do Spring.
 - **Componentes Notáveis:**
-    - Configurações de segurança, serialização, banco de dados e outras configurações transversais da aplicação.
+  - `ConfigSeguranca` / `ConfigSegurancaE2E`: Configurações do Spring Security.
+  - `ConfigWeb`: Configurações de CORS e MVC.
+  - `ConfigThymeleaf`: Configuração do template engine para e-mails.
 
 ### 4. `json`
-
-- **Responsabilidade:** Fornece configurações e utilitários para serialização/deserialização JSON.
+- **Responsabilidade:** Utilitários para serialização e sanitização JSON.
 - **Componentes Notáveis:**
-    - Configurações customizadas do Jackson para tratamento de tipos específicos.
+  - `SanitizeHtml`: Anotação customizada para sanitização de HTML.
+  - `HtmlSanitizingDeserializer`: Deserializador Jackson que remove tags HTML perigosas de strings de entrada.
 
 ## Propósito e Uso
-- **Exceções (`erros`)**: Lançadas pelos serviços para sinalizar um erro de negócio ou técnico. O `RestExceptionHandler` cuida do resto.
-- **Modelo (`model`)**: A `EntidadeBase` é estendida por outras entidades para padronizar a chave primária.
-- **Configuração (`config`)**: Classes de configuração do Spring são carregadas automaticamente durante a inicialização
-  da aplicação.
+- **Padronização de Erros**: Ao lançar exceções do pacote `erros`, garantimos que o cliente da API receba sempre uma resposta JSON consistente e traduzida.
+- **Reutilização**: Classes como `EntidadeBase` e anotações como `@SanitizeHtml` reduzem código boilerplate nos módulos de negócio.
 
-**Exemplo de uso de uma exceção:**
+**Exemplo de uso:**
 ```java
-// Em um serviço de outro módulo
+// Em um serviço de domínio
 public Recurso buscar(Long codigo) {
     return repository.findById(codigo)
         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Recurso", codigo));

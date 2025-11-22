@@ -1,76 +1,76 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6">
         Mapa de competências técnicas
       </div>
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeValidar"
-          class="btn btn-outline-warning"
+          variant="outline-warning"
           title="Apresentar sugestões"
           data-testid="apresentar-sugestoes-btn"
           @click="abrirModalSugestoes"
         >
           Apresentar sugestões
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeValidar"
-          class="btn btn-outline-success"
+          variant="outline-success"
           title="Validar mapa"
           data-testid="validar-btn"
           @click="abrirModalValidar"
         >
           Validar
-        </button>
+        </BButton>
 
-        <button
+        <BButton
           v-if="podeValidar && temHistoricoAnalise"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           title="Histórico de análise"
           data-testid="historico-analise-btn"
           @click="verHistorico"
         >
           Histórico de análise
-        </button>
+        </BButton>
 
-        <button
+        <BButton
           v-if="podeAnalisar"
           v-show="podeVerSugestoes"
-          class="btn btn-outline-info"
+          variant="outline-info"
           title="Ver sugestões"
           data-testid="ver-sugestoes-btn"
           @click="verSugestoes"
         >
           Ver sugestões
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           title="Histórico de análise"
           data-testid="historico-analise-btn-gestor"
           @click="verHistorico"
         >
           Histórico de análise
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-danger"
+          variant="outline-danger"
           title="Devolver para ajustes"
           data-testid="devolver-ajustes-btn"
           @click="abrirModalDevolucao"
         >
           Devolver para ajustes
-        </button>
-        <button
+        </BButton>
+        <BButton
           v-if="podeAnalisar"
-          class="btn btn-outline-success"
+          variant="outline-success"
           data-testid="btn-registrar-aceite-homologar"
           title="Aceitar"
           @click="abrirModalAceitar"
         >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
-        </button>
+        </BButton>
       </div>
     </div>
 
@@ -88,13 +88,14 @@
         <div v-if="!mapa || mapa.competencias.length === 0">
           Nenhuma competência cadastrada.
         </div>
-        <div
+        <BCard
           v-for="comp in mapa?.competencias"
           :key="comp.codigo"
-          class="card mb-3 competencia-card"
+          class="mb-3 competencia-card"
           data-testid="competencia-block"
+          no-body
         >
-          <div class="card-body py-2">
+          <BCardBody class="py-2">
             <div
               class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
             >
@@ -108,13 +109,14 @@
                 v-for="atv in comp.atividades"
                 :key="atv.codigo"
               >
-                <div
-                  class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
+                <BCard
+                  class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
                   data-testid="atividade-item"
+                  no-body
                 >
-                  <div class="card-body d-flex align-items-center py-1 px-2">
+                  <BCardBody class="d-flex align-items-center py-1 px-2">
                     <span class="atividade-associada-descricao me-2">{{ atv.descricao }}</span>
-                  </div>
+                  </BCardBody>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
                       v-for="conhecimento in atv.conhecimentos"
@@ -125,11 +127,11 @@
                       {{ conhecimento.descricao }}
                     </span>
                   </div>
-                </div>
+                </BCard>
               </div>
             </div>
-          </div>
-        </div>
+          </BCardBody>
+        </BCard>
       </div>
     </div>
     <div v-else>
@@ -143,362 +145,244 @@
       @confirmar-aceitacao="confirmarAceitacao"
     />
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalSugestoes }"
-      :style="{ display: mostrarModalSugestoes ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-apresentar-sugestoes"
+    <BModal
+      v-model="mostrarModalSugestoes"
+      title="Apresentar Sugestões"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-apresentar-sugestoes-title"
-            >
-              Apresentar Sugestões
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-apresentar-sugestoes-close"
-              @click="fecharModalSugestoes"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label
-                for="sugestoesTextarea"
-                class="form-label"
-              >Sugestões para o mapa de competências:</label>
-              <textarea
-                id="sugestoesTextarea"
-                v-model="sugestoes"
-                class="form-control"
-                rows="5"
-                placeholder="Digite suas sugestões para o mapa de competências..."
-                data-testid="sugestoes-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-apresentar-sugestoes-cancelar"
-              @click="fecharModalSugestoes"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-testid="modal-apresentar-sugestoes-confirmar"
-              @click="confirmarSugestoes"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <div class="mb-3">
+        <label
+          for="sugestoesTextarea"
+          class="form-label"
+        >Sugestões para o mapa de competências:</label>
+        <BFormTextarea
+          id="sugestoesTextarea"
+          v-model="sugestoes"
+          rows="5"
+          placeholder="Digite suas sugestões para o mapa de competências..."
+          data-testid="sugestoes-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-apresentar-sugestoes-cancelar"
+          @click="fecharModalSugestoes"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="primary"
+          data-testid="modal-apresentar-sugestoes-confirmar"
+          @click="confirmarSugestoes"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalVerSugestoes }"
-      :style="{ display: mostrarModalVerSugestoes ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-sugestoes"
+    <BModal
+      v-model="mostrarModalVerSugestoes"
+      title="Sugestões"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-sugestoes-title"
-            >
-              Sugestões
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-sugestoes-close"
-              @click="fecharModalVerSugestoes"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-sugestoes-body"
-          >
-            <div class="mb-3">
-              <label class="form-label">Sugestões registradas para o mapa de competências:</label>
-              <textarea
-                v-model="sugestoesVisualizacao"
-                class="form-control"
-                rows="5"
-                readonly
-                data-testid="sugestoes-visualizacao-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-sugestoes-fechar"
-              @click="fecharModalVerSugestoes"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
+      <div class="mb-3">
+        <label class="form-label">Sugestões registradas para o mapa de competências:</label>
+        <BFormTextarea
+          v-model="sugestoesVisualizacao"
+          rows="5"
+          readonly
+          data-testid="sugestoes-visualizacao-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-sugestoes-fechar"
+          @click="fecharModalVerSugestoes"
+        >
+          Fechar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalValidar }"
-      :style="{ display: mostrarModalValidar ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-validar"
+    <BModal
+      v-model="mostrarModalValidar"
+      title="Validar Mapa de Competências"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-validar-title"
-            >
-              Validar Mapa de Competências
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-validar-close"
-              @click="fecharModalValidar"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-validar-body"
-          >
-            <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-validar-cancelar"
-              @click="fecharModalValidar"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="modal-validar-confirmar"
-              @click="confirmarValidacao"
-            >
-              Validar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-validar-cancelar"
+          @click="fecharModalValidar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          data-testid="modal-validar-confirmar"
+          @click="confirmarValidacao"
+        >
+          Validar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalDevolucao }"
-      :style="{ display: mostrarModalDevolucao ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-devolucao"
+    <BModal
+      v-model="mostrarModalDevolucao"
+      title="Devolução"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-devolucao-title"
-            >
-              Devolução
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-devolucao-close"
-              @click="fecharModalDevolucao"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-devolucao-body"
-          >
-            <p>Confirma a devolução da validação do mapa para ajustes?</p>
-            <div class="mb-3">
-              <label
-                for="observacaoDevolucao"
-                class="form-label"
-              >Observação:</label>
-              <textarea
-                id="observacaoDevolucao"
-                v-model="observacaoDevolucao"
-                class="form-control"
-                rows="3"
-                placeholder="Digite observações sobre a devolução..."
-                data-testid="observacao-devolucao-textarea"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-devolucao-cancelar"
-              @click="fecharModalDevolucao"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-testid="modal-devolucao-confirmar"
-              @click="confirmarDevolucao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>Confirma a devolução da validação do mapa para ajustes?</p>
+      <div class="mb-3">
+        <label
+          for="observacaoDevolucao"
+          class="form-label"
+        >Observação:</label>
+        <BFormTextarea
+          id="observacaoDevolucao"
+          v-model="observacaoDevolucao"
+          rows="3"
+          placeholder="Digite observações sobre a devolução..."
+          data-testid="observacao-devolucao-textarea"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-devolucao-cancelar"
+          @click="fecharModalDevolucao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          data-testid="modal-devolucao-confirmar"
+          @click="confirmarDevolucao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
-    <div
-      class="modal fade"
-      :class="{ 'show': mostrarModalHistorico }"
-      :style="{ display: mostrarModalHistorico ? 'block' : 'none' }"
-      tabindex="-1"
-      data-testid="modal-historico"
+    <BModal
+      v-model="mostrarModalHistorico"
+      title="Histórico de Análise"
+      centered
+      size="lg"
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title"
-              data-testid="modal-historico-title"
-            >
-              Histórico de Análise
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-historico-close"
-              @click="fecharModalHistorico"
-            />
-          </div>
-          <div
-            class="modal-body"
-            data-testid="modal-historico-body"
+      <table
+        class="table table-striped"
+        data-testid="tabela-historico"
+      >
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Unidade</th>
+            <th>Resultado</th>
+            <th>Observações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in historicoAnalise"
+            :key="item.codigo"
+            data-testid="historico-item"
           >
-            <table
-              class="table table-striped"
-              data-testid="tabela-historico"
-            >
-              <thead>
-                <tr>
-                  <th>Data/Hora</th>
-                  <th>Unidade</th>
-                  <th>Resultado</th>
-                  <th>Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="item in historicoAnalise"
-                  :key="item.codigo"
-                  data-testid="historico-item"
-                >
-                  <td>{{ item.data }}</td>
-                  <td>{{ item.unidade }}</td>
-                  <td>{{ item.resultado }}</td>
-                  <td>{{ item.observacoes }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-historico-fechar"
-              @click="fecharModalHistorico"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <td>{{ item.data }}</td>
+            <td>{{ item.unidade }}</td>
+            <td>{{ item.resultado }}</td>
+            <td>{{ item.observacoes }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="modal-historico-fechar"
+          @click="fecharModalHistorico"
+        >
+          Fechar
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-
-import {useMapasStore} from '@/stores/mapas'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from "@/stores/processos";
-import {useNotificacoesStore} from "@/stores/notificacoes";
-import {useAnalisesStore} from "@/stores/analises";
-import {usePerfil} from "@/composables/usePerfil";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {SituacaoSubprocesso, Unidade} from '@/types/tipos';
-import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
+import {
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAnalisesStore} from "@/stores/analises";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {SituacaoSubprocesso, type Unidade} from "@/types/tipos";
 
-const route = useRoute()
-const router = useRouter()
-const sigla = computed(() => route.params.siglaUnidade as string)
-const codProcesso = computed(() => Number(route.params.codProcesso))
-const unidadesStore = useUnidadesStore()
-const mapaStore = useMapasStore()
-const processosStore = useProcessosStore()
-const notificacoesStore = useNotificacoesStore()
-const analisesStore = useAnalisesStore()
-const subprocessosStore = useSubprocessosStore()
-const {perfilSelecionado} = usePerfil()
+const route = useRoute();
+const router = useRouter();
+const sigla = computed(() => route.params.siglaUnidade as string);
+const codProcesso = computed(() => Number(route.params.codProcesso));
+const unidadesStore = useUnidadesStore();
+const mapaStore = useMapasStore();
+const processosStore = useProcessosStore();
+const notificacoesStore = useNotificacoesStore();
+const analisesStore = useAnalisesStore();
+const subprocessosStore = useSubprocessosStore();
+const {perfilSelecionado} = usePerfil();
 
-const {mapaVisualizacao: mapa} = storeToRefs(mapaStore)
+const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
 
-const mostrarModalAceitar = ref(false)
-const mostrarModalSugestoes = ref(false)
-const mostrarModalVerSugestoes = ref(false)
-const mostrarModalValidar = ref(false)
-const mostrarModalDevolucao = ref(false)
-const mostrarModalHistorico = ref(false)
-const sugestoes = ref('')
-const sugestoesVisualizacao = ref('')
-const observacaoDevolucao = ref('')
+const mostrarModalAceitar = ref(false);
+const mostrarModalSugestoes = ref(false);
+const mostrarModalVerSugestoes = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolucao = ref(false);
+const mostrarModalHistorico = ref(false);
+const sugestoes = ref("");
+const sugestoesVisualizacao = ref("");
+const observacaoDevolucao = ref("");
 
 const unidade = computed<Unidade | null>(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
     for (const unidade of unidades) {
-      if (unidade.sigla === sigla) return unidade
+      if (unidade.sigla === sigla) return unidade;
       if (unidade.filhas && unidade.filhas.length) {
-        const encontrada = buscarUnidade(unidade.filhas, sigla)
-        if (encontrada) return encontrada
+        const encontrada = buscarUnidade(unidade.filhas, sigla);
+        if (encontrada) return encontrada;
       }
     }
-    return null
+    return null;
   }
 
-  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
-})
+  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value);
+});
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === sigla.value);
-})
+  return processosStore.processoDetalhe.unidades.find(
+      (u) => u.sigla === sigla.value,
+  );
+});
 
 const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
@@ -510,83 +394,97 @@ onMounted(async () => {
 });
 
 const podeValidar = computed(() => {
-  return perfilSelecionado.value === 'CHEFE' &&
-      subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
-})
+  return (
+      perfilSelecionado.value === "CHEFE" &&
+      subprocesso.value?.situacaoSubprocesso ===
+      SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
+  );
+});
 
 const podeAnalisar = computed(() => {
-  return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
-      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_VALIDADO || subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
-})
+  return (
+      (perfilSelecionado.value === "GESTOR" ||
+          perfilSelecionado.value === "ADMIN") &&
+      (subprocesso.value?.situacaoSubprocesso ===
+          SituacaoSubprocesso.MAPA_VALIDADO ||
+          subprocesso.value?.situacaoSubprocesso ===
+          SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
+  );
+});
 
 const podeVerSugestoes = computed(() => {
-  return subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
-})
+  return (
+      subprocesso.value?.situacaoSubprocesso ===
+      SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
+  );
+});
 
 const temHistoricoAnalise = computed(() => {
-  return historicoAnalise.value.length > 0
-})
+  return historicoAnalise.value.length > 0;
+});
 
 const historicoAnalise = computed(() => {
-  if (!codSubprocesso.value) return []
+  if (!codSubprocesso.value) return [];
 
-  return analisesStore.getAnalisesPorSubprocesso(codSubprocesso.value).map(analise => ({
-    codigo: analise.codigo,
-    data: new Date(analise.dataHora).toLocaleString('pt-BR'),
-    unidade: (analise as any).unidadeSigla || (analise as any).unidade,
-    resultado: analise.resultado,
-    observacoes: analise.observacoes || ''
-  }))
-})
+  return analisesStore
+      .getAnalisesPorSubprocesso(codSubprocesso.value)
+      .map((analise) => ({
+        codigo: analise.codigo,
+        data: new Date(analise.dataHora).toLocaleString("pt-BR"),
+        unidade: (analise as any).unidadeSigla || (analise as any).unidade,
+        resultado: analise.resultado,
+        observacoes: analise.observacoes || "",
+      }));
+});
 
 function abrirModalAceitar() {
-  mostrarModalAceitar.value = true
+  mostrarModalAceitar.value = true;
 }
 
 function fecharModalAceitar() {
-  mostrarModalAceitar.value = false
+  mostrarModalAceitar.value = false;
 }
 
 function abrirModalSugestoes() {
   // if (mapa.value?.sugestoes) {
   //   sugestoes.value = mapa.value.sugestoes
   // }
-  mostrarModalSugestoes.value = true
+  mostrarModalSugestoes.value = true;
 }
 
 function fecharModalSugestoes() {
-  mostrarModalSugestoes.value = false
-  sugestoes.value = ''
+  mostrarModalSugestoes.value = false;
+  sugestoes.value = "";
 }
 
 function fecharModalVerSugestoes() {
-  mostrarModalVerSugestoes.value = false
-  sugestoesVisualizacao.value = ''
+  mostrarModalVerSugestoes.value = false;
+  sugestoesVisualizacao.value = "";
 }
 
 function abrirModalValidar() {
-  mostrarModalValidar.value = true
+  mostrarModalValidar.value = true;
 }
 
 function fecharModalValidar() {
-  mostrarModalValidar.value = false
+  mostrarModalValidar.value = false;
 }
 
 function abrirModalDevolucao() {
-  mostrarModalDevolucao.value = true
+  mostrarModalDevolucao.value = true;
 }
 
 function fecharModalDevolucao() {
-  mostrarModalDevolucao.value = false
-  observacaoDevolucao.value = ''
+  mostrarModalDevolucao.value = false;
+  observacaoDevolucao.value = "";
 }
 
 function abrirModalHistorico() {
-  mostrarModalHistorico.value = true
+  mostrarModalHistorico.value = true;
 }
 
 function fecharModalHistorico() {
-  mostrarModalHistorico.value = false
+  mostrarModalHistorico.value = false;
 }
 
 function verSugestoes() {
@@ -602,25 +500,26 @@ function verHistorico() {
 async function confirmarSugestoes() {
   if (!codSubprocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes(codSubprocesso.value, { sugestoes: sugestoes.value });
+    await processosStore.apresentarSugestoes(codSubprocesso.value, {
+      sugestoes: sugestoes.value,
+    });
 
-    fecharModalSugestoes()
+    fecharModalSugestoes();
 
     notificacoesStore.sucesso(
-        'Sugestões apresentadas',
-        'Sugestões submetidas para análise da unidade superior'
-    )
+        "Sugestões apresentadas",
+        "Sugestões submetidas para análise da unidade superior",
+    );
 
     await router.push({
-      name: 'Subprocesso',
-      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
-    })
-
+      name: "Subprocesso",
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
+    });
   } catch {
     notificacoesStore.erro(
-        'Erro ao apresentar sugestões',
-        'Ocorreu um erro. Tente novamente.'
-    )
+        "Erro ao apresentar sugestões",
+        "Ocorreu um erro. Tente novamente.",
+    );
   }
 }
 
@@ -629,23 +528,22 @@ async function confirmarValidacao() {
   try {
     await processosStore.validarMapa(codSubprocesso.value);
 
-    fecharModalValidar()
+    fecharModalValidar();
 
     notificacoesStore.sucesso(
-        'Mapa validado',
-        'Mapa validado e submetido para análise da unidade superior'
-    )
+        "Mapa validado",
+        "Mapa validado e submetido para análise da unidade superior",
+    );
 
     await router.push({
-      name: 'Subprocesso',
-      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
-    })
-
+      name: "Subprocesso",
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
+    });
   } catch {
     notificacoesStore.erro(
-        'Erro ao validar mapa',
-        'Ocorreu um erro. Tente novamente.'
-    )
+        "Erro ao validar mapa",
+        "Ocorreu um erro. Tente novamente.",
+    );
   }
 }
 
@@ -653,29 +551,32 @@ async function confirmarAceitacao(observacoes?: string) {
   if (!codSubprocesso.value) return;
 
   const perfil = perfilSelecionado.value;
-  const isHomologacao = perfil === 'ADMIN';
+  const isHomologacao = perfil === "ADMIN";
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
+    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+      observacoes: observacoes || "",
+    });
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {observacoes: observacoes || ''});
+    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {
+      observacoes: observacoes || "",
+    });
   }
 
   fecharModalAceitar();
-  await router.push({name: 'Painel'});
+  await router.push({name: "Painel"});
 }
-
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
 
   await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-    motivo: '',
+    motivo: "",
     observacoes: observacaoDevolucao.value,
   });
 
   fecharModalDevolucao();
-  await router.push({name: 'Painel'});
+  await router.push({name: "Painel"});
 }
 </script>
 

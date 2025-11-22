@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
@@ -10,45 +10,46 @@
         Atividades e conhecimentos
       </h2>
       <div class="d-flex gap-2">
-        <button
+        <BButton
           v-if="podeVerImpacto"
-          class="btn btn-outline-secondary"
+          variant="outline-secondary"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
-        </button>
-        <button
-          class="btn btn-outline-info"
+        </BButton>
+        <BButton
+          variant="outline-info"
           @click="abrirModalHistoricoAnalise"
         >
           Histórico de análise
-        </button>
-        <button
-          class="btn btn-secondary"
+        </BButton>
+        <BButton
+          variant="secondary"
           data-testid="btn-devolver"
           title="Devolver para ajustes"
           @click="devolverCadastro"
         >
           Devolver para ajustes
-        </button>
-        <button
-          class="btn btn-success"
+        </BButton>
+        <BButton
+          variant="success"
           data-testid="btn-acao-principal-analise"
           title="Validar"
           @click="validarCadastro"
         >
           {{ perfilSelecionado === Perfil.ADMIN ? 'Homologar' : 'Registrar aceite' }}
-        </button>
+        </BButton>
       </div>
     </div>
 
     <!-- Lista de atividades -->
-    <div
+    <BCard
       v-for="(atividade) in atividades"
       :key="atividade.codigo"
-      class="card mb-3 atividade-card"
+      class="mb-3 atividade-card"
+      no-body
     >
-      <div class="card-body py-2">
+      <BCardBody class="py-2">
         <div
           class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
@@ -68,8 +69,8 @@
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
         </div>
-      </div>
-    </div>
+      </BCardBody>
+    </BCard>
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
@@ -87,216 +88,197 @@
     />
 
     <!-- Modal de Validação -->
-    <div
-      v-if="mostrarModalValidar"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalValidar"
+      :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro') }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalValidar"
-            />
-          </div>
-          <div class="modal-body">
-            <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
-            <div
-              v-if="!isHomologacao"
-              class="mb-3"
-            >
-              <label
-                class="form-label"
-                for="observacaoValidacao"
-              >Observação</label>
-              <textarea
-                id="observacaoValidacao"
-                v-model="observacaoValidacao"
-                class="form-control"
-                data-testid="input-observacao-aceite"
-                rows="3"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalValidar"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="btn-modal-confirmar-aceite"
-              @click="confirmarValidacao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
+      <div
+        v-if="!isHomologacao"
+        class="mb-3"
+      >
+        <label
+          class="form-label"
+          for="observacaoValidacao"
+        >Observação</label>
+        <BFormTextarea
+          id="observacaoValidacao"
+          v-model="observacaoValidacao"
+          data-testid="input-observacao-aceite"
+          rows="3"
+        />
       </div>
-    </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalValidar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="success"
+          data-testid="btn-modal-confirmar-aceite"
+          @click="confirmarValidacao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de Devolução -->
-    <div
-      v-if="mostrarModalDevolver"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    <BModal
+      v-model="mostrarModalDevolver"
+      :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalDevolver"
-            />
-          </div>
-          <div class="modal-body">
-            <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="observacaoDevolucao"
-              >Observação</label>
-              <textarea
-                id="observacaoDevolucao"
-                v-model="observacaoDevolucao"
-                class="form-control"
-                data-testid="input-observacao-devolucao"
-                rows="3"
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalDevolver"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-testid="btn-modal-confirmar-devolucao"
-              @click="confirmarDevolucao"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+      <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
+      <div class="mb-3">
+        <label
+          class="form-label"
+          for="observacaoDevolucao"
+        >Observação</label>
+        <BFormTextarea
+          id="observacaoDevolucao"
+          v-model="observacaoDevolucao"
+          data-testid="input-observacao-devolucao"
+          rows="3"
+        />
       </div>
-    </div>
-
-    <div
-      v-if="mostrarModalValidar || mostrarModalDevolver"
-      class="modal-backdrop fade show"
-    />
-  </div>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalDevolver"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          data-testid="btn-modal-confirmar-devolucao"
+          @click="confirmarDevolucao"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {usePerfilStore} from '@/stores/perfil';
-import {useAtividadesStore} from '@/stores/atividades';
-import {useUnidadesStore} from '@/stores/unidades';
-import {useProcessosStore} from '@/stores/processos';
-import {useRouter} from 'vue-router';
 import {
-  AceitarCadastroRequest,
-  Atividade,
-  DevolverCadastroRequest,
-  HomologarCadastroRequest,
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
+import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import {useAtividadesStore} from "@/stores/atividades";
+import {usePerfilStore} from "@/stores/perfil";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {
+  type AceitarCadastroRequest,
+  type Atividade,
+  type DevolverCadastroRequest,
+  type HomologarCadastroRequest,
   Perfil,
   SituacaoSubprocesso,
   TipoProcesso,
-  Unidade
-} from '@/types/tipos';
-import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
-import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
-import {useSubprocessosStore} from "@/stores/subprocessos";
+  type Unidade,
+} from "@/types/tipos";
 
 const props = defineProps<{
-  codProcesso: number | string,
-  sigla: string
-}>()
+  codProcesso: number | string;
+  sigla: string;
+}>();
 
-const unidadeId = computed(() => props.sigla)
-const codProcesso = computed(() => Number(props.codProcesso))
+const unidadeId = computed(() => props.sigla);
+const codProcesso = computed(() => Number(props.codProcesso));
 
-const atividadesStore = useAtividadesStore()
-const unidadesStore = useUnidadesStore()
-const processosStore = useProcessosStore()
-const subprocessosStore = useSubprocessosStore()
-const perfilStore = usePerfilStore()
-const router = useRouter()
+const atividadesStore = useAtividadesStore();
+const unidadesStore = useUnidadesStore();
+const processosStore = useProcessosStore();
+const subprocessosStore = useSubprocessosStore();
+const perfilStore = usePerfilStore();
+const router = useRouter();
 
-const mostrarModalImpacto = ref(false)
-const mostrarModalValidar = ref(false)
-const mostrarModalDevolver = ref(false)
-const mostrarModalHistoricoAnalise = ref(false)
-const observacaoValidacao = ref<string>('')
-const observacaoDevolucao = ref<string>('')
+const mostrarModalImpacto = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolver = ref(false);
+const mostrarModalHistoricoAnalise = ref(false);
+const observacaoValidacao = ref<string>("");
+const observacaoDevolucao = ref<string>("");
 
 const unidade = computed(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
+  function buscarUnidade(
+      unidades: Unidade[],
+      sigla: string,
+  ): Unidade | undefined {
     for (const u of unidades) {
-      if (u.sigla === sigla) return u
+      if (u.sigla === sigla) return u;
       if (u.filhas && u.filhas.length) {
-        const encontrada = buscarUnidade(u.filhas, sigla)
-        if (encontrada) return encontrada
+        const encontrada = buscarUnidade(u.filhas, sigla);
+        if (encontrada) return encontrada;
       }
     }
   }
 
-  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value)
-})
+  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value);
+});
 
-const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
-const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
+const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
+const nomeUnidade = computed(() =>
+    unidade.value?.nome ? `${unidade.value.nome}` : "",
+);
 const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === unidadeId.value);
+  return processosStore.processoDetalhe.unidades.find(
+      (u) => u.sigla === unidadeId.value,
+  );
 });
 
 const isHomologacao = computed(() => {
-    if (!subprocesso.value) return false;
-    const {situacaoSubprocesso} = subprocesso.value;
-    return perfilSelecionado.value === Perfil.ADMIN && (situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES || situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA);
+  if (!subprocesso.value) return false;
+  const {situacaoSubprocesso} = subprocesso.value;
+  return (
+      perfilSelecionado.value === Perfil.ADMIN &&
+      (situacaoSubprocesso ===
+          SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES ||
+          situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA)
+  );
 });
 
 const podeVerImpacto = computed(() => {
   if (!subprocesso.value || !perfilSelecionado.value) return false;
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.ATIVIDADES_REVISADAS;
+  const situacaoCorreta =
+      subprocesso.value.situacaoSubprocesso ===
+      SituacaoSubprocesso.ATIVIDADES_REVISADAS;
   return podeVer && situacaoCorreta;
 });
 
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
-  if (codSubrocesso.value === undefined) return []
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
-})
+  if (codSubrocesso.value === undefined) return [];
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+});
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
-const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
+const isRevisao = computed(
+    () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
+);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(codProcesso.value);
@@ -323,48 +305,51 @@ async function confirmarValidacao() {
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = { ...commonRequest };
     if (isRevisao.value) {
-        await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, req);
+      await subprocessosStore.homologarRevisaoCadastro(
+          codSubrocesso.value,
+          req,
+      );
     } else {
-        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
+      await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
     }
   } else {
-      const req: AceitarCadastroRequest = { ...commonRequest };
-      if (isRevisao.value) {
-          await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
-      } else {
-          await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
-      }
+    const req: AceitarCadastroRequest = {...commonRequest};
+    if (isRevisao.value) {
+      await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
+    } else {
+      await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
+    }
   }
 
   fecharModalValidar();
-  await router.push('/painel');
+  await router.push("/painel");
 }
 
 async function confirmarDevolucao() {
   if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
-    motivo: '', // Adicionar esta linha
+    motivo: "", // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 
   if (isRevisao.value) {
-      await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
   } else {
-      await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
   }
 
   fecharModalDevolver();
-  await router.push('/painel');
+  await router.push("/painel");
 }
 
 function fecharModalValidar() {
   mostrarModalValidar.value = false;
-  observacaoValidacao.value = '';
+  observacaoValidacao.value = "";
 }
 
 function fecharModalDevolver() {
   mostrarModalDevolver.value = false;
-  observacaoDevolucao.value = '';
+  observacaoDevolucao.value = "";
 }
 
 function abrirModalImpacto() {

@@ -17,7 +17,7 @@ graph TD
         direction LR
         SpringSecurity
         OutrosServicos
-        UsuarioController
+        SgrhController
         UsuarioService
     end
 
@@ -35,7 +35,7 @@ graph TD
 
     SpringSecurity & UsuarioService -- Usa --> UsuarioRepo
     UsuarioRepo -- Gerencia entidade Usuario em --> DB_SGC
-    UsuarioController -- Usa --> UsuarioService
+    SgrhController -- Usa --> UsuarioService
 
     OutrosServicos -- Consultam --> SgrhServiceFacade
     SgrhServiceFacade -- Busca dados em --> SGRH_Externo
@@ -47,17 +47,21 @@ graph TD
 
 ## Componentes Principais
 
-### Gestão de Usuários (Lógica Interna)
-- **`Usuario` / `Perfil`**: Entidades JPA que modelam o usuário do SGC e seus perfis de acesso (`ADMIN`, `CHEFE`, etc.). A entidade `Usuario` implementa a interface `UserDetails` do Spring Security.
-- **`UsuarioRepo`**: Repositório para persistir e buscar usuários no banco de dados do SGC.
-- **`UsuarioService` / `UsuarioController`**: Camada de serviço e API para operações relacionadas ao usuário, como o
-  fluxo de login/autenticação.
+### Controladores e Serviços (`service`)
+- **`UsuarioService`**: Camada de serviço para lógica interna de usuários, como o fluxo de login/autenticação.
+- **`SgrhService`**: O serviço que atua como fachada/cliente do sistema de RH externo. Outros módulos do SGC (como `alerta` ou `processo`) utilizam este serviço para obter informações organizacionais.
+- **`SgrhController`**: Expõe a API REST (`/api/usuarios`) para autenticação, autorização e finalização de login.
 
-### Fachada de Integração (Lógica Externa)
-- **`SgrhService`**: O serviço que atua como cliente do sistema de RH externo. Outros módulos do SGC (como `alerta` ou `processo`) utilizam este serviço para obter informações sobre unidades e seus responsáveis, sem precisar conhecer os detalhes da integração.
+### Modelo de Dados (`model`)
+- **`Usuario`**: Entidade JPA que representa o usuário do SGC. Implementa a interface `UserDetails` do Spring Security.
+- **`Perfil`**: Enum que define os perfis de acesso (`ADMIN`, `CHEFE`, `GESTOR`, `SERVIDOR`).
+- **`UsuarioRepo`**: Repositório para persistência de usuários.
+
+### DTOs (`dto`)
+- **`AutenticacaoReq`**, **`EntrarReq`**: Requisições de login.
+- **`LoginResp`**: Resposta de login contendo token (simulado).
+- **`PerfilUnidade`**: DTO que combina um perfil e uma unidade, usado durante a autorização.
 
 ## Propósito e Uso
-- **Para autenticação e autorização**, o Spring Security interage diretamente com o `UsuarioRepo` para carregar os dados do usuário.
+- **Para autenticação e autorização**, o Spring Security interage com o `UsuarioRepo` para carregar os dados do usuário.
 - **Para obter dados de RH (unidades, responsáveis, etc.)**, outros serviços devem injetar e utilizar o `SgrhService`.
-
-Esta separação é crucial: a autenticação depende de dados internos e controlados (`Usuario`), enquanto os dados organizacionais são buscados de uma fonte de verdade externa.

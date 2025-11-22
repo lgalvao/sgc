@@ -1,6 +1,8 @@
 package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -13,11 +15,13 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -35,6 +39,7 @@ import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubprocessoDtoService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final MovimentacaoRepo repositorioMovimentacao;
@@ -46,23 +51,39 @@ public class SubprocessoDtoService {
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
+    private final SubprocessoPermissoesService subprocessoPermissoesService;
+    private final SgrhService sgrhService;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
+        System.out.println("Obtendo detalhes para o subprocesso " + codigo);
         if (perfil == null) {
+            System.out.println("Perfil inválido para acesso aos detalhes do subprocesso.");
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
 
         Subprocesso sp = repositorioSubprocesso.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
+        System.out.println("Subprocesso encontrado: " + sp);
 
         if (perfil == Perfil.GESTOR || perfil == Perfil.CHEFE) {
             if (sp.getUnidade() == null || codUnidadeUsuario == null || !codUnidadeUsuario.equals(sp.getUnidade().getCodigo())) {
+                System.out.println("Usuário sem permissão para visualizar este subprocesso.");
                 throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
             }
         } else if (perfil != Perfil.ADMIN) {
+            System.out.println("Perfil sem permissão.");
             throw new ErroAccessoNegado("Perfil sem permissão.");
         }
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        System.out.println("Usuário autenticado: " + username);
+        Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
+        System.out.println("Usuário encontrado: " + usuario);
+
+        Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
+        System.out.println("Responsável encontrado: " + responsavel);
 
         List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
         final List<Atividade> atividades = (sp.getMapa() != null && sp.getMapa().getCodigo() != null)
@@ -74,7 +95,10 @@ public class SubprocessoDtoService {
                 .filter(c -> c.getAtividade() != null && idsAtividades.contains(c.getAtividade().getCodigo()))
                 .toList();
 
-        return SubprocessoDetalheDto.of(sp, movimentacoes, atividades.stream().map(atividadeMapper::toDto).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDto).collect(Collectors.toList()), movimentacaoMapper);
+        SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+        System.out.println("Permissões calculadas: " + permissoes);
+
+        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, atividades.stream().map(atividadeMapper::toDto).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDto).collect(Collectors.toList()), movimentacaoMapper, permissoes);
     }
 
     @Transactional(readOnly = true)
@@ -144,5 +168,12 @@ public class SubprocessoDtoService {
                 .stream()
                 .map(subprocessoMapper::toDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
+        Subprocesso sp = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+        return subprocessoMapper.toDTO(sp);
     }
 }

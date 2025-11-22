@@ -1,24 +1,31 @@
 import type {
+    AtividadeImpactada,
+    CompetenciaImpactada,
+    ImpactoMapa,
+} from "@/types/impacto";
+import type {
     Atividade,
     AtividadeVisualizacao,
-    Competencia,
     Conhecimento,
     ConhecimentoVisualizacao,
-    ImpactoMapa,
     Mapa,
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,
-} from '@/types/tipos';
+} from "@/types/tipos";
 
-function mapConhecimentoVisualizacaoToModel(dto: ConhecimentoVisualizacao): Conhecimento {
+function mapConhecimentoVisualizacaoToModel(
+    dto: ConhecimentoVisualizacao,
+): Conhecimento {
   return {
     id: dto.id,
     descricao: dto.descricao,
   };
 }
 
-function mapAtividadeVisualizacaoToModel(dto: AtividadeVisualizacao): Atividade {
+function mapAtividadeVisualizacaoToModel(
+    dto: AtividadeVisualizacao,
+): Atividade {
   return {
     codigo: dto.codigo,
     descricao: dto.descricao,
@@ -26,11 +33,15 @@ function mapAtividadeVisualizacaoToModel(dto: AtividadeVisualizacao): Atividade 
   };
 }
 
-export function mapMapaVisualizacaoToAtividades(dto: MapaVisualizacao): Atividade[] {
+export function mapMapaVisualizacaoToAtividades(
+    dto: MapaVisualizacao,
+): Atividade[] {
   if (!dto || !dto.competencias) {
     return [];
   }
-  const todasAtividades = dto.competencias.flatMap(competencia => competencia.atividades || []);
+    const todasAtividades = dto.competencias.flatMap(
+        (competencia) => competencia.atividades || [],
+    );
   return todasAtividades.map(mapAtividadeVisualizacaoToModel);
 }
 
@@ -65,6 +76,7 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
         })),
       })),
     })),
+      situacao: dto.situacao || "",
   };
 }
 
@@ -75,14 +87,29 @@ export function mapImpactoMapaDtoToModel(dto: any): ImpactoMapa {
     totalAtividadesRemovidas: dto.totalAtividadesRemovidas,
     totalAtividadesAlteradas: dto.totalAtividadesAlteradas,
     totalCompetenciasImpactadas: dto.totalCompetenciasImpactadas,
-    atividadesInseridas: dto.atividadesInseridas || [],
-    atividadesRemovidas: dto.atividadesRemovidas || [],
-    atividadesAlteradas: dto.atividadesAlteradas || [],
-    competenciasImpactadas: (dto.competenciasImpactadas || []).map((c: any): Competencia => ({
-      codigo: c.codigo,
-      descricao: c.descricao,
-      atividadesAssociadas: c.atividadesAssociadas || [],
-    })),
+      atividadesInseridas: (dto.atividadesInseridas || []).map(
+          (a: any): AtividadeImpactada => ({
+              ...a,
+          }),
+      ),
+      atividadesRemovidas: (dto.atividadesRemovidas || []).map(
+          (a: any): AtividadeImpactada => ({
+              ...a,
+          }),
+      ),
+      atividadesAlteradas: (dto.atividadesAlteradas || []).map(
+          (a: any): AtividadeImpactada => ({
+              ...a,
+          }),
+      ),
+      competenciasImpactadas: (dto.competenciasImpactadas || []).map(
+          (c: any): CompetenciaImpactada => ({
+              codigo: c.codigo,
+              descricao: c.descricao,
+              atividadesAfetadas: c.atividadesAfetadas || [],
+              tipoImpacto: c.tipoImpacto,
+          }),
+      ),
   };
 }
 

@@ -9,17 +9,20 @@
   },
   "author": "Leonardo Galvao",
   "scripts": {
-    "test:e2e": "playwright test",
     "dev:e2e": "concurrently \"./gradlew bootRunE2E\" \"cd frontend && npm run dev\"",
-    "typecheck": "tsc --noEmit"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run check:ts-unused"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "@types/node": "^24.9.2",
-    "axios": "^1.7.2",
+    "@types/node": "^24.10.1",
+    "axios": "^1.13.2",
     "concurrently": "^9.2.1",
+    "consola": "^3.4.2",
     "playwright": "^1.56.1",
+    "ts-unused-exports": "^11.0.1",
     "typescript": "^5.9.3",
-    "uuid": "^10.0.0"
+    "uuid": "^13.0.0"
   }
 }

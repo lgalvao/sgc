@@ -1,9 +1,12 @@
 <template>
   <div>
-    <span
-      class="badge bg-secondary mb-2"
+    <BBadge
+      variant="secondary"
+      class="mb-2"
       style="border-radius: 0"
-    >Detalhes do processo</span>
+    >
+      Detalhes do processo
+    </BBadge>
     <h2
       class="display-6"
       data-testid="processo-info"
@@ -18,7 +21,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {BBadge} from "bootstrap-vue-next";
+import type {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 
 defineProps<{
   descricao: string;

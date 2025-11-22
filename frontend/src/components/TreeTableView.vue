@@ -9,19 +9,22 @@
       </h4>
 
       <div>
-        <button
-          class="btn btn-outline-primary btn-sm me-2"
+        <BButton
+          variant="outline-primary"
+          size="sm"
+          class="me-2"
           data-testid="btn-expandir-todas"
           @click="expandAll"
         >
           <i class="bi bi-arrows-expand" />
-        </button>
-        <button
-          class="btn btn-outline-secondary btn-sm"
+        </BButton>
+        <BButton
+          variant="outline-secondary"
+          size="sm"
           @click="collapseAll"
         >
           <i class="bi bi-arrows-collapse" />
-        </button>
+        </BButton>
       </div>
     </div>
 
@@ -63,8 +66,9 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, ref, watch} from 'vue'
-import TreeRowItem from './TreeRowItem.vue'
+import {BButton} from "bootstrap-vue-next";
+import {computed, nextTick, ref, watch} from "vue";
+import TreeRowItem from "./TreeRowItem.vue";
 
 interface TreeItem {
   id: number | string;
@@ -72,7 +76,7 @@ interface TreeItem {
   children?: TreeItem[];
   level?: number;
 
-  [key: string]: any;  
+  [key: string]: any;
 }
 
 interface FlattenedTreeItem extends TreeItem {
@@ -92,98 +96,102 @@ interface TreeTableProps {
   hideHeaders?: boolean;
 }
 
-const props = defineProps<TreeTableProps>()
-const emit = defineEmits<{
-  (e: 'row-click', item: TreeItem): void
-}>()
+const props = defineProps<TreeTableProps>();
+const emit = defineEmits<(e: "row-click", item: TreeItem) => void>();
 
-const internalData = ref<TreeItem[]>([])
+const internalData = ref<TreeItem[]>([]);
 
 const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
-  return items.map(item => ({
+  return items.map((item) => ({
     ...item,
     expanded: item.expanded !== undefined ? item.expanded : false,
     children: item.children ? initializeExpanded(item.children) : [],
   }));
 };
 
-watch(() => props.data,
+watch(
+    () => props.data,
     (newData) => {
-      internalData.value = initializeExpanded(JSON.parse(JSON.stringify(newData)))
+      internalData.value = initializeExpanded(
+          JSON.parse(JSON.stringify(newData)),
+      );
     },
-    { immediate: true, deep: true }
-)
+    {immediate: true, deep: true},
+);
 
 const flattenedData = computed((): FlattenedTreeItem[] => {
-  const flattened: FlattenedTreeItem[] = []
+  const flattened: FlattenedTreeItem[] = [];
   const flatten = (items: TreeItem[], level: number) => {
     for (const item of items) {
-      flattened.push({ ...item, level })
+      flattened.push({...item, level});
       if (item.expanded && item.children) {
-        flatten(item.children, level + 1)
+        flatten(item.children, level + 1);
       }
     }
-  }
-  flatten(internalData.value, 0)
-  return flattened
-})
+  };
+  flatten(internalData.value, 0);
+  return flattened;
+});
 
-const findItemById = (items: TreeItem[], id: number | string): TreeItem | null => {
+const findItemById = (
+    items: TreeItem[],
+    id: number | string,
+): TreeItem | null => {
   for (const item of items) {
-    if (item.id === id) return item
+    if (item.id === id) return item;
     if (item.children) {
-      const found = findItemById(item.children, id)
-      if (found) return found
+      const found = findItemById(item.children, id);
+      if (found) return found;
     }
   }
-  return null
-}
+  return null;
+};
 
 const toggleExpand = (id: number | string) => {
-  const item = findItemById(internalData.value, id)
+  const item = findItemById(internalData.value, id);
   if (item) {
-    item.expanded = !item.expanded
+    item.expanded = !item.expanded;
   }
-}
+};
 
 const expandAll = () => {
   const expand = (items: TreeItem[]) => {
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.children && item.children.length > 0) {
-        item.expanded = true
-        expand(item.children)
+        item.expanded = true;
+        expand(item.children);
       }
-    })
-  }
-  expand(internalData.value)
+    });
+  };
+  expand(internalData.value);
   nextTick(() => {
-    internalData.value = [...internalData.value]
-  })
-}
+    internalData.value = [...internalData.value];
+  });
+};
 
 const collapseAll = () => {
   const collapse = (items: TreeItem[]) => {
-    items.forEach(item => {
-      item.expanded = false
+    items.forEach((item) => {
+      item.expanded = false;
       if (item.children && item.children.length > 0) {
-        collapse(item.children)
+        collapse(item.children);
       }
-    })
-  }
-  collapse(internalData.value)
+    });
+  };
+  collapse(internalData.value);
   nextTick(() => {
-    internalData.value = [...internalData.value]
-  })
-}
+    internalData.value = [...internalData.value];
+  });
+};
 
 const handleTreeRowClick = (clickedItem: TreeItem) => {
-  emit('row-click', clickedItem)
-}
+  emit("row-click", clickedItem);
+};
 
 defineExpose({
   internalData,
   findItemById,
   toggleExpand,
   handleTreeRowClick,
-})
+});
 </script>

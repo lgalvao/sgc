@@ -1,20 +1,19 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2>Configurações do Sistema</h2>
-    <form @submit.prevent="salvarConfiguracoes">
+    <BForm @submit.prevent="salvarConfiguracoes">
       <div class="mb-3">
         <label
           class="form-label"
           for="diasInativacaoProcesso"
         >Dias para inativação de processos:</label>
-        <input
+        <BFormInput
           id="diasInativacaoProcesso"
           v-model.number="configuracoesStore.diasInativacaoProcesso"
-          class="form-control"
           min="1"
           required
           type="number"
-        >
+        />
         <div class="form-text">
           Dias depois da finalização de um processo para que seja considerado inativo.
         </div>
@@ -25,42 +24,43 @@
           class="form-label"
           for="diasAlertaNovo"
         >Dias para indicação de alerta como novo:</label>
-        <input
+        <BFormInput
           id="diasAlertaNovo"
           v-model.number="configuracoesStore.diasAlertaNovo"
-          class="form-control"
           min="1"
           required
           type="number"
-        >
+        />
         <div class="form-text">
           Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.
         </div>
       </div>
 
-      <button
-        class="btn btn-primary"
+      <BButton
+        variant="primary"
         type="submit"
       >
         Salvar
-      </button>
-    </form>
-    <div
+      </BButton>
+    </BForm>
+    <BAlert
       v-if="mensagemSucesso"
-      class="alert alert-success mt-3"
-      role="alert"
+      variant="success"
+      class="mt-3"
+      :model-value="true"
     >
       {{ mensagemSucesso }}
-    </div>
-  </div>
+    </BAlert>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
-import {useConfiguracoesStore} from '@/stores/configuracoes';
+import {BAlert, BButton, BContainer, BForm, BFormInput,} from "bootstrap-vue-next";
+import {onMounted, ref} from "vue";
+import {useConfiguracoesStore} from "@/stores/configuracoes";
 
 const configuracoesStore = useConfiguracoesStore();
-const mensagemSucesso = ref('');
+const mensagemSucesso = ref("");
 
 onMounted(() => {
   configuracoesStore.loadConfiguracoes();
@@ -68,9 +68,9 @@ onMounted(() => {
 
 const salvarConfiguracoes = () => {
   if (configuracoesStore.saveConfiguracoes()) {
-    mensagemSucesso.value = 'Configurações salvas!';
+    mensagemSucesso.value = "Configurações salvas!";
     setTimeout(() => {
-      mensagemSucesso.value = '';
+      mensagemSucesso.value = "";
     }, 3000);
   }
 };

@@ -1,69 +1,53 @@
 <template>
-  <div>
-    <div
-      v-if="mostrar"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+  <BModal
+    :model-value="mostrar"
+    title="Finalização de processo"
+    header-bg-variant="success"
+    header-text-variant="white"
+    size="lg"
+    centered
+    hide-footer
+    @hide="emit('fechar')"
+  >
+    <BAlert
+      variant="info"
+      :model-value="true"
     >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              <i class="bi bi-check-circle text-success" />
-              Finalização de processo
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="emit('fechar')"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle" />
-              Confirma a finalização do processo <strong>{{ processoDescricao }}</strong>?<br>
-              Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
-              participantes do processo.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="btn-cancelar-finalizacao"
-              @click="emit('fechar')"
-            >
-              <i class="bi bi-x-circle" /> Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="btn-confirmar-finalizacao"
-              @click="emit('confirmar')"
-            >
-              <i class="bi bi-check-circle" />
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrar"
-      class="modal-backdrop fade show"
-    />
-  </div>
+      <i class="bi bi-info-circle" />
+      Confirma a finalização do processo <strong>{{ processoDescricao }}</strong>?<br>
+      Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
+      participantes do processo.
+    </BAlert>
+    <template #footer>
+      <BButton
+        variant="secondary"
+        data-testid="btn-cancelar-finalizacao"
+        @click="emit('fechar')"
+      >
+        <i class="bi bi-x-circle" /> Cancelar
+      </BButton>
+      <BButton
+        variant="success"
+        data-testid="btn-confirmar-finalizacao"
+        @click="emit('confirmar')"
+      >
+        <i class="bi bi-check-circle" />
+        Confirmar
+      </BButton>
+    </template>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
+import {BAlert, BButton, BModal} from "bootstrap-vue-next";
+
 defineProps<{
   mostrar: boolean;
   processoDescricao: string;
 }>();
 
 const emit = defineEmits<{
-  (e: 'fechar'): void
-  (e: 'confirmar'): void
+  (e: "fechar"): void;
+  (e: "confirmar"): void;
 }>();
 </script>

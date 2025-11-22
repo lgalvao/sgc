@@ -246,14 +246,17 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
-        var dto = ProcessoDto.builder().codigo(1L).build();
+        var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
+        doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(1L))
+                .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
         verify(processoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
     }
@@ -261,14 +264,17 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        var dto = ProcessoDto.builder().codigo(1L).build();
+        var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
+        doNothing().when(processoService).iniciarProcessoRevisao(eq(1L), anyList());
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(1L))
+                .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
         verify(processoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
     }
@@ -276,7 +282,6 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
         var req = new IniciarProcessoReq(null, List.of(1L));
-        doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), anyList());
 
         mockMvc.perform(post("/api/processos/999/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -317,5 +322,65 @@ public class ProcessoControllerTest {
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
+    }
+
+    @Test
+    void listarFinalizados_RetornaLista() throws Exception {
+        when(processoService.listarFinalizados()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+
+        mockMvc.perform(get("/api/processos/finalizados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+    }
+
+    @Test
+    void listarAtivos_RetornaLista() throws Exception {
+        when(processoService.listarAtivos()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+
+        mockMvc.perform(get("/api/processos/ativos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+    }
+
+    @Test
+    void obterStatusUnidades_RetornaMap() throws Exception {
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+
+        mockMvc.perform(get("/api/processos/status-unidades").param("tipo", "MAPEAMENTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
+                .andExpect(jsonPath("$.unidadesDesabilitadas[0]").value(100L));
+    }
+
+    @Test
+    void listarUnidadesBloqueadas_RetornaLista() throws Exception {
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+
+        mockMvc.perform(get("/api/processos/unidades-bloqueadas").param("tipo", "MAPEAMENTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").value(100L));
+    }
+
+    @Test
+    void listarSubprocessosElegiveis_RetornaLista() throws Exception {
+        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+
+        mockMvc.perform(get("/api/processos/1/subprocessos-elegiveis"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codSubprocesso").value(10L));
+    }
+
+    @Test
+    void listarSubprocessos_RetornaLista() throws Exception {
+        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+
+        mockMvc.perform(get("/api/processos/1/subprocessos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].codSubprocesso").value(10L));
     }
 }

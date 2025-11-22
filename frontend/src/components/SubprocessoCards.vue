@@ -1,125 +1,149 @@
 <template>
-  <div class="row">
-    <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
+  <BRow>
+    <template v-if="tipoProcesso === TipoProcessoEnum.MAPEAMENTO || tipoProcesso === TipoProcessoEnum.REVISAO">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeEditarMapa"
+          class="h-100 card-actionable"
           data-testid="atividades-card"
-          @click="$emit('irParaAtividades')"
+          @click="navegarPara('SubprocessoCadastro')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Atividades e conhecimentos
-            </h5>
-            <p class="card-text text-muted">
-              Cadastro de atividades e conhecimentos da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO[SITUACOES_MAPA.DISPONIVEL_VALIDACAO] }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Cadastro de atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+        <BCard
+          v-else-if="permissoes.podeVisualizarMapa"
+          class="h-100 card-actionable"
+          data-testid="atividades-card-vis"
+          @click="navegarPara('SubprocessoVisCadastro')"
+        >
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização das atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeVisualizarMapa"
           :class="{ 'disabled-card': !mapa }"
-          class="card h-100 card-actionable"
+          class="h-100 card-actionable"
           data-testid="mapa-card"
-          @click="handleMapaClick"
+          @click="navegarPara('SubprocessoMapa')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Mapa de Competências
-            </h5>
-            <p class="card-text text-muted">
-              Mapa de competências técnicas da unidade
-            </p>
-            <div v-if="mapa">
-              <div v-if="situacao === 'Mapa em andamento'">
-                <span class="badge bg-warning text-dark">Em andamento</span>
-              </div>
-              <div v-else-if="situacao === 'Mapa disponibilizado'">
-                <span class="badge bg-success">Disponibilizado</span>
-              </div>
-              <div v-else-if="situacao">
-                <span class="badge bg-secondary">{{ situacao }}</span>
-              </div>
-              <div v-else>
-                <span class="badge bg-secondary">Disponibilizado</span>
-              </div>
-            </div>
-            <div v-else>
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Mapa de competências técnicas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(mapa?.situacao)"
+            class="badge"
+          >{{ situacaoLabel(mapa?.situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
 
-    <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
-          @click="$emit('irParaDiagnosticoEquipe')"
+    <template v-else-if="tipoProcesso === TipoProcessoEnum.DIAGNOSTICO">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeVisualizarDiagnostico"
+          class="h-100 card-actionable"
+          data-testid="diagnostico-card"
+          @click="navegarPara('DiagnosticoEquipe')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Diagnóstico da Equipe
-            </h5>
-            <p class="card-text text-muted">
-              Diagnóstico das competências pelos servidores da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Diagnóstico da Equipe
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Diagnóstico das competências pelos servidores da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
-          @click="$emit('irParaOcupacoesCriticas')"
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          class="h-100 card-actionable"
+          data-testid="ocupacoes-card"
+          @click="navegarPara('OcupacoesCriticas')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Ocupações Críticas
-            </h5>
-            <p class="card-text text-muted">
-              Identificação das ocupações críticas da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Ocupações Críticas
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Identificação das ocupações críticas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
-  </div>
+  </BRow>
 </template>
 
 <script lang="ts" setup>
-import {Mapa, MapaCompleto, TipoProcesso} from '@/types/tipos';
-import {LABELS_SITUACAO, SITUACOES_MAPA} from '@/constants/situacoes';
+import { BCard, BCardText, BCardTitle, BCol, BRow } from "bootstrap-vue-next";
+import { useRouter } from "vue-router";
+import {
+  type Mapa,
+  type MapaCompleto,
+  SubprocessoPermissoes,
+  TipoProcesso,
+} from "@/types/tipos";
+import { badgeClass, situacaoLabel } from "@/utils";
+
+const TipoProcessoEnum = TipoProcesso;
 
 defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;
+  permissoes: SubprocessoPermissoes;
 }>();
 
-const emit = defineEmits({
-  irParaAtividades: () => true,
-  navegarParaMapa: () => true,
-  irParaDiagnosticoEquipe: () => true,
-  irParaOcupacoesCriticas: () => true,
-});
+const router = useRouter();
+const route = router.currentRoute;
 
-
-
-const handleMapaClick = () => {
-  emit('navegarParaMapa');
+const navegarPara = (routeName: string) => {
+  if (!route.value.params.codSubprocesso) return;
+  router.push({
+    name: routeName,
+    params: { codSubprocesso: route.value.params.codSubprocesso },
+  });
 };
 </script>
 
@@ -135,8 +159,6 @@ const handleMapaClick = () => {
 }
 
 .card-actionable.disabled-card {
-  /* Allow clicks for testing purposes */
-  /* pointer-eventos: none; */
   opacity: 0.6;
 }
 </style>

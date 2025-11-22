@@ -1,14 +1,19 @@
-import {defineConfig} from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import vue from "@vitejs/plugin-vue";
+import tsconfigPaths from "vite-tsconfig-paths";
+import {defineConfig} from "vitest/config";
 
 export default defineConfig({
   plugins: [vue(), tsconfigPaths()],
   test: {
     globals: true,
-    environment: 'jsdom',
-    include: ['src/**/*.{test,spec}.{js,ts}'],
-    exclude: ['node_modules', 'e2e', 'eve'],
-    setupFiles: ['./vitest.setup.ts'],
+      environment: "jsdom",
+      include: ["src/**/*.{test,spec}.{js,ts}"],
+      exclude: ["node_modules", "e2e", "eve"],
+      setupFiles: ["./vitest.setup.ts"],
+    coverage: {
+        provider: "v8",
+        reporter: ["json", "text"],
+        reportsDirectory: "./coverage",
+    },
   },
-})
+});

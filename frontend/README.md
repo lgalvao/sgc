@@ -10,6 +10,7 @@ Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema 
 -   **Gerenciador de Estado:** [Pinia](https://pinia.vuejs.org/)
 -   **Roteamento:** [Vue Router](https://router.vuejs.org/)
 -   **Estilização:** [Bootstrap](https://getbootstrap.com/) 5 e [Bootstrap Icons](https://icons.getbootstrap.com/)
+-   **Componentes UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/)
 -   **Testes:** [Vitest](https://vitest.dev/)
 -   **Cliente HTTP:** [Axios](https://axios-http.com/)
 
@@ -120,6 +121,13 @@ O arquivo `vitest.setup.ts` configura o ambiente de teste, incluindo mocks globa
     ```bash
     npm run lint
     ```
+
+### Verificações de Qualidade Adicionais
+
+Além do ESLint, o projeto está configurado com ferramentas para garantir a qualidade do código:
+
+-   **`npm run check:ts-unused`**: Identifica exportações de TypeScript que não são utilizadas em nenhum outro lugar do código.
+-   **`npm run validate`**: Um script combinado que executa todas as verificações de qualidade: `lint`, `typecheck`, e `check:ts-unused`.
 
 ## Scripts Disponíveis
 

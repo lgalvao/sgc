@@ -1,13 +1,11 @@
 import {vueTest as test} from '../support/vue-specific-setup';
-import {expect} from '@playwright/test';
 import {
+    aguardarTabelaProcessosCarregada,
     clicarProcesso,
     criarProcessoBasico,
     esperarElementoVisivel,
     loginComoAdmin,
-    loginComoChefe,
     loginComoChefeStic,
-    loginComoGestor,
     loginComoServidor,
     SELETORES,
     verificarAlertasOrdenadosPorDataHora,
@@ -15,6 +13,7 @@ import {
     verificarColunasTabelaAlertas,
     verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
+    verificarQuantidadeProcessosNaTabela,
     verificarVisibilidadeProcesso,
 } from '~/helpers';
 
@@ -38,16 +37,16 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test.beforeEach(async ({ page }) => {
             await loginComoAdmin(page);
             // Cria um processo visível para o Chefe da STIC (unidade 2)
-            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC']);
+            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC'], '2025-12-31', 'EM_ANDAMENTO');
             // Cria um processo fora da hierarquia da STIC
-            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT']);
+            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT'], '2025-12-31', 'EM_ANDAMENTO');
         });
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
             await loginComoChefeStic(page);
 
             // Aguardar tabela de processos carregar
-            await page.waitForSelector(`${SELETORES.TABELA_PROCESSOS} tbody tr`);
+            await aguardarTabelaProcessosCarregada(page);
 
             // Chefe STIC deve ver o processo da sua unidade
             await verificarVisibilidadeProcesso(page, /Processo da STIC para CDU-02/, true);
@@ -56,9 +55,7 @@ test.describe('CDU-02: Visualizar Painel', () => {
             await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);
 
             // A tabela deve conter exatamente 1 processo visível para este usuário
-            const tabela = page.getByTestId('tabela-processos');
-            const linhas = tabela.locator('tbody tr');
-            await expect(linhas).toHaveCount(1);
+            await verificarQuantidadeProcessosNaTabela(page, 1);
         });
     });
 

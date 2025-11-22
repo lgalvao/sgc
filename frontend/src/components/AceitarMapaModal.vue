@@ -1,65 +1,64 @@
 <template>
-  <BaseModal
-    :mostrar="mostrarModal"
-    :titulo="tituloModal"
-    :tipo="perfil === 'ADMIN' ? 'success' : 'primary'"
-    :icone="perfil === 'ADMIN' ? 'bi bi-check-circle' : 'bi bi-check-circle'"
-    @fechar="$emit('fecharModal')"
+  <BModal
+    :model-value="mostrarModal"
+    :title="tituloModal"
+    :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
+    header-text-variant="white"
+    centered
+    hide-footer
+    @hide="$emit('fecharModal')"
   >
-    <template #conteudo>
-      <div data-testid="modal-aceite-body">
-        <p v-if="perfil === 'ADMIN'">
-          {{ corpoModal }}
-        </p>
-        <div
-          v-else
-          class="mb-3"
+    <div data-testid="modal-aceite-body">
+      <p v-if="perfil === 'ADMIN'">
+        {{ corpoModal }}
+      </p>
+      <div
+        v-else
+        class="mb-3"
+      >
+        <label
+          for="observacao-textarea"
+          class="form-label"
         >
-          <label
-            for="observacao-textarea"
-            class="form-label"
-          >{{ corpoModal }}</label>
-          <textarea
-            id="observacao-textarea"
-            v-model="observacao"
-            class="form-control"
-            rows="4"
-            placeholder="Digite suas observações sobre o mapa..."
-            data-testid="observacao-aceite-textarea"
-          />
-          <div class="form-text">
-            As observações serão registradas junto com a validação do mapa.
-          </div>
+          Observações <span class="text-muted small">(opcional)</span>
+        </label>
+        <BFormTextarea
+          id="observacao-textarea"
+          v-model="observacao"
+          rows="4"
+          placeholder="Digite suas observações sobre o mapa..."
+          data-testid="observacao-aceite-textarea"
+        />
+        <div class="form-text">
+          As observações serão registradas junto com a validação do mapa.
         </div>
       </div>
-    </template>
+    </div>
 
-    <template #acoes>
-      <button
-        type="button"
-        class="btn btn-secondary"
+    <template #footer>
+      <BButton
+        variant="secondary"
         data-testid="modal-aceite-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
         Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-success"
+      </BButton>
+      <BButton
+        variant="success"
         data-testid="modal-aceite-confirmar"
         @click="$emit('confirmarAceitacao', observacao)"
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar
-      </button>
+      </BButton>
     </template>
-  </BaseModal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
-import BaseModal from './BaseModal.vue';
+import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {computed, ref} from "vue";
 
 interface Props {
   mostrarModal: boolean;
@@ -73,20 +72,22 @@ defineEmits<{
   confirmarAceitacao: [observacao: string];
 }>();
 
-const observacao = ref('');
+const observacao = ref("");
 
 const tituloModal = computed(() => {
-  return props.perfil === 'ADMIN' ? 'Homologação' : 'Aceitar Mapa de Competências';
+  return props.perfil === "ADMIN"
+      ? "Homologação"
+      : "Aceitar Mapa de Competências";
 });
 
 const corpoModal = computed(() => {
-  return props.perfil === 'ADMIN'
-    ? 'Confirma a homologação do mapa de competências?'
-    : 'Observações <small class="text-muted">(opcional)</small>';
+  return props.perfil === "ADMIN"
+      ? "Confirma a homologação do mapa de competências?"
+      : "Observações";
 });
 
 computed(() => {
-  return props.perfil !== 'ADMIN';
+  return props.perfil !== "ADMIN";
 });
 </script>
 
@@ -96,14 +97,5 @@ computed(() => {
   box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
 }
 
-.btn-success {
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
-  border: none;
-  transition: transform 0.2s ease;
-}
-
-.btn-success:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
-}
+/* BButton handles variants, but custom gradients might still be desired or need removal for Bootstrap standard look */
 </style>

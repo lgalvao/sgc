@@ -41,6 +41,8 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataCriacao", source = "processo.dataCriacao")
     @Mapping(target = "unidadeCodigo", source = "unidade.codigo")
     @Mapping(target = "unidadeNome", source = "unidade.nome")
+    @Mapping(target = "linkDestino", ignore = true)
+    @Mapping(target = "unidadesParticipantes", ignore = true)
     ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso);
 
     // Mapeamento de subprocesso para DTO de participante (usado quando não há UnidadeProcesso correspondente)

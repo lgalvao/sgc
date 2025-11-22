@@ -44,10 +44,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = Sgc.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockChefe
+@WithMockChefe("333333333333")
 @Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
@@ -85,8 +85,8 @@ class CDU09IntegrationTest {
     @BeforeEach
     void setUp() {
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
-        unidadeChefe = unidadeRepo.findById(8L).orElseThrow();
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        unidadeChefe = unidadeRepo.findById(10L).orElseThrow(); // Alterado de 8L para 10L para coincidir com a factory
+        // Removido a sobrescrita do titular, pois o banco já tem o usuário 333333333333 como titular da unidade 10
 
         Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoMapeamento);
@@ -128,7 +128,7 @@ class CDU09IntegrationTest {
             var alertas = alertaRepo.findByProcessoCodigo(subprocessoMapeamento.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SEDESENV submetido para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL submetido para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             verify(subprocessoNotificacaoService).notificarAceiteCadastro(

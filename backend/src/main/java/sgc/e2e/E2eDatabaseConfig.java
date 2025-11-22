@@ -52,8 +52,8 @@ public class E2eDatabaseConfig implements WebMvcConfigurer {
         DataSource defaultDataSource = properties.initializeDataSourceBuilder().build();
         // Initialize the default data source with schema and minimal data
         try (Connection connection = defaultDataSource.getConnection()) {
-            ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:schema-h2.sql"));
-            // ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:data-h2-minimal.sql"));
+            ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:schema.sql"));
+            // ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:data-minimal.sql"));
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize default E2E data source", e);
         }

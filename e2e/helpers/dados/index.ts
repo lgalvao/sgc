@@ -8,5 +8,6 @@ export {
     TEXTOS,
     URLS,
     ROTULOS,
-    DADOS_TESTE
+    DADOS_TESTE,
+    USUARIOS
 } from './constantes';

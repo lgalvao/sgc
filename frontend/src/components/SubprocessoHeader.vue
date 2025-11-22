@@ -1,9 +1,10 @@
 <template>
-  <div
-    class="card mb-4"
+  <BCard
+    class="mb-4"
     data-testid="subprocesso-header"
+    no-body
   >
-    <div class="card-body">
+    <BCardBody>
       <p
         class="text-muted small mb-1"
         data-testid="processo-info"
@@ -43,27 +44,26 @@
         <strong>Unidade atual:</strong> {{ unidadeAtual }}
       </p>
 
-      <!-- Botão para alterar data limite (apenas para ADMIN) -->
+      <!-- Botão para alterar data limite -->
       <div
-        v-if="mostrarBotaoAlterarData && isSubprocessoEmAndamento"
+        v-if="podeAlterarDataLimite"
         class="mt-3"
       >
-        <button
-          class="btn btn-outline-primary"
+        <BButton
+          variant="outline-primary"
           @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1" />
           Alterar data limite
-        </button>
+        </BButton>
       </div>
-    </div>
-  </div>
+    </BCardBody>
+  </BCard>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
-import {Perfil} from '@/types/tipos';
-import {badgeClass} from '@/utils'; // Importar a função badgeClass
+import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import {badgeClass} from "@/utils";
 
 interface Props {
   processoDescricao: string;
@@ -77,19 +77,16 @@ interface Props {
   responsavelRamal?: string;
   responsavelEmail?: string;
   unidadeAtual?: string;
-  perfilUsuario: Perfil | null;
-  isSubprocessoEmAndamento: boolean;
+  podeAlterarDataLimite: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const emit = defineEmits({
-  alterarDataLimite: null
+  alterarDataLimite: null,
 });
 
-const mostrarBotaoAlterarData = computed(() => props.perfilUsuario === Perfil.ADMIN);
-
 const handleAlterarDataLimite = () => {
-  emit('alterarDataLimite');
+  emit("alterarDataLimite");
 };
 </script>

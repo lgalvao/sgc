@@ -3,15 +3,7 @@ import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
 import {extrairIdDoSeletor} from '../utils/utils';
-
-// Reduz ruído de logs: suprime linhas [DEBUG] salvo se E2E_DEBUG estiver definido.
-const ORIGINAL_LOG = console.log;
-if (!process.env.E2E_DEBUG) {
-    console.log = (...args: any[]) => {
-        if (args.length && typeof args[0] === 'string' && args[0].includes('[DEBUG]')) return;
-        ORIGINAL_LOG(...args);
-    };
-}
+import { debug, logger } from '../utils/logger';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
@@ -21,8 +13,10 @@ if (!process.env.E2E_DEBUG) {
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        await page.waitForSelector(seletorCheckbox);
-        await page.check(seletorCheckbox);
+        const checkboxLocator = page.locator(seletorCheckbox);
+        await page.waitForSelector(seletorCheckbox, { state: 'visible' });
+        await checkboxLocator.waitFor({ enabled: true });
+        await checkboxLocator.check();
     }
 }
 
@@ -41,6 +35,49 @@ export async function selecionarUnidadeDisponivel(page: Page, index: number = 0)
     const id = await alvo.getAttribute('id');
     await alvo.check();
     return id || '';
+}
+
+/**
+ * Clica no botão Salvar.
+ * @param page A instância da página do Playwright.
+ */
+export async function clicarBotaoSalvar(page: Page): Promise<void> {
+    await page.getByRole('button', {name: /Salvar/i}).click();
+}
+
+/**
+ * Clica no botão Remover.
+ * @param page A instância da página do Playwright.
+ */
+export async function clicarBotaoRemover(page: Page): Promise<void> {
+    await page.getByRole('button', {name: /^Remover$/i}).click();
+}
+
+/**
+ * Seleciona o tipo de processo.
+ * @param page A instância da página do Playwright.
+ * @param tipo O tipo do processo.
+ */
+export async function selecionarTipoProcesso(page: Page, tipo: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_TIPO).selectOption(tipo);
+}
+
+/**
+ * Preenche o campo descrição.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição.
+ */
+export async function preencherDescricao(page: Page, descricao: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
+}
+
+/**
+ * Preenche o campo data limite.
+ * @param page A instância da página do Playwright.
+ * @param data A data limite.
+ */
+export async function preencherDataLimite(page: Page, data: string): Promise<void> {
+    await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill(data);
 }
 
 /**
@@ -64,7 +101,7 @@ export async function selecionarUnidadesPorId(page: Page, unidades: number[]): P
 
     const siglas = unidades.map(id => idParaSigla[id]).filter(Boolean);
     if (siglas.length !== unidades.length) {
-        console.warn('Algumas unidades não têm SIGLA mapeada:', unidades);
+        logger.warn('Algumas unidades não têm SIGLA mapeada:', unidades);
     }
 
     await selecionarUnidadesPorSigla(page, siglas);
@@ -102,7 +139,7 @@ export async function preencherFormularioProcesso(
                 const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"]:not([disabled])');
                 return checkboxes.length > 0;
             },
-            { timeout: 10000 }
+            { timeout: 30000 }
         );
     }
 
@@ -135,7 +172,7 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
-    console.log(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
+    debug(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
 
     // DEBUG: Verificar chamadas de rede
     const responses: string[] = [];
@@ -146,7 +183,7 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
             try {
                 const body = await response.text();
                 responses.push(`${status} ${url}: ${body.substring(0, 200)}`);
-                console.log(`[DEBUG] API Response: ${status} ${url}`);
+                debug(`[DEBUG] API Response: ${status} ${url}`);
             } catch (e) {
                 responses.push(`${status} ${url}: (couldn't read body)`);
             }
@@ -155,21 +192,21 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
 
     // DEBUG: Verificar se checkboxes de unidades estão marcados
     const checkboxesMarcados = await page.locator('input[type="checkbox"]:checked').count();
-    console.log(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
+    debug(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
 
     // Se não há checkboxes marcados, há um bug no frontend!
     // O processo foi criado com unidades, mas ao abrir para edição elas não são carregadas
     if (checkboxesMarcados === 0) {
-        console.warn(`[AVISO] BUG DO FRONTEND: Unidades não foram carregadas ao abrir processo para edição!`);
-        console.warn(`[AVISO] Últimas ${responses.length} respostas da API:`);
-        responses.forEach(r => console.warn(`  ${r}`));
+        logger.warn(`[AVISO] BUG DO FRONTEND: Unidades não foram carregadas ao abrir processo para edição!`);
+        logger.warn(`[AVISO] Últimas ${responses.length} respostas da API:`);
+        responses.forEach(r => logger.warn(`  ${r}`));
     }
 
     await clicarElemento([
         page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)),
         page.getByRole('button', {name: /iniciar processo/i})
     ]);
-    console.log(`[DEBUG] iniciarProcessoMapeamento: Clicou em Iniciar processo`);
+    debug(`[DEBUG] iniciarProcessoMapeamento: Clicou em Iniciar processo`);
 }
 
 /**
@@ -216,40 +253,34 @@ export async function criarProcessoBasico(
     dataLimite: string = '2025-12-31',
     situacao: 'CRIADO' | 'EM_ANDAMENTO' = 'CRIADO'
 ): Promise<void> {
-    console.log(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
+    debug(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
 
     await navegarParaCriacaoProcesso(page);
-    console.log(`[DEBUG] criarProcessoBasico: Navegou para criação`);
+    debug(`[DEBUG] criarProcessoBasico: Navegou para criação`);
 
-    await preencherCampo([page.locator(SELETORES.CAMPO_DESCRICAO)], descricao);
-    console.log(`[DEBUG] criarProcessoBasico: Preencheu descrição`);
-
-    await page.selectOption(SELETORES.CAMPO_TIPO, tipo);
-    console.log(`[DEBUG] criarProcessoBasico: Selecionou tipo ${tipo}`);
-
-    await preencherCampo([page.locator(SELETORES.CAMPO_DATA_LIMITE)], dataLimite);
-    console.log(`[DEBUG] criarProcessoBasico: Preencheu data limite`);
+    await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
+    debug(`[DEBUG] criarProcessoBasico: Preencheu formulário inicial`);
 
     await selecionarUnidadesPorSigla(page, siglas);
-    console.log(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);
+    debug(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);
 
     await clicarElemento([
         page.getByRole('button', {name: /salvar/i}),
         page.getByTestId('btn-salvar')
     ]);
-    console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
+    debug(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, );
-    console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
+    debug(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
 
     if (situacao === 'EM_ANDAMENTO') {
-        console.log(`[DEBUG] criarProcessoBasico: Iniciando processo "${descricao}"`);
+        debug(`[DEBUG] criarProcessoBasico: Iniciando processo "${descricao}"`);
         await abrirProcessoPorNome(page, descricao);
         await iniciarProcessoMapeamento(page);
         await confirmarIniciacaoProcesso(page);
         await page.waitForURL(/\/painel/, );
-        console.log(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
+        debug(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
     }
 }
 
@@ -259,20 +290,20 @@ export async function criarProcessoBasico(
  * @param descricao A descrição do processo a ser aberto.
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
-    console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
+    debug(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
     const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr:has-text("${descricao}")`);
     await row.waitFor({state: 'visible', timeout: 10000});
-    console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
+    debug(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
-    console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
+    debug(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
 
     // Aguardar navegação para página de cadastro
     await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, );
-    console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
+    debug(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
 
     // Aguardar formulário carregar com os dados do processo
     await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
-    console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
+    debug(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
 
     // DEBUG: Verificar dados carregados usando page.evaluate
     const dadosCarregados = await page.evaluate(() => {
@@ -286,7 +317,7 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
             idsCheckboxesMarcados: checkboxesChecked.map((cb: any) => cb.id)
         };
     });
-    console.log(`[DEBUG] abrirProcessoPorNome: Dados carregados:`, JSON.stringify(dadosCarregados));
+    debug(`[DEBUG] abrirProcessoPorNome: Dados carregados:`, JSON.stringify(dadosCarregados));
 }
 
 /**
@@ -327,7 +358,7 @@ export async function criarProcessoCompleto(
             processoId = data.codigo;
         }
     } catch (error) {
-        console.warn('Could not extract process ID from response:', error);
+        logger.warn('Could not extract process ID from response:', error);
     }
 
     // Frontend redirects to /painel after saving

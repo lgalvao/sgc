@@ -4,38 +4,40 @@
       v-if="mostrarBotoesBloco"
       class="mt-3 d-flex gap-2"
     >
-      <button
+      <BButton
         v-if="perfil === 'GESTOR'"
-        class="btn btn-outline-primary"
+        variant="outline-primary"
         data-testid="btn-aceitar-em-bloco"
         @click="emit('aceitarBloco')"
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar em bloco
-      </button>
-      <button
+      </BButton>
+      <BButton
         v-if="perfil === 'ADMIN'"
-        class="btn btn-outline-success"
+        variant="outline-success"
         data-testid="btn-abrir-modal-homologar-bloco"
         @click="emit('homologarBloco')"
       >
         <i class="bi bi-check-all me-1" />
         Homologar em bloco
-      </button>
+      </BButton>
     </div>
-    <button
+    <BButton
       v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
-      class="btn btn-danger mt-3"
+      variant="danger"
+      class="mt-3"
       data-testid="btn-finalizar-processo"
       @click="emit('finalizar')"
     >
       Finalizar processo
-    </button>
+    </BButton>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type {Perfil, SituacaoProcesso} from '@/types/tipos';
+import {BButton} from "bootstrap-vue-next";
+import type {Perfil, SituacaoProcesso} from "@/types/tipos";
 
 defineProps<{
   mostrarBotoesBloco: boolean;
@@ -44,8 +46,8 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'aceitarBloco'): void
-  (e: 'homologarBloco'): void
-  (e: 'finalizar'): void
+  (e: "aceitarBloco"): void;
+  (e: "homologarBloco"): void;
+  (e: "finalizar"): void;
 }>();
 </script>

@@ -22,7 +22,6 @@
 </template>
 
 <script lang="ts" setup>
-
 interface Column {
   key: string;
 }
@@ -34,7 +33,7 @@ interface TreeItem {
   clickable?: boolean;
   level?: number;
 
-  [key: string]: any;  
+  [key: string]: any;
 }
 
 const props = defineProps<{
@@ -44,24 +43,23 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'toggle', id: number | string): void
-  (e: 'row-click', item: TreeItem): void
-}>()
-
+  (e: "toggle", id: number | string): void;
+  (e: "row-click", item: TreeItem): void;
+}>();
 
 const toggleExpand = (id: number | string) => {
-  emit('toggle', id);
+  emit("toggle", id);
 };
 
 const handleRowClick = () => {
   if (props.item.clickable === false) return;
-  emit('row-click', props.item);
+  emit("row-click", props.item);
 };
 
 defineExpose({
   toggleExpand,
   handleRowClick,
-})
+});
 </script>
 
 <style scoped>

@@ -68,7 +68,7 @@ sgc/
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
 │       ├── application-e2e.yml     # Testes E2E (H2)
-│       └── data-h2.sql             # Dados iniciais para testes
+│       └── data.sql             # Dados iniciais para testes
 │
 ├── frontend/             # Aplicação Vue.js
 │   ├── src/

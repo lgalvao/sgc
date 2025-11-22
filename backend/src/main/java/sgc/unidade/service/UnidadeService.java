@@ -95,7 +95,8 @@ public class UnidadeService {
                 u.getSigla(),
                 codigoPai,
                 u.getTipo().name(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                true // isElegivel: Set to true by default for now
             );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -147,7 +148,25 @@ public class UnidadeService {
             unidade.getSigla(),
             codigoPai,
             unidade.getTipo().name(),
-            new ArrayList<>()
+            new ArrayList<>(),
+            false
+        );
+    }
+
+    public UnidadeDto buscarPorId(Long id) {
+        Unidade unidade = unidadeRepo.findById(id)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + id + " não encontrada"));
+
+        Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
+
+        return new UnidadeDto(
+            unidade.getCodigo(),
+            unidade.getNome(),
+            unidade.getSigla(),
+            codigoPai,
+            unidade.getTipo().name(),
+            new ArrayList<>(),
+            false
         );
     }
 }

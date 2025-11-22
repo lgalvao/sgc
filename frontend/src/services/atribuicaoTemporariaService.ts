@@ -1,4 +1,4 @@
-import apiClient from '../axios-setup';
+import apiClient from "../axios-setup";
 
 export interface CriarAtribuicaoTemporariaRequest {
     tituloEleitoralServidor: string;
@@ -7,10 +7,16 @@ export interface CriarAtribuicaoTemporariaRequest {
 }
 
 export async function buscarTodasAtribuicoes() {
-    const response = await apiClient.get('/atribuicoes');
+    const response = await apiClient.get("/atribuicoes");
     return response.data;
 }
 
-export async function criarAtribuicaoTemporaria(idUnidade: number, request: CriarAtribuicaoTemporariaRequest): Promise<void> {
-    await apiClient.post(`/unidades/${idUnidade}/atribuicoes-temporarias`, request);
+export async function criarAtribuicaoTemporaria(
+    idUnidade: number,
+    request: CriarAtribuicaoTemporariaRequest,
+): Promise<void> {
+    await apiClient.post(
+        `/unidades/${idUnidade}/atribuicoes-temporarias`,
+        request,
+    );
 }

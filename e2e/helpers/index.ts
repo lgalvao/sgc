@@ -27,3 +27,6 @@ export * from './dados';
 // ===== UTILITÁRIOS GERAIS =====
 export * from './utils';
 
+// ===== PAGES =====
+export * from './pages/painel-page';
+export * from './pages/processo-page';

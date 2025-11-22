@@ -1,52 +1,40 @@
 <template>
   <div class="d-flex align-items-center gap-3">
-    <button
+    <BButton
       v-if="shouldShowBackButton"
       class="btn btn-outline-secondary btn-sm"
-      type="button"
       @click="goBack"
     >
       <i class="bi bi-arrow-left" /> Voltar
-    </button>
+    </BButton>
 
-    <nav
+    <BBreadcrumb
       v-if="shouldShowBreadcrumbs"
-      aria-label="breadcrumb"
+      class="mb-0"
       data-testid="breadcrumbs"
     >
-      <ol class="breadcrumb mb-0">
-        <li
-          v-for="(crumb, index) in crumbs"
-          :key="index"
-          :class="{ active: index === crumbs.length - 1 }"
-          aria-current="page"
-          class="breadcrumb-item"
-          data-testid="breadcrumb-item"
-        >
-          <router-link
-            v-if="index < crumbs.length - 1 && crumb.to"
-            :to="crumb.to"
-          >
-            <i
-              v-if="crumb.isHome"
-              aria-label="Início"
-              class="bi bi-house-door"
-              data-testid="breadcrumb-home-icon"
-            />
-            <span v-else>{{ crumb.label }}</span>
-          </router-link>
-          <span v-else>
-            {{ crumb.label }}
-          </span>
-        </li>
-      </ol>
-    </nav>
+      <BBreadcrumbItem
+        v-for="(crumb, index) in crumbs"
+        :key="index"
+        :active="index === crumbs.length - 1"
+        :to="crumb.to"
+      >
+        <i
+          v-if="crumb.isHome"
+          aria-label="Início"
+          class="bi bi-house-door"
+          data-testid="breadcrumb-home-icon"
+        />
+        <span v-else>{{ crumb.label }}</span>
+      </BBreadcrumbItem>
+    </BBreadcrumb>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
-import {type RouteLocationNamedRaw, useRoute, useRouter} from 'vue-router';
+import {BBreadcrumb, BBreadcrumbItem, BButton} from "bootstrap-vue-next";
+import {computed} from "vue";
+import {type RouteLocationNamedRaw, useRoute, useRouter} from "vue-router";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/tipos";
 
@@ -63,48 +51,60 @@ function goBack() {
   router.back();
 }
 
-const shouldShowBackButton = computed(() => route.path !== '/login' && route.path !== '/painel');
+const shouldShowBackButton = computed(
+    () => route.path !== "/login" && route.path !== "/painel",
+);
 
-const shouldShowBreadcrumbs = computed(() => route.path !== '/login' && route.path !== '/painel');
+const shouldShowBreadcrumbs = computed(
+    () => route.path !== "/login" && route.path !== "/painel",
+);
 
 const crumbs = computed((): Breadcrumb[] => {
-    const breadcrumbs: Breadcrumb[] = [];
-    const perfil = usePerfilStore();
-    const perfilUsuario = perfil.perfilSelecionado;
+  const breadcrumbs: Breadcrumb[] = [];
+  const perfil = usePerfilStore();
+  const perfilUsuario = perfil.perfilSelecionado;
 
-    // Add home breadcrumb
-    breadcrumbs.push({ label: 'Painel', to: { name: 'Painel' }, isHome: true });
+  // Add home breadcrumb
+  breadcrumbs.push({label: "Painel", to: {name: "Painel"}, isHome: true});
 
-    // Iterate over matched routes to build breadcrumbs
-    route.matched.forEach((routeRecord) => {
-        const { meta, name } = routeRecord;
+  // Iterate over matched routes to build breadcrumbs
+  route.matched.forEach((routeRecord) => {
+    const {meta, name} = routeRecord;
 
-        const shouldAddCrumb = () => {
-            return !(name === 'Processo' && (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR));
+    const shouldAddCrumb = () => {
+      return !(
+          name === "Processo" &&
+          (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR)
+      );
+    };
 
-        };
+    if (meta.breadcrumb && shouldAddCrumb()) {
+      const label =
+          typeof meta.breadcrumb === "function"
+              ? meta.breadcrumb(route)
+              : (meta.breadcrumb as string);
 
-        if (meta.breadcrumb && shouldAddCrumb()) {
-            const label = typeof meta.breadcrumb === 'function' ? meta.breadcrumb(route) : (meta.breadcrumb as string);
-
-            if (label) {
-                // Add breadcrumb if it doesn't already exist as the last one
-                if (breadcrumbs.length === 0 || breadcrumbs[breadcrumbs.length - 1].label !== label) {
-                    breadcrumbs.push({
-                        label,
-                        to: { name: name as string, params: route.params },
-                    });
-                }
-            }
+      if (label) {
+        // Add breadcrumb if it doesn't already exist as the last one
+        if (
+            breadcrumbs.length === 0 ||
+            breadcrumbs[breadcrumbs.length - 1].label !== label
+        ) {
+          breadcrumbs.push({
+            label,
+            to: {name: name as string, params: route.params},
+          });
         }
-    });
-
-    // Remove link from the last breadcrumb
-    if (breadcrumbs.length > 0) {
-        breadcrumbs[breadcrumbs.length - 1].to = undefined;
+      }
     }
+  });
 
-    return breadcrumbs;
+  // Remove link from the last breadcrumb
+  if (breadcrumbs.length > 0) {
+    breadcrumbs[breadcrumbs.length - 1].to = undefined;
+  }
+
+  return breadcrumbs;
 });
 </script>
 

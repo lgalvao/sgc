@@ -1,11 +1,11 @@
-import {defineStore} from 'pinia';
-import {Alerta} from '@/mappers/alertas';
-import * as painelService from '../services/painelService';
-import {Page} from '@/services/painelService';
-import * as alertaService from '../services/alertaService';
-import {usePerfilStore} from './perfil';
+import {defineStore} from "pinia";
+import type {Page} from "@/services/painelService";
+import type {Alerta} from "@/types/tipos";
+import * as alertaService from "../services/alertaService";
+import * as painelService from "../services/painelService";
+import {usePerfilStore} from "./perfil";
 
-export const useAlertasStore = defineStore('alertas', {
+export const useAlertasStore = defineStore("alertas", {
     state: () => ({
         alertas: [] as Alerta[],
         alertasPage: {} as Page<Alerta>,
@@ -17,8 +17,22 @@ export const useAlertasStore = defineStore('alertas', {
         // }
     },
     actions: {
-        async fetchAlertas(usuarioTitulo: string, unidade: number, page: number, size: number) {
-            const response = await painelService.listarAlertas(usuarioTitulo, unidade, page, size);
+        async fetchAlertas(
+            usuarioTitulo: number,
+            unidade: number,
+            page: number,
+            size: number,
+            sort?: "data" | "processo",
+            order?: "asc" | "desc",
+        ) {
+            const response = await painelService.listarAlertas(
+                usuarioTitulo,
+                unidade,
+                page,
+                size,
+                sort,
+                order,
+            );
             this.alertas = response.content;
             this.alertasPage = response;
         },
@@ -28,12 +42,19 @@ export const useAlertasStore = defineStore('alertas', {
                 await alertaService.marcarComoLido(idAlerta);
                 const perfilStore = usePerfilStore();
                 if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
-                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20);
+                    await this.fetchAlertas(
+                        Number(perfilStore.servidorId),
+                        Number(perfilStore.unidadeSelecionada),
+                        0,
+                        20,
+                        undefined,
+                        undefined,
+                    );
                 }
                 return true;
             } catch {
                 return false;
             }
         },
-    }
+    },
 });

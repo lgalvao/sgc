@@ -100,7 +100,7 @@ class UsuarioServiceTest {
     @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
         String tituloEleitoral = "123456789";
-        UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name());
+        UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name(), false);
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 
         // Apenas verifica se o metodo executa sem lançar exceções, já que a implementação atual apenas loga a informação.

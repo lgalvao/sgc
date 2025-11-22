@@ -327,6 +327,11 @@ public class AlertaService {
                             .descricao(dto.getDescricao())
                             .dataHora(dto.getDataHora())
                             .dataHoraLeitura(alertaUsuario.getDataHoraLeitura())
+                            .linkDestino(dto.getLinkDestino())
+                            .mensagem(dto.getMensagem())
+                            .dataHoraFormatada(dto.getDataHoraFormatada())
+                            .processo(dto.getProcesso())
+                            .origem(dto.getOrigem())
                             .build();
                 })
                 .toList();
