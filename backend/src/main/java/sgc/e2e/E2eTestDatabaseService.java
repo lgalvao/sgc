@@ -36,7 +36,7 @@ public class E2eTestDatabaseService {
             for (String statement : sql.split(";")) {
                 String trimmed = statement.trim();
                 if (!trimmed.isEmpty() && !trimmed.startsWith("--")) {
-                    log.debug("Executing SQL statement: {}", trimmed);
+                    log.trace("Executing SQL statement: {}", trimmed);
                     try {
                         stmt.execute(trimmed);
                     } catch (SQLException e) {
@@ -49,7 +49,7 @@ public class E2eTestDatabaseService {
 
     private DataSource createDataSource(String testId) {
         try {
-            log.debug("Creating new isolated DB for testId: {}", testId);
+            log.trace("Creating new isolated DB for testId: {}", testId);
 
             // 1. Create a new H2 in-memory data source with a unique name
             String jdbcUrl = String.format(
@@ -85,7 +85,7 @@ public class E2eTestDatabaseService {
                 // Programmatic insertion of user '1' and 'SERVIDOR' profile for E2E tests
                 try (Statement stmt = conn.createStatement()) {
                     String insertUserSql = "INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES ('1', 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10)";
-                    log.debug("Programmatically inserting user '1': {}", insertUserSql);
+                    log.trace("Programmatically inserting user '1': {}", insertUserSql);
                     stmt.execute(insertUserSql);
 
                     String insertProfileSql = "INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES ('1', 'SERVIDOR')";

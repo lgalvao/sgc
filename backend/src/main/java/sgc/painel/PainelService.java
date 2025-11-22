@@ -1,7 +1,6 @@
 package sgc.painel;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; // Added this import
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@Slf4j // Added this annotation
 public class PainelService {
     private final ProcessoRepo processoRepo;
     private final AlertaRepo alertaRepo;
@@ -65,14 +63,14 @@ public class PainelService {
 
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
-            log.debug("Listando processos para perfil {} e unidades {}. Excluindo situacao: {}", perfil, unidadeIds, SituacaoProcesso.CRIADO);
+
 
             processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
                 unidadeIds,
                 SituacaoProcesso.CRIADO,
                 pageable
             );
-            log.debug("Processos encontrados para perfil {} e unidades {}: {}", perfil, unidadeIds, processos.getContent().stream().map(Processo::getDescricao).collect(Collectors.toList()));
+
         }
 
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));

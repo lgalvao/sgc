@@ -257,11 +257,4 @@ INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30001, 201, '
 INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40001, 30001, 'Atendimento ao público');
 INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30001, 20001);
 
--- Processo mínimo para que o painel carregue
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (1, 'Processo Teste STIC', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 30);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 2); -- STIC
 
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (2, 'Processo Teste SESEL', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 30);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 10); -- SESEL
