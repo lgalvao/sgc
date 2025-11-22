@@ -32,3 +32,4 @@ backend/bin/
 /frontend/tsconfig.tsbuildinfo
 /node_modules/
 e2e-log-problems.md
+test-results/

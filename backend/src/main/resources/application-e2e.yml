@@ -59,6 +59,7 @@ logging:
     org.springframework.data.repository.config: WARN
     org.apache.catalina: WARN
     org.springframework.boot.actuate.endpoint: WARN
+    org.springframework.boot.web.embedded.tomcat.GracefulShutdown: WARN
 
   file:
     name: sgc_e2e.log
