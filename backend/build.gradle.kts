@@ -147,4 +147,5 @@ tasks.register<BootRun>("bootRunE2E") {
     jvmArgs = listOf("-Dspring.profiles.active=e2e")
     mainClass.set("sgc.Sgc")
     classpath = sourceSets["main"].runtimeClasspath
+    isIgnoreExitValue = true
 }

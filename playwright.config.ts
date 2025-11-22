@@ -7,7 +7,7 @@ export default defineConfig({
     fullyParallel: false,
     workers: 1,
     timeout: 10000,
-    reporter: "dot",
+    reporter: [],
     expect: {timeout: 5000},
     globalSetup: require.resolve('./e2e/setup/setup-databases'),
     globalTeardown: require.resolve('./e2e/setup/global-teardown'),

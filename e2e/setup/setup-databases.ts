@@ -12,6 +12,27 @@ const LOG_FILE = path.join(process.cwd(), 'e2e-backend.log');
 
 let backendProcess: ChildProcess | undefined;
 
+// Function to filter out lines we consider noise
+function shouldDisplayLine(line: string): boolean {
+    // Hide lines starting with '>'
+    if (line.startsWith('> ')) {
+        return false;
+    }
+    // Hide Node.js deprecation warnings
+    if (line.startsWith('(node:') && line.includes('DeprecationWarning')) {
+        return false;
+    }
+    // Hide Lombok warnings related to sun.misc.Unsafe
+    if (line.startsWith('WARNING:') && line.includes('lombok.permit.Permit') && line.includes('sun.misc.Unsafe')) {
+        return false;
+    }
+    if (line.startsWith('WARNING:') && line.includes('sun.misc.Unsafe::objectFieldOffset')) {
+        return false;
+    }
+    // You can add more filtering rules here if needed
+    return true;
+}
+
 async function globalSetup(config: FullConfig) {
     debugLog('Starting E2E backend server...');
     
@@ -21,7 +42,7 @@ async function globalSetup(config: FullConfig) {
     debugLog(`Backend logs will be written to: ${LOG_FILE}`);
 
     try {
-        backendProcess = spawn('./gradlew', [':backend:bootRunE2E', "--args='--spring.profiles.active=e2e'"], {
+        backendProcess = spawn('./gradlew', [':backend:bootRunE2E', '--quiet', '--args=--spring.profiles.active=e2e'], {
             stdio: 'pipe', // Capture streams so we can tee them
             shell: true,
             cwd: process.cwd()
@@ -29,15 +50,27 @@ async function globalSetup(config: FullConfig) {
 
         if (backendProcess.stdout) {
             backendProcess.stdout.on('data', (data) => {
-                process.stdout.write(data); // Write to console
-                logStream.write(data);      // Write to file
+                const lines = data.toString().split('\n');
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.length > 0 && shouldDisplayLine(trimmedLine)) {
+                        process.stdout.write(trimmedLine + '\n'); // Write to console
+                        logStream.write(trimmedLine + '\n');      // Write to file
+                    }
+                });
             });
         }
 
         if (backendProcess.stderr) {
             backendProcess.stderr.on('data', (data) => {
-                process.stderr.write(data); // Write to console
-                logStream.write(data);      // Write to file
+                const lines = data.toString().split('\n');
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.length > 0 && shouldDisplayLine(trimmedLine)) {
+                        process.stderr.write(trimmedLine + '\n'); // Write to console
+                        logStream.write(trimmedLine + '\n');      // Write to file
+                    }
+                });
             });
         }
 
@@ -47,7 +80,7 @@ async function globalSetup(config: FullConfig) {
         backendProcess.on('exit', (code) => {
             backendExited = true;
             exitCode = code;
-            if (code !== 0 && code !== null) {
+            if (code !== 0 && code !== 1 && code !== null) {
                 logger.error(`Backend process exited prematurely with code ${code}`);
             }
         });

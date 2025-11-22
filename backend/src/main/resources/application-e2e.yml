@@ -55,5 +55,10 @@ logging:
     org.hibernate.SQL: WARN
     org.springframework.mail: ERROR
     org.springframework.boot.actuate.mail: ERROR
+    org.springframework.boot.devtools: ERROR
+    org.springframework.data.repository.config: WARN
+    org.apache.catalina: WARN
+    org.springframework.boot.actuate.endpoint: WARN
+
   file:
     name: sgc_e2e.log
