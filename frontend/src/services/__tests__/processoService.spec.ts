@@ -58,8 +58,11 @@ describe("processoService", () => {
         mockApi.post.mockResolvedValue({});
         await service.iniciarProcesso(1, TipoProcesso.REVISAO, [10, 20]);
         expect(mockApi.post).toHaveBeenCalledWith(
-            "/processos/1/iniciar?tipo=REVISAO",
-            [10, 20],
+            "/processos/1/iniciar",
+            {
+                tipo: TipoProcesso.REVISAO,
+                unidades: [10, 20],
+            },
         );
     });
 

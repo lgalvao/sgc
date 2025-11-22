@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import type {Page} from "@/services/painelService";
-import {usePerfilStore} from "@/stores/perfil";
 import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
