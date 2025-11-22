@@ -17,7 +17,7 @@ graph TD
         direction LR
         SpringSecurity
         OutrosServicos
-        UsuarioController
+        SgrhController
         UsuarioService
     end
 
@@ -35,7 +35,7 @@ graph TD
 
     SpringSecurity & UsuarioService -- Usa --> UsuarioRepo
     UsuarioRepo -- Gerencia entidade Usuario em --> DB_SGC
-    UsuarioController -- Usa --> UsuarioService
+    SgrhController -- Usa --> UsuarioService
 
     OutrosServicos -- Consultam --> SgrhServiceFacade
     SgrhServiceFacade -- Busca dados em --> SGRH_Externo
@@ -50,8 +50,8 @@ graph TD
 ### Gestão de Usuários (Lógica Interna)
 - **`Usuario` / `Perfil`**: Entidades JPA que modelam o usuário do SGC e seus perfis de acesso (`ADMIN`, `CHEFE`, etc.). A entidade `Usuario` implementa a interface `UserDetails` do Spring Security.
 - **`UsuarioRepo`**: Repositório para persistir e buscar usuários no banco de dados do SGC.
-- **`UsuarioService` / `UsuarioController`**: Camada de serviço e API para operações relacionadas ao usuário, como o
-  fluxo de login/autenticação.
+- **`UsuarioService`**: Camada de serviço para operações relacionadas ao usuário, como o fluxo de login/autenticação.
+- **`SgrhController`**: Expõe a API REST (`/api/usuarios`) para autenticação, autorização e finalização de login.
 
 ### Fachada de Integração (Lógica Externa)
 - **`SgrhService`**: O serviço que atua como cliente do sistema de RH externo. Outros módulos do SGC (como `alerta` ou `processo`) utilizam este serviço para obter informações sobre unidades e seus responsáveis, sem precisar conhecer os detalhes da integração.

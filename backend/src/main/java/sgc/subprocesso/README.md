@@ -5,7 +5,7 @@ Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subproce
 
 A principal responsabilidade deste módulo é garantir que as transições de estado (`situacao`) sigam as regras de negócio e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimentacao`).
 
-Para melhor organização e desacoplamento, o `SubprocessoControle` original foi dividido em múltiplos controladores especializados.
+Para melhor organização e desacoplamento, o `SubprocessoController` original foi dividido em múltiplos controladores especializados.
 
 ## Arquitetura de Serviços
 A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService` atua como uma fachada apenas para operações de CRUD, enquanto os controladores de workflow interagem diretamente com os serviços especializados.
@@ -29,6 +29,7 @@ graph TD
             Mapa(SubprocessoMapaService)
             MapaWorkflow(SubprocessoMapaWorkflowService)
             Notificacao(SubprocessoNotificacaoService)
+            Permissoes(SubprocessoPermissoesService)
         end
 
         Repos(Repositórios JPA)
@@ -39,7 +40,7 @@ graph TD
     ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder
     ControleValidacao -- Utiliza --> Workflow & DtoBuilder
 
-    Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao -- Acessam --> Repos
+    Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao & Permissoes -- Acessam --> Repos
 ```
 
 ## Componentes Principais
@@ -62,6 +63,7 @@ graph TD
 - **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação com o mapa.
 - **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow.
 - **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações específicas do subprocesso.
+- **`SubprocessoPermissoesService`**: Centraliza a lógica de verificação de permissões e elegibilidade para ações no subprocesso.
 - **`model/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
 - **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
 
