@@ -270,6 +270,15 @@ export async function criarProcessoBasico(
     ]);
     debug(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
+    // Intercept the API response to get the created process code
+    const saveProcessResponse = await page.waitForResponse(response =>
+        response.url().includes('/api/processos') &&
+        response.request().method() === 'POST' &&
+        response.status() === 201
+    );
+    const savedProcessData = await saveProcessResponse.json();
+    debug(`[DEBUG] Processo criado no backend: ${JSON.stringify(savedProcessData)}`);
+
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, );
     debug(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
