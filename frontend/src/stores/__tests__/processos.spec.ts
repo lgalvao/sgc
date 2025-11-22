@@ -38,7 +38,6 @@ describe("useProcessosStore", () => {
             typeof import("@/services/processoService")
         >;
         vi.restoreAllMocks();
-        store.$reset();
     });
 
     it("deve inicializar com o estado padrão", () => {
@@ -149,15 +148,14 @@ describe("useProcessosStore", () => {
                 processoService.iniciarProcesso.mockResolvedValue();
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
-                ); // Adicionar mock
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
+                );
                 await store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]);
                 expect(processoService.iniciarProcesso).toHaveBeenCalledWith(
                     1,
                     TipoProcesso.MAPEAMENTO,
                     [10],
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
             it("deve lançar um erro em caso de falha", async () => {
@@ -200,10 +198,9 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.finalizarProcesso(1);
                 expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -219,12 +216,11 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.processarCadastroBloco(payload);
                 expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(
                     payload,
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -236,12 +232,11 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.alterarDataLimiteSubprocesso(1, payload);
                 expect(
                     processoService.alterarDataLimiteSubprocesso,
                 ).toHaveBeenCalledWith(1, payload);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -253,13 +248,12 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.apresentarSugestoes(1, payload);
                 expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(
                     1,
                     payload,
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -270,10 +264,9 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.validarMapa(1);
                 expect(processoService.validarMapa).toHaveBeenCalledWith(1);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
     });

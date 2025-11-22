@@ -1,7 +1,8 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {ImpactoMapa} from "@/types/impacto";
+import type { ImpactoMapa } from "@/types/impacto";
 import type {
     Competencia,
     DisponibilizarMapaRequest,
@@ -11,186 +12,197 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
-import {useNotificacoesStore} from "./notificacoes";
+import { useNotificacoesStore } from "./notificacoes";
 
-export const useMapasStore = defineStore("mapas", {
-    state: () => ({
-        mapaCompleto: null as MapaCompleto | null,
-        mapaAjuste: null as MapaAjuste | null,
-        impactoMapa: null as ImpactoMapa | null,
-        mapaVisualizacao: null as MapaVisualizacao | null,
-    }),
+export const useMapasStore = defineStore("mapas", () => {
+    const mapaCompleto = ref<MapaCompleto | null>(null);
+    const mapaAjuste = ref<MapaAjuste | null>(null);
+    const impactoMapa = ref<ImpactoMapa | null>(null);
+    const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
 
-    getters: {},
+    async function fetchMapaVisualizacao(codSubrocesso: number) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaVisualizacao.value =
+                await mapaService.obterMapaVisualizacao(codSubrocesso);
+        } catch {
+            notificacoes.erro(
+                "Erro ao buscar mapa",
+                "Não foi possível carregar a visualização do mapa.",
+            );
+            mapaVisualizacao.value = null;
+        }
+    }
 
-    actions: {
-        async fetchMapaVisualizacao(codSubrocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaVisualizacao =
-                    await mapaService.obterMapaVisualizacao(codSubrocesso);
-            } catch {
-                notificacoes.erro(
-                    "Erro ao buscar mapa",
-                    "Não foi possível carregar a visualização do mapa.",
-                );
-                this.mapaVisualizacao = null;
-            }
-        },
+    async function fetchMapaCompleto(codSubrocesso: number) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
+        } catch {
+            notificacoes.erro(
+                "Erro ao buscar mapa",
+                "Não foi possível carregar o mapa de competências.",
+            );
+            mapaCompleto.value = null;
+        }
+    }
 
-        async fetchMapaCompleto(codSubrocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaCompleto = await mapaService.obterMapaCompleto(codSubrocesso);
-            } catch {
-                notificacoes.erro(
-                    "Erro ao buscar mapa",
-                    "Não foi possível carregar o mapa de competências.",
-                );
-                this.mapaCompleto = null;
-            }
-        },
+    async function salvarMapa(codSubrocesso: number, request: SalvarMapaRequest) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaCompleto.value = await mapaService.salvarMapaCompleto(
+                codSubrocesso,
+                request,
+            );
+            notificacoes.sucesso("Mapa salvo", "O mapa de competências foi salvo.");
+        } catch {
+            notificacoes.erro(
+                "Erro ao salvar",
+                "Não foi possível salvar o mapa de competências.",
+            );
+        }
+    }
 
-        async salvarMapa(codSubrocesso: number, request: SalvarMapaRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaCompleto = await mapaService.salvarMapaCompleto(
-                    codSubrocesso,
-                    request,
-                );
-                notificacoes.sucesso("Mapa salvo", "O mapa de competências foi salvo.");
-            } catch {
-                notificacoes.erro(
-                    "Erro ao salvar",
-                    "Não foi possível salvar o mapa de competências.",
-                );
-            }
-        },
+    async function adicionarCompetencia(
+        codSubrocesso: number,
+        competencia: Competencia,
+    ) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaCompleto.value = await subprocessoService.adicionarCompetencia(
+                codSubrocesso,
+                competencia,
+            );
+            notificacoes.sucesso(
+                "Competência adicionada",
+                "A competência foi adicionada.",
+            );
+        } catch {
+            notificacoes.erro(
+                "Erro ao adicionar",
+                "Não foi possível adicionar a competência.",
+            );
+        }
+    }
 
-        async adicionarCompetencia(
-            codSubrocesso: number,
-            competencia: Competencia,
-        ) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaCompleto = await subprocessoService.adicionarCompetencia(
-                    codSubrocesso,
-                    competencia,
-                );
-                notificacoes.sucesso(
-                    "Competência adicionada",
-                    "A competência foi adicionada.",
-                );
-            } catch {
-                notificacoes.erro(
-                    "Erro ao adicionar",
-                    "Não foi possível adicionar a competência.",
-                );
-            }
-        },
+    async function atualizarCompetencia(
+        codSubrocesso: number,
+        competencia: Competencia,
+    ) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaCompleto.value = await subprocessoService.atualizarCompetencia(
+                codSubrocesso,
+                competencia,
+            );
+            notificacoes.sucesso(
+                "Competência atualizada",
+                "A competência foi atualizada.",
+            );
+        } catch {
+            notificacoes.erro(
+                "Erro ao atualizar",
+                "Não foi possível atualizar a competência.",
+            );
+        }
+    }
 
-        async atualizarCompetencia(
-            codSubrocesso: number,
-            competencia: Competencia,
-        ) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaCompleto = await subprocessoService.atualizarCompetencia(
-                    codSubrocesso,
-                    competencia,
-                );
-                notificacoes.sucesso(
-                    "Competência atualizada",
-                    "A competência foi atualizada.",
-                );
-            } catch {
-                notificacoes.erro(
-                    "Erro ao atualizar",
-                    "Não foi possível atualizar a competência.",
-                );
-            }
-        },
+    async function removerCompetencia(codSubrocesso: number, idCompetencia: number) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaCompleto.value = await subprocessoService.removerCompetencia(
+                codSubrocesso,
+                idCompetencia,
+            );
+            notificacoes.sucesso(
+                "Competência removida",
+                "A competência foi removida.",
+            );
+        } catch {
+            notificacoes.erro(
+                "Erro ao remover",
+                "Não foi possível remover a competência.",
+            );
+        }
+    }
 
-        async removerCompetencia(codSubrocesso: number, idCompetencia: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaCompleto = await subprocessoService.removerCompetencia(
-                    codSubrocesso,
-                    idCompetencia,
-                );
-                notificacoes.sucesso(
-                    "Competência removida",
-                    "A competência foi removida.",
-                );
-            } catch {
-                notificacoes.erro(
-                    "Erro ao remover",
-                    "Não foi possível remover a competência.",
-                );
-            }
-        },
+    async function fetchMapaAjuste(codSubrocesso: number) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            mapaAjuste.value = await mapaService.obterMapaAjuste(codSubrocesso);
+        } catch {
+            notificacoes.erro(
+                "Erro ao buscar mapa para ajuste",
+                "Não foi possível carregar as informações para o ajuste.",
+            );
+            mapaAjuste.value = null;
+        }
+    }
 
-        async fetchMapaAjuste(codSubrocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.mapaAjuste = await mapaService.obterMapaAjuste(codSubrocesso);
-            } catch {
-                notificacoes.erro(
-                    "Erro ao buscar mapa para ajuste",
-                    "Não foi possível carregar as informações para o ajuste.",
-                );
-                this.mapaAjuste = null;
-            }
-        },
+    async function salvarAjustes(codSubrocesso: number, request: SalvarAjustesRequest) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            await mapaService.salvarMapaAjuste(codSubrocesso, request);
+            notificacoes.sucesso(
+                "Ajustes salvos",
+                "Os ajustes no mapa foram salvos.",
+            );
+        } catch {
+            notificacoes.erro(
+                "Erro ao salvar ajustes",
+                "Não foi possível salvar os ajustes.",
+            );
+        }
+    }
 
-        async salvarAjustes(codSubrocesso: number, request: SalvarAjustesRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await mapaService.salvarMapaAjuste(codSubrocesso, request);
-                notificacoes.sucesso(
-                    "Ajustes salvos",
-                    "Os ajustes no mapa foram salvos.",
-                );
-            } catch {
-                notificacoes.erro(
-                    "Erro ao salvar ajustes",
-                    "Não foi possível salvar os ajustes.",
-                );
-            }
-        },
+    async function fetchImpactoMapa(codSubrocesso: number) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            impactoMapa.value =
+                await mapaService.verificarImpactosMapa(codSubrocesso);
+        } catch {
+            notificacoes.erro(
+                "Erro ao verificar impactos",
+                "Não foi possível carregar os impactos no mapa.",
+            );
+            impactoMapa.value = null;
+        }
+    }
 
-        async fetchImpactoMapa(codSubrocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                this.impactoMapa =
-                    await mapaService.verificarImpactosMapa(codSubrocesso);
-            } catch {
-                notificacoes.erro(
-                    "Erro ao verificar impactos",
-                    "Não foi possível carregar os impactos no mapa.",
-                );
-                this.impactoMapa = null;
-            }
-        },
+    async function disponibilizarMapa(
+        codSubrocesso: number,
+        request: DisponibilizarMapaRequest,
+    ) {
+        const notificacoes = useNotificacoesStore();
+        try {
+            await mapaService.disponibilizarMapa(codSubrocesso, request);
+            notificacoes.sucesso(
+                "Mapa disponibilizado",
+                "O mapa de competências foi disponibilizado para validação.",
+            );
+        } catch (error: any) {
+            notificacoes.erro(
+                "Erro ao disponibilizar",
+                error.response.data.message,
+            );
+            throw error;
+        }
+    }
 
-        async disponibilizarMapa(
-            codSubrocesso: number,
-            request: DisponibilizarMapaRequest,
-        ) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await mapaService.disponibilizarMapa(codSubrocesso, request);
-                notificacoes.sucesso(
-                    "Mapa disponibilizado",
-                    "O mapa de competências foi disponibilizado para validação.",
-                );
-            } catch (error: any) {
-                notificacoes.erro(
-                    "Erro ao disponibilizar",
-                    error.response.data.message,
-                );
-                throw error;
-            }
-        },
-    },
+    return {
+        mapaCompleto,
+        mapaAjuste,
+        impactoMapa,
+        mapaVisualizacao,
+        fetchMapaVisualizacao,
+        fetchMapaCompleto,
+        salvarMapa,
+        adicionarCompetencia,
+        atualizarCompetencia,
+        removerCompetencia,
+        fetchMapaAjuste,
+        salvarAjustes,
+        fetchImpactoMapa,
+        disponibilizarMapa,
+    };
 });
