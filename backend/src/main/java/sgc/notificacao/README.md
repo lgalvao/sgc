@@ -22,7 +22,7 @@ graph TD
     subgraph "Módulo de Notificação (este pacote)"
         Listener(EventoProcessoListener)
         TemplateService(NotificacaoModelosService)
-        EmailService(NotificacaoService)
+        EmailService(NotificacaoEmailService)
     end
 
     subgraph "Módulo de Alerta"
@@ -43,15 +43,15 @@ graph TD
 
 ### Fluxo de Trabalho:
 1.  **Ação de Negócio:** O `ProcessoService` executa uma ação (ex: inicia um processo).
-2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `ProcessoIniciadoEvento`).
+2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `EventoProcessoIniciado`).
 3.  **Captura do Evento:** O `EventoProcessoListener` captura este evento.
 4.  **Criação de Alertas:** O listener invoca o `AlertaService` para criar os alertas internos.
 5. **Criação do E-mail:** O listener usa o `NotificacaoModelosService` para gerar o conteúdo HTML do e-mail.
-6.  **Envio do E-mail:** O listener invoca o `NotificacaoService` para enviar o e-mail.
+6.  **Envio do E-mail:** O listener invoca o `NotificacaoEmailService` para enviar o e-mail.
 
 ## Componentes Principais
 - **`EventoProcessoListener`**: O principal ponto de entrada reativo da aplicação. Ouve os eventos de domínio e orquestra as ações de notificação e alerta.
-- **`NotificacaoService`**: Serviço responsável pela lógica de envio de e-mails.
+- **`NotificacaoEmailService`**: Serviço responsável pela lógica de envio de e-mails.
   - **Assíncrono (`@Async`):** O envio é executado em uma thread separada.
   - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
   - **Retentativas:** Em caso de falha, tenta reenviar o e-mail.
