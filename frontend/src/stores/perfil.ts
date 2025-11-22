@@ -50,7 +50,7 @@ export const usePerfilStore = defineStore("perfil", {
                     await usuarioService.autorizar(tituloEleitoralNum);
                 this.perfisUnidades = perfisUnidades;
                 
-                const perfis = [...new Set(perfisUnidades.map((p) => p.perfil))];
+                const perfis = [...new Set(perfisUnidades.map((p) => p.perfil as unknown as Perfil))];
                 this.setPerfis(perfis);
 
                 // Se houver apenas uma opção, seleciona automaticamente
@@ -62,7 +62,7 @@ export const usePerfilStore = defineStore("perfil", {
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
                     this.setPerfilUnidade(
-                        loginResponse.perfil as Perfil,
+                        loginResponse.perfil as unknown as Perfil,
                         loginResponse.unidadeCodigo,
                     ); // Usar loginResponse.codUnidade
                     this.setServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
@@ -83,7 +83,7 @@ export const usePerfilStore = defineStore("perfil", {
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
             this.setPerfilUnidade(
-                loginResponse.perfil as Perfil,
+                loginResponse.perfil as unknown as Perfil,
                 loginResponse.unidadeCodigo,
             );
             this.setServidorId(loginResponse.tituloEleitoral);

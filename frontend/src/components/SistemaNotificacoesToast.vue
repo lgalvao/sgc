@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { BToast } from "bootstrap-vue-next";
+import { BToast, type BaseColorVariant } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import {
   TipoNotificacao,
@@ -28,7 +28,7 @@ const notificacoesStore = useNotificacoesStore();
 const { notificacoes: storeNotificacoes } = storeToRefs(notificacoesStore);
 const { removerNotificacao } = notificacoesStore;
 
-const getVariant = (tipo: TipoNotificacao): string => {
+const getVariant = (tipo: TipoNotificacao): keyof BaseColorVariant => {
   switch (tipo) {
     case "success":
       return "success";

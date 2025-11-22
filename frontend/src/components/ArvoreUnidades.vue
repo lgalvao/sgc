@@ -104,7 +104,6 @@
 import {BFormCheckbox} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import type {Unidade} from "@/types/tipos";
-import logger from "@/utils/logger";
 
 interface Props {
   unidades: Unidade[];
