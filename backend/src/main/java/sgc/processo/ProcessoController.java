@@ -143,17 +143,23 @@ public class ProcessoController {
      */
     @PostMapping("/{codigo}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
-    public ResponseEntity<ProcessoDto> iniciar(
+    public ResponseEntity<?> iniciar(
             @PathVariable Long codigo,
             @RequestBody IniciarProcessoReq req) {
-
+        
+        List<String> erros;
         if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
-            processoService.iniciarProcessoRevisao(codigo, req.unidades());
+            erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
         } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
-            processoService.iniciarProcessoMapeamento(codigo, req.unidades());
+            erros = processoService.iniciarProcessoMapeamento(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();
         }
+
+        if (!erros.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("erros", erros));
+        }
+
         ProcessoDto processoAtualizado = processoService.obterPorId(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
         return ResponseEntity.ok(processoAtualizado);

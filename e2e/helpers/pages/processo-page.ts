@@ -51,6 +51,11 @@ export class PaginaProcesso {
         await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
     }
 
+    async confirmarRemocaoNoModal() {
+        const modal = this.page.locator('.modal.show');
+        await modal.getByRole('button', { name: TEXTOS.REMOVER }).click();
+    }
+
     // --- Verificações ---
 
     async verificarPaginaDeCadastro() {

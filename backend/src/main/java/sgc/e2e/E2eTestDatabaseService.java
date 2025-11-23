@@ -3,6 +3,7 @@ package sgc.e2e;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -31,23 +32,9 @@ public class E2eTestDatabaseService {
         return dataSources.computeIfAbsent(testId, this::createDataSource);
     }
 
-    public void executeSqlScripts(Connection connection, Resource... scripts) throws Exception {
-        try (Statement stmt = connection.createStatement()) {
-            for (Resource scriptResource : scripts) {
-                String sql = new BufferedReader(
-                        new InputStreamReader(scriptResource.getInputStream()))
-                        .lines()
-                        .filter(line -> !line.trim().startsWith("--"))
-                        .collect(Collectors.joining("\n"));
-
-                for (String statement : sql.split(";")) {
-                    String trimmed = statement.trim();
-                    if (!trimmed.isEmpty()) {
-                        log.trace("Executing SQL statement: {}", trimmed);
-                        stmt.execute(trimmed);
-                    }
-                }
-            }
+    public void executeSqlScripts(Connection connection, Resource... scripts) {
+        for (Resource script : scripts) {
+            ScriptUtils.executeSqlScript(connection, script);
         }
     }
 
@@ -63,7 +50,7 @@ public class E2eTestDatabaseService {
 
             // 1. Create a new H2 in-memory data source with a unique name
             String jdbcUrl = String.format(
-                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS SGC",
+                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC",
                     testId
             );
 

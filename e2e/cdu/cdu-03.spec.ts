@@ -1,5 +1,6 @@
 import { vueTest as test } from '../support/vue-specific-setup';
 import { PaginaPainel, PaginaProcesso } from '~/helpers';
+import {expect} from "@playwright/test";
 
 test.describe('CDU-03: Manter processo', () => {
     let paginaPainel: PaginaPainel;
@@ -59,6 +60,7 @@ test.describe('CDU-03: Manter processo', () => {
         await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.preencherDescricao(descricaoOriginal);
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+        await paginaProcesso.preencherDataLimite('2025-12-31'); // <-- FIX: Data limite ausente
         await paginaProcesso.selecionarUnidadesPorSigla(['SEDESENV']);
         await paginaProcesso.clicarBotaoSalvar();
         await paginaPainel.aguardarProcessoNoPainel(descricaoOriginal);
@@ -85,9 +87,9 @@ test.describe('CDU-03: Manter processo', () => {
 
         // Após criar e abrir para edição, o botão deve aparecer
         const descricao = `Processo com Botão Remover ${Date.now()}`;
-        await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.preencherDescricao(descricao);
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+        await paginaProcesso.preencherDataLimite('2025-12-31');
         await paginaProcesso.selecionarUnidadesPorSigla(['SEDESENV']);
         await paginaProcesso.clicarBotaoSalvar();
         await paginaPainel.aguardarProcessoNoPainel(descricao);
@@ -106,6 +108,7 @@ test.describe('CDU-03: Manter processo', () => {
         await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.preencherDescricao(descricao);
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+        await paginaProcesso.preencherDataLimite('2025-12-31');
         await paginaProcesso.selecionarUnidadesPorSigla(['SEDESENV']);
         await paginaProcesso.clicarBotaoSalvar();
         await paginaPainel.aguardarProcessoNoPainel(descricao);
@@ -129,6 +132,7 @@ test.describe('CDU-03: Manter processo', () => {
         await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.preencherDescricao(descricao);
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+        await paginaProcesso.preencherDataLimite('2025-12-31');
         await paginaProcesso.selecionarUnidadesPorSigla(['SEDESENV']);
         await paginaProcesso.clicarBotaoSalvar();
         await paginaPainel.aguardarProcessoNoPainel(descricao);
@@ -138,7 +142,7 @@ test.describe('CDU-03: Manter processo', () => {
         await paginaProcesso.verificarPaginaDeEdicao();
         await paginaProcesso.clicarBotaoRemover();
         await paginaProcesso.verificarDialogoConfirmacaoRemocao(descricao);
-        await paginaProcesso.confirmarNoModal();
+        await paginaProcesso.confirmarRemocaoNoModal();
 
         // Verificação
         await paginaPainel.verificarUrlDoPainel();
@@ -147,65 +151,70 @@ test.describe('CDU-03: Manter processo', () => {
 
     // ===== REGRAS DE SELEÇÃO DE UNIDADES (ÁRVORE) =====
 
-    test('deve selecionar automaticamente as unidades filhas ao selecionar o pai', async () => {
+    test('deve selecionar automaticamente as unidades filhas ao selecionar o pai', async ({ page }) => {
         await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
-        
-        // Encontrar uma unidade pai (que tenha uma div.ms-4 logo após)
-        // Estrutura: div.form-check (Pai) + div.ms-4 (Container Filhos) > div.form-check (Filho)
-        const parentCheckbox = page.locator('.arvore-unidades > .form-check input[type="checkbox"]').first();
-        const childContainer = page.locator('.arvore-unidades > .form-check').first().locator('+ div.ms-4');
-        const childCheckbox = childContainer.locator('.form-check input[type="checkbox"]').first();
 
-        // Verifica se existem elementos para o teste
-        if (await childCheckbox.count() > 0) {
-            // Selecionar Pai
-            await parentCheckbox.check();
-            
-            // Verificar Pai e Filho marcados
-            await expect(parentCheckbox).toBeChecked();
-            await expect(childCheckbox).toBeChecked();
+        const paiSigla = 'COSIS';
+        const filhosSiglas = ['SEDESENV', 'SEDIA', 'SESEL'];
 
-            // Desmarcar Pai
-            await parentCheckbox.uncheck();
-            
-            // Verificar Pai e Filho desmarcados
-            await expect(parentCheckbox).not.toBeChecked();
-            await expect(childCheckbox).not.toBeChecked();
-        } else {
-            test.skip('Não foi encontrada uma estrutura de pai-filho na árvore para teste de seleção em cascata.');
+        const checkboxPai = page.locator(`#chk-${paiSigla}`);
+        const checkboxesFilhos = filhosSiglas.map(sigla => page.locator(`#chk-${sigla}`));
+
+        // Garante que o pai e os filhos existem antes de interagir
+        await expect(checkboxPai).toBeVisible();
+        for (const checkbox of checkboxesFilhos) {
+            await expect(checkbox).toBeVisible();
+        }
+
+        // Selecionar Pai
+        await checkboxPai.check();
+
+        // Verificar Pai e todos os Filhos marcados
+        await expect(checkboxPai).toBeChecked();
+        for (const checkbox of checkboxesFilhos) {
+            await expect(checkbox).toBeChecked();
+        }
+
+        // Desmarcar Pai
+        await checkboxPai.uncheck();
+
+        // Verificar Pai e todos os Filhos desmarcados
+        await expect(checkboxPai).not.toBeChecked();
+        for (const checkbox of checkboxesFilhos) {
+            await expect(checkbox).not.toBeChecked();
         }
     });
 
-    test('deve selecionar o pai automaticamente ao selecionar todas as filhas', async () => {
+    test('deve selecionar o pai automaticamente ao selecionar todas as filhas', async ({ page }) => {
         await paginaPainel.irParaCriacaoDeProcesso();
         await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
 
-        const parentCheckbox = page.locator('.arvore-unidades > .form-check input[type="checkbox"]').first();
-        const childContainer = page.locator('.arvore-unidades > .form-check').first().locator('+ div.ms-4');
-        
-        if (await childContainer.count() > 0) {
-            const childrenCheckboxes = childContainer.locator('> div.form-check input[type="checkbox"]');
-            const count = await childrenCheckboxes.count();
-            
-            if (count > 0) {
-                // Marcar todos os filhos
-                for (let i = 0; i < count; i++) {
-                    await childrenCheckboxes.nth(i).check();
-                }
-                
-                // Verificar se o pai foi marcado automaticamente
-                await expect(parentCheckbox).toBeChecked();
+        const paiSigla = 'COSIS';
+        const filhosSiglas = ['SEDESENV', 'SEDIA', 'SESEL'];
 
-                // Desmarcar um filho
-                await childrenCheckboxes.first().uncheck();
+        const checkboxPai = page.locator(`#chk-${paiSigla}`);
+        const checkboxesFilhos = filhosSiglas.map(sigla => page.locator(`#chk-${sigla}`));
 
-                // Verificar se o pai foi desmarcado (mas ficou "indeterminate" visualmente, aqui verificamos o checked property que deve ser false)
-                await expect(parentCheckbox).not.toBeChecked();
-            }
-        } else {
-            test.skip('Não foi encontrada uma estrutura de pai-filho na árvore para teste de seleção reversa.');
+        // Garante que o pai e os filhos existem antes de interagir
+        await expect(checkboxPai).toBeVisible();
+        for (const checkbox of checkboxesFilhos) {
+            await expect(checkbox).toBeVisible();
         }
+
+        // Marcar todos os filhos
+        for (const checkbox of checkboxesFilhos) {
+            await checkbox.check();
+        }
+
+        // Verificar se o pai foi marcado automaticamente
+        await expect(checkboxPai).toBeChecked();
+
+        // Desmarcar um filho
+        await checkboxesFilhos[0].uncheck();
+
+        // Verificar se o pai foi desmarcado
+        await expect(checkboxPai).not.toBeChecked();
     });
 
     // ===== VALIDAÇÃO DE REVISÃO =====

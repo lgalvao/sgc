@@ -66,6 +66,7 @@ export class PaginaPainel {
      * @param descricao A descrição do processo.
      */
     async verificarProcessoNaoVisivel(descricao: string) {
-        await expect(this.page.getByText(descricao)).not.toBeVisible();
+        const tabela = this.page.locator(SELETORES.TABELA_PROCESSOS);
+        await expect(tabela.getByText(descricao)).not.toBeVisible();
     }
 }
