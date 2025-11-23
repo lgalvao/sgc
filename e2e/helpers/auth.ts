@@ -17,18 +17,27 @@ async function loginPelaUI(
     await page.goto('/login');
     await page.getByTestId('input-titulo').fill(usuario.titulo);
     await page.getByTestId('input-senha').fill(usuario.senha);
-    await page.getByTestId('botao-entrar').click();
 
-    // Se um seletor de perfil aparecer, selecione a opção desejada
     if (perfilUnidadeLabel) {
+        // Prepare to wait for navigation
+        const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+
+        await page.getByTestId('botao-entrar').click();
+
         const seletorPerfil = page.getByTestId('select-perfil-unidade');
         await seletorPerfil.waitFor({state: 'visible', timeout: 2000});
         await seletorPerfil.selectOption({label: perfilUnidadeLabel});
         await page.getByTestId('botao-entrar').click();
-    }
 
-    // Aguarda o redirecionamento para o painel
-    await page.waitForURL('/painel', {timeout: 5000});
+        await navigationPromise; // Wait for navigation to complete
+    } else {
+        // Prepare to wait for navigation
+        const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+
+        await page.getByTestId('botao-entrar').click();
+
+        await navigationPromise; // Wait for navigation to complete
+    }
     await page.waitForLoadState('networkidle');
 }
 

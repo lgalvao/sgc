@@ -235,6 +235,7 @@ export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
  * @param tipo O tipo do processo.
  * @param siglas As siglas das unidades a serem associadas ao processo.
  * @param dataLimite A data limite do processo.
+ * @returns O ID do processo criado.
  */
 export async function criarProcessoBasico(
     page: Page,
@@ -243,8 +244,17 @@ export async function criarProcessoBasico(
     siglas: string[],
     dataLimite: string = '2025-12-31',
     situacao: 'CRIADO' | 'EM_ANDAMENTO' = 'CRIADO'
-): Promise<void> {
+): Promise<number> {
     debug(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
+    let processoId = 0;
+
+    // Intercept the API response to extract the process ID
+    const responsePromise = page.waitForResponse(response =>
+        response.url().includes('/api/processos') &&
+        !response.url().includes('/status-unidades') &&
+        response.request().method() === 'POST' &&
+        response.status() === 201
+    );
 
     await navegarParaCriacaoProcesso(page);
     debug(`[DEBUG] criarProcessoBasico: Navegou para criação`);
@@ -261,6 +271,16 @@ export async function criarProcessoBasico(
     ]);
     debug(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
+    try {
+        const response = await responsePromise;
+        const data = await response.json();
+        if (data && data.codigo) {
+            processoId = data.codigo;
+        }
+    } catch (error) {
+        logger.warn('Could not extract process ID from response:', error);
+    }
+
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, );
     debug(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
@@ -273,6 +293,7 @@ export async function criarProcessoBasico(
         await page.waitForURL(/\/painel/, );
         debug(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
     }
+    return processoId;
 }
 
 /**
@@ -282,7 +303,7 @@ export async function criarProcessoBasico(
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     debug(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
-    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr:has-text("${descricao}")`);
+    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, {hasText: `"${descricao}"`});
     await row.waitFor({state: 'visible', timeout: 10000});
     debug(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
@@ -582,8 +603,8 @@ export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
  * @param nomeProcesso O nome do processo.
  */
 export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): Promise<void> {
-    await page.waitForSelector(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`); // Espera a tabela carregar
-    const processo = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: nomeProcesso});
+    await page.waitForSelector(SELETORES.TABELA_PROCESSOS); // Espera a tabela carregar
+    const processo = page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).filter({hasText: nomeProcesso});
     await processo.click();
 }
 

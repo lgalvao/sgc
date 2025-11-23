@@ -294,7 +294,7 @@ export async function verificarDialogoConfirmacaoFechado(page: Page, descricaoPr
  * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
-    await expect(page.getByText(TEXTOS.PROCESSO_INICIADO)).toBeVisible();
+    await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.locator('tr', {hasText: descricaoProcesso}).getByText(TEXTOS.EM_ANDAMENTO)).toBeVisible();
 }
@@ -504,15 +504,17 @@ export async function verificarPaginaDetalheProcesso(page: Page): Promise<void> 
 }
 
 /**
- * Verifica via API se os subprocessos foram criados.
+ * Verifica via API se os subprocessos foram criados e os retorna.
  * @param page A instância da página do Playwright.
  * @param processoId O ID do processo.
+ * @returns A lista de subprocessos criados.
  */
-export async function verificarCriacaoSubprocessos(page: Page, processoId: string): Promise<void> {
+export async function verificarCriacaoSubprocessos(page: Page, processoId: string): Promise<any[]> {
     const response = await page.request.get(`/api/processos/${processoId}/subprocessos`);
     expect(response.ok()).toBeTruthy();
     const subprocessos = await response.json();
     expect(subprocessos.length).toBeGreaterThan(0);
+    return subprocessos;
 }
 
 /**
@@ -539,4 +541,52 @@ export async function verificarSituacaoProcesso(page: Page, nomeProcesso: string
     const linha = tabela.locator('tr').filter({hasText: nomeProcesso});
     await expect(linha).toBeVisible();
     await expect(linha).toContainText(situacao);
+}
+
+/**
+ * Verifica via API se um mapa de competências vazio foi criado para um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param subprocessoId O ID do subprocesso.
+ */
+export async function verificarMapaVazioCriadoParaSubprocesso(page: Page, subprocessoId: number): Promise<void> {
+    const response = await page.request.get(`/api/subprocessos/${subprocessoId}/mapa`);
+    expect(response.ok()).toBeTruthy();
+    const mapa = await response.json();
+    expect(mapa.competencias).toEqual([]);
+}
+
+/**
+ * Verifica via API a movimentação inicial de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param subprocessoId O ID do subprocesso.
+ */
+export async function verificarMovimentacaoInicialSubprocesso(page: Page, subprocessoId: number): Promise<void> {
+    const response = await page.request.get(`/api/subprocessos/${subprocessoId}`);
+    expect(response.ok()).toBeTruthy();
+    const subprocesso = await response.json();
+    expect(subprocesso.movimentacoes).toHaveLength(1);
+    const movimentacao = subprocesso.movimentacoes[0];
+    expect(movimentacao.descricao).toBe('Processo iniciado');
+    expect(movimentacao.unidadeOrigem).toBe('SEDOC');
+}
+
+/**
+ * Verifica via API o alerta de início de processo para uma unidade.
+ * @param page A instância da página do Playwright.
+ * @param unidadeSigla A sigla da unidade.
+ * @param processoId O ID do processo.
+ */
+export async function verificarAlertaInicioProcesso(page: Page, unidadeSigla: string, processoId: number): Promise<void> {
+    const unidadeResponse = await page.request.get(`/api/unidades/sigla/${unidadeSigla}`);
+    expect(unidadeResponse.ok()).toBeTruthy();
+    const unidade = await unidadeResponse.json();
+    const unidadeId = unidade.codigo;
+
+    const response = await page.request.get(`/api/painel/alertas?unidade=${unidadeId}`);
+    expect(response.ok()).toBeTruthy();
+    const alertas = await response.json();
+
+    const alertaProcesso = alertas.content.find(alerta => alerta.codProcesso === processoId);
+    expect(alertaProcesso).toBeDefined();
+    expect(alertaProcesso.descricao).toContain('Início do processo');
 }

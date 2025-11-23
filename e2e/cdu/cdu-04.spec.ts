@@ -7,7 +7,10 @@ import {
     criarProcessoBasico,
     loginComoAdmin,
     verificarBotaoIniciarProcessoVisivel,
+    verificarCriacaoSubprocessos,
+    verificarMapaVazioCriadoParaSubprocesso,
     verificarModalConfirmacaoIniciacaoProcesso,
+    verificarMovimentacaoInicialSubprocesso,
     verificarModalFechado,
     verificarPaginaDetalheProcesso,
     verificarPaginaEdicaoProcesso,
@@ -27,11 +30,11 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         await loginComoAdmin(page);
     });
 
-    test('deve abrir modal de confirmação e iniciar processo', async ({page}) => {
+    test('deve abrir modal de confirmação, iniciar processo, criar subprocessos, mapas e movimentações', async ({page}) => {
         const descricao = `Processo Iniciar ${Date.now()}`;
 
         // 1. Criar processo com STIC
-        await criarProcessoBasico(page, descricao, 'MAPEAMENTO', ['STIC']);
+        const processoId = await criarProcessoBasico(page, descricao, 'MAPEAMENTO', ['STIC']);
 
         // 2. Abrir processo e aguardar carregamento completo
         await clicarProcessoNaTabela(page, descricao);
@@ -47,6 +50,17 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
 
         // 5. Verificar que processo aparece no painel
         await verificarProcessoIniciadoComSucesso(page, descricao);
+
+        // 6. Verificar que subprocessos foram criados
+        const subprocessos = await verificarCriacaoSubprocessos(page, String(processoId));
+
+        // 7. Verificar criações para cada subprocesso
+        for (const subprocesso of subprocessos) {
+            // 7.1 Mapa vazio
+            await verificarMapaVazioCriadoParaSubprocesso(page, subprocesso.codigo);
+            // 7.2 Movimentação inicial
+            await verificarMovimentacaoInicialSubprocesso(page, subprocesso.codigo);
+        }
     });
 
     test('deve cancelar iniciação e permanecer na tela', async ({page}) => {
