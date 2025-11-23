@@ -93,6 +93,10 @@ public class ProcessoService {
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
         }
 
+        if (requisicao.getTipo() == TipoProcesso.REVISAO || requisicao.getTipo() == TipoProcesso.DIAGNOSTICO) {
+            validarUnidadesComMapasVigentes(new ArrayList<>(requisicao.getUnidades()));
+        }
+
         Processo processo = new Processo();
         processo.setDescricao(requisicao.getDescricao());
         processo.setTipo(requisicao.getTipo());
@@ -121,6 +125,10 @@ public class ProcessoService {
         processo.setDescricao(requisicao.getDescricao());
         processo.setTipo(requisicao.getTipo());
         processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+
+        if (requisicao.getTipo() == TipoProcesso.REVISAO || requisicao.getTipo() == TipoProcesso.DIAGNOSTICO) {
+            validarUnidadesComMapasVigentes(new ArrayList<>(requisicao.getUnidades()));
+        }
 
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : requisicao.getUnidades()) {

@@ -63,7 +63,7 @@ public class E2eTestDatabaseService {
 
             // 1. Create a new H2 in-memory data source with a unique name
             String jdbcUrl = String.format(
-                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1",
+                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS SGC",
                     testId
             );
 
@@ -75,9 +75,6 @@ public class E2eTestDatabaseService {
                     .build();
 
             try (Connection conn = dataSource.getConnection()) {
-                try (Statement stmt = conn.createStatement()) {
-                    stmt.execute("CREATE SCHEMA SGC");
-                }
                 conn.setSchema("SGC");
                 executeSqlScripts(conn, new ClassPathResource("/schema.sql"));
 
@@ -86,26 +83,11 @@ public class E2eTestDatabaseService {
                 executeSqlScripts(conn, new ClassPathResource("/data-minimal.sql"));
                 setReferentialIntegrity(conn, true);
 
-                // Programmatic insertion of user '1' and 'SERVIDOR' profile for E2E tests
-                try (Statement stmt = conn.createStatement()) {
-                    String insertUserSql = "INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES ('1', 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10)";
-                    log.trace("Programmatically inserting user '1': {}", insertUserSql);
-                    stmt.execute(insertUserSql);
 
-                    String insertProfileSql = "INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES ('1', 'SERVIDOR')";
-                    log.debug("Programmatically inserting profile for user '1': {}", insertProfileSql);
-                    stmt.execute(insertProfileSql);
-
-                    // Verify programmatic insert
-                    try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM SGC.USUARIO WHERE TITULO_ELEITORAL = '1'")) {
-                        if (rs.next()) {
-                            log.info("DEBUG (Programmatic): Count for USUARIO with TITULO_ELEITORAL '1' after programmatic insert: {}", rs.getInt(1));
-                        }
-                    }
-                }
+                // Programmatic insertion of user '1' removed as it is already in data-minimal.sql
 
                 // Explicitly commit the transaction
-                conn.commit();
+                // conn.commit(); // Removed due to auto-commit being true by default on H2 connections
 
 
             }
@@ -125,7 +107,15 @@ public class E2eTestDatabaseService {
                  Statement stmt = conn.createStatement()) {
                 stmt.execute("DROP ALL OBJECTS");
             } catch (Exception e) {
-                log.error("Failed to cleanup DB for testId: {}", testId, e);
+                log.error("Failed to cleanup DB objects for testId: {}", testId, e);
+            }
+            
+            if (dataSource instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) dataSource).close();
+                } catch (Exception e) {
+                    log.error("Failed to close DataSource for testId: {}", testId, e);
+                }
             }
         }
         log.debug("Cleaned up isolated DB for testId: {}", testId);

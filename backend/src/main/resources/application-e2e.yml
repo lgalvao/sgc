@@ -49,9 +49,9 @@ management:
 logging:
   level:
     root: INFO
-    sgc: DEBUG
+    sgc: INFO
     org.springframework: INFO
-    org.springframework.jdbc: DEBUG
+    org.springframework.jdbc: INFO
     org.springframework.boot.autoconfigure: ERROR
     org.hibernate.SQL: WARN
     org.springframework.mail: ERROR

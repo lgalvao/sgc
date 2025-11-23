@@ -14,9 +14,10 @@ export class PaginaPainel {
      */
     async loginComoAdmin() {
         await this.page.goto('/login');
-        await this.page.waitForLoadState('networkidle');
+        await this.page.waitForLoadState('domcontentloaded');
         await this.page.getByTestId('input-titulo').fill(USUARIOS.ADMIN.titulo);
         await this.page.getByTestId('input-senha').fill(USUARIOS.ADMIN.senha);
+        await this.page.locator(SELETORES.BTN_LOGIN).click();
         await this.verificarUrlDoPainel();
         await this.page.waitForSelector(SELETORES.BTN_CRIAR_PROCESSO, { state: 'visible' });
     }
@@ -35,14 +36,7 @@ export class PaginaPainel {
      * @param descricaoProcesso A descrição do processo.
      */
     async aguardarProcessoNoPainel(descricaoProcesso: string) {
-        // Verifica se a página atual é a de cadastro, o que indica um bug da aplicação.
-        // O requisito é redirecionar para o painel após a criação.
-        if (this.page.url().includes('/processo/cadastro')) {
-            console.warn('BUG DA APLICACAO: Após criar processo, não houve redirecionamento automático para o Painel. Navegando manualmente.');
-            await this.page.goto(URLS.PAINEL);
-            await this.page.waitForLoadState('networkidle');
-        }
-        await this.verificarUrlDoPainel(); // Agora verifica que estamos no painel, seja por redirecionamento ou navegação manual
+        await this.verificarUrlDoPainel();
         await expect(this.page.getByText(descricaoProcesso)).toBeVisible();
     }
     
@@ -52,7 +46,7 @@ export class PaginaPainel {
     async verificarUrlDoPainel() {
         await this.page.waitForURL(URLS.PAINEL);
         await expect(this.page).toHaveURL(URLS.PAINEL);
-        await this.page.waitForLoadState('networkidle');
+        await this.page.waitForLoadState('domcontentloaded');
     }
 
     /**

@@ -1,5 +1,5 @@
 export const SELETORES = {
-    BTN_LOGIN: '[data-testid="btn-login"]',
+    BTN_LOGIN: '[data-testid="botao-entrar"]',
     TABELA_PROCESSOS: '[data-testid="tabela-processos"]',
     TABELA_ALERTAS: '[data-testid="tabela-alertas"]',
     TITULO_PROCESSOS: '[data-testid="titulo-processos"]',

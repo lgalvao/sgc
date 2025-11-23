@@ -7,11 +7,11 @@
       <div class="form-check">
         <BFormCheckbox
           :id="`chk-${unidade.sigla}`"
-          v-model="unidadesSelecionadasLocal"
-          :value="unidade.codigo"
+          :model-value="isChecked(unidade.codigo)"
           :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
           :disabled="!unidade.isElegivel"
           :data-testid="`chk-${unidade.sigla}`"
+          @update:model-value="(val) => toggle(unidade, val as boolean)"
         >
           <label
             :for="`chk-${unidade.sigla}`"
@@ -29,7 +29,7 @@
         </BFormCheckbox>
       </div>
 
-      <!-- Mostrar filhas se a unidade tem filhas (mesmo que a unidade pai não seja) -->
+      <!-- Mostrar filhas se a unidade tem filhas -->
       <div
         v-if="unidade.filhas && unidade.filhas.length"
         class="ms-4"
@@ -41,10 +41,10 @@
           <div class="form-check">
             <BFormCheckbox
               :id="`chk-${filha.sigla}`"
-              v-model="unidadesSelecionadasLocal"
-              :value="filha.codigo"
+              :model-value="isChecked(filha.codigo)"
               :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
               :disabled="!filha.isElegivel"
+              @update:model-value="(val) => toggle(filha, val as boolean)"
             >
               <label
                 :for="`chk-${filha.sigla}`"
@@ -73,9 +73,9 @@
               <div class="form-check">
                 <BFormCheckbox
                   :id="`chk-${neta.sigla}`"
-                  v-model="unidadesSelecionadasLocal"
-                  :value="neta.codigo"
+                  :model-value="isChecked(neta.codigo)"
                   :disabled="!neta.isElegivel"
+                  @update:model-value="(val) => toggle(neta, val as boolean)"
                 >
                   <label
                     :for="`chk-${neta.sigla}`"
@@ -101,9 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import {BFormCheckbox} from "bootstrap-vue-next";
-import {computed, ref, watch} from "vue";
-import type {Unidade} from "@/types/tipos";
+import { BFormCheckbox } from "bootstrap-vue-next";
+import { computed, ref, watch } from "vue";
+import type { Unidade } from "@/types/tipos";
 
 interface Props {
   unidades: Unidade[];
@@ -118,6 +118,17 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+
+// Map to find parent of a unit
+const parentMap = computed(() => {
+  const map = new Map<number, Unidade>();
+  const traverse = (node: Unidade, parent?: Unidade) => {
+    if (parent) map.set(node.codigo, parent);
+    if (node.filhas) node.filhas.forEach(child => traverse(child, node));
+  };
+  props.unidades.forEach(u => traverse(u));
+  return map;
+});
 
 // Filtrar unidades pela função customizada
 const unidadesFiltradas = computed(() => {
@@ -168,13 +179,56 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   if (selecionadas === subunidades.length && selfSelected) {
     return true;
   }
-
-  // INTEROPERACIONAL marcada sem todas filhas → mostrar como marcada (não indeterminate)
+  
+  // Se for Interoperacional e estiver selecionada, mostra como true (não indeterminate),
+  // mesmo que nem todas as filhas estejam selecionadas.
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
 
   return "indeterminate";
+}
+
+function toggle(unidade: Unidade, checked: boolean) {
+  const newSelection = new Set(unidadesSelecionadasLocal.value);
+  
+  // 1. Handle Self and Descendants
+  const idsToToggle = [unidade.codigo, ...getTodasSubunidades(unidade)];
+  
+  if (checked) {
+    idsToToggle.forEach(id => newSelection.add(id));
+  } else {
+    idsToToggle.forEach(id => newSelection.delete(id));
+  }
+  
+  // 2. Handle Ancestors (Upwards)
+  updateAncestors(unidade, newSelection);
+
+  unidadesSelecionadasLocal.value = Array.from(newSelection);
+}
+
+function updateAncestors(node: Unidade, selectionSet: Set<number>) {
+  let current = node;
+  while (true) {
+    const parent = parentMap.value.get(current.codigo);
+    if (!parent) break;
+
+    const children = parent.filhas || [];
+    const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
+
+    if (allChildrenSelected) {
+      selectionSet.add(parent.codigo);
+    } else {
+      // Se não forem todas as filhas selecionadas, remove o pai
+      // EXCETO se o pai for INTEROPERACIONAL (regra 2.3.2.5)
+      if (parent.tipo !== 'INTEROPERACIONAL') {
+         selectionSet.delete(parent.codigo);
+      }
+      // Se for INTEROPERACIONAL, mantemos o estado atual dele (seja selecionado ou não)
+      // a menos que a ação explicita de desmarcar tenha ocorrido nele (tratado no passo 1)
+    }
+    current = parent;
+  }
 }
 
 watch(

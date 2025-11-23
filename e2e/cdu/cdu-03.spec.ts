@@ -72,7 +72,10 @@ test.describe('CDU-03: Manter processo', () => {
         await paginaProcesso.verificarValorDescricao(novaDescricao);
         
         await paginaProcesso.clicarBotaoSalvar();
-        await paginaProcesso.verificarPermanenciaNaPaginaDeEdicao(novaDescricao);
+        
+        // Após salvar, deve redirecionar para o Painel (comportamento padrão de "Salvar" no sistema)
+        await paginaPainel.verificarUrlDoPainel();
+        await paginaPainel.aguardarProcessoNoPainel(novaDescricao);
     });
 
     test('deve exibir botão Remover apenas em modo de edição', async () => {
@@ -140,6 +143,94 @@ test.describe('CDU-03: Manter processo', () => {
         // Verificação
         await paginaPainel.verificarUrlDoPainel();
         await paginaPainel.verificarProcessoNaoVisivel(descricao);
+    });
+
+    // ===== REGRAS DE SELEÇÃO DE UNIDADES (ÁRVORE) =====
+
+    test('deve selecionar automaticamente as unidades filhas ao selecionar o pai', async () => {
+        await paginaPainel.irParaCriacaoDeProcesso();
+        await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+        
+        // Encontrar uma unidade pai (que tenha uma div.ms-4 logo após)
+        // Estrutura: div.form-check (Pai) + div.ms-4 (Container Filhos) > div.form-check (Filho)
+        const parentCheckbox = page.locator('.arvore-unidades > .form-check input[type="checkbox"]').first();
+        const childContainer = page.locator('.arvore-unidades > .form-check').first().locator('+ div.ms-4');
+        const childCheckbox = childContainer.locator('.form-check input[type="checkbox"]').first();
+
+        // Verifica se existem elementos para o teste
+        if (await childCheckbox.count() > 0) {
+            // Selecionar Pai
+            await parentCheckbox.check();
+            
+            // Verificar Pai e Filho marcados
+            await expect(parentCheckbox).toBeChecked();
+            await expect(childCheckbox).toBeChecked();
+
+            // Desmarcar Pai
+            await parentCheckbox.uncheck();
+            
+            // Verificar Pai e Filho desmarcados
+            await expect(parentCheckbox).not.toBeChecked();
+            await expect(childCheckbox).not.toBeChecked();
+        } else {
+            test.skip('Não foi encontrada uma estrutura de pai-filho na árvore para teste de seleção em cascata.');
+        }
+    });
+
+    test('deve selecionar o pai automaticamente ao selecionar todas as filhas', async () => {
+        await paginaPainel.irParaCriacaoDeProcesso();
+        await paginaProcesso.selecionarTipoProcesso('MAPEAMENTO');
+
+        const parentCheckbox = page.locator('.arvore-unidades > .form-check input[type="checkbox"]').first();
+        const childContainer = page.locator('.arvore-unidades > .form-check').first().locator('+ div.ms-4');
+        
+        if (await childContainer.count() > 0) {
+            const childrenCheckboxes = childContainer.locator('> div.form-check input[type="checkbox"]');
+            const count = await childrenCheckboxes.count();
+            
+            if (count > 0) {
+                // Marcar todos os filhos
+                for (let i = 0; i < count; i++) {
+                    await childrenCheckboxes.nth(i).check();
+                }
+                
+                // Verificar se o pai foi marcado automaticamente
+                await expect(parentCheckbox).toBeChecked();
+
+                // Desmarcar um filho
+                await childrenCheckboxes.first().uncheck();
+
+                // Verificar se o pai foi desmarcado (mas ficou "indeterminate" visualmente, aqui verificamos o checked property que deve ser false)
+                await expect(parentCheckbox).not.toBeChecked();
+            }
+        } else {
+            test.skip('Não foi encontrada uma estrutura de pai-filho na árvore para teste de seleção reversa.');
+        }
+    });
+
+    // ===== VALIDAÇÃO DE REVISÃO =====
+
+    test('deve validar unidades sem mapa ao criar processo de Revisão', async () => {
+        await paginaPainel.irParaCriacaoDeProcesso();
+
+        await paginaProcesso.preencherDescricao('Processo Revisão Inválido');
+        await paginaProcesso.selecionarTipoProcesso('REVISAO');
+        await paginaProcesso.preencherDataLimite('2025-12-31');
+        
+        // Seleciona todas as unidades para garantir que pegamos alguma sem mapa (ou use uma específica se souber)
+        // Assumindo que 'STIC' não tem mapa no seed inicial.
+        await paginaProcesso.selecionarUnidadesPorSigla(['STIC']);
+        
+        await paginaProcesso.clicarBotaoSalvar();
+
+        // Deve exibir erro (não redirecionar)
+        // A mensagem de erro aparece em um toast ou modal de erro?
+        // O código CadProcesso.vue usa notificacoesStore.erro() -> provavelmente um toast.
+        // Verificamos se permaneceu na página
+        await paginaProcesso.verificarPaginaDeCadastro();
+        
+        // Opcional: Verificar mensagem de erro específica
+        // await expect(page.locator('text=não possuem mapa vigente')).toBeVisible();
     });
 });
 

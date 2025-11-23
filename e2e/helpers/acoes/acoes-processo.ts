@@ -15,7 +15,6 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
         const seletorCheckbox = `#chk-${sigla}`;
         const checkboxLocator = page.locator(seletorCheckbox);
         await page.waitForSelector(seletorCheckbox, { state: 'visible' });
-        await checkboxLocator.waitFor({ enabled: true });
         await checkboxLocator.check();
     }
 }
@@ -193,14 +192,6 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
     // DEBUG: Verificar se checkboxes de unidades estão marcados
     const checkboxesMarcados = await page.locator('input[type="checkbox"]:checked').count();
     debug(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
-
-    // Se não há checkboxes marcados, há um bug no frontend!
-    // O processo foi criado com unidades, mas ao abrir para edição elas não são carregadas
-    if (checkboxesMarcados === 0) {
-        logger.warn(`[AVISO] BUG DO FRONTEND: Unidades não foram carregadas ao abrir processo para edição!`);
-        logger.warn(`[AVISO] Últimas ${responses.length} respostas da API:`);
-        responses.forEach(r => logger.warn(`  ${r}`));
-    }
 
     await clicarElemento([
         page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)),
