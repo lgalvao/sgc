@@ -159,7 +159,7 @@ class ProcessoServiceTest {
             .build();
 
         assertThatThrownBy(() -> processoService.atualizar(id, req))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -214,7 +214,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.apagar(id))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -287,9 +287,8 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(outroProcesso));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(id, List.of(1L)))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("já participam de outro processo");
+        List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
+        assertThat(erros).contains("As seguintes unidades já participam de outro processo ativo: ");
     }
 
     @Test
@@ -335,9 +334,8 @@ class ProcessoServiceTest {
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoRevisao(id, List.of(1L)))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("não possuem mapa vigente");
+        List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
+        assertThat(erros).contains("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: U1");
     }
 
     @Test

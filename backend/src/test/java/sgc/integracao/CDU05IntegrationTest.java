@@ -185,7 +185,7 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isConflict()); // Espera-se um erro de negócio
+                .andExpect(status().isBadRequest()); // Espera-se um erro de validação (400 Bad Request)
     }
 
     @Test

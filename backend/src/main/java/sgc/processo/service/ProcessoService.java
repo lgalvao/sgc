@@ -120,7 +120,7 @@ public class ProcessoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
         processo.setDescricao(requisicao.getDescricao());
@@ -151,7 +151,7 @@ public class ProcessoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser removidos.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
         processoRepo.deleteById(codigo);

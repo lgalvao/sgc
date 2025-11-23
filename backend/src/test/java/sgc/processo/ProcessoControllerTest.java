@@ -249,7 +249,7 @@ public class ProcessoControllerTest {
         var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
-        doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
+        when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -267,7 +267,7 @@ public class ProcessoControllerTest {
         var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
-        doNothing().when(processoService).iniciarProcessoRevisao(eq(1L), anyList());
+        when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(List.of());
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
