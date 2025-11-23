@@ -1,8 +1,39 @@
+-- UNIQUE_IDENTIFIER_GEMINI_20251123
+-- Last modified: 2025-11-23 11:15:00
 -- =================================================================================================
 -- DADOS DE REFERÊNCIA MÍNIMOS PARA TESTES E2E
 -- Contém apenas dados essenciais e estáveis: Unidades, Usuários, Perfis e Mapas Vigentes.
--- NÃO contém dados transacionais como Processos, Subprocessos ou Alertas.
+-- TAMBÉM CONTÉM DADOS TRANSACIONAIS (PROCESSOS, SUBPROCESSOS, ALERTAS, MOVIMENTACOES) PARA TESTES E2E ESPECÍFICOS.
 -- =================================================================================================
+
+-- Deletar dados transacionais para garantir idempotência, mesmo em bancos de dados isolados
+DELETE FROM SGC.MOVIMENTACAO;
+DELETE FROM SGC.ALERTA_USUARIO;
+DELETE FROM SGC.ALERTA;
+DELETE FROM SGC.ANALISE; -- Add ANALISE here as it depends on SUBPROCESSO
+DELETE FROM SGC.NOTIFICACAO; -- Add NOTIFICACAO here as it depends on SUBPROCESSO
+DELETE FROM SGC.UNIDADE_PROCESSO;
+DELETE FROM SGC.SUBPROCESSO;
+DELETE FROM SGC.PROCESSO;
+
+DELETE FROM SGC.CONHECIMENTO;
+DELETE FROM SGC.COMPETENCIA_ATIVIDADE;
+DELETE FROM SGC.ATIVIDADE;
+
+DELETE FROM SGC.ATRIBUICAO_TEMPORARIA;
+DELETE FROM SGC.COMPETENCIA;
+DELETE FROM SGC.USUARIO_PERFIL;
+DELETE FROM SGC.VINCULACAO_UNIDADE; -- Add VINCULACAO_UNIDADE here as it depends on UNIDADE
+
+-- Clear foreign key references from UNIDADE before deleting USUARIO and MAPA
+UPDATE SGC.UNIDADE SET titular_titulo = NULL, mapa_vigente_codigo = NULL;
+
+DELETE FROM SGC.USUARIO;
+DELETE FROM SGC.UNIDADE;
+DELETE FROM SGC.MAPA;
+
+DELETE FROM SGC.PARAMETRO; -- No dependencies, can be deleted anywhere
+
 
 INSERT INTO SGC.MAPA (codigo) VALUES (1001);
 INSERT INTO SGC.MAPA (codigo) VALUES (1002);
@@ -257,4 +288,24 @@ INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30001, 201, '
 INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40001, 30001, 'Atendimento ao público');
 INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30001, 20001);
 
+-- -------------------------------------------------------------------------------------------------
+-- PROCESSOS, SUBPROCESSOS, ALERTAS, MOVIMENTACOES (para testes E2E)
+-- -------------------------------------------------------------------------------------------------
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
+VALUES (50000, 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO');
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES (50000, 8);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES (70000, 50000, 50001, 'Alerta de teste para processo A', CURRENT_TIMESTAMP());
 
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
+VALUES (50001, 'Processo Teste B', 'FINALIZADO', CURRENT_TIMESTAMP(), 'MAPEAMENTO');
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES (50001, 9);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES (70001, 50001, 50003, 'Alerta de teste para processo B', CURRENT_TIMESTAMP());
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+VALUES (60000, 50000, 8, 1001, 'CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_codigo, descricao, data_hora)
+VALUES (80000, 60000, 50001, 'INICIADO', CURRENT_TIMESTAMP());

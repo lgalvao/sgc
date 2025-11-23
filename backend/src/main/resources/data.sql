@@ -195,24 +195,20 @@ INSERT INTO SGC.MAPA (codigo)
 VALUES (201);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1001, 100, 8, 1001, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
+                             data_fim_etapa1, data_fim_etapa2)
+VALUES (1001, 100, 8, 1001, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1002, 100, 9, 1002, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
+                             data_fim_etapa1, data_fim_etapa2)
+VALUES (1002, 100, 9, 1002, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1003, 100, 10, 1003, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
+                             data_fim_etapa1, data_fim_etapa2)
+VALUES (1003, 100, 10, 1003, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
+                             data_fim_etapa1, data_fim_etapa2)
+VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
 
 -- Mapas vigentes (migrados para a tabela unidade)
 UPDATE SGC.UNIDADE
@@ -422,3 +418,15 @@ VALUES (1900);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
 VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', CURRENT_DATE + 30);
+
+INSERT INTO SGC.PROCESSO (codigo, tipo, situacao, descricao, data_criacao, data_limite)
+VALUES (50000, 'MAPEAMENTO', 'EM_ANDAMENTO', 'Processo de Mapeamento para Teste', CURRENT_DATE, CURRENT_DATE + 30);
+
+INSERT INTO SGC.PROCESSO (codigo, tipo, situacao, descricao, data_criacao, data_limite)
+VALUES (50001, 'REVISAO', 'EM_ANDAMENTO', 'Processo de Revisao para Teste', CURRENT_DATE, CURRENT_DATE + 30);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, situacao_id)
+VALUES (60000, 50000, 'NAO_INICIADO');
+
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, descricao)
+VALUES (70000, 60000, 'Movimentação de teste');

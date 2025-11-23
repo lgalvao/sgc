@@ -27,6 +27,8 @@ public abstract class AlertaMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
+
+    // TODO 'alerta' is no being recognized
     @Mapping(source = "alerta", target = "linkDestino", qualifiedByName = "buildLinkDestino")
     @Mapping(source = "descricao", target = "mensagem")
     @Mapping(source = "dataHora", target = "dataHoraFormatada", qualifiedByName = "formatDataHora")

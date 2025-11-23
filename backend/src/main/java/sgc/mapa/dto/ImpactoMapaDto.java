@@ -21,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // to encourage use of factory methods
 public class ImpactoMapaDto {
-
     private boolean temImpactos;
     private int totalAtividadesInseridas;
     private int totalAtividadesRemovidas;
@@ -32,29 +31,13 @@ public class ImpactoMapaDto {
     private List<AtividadeImpactadaDto> atividadesAlteradas;
     private List<CompetenciaImpactadaDto> competenciasImpactadas;
 
-    // Custom setters for defensive copying
-    public void setAtividadesInseridas(List<AtividadeImpactadaDto> atividadesInseridas) {
-        this.atividadesInseridas = (atividadesInseridas == null) ? List.of() : List.copyOf(atividadesInseridas);
-    }
-
-    public void setAtividadesRemovidas(List<AtividadeImpactadaDto> atividadesRemovidas) {
-        this.atividadesRemovidas = (atividadesRemovidas == null) ? List.of() : List.copyOf(atividadesRemovidas);
-    }
-
-    public void setAtividadesAlteradas(List<AtividadeImpactadaDto> atividadesAlteradas) {
-        this.atividadesAlteradas = (atividadesAlteradas == null) ? List.of() : List.copyOf(atividadesAlteradas);
-    }
-
-    public void setCompetenciasImpactadas(List<CompetenciaImpactadaDto> competenciasImpactadas) {
-        this.competenciasImpactadas = (competenciasImpactadas == null) ? List.of() : List.copyOf(competenciasImpactadas);
-    }
-
     /**
      * Factory method for creating an ImpactoMapaDto with no impacts.
      *
      * @return An empty ImpactoMapaDto.
      */
     public static ImpactoMapaDto semImpacto() {
+        // TODO Usar sempre o builder, nao usar construtores enormes
         return new ImpactoMapaDto(false, 0, 0, 0, 0, List.of(), List.of(), List.of(), List.of());
     }
 
@@ -69,6 +52,7 @@ public class ImpactoMapaDto {
             List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
         boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
+        // TODO Usar sempre o builder, nao usar construtores enormes
         return new ImpactoMapaDto(
                 temImpactos,
                 atividadesInseridas.size(),

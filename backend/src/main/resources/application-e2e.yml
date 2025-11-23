@@ -23,7 +23,7 @@ spring:
     show-sql: false
   sql:
     init:
-      mode: always # Explicitly enable default SQL initialization for E2E profile
+      mode: never # Explicitly enable default SQL initialization for E2E profile
       platform: h2
 
   devtools:
@@ -48,9 +48,10 @@ management:
 
 logging:
   level:
-    sgc: INFO
+    root: INFO
+    sgc: DEBUG
     org.springframework: INFO
-    org.springframework.jdbc: ERROR
+    org.springframework.jdbc: DEBUG
     org.springframework.boot.autoconfigure: ERROR
     org.hibernate.SQL: WARN
     org.springframework.mail: ERROR

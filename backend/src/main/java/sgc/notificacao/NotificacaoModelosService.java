@@ -17,12 +17,13 @@ public class NotificacaoModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Constantes para títulos de e-mail
-    private static final String TITULO_PROCESSO_INICIADO = "Processo Iniciado - ";
-    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro Disponibilizado para Análise";
-    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro Devolvido para Ajustes";
-    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências Disponibilizado";
-    private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências Validado";
-    private static final String TITULO_PROCESSO_FINALIZADO = "Processo Finalizado - Mapas Vigentes";
+    private static final String TITULO_PROCESSO_INICIADO = "Processo iniciado - ";
+    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro disponibilizado para análise";
+    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro devolvido para ajustes";
+    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências disponibilizado";
+    private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
+    private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
+    // TODO esse título parece fugir do padrao com esse prefixo 'SGC'
     private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "SGC: Conclusão do processo ";
 
     private final SpringTemplateEngine templateEngine;

@@ -6,9 +6,8 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import javax.sql.DataSource;
 
 public class E2eDataSourceRouter extends AbstractRoutingDataSource {
-
     private final E2eTestDatabaseService e2eTestDatabaseService;
-    // Setter for the default data source
+
     @Setter
     private DataSource defaultDataSource; // To hold the default data source
 

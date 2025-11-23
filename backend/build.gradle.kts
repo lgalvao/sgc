@@ -6,7 +6,6 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
-    id("jacoco")
     java
 }
 
@@ -118,27 +117,6 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
     }
-}
-
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-    reports {
-        xml.required.set(true)
-        csv.required.set(true)
-        html.required.set(true)
-    }
-    classDirectories.setFrom(
-        sourceSets["main"].output.asFileTree.matching {
-            exclude("**/sgc/e2e/**")
-            exclude("**/sgc/comum/config/**")
-            exclude("**/*MapperImpl*")
-            exclude("**/*Impl_*")
-        }
-    )
 }
 
 tasks.register<BootRun>("bootRunE2E") {

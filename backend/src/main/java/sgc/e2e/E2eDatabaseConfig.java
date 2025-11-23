@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,14 +16,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @Profile("e2e")
 @RequiredArgsConstructor
+@Slf4j
 public class E2eDatabaseConfig implements WebMvcConfigurer {
-
     private final E2eTestRequestInterceptor e2eTestRequestInterceptor;
     private final E2eTestDatabaseService e2eTestDatabaseService;
     private final ResourceLoader resourceLoader;
@@ -50,15 +52,24 @@ public class E2eDatabaseConfig implements WebMvcConfigurer {
     @Bean
     public DataSource defaultE2eDataSource(@Qualifier("e2eDataSourceProperties") DataSourceProperties properties) {
         DataSource defaultDataSource = properties.initializeDataSourceBuilder().build();
-        // Initialize the default data source with schema and minimal data
         try (Connection connection = defaultDataSource.getConnection()) {
-            ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:schema.sql"));
-            // ScriptUtils.executeSqlScript(connection, resourceLoader.getResource("classpath:data-minimal.sql"));
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("CREATE SCHEMA IF NOT EXISTS SGC");
+            }
+            connection.setSchema("SGC");
+            e2eTestDatabaseService.executeSqlScripts(connection, resourceLoader.getResource("classpath:schema.sql"));
+            // Temporarily disable referential integrity for data loading
+            e2eTestDatabaseService.setReferentialIntegrity(connection, false);
+            e2eTestDatabaseService.executeSqlScripts(connection, resourceLoader.getResource("classpath:data-minimal.sql"));
+            // Re-enable referential integrity
+            e2eTestDatabaseService.setReferentialIntegrity(connection, true);
         } catch (Exception e) {
+            log.error("Failed to initialize default E2E data source. Original exception: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to initialize default E2E data source", e);
         }
         return defaultDataSource;
     }
+
 
     /**
      * The primary DataSource bean for the application when profile 'e2e' is active.

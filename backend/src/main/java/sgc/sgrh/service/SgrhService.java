@@ -27,11 +27,13 @@ public class SgrhService {
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
         log.warn("MOCK SGRH: Buscando usuário por título.");
 
-        return Optional.of(new UsuarioDto(titulo,
-                "Usuário Mock %s".formatted(titulo),
-                "%s@tre-pe.jus.br".formatted(titulo),
-                "MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))),
-                "Analista Judiciário"));
+        return Optional.of(UsuarioDto.builder()
+                .titulo(titulo)
+                .nome("Usuário Mock %s".formatted(titulo))
+                .email("%s@tre-pe.jus.br".formatted(titulo))
+                .matricula("MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))))
+                .cargo("Analista Judiciário")
+                .build());
     }
 
     public Usuario buscarUsuarioPorLogin(String login) {
@@ -54,44 +56,68 @@ public class SgrhService {
         log.warn("MOCK SGRH: Buscando perfis do usuário (padrão).");
 
         if ("1".equals(titulo)) { // Servidor Ana Paula Souza (SESEL)
-            return List.of(new PerfilDto(titulo, 10L, "SESEL", "SERVIDOR"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(10L).unidadeNome("SESEL").perfil("SERVIDOR").build());
         } else if ("6".equals(titulo)) { // Admin Ricardo Alves (STIC)
-            return List.of(new PerfilDto(titulo, 2L, "STIC", "ADMIN"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("ADMIN").build());
         } else if ("777".equals(titulo)) { // Chefe STIC Teste (STIC)
-            return List.of(new PerfilDto(titulo, 2L, "STIC", "CHEFE"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("CHEFE").build());
         } else if ("2".equals(titulo)) { // Chefe SGP
-            return List.of(new PerfilDto(titulo, 200L, "SGP", "CHEFE"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(200L).unidadeNome("SGP").perfil("CHEFE").build());
         } else if ("3".equals(titulo)) { // Chefe SEDESENV
-            return List.of(new PerfilDto(titulo, 8L, "SEDESENV", "CHEFE"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(8L).unidadeNome("SEDESENV").perfil("CHEFE").build());
         } else if ("8".equals(titulo)) { // Gestor Paulo Horta (SEDESENV)
-            return List.of(new PerfilDto(titulo, 8L, "SEDESENV", "GESTOR"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(8L).unidadeNome("SEDESENV").perfil("GESTOR").build());
         } else if ("10".equals(titulo)) { // Chefe SEDIA (SEDIA)
-            return List.of(new PerfilDto(titulo, 9L, "SEDIA", "CHEFE"));
+            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(9L).unidadeNome("SEDIA").perfil("CHEFE").build());
         } else if ("999999999999".equals(titulo)) { // Usuario Multi Perfil (STIC)
             return List.of(
-                new PerfilDto(titulo, 2L, "STIC", "ADMIN"),
-                new PerfilDto(titulo, 2L, "STIC", "GESTOR")
+                PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("ADMIN").build(),
+                PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("GESTOR").build()
             );
         }
 
         // Default behavior for other users if not explicitly mocked
         return List.of(
-            new PerfilDto(titulo, 1L, "SEDOC", "ADMIN"),
-            new PerfilDto(titulo, 2L, "SGP", "GESTOR")
+            PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(1L).unidadeNome("SEDOC").perfil("ADMIN").build(),
+            PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("SGP").perfil("GESTOR").build()
         );
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         String titulo = email.split("@")[0];
-        return Optional.of(new UsuarioDto(titulo, "Usuário %s".formatted(titulo), email, "MAT%d".formatted(titulo.hashCode()), "Analista Judiciário"));
+        return Optional.of(UsuarioDto.builder()
+                .titulo(titulo)
+                .nome("Usuário %s".formatted(titulo))
+                .email(email)
+                .matricula("MAT%d".formatted(titulo.hashCode()))
+                .cargo("Analista Judiciário")
+                .build());
     }
 
     public List<UsuarioDto> buscarUsuariosAtivos() {
         log.warn("MOCK SGRH: Listando usuários ativos");
         return List.of(
-                new UsuarioDto("123456789012", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001", "Analista Judiciário"),
-                new UsuarioDto("987654321098", "Maria Santos", "maria.santos@tre-pe.jus.br", "MAT002", "Técnico Judiciário"),
-                new UsuarioDto("111222333444", "Pedro Oliveira", "pedro.oliveira@tre-pe.jus.br", "MAT003", "Analista Judiciário"));
+                UsuarioDto.builder()
+                        .titulo("123456789012")
+                        .nome("João Silva")
+                        .email("joao.silva@tre-pe.jus.br")
+                        .matricula("MAT001")
+                        .cargo("Analista Judiciário")
+                        .build(),
+                UsuarioDto.builder()
+                        .titulo("987654321098")
+                        .nome("Maria Santos")
+                        .email("maria.santos@tre-pe.jus.br")
+                        .matricula("MAT002")
+                        .cargo("Técnico Judiciário")
+                        .build(),
+                UsuarioDto.builder()
+                        .titulo("111222333444")
+                        .nome("Pedro Oliveira")
+                        .email("pedro.oliveira@tre-pe.jus.br")
+                        .matricula("MAT003")
+                        .cargo("Analista Judiciário")
+                        .build());
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
@@ -132,27 +158,48 @@ public class SgrhService {
                 .stream()
                 .map(filho -> construirArvore(filho, subunidadesPorPai))
                 .toList();
-        return new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), unidade.getCodigoPai(), unidade.getTipo(), filhos.isEmpty() ? null : filhos, false);
+        return UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(unidade.getCodigoPai())
+                .tipo(unidade.getTipo())
+                .subunidades(filhos.isEmpty() ? null : filhos)
+                .isElegivel(false)
+                .build();
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
         log.warn("MOCK SGRH: Buscando responsável da unidade.");
-        return Optional.of(new ResponsavelDto(unidadeCodigo, "123456789012", "João Silva (Titular)", "987654321098", "Maria Santos (Substituto)"));
+        return Optional.of(ResponsavelDto.builder()
+                .unidadeCodigo(unidadeCodigo)
+                .titularTitulo("123456789012")
+                .titularNome("João Silva (Titular)")
+                .substitutoTitulo("987654321098")
+                .substitutoNome("Maria Santos (Substituto)")
+                .build());
     }
 
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
-        return unidadesCodigos.stream().collect(Collectors.toMap(codigo -> codigo, codigo -> new ResponsavelDto(codigo, String.format("%012d", codigo), "Titular da Unidade " + codigo, String.format("%012d", codigo + 1000), "Substituto da Unidade " + codigo)));
+        return unidadesCodigos.stream().collect(Collectors.toMap(codigo -> codigo, codigo -> ResponsavelDto.builder()
+                .unidadeCodigo(codigo)
+                .titularTitulo(String.format("%012d", codigo))
+                .titularNome("Titular da Unidade " + codigo)
+                .substitutoTitulo(String.format("%012d", codigo + 1000))
+                .substitutoNome("Substituto da Unidade " + codigo)
+                .build()));
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
         log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
-        return titulos.stream().collect(Collectors.toMap(titulo -> titulo, titulo -> new UsuarioDto(
-                titulo,
-                "Usuário Mock %s".formatted(titulo),
-                "%s@tre-pe.jus.br".formatted(titulo),
-                "MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))),
-                "Analista Judiciário"), (u1, u2) -> u1)
+        return titulos.stream().collect(Collectors.toMap(titulo -> titulo, titulo -> UsuarioDto.builder()
+                .titulo(titulo)
+                .nome("Usuário Mock %s".formatted(titulo))
+                .email("%s@tre-pe.jus.br".formatted(titulo))
+                .matricula("MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))))
+                .cargo("Analista Judiciário")
+                .build(), (u1, u2) -> u1)
         );
     }
 
@@ -178,20 +225,20 @@ public class SgrhService {
 
     private Map<Long, UnidadeDto> criarUnidadesMock() {
         Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
-        unidadesDto.put(2L, new UnidadeDto(2L, "Secretaria de Informática e Comunicações", "STIC", null, "INTEROPERACIONAL", false));
-        unidadesDto.put(3L, new UnidadeDto(3L, "Secretaria de Gestao de Pessoas", "SGP", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(6L, new UnidadeDto(6L, "Coordenadoria de Sistemas", "COSIS", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(7L, new UnidadeDto(7L, "Coordenadoria de Suporte e Infraestrutura", "COSINF", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(14L, new UnidadeDto(14L, "Coordenadoria Jurídica", "COJUR", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(4L, new UnidadeDto(4L, "Coordenadoria de Educação Especial", "COEDE", 3L, "INTERMEDIARIA", false));
-        unidadesDto.put(8L, new UnidadeDto(8L, "Seção de Desenvolvimento de Sistemas", "SEDESENV", 6L, "OPERACIONAL", false));
-        unidadesDto.put(9L, new UnidadeDto(9L, "Seção de Dados e Inteligência Artificial", "SEDIA", 6L, "OPERACIONAL", false));
-        unidadesDto.put(10L, new UnidadeDto(10L, "Seção de Sistemas Eleitorais", "SESEL", 6L, "OPERACIONAL", false));
-        unidadesDto.put(11L, new UnidadeDto(11L, "Seção de Infraestrutura", "SENIC", 7L, "OPERACIONAL", false));
-        unidadesDto.put(12L, new UnidadeDto(12L, "Seção Jurídica", "SEJUR", 14L, "OPERACIONAL", false));
-        unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL", false));
-        unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL", false));
-        unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL", false));
+        unidadesDto.put(2L, UnidadeDto.builder().codigo(2L).nome("Secretaria de Informática e Comunicações").sigla("STIC").codigoPai(null).tipo("INTEROPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(3L, UnidadeDto.builder().codigo(3L).nome("Secretaria de Gestao de Pessoas").sigla("SGP").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(6L, UnidadeDto.builder().codigo(6L).nome("Coordenadoria de Sistemas").sigla("COSIS").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(7L, UnidadeDto.builder().codigo(7L).nome("Coordenadoria de Suporte e Infraestrutura").sigla("COSINF").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(14L, UnidadeDto.builder().codigo(14L).nome("Coordenadoria Jurídica").sigla("COJUR").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(4L, UnidadeDto.builder().codigo(4L).nome("Coordenadoria de Educação Especial").sigla("COEDE").codigoPai(3L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(8L, UnidadeDto.builder().codigo(8L).nome("Seção de Desenvolvimento de Sistemas").sigla("SEDESENV").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(9L, UnidadeDto.builder().codigo(9L).nome("Seção de Dados e Inteligência Artificial").sigla("SEDIA").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(10L, UnidadeDto.builder().codigo(10L).nome("Seção de Sistemas Eleitorais").sigla("SESEL").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(11L, UnidadeDto.builder().codigo(11L).nome("Seção de Infraestrutura").sigla("SENIC").codigoPai(7L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(12L, UnidadeDto.builder().codigo(12L).nome("Seção Jurídica").sigla("SEJUR").codigoPai(14L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(13L, UnidadeDto.builder().codigo(13L).nome("Seção de Processos").sigla("SEPRO").codigoPai(14L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(15L, UnidadeDto.builder().codigo(15L).nome("Seção de Documentação").sigla("SEDOC").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(5L, UnidadeDto.builder().codigo(5L).nome("Seção Magistrados e Requisitados").sigla("SEMARE").codigoPai(4L).tipo("OPERACIONAL").isElegivel(false).build());
         return unidadesDto;
     }
 }

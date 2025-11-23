@@ -33,3 +33,4 @@ backend/bin/
 /node_modules/
 e2e-log-problems.md
 test-results/
+!backend/build/reports/tests/test/index.html

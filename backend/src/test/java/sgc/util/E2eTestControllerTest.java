@@ -58,41 +58,18 @@ class E2eTestControllerTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @BeforeEach
-    void setUp() {
-        movimentacaoRepo.deleteAll();
-        subprocessoRepo.deleteAll();
-        processoRepo.deleteAll();
-        alertaUsuarioRepo.deleteAll();
-        alertaRepo.deleteAll();
-
-        var processo1 = new Processo();
-        processo1.setTipo(TipoProcesso.MAPEAMENTO);
-        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoRepo.save(processo1);
-
-        var processo2 = new Processo();
-        processo2.setTipo(TipoProcesso.REVISAO);
-        processo2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoRepo.save(processo2);
-
-        var subprocesso = new Subprocesso();
-        subprocesso.setProcesso(processo1);
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        subprocessoRepo.save(subprocesso);
-
-        var movimentacao = new Movimentacao();
-        movimentacao.setSubprocesso(subprocesso);
-        movimentacao.setDescricao("Movimentação de teste");
-        movimentacaoRepo.save(movimentacao);
+    void setUp() throws Exception {
+        mockMvc.perform(post("/api/e2e/dados-teste/recarregar"))
+                .andExpect(status().isOk());
     }
 
     @org.junit.jupiter.api.AfterEach
     void tearDown() {
+        alertaUsuarioRepo.deleteAll();
+        alertaRepo.deleteAll();
         movimentacaoRepo.deleteAll();
         subprocessoRepo.deleteAll();
         processoRepo.deleteAll();
-        alertaUsuarioRepo.deleteAll();
-        alertaRepo.deleteAll();
     }
 
     @Nested
@@ -101,8 +78,8 @@ class E2eTestControllerTest {
         @Test
         @DisplayName("Deve apagar processo, subprocessos e movimentações")
         void deveApagarProcessoComDependencias() throws Exception {
-            var processos = processoRepo.findAll();
-            var codigo = processos.get(0).getCodigo();
+            var processo = processoRepo.findById(50000L).get();
+            var codigo = processo.getCodigo();
 
             assertThat(processoRepo.existsById(codigo)).isTrue();
 
@@ -146,8 +123,7 @@ class E2eTestControllerTest {
         @Test
         @DisplayName("Deve apagar processos com situação EM_ANDAMENTO")
         void deveLimparProcessosEmAndamento() throws Exception {
-            var countAntes = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).size();
-            assertThat(countAntes).isGreaterThan(0);
+            assertThat(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).isNotEmpty();
 
             mockMvc.perform(post("/api/e2e/processos/em-andamento/limpar"))
                     .andExpect(status().isNoContent());
@@ -162,8 +138,7 @@ class E2eTestControllerTest {
         @Test
         @DisplayName("Deve deletar todos os processos, subprocessos, alertas e movimentações")
         void deveResetarTodoOBanco() throws Exception {
-            var countAntes = processoRepo.count();
-            assertThat(countAntes).isGreaterThan(0);
+            assertThat(processoRepo.count()).isGreaterThan(0);
 
             mockMvc.perform(post("/api/e2e/reset"))
                     .andExpect(status().isNoContent());
@@ -194,7 +169,7 @@ class E2eTestControllerTest {
         @Test
         @DisplayName("Deve retornar dados das unidades vinculadas ao processo")
         void deveRetornarDadosUnidadesDoProcesso() throws Exception {
-            var processo = processoRepo.findAll().get(0);
+            var processo = processoRepo.findById(50000L).get();
             var codigo = processo.getCodigo();
 
             mockMvc.perform(get("/api/e2e/debug/processos/" + codigo + "/unidades"))
@@ -232,13 +207,12 @@ class E2eTestControllerTest {
         @Test
         @DisplayName("Deve remover movimentações junto com subprocessos")
         void deveRemoverMovimentacoesDuranteDelecao() throws Exception {
-            var subprocessos = subprocessoRepo.findAll();
-            assertThat(subprocessos).isNotEmpty();
-            var codigoSubprocesso = subprocessos.get(0).getCodigo();
+            var subprocesso = subprocessoRepo.findById(60000L).get();
+            var codigoSubprocesso = subprocesso.getCodigo();
 
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(codigoSubprocesso)).isNotEmpty();
 
-            var processo = subprocessos.get(0).getProcesso();
+            var processo = subprocesso.getProcesso();
             mockMvc.perform(post("/api/e2e/processos/" + processo.getCodigo() + "/apagar"))
                     .andExpect(status().isNoContent());
 

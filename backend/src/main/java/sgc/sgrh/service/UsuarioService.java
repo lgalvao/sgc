@@ -60,7 +60,14 @@ public class UsuarioService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         Unidade unidade = usuario.getUnidade();
-        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name(), false);
+        UnidadeDto unidadeDto = UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(null)
+                .tipo(unidade.getTipo().name())
+                .isElegivel(false)
+                .build();
 
         return usuario.getPerfis().stream()
                 .map(perfil -> new PerfilUnidade(perfil, unidadeDto))
@@ -98,7 +105,14 @@ public class UsuarioService {
         Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
         Perfil perfil = Perfil.valueOf(request.getPerfil());
-        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name(), false);
+        UnidadeDto unidadeDto = UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(null)
+                .tipo(unidade.getTipo().name())
+                .isElegivel(false)
+                .build();
         PerfilUnidade pu = new PerfilUnidade(perfil, unidadeDto);
         this.entrar(request.getTituloEleitoral(), pu);
     }

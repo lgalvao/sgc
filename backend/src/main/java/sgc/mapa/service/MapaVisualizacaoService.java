@@ -38,7 +38,11 @@ public class MapaVisualizacaoService {
         }
 
         Unidade unidade = subprocesso.getUnidade();
-        var unidadeDto = new MapaVisualizacaoDto.UnidadeDto(unidade.getCodigo(), unidade.getSigla(), unidade.getNome());
+        var unidadeDto = MapaVisualizacaoDto.UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .sigla(unidade.getSigla())
+                .nome(unidade.getNome())
+                .build();
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
 
@@ -48,14 +52,25 @@ public class MapaVisualizacaoService {
             List<AtividadeDto> atividadesDto = atividades.stream().map(atividade -> {
                 List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
                 List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
-                    .map(c -> new ConhecimentoDto(c.getCodigo(), c.getDescricao()))
+                    .map(c -> ConhecimentoDto.builder().codigo(c.getCodigo()).descricao(c.getDescricao()).build())
                     .toList();
-                return new AtividadeDto(atividade.getCodigo(), atividade.getDescricao(), conhecimentosDto);
+                return AtividadeDto.builder()
+                        .codigo(atividade.getCodigo())
+                        .descricao(atividade.getDescricao())
+                        .conhecimentos(conhecimentosDto)
+                        .build();
             }).toList();
 
-            return new CompetenciaDto(competencia.getCodigo(), competencia.getDescricao(), atividadesDto);
+            return CompetenciaDto.builder()
+                    .codigo(competencia.getCodigo())
+                    .descricao(competencia.getDescricao())
+                    .atividades(atividadesDto)
+                    .build();
         }).toList();
 
-        return new MapaVisualizacaoDto(unidadeDto, competenciasDto);
+        return MapaVisualizacaoDto.builder()
+                .unidade(unidadeDto)
+                .competencias(competenciasDto)
+                .build();
     }
 }

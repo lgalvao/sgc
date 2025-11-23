@@ -9,13 +9,17 @@ import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet; // Added this import
-import java.sql.SQLException; // Added this import
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 @Slf4j
 @Service
@@ -27,23 +31,29 @@ public class E2eTestDatabaseService {
         return dataSources.computeIfAbsent(testId, this::createDataSource);
     }
 
-    private void executeSqlScript(Connection connection, String scriptPath) throws Exception {
-        String sql = new BufferedReader(
-                new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(scriptPath))))
-                .lines()
-                .collect(Collectors.joining("\n"));
+    public void executeSqlScripts(Connection connection, Resource... scripts) throws Exception {
         try (Statement stmt = connection.createStatement()) {
-            for (String statement : sql.split(";")) {
-                String trimmed = statement.trim();
-                if (!trimmed.isEmpty() && !trimmed.startsWith("--")) {
-                    log.trace("Executing SQL statement: {}", trimmed);
-                    try {
+            for (Resource scriptResource : scripts) {
+                String sql = new BufferedReader(
+                        new InputStreamReader(scriptResource.getInputStream()))
+                        .lines()
+                        .filter(line -> !line.trim().startsWith("--"))
+                        .collect(Collectors.joining("\n"));
+
+                for (String statement : sql.split(";")) {
+                    String trimmed = statement.trim();
+                    if (!trimmed.isEmpty()) {
+                        log.trace("Executing SQL statement: {}", trimmed);
                         stmt.execute(trimmed);
-                    } catch (SQLException e) {
-                        log.error("Error executing SQL statement: {}", trimmed, e);
                     }
                 }
             }
+        }
+    }
+
+    public void setReferentialIntegrity(Connection conn, boolean enable) throws SQLException {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("SET REFERENTIAL_INTEGRITY " + (enable ? "TRUE" : "FALSE"));
         }
     }
 
@@ -69,18 +79,12 @@ public class E2eTestDatabaseService {
                     stmt.execute("CREATE SCHEMA SGC");
                 }
                 conn.setSchema("SGC");
-                executeSqlScript(conn, "/schema.sql");
+                executeSqlScripts(conn, new ClassPathResource("/schema.sql"));
 
                 // Temporarily disable referential integrity for data loading
-                try (Statement stmt = conn.createStatement()) {
-                    stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-                }
-                executeSqlScript(conn, "/data-minimal.sql");
-
-                // Re-enable referential integrity
-                try (Statement stmt = conn.createStatement()) {
-                    stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
-                }
+                setReferentialIntegrity(conn, false);
+                executeSqlScripts(conn, new ClassPathResource("/data-minimal.sql"));
+                setReferentialIntegrity(conn, true);
 
                 // Programmatic insertion of user '1' and 'SERVIDOR' profile for E2E tests
                 try (Statement stmt = conn.createStatement()) {
@@ -129,5 +133,27 @@ public class E2eTestDatabaseService {
 
     public DataSource getDataSource(String testId) {
         return dataSources.get(testId);
+    }
+
+    public void reloadDatabaseScripts(Connection conn, ResourceLoader resourceLoader) throws Exception {
+        // Temporarily disable referential integrity for data loading
+        setReferentialIntegrity(conn, false);
+
+        // Execute the file of data SQL (preferring minimal if it exists)
+        String sqlFilePath = "/data-minimal.sql";
+        Resource dataMinimalResource = resourceLoader.getResource("classpath:" + sqlFilePath);
+        Resource dataResource;
+
+        if (dataMinimalResource.exists()) {
+            dataResource = dataMinimalResource;
+        } else {
+            sqlFilePath = "/data.sql";
+            dataResource = resourceLoader.getResource("classpath:" + sqlFilePath);
+        }
+        log.info("Executing SQL file: {}", sqlFilePath);
+        executeSqlScripts(conn, dataResource);
+
+        // Re-enable referential integrity
+        setReferentialIntegrity(conn, true);
     }
 }
