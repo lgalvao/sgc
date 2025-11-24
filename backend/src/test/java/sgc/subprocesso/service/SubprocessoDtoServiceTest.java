@@ -191,7 +191,6 @@ class SubprocessoDtoServiceTest {
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
         assertThat(res).isNotNull();
-        assertThat(res.getElementosProcesso()).isEmpty();
     }
 
     @Test

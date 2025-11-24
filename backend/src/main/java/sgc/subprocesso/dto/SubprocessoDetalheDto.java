@@ -1,12 +1,7 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import sgc.atividade.dto.AtividadeDto;
-import sgc.atividade.dto.ConhecimentoDto;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
@@ -29,18 +24,17 @@ public class SubprocessoDetalheDto {
     private final String situacao;
     private final String situacaoLabel;
     private final String localizacaoAtual;
+    private final String processoDescricao;
+    private final String tipoProcesso;
     private final LocalDateTime prazoEtapaAtual;
     private final boolean isEmAndamento;
     private final Integer etapaAtual;
     private final List<MovimentacaoDto> movimentacoes;
-    private final List<ElementoProcessoDto> elementosProcesso;
     private final SubprocessoPermissoesDto permissoes;
 
     public static SubprocessoDetalheDto of(Subprocesso sp,
                                            Usuario responsavel,
                                            List<Movimentacao> movimentacoes,
-                                           List<AtividadeDto> atividades,
-                                           List<ConhecimentoDto> conhecimentos,
                                            MovimentacaoMapper movimentacaoMapper,
                                            SubprocessoPermissoesDto permissoes) {
         UnidadeDto unidadeDto = null;
@@ -52,22 +46,32 @@ public class SubprocessoDetalheDto {
                 .build();
         }
 
-        ResponsavelDto titularDto = null;
-        if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
-            var titular = sp.getUnidade().getTitular();
-            titularDto = ResponsavelDto.builder()
-                .nome(HtmlUtils.escapeHtml(titular.getNome()))
-                .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
-                .email(HtmlUtils.escapeHtml(titular.getEmail()))
-                .build();
-        }
-
+        Usuario titular = (sp.getUnidade() != null) ? sp.getUnidade().getTitular() : null;
         ResponsavelDto responsavelDto = null;
+        boolean isTitularResponsavel = false;
+
         if (responsavel != null) {
+            String tipo = "Substituição"; // Default
+            if (titular != null && titular.equals(responsavel)) {
+                tipo = "Titular";
+                isTitularResponsavel = true;
+            }
+
             responsavelDto = ResponsavelDto.builder()
                 .nome(HtmlUtils.escapeHtml(responsavel.getNome()))
                 .ramal(HtmlUtils.escapeHtml(responsavel.getRamal()))
                 .email(HtmlUtils.escapeHtml(responsavel.getEmail()))
+                .tipoResponsabilidade(tipo)
+                .build();
+        }
+
+        ResponsavelDto titularDto = null;
+        // Titular só é exibido se não for o responsável
+        if (titular != null && !isTitularResponsavel) {
+            titularDto = ResponsavelDto.builder()
+                .nome(HtmlUtils.escapeHtml(titular.getNome()))
+                .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
+                .email(HtmlUtils.escapeHtml(titular.getEmail()))
                 .build();
         }
 
@@ -86,14 +90,6 @@ public class SubprocessoDetalheDto {
             movimentacoesDto = movimentacoes.stream().map(movimentacaoMapper::toDTO).collect(Collectors.toList());
         }
 
-        List<ElementoProcessoDto> elementos = new ArrayList<>();
-        if (atividades != null) {
-            atividades.forEach(a -> elementos.add(new ElementoProcessoDto("ATIVIDADE", a)));
-        }
-        if (conhecimentos != null) {
-            conhecimentos.forEach(c -> elementos.add(new ElementoProcessoDto("CONHECIMENTO", c)));
-        }
-
         return SubprocessoDetalheDto.builder()
             .unidade(unidadeDto)
             .titular(titularDto)
@@ -101,11 +97,12 @@ public class SubprocessoDetalheDto {
             .situacao(sp.getSituacao().name())
             .situacaoLabel(sp.getSituacao().getDescricao())
             .localizacaoAtual(localizacaoAtual)
+            .processoDescricao(sp.getProcesso() != null ? HtmlUtils.escapeHtml(sp.getProcesso().getDescricao()) : null)
+            .tipoProcesso(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)
             .prazoEtapaAtual(prazoEtapaAtual)
             .isEmAndamento(sp.isEmAndamento())
             .etapaAtual(sp.getEtapaAtual())
             .movimentacoes(movimentacoesDto)
-            .elementosProcesso(elementos)
             .permissoes(permissoes)
             .build();
     }
@@ -126,14 +123,5 @@ public class SubprocessoDetalheDto {
         private final String tipoResponsabilidade;
         private final String ramal;
         private final String email;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ElementoProcessoDto {
-        private String tipo;
-        private Object payload;
     }
 }

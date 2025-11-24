@@ -56,49 +56,41 @@ public class SubprocessoDtoService {
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
-        System.out.println("Obtendo detalhes para o subprocesso " + codigo);
+        log.debug("Obtendo detalhes para o subprocesso {}", codigo);
         if (perfil == null) {
-            System.out.println("Perfil inválido para acesso aos detalhes do subprocesso.");
+            log.warn("Perfil inválido para acesso aos detalhes do subprocesso.");
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
 
         Subprocesso sp = repositorioSubprocesso.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
-        System.out.println("Subprocesso encontrado: " + sp);
+        log.debug("Subprocesso encontrado: {}", sp);
 
         if (perfil == Perfil.GESTOR || perfil == Perfil.CHEFE) {
             if (sp.getUnidade() == null || codUnidadeUsuario == null || !codUnidadeUsuario.equals(sp.getUnidade().getCodigo())) {
-                System.out.println("Usuário sem permissão para visualizar este subprocesso.");
+                log.warn("Usuário sem permissão para visualizar este subprocesso.");
                 throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
             }
         } else if (perfil != Perfil.ADMIN) {
-            System.out.println("Perfil sem permissão.");
+            log.warn("Perfil sem permissão.");
             throw new ErroAccessoNegado("Perfil sem permissão.");
         }
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("Usuário autenticado: " + username);
+        log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
-        System.out.println("Usuário encontrado: " + usuario);
+        log.debug("Usuário encontrado: {}", usuario);
 
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
-        System.out.println("Responsável encontrado: " + responsavel);
+        log.debug("Responsável encontrado: {}", responsavel);
 
         List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        final List<Atividade> atividades = (sp.getMapa() != null && sp.getMapa().getCodigo() != null)
-                ? atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo())
-                : emptyList();
-
-        final Set<Long> idsAtividades = atividades.stream().map(Atividade::getCodigo).filter(Objects::nonNull).collect(Collectors.toSet());
-        List<Conhecimento> conhecimentos = repositorioConhecimento.findAll().stream()
-                .filter(c -> c.getAtividade() != null && idsAtividades.contains(c.getAtividade().getCodigo()))
-                .toList();
 
         SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
-        System.out.println("Permissões calculadas: " + permissoes);
+        log.debug("Permissões calculadas: {}", permissoes);
 
-        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, atividades.stream().map(atividadeMapper::toDto).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDto).collect(Collectors.toList()), movimentacaoMapper, permissoes);
+        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
     }
 
     @Transactional(readOnly = true)
