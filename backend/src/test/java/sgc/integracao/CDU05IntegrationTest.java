@@ -172,20 +172,11 @@ public class CDU05IntegrationTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())
+        // A validação agora ocorre na criação do processo
+        mockMvc.perform(post("/api/processos").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
-
-        // 2. Tentar iniciar o processo de revisão (deve falhar)
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isBadRequest()); // Espera-se um erro de validação (400 Bad Request)
+                .andExpect(status().isConflict()); // ErroProcesso mapeado para 409 Conflict
     }
 
     @Test
