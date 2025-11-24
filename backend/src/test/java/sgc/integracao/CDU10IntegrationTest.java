@@ -127,10 +127,10 @@ class CDU10IntegrationTest {
             var alertas = alertaRepo.findByProcessoCodigo(subprocessoRevisao.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade SESEL submetida para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
+            verify(subprocessoNotificacaoService).notificarDisponibilizacaoRevisaoCadastro(
                     org.mockito.ArgumentMatchers.any(Subprocesso.class),
                     org.mockito.ArgumentMatchers.any(Unidade.class)
             );

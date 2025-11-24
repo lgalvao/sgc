@@ -295,6 +295,41 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
+     * Notifica a unidade superior sobre a disponibilização da revisão do cadastro de atividades.
+     * <p>
+     * Corresponde ao CDU-10.
+     *
+     * @param sp             O subprocesso cuja revisão de cadastro foi disponibilizada.
+     * @param unidadeDestino A unidade que realizará a análise.
+     */
+    public void notificarDisponibilizacaoRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidadeSuperior = unidadeDestino.getSigla();
+
+        java.util.Map<String, Object> variaveis = new java.util.HashMap<>();
+        variaveis.put("siglaUnidadeOrigem", siglaUnidadeSubprocesso);
+        variaveis.put("siglaUnidadeDestino", siglaUnidadeSuperior);
+        variaveis.put("nomeProcesso", descricaoProcesso);
+
+        // CDU-10 Item 12: Notificação por e-mail
+        String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: %s", siglaUnidadeSubprocesso);
+        String corpo = processarTemplate("email/disponibilizacao-revisao-cadastro.html", variaveis);
+        notificacaoEmailService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
+
+        // CDU-10 Item 13: Alerta interno
+        criarEsalvarAlerta(
+            String.format("Cadastro de atividades e conhecimentos da unidade %s disponibilizado para análise", siglaUnidadeSubprocesso),
+            sp.getProcesso(),
+            sp.getUnidade(),
+            unidadeDestino,
+            null
+        );
+    }
+
+    /**
      * Notifica a unidade responsável sobre a devolução da revisão de seu cadastro
      * para ajustes.
      * <p>
