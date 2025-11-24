@@ -172,4 +172,21 @@ public class CDU06IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.podeHomologarMapa").value(true));
     }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve retornar detalhes da unidade com situação do subprocesso correta")
+    void testDetalharProcesso_dadosSubprocesso() throws Exception {
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        subprocessoRepo.save(subprocesso);
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value("MAPA_HOMOLOGADO"))
+                .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
+    }
 }

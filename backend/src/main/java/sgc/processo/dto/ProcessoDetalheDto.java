@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
@@ -35,6 +36,7 @@ public class ProcessoDetalheDto {
     private boolean podeHomologarMapa;
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
