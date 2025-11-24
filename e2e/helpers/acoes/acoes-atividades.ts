@@ -56,9 +56,13 @@ export async function removerAtividade(page: Page, nomeAtividade: string): Promi
 export async function editarConhecimento(page: Page, nomeAtividade: string, nomeAtual: string, nomeNovo: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeAtual});
+
     await conhecimento.locator(SELETORES.BTN_EDITAR_CONHECIMENTO).click();
-    await conhecimento.locator('input[type="text"]').fill(nomeNovo);
-    await conhecimento.locator('button[type="submit"]').click();
+
+    // After clicking edit, the text is replaced by input, so we search for the input within the card
+    // We assume only one knowledge is being edited at a time
+    await cardAtividade.locator(SELETORES.INPUT_EDITAR_CONHECIMENTO).fill(nomeNovo);
+    await cardAtividade.locator(SELETORES.BTN_SALVAR_EDICAO_CONHECIMENTO).click();
 }
 
 /**

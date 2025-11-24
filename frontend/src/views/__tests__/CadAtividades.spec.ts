@@ -2,7 +2,6 @@ import { createTestingPinia } from "@pinia/testing";
 import { flushPromises, mount } from "@vue/test-utils";
 import { BFormInput } from "bootstrap-vue-next";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import EditarConhecimentoModal from "@/components/EditarConhecimentoModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
@@ -159,7 +158,6 @@ describe("CadAtividades.vue", () => {
         ],
         stubs: {
           ImportarAtividadesModal: true,
-          EditarConhecimentoModal: true,
           BModal: {
             name: "BModal",
             template: `
@@ -402,7 +400,7 @@ describe("CadAtividades.vue", () => {
     );
   });
 
-  it("deve abrir modal de editar conhecimento", async () => {
+  it("deve permitir edição inline de conhecimento", async () => {
     vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
       mockMapaVisualizacao([...mockAtividades] as any) as any,
     );
@@ -415,9 +413,28 @@ describe("CadAtividades.vue", () => {
       .find('[data-testid="btn-editar-conhecimento"]')
       .trigger("click");
 
-    const modal = wrapper.findComponent(EditarConhecimentoModal);
-    expect(modal.props("mostrar")).toBe(true);
-    expect(modal.props("conhecimento")).toBeTruthy();
+    expect(
+      wrapper.find('[data-testid="input-editar-conhecimento"]').exists(),
+    ).toBe(true);
+
+    await wrapper
+      .find('[data-testid="input-editar-conhecimento"]')
+      .setValue("Conhecimento Editado");
+
+    vi.mocked(atividadeService.atualizarConhecimento).mockResolvedValue({
+      id: 101,
+      descricao: "Conhecimento Editado",
+    } as any);
+
+    await wrapper
+      .find('[data-testid="btn-salvar-edicao-conhecimento"]')
+      .trigger("click");
+
+    expect(atividadeService.atualizarConhecimento).toHaveBeenCalledWith(
+      1,
+      101,
+      expect.objectContaining({ descricao: "Conhecimento Editado" }),
+    );
   });
 
   it("deve tratar disponibilizacao de revisao", async () => {
