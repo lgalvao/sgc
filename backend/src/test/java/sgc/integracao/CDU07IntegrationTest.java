@@ -100,6 +100,10 @@ public class CDU07IntegrationTest {
                 .andExpect(jsonPath("$.unidade.nome").value("Se&ccedil;&atilde;o de Sistemas Eleitorais"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
                 .andExpect(jsonPath("$.localizacaoAtual").value(UNIDADE_SIGLA))
+                .andExpect(jsonPath("$.processoDescricao").value("Processo de Teste"))
+                .andExpect(jsonPath("$.tipoProcesso").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.responsavel.tipoResponsabilidade").value("Substituição"))
+                .andExpect(jsonPath("$.titular").exists())
                 .andExpect(jsonPath("$.movimentacoes[0].descricao").value("Subprocesso iniciado"));
         }
 
