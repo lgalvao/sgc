@@ -7,6 +7,7 @@ import sgc.sgrh.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
 import java.util.Comparator;
@@ -18,6 +19,9 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
 
     @Autowired
     private ProcessoDetalheMapper delegate;
+
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
     @Override
     public ProcessoDetalheDto toDetailDTO(Processo processo) {
@@ -34,8 +38,9 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
                 .build();
 
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
         // Montar a hierarquia de unidades participantes
-        montarHierarquiaUnidades(dto, processo, List.of());
+        montarHierarquiaUnidades(dto, processo, subprocessos);
         
         return dto;
     }
@@ -73,6 +78,10 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
 
         for (Subprocesso sp : subprocessos) {
             ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = mapaUnidades.get(sp.getUnidade().getCodigo());
+            if (unidadeDto != null) {
+                unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
+                unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
+            }
         }
 
         // Monta a hierarquia
