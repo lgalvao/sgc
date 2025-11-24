@@ -68,7 +68,10 @@ export {
     verificarCriacaoSubprocessos,
     verificarCamposProcessoDesabilitados,
     verificarSituacaoProcesso,
-    verificarBotaoIniciarProcessoInvisivel
+    verificarBotaoIniciarProcessoInvisivel,
+    verificarMapaVazioCriadoParaSubprocesso,
+    verificarMovimentacaoInicialSubprocesso,
+    verificarAlertaInicioProcesso
 } from './verificacoes-processo';
 
 // Verificações de UI

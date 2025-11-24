@@ -1,17 +1,5 @@
-import {Locator, Page} from '@playwright/test';
-import logger from '../../../frontend/src/utils/logger';
-
-/**
- * Extrai o ID de um seletor completo ou retorna o valor se já for um ID simples.
- * Converte '[data-testid="id"]' para 'id' e '[data-testid="id"] tbody tr' para 'id'
- * @param selector O seletor completo ou ID simples.
- * @returns O ID extraído.
- */
-export function extrairIdDoSeletor(selector: string): string {
-    if (!selector.includes('[data-testid=')) return selector;
-    const match = selector.match(/"([^"]+)"/);
-    return match ? match[1] : selector;
-}
+import { Page } from '@playwright/test';
+import { logger } from './logger';
 
 /**
  * Gera um nome único adicionando um timestamp a um prefixo.
@@ -48,94 +36,5 @@ export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade:
     } catch (error) {
         // Falha silenciosa - se não conseguir limpar, teste tentará rodar mesmo assim
         logger.warn('Aviso: Não foi possível limpar processos:', error);
-    }
-}
-
-/**
- * Localiza um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
- * @param pageOrLocator A instância da página ou um localizador do Playwright.
- * @param testId O test-id do elemento.
- * @param role A role do elemento.
- * @param name O nome do elemento.
- * @param locatorFallback Um seletor de fallback.
- * @returns O localizador do elemento.
- */
-export async function localizarPorTestIdOuRole(pageOrLocator: Page | Locator, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<Locator> {
-    const page = pageOrLocator as Page;
-    if (testId) {
-        const byTestId = page.getByTestId(testId);
-        if ((await byTestId.count()) > 0) return byTestId;
-    }
-
-    if (role && name) {
-        const byRole = page.getByRole(role as any, {name});
-        if ((await byRole.count()) > 0) return byRole;
-    }
-
-    if (name) {
-        const byText = page.getByText(name);
-        if ((await byText.count()) > 0) return byText;
-    }
-
-    if (locatorFallback) {
-        const byLocator = page.locator(locatorFallback);
-        if ((await byLocator.count()) > 0) return byLocator;
-    }
-
-    // Último recurso: retornar locator do testId (mesmo que vazio) para que o chamador lide com erro.
-    return page.getByTestId(testId || '');
-}
-
-/**
- * Clica em um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
- * @param page A instância da página do Playwright.
- * @param testId O test-id do elemento.
- * @param role A role do elemento.
- * @param name O nome do elemento.
- * @param locatorFallback Um seletor de fallback.
- * @returns `true` se o clique foi bem-sucedido, `false` caso contrário.
- */
-export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<boolean> {
-    const el = await localizarPorTestIdOuRole(page, testId, role, name, locatorFallback);
-    if ((await el.count()) === 0) return false;
-    const first = el.first();
-
-    // Tenta o click normal primeiro; se falhar por backdrop/animation, aplica fallbacks seguros.
-    try {
-        await first.click();
-        return true;
-    } catch {
-        // 1) Tentar elemento via elementHandle + evaluate (click via DOM)
-        try {
-            const handle = await first.elementHandle();
-            if (handle) {
-                await handle.evaluate((node: HTMLElement) => (node as HTMLElement).click());
-                return true;
-            }
-        } catch {
-            // continua para próximo fallback
-        }
-
-        // 2) Tentar clique forçado (force: true)
-        try {
-            await first.click({force: true});
-            return true;
-        } catch {
-            // continua para próximo fallback
-        }
-
-        // 3) Se houver backdrop que intercepta pointer eventos, desabilitar pointerEvents via evaluateAll e tentar novamente
-        try {
-            await page.locator('.modal-backdrop, .modal.fade.show').evaluateAll((nodes: Element[]) => {
-                nodes.forEach(n => {
-                    (n as HTMLElement).style.pointerEvents = 'none';
-                });
-            });
-            await first.click({timeout: 3000});
-            return true;
-        } catch {
-            // falha final — retornar false para que o chamador trate/report
-            return false;
-        }
     }
 }
