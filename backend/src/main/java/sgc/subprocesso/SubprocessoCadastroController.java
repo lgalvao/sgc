@@ -70,6 +70,14 @@ public class SubprocessoCadastroController {
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Usuario usuario
     ) {
+        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
+        if (faltando != null && !faltando.isEmpty()) {
+            var lista = faltando.stream()
+                    .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
+                    .toList();
+            throw new ErroValidacao("Existem atividades sem conhecimentos associados.", Map.of("atividadesSemConhecimento", lista));
+        }
+
         subprocessoWorkflowService.disponibilizarCadastro(codSubprocesso, usuario);
         return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }

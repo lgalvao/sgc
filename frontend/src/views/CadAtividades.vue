@@ -641,6 +641,7 @@ function disponibilizarCadastro() {
       "Atividades Incompletas",
       `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
     );
+    return;
   }
 
   mostrarModalConfirmacao.value = true;
