@@ -23,7 +23,7 @@ test.describe('CDU-14: Analisar revisão de cadastro de atividades e conheciment
 
     test.beforeEach(async ({ page }) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO CDU-14');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [1]);
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', ['STIC']);
     });
 
     test('deve apresentar ações adequadas para cada perfil', async ({page}) => {

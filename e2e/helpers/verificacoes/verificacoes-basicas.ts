@@ -9,13 +9,7 @@ import {SELETORES, TEXTOS, URLS} from '../dados';
 export async function esperarMensagemSucesso(page: Page, mensagem: string): Promise<void> {
     const seletorNotificacao = `[data-testid^="notificacao-"]`;
     const notificacao = page.locator(seletorNotificacao, {hasText: mensagem});
-    try {
-        await notificacao.first().waitFor({state: 'visible'});
-    } catch {
-        const parcial = mensagem.split(' ').slice(0, 3).join(' ');
-        const alternativa = page.locator(seletorNotificacao, {hasText: parcial});
-        await alternativa.first().waitFor({state: 'visible'});
-    }
+    await notificacao.first().waitFor({state: 'visible'});
 }
 
 /**
@@ -40,23 +34,19 @@ export async function esperarTextoVisivel(page: Page, texto: string): Promise<vo
 /**
  * Espera que um elemento seja exibido na página.
  * @param page A instância da página do Playwright.
- * @param testId O test-id do elemento (pode ser um ID simples ou seletor completo).
+ * @param testId O test-id do elemento.
  */
 export async function esperarElementoVisivel(page: Page, testId: string): Promise<void> {
-    // Extrai o ID se receber um seletor completo como '[data-testid="id"]'
-    const idExtraido = testId.includes('[data-testid=') ? testId.match(/"([^"]+)"/)?.[1] || testId : testId;
-    await expect(page.getByTestId(idExtraido).first()).toBeVisible();
+    await expect(page.getByTestId(testId).first()).toBeVisible();
 }
 
 /**
  * Espera que um elemento não seja exibido na página.
  * @param page A instância da página do Playwright.
- * @param seletor O seletor do elemento (pode ser um ID simples ou seletor completo).
+ * @param testId O test-id do elemento.
  */
-export async function esperarElementoInvisivel(page: Page, seletor: string): Promise<void> {
-    // Extrai o ID se receber um seletor completo como '[data-testid="id"]'
-    const idExtraido = seletor.includes('[data-testid=') ? seletor.match(/"([^"]+)"/)?.[1] || seletor : seletor;
-    await expect(page.getByTestId(idExtraido).first()).not.toBeVisible();
+export async function esperarElementoInvisivel(page: Page, testId: string): Promise<void> {
+    await expect(page.getByTestId(testId).first()).not.toBeVisible();
 }
 
 /**
@@ -65,7 +55,8 @@ export async function esperarElementoInvisivel(page: Page, seletor: string): Pro
  * @param url O padrão da URL.
  */
 export async function verificarUrl(page: Page, url: string): Promise<void> {
-    const regexUrl = new RegExp(url.replace(/\*\*/g, '.*'));
+    // Remove fallback replacement logic
+    const regexUrl = new RegExp(url);
     await expect(page).toHaveURL(regexUrl);
 }
 
@@ -75,11 +66,7 @@ export async function verificarUrl(page: Page, url: string): Promise<void> {
  * @param url O padrão da URL.
  */
 export async function esperarUrl(page: Page, url: string | RegExp): Promise<void> {
-    if (typeof url === 'string') {
-        await expect(page).toHaveURL(new RegExp(url));
-    } else {
-        await expect(page).toHaveURL(url);
-    }
+    await expect(page).toHaveURL(url);
 }
 
 /**
@@ -131,14 +118,12 @@ export async function esperarNotificacaoLoginInvalido(page: Page): Promise<void>
  * @param notificacaoTestId O test-id da notificação.
  */
 export async function verificarDisponibilizacaoConcluida(page: Page, modalTestId: string = 'disponibilizar-modal', notificacaoTestId: string = 'notificacao-disponibilizacao'): Promise<void> {
+    // Verificação sequencial estrita: modal deve fechar E notificação deve aparecer
     const modal = page.getByTestId(modalTestId);
-    try {
-        await modal.waitFor({state: 'hidden', timeout: 2000});
-        return;
-    } catch {
-        const notificacao = page.getByTestId(notificacaoTestId);
-        await expect(notificacao).toBeVisible();
-    }
+    await expect(modal).toBeHidden();
+
+    const notificacao = page.getByTestId(notificacaoTestId);
+    await expect(notificacao).toBeVisible();
 }
 
 /**
@@ -161,13 +146,17 @@ export async function verificarCampoObservacoesValor(page: Page, valorEsperado: 
 /**
  * Verifica se o botão de disponibilizar está habilitado.
  * @param page A instância da página do Playwright.
- * @param habilitado `true` se o botão deve estar habilitado, `false` caso contrário.
  */
-export async function verificarBotaoDisponibilizarHabilitado(page: Page, habilitado: boolean = true): Promise<void> {
+export async function verificarBotaoDisponibilizarHabilitado(page: Page): Promise<void> {
     const botao = page.getByTestId('btn-disponibilizar');
-    if (habilitado) {
-        await expect(botao).toBeEnabled();
-    } else {
-        await expect(botao).toBeDisabled();
-    }
+    await expect(botao).toBeEnabled();
+}
+
+/**
+ * Verifica se o botão de disponibilizar está desabilitado.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarBotaoDisponibilizarDesabilitado(page: Page): Promise<void> {
+    const botao = page.getByTestId('btn-disponibilizar');
+    await expect(botao).toBeDisabled();
 }

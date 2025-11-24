@@ -22,7 +22,8 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO CDU-07');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]); // Unidade 1 = SEDOC
+        // Alterado [1] para ['STIC']
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['STIC']);
     });
 
     test('deve mostrar detalhes do subprocesso para CHEFE', async ({page}) => {

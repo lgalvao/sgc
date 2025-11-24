@@ -25,7 +25,7 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-20');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [8]); // Unidade 8 = SEDESENV
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SEDESENV']); // Unidade 8 = SEDESENV
         await iniciarProcesso(page);
     });
 

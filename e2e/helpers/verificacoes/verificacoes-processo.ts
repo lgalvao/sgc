@@ -33,27 +33,10 @@ export async function verificarCamposObrigatoriosFormulario(page: Page): Promise
  * @param page A instância da página do Playwright.
  */
 export async function verificarNotificacaoErro(page: Page): Promise<void> {
-    // As notificações aparecem como alerts do Bootstrap ou mensagens inline
-    // Vamos verificar se há alguma mensagem de erro visível
-    const erroSelectors = [
-        '.alert.alert-danger',  // Bootstrap alert
-        '[role="alert"]',        // ARIA alert
-        '.text-danger',          // Texto vermelho
-        '.invalid-feedback:visible', // Feedback de validação do Bootstrap
-    ];
-
-    let encontrado = false;
-    for (const selector of erroSelectors) {
-        const element = page.locator(selector).first();
-        if (await element.isVisible({timeout: 5000}).catch(() => false)) {
-            encontrado = true;
-            break;
-        }
-    }
-
-    if (!encontrado) {
-        throw new Error('Nenhuma mensagem de erro encontrada na página');
-    }
+    // Utiliza o seletor padrão de erro. Se houver múltiplos tipos de erro, o teste deve ser específico.
+    // Para este helper genérico, assumimos o seletor mais comum.
+    const notificacao = page.locator('[data-testid="notificacao-error"]');
+    await expect(notificacao).toBeVisible();
 }
 
 /**
@@ -96,87 +79,15 @@ export async function verificarDialogoConfirmacaoRemocao(page: Page, descricaoPr
 export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
     const mensagemEsperada = `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricaoProcesso}${TEXTOS.PROCESSO_REMOVIDO_FIM}`;
 
-    // 1) Tentar verificar marcador em localStorage (mais robusto em presença de navegação)
-    try {
-        const lastRemoved = await page.evaluate(() => localStorage.getItem('lastRemovedProcess'));
-        if (lastRemoved === descricaoProcesso) {
-            // Remover o marcador para evitar interferência em próximos testes
-            await page.evaluate(() => localStorage.removeItem('lastRemovedProcess'));
-            return;
-        }
-    } catch {
-        // continuar para os fallbacks
-    }
+    // 1) Verificar notificação de sucesso específica
+    await expect(page.locator(`.notification:has-text("${mensagemEsperada}")`)).toBeVisible();
 
-    // 2) Tentar localizar notificação com test-id específico (mais robusto)
-    try {
-        const notificacaoTestId = page.getByTestId('notificacao-remocao');
-        if ((await notificacaoTestId.count()) > 0) {
-            await notificacaoTestId.first().waitFor({state: 'visible'});
-            return; // sucesso
-        }
-    } catch {
-        // continuar para os fallbacks
-    }
+    // 2) Retorno ao painel
+    await expect(page).toHaveURL(URLS.PAINEL);
 
-    // 2) Tentar localizar notificação que contenha exatamente a mensagem canônica
-    try {
-        await page.waitForSelector(`.notification:has-text("${mensagemEsperada}")`,);
-        await expect(page.locator(`.notification:has-text("${mensagemEsperada}")`)).toBeVisible();
-    } catch {
-        // 3) Fallback: procurar qualquer notificação que contenha o nome do processo
-        try {
-            await page.waitForSelector(`.notification:has-text("${descricaoProcesso}")`);
-            await expect(page.locator(`.notification:has-text("${descricaoProcesso}")`)).toBeVisible();
-        } catch {
-            // 4) Se ainda não encontrado, registrar aviso para diagnóstico e prosseguir para verificação de ausência na tabela
-
-            console.warn(`Aviso: não foi possível encontrar notificação de remoção para "${descricaoProcesso}"`);
-        }
-    }
-
-    // Tentar garantir que retornou ao painel — não falhar imediatamente se a navegação for rápida/assíncrona
-    try {
-        await expect(page).toHaveURL(URLS.PAINEL);
-    } catch {
-        // Aviso para diagnóstico, mas continuamos com verificação da tabela
-        console.warn('Aviso: não foi possível confirmar navegação para o painel via URL após remoção.');
-    }
-
-    // Verificar que a linha do processo não está mais presente na tabela de processos.
-    // Usar polling tolerante para lidar com timings assíncronos da UI
-    const timeoutMs = 2000;
-    const intervalMs = 500;
-    const deadline = Date.now() + timeoutMs;
-    let stillPresent = true;
-    while (Date.now() < deadline) {
-        try {
-            const linhaProcesso = page.locator('[data-testid="tabela-processos"] tbody tr').filter({hasText: descricaoProcesso});
-            const count = await linhaProcesso.count();
-            if (count === 0) {
-                stillPresent = false;
-                break;
-            }
-            // se existe, verificar se está invisível
-            const visible = (await linhaProcesso.first().isVisible());
-            if (!visible) {
-                stillPresent = false;
-                break;
-            }
-        } catch (err) {
-            // Se a página/contexto foi fechado inesperadamente, abortamos o loop
-
-            console.warn('Aviso durante verificação de remoção:', err);
-            break;
-        }
-        // aguardar próximo polling
-        await new Promise(res => setTimeout(res, intervalMs));
-    }
-
-    if (stillPresent) {
-        // Falha explícita para diagnóstico (mantemos stack de onde foi chamada)
-        throw new Error(`Linha do processo "${descricaoProcesso}" ainda está presente após ${timeoutMs}ms`);
-    }
+    // 3) Ausência na tabela
+    const linhaProcesso = page.locator('[data-testid="tabela-processos"] tbody tr').filter({hasText: descricaoProcesso});
+    await expect(linhaProcesso).not.toBeVisible();
 }
 
 /**
@@ -375,7 +286,6 @@ export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
     await expect(page.locator(SELETORES.TITULO_MODAL_INICIAR_PROCESSO)).toBeVisible();
     await expect(page.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
-    // Removido: verificação de notificação por email que pode não estar presente no modal atual
 }
 
 /**
@@ -474,16 +384,22 @@ export async function verificarValorCampoDataLimite(page: Page, data: string): P
 }
 
 /**
- * Verifica se o campo Tipo está visível e com valor selecionado.
+ * Verifica se o campo Tipo está visível e opcionalmente verifica seu valor.
  * @param page A instância da página do Playwright.
- * @param valor O valor esperado (opcional).
  */
-export async function verificarCampoTipoVisivel(page: Page, valor?: string): Promise<void> {
+export async function verificarCampoTipoVisivel(page: Page): Promise<void> {
     const selectTipo = page.locator(SELETORES.CAMPO_TIPO);
     await expect(selectTipo).toBeVisible();
-    if (valor) {
-        await expect(selectTipo).toHaveValue(valor);
-    }
+}
+
+/**
+ * Verifica se o campo Tipo tem o valor esperado.
+ * @param page A instância da página do Playwright.
+ * @param valor O valor esperado.
+ */
+export async function verificarCampoTipoValor(page: Page, valor: string): Promise<void> {
+    const selectTipo = page.locator(SELETORES.CAMPO_TIPO);
+    await expect(selectTipo).toHaveValue(valor);
 }
 
 /**
@@ -523,10 +439,12 @@ export async function verificarCriacaoSubprocessos(page: Page, processoId: strin
  */
 export async function verificarCamposProcessoDesabilitados(page: Page): Promise<void> {
     const campoDescricao = page.locator(SELETORES.CAMPO_DESCRICAO);
-    if (await campoDescricao.count() > 0) {
+    // Apenas verifica se o campo existe antes de afirmar estado
+    const count = await campoDescricao.count();
+    if (count > 0) {
         const isDisabled = await campoDescricao.isDisabled();
         const isReadonly = await campoDescricao.getAttribute('readonly');
-        expect(isDisabled || isReadonly !== null).toBeTruthy();
+        expect(isDisabled || isReadonly !== null, 'Campo descrição deve estar desabilitado ou readonly').toBeTruthy();
     }
 }
 

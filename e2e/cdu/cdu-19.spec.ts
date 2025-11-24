@@ -24,7 +24,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-19');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [9]); // Unidade 9 = SEDIA
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SEDIA']); // Unidade 9 = SEDIA
         await iniciarProcesso(page);
         await loginComoChefeSedia(page);
     });

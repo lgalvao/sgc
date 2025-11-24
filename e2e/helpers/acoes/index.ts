@@ -5,7 +5,6 @@ export {
 } from './acoes-login';
 export * from './acoes-atividades';
 export {
-    selecionarUnidadesPorId,
     selecionarUnidadesPorSigla,
     preencherFormularioProcesso,
     selecionarPrimeiraUnidade,
@@ -47,7 +46,8 @@ export {
     clicarBotaoRemover,
     selecionarTipoProcesso,
     preencherDescricao,
-    preencherDataLimite
+    preencherDataLimite,
+    criarEIniciarProcessoBasico
 } from './acoes-processo';
 export * from './acoes-mapa';
 export {
@@ -62,5 +62,3 @@ export {
 } from './acoes-modais';
 export * from './acoes-validacao';
 export * from '../utils/limpeza';
-export * from './acoes-mapa';
-export * from './acoes-modais';
