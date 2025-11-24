@@ -14,6 +14,7 @@ import * as processoService from "@/services/processoService";
 import * as unidadesService from "@/services/unidadesService";
 import { useAnalisesStore } from "@/stores/analises";
 import { useAtividadesStore } from "@/stores/atividades";
+import { useNotificacoesStore } from "@/stores/notificacoes";
 import { useProcessosStore } from "@/stores/processos";
 import { useSubprocessosStore } from "@/stores/subprocessos";
 import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
@@ -320,8 +321,11 @@ describe("CadAtividades.vue", () => {
   });
 
   it("deve disponibilizar o cadastro", async () => {
+    const atividadesComConhecimento = mockAtividades.filter(
+      (a) => a.conhecimentos.length > 0,
+    );
     vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
+      mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
     );
 
     const { wrapper: w } = createWrapper();
@@ -450,8 +454,11 @@ describe("CadAtividades.vue", () => {
         },
       ],
     } as any);
+    const atividadesComConhecimento = mockAtividades.filter(
+      (a) => a.conhecimentos.length > 0,
+    );
     vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
+      mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
     );
 
     const { wrapper: w } = createWrapper(true); // isRevisao = true
@@ -512,12 +519,19 @@ describe("CadAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
+    // Import store to spy on it
+    const notificacoesStore = useNotificacoesStore();
+    const avisoSpy = vi.spyOn(notificacoesStore, "aviso");
+
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
     await flushPromises();
 
-    expect(wrapper.text()).toContain(
-      "As seguintes atividades não têm conhecimentos associados",
+    expect(avisoSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Atividades Incompletas"),
+      expect.stringContaining(
+        "As seguintes atividades não têm conhecimentos associados",
+      ),
     );
-    expect(wrapper.text()).toContain("Atividade 2");
+    expect(avisoSpy.mock.calls[0][1]).toContain("Atividade 2");
   });
 });

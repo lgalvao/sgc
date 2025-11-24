@@ -76,7 +76,7 @@ public class MovimentacaoListener {
 
         Unidade destino = resolveDestino(evento);
         if (destino != null) {
-            notificacaoService.notificarAceiteRevisaoCadastro(sp, destino);
+            notificacaoService.notificarDisponibilizacaoRevisaoCadastro(sp, destino);
         }
     }
 
