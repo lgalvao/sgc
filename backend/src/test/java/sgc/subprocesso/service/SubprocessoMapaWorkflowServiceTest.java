@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -17,17 +18,16 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
+import sgc.processo.eventos.EventoSubprocessoMapaDisponibilizado;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +46,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AtividadeRepo atividadeRepo;
     @Mock private MapaService mapaService;
     @Mock private CompetenciaService competenciaService;
-    @Mock private SubprocessoNotificacaoService subprocessoNotificacaoService;
-    @Mock private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock private ApplicationEventPublisher publicadorDeEventos;
 
     @InjectMocks private SubprocessoMapaWorkflowService service;
 
@@ -131,7 +130,7 @@ class SubprocessoMapaWorkflowServiceTest {
         service.disponibilizarMapa(id, new DisponibilizarMapaRequest(), new Usuario());
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
-        verify(subprocessoNotificacaoService).notificarDisponibilizacaoMapa(sp);
+        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));
     }
 
     @Test
