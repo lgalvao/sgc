@@ -89,6 +89,38 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
+     * Notifica a unidade superior sobre a disponibilização do cadastro de atividades.
+     * Corresponde ao CDU-09.
+     *
+     * @param sp             O subprocesso cujo cadastro foi disponibilizado.
+     * @param unidadeDestino A unidade que realizará a análise.
+     */
+    public void notificarDisponibilizacaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeOrigem = sp.getUnidade().getSigla();
+        String nomeProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidadeDestino = unidadeDestino.getSigla();
+
+        java.util.Map<String, Object> variaveis = new java.util.HashMap<>();
+        variaveis.put("siglaUnidadeOrigem", siglaUnidadeOrigem);
+        variaveis.put("siglaUnidadeDestino", siglaUnidadeDestino);
+        variaveis.put("nomeProcesso", nomeProcesso);
+
+        String assunto = "SGC: Cadastro de atividades e conhecimentos disponibilizado: " + siglaUnidadeOrigem;
+        String corpo = processarTemplate("email/disponibilizacao-cadastro.html", variaveis);
+        notificacaoEmailService.enviarEmail(siglaUnidadeDestino, assunto, corpo);
+
+        criarEsalvarAlerta(
+                "Cadastro de atividades/conhecimentos da unidade " + siglaUnidadeOrigem + " disponibilizado para análise",
+                sp.getProcesso(),
+                sp.getUnidade(),
+                unidadeDestino,
+                null
+        );
+    }
+
+    /**
      * Notifica a unidade superior sobre a apresentação de sugestões em um mapa.
      *
      * @param sp O subprocesso no qual as sugestões foram feitas.

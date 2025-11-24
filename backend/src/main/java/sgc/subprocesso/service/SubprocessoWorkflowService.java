@@ -42,6 +42,8 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
+        analiseService.removerPorSubprocesso(sp.getCodigo());
+
         Unidade unidadeSuperior = sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
 
         publicadorDeEventos.publishEvent(EventoSubprocessoCadastroDisponibilizado.builder()

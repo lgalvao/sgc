@@ -128,10 +128,10 @@ class CDU09IntegrationTest {
             var alertas = alertaRepo.findByProcessoCodigo(subprocessoMapeamento.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL submetido para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades/conhecimentos da unidade SESEL disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            verify(subprocessoNotificacaoService).notificarAceiteCadastro(
+            verify(subprocessoNotificacaoService).notificarDisponibilizacaoCadastro(
                     org.mockito.ArgumentMatchers.any(Subprocesso.class),
                     org.mockito.ArgumentMatchers.any(Unidade.class)
             );
@@ -145,7 +145,8 @@ class CDU09IntegrationTest {
 
             mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.message", is("Existem atividades sem conhecimentos associados.")));
+                    .andExpect(jsonPath("$.message", is("Existem atividades sem conhecimentos associados.")))
+                    .andExpect(jsonPath("$.details.atividadesSemConhecimento[0].descricao", is("Atividade Vazia")));
 
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoMapeamento.getCodigo()).orElseThrow();
             assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
