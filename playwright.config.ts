@@ -13,11 +13,19 @@ export default defineConfig({
     globalTeardown: require.resolve('./e2e/setup/global-teardown'),
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
 
-    webServer: {
-        command: 'npm --prefix ./frontend run dev',
-        url: 'http://localhost:5173',
-        reuseExistingServer: !process.env.CI,
-    },
+    webServer: [
+        {
+            command: 'npm --prefix ./frontend run dev',
+            url: 'http://localhost:5173',
+            reuseExistingServer: !process.env.CI,
+        },
+        {
+            command: 'gradlew.bat :backend:bootRunE2E',
+            url: 'http://localhost:10000/actuator/health',
+            reuseExistingServer: !process.env.CI,
+            timeout: 120 * 1000,
+        }
+    ],
     use: {
         baseURL: 'http://localhost:5173',
         trace: 'retain-on-failure'

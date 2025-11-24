@@ -2,26 +2,25 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.service.CompetenciaService;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
+import sgc.processo.eventos.EventoSubprocessoMapaDisponibilizado;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
-import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-
 
 import java.util.stream.Collectors;
 
@@ -34,8 +33,7 @@ public class SubprocessoMapaWorkflowService {
     private final AtividadeRepo atividadeRepo;
     private final MapaService mapaService;
     private final CompetenciaService competenciaService;
-    private final SubprocessoNotificacaoService subprocessoNotificacaoService;
-    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
+    private final ApplicationEventPublisher publicadorDeEventos;
 
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
@@ -100,13 +98,12 @@ public class SubprocessoMapaWorkflowService {
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         repositorioSubprocesso.save(subprocesso);
 
-        registrarMovimentacao(
-            subprocesso,
-            "Disponibilização do mapa de competências para validação.",
-            usuario
-        );
-
-        subprocessoNotificacaoService.notificarDisponibilizacaoMapa(subprocesso);
+        publicadorDeEventos.publishEvent(EventoSubprocessoMapaDisponibilizado.builder()
+                .codSubprocesso(codSubprocesso)
+                .usuario(usuario)
+                .unidadeOrigem(subprocesso.getUnidade())
+                .unidadeDestino(subprocesso.getUnidade())
+                .build());
 
         log.info("Subprocesso {} atualizado para MAPEAMENTO_CONCLUIDO e mapa disponibilizado.", codSubprocesso);
     }
@@ -135,16 +132,5 @@ public class SubprocessoMapaWorkflowService {
                 .collect(Collectors.joining(", "));
             throw new ErroValidacao("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
         }
-    }
-
-    public void registrarMovimentacao(Subprocesso subprocesso, String descricao, Usuario usuario) {
-        Movimentacao movimentacao = new Movimentacao(
-            subprocesso,
-            subprocesso.getUnidade(),
-            subprocesso.getUnidade(),
-            descricao,
-            usuario
-        );
-        movimentacaoRepo.save(movimentacao);
     }
 }

@@ -60,11 +60,19 @@ async function globalSetup(config: FullConfig) {
     debugLog(`Backend logs will be written to: ${LOG_FILE}`);
 
     try {
-        backendProcess = spawn('./gradlew', [':backend:bootRunE2E', '--quiet', '--args=--spring.profiles.active=e2e'], {
-            stdio: 'pipe', // Capture streams so we can tee them
-            shell: true,
-            cwd: process.cwd()
-        });
+        if (process.platform === 'win32') {
+            backendProcess = spawn('cmd.exe', ['/c', 'gradlew :backend:bootRunE2E --quiet --args=--spring.profiles.active=e2e'], {
+                stdio: 'pipe', // Capture streams so we can tee them
+                shell: false, // shell: false since we're explicitly calling cmd.exe
+                cwd: process.cwd()
+            });
+        } else {
+            backendProcess = spawn('./gradlew', [':backend:bootRunE2E', '--quiet', '--args=--spring.profiles.active=e2e'], {
+                stdio: 'pipe', // Capture streams so we can tee them
+                shell: true,
+                cwd: process.cwd()
+            });
+        }
 
         if (backendProcess.stdout) {
             backendProcess.stdout.on('data', (data) => {
@@ -180,29 +188,55 @@ async function globalTeardown() {
         try {
             const port = new URL(BACKEND_URL).port;
             if (port) {
-               // Find PID using lsof and kill it
-               const { execSync } = require('child_process');
-               try {
-                   // Check if lsof is available
-                   try {
-                     execSync('lsof -v', { stdio: 'ignore' });
-                   } catch (e) {
-                     // lsof not available
-                   }
+                const { execSync } = require('child_process');
+                if (process.platform === 'win32') {
+                    try {
+                        const output = execSync(`netstat -ano | findstr :${port}`).toString();
+                        const lines = output.split('\n');
+                        for (const line of lines) {
+                            const parts = line.trim().split(/\s+/);
+                            // Find the PID in the last column
+                            // Check for 'LISTENING' state and IPv4/IPv6 address.
+                            // Example for IPv4: TCP    127.0.0.1:10000        0.0.0.0:0              LISTENING       1234
+                            // Example for IPv6: TCP    [::]:10000             [::]:0                 LISTENING       5678
+                            if (parts.length >= 5 && parts[4] === 'LISTENING' && (parts[1].includes(`:${port}`) || parts[2].includes(`:${port}`))) {
+                                const pid = parts[parts.length - 1];
+                                if (pid) {
+                                    logger.warn(`Force killing backend process on port ${port} (PID: ${pid}) using taskkill...`);
+                                    execSync(`taskkill /PID ${pid} /F`);
+                                    // Do not break here. netstat might return multiple lines for a single port, e.g., both IPv4 and IPv6.
+                                    // We want to make sure all processes related to this port are killed.
+                                }
+                            }
+                        }
+                    } catch (e: any) {
+                        // Ignore if no process found or other error
+                        debugLog(`Error while trying to kill process on port ${port} (Windows): ${e.message}`);
+                    }
+                } else {
+                    // Original lsof logic for Unix-like systems
+                    try {
+                        // Check if lsof is available
+                        try {
+                            execSync('lsof -v', { stdio: 'ignore' });
+                        } catch (e) {
+                            // lsof not available
+                        }
 
-                   // Use lsof to check if port is still in use
-                   try {
-                       const pid = execSync(`lsof -t -i:${port}`).toString().trim();
-                       if (pid) {
-                           logger.warn(`Force killing backend process on port ${port} (PID: ${pid})...`);
-                           process.kill(parseInt(pid), 'SIGKILL');
-                       }
-                   } catch (e) {
-                       // No process on port, all good
-                   }
-               } catch (e) {
-                   // Ignore
-               }
+                        // Use lsof to check if port is still in use
+                        try {
+                            const pid = execSync(`lsof -t -i:${port}`).toString().trim();
+                            if (pid) {
+                                logger.warn(`Force killing backend process on port ${port} (PID: ${pid})...`);
+                                process.kill(parseInt(pid), 'SIGKILL');
+                            }
+                        } catch (e) {
+                            // No process on port, all good
+                        }
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
             }
         } catch (e) {
             // Ignore URL parsing errors
