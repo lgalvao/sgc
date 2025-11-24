@@ -3,7 +3,6 @@ import {
     apresentarSugestoes,
     cancelarNoModal,
     clicarBotaoHistoricoAnalise,
-    clicarPorTestIdOuRole,
     criarProcessoCompleto,
     esperarElementoInvisivel,
     esperarElementoVisivel,
@@ -58,7 +57,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar apresentação de sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
-        await clicarPorTestIdOuRole(page, SELETORES.BTN_APRESENTAR_SUGESTOES);
+        await page.locator(SELETORES.BTN_APRESENTAR_SUGESTOES).click();
         await esperarElementoVisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
         await cancelarNoModal(page);
         await esperarElementoInvisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
@@ -66,7 +65,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar validação de mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
-        await clicarPorTestIdOuRole(page, SELETORES.BTN_VALIDAR);
+        await page.locator(SELETORES.BTN_VALIDAR).click();
         await esperarElementoVisivel(page, SELETORES.MODAL_VALIDAR);
         await cancelarNoModal(page);
         await esperarElementoInvisivel(page, SELETORES.MODAL_VALIDAR);

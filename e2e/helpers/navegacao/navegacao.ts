@@ -1,7 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
-import {extrairIdDoSeletor} from '../utils/utils';
 
 /**
  * Espera um texto ficar visível na página.
@@ -255,7 +254,7 @@ export async function clicarPrimeiroProcesso(page: Page): Promise<void> {
  * @param nomeProcesso O nome do processo.
  */
 export async function clicarProcesso(page: Page, nomeProcesso: string | RegExp): Promise<void> {
-    await page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_PROCESSOS)).locator('tr', {hasText: nomeProcesso}).click();
+    await page.locator(SELETORES.TABELA_PROCESSOS).locator('tr', {hasText: nomeProcesso}).click();
 }
 
 /**

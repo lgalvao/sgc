@@ -1,6 +1,5 @@
 import {Page} from '@playwright/test';
 import {SELETORES} from '../dados';
-import {extrairIdDoSeletor} from '../utils/utils';
 
 /**
  * Adiciona uma nova atividade.
@@ -8,8 +7,8 @@ import {extrairIdDoSeletor} from '../utils/utils';
  * @param nomeAtividade O nome da atividade a ser adicionada.
  */
 export async function adicionarAtividade(page: Page, nomeAtividade: string): Promise<void> {
-    await page.getByTestId(extrairIdDoSeletor(SELETORES.INPUT_NOVA_ATIVIDADE)).fill(nomeAtividade);
-    await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_ADICIONAR_ATIVIDADE)).click();
+    await page.locator(SELETORES.INPUT_NOVA_ATIVIDADE).fill(nomeAtividade);
+    await page.locator(SELETORES.BTN_ADICIONAR_ATIVIDADE).click();
 }
 
 /**
@@ -20,8 +19,8 @@ export async function adicionarAtividade(page: Page, nomeAtividade: string): Pro
  */
 export async function adicionarConhecimentoNaAtividade(page: Page, nomeAtividade: string, nomeConhecimento: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.INPUT_NOVO_CONHECIMENTO)).fill(nomeConhecimento);
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.BTN_ADICIONAR_CONHECIMENTO)).click();
+    await cardAtividade.locator(SELETORES.INPUT_NOVO_CONHECIMENTO).fill(nomeConhecimento);
+    await cardAtividade.locator(SELETORES.BTN_ADICIONAR_CONHECIMENTO).click();
 }
 
 /**
@@ -32,9 +31,9 @@ export async function adicionarConhecimentoNaAtividade(page: Page, nomeAtividade
  */
 export async function editarAtividade(page: Page, nomeAtual: string, nomeNovo: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtual});
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.BTN_EDITAR_ATIVIDADE)).click();
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.INPUT_EDITAR_ATIVIDADE)).fill(nomeNovo);
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.BTN_SALVAR_EDICAO_ATIVIDADE)).click();
+    await cardAtividade.locator(SELETORES.BTN_EDITAR_ATIVIDADE).click();
+    await cardAtividade.locator(SELETORES.INPUT_EDITAR_ATIVIDADE).fill(nomeNovo);
+    await cardAtividade.locator(SELETORES.BTN_SALVAR_EDICAO_ATIVIDADE).click();
 }
 
 /**
@@ -44,7 +43,7 @@ export async function editarAtividade(page: Page, nomeAtual: string, nomeNovo: s
  */
 export async function removerAtividade(page: Page, nomeAtividade: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-    await cardAtividade.getByTestId(extrairIdDoSeletor(SELETORES.BTN_REMOVER_ATIVIDADE)).click();
+    await cardAtividade.locator(SELETORES.BTN_REMOVER_ATIVIDADE).click();
 }
 
 /**
@@ -57,7 +56,7 @@ export async function removerAtividade(page: Page, nomeAtividade: string): Promi
 export async function editarConhecimento(page: Page, nomeAtividade: string, nomeAtual: string, nomeNovo: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeAtual});
-    await conhecimento.getByTestId(extrairIdDoSeletor(SELETORES.BTN_EDITAR_CONHECIMENTO)).click();
+    await conhecimento.locator(SELETORES.BTN_EDITAR_CONHECIMENTO).click();
     await conhecimento.locator('input[type="text"]').fill(nomeNovo);
     await conhecimento.locator('button[type="submit"]').click();
 }
@@ -71,7 +70,7 @@ export async function editarConhecimento(page: Page, nomeAtividade: string, nome
 export async function removerConhecimento(page: Page, nomeAtividade: string, nomeConhecimento: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento});
-    await conhecimento.getByTestId(extrairIdDoSeletor(SELETORES.BTN_REMOVER_CONHECIMENTO)).click();
+    await conhecimento.locator(SELETORES.BTN_REMOVER_CONHECIMENTO).click();
 }
 
 /**

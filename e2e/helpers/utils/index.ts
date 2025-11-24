@@ -1,5 +1,3 @@
-export { gerarNomeUnico, localizarPorTestIdOuRole, clicarPorTestIdOuRole, limparProcessosCriadosComUnidade } from './utils';
-export { localizarElemento, preencherCampo, clicarElemento } from './refactoring-utils';
+export { gerarNomeUnico, limparProcessosCriadosComUnidade } from './utils';
 export { parseDate } from './date-utils';
-
-
+export { logger, debug, info, warn, error } from './logger';

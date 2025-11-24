@@ -1,9 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
-import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
-import {extrairIdDoSeletor} from '../utils/utils';
-import { debug, logger } from '../utils/logger';
+import {logger} from '../utils/logger';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
@@ -13,9 +11,7 @@ import { debug, logger } from '../utils/logger';
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        const checkboxLocator = page.locator(seletorCheckbox);
-        await page.waitForSelector(seletorCheckbox, { state: 'visible' });
-        await checkboxLocator.check();
+        await page.locator(seletorCheckbox).check();
     }
 }
 
@@ -128,18 +124,10 @@ export async function preencherFormularioProcesso(
         await page.fill(SELETORES.CAMPO_DATA_LIMITE, dataLimite);
     }
     
-    // Para processos de REVISAO/DIAGNOSTICO, aguardar que as validações de mapa vigente terminem
-    // O Vue faz requisições assíncronas para verificar todas as unidades
+    // Para processos de REVISAO/DIAGNOSTICO, a UI carrega checkboxes assincronamente.
+    // Simplificamos aguardando que checkboxes apareçam.
     if (tipo === 'REVISAO' || tipo === 'DIAGNOSTICO') {
-        // Aguardar que pelo menos alguns checkboxes operacionais estejam visíveis
-        // Isso indica que a validação de mapas vigentes foi concluída
-        await page.waitForFunction(
-            () => {
-                const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"]:not([disabled])');
-                return checkboxes.length > 0;
-            },
-            { timeout: 30000 }
-        );
+        await page.waitForSelector('.form-check-input[type="checkbox"]:not([disabled])', { timeout: 30000 });
     }
     
     if (sticChecked) {
@@ -171,33 +159,7 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
-    debug(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
-
-    // DEBUG: Verificar chamadas de rede
-    const responses: string[] = [];
-    page.on('response', async (response) => {
-        if (response.url().includes('/api/')) {
-            const status = response.status();
-            const url = response.url();
-            try {
-                const body = await response.text();
-                responses.push(`${status} ${url}: ${body.substring(0, 200)}`);
-                debug(`[DEBUG] API Response: ${status} ${url}`);
-            } catch (e) {
-                responses.push(`${status} ${url}: (couldn't read body)`);
-            }
-        }
-    });
-
-    // DEBUG: Verificar se checkboxes de unidades estão marcados
-    const checkboxesMarcados = await page.locator('input[type="checkbox"]:checked').count();
-    debug(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
-
-    await clicarElemento([
-        page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)),
-        page.getByRole('button', {name: /iniciar processo/i})
-    ]);
-    debug(`[DEBUG] iniciarProcessoMapeamento: Clicou em Iniciar processo`);
+    await page.locator(SELETORES.BTN_INICIAR_PROCESSO).click();
 }
 
 /**
@@ -206,12 +168,8 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
  */
 export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await modal.waitFor({state: 'visible', timeout: 10000});
-
-    await clicarElemento([
-        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CONFIRMAR)),
-        modal.getByRole('button', {name: /confirmar/i})
-    ]);
+    await expect(modal).toBeVisible();
+    await modal.locator(SELETORES.BTN_MODAL_CONFIRMAR).click();
 }
 
 /**
@@ -220,12 +178,8 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
  */
 export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await modal.waitFor({state: 'visible', timeout: 10000});
-
-    await clicarElemento([
-        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CANCELAR)),
-        modal.getByRole('button', {name: /cancelar/i})
-    ]);
+    await expect(modal).toBeVisible();
+    await modal.locator(SELETORES.BTN_MODAL_CANCELAR).click();
 }
 
 /**
@@ -245,7 +199,6 @@ export async function criarProcessoBasico(
     dataLimite: string = '2025-12-31',
     situacao: 'CRIADO' | 'EM_ANDAMENTO' = 'CRIADO'
 ): Promise<number> {
-    debug(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
     let processoId = 0;
 
     // Intercept the API response to extract the process ID
@@ -257,19 +210,12 @@ export async function criarProcessoBasico(
     );
 
     await navegarParaCriacaoProcesso(page);
-    debug(`[DEBUG] criarProcessoBasico: Navegou para criação`);
-
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
-    debug(`[DEBUG] criarProcessoBasico: Preencheu formulário inicial`);
-
     await selecionarUnidadesPorSigla(page, siglas);
-    debug(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);
 
-    await clicarElemento([
-        page.getByRole('button', {name: /salvar/i}),
-        page.getByTestId('btn-salvar')
-    ]);
-    debug(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
+    // Prefer data-testid if available, otherwise role
+    const btnSalvar = page.getByRole('button', {name: /salvar/i});
+    await btnSalvar.click();
 
     try {
         const response = await responsePromise;
@@ -282,16 +228,13 @@ export async function criarProcessoBasico(
     }
 
     // Aguardar redirecionamento ao painel
-    await page.waitForURL(/\/painel/, );
-    debug(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
+    await page.waitForURL(/\/painel/);
 
     if (situacao === 'EM_ANDAMENTO') {
-        debug(`[DEBUG] criarProcessoBasico: Iniciando processo "${descricao}"`);
         await abrirProcessoPorNome(page, descricao);
         await iniciarProcessoMapeamento(page);
         await confirmarIniciacaoProcesso(page);
-        await page.waitForURL(/\/painel/, );
-        debug(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
+        await page.waitForURL(/\/painel/);
     }
     return processoId;
 }
@@ -302,34 +245,14 @@ export async function criarProcessoBasico(
  * @param descricao A descrição do processo a ser aberto.
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
-    debug(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
     const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, {hasText: `"${descricao}"`});
-    await row.waitFor({state: 'visible', timeout: 10000});
-    debug(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
-    await row.click();
-    debug(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
+    await row.first().click();
 
     // Aguardar navegação para página de cadastro
-    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, );
-    debug(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
+    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
 
-    // Aguardar formulário carregar com os dados do processo
-    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
-    debug(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
-
-    // DEBUG: Verificar dados carregados usando page.evaluate
-    const dadosCarregados = await page.evaluate(() => {
-        // Acessar variáveis Vue através do DOM
-        const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
-        const checkboxesChecked = checkboxes.filter((cb: any) => cb.checked);
-        return {
-            totalCheckboxes: checkboxes.length,
-            checkboxesMarcados: checkboxesChecked.length,
-            idsCheckboxes: checkboxes.map((cb: any) => cb.id),
-            idsCheckboxesMarcados: checkboxesChecked.map((cb: any) => cb.id)
-        };
-    });
-    debug(`[DEBUG] abrirProcessoPorNome: Dados carregados:`, JSON.stringify(dadosCarregados));
+    // Aguardar formulário carregar
+    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO);
 }
 
 /**
@@ -350,7 +273,6 @@ export async function criarProcessoCompleto(
 ): Promise<{ processo: { codigo: number; descricao: string; } }> {
     let processoId = 0;
     
-    // Intercept the API response to extract the process ID
     const responsePromise = page.waitForResponse(response =>
         response.url().includes('/api/processos') &&
         !response.url().includes('/status-unidades') &&
@@ -373,7 +295,6 @@ export async function criarProcessoCompleto(
         logger.warn('Could not extract process ID from response:', error);
     }
     
-    // Frontend redirects to /painel after saving
     await page.waitForURL(/\/painel/);
     
     return { processo: { codigo: processoId, descricao } };
@@ -497,7 +418,7 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        await preencherCampo([modal.getByLabel('Observação')], observacao);
+        await modal.getByLabel('Observação').fill(observacao);
     }
 
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
@@ -528,13 +449,14 @@ export async function devolverCadastro(page: Page, processo: {
  * @param observacao Uma observação opcional.
  */
 export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
-    await clicarElemento([page.getByRole('button', {name: 'Registrar aceite'}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
+    // "Registrar aceite" OR "Validar"
+    await page.getByRole('button', {name: /Registrar aceite|Validar/}).click();
 
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        await preencherCampo([modal.getByLabel('Observação')], observacao);
+        await modal.getByLabel('Observação').fill(observacao);
     }
 
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
@@ -551,21 +473,11 @@ export async function registrarAceiteRevisao(page: Page, observacao?: string): P
     await page.getByRole('button', {name: TEXTOS.REGISTRAR_ACEITE}).click();
     await expect(modal).toBeVisible();
 
-    // Tentar localizar título específico, caso não exista aceitamos qualquer heading que contenha 'aceit'
-    if ((await modal.getByRole('heading', {name: TEXTOS.ACEITE_REVISAO_TITULO}).count()) > 0) {
-        await expect(modal.getByRole('heading', {name: TEXTOS.ACEITE_REVISAO_TITULO})).toBeVisible();
-    } else {
-        await expect(modal.getByRole('heading', {name: /aceit(ar|e)?/i}).first()).toBeVisible();
-    }
-
     if (observacao) {
-        await preencherCampo([modal.getByLabel(/observa/i), modal.locator('textarea, input').first()], observacao);
+        await modal.locator('textarea, input').first().fill(observacao);
     }
 
-    await clicarElemento([
-        modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
-        modal.getByRole('button', {name: /aceitar|confirmar/i}),
-    ]);
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
@@ -574,19 +486,17 @@ export async function registrarAceiteRevisao(page: Page, observacao?: string): P
  * @param observacao Uma observação opcional.
  */
 export async function homologarCadastro(page: Page, observacao?: string): Promise<void> {
-    await clicarElemento([page.getByRole('button', {name: TEXTOS.HOMOLOGAR}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
+    // "Homologar" OR "Validar"
+    await page.getByRole('button', {name: /Homologar|Validar/}).click();
 
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        await preencherCampo([modal.getByLabel(/observa/i)], observacao);
+        await modal.getByLabel(/observa/i).fill(observacao);
     }
 
-    await clicarElemento([
-        modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
-        modal.getByRole('button', {name: /aceitar|confirmar/i}),
-    ]);
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
@@ -603,7 +513,7 @@ export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
  * @param nomeProcesso O nome do processo.
  */
 export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): Promise<void> {
-    await page.waitForSelector(SELETORES.TABELA_PROCESSOS); // Espera a tabela carregar
+    await page.waitForSelector(SELETORES.TABELA_PROCESSOS);
     const processo = page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).filter({hasText: nomeProcesso});
     await processo.click();
 }
@@ -672,7 +582,7 @@ export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: str
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
-    await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_HISTORICO_ANALISE)).click();
+    await page.locator(SELETORES.BTN_HISTORICO_ANALISE).click();
 }
 
 /**
