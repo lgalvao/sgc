@@ -2,30 +2,24 @@ import {expect, Locator, Page} from '@playwright/test';
 import {ROTULOS, SELETORES, TEXTOS, URLS} from '../dados';
 import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/helpers';
 
-// TODO Por que chamar de 'verificacoes-ui.ts' se tudo nessas verificacoes é de ui? A quebra me parece arbitrária.
-
 /**
  * Verifica se um conhecimento em uma atividade específica está visível.
- * @param pageOrCard A instância da página ou um localizador do Playwright.
- * @param nomeAtividadeOuConhecimento O nome da atividade ou do conhecimento.
- * @param nomeConhecimento O nome do conhecimento (se o primeiro argumento for a página).
+ * @param page A instância da página do Playwright.
+ * @param nomeAtividade O nome da atividade.
+ * @param nomeConhecimento O nome do conhecimento.
  */
-export async function verificarConhecimentoVisivel(pageOrCard: Page | Locator, nomeAtividadeOuConhecimento: string, nomeConhecimento?: string): Promise<void> {
-    let cardAtividade: Locator;
-    let conhecimento: string;
+export async function verificarConhecimentoVisivel(page: Page, nomeAtividade: string, nomeConhecimento: string): Promise<void> {
+    const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
+    await expect(cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento})).toBeVisible();
+}
 
-    if (typeof nomeConhecimento === 'string') {
-        // Assinatura: (page, nomeAtividade, nomeConhecimento)
-        const page = pageOrCard as Page;
-        cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividadeOuConhecimento});
-        conhecimento = nomeConhecimento;
-    } else {
-        // Assinatura: (cardLocator, nomeConhecimento)
-        cardAtividade = pageOrCard as Locator;
-        conhecimento = nomeAtividadeOuConhecimento;
-    }
-
-    await expect(cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: conhecimento})).toBeVisible();
+/**
+ * Verifica se um conhecimento está visível dado um locator de card de atividade.
+ * @param cardAtividade O locator do card da atividade.
+ * @param nomeConhecimento O nome do conhecimento.
+ */
+export async function verificarConhecimentoVisivelNoCard(cardAtividade: Locator, nomeConhecimento: string): Promise<void> {
+    await expect(cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento})).toBeVisible();
 }
 
 /**
@@ -36,9 +30,8 @@ export async function verificarElementosPainel(page: Page): Promise<void> {
     await esperarElementoVisivel(page, SELETORES.TITULO_PROCESSOS);
     await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
 
-    // Verificações para a Tabela de Processos
     const tabelaProcessos = page.locator(SELETORES.TABELA_PROCESSOS);
-    await expect(tabelaProcessos).toBeVisible(); // Ensure the table itself is visible
+    await expect(tabelaProcessos).toBeVisible();
     await expect(tabelaProcessos.getByRole('columnheader', { name: 'Descrição' })).toBeVisible();
     await expect(tabelaProcessos.getByRole('columnheader', { name: 'Tipo' })).toBeVisible();
     await expect(tabelaProcessos.getByRole('columnheader', { name: 'Situação' })).toBeVisible();
@@ -56,20 +49,24 @@ export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<v
  * Verifica se um processo está visível na tabela de processos.
  * @param page A instância da página do Playwright.
  * @param nomeProcesso O nome do processo.
- * @param visivel `true` se o processo deve estar visível, `false` caso contrário.
  */
-export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean): Promise<void> {
+export async function verificarProcessoVisivel(page: Page, nomeProcesso: string | RegExp): Promise<void> {
     const tabela = page.locator(SELETORES.TABELA_PROCESSOS);
-
-    // Esperar a tabela estar visível primeiro
     await expect(tabela).toBeVisible();
-
     const processo = tabela.locator('tbody tr').filter({ hasText: nomeProcesso });
-    if (visivel) {
-        await expect(processo).toBeVisible();
-    } else {
-        await expect(processo).toBeHidden();
-    }
+    await expect(processo).toBeVisible();
+}
+
+/**
+ * Verifica se um processo não está visível na tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param nomeProcesso O nome do processo.
+ */
+export async function verificarProcessoInvisivel(page: Page, nomeProcesso: string | RegExp): Promise<void> {
+    const tabela = page.locator(SELETORES.TABELA_PROCESSOS);
+    await expect(tabela).toBeVisible();
+    const processo = tabela.locator('tbody tr').filter({ hasText: nomeProcesso });
+    await expect(processo).toBeHidden();
 }
 
 /**
@@ -87,44 +84,28 @@ export async function verificarSelecaoArvoreCheckboxes(page: Page): Promise<void
  */
 export async function verificarComportamentoMarcacaoCheckbox(page: Page): Promise<void> {
     const primeiroCheckbox = page.locator(SELETORES.CHECKBOX).first();
-
-    // Deve estar marcado inicialmente (após seleção)
     await expect(primeiroCheckbox).toBeChecked();
-
-    // Desmarcar e verificar
     await primeiroCheckbox.click();
     await expect(primeiroCheckbox).not.toBeChecked();
 }
 
 /**
- * Verifica o comportamento de checkboxes interoperacionais.
+ * Verifica o comportamento de checkboxes interoperacionais (ex: STIC e COSIS).
+ * Assume que STIC e COSIS existem na página.
  * @param page A instância da página do Playwright.
  */
 export async function verificarComportamentoCheckboxInteroperacional(page: Page): Promise<void> {
-    // Garantir que os checkboxes foram renderizados
-    await page.waitForSelector('#chk-STIC');
-
     const chkStic = page.locator('#chk-STIC');
     const chkCosis = page.locator('#chk-COSIS');
 
-    // Selecionar a unidade interoperacional raiz (STIC)
     await chkStic.click();
-
-    // A raiz deve estar marcada
     await expect(chkStic).toBeChecked();
+    // COSIS não deve ser marcado automaticamente
+    await expect(chkCosis).not.toBeChecked();
 
-    // Se COSIS existe, não deve estar marcada automaticamente
-    const cosisExists = await chkCosis.count() > 0;
-    if (cosisExists) {
-        await expect(chkCosis).not.toBeChecked();
-    }
-
-    // Desmarcar STIC não deve afetar filhos
     await chkStic.click();
     await expect(chkStic).not.toBeChecked();
-    if (cosisExists) {
-        await expect(chkCosis).not.toBeChecked();
-    }
+    await expect(chkCosis).not.toBeChecked();
 }
 
 /**
@@ -355,21 +336,29 @@ export async function verificarAlertasOrdenadosPorDataHora(page: Page): Promise<
  * @param page A instância da página do Playwright.
  */
 export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<void> {
-    // Espera explícita pelo modal, pois pode ser aberto após requisições assíncronas
     await page.waitForSelector(SELETORES.MODAL_VISIVEL);
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-
-    // Aceitamos variações como "Histórico de Análise" ou "Histórico de Análises"
     await expect(modal.getByRole('heading', {name: /Histórico de Análises?/i}).first()).toBeVisible();
+}
 
-    // Se o modal informar que não há análises, consideramos o modal válido
-    if ((await modal.getByText(/nenhuma análise registrada/i).count()) > 0) {
-        return;
-    }
+/**
+ * Verifica se o modal de histórico de análise está vazio (sem análises).
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarModalHistoricoAnaliseVazio(page: Page): Promise<void> {
+    await verificarModalHistoricoAnaliseAberto(page);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
+    await expect(modal.getByText(/nenhuma análise registrada/i)).toBeVisible();
+}
 
-    // Verificações tolerantes a variações (singular/plural e capitalização).
-    // Usamos `.first()` para evitar violação de strict mode quando houver múltiplas células.
+/**
+ * Verifica se o modal de histórico de análise contém registros.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarModalHistoricoAnaliseComRegistros(page: Page): Promise<void> {
+    await verificarModalHistoricoAnaliseAberto(page);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal.getByText(/data\/hora/i).first()).toBeVisible();
     await expect(modal.getByText(/unidade/i).first()).toBeVisible();
     await expect(modal.getByText(/resultado/i).first()).toBeVisible();
@@ -377,15 +366,13 @@ export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<
 }
 
 /**
- * Verifica se o modal de histórico de análise contém uma observação.
+ * Verifica se o modal de histórico de análise contém uma observação específica.
  * @param page A instância da página do Playwright.
  * @param observacao A observação a ser verificada.
  */
 export async function verificarModalHistoricoAnalise(page: Page, observacao: string): Promise<void> {
-    await page.waitForSelector(SELETORES.MODAL_VISIVEL);
+    await verificarModalHistoricoAnaliseAberto(page);
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
-    await expect(modal).toBeVisible();
-    await expect(modal.getByRole('heading', {name: /Histórico de Análises?/i})).toBeVisible();
     await expect(modal.locator('tbody tr').first()).toContainText(observacao);
 }
 
@@ -442,25 +429,9 @@ export async function verificarCompetenciaNaoVisivel(page: Page, descricao: stri
  * @param page A instância da página do Playwright.
  */
 export async function verificarListagemAtividadesEConhecimentos(page: Page): Promise<void> {
-    // Verifica se há atividades; se houver, garante que pelo menos um card está visível.
-    const atividadesCount = await page.locator(SELETORES.ITEM_ATIVIDADE).count();
-    if (atividadesCount > 0) {
-        await expect(page.locator(SELETORES.ITEM_ATIVIDADE).first()).toBeVisible();
-    } else if ((await page.getByTestId('atividade-descricao').count()) > 0) {
-        await expect(page.getByTestId('atividade-descricao').first()).toBeVisible();
-    } else {
-        // Se não houver atividades, aceitaremos que a listagem esteja vazia (situação válida em alguns cenários).
-    }
-
-    // Verifica se há conhecimentos; se houver, garante que pelo menos um esteja visível.
-    const conhecimentosCount = await page.locator(SELETORES.ITEM_CONHECIMENTO).count();
-    if (conhecimentosCount > 0) {
-        await expect(page.locator(SELETORES.ITEM_CONHECIMENTO).first()).toBeVisible();
-    } else if ((await page.getByTestId('conhecimento-descricao').count()) > 0) {
-        await expect(page.getByTestId('conhecimento-descricao').first()).toBeVisible();
-    } else {
-        // Não há conhecimentos — fluxo válido; não falhar.
-    }
+    // Esta função espera que haja pelo menos um item.
+    // Se o teste espera lista vazia, não deve usar esta verificação.
+    await expect(page.locator(SELETORES.ITEM_ATIVIDADE).first()).toBeVisible();
 }
 
 /**
@@ -482,21 +453,7 @@ export async function verificarModoSomenteLeitura(page: Page): Promise<void> {
  * @param siglaEsperada A sigla esperada da unidade.
  */
 export async function verificarCabecalhoUnidade(page: Page, siglaEsperada: string): Promise<void> {
-    const sigla = page.locator('.unidade-cabecalho .unidade-sigla');
-    const nome = page.locator('.unidade-cabecalho .unidade-nome');
-
-    // Tentar pela versão do cabeçalho (quando presente)
-    if ((await sigla.count()) > 0) {
-        await expect(sigla).toBeVisible();
-        await expect(sigla).toContainText(siglaEsperada);
-        if ((await nome.count()) > 0) {
-            await expect(nome).toBeVisible();
-            await expect(nome).toHaveText(/\S+/);
-        }
-        return;
-    }
-
-    // Fallback: utilizar o test-id de info da unidade (mais estável entre variações de UI)
+    // Remove fallback. Assume a estrutura padrão correta.
     await expect(page.locator(SELETORES.INFO_UNIDADE)).toBeVisible();
     await expect(page.locator(SELETORES.INFO_UNIDADE)).toContainText(siglaEsperada);
 }
@@ -566,11 +523,7 @@ export async function verificarSelecaoPerfilVisivel(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarImpactosNoMapa(page: Page): Promise<void> {
-    try {
-        await expect(page.getByTestId('impacto-mapa-modal')).toBeVisible();
-    } catch {
-        await expect(page.getByText('Nenhum impacto no mapa da unidade.')).toBeVisible();
-    }
+    await expect(page.getByTestId('impacto-mapa-modal')).toBeVisible();
 }
 
 /**

@@ -10,6 +10,7 @@ import {
     iniciarProcesso,
     navegarParaMapaMapeamento,
     TEXTOS,
+    verificarBotaoDisponibilizarDesabilitado,
     verificarBotaoDisponibilizarHabilitado,
     verificarCampoObservacoesValor,
     verificarModalDisponibilizacaoVisivel,
@@ -22,7 +23,7 @@ const siglaUnidade = 'SESEL';
 test.describe('CDU-17: Disponibilizar mapa de competências', () => {
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-17');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [10]); // Unidade 10 = SESEL
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SESEL']);
         await iniciarProcesso(page);
     });
 
@@ -47,9 +48,12 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await criarCompetencia(page, 'Competência Teste', []);
 
         await disponibilizarCadastro(page);
-        await verificarBotaoDisponibilizarHabilitado(page, false);
+        await verificarBotaoDisponibilizarDesabilitado(page);
 
-        await verificarBotaoDisponibilizarHabilitado(page, true);
+        // O teste original tentava verificar habilitado aqui sem ação aparente.
+        // Mantendo a verificação para preservação da intenção original,
+        // embora possa falhar se a data não for preenchida.
+        await verificarBotaoDisponibilizarHabilitado(page);
     });
 
     test('deve validar campos obrigatórios do modal', async ({page}) => {
@@ -59,8 +63,8 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await disponibilizarCadastro(page);
         await verificarModalDisponibilizacaoVisivel(page);
 
-        await verificarBotaoDisponibilizarHabilitado(page, false);
-        await verificarBotaoDisponibilizarHabilitado(page, true);
+        await verificarBotaoDisponibilizarDesabilitado(page);
+        await verificarBotaoDisponibilizarHabilitado(page);
 
         await verificarCampoObservacoesValor(page, 'Teste de observações');
     });
@@ -71,7 +75,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
         await disponibilizarCadastro(page);
 
-        await verificarBotaoDisponibilizarHabilitado(page, true);
+        await verificarBotaoDisponibilizarHabilitado(page);
         await confirmarNoModal(page);
     });
 

@@ -2,42 +2,51 @@ import {Page} from '@playwright/test';
 import {USUARIOS} from './dados/constantes';
 
 /**
- * Realiza o login completo através da interface de usuário.
- * Lida com a seleção de perfil para usuários com múltiplos perfis.
+ * Realiza o login direto para usuários com um único perfil.
  *
  * @param page A instância da página do Playwright.
  * @param usuario O objeto do usuário (ex: USUARIOS.ADMIN).
- * @param perfilUnidadeLabel O perfil a ser selecionado, se houver múltiplos (ex: 'ADMIN - STIC').
  */
-async function loginPelaUI(
+async function loginDireto(
     page: Page,
-    usuario: { titulo: string; senha: string },
-    perfilUnidadeLabel?: string
+    usuario: { titulo: string; senha: string }
 ) {
     await page.goto('/login');
     await page.getByTestId('input-titulo').fill(usuario.titulo);
     await page.getByTestId('input-senha').fill(usuario.senha);
 
-    if (perfilUnidadeLabel) {
-        // Prepare to wait for navigation
-        const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    await page.getByTestId('botao-entrar').click();
+    await navigationPromise;
+    await page.waitForLoadState('networkidle');
+}
 
-        await page.getByTestId('botao-entrar').click();
+/**
+ * Realiza o login com seleção de perfil para usuários com múltiplos perfis.
+ *
+ * @param page A instância da página do Playwright.
+ * @param usuario O objeto do usuário (ex: USUARIOS.MULTI_PERFIL).
+ * @param perfilUnidadeLabel O perfil a ser selecionado (ex: 'ADMIN - STIC').
+ */
+async function loginComSelecaoPerfil(
+    page: Page,
+    usuario: { titulo: string; senha: string },
+    perfilUnidadeLabel: string
+) {
+    await page.goto('/login');
+    await page.getByTestId('input-titulo').fill(usuario.titulo);
+    await page.getByTestId('input-senha').fill(usuario.senha);
 
-        const seletorPerfil = page.getByTestId('select-perfil-unidade');
-        await seletorPerfil.waitFor({state: 'visible', timeout: 2000});
-        await seletorPerfil.selectOption({label: perfilUnidadeLabel});
-        await page.getByTestId('botao-entrar').click();
+    await page.getByTestId('botao-entrar').click();
 
-        await navigationPromise; // Wait for navigation to complete
-    } else {
-        // Prepare to wait for navigation
-        const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    const seletorPerfil = page.getByTestId('select-perfil-unidade');
+    await seletorPerfil.waitFor({state: 'visible', timeout: 2000});
+    await seletorPerfil.selectOption({label: perfilUnidadeLabel});
 
-        await page.getByTestId('botao-entrar').click();
+    const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    await page.getByTestId('botao-entrar').click();
+    await navigationPromise;
 
-        await navigationPromise; // Wait for navigation to complete
-    }
     await page.waitForLoadState('networkidle');
 }
 
@@ -46,7 +55,7 @@ async function loginPelaUI(
  * @param page A instância da página do Playwright.
  */
 export async function loginComoAdmin(page: Page) {
-    await loginPelaUI(page, USUARIOS.ADMIN);
+    await loginDireto(page, USUARIOS.ADMIN);
 }
 
 /**
@@ -54,7 +63,7 @@ export async function loginComoAdmin(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoGestor(page: Page) {
-    await loginPelaUI(page, USUARIOS.GESTOR);
+    await loginDireto(page, USUARIOS.GESTOR);
 }
 
 /**
@@ -62,7 +71,7 @@ export async function loginComoGestor(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoChefe(page: Page) {
-    await loginPelaUI(page, USUARIOS.CHEFE_SGP);
+    await loginDireto(page, USUARIOS.CHEFE_SGP);
 }
 
 /**
@@ -70,7 +79,7 @@ export async function loginComoChefe(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoChefeStic(page: Page) {
-    await loginPelaUI(page, USUARIOS.CHEFE_STIC);
+    await loginDireto(page, USUARIOS.CHEFE_STIC);
 }
 
 /**
@@ -78,7 +87,7 @@ export async function loginComoChefeStic(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoServidor(page: Page) {
-    await loginPelaUI(page, USUARIOS.SERVIDOR);
+    await loginDireto(page, USUARIOS.SERVIDOR);
 }
 
 /**
@@ -86,7 +95,7 @@ export async function loginComoServidor(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComMultiPerfilAdmin(page: Page) {
-    await loginPelaUI(page, USUARIOS.MULTI_PERFIL, 'ADMIN - STIC');
+    await loginComSelecaoPerfil(page, USUARIOS.MULTI_PERFIL, 'ADMIN - STIC');
 }
 
 /**
@@ -94,5 +103,5 @@ export async function loginComMultiPerfilAdmin(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoChefeSedia(page: Page) {
-    await loginPelaUI(page, USUARIOS.CHEFE_SEDIA);
+    await loginDireto(page, USUARIOS.CHEFE_SEDIA);
 }

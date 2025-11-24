@@ -2,6 +2,7 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {
     aguardarTabelaProcessosCarregada,
     clicarProcesso,
+    criarEIniciarProcessoBasico,
     criarProcessoBasico,
     esperarElementoVisivel,
     loginComoAdmin,
@@ -13,8 +14,9 @@ import {
     verificarColunasTabelaAlertas,
     verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
+    verificarProcessoInvisivel,
+    verificarProcessoVisivel,
     verificarQuantidadeProcessosNaTabela,
-    verificarVisibilidadeProcesso,
 } from '~/helpers';
 
 test.describe('CDU-02: Visualizar Painel', () => {
@@ -24,7 +26,7 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({page}) => {
             // Cria um processo em estado "EM_ANDAMENTO" para o SERVIDOR (Ana Paula Souza, SESEL)
             await loginComoAdmin(page);
-            await criarProcessoBasico(page, 'Processo Servidor SESEL', 'MAPEAMENTO', ['SESEL'], '2025-12-31', 'EM_ANDAMENTO');
+            await criarEIniciarProcessoBasico(page, 'Processo Servidor SESEL', 'MAPEAMENTO', ['SESEL'], '2025-12-31');
 
             await loginComoServidor(page);
             await verificarElementosPainel(page);
@@ -37,9 +39,9 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test.beforeEach(async ({ page }) => {
             await loginComoAdmin(page);
             // Cria um processo visível para o Chefe da STIC (unidade 2)
-            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC'], '2025-12-31', 'EM_ANDAMENTO');
+            await criarEIniciarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC'], '2025-12-31');
             // Cria um processo fora da hierarquia da STIC
-            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT'], '2025-12-31', 'EM_ANDAMENTO');
+            await criarEIniciarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT'], '2025-12-31');
         });
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
@@ -49,10 +51,10 @@ test.describe('CDU-02: Visualizar Painel', () => {
             await aguardarTabelaProcessosCarregada(page);
 
             // Chefe STIC deve ver o processo da sua unidade
-            await verificarVisibilidadeProcesso(page, /Processo da STIC para CDU-02/, true);
+            await verificarProcessoVisivel(page, /Processo da STIC para CDU-02/);
 
             // Não deve ver processo da ADMIN-UNIT
-            await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);
+            await verificarProcessoInvisivel(page, /Processo ADMIN-UNIT - Fora da STIC/);
 
             // A tabela deve conter exatamente 1 processo visível para este usuário
             await verificarQuantidadeProcessosNaTabela(page, 1);

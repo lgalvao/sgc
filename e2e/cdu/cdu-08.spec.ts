@@ -20,7 +20,8 @@ import {
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     test('deve adicionar, editar e remover atividades e conhecimentos', async ({page}) => {
-        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-08'), 'Mapeamento', '2025-12-31', [1]);
+        // Alterado [1] para ['STIC']
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-08'), 'Mapeamento', '2025-12-31', ['STIC']);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');

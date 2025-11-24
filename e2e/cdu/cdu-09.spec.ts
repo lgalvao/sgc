@@ -23,7 +23,7 @@ import {
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
     test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar', async ({page}) => {
-        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-09'), 'Mapeamento', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-09'), 'Mapeamento', '2025-12-31', ['STIC']);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
@@ -57,7 +57,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
     });
 
     test('deve exibir o histórico de análise após devolução', async ({page}) => {
-        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), 'Mapeamento', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), 'Mapeamento', '2025-12-31', ['STIC']);
         await iniciarProcesso(page);
         await verificarMensagemSucesso(page, 'Processo iniciado');
 

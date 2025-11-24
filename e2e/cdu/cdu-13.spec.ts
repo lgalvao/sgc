@@ -30,7 +30,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-13');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [2]); // Unidade 2 = STIC
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['STIC']); // Unidade 2 = STIC
         await iniciarProcesso(page);
 
         // Chefe da STIC preenche e disponibiliza o cadastro
@@ -67,7 +67,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await loginComoAdmin(page);
         await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
-        await devolverParaAjustes(page); // Sem observação
+        await devolverParaAjustes(page, ''); // Sem observação
 
         await verificarMensagemSucesso(page, TEXTOS.CADASTRO_DEVOLVIDO_AJUSTES);
         await verificarUrlDoPainel(page);

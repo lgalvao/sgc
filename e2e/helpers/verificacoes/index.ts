@@ -19,7 +19,8 @@ export {
     verificarDisponibilizacaoConcluida,
     verificarModalDisponibilizacaoVisivel,
     verificarCampoObservacoesValor,
-    verificarBotaoDisponibilizarHabilitado
+    verificarBotaoDisponibilizarHabilitado,
+    verificarBotaoDisponibilizarDesabilitado
 } from './verificacoes-basicas';
 
 // Verificações de processo
@@ -63,6 +64,7 @@ export {
     verificarCheckboxUnidadeMarcado,
     verificarValorCampoDataLimite,
     verificarCampoTipoVisivel,
+    verificarCampoTipoValor,
     verificarProcessoNaoVisivel,
     verificarPaginaDetalheProcesso,
     verificarCriacaoSubprocessos,
@@ -83,7 +85,8 @@ export {
     verificarPainelComCriacao,
     verificarPainelComAlertas,
     verificarAusenciaBotaoCriarProcesso,
-    verificarVisibilidadeProcesso,
+    verificarProcessoVisivel,
+    verificarProcessoInvisivel,
     verificarSelecaoArvoreCheckboxes,
     verificarComportamentoMarcacaoCheckbox,
     verificarComportamentoCheckboxInteroperacional,
@@ -99,6 +102,7 @@ export {
     verificarAtividadeVisivel,
     verificarAtividadeNaoVisivel,
     verificarConhecimentoVisivel,
+    verificarConhecimentoVisivelNoCard,
     verificarConhecimentoNaoVisivel,
     verificarContadorAtividades,
     verificarColunasTabelaAlertas,
@@ -106,6 +110,8 @@ export {
     verificarBotaoHistoricoAnaliseVisivel,
     verificarModalHistoricoAnalise,
     verificarModalHistoricoAnaliseAberto,
+    verificarModalHistoricoAnaliseVazio,
+    verificarModalHistoricoAnaliseComRegistros,
     verificarAcoesAnaliseGestor,
     verificarAcaoHomologarVisivel,
     verificarMensagemNenhumImpacto,

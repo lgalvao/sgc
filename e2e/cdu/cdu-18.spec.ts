@@ -22,7 +22,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-18');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [2]); // Unidade 2 = STIC
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['STIC']); // Unidade 2 = STIC
         await iniciarProcesso(page);
     });
 

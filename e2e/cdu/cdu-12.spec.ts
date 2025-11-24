@@ -21,7 +21,7 @@ test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
 
     test.beforeEach(async ({ page }) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-12');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [10]); // Unidade 10 = SESEL
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', ['SESEL']);
         await iniciarProcesso(page);
         await loginComoAdmin(page);
     });

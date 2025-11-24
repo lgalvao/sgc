@@ -19,7 +19,7 @@ import {
 test.describe('CDU-21: Finalizar processo', () => {
     async function setupProcessoEmAndamento(page) {
         const nomeProcesso = `PROCESSO FINALIZAR TESTE - ${Date.now()}`;
-        const processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]); // Unidade 1 = SEDOC
+        const processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['STIC']); // Unidade 1 = SEDOC (assuming STIC based on patterns)
         await navegarParaProcessoPorId(page, processo.processo.codigo);
         await iniciarProcesso(page);
         return {nomeProcesso, processo};

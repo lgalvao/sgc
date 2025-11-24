@@ -21,7 +21,7 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
 
     test.beforeEach(async ({page}) => {
         await loginComoAdmin(page);
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]);
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['STIC']);
         await navegarParaEdicaoMapa(page, processo.processo.codigo, siglaUnidade);
     });
 

@@ -19,7 +19,7 @@ import {
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
     test('deve disponibilizar a revisão após corrigir atividades incompletas', async ({page}) => {
-        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', ['STIC']);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
@@ -45,7 +45,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
 
     test('deve exibir o histórico de análise após a devolução de um cadastro em revisão', async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO REVISAO COM DEVOLUCAO');
-        const {processo} = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', ['STIC']);
         const nomeUnidade = 'STIC';
         const motivoDevolucao = 'Motivo da devolução pelo Gestor para teste CDU-10';
 

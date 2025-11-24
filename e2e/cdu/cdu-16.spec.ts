@@ -25,7 +25,7 @@ const siglaUnidade = 'SESEL';
 test.describe('CDU-16: Ajustar mapa de competências', () => {
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-16');
-        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [10]); // Unidade 10 = SESEL
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', ['SESEL']); // Unidade 10 = SESEL
         await iniciarProcesso(page);
     });
 
