@@ -10,6 +10,7 @@ import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.CompetenciaRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
@@ -69,8 +70,10 @@ public class SubprocessoMapaService {
         Subprocesso spDestino = subprocessoRepo.findById(codSubprocessoDestino)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
 
-        if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
-            throw new ErroAtividadesEmSituacaoInvalida("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
+        if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO &&
+            spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO &&
+            spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
+            throw new ErroAtividadesEmSituacaoInvalida("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração ou não iniciado.");
         }
 
         Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
@@ -109,6 +112,16 @@ public class SubprocessoMapaService {
                     conhecimentoRepo.save(novoConhecimento);
                 }
             }
+        }
+
+        if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            var tipoProcesso = spDestino.getProcesso().getTipo();
+            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
+                spDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            } else if (tipoProcesso == TipoProcesso.REVISAO) {
+                spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            }
+            subprocessoRepo.save(spDestino);
         }
 
         String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",

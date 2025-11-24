@@ -22,6 +22,10 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.ImportarAtividadesReq;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -75,13 +79,20 @@ class CDU08IntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
+    @Autowired
+    private ProcessoRepo processoRepo;
+
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
+    private Processo processo;
 
     @BeforeEach
     void setUp() {
         Unidade unidadeOrigem = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
         Unidade unidadeDestino = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+
+        processo = new Processo("Processo Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
+        processoRepo.save(processo);
 
         Mapa mapaOrigem = new Mapa();
         mapaRepo.save(mapaOrigem);
@@ -100,6 +111,7 @@ class CDU08IntegrationTest {
         subprocessoOrigem.setMapa(mapaOrigem);
         subprocessoOrigem.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         subprocessoOrigem.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoOrigem.setProcesso(processo);
         subprocessoRepo.save(subprocessoOrigem);
 
         Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
@@ -110,6 +122,7 @@ class CDU08IntegrationTest {
         subprocessoDestino.setMapa(mapa); // Usa o 'mapa' para os testes de CRUD
         subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoDestino.setProcesso(processo);
         subprocessoRepo.save(subprocessoDestino);
     }
 
@@ -146,6 +159,23 @@ class CDU08IntegrationTest {
             List<sgc.subprocesso.model.Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
+        }
+
+        @Test
+        @DisplayName("Deve importar e atualizar status se NAO_INICIADO")
+        void deveImportarEAtualizarStatus() throws Exception {
+            subprocessoDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            subprocessoRepo.save(subprocessoDestino);
+
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
+
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            Subprocesso atualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
+            assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         }
 
         @Test

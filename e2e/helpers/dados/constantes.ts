@@ -63,6 +63,9 @@ export const SELETORES = {
     GRUPO_CONHECIMENTO: '[data-testid="grupo-conhecimento"]',
     BTN_EDITAR_CONHECIMENTO: '[data-testid="btn-editar-conhecimento"]',
     BTN_REMOVER_CONHECIMENTO: '[data-testid="btn-remover-conhecimento"]',
+    INPUT_EDITAR_CONHECIMENTO: '[data-testid="input-editar-conhecimento"]',
+    BTN_SALVAR_EDICAO_CONHECIMENTO: '[data-testid="btn-salvar-edicao-conhecimento"]',
+    BTN_CANCELAR_EDICAO_CONHECIMENTO: '[data-testid="btn-cancelar-edicao-conhecimento"]',
 };
 
 export const SELETORES_CSS = {};
