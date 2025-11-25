@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: never
+      platform: h2
+      data-locations: classpath:data.sql
+
+aplicacao:
+  email:
+    remetente: test@example.com
+    remetente-nome: Test
+    assunto-prefixo: '[SGC-TEST]'

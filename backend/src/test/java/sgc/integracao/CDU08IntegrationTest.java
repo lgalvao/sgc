@@ -71,9 +71,7 @@ import org.springframework.test.context.jdbc.SqlGroup;
 
 @SqlGroup({
 
-    @Sql(scripts = "/schema.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
-
-    @Sql(scripts = "/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/schema.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 
 })
 
