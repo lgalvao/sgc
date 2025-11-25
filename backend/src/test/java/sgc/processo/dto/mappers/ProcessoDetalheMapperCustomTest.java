@@ -16,14 +16,17 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +35,9 @@ class ProcessoDetalheMapperCustomTest {
 
     @Mock
     private ProcessoDetalheMapper delegate;
+
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
     @InjectMocks
     private ProcessoDetalheMapperCustomImpl mapper;
@@ -75,6 +81,8 @@ class ProcessoDetalheMapperCustomTest {
         Authentication auth = mock(Authentication.class);
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(auth);
         when(auth.isAuthenticated()).thenReturn(false);
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(anyLong())).thenReturn(Collections.emptyList());
 
         ProcessoDetalheDto dto = mapper.toDetailDTO(p);
 

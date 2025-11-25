@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockCustomUser;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -41,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("CDU-07: Detalhar Subprocesso")
 public class CDU07IntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL";
@@ -119,7 +122,7 @@ public class CDU07IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(OUTRO_CHEFE_TITULO)
+        @WithMockCustomUser(tituloEleitoral = OUTRO_CHEFE_TITULO, perfis = {"CHEFE"}, unidadeId = 11L)
         @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
         void chefeNaoPodeVisualizarOutraUnidade() throws Exception {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())

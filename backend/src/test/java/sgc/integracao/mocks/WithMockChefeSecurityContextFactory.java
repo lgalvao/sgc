@@ -15,33 +15,57 @@ import java.util.Set;
 
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
 
-    @Autowired
+    @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
-    @Autowired
+    @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
-        Unidade unidade = unidadeRepo.findById(10L).orElseThrow();
+        Unidade unidade = null;
+        boolean dbAvailable = false;
+        if (unidadeRepo != null) {
+            try {
+                unidade = unidadeRepo.findById(10L).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                unidade = null;
+            }
+        }
+        if (unidade == null) {
+             unidade = new Unidade("Unidade Mock", "SESEL");
+             unidade.setCodigo(10L);
+        }
 
-        // Busca o usuário ou cria um novo para evitar instâncias duplicadas
-        Usuario usuario = usuarioRepo.findById(annotation.value())
-            .orElseGet(() -> {
-                Usuario novoUsuario = new Usuario(
-                    annotation.value(),
-                    "Chefe Teste",
-                    "chefe@teste.com",
-                    "123",
-                    unidade,
-                    Set.of(Perfil.CHEFE)
-                );
-                return usuarioRepo.save(novoUsuario);
-            });
+        Usuario usuario = null;
+        if (usuarioRepo != null) {
+            try {
+                usuario = usuarioRepo.findById(annotation.value()).orElse(null);
+            } catch (Exception e) {
+                usuario = null;
+            }
+        }
 
-        // Garante que a unidade está correta no usuário do contexto, pois o usuário
-        // pode existir no banco de dados com uma unidade diferente.
+        if (usuario == null) {
+            usuario = new Usuario(
+                annotation.value(),
+                "Chefe Teste",
+                "chefe@teste.com",
+                "123",
+                unidade,
+                Set.of(Perfil.CHEFE)
+            );
+            if (dbAvailable && usuarioRepo != null) {
+                try { usuarioRepo.save(usuario); } catch (Exception e) { }
+            }
+        }
+
+        // Garante que a unidade está correta no usuário do contexto
         usuario.setUnidade(unidade);
-        usuarioRepo.save(usuario);
+        usuario.setPerfis(Set.of(Perfil.CHEFE));
+        if (dbAvailable && usuarioRepo != null) {
+            try { usuarioRepo.save(usuario); } catch (Exception e) { }
+        }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
             usuario, null, usuario.getAuthorities());

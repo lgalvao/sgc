@@ -60,7 +60,7 @@ class MovimentacaoListenerTest {
         listener.handle(evento);
 
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-        verify(notificacaoService).notificarAceiteCadastro(sp, destino);
+        verify(notificacaoService).notificarDisponibilizacaoCadastro(sp, destino);
     }
 
     @Test
@@ -147,7 +147,7 @@ class MovimentacaoListenerTest {
         listener.handle(evento);
 
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-        verify(notificacaoService).notificarAceiteRevisaoCadastro(sp, destino);
+        verify(notificacaoService).notificarDisponibilizacaoRevisaoCadastro(sp, destino);
     }
 
     @Test

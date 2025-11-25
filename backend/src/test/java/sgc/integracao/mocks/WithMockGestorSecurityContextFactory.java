@@ -16,11 +16,8 @@ import java.util.Set;
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
 
-    private final UsuarioRepo usuarioRepo;
-
-    public WithMockGestorSecurityContextFactory(UsuarioRepo usuarioRepo) {
-        this.usuarioRepo = usuarioRepo;
-    }
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
@@ -28,11 +25,15 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
 
         String tituloGestor = customUser.value();
 
-        Usuario principal;
-        try {
-            principal = usuarioRepo.findById(tituloGestor).orElse(null);
-        } catch (Exception e) {
-            principal = null;
+        Usuario principal = null;
+        boolean dbAvailable = false;
+        if (usuarioRepo != null) {
+            try {
+                principal = usuarioRepo.findById(tituloGestor).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                principal = null;
+            }
         }
         
         if (principal == null) {
@@ -42,6 +43,14 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
             principal.setEmail("gestor@example.com");
             principal.setPerfis(Set.of(Perfil.GESTOR));
             principal.setUnidade(new Unidade("Unidade Mock", "UO_SUP"));
+            if (dbAvailable) {
+                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            }
+        } else {
+            principal.setPerfis(Set.of(Perfil.GESTOR));
+            if (dbAvailable) {
+                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            }
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());

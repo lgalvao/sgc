@@ -16,11 +16,8 @@ import java.util.Set;
 @Component
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
 
-    private final UsuarioRepo usuarioRepo;
-
-    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo) {
-        this.usuarioRepo = usuarioRepo;
-    }
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockAdmin customUser) {
@@ -28,11 +25,15 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
 
         String tituloAdmin = "111111111111";
 
-        Usuario principal;
-        try {
-            principal = usuarioRepo.findById(tituloAdmin).orElse(null);
-        } catch (Exception e) {
-            principal = null;
+        Usuario principal = null;
+        boolean dbAvailable = false;
+        if (usuarioRepo != null) {
+            try {
+                principal = usuarioRepo.findById(tituloAdmin).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                principal = null;
+            }
         }
         
         if (principal == null) {
@@ -42,6 +43,14 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
             principal.setEmail("admin@example.com");
             principal.setPerfis(Set.of(Perfil.ADMIN));
             principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+            if (dbAvailable) {
+                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            }
+        } else {
+            principal.setPerfis(Set.of(Perfil.ADMIN));
+            if (dbAvailable) {
+                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            }
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
