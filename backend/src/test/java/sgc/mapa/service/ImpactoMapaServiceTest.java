@@ -1,5 +1,6 @@
 package sgc.mapa.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,7 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.mapa.model.MapaRepo;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,23 +36,23 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-@ExtendWith(MockitoExtension.class)
+
 @DisplayName("Testes para ImpactoMapaService")
 class ImpactoMapaServiceTest {
 
-    @InjectMocks
+    @Autowired
     private ImpactoMapaService impactoMapaService;
 
-    @Mock
+    @MockBean
     private SubprocessoRepo subprocessoRepo;
 
-    @Mock
+    @MockBean
     private MapaRepo mapaRepo;
 
-    @Mock
+    @MockBean
     private ImpactoAtividadeService impactoAtividadeService;
 
-    @Mock
+    @MockBean
     private ImpactoCompetenciaService impactoCompetenciaService;
 
     private Usuario chefe;
