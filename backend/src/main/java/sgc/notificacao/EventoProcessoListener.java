@@ -40,7 +40,6 @@ import static sgc.unidade.model.TipoUnidade.*;
  * enquanto este listener contém a lógica de reação aos eventos.
  */
 @Component
-@Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
 public class EventoProcessoListener {

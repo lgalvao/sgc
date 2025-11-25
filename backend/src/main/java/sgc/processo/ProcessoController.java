@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
+import sgc.subprocesso.dto.SubprocessoDto;
 
 import java.net.URI;
 import java.util.List;
@@ -218,8 +219,8 @@ public class ProcessoController {
      */
     @GetMapping("/{codigo}/subprocessos")
     @Operation(summary = "Lista todos os subprocessos de um processo")
-    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessos(@PathVariable Long codigo) {
-        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
-        return ResponseEntity.ok(elegiveis);
+    public ResponseEntity<List<SubprocessoDto>> listarSubprocessos(@PathVariable Long codigo) {
+        List<SubprocessoDto> subprocessos = processoService.listarTodosSubprocessos(codigo);
+        return ResponseEntity.ok(subprocessos);
     }
 }

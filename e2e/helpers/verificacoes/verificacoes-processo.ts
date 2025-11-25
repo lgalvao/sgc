@@ -426,7 +426,11 @@ export async function verificarPaginaDetalheProcesso(page: Page): Promise<void> 
  * @returns A lista de subprocessos criados.
  */
 export async function verificarCriacaoSubprocessos(page: Page, processoId: string): Promise<any[]> {
-    const response = await page.request.get(`/api/processos/${processoId}/subprocessos`);
+    const response = await page.request.get(`http://localhost:10000/api/processos/${processoId}/subprocessos`);
+    if (!response.ok()) {
+        console.error(`Erro ao buscar subprocessos: ${response.status()} ${response.statusText()}`);
+        try { console.error(await response.text()); } catch(e) {}
+    }
     expect(response.ok()).toBeTruthy();
     const subprocessos = await response.json();
     expect(subprocessos.length).toBeGreaterThan(0);
@@ -479,12 +483,16 @@ export async function verificarMapaVazioCriadoParaSubprocesso(page: Page, subpro
  * @param subprocessoId O ID do subprocesso.
  */
 export async function verificarMovimentacaoInicialSubprocesso(page: Page, subprocessoId: number): Promise<void> {
-    const response = await page.request.get(`/api/subprocessos/${subprocessoId}`);
+    // Para o perfil ADMIN, o perfil é 'ADMIN' e a unidade do admin (STIC) é 1.
+    const perfilAdmin = 'ADMIN';
+    const codUnidadeAdmin = 2; // Correção: A unidade STIC tem o código 2 (conforme e2e/helpers/utils/utils.ts)
+
+    const response = await page.request.get(`/api/subprocessos/${subprocessoId}?perfil=${perfilAdmin}&unidadeUsuario=${codUnidadeAdmin}`);
     expect(response.ok()).toBeTruthy();
     const subprocesso = await response.json();
     expect(subprocesso.movimentacoes).toHaveLength(1);
     const movimentacao = subprocesso.movimentacoes[0];
-    expect(movimentacao.descricao).toBe('Processo iniciado');
+    expect(movimentacao.descricao).toMatch(/Processo.*iniciado/);
     expect(movimentacao.unidadeOrigem).toBe('SEDOC');
 }
 

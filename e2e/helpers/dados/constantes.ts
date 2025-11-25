@@ -192,4 +192,10 @@ export const USUARIOS = {
         senha: '123',
         unidade: 'SEDIA',
     },
+    CHEFE_TESTE: {
+        titulo: '333333333333',
+        nome: 'Chefe Teste',
+        senha: '123',
+        unidade: 'SEDESENV',
+    },
 } as const;

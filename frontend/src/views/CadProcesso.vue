@@ -114,6 +114,7 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar

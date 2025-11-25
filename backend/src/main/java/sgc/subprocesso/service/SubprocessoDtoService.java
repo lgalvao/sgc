@@ -72,6 +72,8 @@ public class SubprocessoDtoService {
         log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
         log.debug("Usuário encontrado: {}", usuario);
+        log.debug("Perfis do usuário (from SGRH): {}", usuario.getPerfis());
+        log.debug("Perfil solicitado (from request): {}", perfil);
 
         verificarPermissaoVisualizacao(sp, perfil, usuario);
 

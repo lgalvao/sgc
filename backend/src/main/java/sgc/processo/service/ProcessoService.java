@@ -27,6 +27,8 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoMapper;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
@@ -45,6 +47,7 @@ public class ProcessoService {
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheMapper processoDetalheMapper;
+    private final SubprocessoMapper subprocessoMapper;
     private final MapaRepo mapaRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
@@ -442,6 +445,13 @@ public class ProcessoService {
                 .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
                 .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO)
                 .map(this::toSubprocessoElegivelDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
+        return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso).stream()
+                .map(subprocessoMapper::toDTO)
                 .toList();
     }
 

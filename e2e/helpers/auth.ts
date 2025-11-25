@@ -1,5 +1,18 @@
-import {Page} from '@playwright/test';
-import {USUARIOS} from './dados/constantes';
+import { Page } from '@playwright/test';
+import { USUARIOS } from './dados/constantes';
+
+/**
+ * Realiza o login direto para usuários com um único perfil.
+ *
+ * @param page A instância da página do Playwright.
+ * @param usuario O objeto do usuário (ex: USUARIOS.ADMIN).
+ */
+export async function loginComo(
+    page: Page,
+    usuario: { titulo: string; senha: string }
+) {
+    await loginDireto(page, usuario);
+}
 
 /**
  * Realiza o login direto para usuários com um único perfil.
@@ -15,7 +28,7 @@ async function loginDireto(
     await page.getByTestId('input-titulo').fill(usuario.titulo);
     await page.getByTestId('input-senha').fill(usuario.senha);
 
-    const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    const navigationPromise = page.waitForURL('/painel', { timeout: 5000 });
     await page.getByTestId('botao-entrar').click();
     await navigationPromise;
     await page.waitForLoadState('networkidle');
@@ -40,10 +53,10 @@ async function loginComSelecaoPerfil(
     await page.getByTestId('botao-entrar').click();
 
     const seletorPerfil = page.getByTestId('select-perfil-unidade');
-    await seletorPerfil.waitFor({state: 'visible', timeout: 2000});
-    await seletorPerfil.selectOption({label: perfilUnidadeLabel});
+    await seletorPerfil.waitFor({ state: 'visible', timeout: 2000 });
+    await seletorPerfil.selectOption({ label: perfilUnidadeLabel });
 
-    const navigationPromise = page.waitForURL('/painel', {timeout: 5000});
+    const navigationPromise = page.waitForURL('/painel', { timeout: 5000 });
     await page.getByTestId('botao-entrar').click();
     await navigationPromise;
 

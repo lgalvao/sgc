@@ -1,5 +1,6 @@
 package sgc.sgrh.service;
 
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,8 @@ public class SgrhService {
     }
 
     public Usuario buscarUsuarioPorLogin(String login) {
-        return usuarioRepo.findById(login).orElseGet(() -> {
-            log.warn("MOCK SGRH: Buscando usuário por login (Fallback).");
-            var unidade = unidadeRepo.findById(10L).orElse(null); // Usa uma unidade padrão para o mock
-            return new Usuario(login, "Usuário Mock", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
-        });
+        return usuarioRepo.findById(login)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {

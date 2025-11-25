@@ -1,5 +1,5 @@
-import {vueTest as test} from '../support/vue-specific-setup';
-import {expect} from '@playwright/test';
+import { vueTest as test } from '../support/vue-specific-setup';
+import { expect } from '@playwright/test';
 import {
     abrirProcessoPorNome,
     aguardarTabelaProcessosCarregada,
@@ -23,12 +23,15 @@ import {
     verificarCamposProcessoDesabilitados,
     verificarCriacaoSubprocessos,
     verificarModalConfirmacaoIniciacaoProcesso,
+    verificarMovimentacaoInicialSubprocesso,
     verificarModalFechado,
     verificarPaginaCadastroProcesso,
     verificarPaginaDetalheProcesso,
     verificarPaginaEdicaoProcesso,
     verificarSituacaoProcesso,
-    verificarUrlDoPainel
+    verificarUrlDoPainel,
+    loginComo,
+    USUARIOS
 } from '~/helpers';
 
 /**
@@ -54,13 +57,13 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         // Loga como admin e limpa processos anteriores
         await loginComoAdmin(page);
         await limparProcessosEmAndamento(page);
-        
+
         // Gera nome único e cria processo base
         nomeProcessoRevisao = `Processo teste revisão CDU-05 ${Date.now()}`;
-        await criarProcessoBasico(page, nomeProcessoRevisao, 'REVISAO', ['CDU05-REV-UNIT']);
+        await criarProcessoBasico(page, nomeProcessoRevisao, 'REVISAO', ['SESEL']);
     });
 
-    test('deve exibir modal de confirmação ao clicar em Iniciar processo', async ({page}) => {
+    test('deve exibir modal de confirmação ao clicar em Iniciar processo', async ({ page }) => {
         // Abrir processo de revisão em situação CRIADO
         await clicarProcessoNaTabela(page, nomeProcessoRevisao);
 
@@ -71,7 +74,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarModalConfirmacaoIniciacaoProcesso(page);
     });
 
-    test('deve cancelar iniciação do processo ao clicar em Cancelar no modal', async ({page}) => {
+    test('deve cancelar iniciação do processo ao clicar em Cancelar no modal', async ({ page }) => {
         // Abrir processo e clicar em Iniciar
         await clicarProcessoNaTabela(page, nomeProcessoRevisao);
         await clicarBotaoIniciarProcesso(page);
@@ -85,12 +88,12 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarBotaoIniciarProcessoVisivel(page);
     });
 
-    test('deve iniciar processo de revisão e mudar situação para EM_ANDAMENTO', async ({page}) => {
+    test('deve iniciar processo de revisão e mudar situação para EM_ANDAMENTO', async ({ page }) => {
         // Criar novo processo
         await navegarParaCriacaoProcesso(page);
         const nomeProcesso = `Processo Revisão Teste ${gerarNomeUnico('CDU-05')}`;
         await preencherFormularioProcesso(page, nomeProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['CDU05-REV-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['SEDIA']);
         await clicarBotaoSalvar(page);
         await verificarUrlDoPainel(page);
 
@@ -110,12 +113,12 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarBotaoIniciarProcessoInvisivel(page);
     });
 
-    test('deve criar subprocessos para unidades participantes ao iniciar processo', async ({page}) => {
+    test('deve criar subprocessos para unidades participantes ao iniciar processo', async ({ page }) => {
         // Criar processo com unidade que tem subunidades
         await navegarParaCriacaoProcesso(page);
         const nomeProcesso = `Processo Multi-Unidade ${gerarNomeUnico('CDU-05')}`;
         await preencherFormularioProcesso(page, nomeProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['CDU05-SUB-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['SESEL']);
         await clicarBotaoSalvar(page);
         await verificarUrlDoPainel(page);
 
@@ -125,21 +128,35 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         const match = url.match(/codProcesso=(\d+)/);
         const processoId = match ? match[1] : null;
         expect(processoId).toBeTruthy();
-        
+
         // Iniciar processo
         await clicarBotaoIniciarProcesso(page);
+        await verificarModalConfirmacaoIniciacaoProcesso(page); // Explicitly wait for modal
         await confirmarNoModal(page);
-        
+        await verificarUrlDoPainel(page);
+
         // Verificar criação de subprocessos via API
-        await verificarCriacaoSubprocessos(page, processoId!);
+        const subprocessos = await verificarCriacaoSubprocessos(page, processoId!);
+
+        // Validar campos e movimentações dos subprocessos (Reqs 9 e 11)
+        for (const sub of subprocessos) {
+            // 9.2. Situação: 'Não iniciado'
+            expect(sub.situacao).toBe('NAO_INICIADO');
+
+            // 9.1. Data limite etapa 1: Copiada do processo (2025-12-31)
+            expect(sub.dataLimiteEtapa1).toContain('2025-12-31');
+
+            // 11. Movimentação inicial 'Processo iniciado'
+            await verificarMovimentacaoInicialSubprocesso(page, sub.codigo);
+        }
     });
 
-    test('deve criar alertas para unidades participantes ao iniciar processo', async ({page}) => {
+    test('deve criar alertas para unidades participantes ao iniciar processo', async ({ page }) => {
         // Criar e iniciar processo
         await navegarParaCriacaoProcesso(page);
         const nomeProcesso = `Processo Alertas ${gerarNomeUnico('CDU-05')}`;
         await preencherFormularioProcesso(page, nomeProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['CDU05-ALERT-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['SEDESENV']);
         await clicarBotaoSalvar(page);
         await verificarUrlDoPainel(page);
 
@@ -149,16 +166,20 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await confirmarNoModal(page);
         await verificarUrlDoPainel(page);
 
+        // Logar como Chefe da SEDESENV (Chefe Teste) para ver o alerta
+        await navegarParaHome(page);
+        await loginComo(page, USUARIOS.CHEFE_TESTE);
+
         // Verificar criação de alertas
         await verificarAlertaNaTabela(page, /Início do processo/i);
     });
 
-    test('deve preservar dados do processo após iniciação (somente leitura)', async ({page}) => {
+    test('deve preservar dados do processo após iniciação (somente leitura)', async ({ page }) => {
         // Criar processo
         await navegarParaCriacaoProcesso(page);
         const nomeProcesso = `Processo Somente Leitura ${gerarNomeUnico('CDU-05')}`;
         await preencherFormularioProcesso(page, nomeProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['CDU05-READONLY-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['SEDESENV']);
         await clicarBotaoSalvar(page);
         await verificarUrlDoPainel(page);
 
@@ -172,23 +193,23 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await navegarParaHome(page);
         await aguardarTabelaProcessosCarregada(page);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        
+
         // Verificar que campos estão desabilitados
         await verificarCamposProcessoDesabilitados(page);
-        
+
         // Botão Remover não deve estar visível
         await verificarBotaoRemoverInvisivel(page);
-        
+
         // Botão Iniciar não deve estar visível (já foi iniciado)
         await verificarBotaoIniciarProcessoInvisivel(page);
     });
 
-    test('deve validar que apenas processos CRIADO podem ser iniciados', async ({page}) => {
+    test('deve validar que apenas processos CRIADO podem ser iniciados', async ({ page }) => {
         // 1. Criar e iniciar um processo para que ele fique EM_ANDAMENTO
         const nomeProcessoEmAndamento = `Processo JÁ EM ANDAMENTO ${gerarNomeUnico('CDU-05')}`;
         await navegarParaCriacaoProcesso(page);
         await preencherFormularioProcesso(page, nomeProcessoEmAndamento, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['CDU05-READONLY-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['SEDESENV']);
         await clicarBotaoSalvar(page);
         await verificarUrlDoPainel(page);
 
@@ -205,7 +226,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarBotaoIniciarProcessoInvisivel(page);
     });
 
-    test('deve exibir informações corretas no modal de confirmação', async ({page}) => {
+    test('deve exibir informações corretas no modal de confirmação', async ({ page }) => {
         // Abrir processo
         await clicarProcessoNaTabela(page, nomeProcessoRevisao);
         await verificarPaginaEdicaoProcesso(page);
