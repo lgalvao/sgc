@@ -27,6 +27,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
 import sgc.util.HtmlUtils;
 
 import java.util.ArrayList;
@@ -66,21 +67,13 @@ public class SubprocessoDtoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
         log.debug("Subprocesso encontrado: {}", sp);
 
-        if (perfil == Perfil.GESTOR || perfil == Perfil.CHEFE) {
-            if (sp.getUnidade() == null || codUnidadeUsuario == null || !codUnidadeUsuario.equals(sp.getUnidade().getCodigo())) {
-                log.warn("Usuário sem permissão para visualizar este subprocesso.");
-                throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
-            }
-        } else if (perfil != Perfil.ADMIN) {
-            log.warn("Perfil sem permissão.");
-            throw new ErroAccessoNegado("Perfil sem permissão.");
-        }
-
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
         log.debug("Usuário encontrado: {}", usuario);
+
+        verificarPermissaoVisualizacao(sp, perfil, usuario);
 
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
         log.debug("Responsável encontrado: {}", responsavel);
@@ -91,6 +84,48 @@ public class SubprocessoDtoService {
         log.debug("Permissões calculadas: {}", permissoes);
 
         return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
+    }
+
+    private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
+        if (!usuario.getPerfis().contains(perfil)) {
+            log.warn("Usuário não possui o perfil solicitado.");
+            throw new ErroAccessoNegado("Perfil inválido para o usuário.");
+        }
+
+        if (perfil == Perfil.ADMIN) {
+            return;
+        }
+
+        Unidade unidadeUsuario = usuario.getUnidade();
+        Unidade unidadeAlvo = sp.getUnidade();
+
+        if (unidadeUsuario == null || unidadeAlvo == null) {
+            throw new ErroAccessoNegado("Unidade não identificada.");
+        }
+
+        if (perfil == Perfil.GESTOR) {
+            if (isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario)) {
+                return;
+            }
+        } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
+            if (unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo())) {
+                return;
+            }
+        }
+
+        log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
+        throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
+    }
+
+    private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
+        sgc.unidade.model.Unidade atual = alvo;
+        while (atual != null) {
+            if (atual.getCodigo().equals(superior.getCodigo())) {
+                return true;
+            }
+            atual = atual.getUnidadeSuperior();
+        }
+        return false;
     }
 
     @Transactional(readOnly = true)

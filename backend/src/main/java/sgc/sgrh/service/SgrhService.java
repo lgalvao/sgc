@@ -9,6 +9,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SgrhService {
     final UnidadeRepo unidadeRepo;
+    final UsuarioRepo usuarioRepo;
 
     // Mapa estático para controle de mocks em testes E2E
     public static final Map<String, List<PerfilDto>> perfisMock = new ConcurrentHashMap<>();
@@ -37,9 +39,11 @@ public class SgrhService {
     }
 
     public Usuario buscarUsuarioPorLogin(String login) {
-        log.warn("MOCK SGRH: Buscando usuário por login.");
-        var unidade = unidadeRepo.findById(10L).orElse(null); // Usa uma unidade padrão para o mock
-        return new Usuario(login, "Usuário Mock", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
+        return usuarioRepo.findById(login).orElseGet(() -> {
+            log.warn("MOCK SGRH: Buscando usuário por login (Fallback).");
+            var unidade = unidadeRepo.findById(10L).orElse(null); // Usa uma unidade padrão para o mock
+            return new Usuario(login, "Usuário Mock", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
+        });
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {

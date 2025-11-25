@@ -96,9 +96,11 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("admin");
 
+        Usuario admin = new Usuario();
+        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(new Usuario());
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
@@ -114,13 +116,64 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
-    @DisplayName("obterDetalhes falha se perfil invalido")
-    void obterDetalhesPerfilInvalido() {
+    @DisplayName("obterDetalhes sucesso servidor mesma unidade")
+    void obterDetalhesServidorMesmaUnidade() {
         Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.SERVIDOR, null))
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(u);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("servidor");
+
+        Usuario servidor = new Usuario();
+        servidor.setUnidade(u);
+        servidor.setPerfis(java.util.Set.of(Perfil.SERVIDOR));
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+
+        var res = service.obterDetalhes(id, Perfil.SERVIDOR, 10L);
+
+        assertThat(res).isNotNull();
+    }
+
+    @Test
+    @DisplayName("obterDetalhes falha servidor unidade diferente")
+    void obterDetalhesServidorUnidadeDiferente() {
+        Long id = 1L;
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(u1);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("servidor");
+
+        Usuario servidor = new Usuario();
+        servidor.setUnidade(u2);
+        servidor.setPerfis(java.util.Set.of(Perfil.SERVIDOR));
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+
+        assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.SERVIDOR, null))
             .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -143,8 +196,12 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("gestor");
 
+        Usuario gestor = new Usuario();
+        gestor.setUnidade(u);
+        gestor.setPerfis(java.util.Set.of(Perfil.GESTOR));
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(new Usuario());
+        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.GESTOR, 10L);
@@ -156,14 +213,27 @@ class SubprocessoDtoServiceTest {
     @DisplayName("obterDetalhes falha gestor unidade errada")
     void obterDetalhesGestorErrado() {
         Long id = 1L;
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setUnidade(u);
+        sp.setUnidade(u1);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("gestor");
+
+        Usuario gestor = new Usuario();
+        gestor.setUnidade(u2);
+        gestor.setPerfis(java.util.Set.of(Perfil.GESTOR));
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
 
         assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.GESTOR, 20L))
             .isInstanceOf(ErroAccessoNegado.class);
@@ -185,7 +255,11 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("admin");
 
+        Usuario admin = new Usuario();
+        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
