@@ -350,6 +350,7 @@ class SubprocessoWorkflowServiceTest {
         user.setUnidade(u);
 
         Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         sp.setUnidade(u);
         u.setUnidadeSuperior(new Unidade());
 
@@ -369,18 +370,20 @@ class SubprocessoWorkflowServiceTest {
     void aceitarCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         Unidade u = new Unidade();
         Unidade sup = new Unidade();
         sup.setSigla("SUP");
         u.setUnidadeSuperior(sup);
         sp.setUnidade(u);
         Usuario user = new Usuario();
+        user.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.aceitarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroAceito.class));
     }
 

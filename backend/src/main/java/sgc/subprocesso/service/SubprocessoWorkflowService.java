@@ -264,64 +264,12 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void devolverCadastro(Long codSubprocesso, String motivo, String observacoes, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        analiseService.criarAnalise(CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                .siglaUnidade(usuario.getUnidade().getSigla())
-                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(motivo)
-                .build());
-
-        Unidade unidadeDevolucao = sp.getUnidade();
-
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-        sp.setDataFimEtapa1(null);
-        repositorioSubprocesso.save(sp);
-
-        publicadorDeEventos.publishEvent(EventoSubprocessoCadastroDevolvido.builder()
-                .codSubprocesso(codSubprocesso)
-                .usuario(usuario)
-                .unidadeOrigem(sp.getUnidade().getUnidadeSuperior())
-                .unidadeDestino(unidadeDevolucao)
-                .motivo(motivo)
-                .observacoes(observacoes)
-                .build());
+        devolverEtapaCadastro(codSubprocesso, motivo, observacoes, usuario, false);
     }
 
     @Transactional
     public void aceitarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-
-        Unidade unidadeOrigem = sp.getUnidade();
-        Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
-        if (unidadeDestino == null) {
-            throw new IllegalStateException("Não foi possível identificar a unidade superior para enviar a análise.");
-        }
-
-        analiseService.criarAnalise(CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                .siglaUnidade(unidadeDestino.getSigla())
-                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(null)
-                .build());
-
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
-        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
-        repositorioSubprocesso.save(sp);
-
-        publicadorDeEventos.publishEvent(EventoSubprocessoCadastroAceito.builder()
-                .codSubprocesso(codSubprocesso)
-                .usuario(usuario)
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(unidadeDestino)
-                .observacoes(observacoes)
-                .build());
+        aceitarEtapaCadastro(codSubprocesso, observacoes, usuario, false);
     }
 
     @Transactional
@@ -349,76 +297,12 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void devolverRevisaoCadastro(Long codSubprocesso, String motivo, String observacoes, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
-        }
-
-        analiseService.criarAnalise(CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-                .siglaUnidade(usuario.getUnidade().getSigla())
-                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(motivo)
-                .build());
-
-        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de análise não encontrada."));
-        Unidade unidadeDestino = unidadeRepo.findById(sp.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
-
-        if (unidadeDestino.equals(sp.getUnidade())) {
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            sp.setDataFimEtapa1(null);
-        }
-        repositorioSubprocesso.save(sp);
-
-        publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoDevolvida.builder()
-                .codSubprocesso(codSubprocesso)
-                .usuario(usuario)
-                .unidadeOrigem(unidadeAnalise)
-                .unidadeDestino(unidadeDestino)
-                .motivo(motivo)
-                .observacoes(observacoes)
-                .build());
+        devolverEtapaCadastro(codSubprocesso, motivo, observacoes, usuario, true);
     }
 
     @Transactional
     public void aceitarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
-        }
-
-        analiseService.criarAnalise(CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(TipoAcaoAnalise.ACEITE_REVISAO)
-                .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
-                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(null)
-                .build());
-
-        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de origem não encontrada."));
-        Unidade unidadeDestino = unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
-
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        repositorioSubprocesso.save(sp);
-
-        publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoAceita.builder()
-                .codSubprocesso(codSubprocesso)
-                .usuario(usuario)
-                .unidadeOrigem(unidadeAnalise)
-                .unidadeDestino(unidadeDestino)
-                .observacoes(observacoes)
-                .build());
+        aceitarEtapaCadastro(codSubprocesso, observacoes, usuario, true);
     }
 
     @Transactional
@@ -447,8 +331,86 @@ public class SubprocessoWorkflowService {
                     .observacoes(observacoes)
                     .build());
         }
-
         repositorioSubprocesso.save(sp);
+    }
+
+    private void devolverEtapaCadastro(Long codSubprocesso, String motivo, String observacoes, Usuario usuario, boolean isRevisao) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
+        final SituacaoSubprocesso situacaoEsperada = isRevisao ? SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA : SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO;
+        final String tipoFluxoStr = isRevisao ? "revisões de cadastro" : "cadastros";
+
+        if (situacaoAtual != situacaoEsperada) {
+            throw new IllegalStateException("Ação de devolução só pode ser executada em " + tipoFluxoStr + " disponibilizadas. Situação atual: " + situacaoAtual);
+        }
+
+        analiseService.criarAnalise(CriarAnaliseRequest.builder()
+                .codSubprocesso(codSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(isRevisao ? TipoAcaoAnalise.DEVOLUCAO_REVISAO : TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                .siglaUnidade(usuario.getUnidade().getSigla())
+                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(motivo)
+                .build());
+
+        Unidade unidadeOrigem = usuario.getUnidade();
+        Unidade unidadeDestino = sp.getUnidade();
+
+        sp.setSituacao(isRevisao ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        sp.setDataFimEtapa1(null);
+        repositorioSubprocesso.save(sp);
+
+        if (isRevisao) {
+            publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoDevolvida.builder()
+                .codSubprocesso(codSubprocesso).usuario(usuario).unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(unidadeDestino).motivo(motivo).observacoes(observacoes).build());
+        } else {
+            publicadorDeEventos.publishEvent(EventoSubprocessoCadastroDevolvido.builder()
+                .codSubprocesso(codSubprocesso).usuario(usuario).unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(unidadeDestino).motivo(motivo).observacoes(observacoes).build());
+        }
+    }
+
+    private void aceitarEtapaCadastro(Long codSubprocesso, String observacoes, Usuario usuario, boolean isRevisao) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
+        final SituacaoSubprocesso situacaoEsperada = isRevisao ? SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA : SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO;
+        final String tipoFluxoStr = isRevisao ? "revisões de cadastro" : "cadastros";
+        if (situacaoAtual != situacaoEsperada) {
+            throw new IllegalStateException("Ação de aceite só pode ser executada em " + tipoFluxoStr + " disponibilizadas.");
+        }
+
+        Unidade unidadeAnalise = usuario.getUnidade();
+        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+        if (unidadeDestino == null) {
+            throw new IllegalStateException("Não foi possível identificar a unidade superior para enviar a análise.");
+        }
+
+        analiseService.criarAnalise(CriarAnaliseRequest.builder()
+                .codSubprocesso(codSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(isRevisao ? TipoAcaoAnalise.ACEITE_REVISAO : TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .siglaUnidade(unidadeAnalise.getSigla())
+                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(null)
+                .build());
+
+        sp.setSituacao(situacaoEsperada);
+        repositorioSubprocesso.save(sp);
+
+        if (isRevisao) {
+            publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoAceita.builder()
+                .codSubprocesso(codSubprocesso).usuario(usuario).unidadeOrigem(unidadeAnalise)
+                .unidadeDestino(unidadeDestino).observacoes(observacoes).build());
+        } else {
+            publicadorDeEventos.publishEvent(EventoSubprocessoCadastroAceito.builder()
+                .codSubprocesso(codSubprocesso).usuario(usuario).unidadeOrigem(unidadeAnalise)
+                .unidadeDestino(unidadeDestino).observacoes(observacoes).build());
+        }
     }
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {

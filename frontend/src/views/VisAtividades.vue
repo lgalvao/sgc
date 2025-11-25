@@ -139,6 +139,18 @@
       <div class="mb-3">
         <label
           class="form-label"
+          for="motivoDevolucao"
+        >Motivo</label>
+        <BFormTextarea
+          id="motivoDevolucao"
+          v-model="motivoDevolucao"
+          data-testid="input-motivo-devolucao"
+          rows="3"
+        />
+      </div>
+      <div class="mb-3">
+        <label
+          class="form-label"
           for="observacaoDevolucao"
         >Observação</label>
         <BFormTextarea
@@ -217,6 +229,7 @@ const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
 const observacaoValidacao = ref<string>("");
 const observacaoDevolucao = ref<string>("");
+const motivoDevolucao = ref<string>("");
 
 const unidade = computed(() => {
   function buscarUnidade(
@@ -329,7 +342,7 @@ async function confirmarValidacao() {
 async function confirmarDevolucao() {
   if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
-    motivo: "", // Adicionar esta linha
+    motivo: motivoDevolucao.value,
     observacoes: observacaoDevolucao.value,
   };
 
@@ -351,6 +364,7 @@ function fecharModalValidar() {
 function fecharModalDevolver() {
   mostrarModalDevolver.value = false;
   observacaoDevolucao.value = "";
+  motivoDevolucao.value = "";
 }
 
 function abrirModalImpacto() {
