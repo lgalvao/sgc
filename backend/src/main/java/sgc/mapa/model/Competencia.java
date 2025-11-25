@@ -21,6 +21,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Competencia extends EntidadeBase {
+    public Competencia(Long codigo, String descricao, Mapa mapa) {
+        super(codigo);
+        this.descricao = descricao;
+        this.mapa = mapa;
+    }
+
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;

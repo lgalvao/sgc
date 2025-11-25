@@ -23,6 +23,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alerta extends EntidadeBase {
+    public Alerta(Long codigo, sgc.processo.model.Processo processo, sgc.sgrh.model.Usuario usuarioDestino, String descricao, java.time.LocalDateTime dataHora) {
+        super(codigo);
+        this.processo = processo;
+        this.usuarioDestino = usuarioDestino;
+        this.descricao = descricao;
+        this.dataHora = dataHora;
+    }
+
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;

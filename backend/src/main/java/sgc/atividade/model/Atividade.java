@@ -25,6 +25,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Atividade extends EntidadeBase {
+    public Atividade(Long codigo, String descricao, sgc.mapa.model.Mapa mapa) {
+        super(codigo);
+        this.descricao = descricao;
+        this.mapa = mapa;
+    }
+
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;

@@ -17,6 +17,12 @@ import sgc.comum.model.EntidadeBase;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Conhecimento extends EntidadeBase {
+    public Conhecimento(Long codigo, String descricao, Atividade atividade) {
+        super(codigo);
+        this.descricao = descricao;
+        this.atividade = atividade;
+    }
+
     @ManyToOne
     @JoinColumn(name = "atividade_codigo")
     private Atividade atividade;

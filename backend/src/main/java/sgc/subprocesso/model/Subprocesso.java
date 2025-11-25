@@ -21,6 +21,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Subprocesso extends EntidadeBase {
+    public Subprocesso(Long codigo, sgc.processo.model.Processo processo, sgc.unidade.model.Unidade unidade, sgc.mapa.model.Mapa mapa, SituacaoSubprocesso situacao, java.time.LocalDateTime dataLimiteEtapa1) {
+        super(codigo);
+        this.processo = processo;
+        this.unidade = unidade;
+        this.mapa = mapa;
+        this.situacao = situacao;
+        this.dataLimiteEtapa1 = dataLimiteEtapa1;
+    }
+
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
