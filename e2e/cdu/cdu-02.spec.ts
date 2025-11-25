@@ -1,93 +1,117 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import { expect } from '@playwright/test';
+import { vueTest as test } from '../support/vue-specific-setup';
 import {
-    aguardarTabelaProcessosCarregada,
-    clicarProcesso,
     criarEIniciarProcessoBasico,
     criarProcessoBasico,
-    esperarElementoVisivel,
-    loginComoAdmin,
-    loginComoChefeStic,
-    loginComoServidor,
-    SELETORES,
-    verificarAlertasOrdenadosPorDataHora,
-    verificarAusenciaBotaoCriarProcesso,
-    verificarColunasTabelaAlertas,
-    verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
-    verificarProcessoInvisivel,
-    verificarProcessoVisivel,
-    verificarQuantidadeProcessosNaTabela,
 } from '~/helpers';
+import { PaginaLogin } from '~/helpers/pages/login-page';
+import { PaginaPainel } from '~/helpers/pages/painel-page';
+import { USUARIOS } from '~/helpers/dados/constantes';
 
 test.describe('CDU-02: Visualizar Painel', () => {
+    // Clean up of 'processos em andamento' is removed as the fixture now guarantees an isolated DB per test.
+
     test.describe('Visibilidade de Componentes por Perfil', () => {
-        const NOME_PROCESSO_CRIADO = 'Processo teste revisão CDU-05';
+        test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({ page }) => {
+            const loginPage = new PaginaLogin(page);
+            const painelPage = new PaginaPainel(page);
 
-        test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({page}) => {
-            // Cria um processo em estado "EM_ANDAMENTO" para o SERVIDOR (Ana Paula Souza, SESEL)
-            await loginComoAdmin(page);
-            await criarEIniciarProcessoBasico(page, 'Processo Servidor SESEL', 'MAPEAMENTO', ['SESEL'], '2025-12-31');
+            await test.step('Preparação: Criar dados como ADMIN', async () => {
+                await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
+                
+                const nomeProcesso = `Processo Servidor SESEL ${Date.now()}`;
+                await criarEIniciarProcessoBasico(page, nomeProcesso, 'MAPEAMENTO', ['SESEL'], '2025-12-31');
+            });
 
-            await loginComoServidor(page);
-            await verificarElementosPainel(page);
-            await verificarAusenciaBotaoCriarProcesso(page);
-            await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
+            await test.step('Ação: Logar como SERVIDOR', async () => {
+                await loginPage.realizarLogin(USUARIOS.SERVIDOR.titulo, USUARIOS.SERVIDOR.senha);
+            });
+
+            await test.step('Verificação: Elementos do Painel', async () => {
+                await painelPage.verificarTituloProcessos();
+                await painelPage.verificarTituloAlertas();
+                await painelPage.verificarTabelaProcessosVisivel();
+                await painelPage.verificarColunasTabelaProcessos();
+                await painelPage.verificarBotaoCriarProcesso(false);
+                await painelPage.verificarTabelaAlertasVisivel();
+            });
         });
     });
 
     test.describe('Tabela de Processos', () => {
+        let nomeProcessoSgp: string;
+        let nomeProcessoCojur: string;
+
         test.beforeEach(async ({ page }) => {
-            await loginComoAdmin(page);
-            // Cria um processo visível para o Chefe da STIC (unidade 2)
-            await criarEIniciarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC'], '2025-12-31');
-            // Cria um processo fora da hierarquia da STIC
-            await criarEIniciarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT'], '2025-12-31');
+            const loginPage = new PaginaLogin(page);
+            await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
+
+            nomeProcessoSgp = `Processo da SGP para CDU-02 ${Date.now()}`;
+            await criarEIniciarProcessoBasico(page, nomeProcessoSgp, 'MAPEAMENTO', ['SGP'], '2025-12-31');
+
+            nomeProcessoCojur = `Processo COJUR - Fora da SGP ${Date.now()}`;
+            await criarEIniciarProcessoBasico(page, nomeProcessoCojur, 'MAPEAMENTO', ['COJUR'], '2025-12-31');
         });
 
-        test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
-            await loginComoChefeStic(page);
+        test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({ page }) => {
+            const loginPage = new PaginaLogin(page);
+            const painelPage = new PaginaPainel(page);
 
-            // Aguardar tabela de processos carregar
-            await aguardarTabelaProcessosCarregada(page);
+            await loginPage.realizarLogin(USUARIOS.CHEFE_SGP.titulo, USUARIOS.CHEFE_SGP.senha);
 
-            // Chefe STIC deve ver o processo da sua unidade
-            await verificarProcessoVisivel(page, /Processo da STIC para CDU-02/);
+            // Chefe SGP deve ver o processo da sua unidade
+            await painelPage.aguardarProcessoNoPainel(new RegExp(nomeProcessoSgp));
 
-            // Não deve ver processo da ADMIN-UNIT
-            await verificarProcessoInvisivel(page, /Processo ADMIN-UNIT - Fora da STIC/);
+            // Não deve ver processo da COJUR
+            await painelPage.verificarProcessoNaoVisivel(new RegExp(nomeProcessoCojur));
 
             // A tabela deve conter exatamente 1 processo visível para este usuário
-            await verificarQuantidadeProcessosNaTabela(page, 1);
+            await painelPage.verificarQuantidadeProcessosNaTabela(1);
         });
     });
 
     test.describe('Navegação a partir do Painel', () => {
-        const NOME_PROCESSO_CRIADO = 'Processo teste revisão CDU-05';
+        let nomeProcessoTeste: string;
 
         test.beforeEach(async ({ page }) => {
-            // Cria um processo em estado "CRIADO" para o teste de navegação
-            await loginComoAdmin(page);
-            await criarProcessoBasico(page, NOME_PROCESSO_CRIADO, 'REVISAO', ['CDU05-REV-UNIT']);
+            const loginPage = new PaginaLogin(page);
+            await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
+            nomeProcessoTeste = `Processo para Teste de Navegação ${Date.now()}`;
+            // Usando SGP pois STIC pode estar bloqueada por processos em andamento (SEDESENV)
+            await criarProcessoBasico(page, nomeProcessoTeste, 'MAPEAMENTO', ['SGP']);
         });
 
-        test('ADMIN deve navegar para a edição ao clicar em processo "Criado"', async ({page}) => {
-            await loginComoAdmin(page);
-            await clicarProcesso(page, /Processo teste revisão CDU-05/);
+        test('ADMIN deve navegar para a edição ao clicar em processo "Criado"', async ({ page }) => {
+            const loginPage = new PaginaLogin(page);
+            const painelPage = new PaginaPainel(page);
+
+            // Note: creating process already leaves us logged in as admin, but explicitly logging in is safer for test isolation/readability if beforeEach didn't imply state persistence (though Playwright page is persistent per test).
+            // Since we are in the same test execution (same page), we are logged in.
+            // But to be consistent with the previous test block structure...
+            // Actually, we are already logged in from beforeEach.
+            
+            await painelPage.clicarProcessoNaTabela(new RegExp(nomeProcessoTeste));
             await verificarNavegacaoPaginaCadastroProcesso(page);
         });
     });
 
     test.describe('Tabela de Alertas', () => {
-        test.beforeEach(async ({page}) => await loginComoAdmin(page));
-
-        test('deve mostrar alertas na tabela com as colunas corretas', async ({page}) => {
-            await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
-            await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
-            await verificarColunasTabelaAlertas(page);
+        test.beforeEach(async ({ page }) => {
+            const loginPage = new PaginaLogin(page);
+            await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
         });
 
-        test('deve exibir alertas ordenados por data/hora decrescente inicialmente', async ({page}) => {
-            await verificarAlertasOrdenadosPorDataHora(page);
+        test('deve mostrar alertas na tabela com as colunas corretas', async ({ page }) => {
+            const painelPage = new PaginaPainel(page);
+            await painelPage.verificarTituloAlertas();
+            await painelPage.verificarTabelaAlertasVisivel();
+            await painelPage.verificarColunasTabelaAlertas();
+        });
+
+        test('deve exibir alertas ordenados por data/hora decrescente inicialmente', async ({ page }) => {
+            const painelPage = new PaginaPainel(page);
+            await painelPage.verificarAlertasOrdenadosPorDataHora();
         });
     });
 });

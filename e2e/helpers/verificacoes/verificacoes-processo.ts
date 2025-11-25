@@ -275,7 +275,7 @@ export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoIniciarProcessoInvisivel(page: Page): Promise<void> {
-    await expect(page.locator(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`)).not.toBeVisible();
+    await expect(page.locator(`[data-testid="btn-iniciar-processo"]`)).not.toBeVisible();
 }
 
 /**

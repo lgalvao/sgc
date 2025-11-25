@@ -1,6 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {navegarParaCriacaoProcesso} from '~/helpers';
+import {aguardarTabelaProcessosCarregada} from '../verificacoes/verificacoes-processo';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
@@ -139,7 +140,11 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
 export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await expect(modal).toBeVisible();
-    await modal.locator(SELETORES.BTN_MODAL_CONFIRMAR).click();
+
+    const confirmButton = modal.locator(SELETORES.BTN_MODAL_CONFIRMAR);
+    await expect(confirmButton).toBeVisible();
+    await expect(confirmButton).toBeEnabled();
+    await confirmButton.click({ force: true });
 }
 
 /**
@@ -223,7 +228,8 @@ export async function criarEIniciarProcessoBasico(
  * @param descricao A descrição do processo a ser aberto.
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
-    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, {hasText: `"${descricao}"`});
+    await aguardarTabelaProcessosCarregada(page);
+    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, {hasText: descricao});
     await row.first().click();
 
     // Aguardar navegação para página de cadastro
@@ -305,9 +311,10 @@ export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso:
  * @param novaDescricao A nova descrição do processo.
  */
 export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
-    await page.fill(SELETORES.CAMPO_DESCRICAO, novaDescricao);
+    await page.locator(SELETORES.CAMPO_DESCRICAO).fill(novaDescricao);
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
 }
+
 
 /**
  * Cria um processo de mapeamento completo.

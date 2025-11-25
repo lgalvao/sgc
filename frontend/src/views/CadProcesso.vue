@@ -120,6 +120,7 @@
         </BButton>
         <BButton
           variant="primary"
+          data-testid="btn-modal-confirmar"
           @click="confirmarIniciarProcesso"
         >
           Confirmar

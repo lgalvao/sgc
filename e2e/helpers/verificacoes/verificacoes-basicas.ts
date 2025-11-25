@@ -37,7 +37,7 @@ export async function esperarTextoVisivel(page: Page, texto: string): Promise<vo
  * @param testId O test-id do elemento.
  */
 export async function esperarElementoVisivel(page: Page, testId: string): Promise<void> {
-    await expect(page.getByTestId(testId).first()).toBeVisible();
+    await expect(page.locator(testId).first()).toBeVisible();
 }
 
 /**
@@ -46,7 +46,7 @@ export async function esperarElementoVisivel(page: Page, testId: string): Promis
  * @param testId O test-id do elemento.
  */
 export async function esperarElementoInvisivel(page: Page, testId: string): Promise<void> {
-    await expect(page.getByTestId(testId).first()).not.toBeVisible();
+    await expect(page.locator(testId).first()).not.toBeVisible();
 }
 
 /**

@@ -23,6 +23,17 @@ export class PaginaLogin {
         await this.clicarEntrar();
     }
 
+    /**
+     * Realiza o login e aguarda o redirecionamento para o painel.
+     * Use este método para fluxos padrão de login (sem seleção de perfil).
+     */
+    async realizarLogin(usuario: string, senha_plana: string) {
+        await this.navegar();
+        await this.fazerLogin(usuario, senha_plana);
+        await this.page.waitForURL(URLS.PAINEL);
+        await this.page.waitForLoadState('domcontentloaded');
+    }
+
     async selecionarPerfil(perfil: string) {
         const seletor = this.page.getByTestId('select-perfil-unidade');
         await seletor.waitFor({ state: 'visible' });

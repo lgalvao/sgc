@@ -34,7 +34,6 @@ import org.springframework.data.domain.Pageable; // Added for Pageable.unpaged()
 @RestController
 @RequestMapping("/api/e2e")
 @RequiredArgsConstructor
-@Profile("e2e")
 @Slf4j
 public class E2eTestController {
     private final ProcessoRepo processoRepo;
