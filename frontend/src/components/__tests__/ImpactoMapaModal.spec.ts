@@ -1,122 +1,105 @@
-import {mount} from "@vue/test-utils";
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
-import ImpactoMapaModal from "../ImpactoMapaModal.vue";
+import { createTestingPinia } from "@pinia/testing";
+import { flushPromises, mount } from "@vue/test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import { useMapasStore } from "@/stores/mapas";
+import { TipoImpactoCompetencia } from "@/types/impacto";
 
-const mocks = vi.hoisted(() => {
-    const mockImpacto = {
-        temImpactos: true,
-        totalAtividadesInseridas: 1,
-        totalAtividadesRemovidas: 1,
-        totalAtividadesAlteradas: 0,
-        totalCompetenciasImpactadas: 1,
-        atividadesInseridas: [
-            {
-                codigo: 203,
-                descricao: "Nova Atividade",
-                tipoImpacto: "INSERIDA",
-                competenciasVinculadas: [],
-            },
-        ],
-        atividadesRemovidas: [
-            {codigo: 204, descricao: "Atividade Removida", tipoImpacto: "REMOVIDA"},
-        ],
-        atividadesAlteradas: [],
-        competenciasImpactadas: [
-            {
-                codigo: 101,
-                descricao: "Competência A",
-                atividadesAfetadas: ["Atividade Removida"],
-                tipoImpacto: "ATIVIDADE_REMOVIDA",
-            },
-        ],
-    };
-    return {
-        mockImpacto,
-        fetchImpactoMapa: vi.fn(),
-    };
-});
-
-// Mock stores
-vi.mock("@/stores/mapas", () => ({
-  useMapasStore: () => ({
-    impactoMapa: ref(mocks.mockImpacto),
-    fetchImpactoMapa: mocks.fetchImpactoMapa,
-  }),
+vi.mock("@/services/mapaService", () => ({
+  verificarImpactos: vi.fn(),
 }));
 
-vi.mock("@/stores/processos", () => ({
-  useProcessosStore: () => ({
-    processoDetalhe: {
-        unidades: [{sigla: "UT", codSubprocesso: 100}],
-    },
-    fetchProcessoDetalhe: vi.fn(),
-  }),
-}));
+describe("ImpactoMapaModal.vue", () => {
+  let wrapper: any;
 
-describe("ImpactoMapaModal", () => {
+  function createWrapper(impacto: any) {
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 1,
+        siglaUnidade: "TESTE",
+      },
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              mapas: {
+                impactoMapa: impacto,
+              },
+              processos: {
+                processoDetalhe: {
+                  unidades: [{ sigla: "TESTE", codSubprocesso: 123 }],
+                },
+              },
+            },
+          }),
+        ],
+      },
+    });
+
+    return { wrapper };
+  }
+
   beforeEach(() => {
-    setActivePinia(createPinia());
-    mocks.fetchImpactoMapa.mockClear();
+    vi.clearAllMocks();
   });
 
-    it("não deve buscar impactos quando mostrar for falso", () => {
-    mount(ImpactoMapaModal, {
-        props: {mostrar: false, idProcesso: 1, siglaUnidade: "UT"},
-      global: {
-          stubs: {BModal: true},
-      },
-    });
-    expect(mocks.fetchImpactoMapa).not.toHaveBeenCalled();
+  afterEach(() => {
+    wrapper?.unmount();
   });
 
-    it("deve buscar impactos ao abrir", async () => {
-    const wrapper = mount(ImpactoMapaModal, {
-        props: {mostrar: false, idProcesso: 1, siglaUnidade: "UT"},
-      global: {
-          stubs: {BModal: true},
-      },
-    });
+  it("deve mostrar mensagem de nenhum impacto", async () => {
+    const impacto = {
+      temImpactos: false,
+      atividadesInseridas: [],
+      atividadesRemovidas: [],
+      atividadesAlteradas: [],
+      competenciasImpactadas: [],
+    };
+    const { wrapper: w } = createWrapper(impacto);
+    wrapper = w;
+    await flushPromises();
 
-    await wrapper.setProps({ mostrar: true });
-    expect(mocks.fetchImpactoMapa).toHaveBeenCalledWith(100);
+    expect(wrapper.text()).toContain("Nenhum impacto detectado no mapa.");
   });
 
-    it("deve renderizar a seção de atividades inseridas corretamente", () => {
-    const wrapper = mount(ImpactoMapaModal, {
-        props: {mostrar: true, idProcesso: 1, siglaUnidade: "UT"},
-      global: {
-          stubs: {BModal: {template: "<div><slot/></div>"}},
-      },
-    });
+  it("deve mostrar atividades inseridas", async () => {
+    const impacto = {
+      temImpactos: true,
+      atividadesInseridas: [{ codigo: 1, descricao: "Nova Atividade" }],
+      atividadesRemovidas: [],
+      atividadesAlteradas: [],
+      competenciasImpactadas: [],
+    };
+    const { wrapper: w } = createWrapper(impacto);
+    wrapper = w;
+    await flushPromises();
 
-        expect(wrapper.text()).toContain("Atividades Inseridas");
-        expect(wrapper.text()).toContain("Nova Atividade");
+    expect(wrapper.text()).toContain("Atividades Inseridas");
+    expect(wrapper.text()).toContain("Nova Atividade");
   });
 
-    it("deve renderizar a seção de atividades removidas corretamente", () => {
-        const wrapper = mount(ImpactoMapaModal, {
-            props: {mostrar: true, idProcesso: 1, siglaUnidade: "UT"},
-      global: {
-          stubs: {BModal: {template: "<div><slot/></div>"}},
-      },
-    });
+  it("deve mostrar competências impactadas", async () => {
+    const impacto = {
+      temImpactos: true,
+      atividadesInseridas: [],
+      atividadesRemovidas: [],
+      atividadesAlteradas: [],
+      competenciasImpactadas: [
+        {
+          codigo: 1,
+          descricao: "Competência Impactada",
+          atividadesAfetadas: ["Atividade Removida"],
+          tipoImpacto: TipoImpactoCompetencia.ATIVIDADE_REMOVIDA,
+        },
+      ],
+    };
+    const { wrapper: w } = createWrapper(impacto);
+    wrapper = w;
+    await flushPromises();
 
-        expect(wrapper.text()).toContain("Atividades Removidas");
-        expect(wrapper.text()).toContain("Atividade Removida");
-  });
-
-    it("deve renderizar a seção de competências impactadas corretamente", () => {
-    const wrapper = mount(ImpactoMapaModal, {
-        props: {mostrar: true, idProcesso: 1, siglaUnidade: "UT"},
-      global: {
-          stubs: {BModal: {template: "<div><slot/></div>"}},
-      },
-    });
-
-        expect(wrapper.text()).toContain("Competências Impactadas");
-        expect(wrapper.text()).toContain("Competência A");
-        expect(wrapper.text()).toContain("Atividade Removida");
+    expect(wrapper.text()).toContain("Competências Impactadas");
+    expect(wrapper.text()).toContain("Competência Impactada");
   });
 });

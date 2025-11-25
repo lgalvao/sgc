@@ -431,4 +431,24 @@ describe("CadMapa.vue", () => {
     const impactoModal = wrapper.findComponent({ name: "ImpactoMapaModal" });
     expect(impactoModal.props("mostrar")).toBe(true);
   });
+
+  it('deve mostrar o botão "Impacto no mapa" se tiver permissão', async () => {
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
+  });
+
+  it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {
+    vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue({
+      permissoes: { podeVisualizarImpacto: false },
+    } as any);
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(false);
+  });
 });
