@@ -289,7 +289,6 @@ describe("VisMapa.vue", () => {
     await confirmBtn.trigger("click");
 
     expect(store.devolverRevisaoCadastro).toHaveBeenCalledWith(10, {
-      motivo: "",
       observacoes: "Ajustar X",
     });
   });

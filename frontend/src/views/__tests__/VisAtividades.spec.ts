@@ -100,26 +100,22 @@ describe("VisAtividades.vue", () => {
     wrapper?.unmount();
   });
 
-  it('deve mostrar o botão "Impacto no mapa" para GESTOR em REVISAO_CADASTRO_DISPONIBILIZADA', async () => {
+  it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
     const { wrapper: w } = createWrapper(
       Perfil.GESTOR,
-      SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+      SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
     );
     wrapper = w;
     await flushPromises();
     await nextTick();
 
-    console.log(wrapper.vm.perfilSelecionado);
-    if (wrapper.vm.subprocesso) {
-      console.log(wrapper.vm.subprocesso.situacaoSubprocesso);
-    }
     expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
   });
 
-  it('deve mostrar o botão "Impacto no mapa" para ADMIN em REVISAO_CADASTRO_DISPONIBILIZADA', async () => {
+  it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
     const { wrapper: w } = createWrapper(
       Perfil.ADMIN,
-      SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+      SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
     );
     wrapper = w;
     await flushPromises();

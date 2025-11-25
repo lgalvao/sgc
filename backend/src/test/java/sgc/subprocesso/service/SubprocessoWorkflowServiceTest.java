@@ -355,7 +355,7 @@ class SubprocessoWorkflowServiceTest {
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
-        service.devolverCadastro(id, "motivo", "obs", user);
+        service.devolverCadastro(id, "obs", user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         verify(analiseService).criarAnalise(any());
@@ -380,7 +380,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroAceito.class));
     }
 
@@ -452,7 +452,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(unidadeRepo.findById(10L)).thenReturn(Optional.of(u));
 
-        service.devolverRevisaoCadastro(id, "motivo", "obs", user);
+        service.devolverRevisaoCadastro(id, "obs", user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoDevolvida.class));

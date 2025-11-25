@@ -265,7 +265,7 @@ const podeVerImpacto = computed(() => {
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
   const situacaoCorreta =
       subprocesso.value.situacaoSubprocesso ===
-      SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+      SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO;
   return podeVer && situacaoCorreta;
 });
 
@@ -329,7 +329,6 @@ async function confirmarValidacao() {
 async function confirmarDevolucao() {
   if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
-    motivo: "", // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 

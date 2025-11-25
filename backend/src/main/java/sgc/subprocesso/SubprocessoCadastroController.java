@@ -133,12 +133,10 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.getMotivo());
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(
                 codigo,
-                sanitizedMotivo,
                 sanitizedObservacoes,
                 usuario
         );
@@ -203,12 +201,10 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.getMotivo());
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(
                 codigo,
-                sanitizedMotivo,
                 sanitizedObservacoes,
                 usuario
         );

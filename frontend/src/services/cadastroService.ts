@@ -10,7 +10,7 @@ export async function disponibilizarRevisaoCadastro(id: number): Promise<void> {
 
 export async function devolverCadastro(
     id: number,
-    dados: { motivo: string; observacoes: string },
+    dados: { observacoes: string },
 ): Promise<void> {
   await apiClient.post(`/subprocessos/${id}/devolver-cadastro`, dados);
 }
@@ -31,7 +31,7 @@ export async function homologarCadastro(
 
 export async function devolverRevisaoCadastro(
     id: number,
-    dados: { motivo: string; observacoes: string },
+    dados: { observacoes: string },
 ): Promise<void> {
   await apiClient.post(`/subprocessos/${id}/devolver-revisao-cadastro`, dados);
 }

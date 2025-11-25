@@ -263,7 +263,7 @@ public class SubprocessoWorkflowService {
     }
 
     @Transactional
-    public void devolverCadastro(Long codSubprocesso, String motivo, String observacoes, Usuario usuario) {
+    public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
@@ -272,7 +272,6 @@ public class SubprocessoWorkflowService {
                 .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
                 .siglaUnidade(usuario.getUnidade().getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(motivo)
                 .build());
 
         Unidade unidadeDevolucao = sp.getUnidade();
@@ -286,7 +285,6 @@ public class SubprocessoWorkflowService {
                 .usuario(usuario)
                 .unidadeOrigem(sp.getUnidade().getUnidadeSuperior())
                 .unidadeDestino(unidadeDevolucao)
-                .motivo(motivo)
                 .observacoes(observacoes)
                 .build());
     }
@@ -311,8 +309,7 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
-        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         repositorioSubprocesso.save(sp);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoCadastroAceito.builder()
@@ -348,7 +345,7 @@ public class SubprocessoWorkflowService {
     }
 
     @Transactional
-    public void devolverRevisaoCadastro(Long codSubprocesso, String motivo, String observacoes, Usuario usuario) {
+    public void devolverRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
@@ -362,7 +359,6 @@ public class SubprocessoWorkflowService {
                 .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
                 .siglaUnidade(usuario.getUnidade().getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                .motivo(motivo)
                 .build());
 
         Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
@@ -381,7 +377,6 @@ public class SubprocessoWorkflowService {
                 .usuario(usuario)
                 .unidadeOrigem(unidadeAnalise)
                 .unidadeDestino(unidadeDestino)
-                .motivo(motivo)
                 .observacoes(observacoes)
                 .build());
     }

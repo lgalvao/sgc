@@ -93,16 +93,9 @@ class SubprocessoDtoTest {
 
     @Test
     void DevolverCadastroReq_RecordConstructorAndGetters() {
-        DevolverCadastroReq req = new DevolverCadastroReq("Motivo", OBSERVACOES);
+        DevolverCadastroReq req = new DevolverCadastroReq(OBSERVACOES);
 
-        assertEquals("Motivo", req.getMotivo());
         assertEquals(OBSERVACOES, req.getObservacoes());
-    }
-
-    @Test
-    void DevolverCadastroReq_InvalidMotivo_ThrowsException() {
-        DevolverCadastroReq req = new DevolverCadastroReq("", OBSERVACOES);
-        assertEquals("", req.getMotivo());
     }
 
     @Test
