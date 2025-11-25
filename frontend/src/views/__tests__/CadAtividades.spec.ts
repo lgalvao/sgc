@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing";
 import { flushPromises, mount } from "@vue/test-utils";
 import { BFormInput } from "bootstrap-vue-next";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { computed } from "vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
@@ -107,9 +108,9 @@ describe("CadAtividades.vue", () => {
   function createWrapper(isRevisao = false, customState = {}) {
     // Setup usePerfil mock per test
     vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-      perfilSelecionado: { value: Perfil.CHEFE },
-      servidorLogado: { value: null },
-      unidadeSelecionada: { value: null },
+      perfilSelecionado: computed(() => Perfil.CHEFE),
+      servidorLogado: computed(() => null),
+      unidadeSelecionada: computed(() => null),
       getPerfisDoServidor: vi.fn(),
     } as any);
 

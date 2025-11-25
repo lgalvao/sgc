@@ -13,6 +13,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
+          data-testid="impactos-mapa-button"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
@@ -264,7 +265,7 @@ const podeVerImpacto = computed(() => {
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
   const situacaoCorreta =
       subprocesso.value.situacaoSubprocesso ===
-      SituacaoSubprocesso.ATIVIDADES_REVISADAS;
+      SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
   return podeVer && situacaoCorreta;
 });
 

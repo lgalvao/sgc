@@ -13,6 +13,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
+          data-testid="impactos-mapa-button"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
