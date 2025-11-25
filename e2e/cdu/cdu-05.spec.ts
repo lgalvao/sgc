@@ -10,6 +10,7 @@ import {
     confirmarNoModal,
     criarProcessoBasico,
     gerarNomeUnico,
+    limparProcessosEmAndamento,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     navegarParaHome,
@@ -47,17 +48,21 @@ import {
  * ✅ Validações de estado e criação de dados
  */
 test.describe('CDU-05: Iniciar processo de revisão', () => {
-    const NOME_PROCESSO_REVISAO = 'Processo teste revisão CDU-05';
+    let nomeProcessoRevisao: string;
 
     test.beforeEach(async ({ page }) => {
-        // Loga como admin e cria o processo base para os testes
+        // Loga como admin e limpa processos anteriores
         await loginComoAdmin(page);
-        await criarProcessoBasico(page, NOME_PROCESSO_REVISAO, 'REVISAO', ['CDU05-REV-UNIT']);
+        await limparProcessosEmAndamento(page);
+        
+        // Gera nome único e cria processo base
+        nomeProcessoRevisao = `Processo teste revisão CDU-05 ${Date.now()}`;
+        await criarProcessoBasico(page, nomeProcessoRevisao, 'REVISAO', ['CDU05-REV-UNIT']);
     });
 
     test('deve exibir modal de confirmação ao clicar em Iniciar processo', async ({page}) => {
         // Abrir processo de revisão em situação CRIADO
-        await clicarProcessoNaTabela(page, NOME_PROCESSO_REVISAO);
+        await clicarProcessoNaTabela(page, nomeProcessoRevisao);
 
         // Clicar em Iniciar processo
         await clicarBotaoIniciarProcesso(page);
@@ -68,7 +73,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
 
     test('deve cancelar iniciação do processo ao clicar em Cancelar no modal', async ({page}) => {
         // Abrir processo e clicar em Iniciar
-        await clicarProcessoNaTabela(page, NOME_PROCESSO_REVISAO);
+        await clicarProcessoNaTabela(page, nomeProcessoRevisao);
         await clicarBotaoIniciarProcesso(page);
 
         // Cancelar no modal
@@ -202,7 +207,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
 
     test('deve exibir informações corretas no modal de confirmação', async ({page}) => {
         // Abrir processo
-        await clicarProcessoNaTabela(page, NOME_PROCESSO_REVISAO);
+        await clicarProcessoNaTabela(page, nomeProcessoRevisao);
         await verificarPaginaEdicaoProcesso(page);
 
         // Clicar e verificar modal

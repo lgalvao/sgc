@@ -5,6 +5,7 @@ import {
     clicarProcessoNaTabela,
     confirmarIniciacaoProcesso,
     criarProcessoBasico,
+    limparProcessosEmAndamento,
     loginComoAdmin,
     verificarBotaoIniciarProcessoVisivel,
     verificarCriacaoSubprocessos,
@@ -16,7 +17,8 @@ import {
     verificarPaginaEdicaoProcesso,
     verificarProcessoBloqueadoParaEdicao,
     verificarProcessoIniciadoComSucesso,
-    verificarValorCampoDescricao
+    verificarValorCampoDescricao,
+    TEXTOS
 } from '~/helpers';
 
 /**
@@ -28,6 +30,7 @@ import {
 test.describe.serial('CDU-04: Iniciar processo', () => {
     test.beforeEach(async ({page}) => {
         await loginComoAdmin(page);
+        await limparProcessosEmAndamento(page);
     });
 
     test('deve abrir modal de confirmação, iniciar processo, criar subprocessos, mapas e movimentações', async ({page}) => {
@@ -46,10 +49,16 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         await verificarModalConfirmacaoIniciacaoProcesso(page);
 
         // 4. Confirmar → Processo iniciado
+        const iniciarResponsePromise = page.waitForResponse(response =>
+            response.url().includes(`/api/processos/${processoId}/iniciar`) &&
+            response.request().method() === 'POST' &&
+            response.status() === 200
+        );
         await confirmarIniciacaoProcesso(page);
+        await iniciarResponsePromise; // Wait for the API call to complete successfully
 
         // 5. Verificar que processo aparece no painel
-        await verificarProcessoIniciadoComSucesso(page, descricao);
+        await verificarProcessoIniciadoComSucesso(page, TEXTOS.PROCESSO_INICIADO);
 
         // 6. Verificar que subprocessos foram criados
         const subprocessos = await verificarCriacaoSubprocessos(page, String(processoId));
@@ -94,8 +103,14 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         await clicarProcessoNaTabela(page, descricao);
         await verificarPaginaEdicaoProcesso(page);
         await clicarBotaoIniciarProcesso(page);
+        const iniciarResponsePromise = page.waitForResponse(response =>
+            response.url().includes(`/api/processos`) &&
+            response.request().method() === 'POST' &&
+            response.status() === 200
+        );
         await confirmarIniciacaoProcesso(page);
-        await verificarProcessoIniciadoComSucesso(page, descricao);
+        await iniciarResponsePromise;
+        await verificarProcessoIniciadoComSucesso(page, TEXTOS.PROCESSO_INICIADO);
 
         // 2. Abrir processo iniciado → botões Editar/Remover/Iniciar não aparecem
         await clicarProcessoNaTabela(page, descricao);

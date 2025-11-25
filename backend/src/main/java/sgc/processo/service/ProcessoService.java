@@ -106,7 +106,7 @@ public class ProcessoService {
         processo.setDataCriacao(LocalDateTime.now());
         processo.setParticipantes(participantes);
 
-        Processo processoSalvo = processoRepo.save(processo);
+        Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
@@ -139,7 +139,7 @@ public class ProcessoService {
         }
         processo.setParticipantes(participantes);
 
-        Processo processoAtualizado = processoRepo.save(processo);
+        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
         log.info("Processo {} atualizado.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
