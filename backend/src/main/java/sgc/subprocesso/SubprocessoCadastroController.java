@@ -129,6 +129,7 @@ public class SubprocessoCadastroController {
      */
     @PostMapping("/{codigo}/devolver-cadastro")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
+    @Transactional
     public void devolverCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,

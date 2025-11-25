@@ -46,13 +46,6 @@ describe("VisAtividades.vue", () => {
   let wrapper: any;
 
   function createWrapper(perfil: Perfil, situacao: SituacaoSubprocesso) {
-    vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-      perfilSelecionado: computed(() => perfil),
-      servidorLogado: computed(() => null),
-      unidadeSelecionada: computed(() => null),
-      getPerfisDoServidor: vi.fn(),
-    } as any);
-
     const wrapper = mount(VisAtividades, {
       props: {
         codProcesso: 1,
@@ -63,6 +56,9 @@ describe("VisAtividades.vue", () => {
           createTestingPinia({
             stubActions: false,
             initialState: {
+              perfil: {
+                perfilSelecionado: perfil,
+              },
               processos: {
                 processoDetalhe: {
                   codigo: 1,
@@ -106,6 +102,7 @@ describe("VisAtividades.vue", () => {
       SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
     );
     wrapper = w;
+    wrapper.vm.subprocesso.situacaoSubprocesso = SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
     await flushPromises();
     await nextTick();
 
@@ -122,6 +119,7 @@ describe("VisAtividades.vue", () => {
       SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
     );
     wrapper = w;
+    wrapper.vm.subprocesso.situacaoSubprocesso = SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
     await flushPromises();
 
     expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
