@@ -9,11 +9,10 @@ server:
 
 spring:
   datasource:
-    e2e:
-      url: jdbc:h2:mem:sgcdb_default;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
-      driverClassName: org.h2.Driver
-      username: sa
-      password:
+    url: jdbc:h2:mem:sgcdb_default;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -23,7 +22,7 @@ spring:
     show-sql: false
   sql:
     init:
-      mode: never # Explicitly enable default SQL initialization for E2E profile
+      mode: never # Explicitly disable default SQL initialization, handled by E2eTestDatabaseService
       platform: h2
 
   devtools:

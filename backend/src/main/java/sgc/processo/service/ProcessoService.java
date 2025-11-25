@@ -234,6 +234,7 @@ public class ProcessoService {
 
     @Transactional
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
+        log.info("Iniciando processo de revisão para código {} com unidades {}", codigo, codigosUnidades);
         Processo processo = processoRepo.findById(codigo)
             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
@@ -352,6 +353,7 @@ public class ProcessoService {
         Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
+        log.info("Subprocesso {} para revisão criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 
     private void validarFinalizacaoProcesso(Processo processo) {

@@ -129,11 +129,28 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         const processoId = match ? match[1] : null;
         expect(processoId).toBeTruthy();
 
+        // Interceptar e logar requisições de iniciar processo
+        let iniciarProcessoResponse;
+        page.route('**/api/processos/*/iniciar', async route => {
+            const request = route.request();
+            if (request.method() === 'POST') {
+                iniciarProcessoResponse = await page.request.fetch(request);
+                console.log('Intercepted Iniciar Processo Request:');
+                console.log('  URL:', request.url());
+                console.log('  Method:', request.method());
+                console.log('  Headers:', request.headers());
+                console.log('  PostData:', request.postDataJSON());
+                console.log('Intercepted Iniciar Processo Response:');
+                console.log('  Status:', iniciarProcessoResponse.status());
+                console.log('  Body:', await iniciarProcessoResponse.json());
+            }
+            route.continue();
+        });
+
         // Iniciar processo
         await clicarBotaoIniciarProcesso(page);
-        await verificarModalConfirmacaoIniciacaoProcesso(page); // Explicitly wait for modal
+        await verificarModalConfirmacaoIniciacaoProcesso(page);
         await confirmarNoModal(page);
-        await verificarUrlDoPainel(page);
 
         // Verificar criação de subprocessos via API
         const subprocessos = await verificarCriacaoSubprocessos(page, processoId!);

@@ -483,11 +483,20 @@ export async function verificarMapaVazioCriadoParaSubprocesso(page: Page, subpro
  * @param subprocessoId O ID do subprocesso.
  */
 export async function verificarMovimentacaoInicialSubprocesso(page: Page, subprocessoId: number): Promise<void> {
-    // Para o perfil ADMIN, o perfil é 'ADMIN' e a unidade do admin (STIC) é 1.
     const perfilAdmin = 'ADMIN';
     const codUnidadeAdmin = 2; // Correção: A unidade STIC tem o código 2 (conforme e2e/helpers/utils/utils.ts)
 
-    const response = await page.request.get(`/api/subprocessos/${subprocessoId}?perfil=${perfilAdmin}&unidadeUsuario=${codUnidadeAdmin}`);
+    // Recuperar o token JWT do localStorage da página
+    const jwtToken = await page.evaluate(() => localStorage.getItem('jwtToken'));
+
+    const response = await page.request.get(
+        `/api/subprocessos/${subprocessoId}?perfil=${perfilAdmin}&unidadeUsuario=${codUnidadeAdmin}`,
+        {
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,
+            },
+        }
+    );
     expect(response.ok()).toBeTruthy();
     const subprocesso = await response.json();
     expect(subprocesso.movimentacoes).toHaveLength(1);
