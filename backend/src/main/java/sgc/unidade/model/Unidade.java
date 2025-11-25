@@ -17,6 +17,15 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Unidade extends EntidadeBase {
+    public Unidade(Long codigo, String nome, String sigla, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
+        super(codigo);
+        this.nome = nome;
+        this.sigla = sigla;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.unidadeSuperior = unidadeSuperior;
+    }
+
     public Unidade(String nome, String sigla) {
         super();
         this.nome = nome;

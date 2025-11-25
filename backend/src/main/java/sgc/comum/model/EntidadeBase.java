@@ -17,7 +17,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public abstract class EntidadeBase implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")
     private Long codigo;
 

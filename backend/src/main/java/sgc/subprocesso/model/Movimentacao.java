@@ -21,6 +21,14 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Movimentacao extends EntidadeBase {
+    public Movimentacao(Long codigo, Subprocesso subprocesso, Usuario usuario, String descricao, LocalDateTime dataHora) {
+        super(codigo);
+        this.subprocesso = subprocesso;
+        this.usuario = usuario;
+        this.descricao = descricao;
+        this.dataHora = dataHora;
+    }
+
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
     private Subprocesso subprocesso;

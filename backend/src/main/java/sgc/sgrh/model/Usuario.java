@@ -81,4 +81,12 @@ public class Usuario implements Serializable, UserDetails {
         this.perfis = new java.util.HashSet<>(perfis);
     }
 
+    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidade) {
+        this.tituloEleitoral = tituloEleitoral;
+        this.nome = nome;
+        this.email = email;
+        this.ramal = ramal;
+        this.unidade = unidade;
+    }
+
 }
