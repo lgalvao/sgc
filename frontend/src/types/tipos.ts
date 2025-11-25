@@ -81,6 +81,7 @@ export enum SituacaoSubprocesso {
     MAPA_HOMOLOGADO = "MAPA_HOMOLOGADO",
     CONCLUIDO = "CONCLUIDO",
     REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
+    CADASTRO_DISPONIBILIZADO = "CADASTRO_DISPONIBILIZADO",
     CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
 }
 
@@ -315,7 +316,6 @@ export interface AceitarCadastroRequest {
 }
 
 export interface DevolverCadastroRequest {
-    motivo: string;
     observacoes: string;
 }
 

@@ -120,9 +120,8 @@ public class CDU13IntegrationTest {
             // Simula um usuário com perfil de gestor
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
-            String motivoDevolucao = "Atividades incompletas";
             String observacoes = "Favor revisar a atividade X e Y.";
-            DevolverCadastroReq requestBody = new DevolverCadastroReq(motivoDevolucao, observacoes);
+            DevolverCadastroReq requestBody = new DevolverCadastroReq(observacoes);
 
             // When
             mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
@@ -144,7 +143,6 @@ public class CDU13IntegrationTest {
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-            assertThat(analiseRegistrada.getMotivo()).isEqualTo(motivoDevolucao);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
@@ -154,7 +152,6 @@ public class CDU13IntegrationTest {
             Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
             assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
             assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(movimentacaoDevolucao.getDescricao()).contains(motivoDevolucao);
         }
     }
 
@@ -245,9 +242,8 @@ public class CDU13IntegrationTest {
         @WithMockGestor("666666666666")
         void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
             // Given: First, a manager returns the process for adjustments
-            String motivoDevolucao = "Incompleto";
             String obsDevolucao = "Falta atividade Z";
-            DevolverCadastroReq devolverReq = new DevolverCadastroReq(motivoDevolucao, obsDevolucao);
+            DevolverCadastroReq devolverReq = new DevolverCadastroReq(obsDevolucao);
 
             mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
                     .with(csrf())

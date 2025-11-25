@@ -571,7 +571,6 @@ async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
 
   await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-    motivo: "",
     observacoes: observacaoDevolucao.value,
   });
 
