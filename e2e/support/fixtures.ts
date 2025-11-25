@@ -44,17 +44,18 @@ export const test = base.extend<MyFixtures>({
         await use(page);
 
         // 4. Clean up the isolated database after the test
-        /* try {
+        try {
             const cleanupDbResponse = await page.request.post(`${BACKEND_URL}/api/e2e/setup/cleanup-db/${testId}`);
             if (!cleanupDbResponse.ok()) {
-                const errorBody = await cleanupDbResponse.json();
-                logger.warn(`[${testInfo.title}] Warning: Failed to clean up isolated DB for testId ${testId}: ${cleanupDbResponse.status()} - ${JSON.stringify(errorBody)}`);
+                // Log warning but don't fail the test just for cleanup
+                const errorBody = await cleanupDbResponse.json().catch(() => ({})); 
+                console.warn(`[${testInfo.title}] Warning: Failed to clean up isolated DB for testId ${testId}: ${cleanupDbResponse.status()}`, errorBody);
             } else {
                 debugLog(`[${testInfo.title}] Cleaned up isolated DB: ${testId}`);
             }
         } catch (error) {
-            logger.warn(`[${testInfo.title}] Warning: Error during DB cleanup:`, error);
-        } */
+            console.warn(`[${testInfo.title}] Warning: Error during DB cleanup:`, error);
+        }
     },
 });
 

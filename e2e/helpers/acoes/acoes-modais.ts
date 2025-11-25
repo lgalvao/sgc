@@ -94,3 +94,12 @@ export async function preencherModalDisponibilizarMapa(page: Page, data: string,
     await modal.locator('input[type="date"]').fill(data);
     await modal.locator('textarea').fill(observacoes);
 }
+
+/**
+ * Fecha um alerta clicando no botão de fechar.
+ * @param page A instância da página do Playwright.
+ */
+export async function fecharAlerta(page: Page): Promise<void> {
+    await page.locator('.btn-close').click();
+}
+

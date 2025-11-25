@@ -30,4 +30,5 @@ export * from './utils';
 // ===== PAGES =====
 export * from './pages/painel-page';
 export * from './pages/processo-page';
+export * from './pages/login-page';
 

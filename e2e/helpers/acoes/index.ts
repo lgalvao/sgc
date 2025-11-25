@@ -1,8 +1,9 @@
-export {
-    preencherFormularioLogin,
-    selecionarPerfil,
-    fecharAlerta,
-} from './acoes-login';
+export * from './acoes-atividades';
+export * from './acoes-mapa';
+export * from './acoes-modais';
+export * from './acoes-processo';
+export * from './acoes-validacao';
+
 export * from './acoes-atividades';
 export {
     selecionarUnidadesPorSigla,

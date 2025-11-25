@@ -3,7 +3,6 @@
  * Re-exporta todas as funções de navegação e login
  */
 export {
-    navegarParaLogin,
     navegarParaMapaRevisao,
     navegarParaMapaMapeamento,
     navegarParaCriacaoProcesso,
@@ -28,7 +27,6 @@ export {
     expandirTodasAsUnidades,
     clicarUnidade,
     navegarParaHome,
-    clicarBotaoEntrar,
     clicarBotaoSair
 } from './navegacao';
 

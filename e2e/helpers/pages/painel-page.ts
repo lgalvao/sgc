@@ -69,4 +69,14 @@ export class PaginaPainel {
         const tabela = this.page.locator(SELETORES.TABELA_PROCESSOS);
         await expect(tabela.getByText(descricao)).not.toBeVisible();
     }
+
+    async verificarPainelAdminVisivel() {
+        await this.verificarUrlDoPainel();
+        await expect(this.page.getByTitle('Configurações do sistema')).toBeVisible();
+    }
+
+    async verificarPainelChefeVisivel() {
+        await this.verificarUrlDoPainel();
+        await expect(this.page.getByTitle('Configurações do sistema')).not.toBeVisible();
+    }
 }

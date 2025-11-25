@@ -12,15 +12,6 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
 }
 
 /**
- * Navega para a página de login.
- * @param page A instância da página do Playwright.
- */
-export async function navegarParaLogin(page: Page): Promise<void> {
-    await page.goto(URLS.LOGIN);
-    await page.waitForLoadState('networkidle');
-}
-
-/**
  * Navega para a página de criação de processo.
  * @param page A instância da página do Playwright.
  */
@@ -290,14 +281,6 @@ export async function clicarUnidade(page: Page, nomeUnidade: string): Promise<vo
 export async function navegarParaHome(page: Page): Promise<void> {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-}
-
-/**
- * Clica no botão "Entrar".
- * @param page A instância da página do Playwright.
- */
-export async function clicarBotaoEntrar(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.ENTRAR}).click();
 }
 
 /**
