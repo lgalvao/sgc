@@ -91,7 +91,7 @@ create table if not exists sgc.alerta
 
 create table if not exists sgc.alerta_usuario
 (
-    alerta_codigo            bigint not null,
+    alerta_codigo            bigint       not null,
     data_hora_leitura        timestamp(6),
     usuario_titulo_eleitoral varchar(255) not null,
     primary key (alerta_codigo, usuario_titulo_eleitoral)

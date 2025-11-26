@@ -1,3 +1,5 @@
+-- noinspection SqlWithoutWhereForFile
+
 -- UNIQUE_IDENTIFIER_GEMINI_20251123
 -- Last modified: 2025-11-23 11:15:00
 -- =================================================================================================
@@ -7,39 +9,66 @@
 -- =================================================================================================
 
 -- Deletar dados transacionais para garantir idempotência, mesmo em bancos de dados isolados
-DELETE FROM SGC.MOVIMENTACAO;
-DELETE FROM SGC.ALERTA_USUARIO;
-DELETE FROM SGC.ALERTA;
-DELETE FROM SGC.ANALISE; -- Add ANALISE here as it depends on SUBPROCESSO
-DELETE FROM SGC.NOTIFICACAO; -- Add NOTIFICACAO here as it depends on SUBPROCESSO
-DELETE FROM SGC.UNIDADE_PROCESSO;
-DELETE FROM SGC.SUBPROCESSO;
-DELETE FROM SGC.PROCESSO;
+DELETE
+FROM SGC.MOVIMENTACAO;
+DELETE
+FROM SGC.ALERTA_USUARIO;
+DELETE
+FROM SGC.ALERTA;
+DELETE
+FROM SGC.ANALISE; -- Add ANALISE here as it depends on SUBPROCESSO
+DELETE
+FROM SGC.NOTIFICACAO; -- Add NOTIFICACAO here as it depends on SUBPROCESSO
+DELETE
+FROM SGC.UNIDADE_PROCESSO;
+DELETE
+FROM SGC.SUBPROCESSO;
+DELETE
+FROM SGC.PROCESSO;
 
-DELETE FROM SGC.CONHECIMENTO;
-DELETE FROM SGC.COMPETENCIA_ATIVIDADE;
-DELETE FROM SGC.ATIVIDADE;
+DELETE
+FROM SGC.CONHECIMENTO;
+DELETE
+FROM SGC.COMPETENCIA_ATIVIDADE;
+DELETE
+FROM SGC.ATIVIDADE;
 
-DELETE FROM SGC.ATRIBUICAO_TEMPORARIA;
-DELETE FROM SGC.COMPETENCIA;
-DELETE FROM SGC.USUARIO_PERFIL;
-DELETE FROM SGC.VINCULACAO_UNIDADE; -- Add VINCULACAO_UNIDADE here as it depends on UNIDADE
+DELETE
+FROM SGC.ATRIBUICAO_TEMPORARIA;
+DELETE
+FROM SGC.COMPETENCIA;
+DELETE
+FROM SGC.USUARIO_PERFIL;
+DELETE
+FROM SGC.VINCULACAO_UNIDADE;
+-- Add VINCULACAO_UNIDADE here as it depends on UNIDADE
 
 -- Clear foreign key references from UNIDADE before deleting USUARIO and MAPA
-UPDATE SGC.UNIDADE SET titular_titulo = NULL, mapa_vigente_codigo = NULL;
+UPDATE SGC.UNIDADE
+SET titular_titulo      = NULL,
+    mapa_vigente_codigo = NULL;
 
-DELETE FROM SGC.USUARIO;
-DELETE FROM SGC.UNIDADE;
-DELETE FROM SGC.MAPA;
+DELETE
+FROM SGC.USUARIO;
+DELETE
+FROM SGC.UNIDADE;
+DELETE
+FROM SGC.MAPA;
 
-DELETE FROM SGC.PARAMETRO; -- No dependencies, can be deleted anywhere
+DELETE
+FROM SGC.PARAMETRO; -- No dependencies, can be deleted anywhere
 
 
-INSERT INTO SGC.MAPA (codigo) VALUES (1001);
-INSERT INTO SGC.MAPA (codigo) VALUES (1002);
-INSERT INTO SGC.MAPA (codigo) VALUES (1003);
-INSERT INTO SGC.MAPA (codigo) VALUES (1004);
-INSERT INTO SGC.MAPA (codigo) VALUES (201);
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1001);
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1002);
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1003);
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1004);
+INSERT INTO SGC.MAPA (codigo)
+VALUES (201);
 
 -- -------------------------------------------------------------------------------------------------
 -- UNIDADES
@@ -264,29 +293,44 @@ SET titular_titulo = 222222222222
 WHERE codigo = 101; -- GESTOR-UNIT
 UPDATE SGC.UNIDADE
 SET titular_titulo = 333333333333
-WHERE codigo = 102; -- SUB-UNIT
+WHERE codigo = 102;
+-- SUB-UNIT
 
 -- -------------------------------------------------------------------------------------------------
 -- MAPAS, COMPETÊNCIAS, ATIVIDADES (DADOS BASE PARA REVISÃO)
 -- -------------------------------------------------------------------------------------------------
 -- Mapas vigentes (removido - agora inserido diretamente nas unidades)
 
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10001, 1001, 'Desenvolvimento em Java');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10002, 1001, 'Desenvolvimento em Vue.js');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10003, 1002, 'Análise de Dados');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10004, 1002, 'Machine Learning');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10005, 1003, 'Segurança da Informação');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10006, 1003, 'Gestão de Projetos');
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10007, 1004, 'Gestão Administrativa');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10001, 1001, 'Desenvolvimento em Java');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10002, 1001, 'Desenvolvimento em Vue.js');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10003, 1002, 'Análise de Dados');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10004, 1002, 'Machine Learning');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10005, 1003, 'Segurança da Informação');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10006, 1003, 'Gestão de Projetos');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (10007, 1004, 'Gestão Administrativa');
 
-INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30000, 1004, 'Realizar atendimento presencial');
-INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40000, 30000, 'Atendimento ao público');
-INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30000, 10007);
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
+VALUES (30000, 1004, 'Realizar atendimento presencial');
+INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao)
+VALUES (40000, 30000, 'Atendimento ao público');
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
+VALUES (30000, 10007);
 
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (20001, 201, 'Gestão Administrativa');
-INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30001, 201, 'Realizar atendimento presencial');
-INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40001, 30001, 'Atendimento ao público');
-INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30001, 20001);
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (20001, 201, 'Gestão Administrativa');
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
+VALUES (30001, 201, 'Realizar atendimento presencial');
+INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao)
+VALUES (40001, 30001, 'Atendimento ao público');
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
+VALUES (30001, 20001);
 
 -- -------------------------------------------------------------------------------------------------
 -- PROCESSOS, SUBPROCESSOS, ALERTAS, MOVIMENTACOES (para testes E2E)
