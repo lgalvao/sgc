@@ -78,7 +78,7 @@ class ProcessoServiceTest {
         unidade.setCodigo(1L);
 
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-        when(processoRepo.save(any())).thenAnswer(i -> {
+        when(processoRepo.saveAndFlush(any())).thenAnswer(i -> {
             Processo p = i.getArgument(0);
             p.setCodigo(100L);
             return p;
@@ -87,7 +87,7 @@ class ProcessoServiceTest {
 
         processoService.criar(req);
 
-        verify(processoRepo).save(any());
+        verify(processoRepo).saveAndFlush(any());
         verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
     }
 
@@ -141,7 +141,7 @@ class ProcessoServiceTest {
         processoService.atualizar(id, req);
 
         assertThat(processo.getDescricao()).isEqualTo("Nova Desc");
-        verify(processoRepo).save(processo);
+        verify(processoRepo).saveAndFlush(processo);
     }
 
     @Test

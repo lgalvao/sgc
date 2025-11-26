@@ -52,17 +52,20 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
                 "Chefe Teste",
                 "chefe@teste.com",
                 "123",
-                unidade,
-                Set.of(Perfil.CHEFE)
+                unidade
             );
+            usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+
             if (dbAvailable && usuarioRepo != null) {
                 try { usuarioRepo.save(usuario); } catch (Exception e) { }
             }
         }
 
         // Garante que a unidade está correta no usuário do contexto
-        usuario.setUnidade(unidade);
-        usuario.setPerfis(Set.of(Perfil.CHEFE));
+        usuario.setUnidadeLotacao(unidade);
+        if (usuario.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+            usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+        }
         if (dbAvailable && usuarioRepo != null) {
             try { usuarioRepo.save(usuario); } catch (Exception e) { }
         }

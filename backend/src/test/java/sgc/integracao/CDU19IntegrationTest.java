@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
-@Disabled("Este teste foi desabilitado porque depende de dados do data.sql, que foi removido.")
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest {

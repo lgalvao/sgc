@@ -59,18 +59,19 @@ public class UsuarioService {
         Usuario usuario = usuarioRepo.findById(tituloEleitoral)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
-        Unidade unidade = usuario.getUnidade();
-        UnidadeDto unidadeDto = UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .codigoPai(null)
-                .tipo(unidade.getTipo().name())
-                .isElegivel(false)
-                .build();
-
-        return usuario.getPerfis().stream()
-                .map(perfil -> new PerfilUnidade(perfil, unidadeDto))
+        return usuario.getTodasAtribuicoes().stream()
+                .map(atribuicao -> {
+                    Unidade unidade = atribuicao.getUnidade();
+                    UnidadeDto unidadeDto = UnidadeDto.builder()
+                            .codigo(unidade.getCodigo())
+                            .nome(unidade.getNome())
+                            .sigla(unidade.getSigla())
+                            .codigoPai(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                            .tipo(unidade.getTipo().name())
+                            .isElegivel(false)
+                            .build();
+                    return new PerfilUnidade(atribuicao.getPerfil(), unidadeDto);
+                })
                 .collect(Collectors.toList());
     }
 

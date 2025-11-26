@@ -1,35 +1,30 @@
 package sgc.mapa.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import java.util.Set;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.model.MapaRepo;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.mapa.model.MapaRepo;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -39,20 +34,19 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @DisplayName("Testes para ImpactoMapaService")
 class ImpactoMapaServiceTest {
-
     @Autowired
     private ImpactoMapaService impactoMapaService;
 
-    @MockBean
+    @MockitoBean
     private SubprocessoRepo subprocessoRepo;
 
-    @MockBean
+    @MockitoBean
     private MapaRepo mapaRepo;
 
-    @MockBean
+    @MockitoBean
     private ImpactoAtividadeService impactoAtividadeService;
 
-    @MockBean
+    @MockitoBean
     private ImpactoCompetenciaService impactoCompetenciaService;
 
     private Usuario chefe;
@@ -63,13 +57,13 @@ class ImpactoMapaServiceTest {
     @BeforeEach
     void setUp() {
         chefe = new Usuario();
-        chefe.setPerfis(Set.of(Perfil.CHEFE));
+        addAtribuicao(chefe, Perfil.CHEFE);
 
         gestor = new Usuario();
-        gestor.setPerfis(Set.of(Perfil.GESTOR));
+        addAtribuicao(gestor, Perfil.GESTOR);
 
         admin = new Usuario();
-        admin.setPerfis(Set.of(Perfil.ADMIN));
+        addAtribuicao(admin, Perfil.ADMIN);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -77,6 +71,14 @@ class ImpactoMapaServiceTest {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         subprocesso.setUnidade(unidade);
+    }
+
+    private void addAtribuicao(Usuario u, Perfil p) {
+        u.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
+                .usuario(u)
+                .unidade(new Unidade()) // Mock unit, logic should handle checking if unit matches if strictly required
+                .perfil(p)
+                .build());
     }
 
     @Nested
@@ -190,7 +192,11 @@ class ImpactoMapaServiceTest {
 
             impactoMapaService.verificarImpactos(1L, chefe);
 
-            // TODO: verificar se os services de impacto foram chamados com os parâmetros corretos
+            verify(impactoAtividadeService, times(2)).obterAtividadesDoMapa(any());
+            verify(impactoAtividadeService).detectarAtividadesInseridas(any(), any());
+            verify(impactoAtividadeService).detectarAtividadesRemovidas(any(), any(), eq(mapaVigente));
+            verify(impactoAtividadeService).detectarAtividadesAlteradas(any(), any(), eq(mapaVigente));
+            verify(impactoCompetenciaService).identificarCompetenciasImpactadas(eq(mapaVigente), any(), any());
         }
     }
 }

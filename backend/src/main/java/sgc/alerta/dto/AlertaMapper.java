@@ -27,8 +27,6 @@ public abstract class AlertaMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
-
-    // TODO 'alerta' is no being recognized
     @Mapping(source = "alerta", target = "linkDestino", qualifiedByName = "buildLinkDestino")
     @Mapping(source = "descricao", target = "mensagem")
     @Mapping(source = "dataHora", target = "dataHoraFormatada", qualifiedByName = "formatDataHora")
@@ -44,14 +42,16 @@ public abstract class AlertaMapper {
         }
 
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long codUnidade = usuario.getUnidade().getCodigo();
-
-        Optional<Subprocesso> subprocessoOpt = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
-            alerta.getProcesso().getCodigo(),
-            codUnidade
-        );
-
-        return subprocessoOpt
+        
+        // Try to find a subprocess for any of the user's units
+        return usuario.getTodasAtribuicoes().stream()
+            .map(attr -> subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
+                alerta.getProcesso().getCodigo(),
+                attr.getUnidade().getCodigo()
+            ))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst()
             .map(sp -> String.format("/subprocessos/%d", sp.getCodigo()))
             .orElse(null);
     }

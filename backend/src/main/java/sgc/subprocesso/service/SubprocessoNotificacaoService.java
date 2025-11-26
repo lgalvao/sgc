@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubprocessoNotificacaoService {
     private final NotificacaoEmailService notificacaoEmailService;
     private final AlertaRepo repositorioAlerta;
@@ -126,8 +128,10 @@ public class SubprocessoNotificacaoService {
      * @param sp O subprocesso no qual as sugestões foram feitas.
      */
     public void notificarSugestoes(Subprocesso sp) {
+        log.debug("Notificando sugestões para subprocesso {}", sp.getCodigo());
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
+            log.debug("Unidade superior existe: {}", unidadeSuperior.getSigla());
             java.util.Map<String, Object> variaveis = new java.util.HashMap<>();
             variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
             variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
@@ -138,6 +142,8 @@ public class SubprocessoNotificacaoService {
                     processarTemplate("email/sugestoes-mapa.html", variaveis)
             );
 
+            log.debug("Criando e salvando alerta para sugestões. Processo: {}, Unidade Origem: {}, Unidade Destino: {}",
+                sp.getProcesso().getCodigo(), sp.getUnidade().getSigla(), unidadeSuperior.getSigla());
             criarEsalvarAlerta(
                 "Sugestões para o mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise",
                 sp.getProcesso(),
@@ -145,6 +151,8 @@ public class SubprocessoNotificacaoService {
                 unidadeSuperior,
                 null
             );
+        } else {
+            log.debug("Unidade superior não encontrada para subprocesso {}. Não será criado alerta ou enviado e-mail.", sp.getCodigo());
         }
     }
 

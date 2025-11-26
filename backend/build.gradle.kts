@@ -89,7 +89,7 @@ tasks.withType<Test> {
 
     jvmArgs = listOf(
         "-Dlogging.level.root=INFO",
-        "-Dlogging.level.sgc=INFO",
+        "-Dlogging.level.sgc=DEBUG",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
@@ -122,7 +122,7 @@ tasks.withType<JavaCompile> {
 tasks.register<BootRun>("bootRunE2E") {
     group = "Application"
     description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
-    jvmArgs = listOf("-Dspring.profiles.active=e2e")
+    jvmArgs = listOf("-Dspring.profiles.active=e2e", "-Dlogging.level.sgc=DEBUG")
     mainClass.set("sgc.Sgc")
     classpath = sourceSets["main"].runtimeClasspath
     isIgnoreExitValue = true

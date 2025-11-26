@@ -83,9 +83,10 @@ public class CDU06IntegrationTest {
     private void setupSecurityContext(Unidade unidade, Perfil perfil) {
         Usuario principal = new Usuario(
                 TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123",
-                unidade,
-                Collections.singletonList(perfil)
+                unidade
         );
+        principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(unidade).perfil(perfil).build());
+        
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);

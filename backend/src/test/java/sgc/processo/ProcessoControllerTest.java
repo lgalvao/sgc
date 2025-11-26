@@ -376,11 +376,11 @@ public class ProcessoControllerTest {
 
     @Test
     void listarSubprocessos_RetornaLista() throws Exception {
-        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+        when(processoService.listarTodosSubprocessos(1L)).thenReturn(List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
 
         mockMvc.perform(get("/api/processos/1/subprocessos"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].codSubprocesso").value(10L));
+                .andExpect(jsonPath("$[0].codigo").value(10L));
     }
 }

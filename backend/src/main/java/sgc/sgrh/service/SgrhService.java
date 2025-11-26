@@ -47,7 +47,15 @@ public class SgrhService {
     public Usuario buscarResponsavelVigente(String sigla) {
         log.warn("MOCK SGRH: Buscando responsável vigente para a sigla {}.", sigla);
         var unidade = unidadeRepo.findBySigla(sigla).orElse(null);
-        return new Usuario("responsavel", "Responsável Vigente", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
+        Usuario usuario = new Usuario("responsavel", "Responsável Vigente", "email", "ramal", unidade);
+        if (unidade != null) {
+            usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
+                    .usuario(usuario)
+                    .unidade(unidade)
+                    .perfil(Perfil.CHEFE)
+                    .build());
+        }
+        return usuario;
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {

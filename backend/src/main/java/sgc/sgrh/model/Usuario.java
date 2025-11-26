@@ -10,7 +10,12 @@ import sgc.unidade.model.Unidade;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import java.time.LocalDateTime;
+import sgc.unidade.model.AtribuicaoTemporaria;
 
 @Entity
 @Table(name = "USUARIO", schema = "sgc")
@@ -32,34 +37,48 @@ public class Usuario implements Serializable, UserDetails {
     private String ramal;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_codigo")
-    private Unidade unidade;
+    @JoinColumn(name = "unidade_lotacao_codigo")
+    private Unidade unidadeLotacao;
 
-    @ElementCollection(targetClass = Perfil.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "USUARIO_PERFIL", joinColumns = @JoinColumn(name = "usuario_titulo_eleitoral"), schema = "sgc")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "perfil")
-    private java.util.Set<Perfil> perfis = new java.util.HashSet<>();
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<UsuarioPerfil> atribuicoes = new java.util.HashSet<>();
 
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
+    private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new java.util.HashSet<>();
+
+    public Set<UsuarioPerfil> getTodasAtribuicoes() {
+        Set<UsuarioPerfil> todas = new java.util.HashSet<>(atribuicoes);
+        LocalDateTime now = LocalDateTime.now();
+        if (atribuicoesTemporarias != null) {
+            for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
+                if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now)) &&
+                    (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
+                    todas.add(new UsuarioPerfil(null, this, temp.getUnidade(), temp.getPerfil()));
+                }
+            }
+        }
+        return todas;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
-        return java.util.Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
+        return Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(tituloEleitoral);
+        return Objects.hash(tituloEleitoral);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return perfis.stream()
+        return getTodasAtribuicoes().stream()
+                .map(UsuarioPerfil::getPerfil)
                 .map(Perfil::toGrantedAuthority)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -72,21 +91,11 @@ public class Usuario implements Serializable, UserDetails {
         return tituloEleitoral;
     }
 
-    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidade, Collection<Perfil> perfis) {
+    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidadeLotacao) {
         this.tituloEleitoral = tituloEleitoral;
         this.nome = nome;
         this.email = email;
         this.ramal = ramal;
-        this.unidade = unidade;
-        this.perfis = new java.util.HashSet<>(perfis);
+        this.unidadeLotacao = unidadeLotacao;
     }
-
-    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidade) {
-        this.tituloEleitoral = tituloEleitoral;
-        this.nome = nome;
-        this.email = email;
-        this.ramal = ramal;
-        this.unidade = unidade;
-    }
-
 }

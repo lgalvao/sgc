@@ -15,15 +15,19 @@ import java.util.Objects;
 public class SubprocessoPermissoesService {
 
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
-        if (usuario == null || usuario.getPerfis() == null) {
+        if (usuario == null || usuario.getTodasAtribuicoes() == null) {
             return construirPermissoesVazias();
         }
 
-        boolean isAdmin = usuario.getPerfis().contains(Perfil.ADMIN);
-        boolean isGestor = usuario.getPerfis().contains(Perfil.GESTOR);
-        boolean isChefe = usuario.getPerfis().contains(Perfil.CHEFE);
-
-        boolean isChefeDaUnidade = isChefe && Objects.equals(usuario.getUnidade().getCodigo(), subprocesso.getUnidade().getCodigo());
+        boolean isAdmin = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == Perfil.ADMIN);
+        
+        boolean isGestor = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == Perfil.GESTOR);
+        
+        boolean isChefeDaUnidade = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == Perfil.CHEFE && 
+                               a.getUnidade().getCodigo().equals(subprocesso.getUnidade().getCodigo()));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
 

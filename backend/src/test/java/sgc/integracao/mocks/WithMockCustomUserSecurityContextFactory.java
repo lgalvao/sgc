@@ -47,9 +47,12 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 customUser.nome(),
                 customUser.email(),
                 "321",
-                unidade,
-                Arrays.stream(customUser.perfis()).map(Perfil::valueOf).collect(Collectors.toList())
+                unidade
         );
+        final Unidade finalUnidade = unidade;
+        Arrays.stream(customUser.perfis()).forEach(p -> {
+             principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(finalUnidade).perfil(Perfil.valueOf(p)).build());
+        });
 
         if (dbAvailable && usuarioRepo != null) {
             try { usuarioRepo.save(principal); } catch (Exception e) { }

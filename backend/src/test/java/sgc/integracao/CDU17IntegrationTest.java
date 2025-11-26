@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,10 +47,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Disabled("Este teste foi desabilitado porque depende de dados do data.sql, que foi removido.")
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
-@org.springframework.context.annotation.Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 class CDU17IntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";

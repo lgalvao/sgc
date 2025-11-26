@@ -111,9 +111,9 @@ class UnidadeServiceTest {
         usuario.setTituloEleitoral("123");
         usuario.setNome("Teste");
         usuario.setEmail("teste@email.com");
-        usuario.setUnidade(unidade);
+        usuario.setUnidadeLotacao(unidade);
 
-        when(usuarioRepo.findByUnidadeCodigo(unidadeId)).thenReturn(List.of(usuario));
+        when(usuarioRepo.findByUnidadeLotacaoCodigo(unidadeId)).thenReturn(List.of(usuario));
 
         var resultado = unidadeService.buscarServidoresPorUnidade(unidadeId);
 

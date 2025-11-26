@@ -29,10 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("e2e")
 @DisplayName("Testes do CarregamentoService")
 class CarregamentoServiceTest {
-
     @Autowired
     private CarregamentoService carregamentoService;
-
     @Autowired
     private AlertaRepo alertaRepo;
     @Autowired

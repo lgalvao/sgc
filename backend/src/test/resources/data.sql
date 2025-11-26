@@ -305,7 +305,45 @@ VALUES (50001, 9);
 INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
 VALUES (70001, 50001, 50003, 'Alerta de teste para processo B', CURRENT_TIMESTAMP());
 
+-- Alertas específicos para CDU-02
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES (70002, 50000, '8', 'Alerta para Gestor', CURRENT_TIMESTAMP());
+
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_destino_codigo, descricao, data_hora)
+VALUES (70003, 50000, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP());
+
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
 VALUES (60000, 50000, 8, 1001, 'CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
 INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_codigo, descricao, data_hora)
 VALUES (80000, 60000, 50001, 'INICIADO', CURRENT_TIMESTAMP());
+
+-- DADOS ADICIONAIS PARA CDU-17 e CDU-19 e CDU-02
+-- Processo 1700 (para CDU-17)
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES (1700, 'Processo para CDU-17', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1700, 8);
+
+-- Mapa e Subprocesso para CDU-17
+INSERT INTO SGC.MAPA (codigo) VALUES (1700);
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (17001, 1700, 'Atividade Teste CDU-17');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (17001, 1700, 'Competência Teste CDU-17');
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (17001, 17001);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+VALUES (1700, 1700, 8, 1700, 'REVISAO_CADASTRO_HOMOLOGADA', '2025-12-31 23:59:59');
+
+
+-- Processo 1900 (para CDU-19)
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES (1900, 'Processo para CDU-19', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1900, 9);
+
+-- Mapa e Subprocesso para CDU-19
+INSERT INTO SGC.MAPA (codigo) VALUES (1900);
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', '2025-12-31 23:59:59');
+
+-- Processo CRIADO (para CDU-02 teste de Admin)
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES (2000, 'Processo Criado', 'CRIADO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2000, 8);

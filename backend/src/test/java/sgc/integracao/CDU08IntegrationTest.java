@@ -47,16 +47,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.test.context.jdbc.Sql;
-
-import org.springframework.test.context.jdbc.Sql;
-
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
-import org.springframework.test.context.jdbc.SqlGroup;
-
-
-
 @SpringBootTest
 
 @AutoConfigureMockMvc
@@ -68,12 +58,6 @@ import org.springframework.test.context.jdbc.SqlGroup;
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
-
-@SqlGroup({
-
-    @Sql(scripts = "/schema.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-
-})
 
 class CDU08IntegrationTest {
     @Autowired

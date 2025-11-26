@@ -1,0 +1,202 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+ProcessoControllerTest > listarSubprocessos_RetornaLista() FAILED
+    java.lang.AssertionError: No value at JSON path "$[0].codSubprocesso"
+        at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:351)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:148)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:112)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.processo.ProcessoControllerTest.listarSubprocessos_RetornaLista(ProcessoControllerTest.java:384)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+        Caused by:
+        com.jayway.jsonpath.PathNotFoundException: No results for path: $[0]['codSubprocesso']
+
+ProcessoServiceTest > Criar processo deve persistir e publicar evento FAILED
+    java.lang.NullPointerException: Cannot invoke "sgc.processo.model.Processo.getCodigo()" because "processoSalvo" is null
+        at sgc.processo.service.ProcessoService.criar(ProcessoService.java:114)
+        at sgc.processo.ProcessoServiceTest.criar(ProcessoServiceTest.java:88)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+ProcessoServiceTest > Atualizar deve modificar processo se estiver CRIADO FAILED
+    Wanted but not invoked:
+    processoRepo.save(
+        {"dataCriacao":null,"dataFinalizacao":null,"dataLimite":"2025-11-26T14:07:11.023726","descricao":"Nova Desc","participantes":[{"dataVigenciaMapaAtual":null,"mapaVigente":null,"nome":null,"processos":[],"sigla":null,"situacao":null,"tipo":null,"titular":null,"unidadeSuperior":null,"codigo":null}],"situacao":"CRIADO","tipo":"MAPEAMENTO","codigo":100}
+    );
+    -> at sgc.processo.ProcessoServiceTest.atualizar(ProcessoServiceTest.java:144)
+
+    However, there were exactly 2 interactions with this mock:
+    processoRepo.findById(100L);
+    -> at sgc.processo.service.ProcessoService.atualizar(ProcessoService.java:122)
+
+    processoRepo.saveAndFlush(
+        {"dataCriacao":null,"dataFinalizacao":null,"dataLimite":"2025-11-26T14:07:11.023726","descricao":"Nova Desc","participantes":[{"dataVigenciaMapaAtual":null,"mapaVigente":null,"nome":null,"processos":[],"sigla":null,"situacao":null,"tipo":null,"titular":null,"unidadeSuperior":null,"codigo":null}],"situacao":"CRIADO","tipo":"MAPEAMENTO","codigo":100}
+    );
+    -> at sgc.processo.service.ProcessoService.atualizar(ProcessoService.java:145)
+        at app//sgc.processo.ProcessoServiceTest.atualizar(ProcessoServiceTest.java:144)
+        at java.base@25.0.1/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+Testes do CarregamentoService > Deve carregar e remover os dados SKIPPED
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas FAILED
+    java.lang.AssertionError: JSON path "$.content"
+    Expected: a collection with size a value equal to or greater than <3>
+         but: collection size <2> was less than <3>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:88)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.integracao.CDU02IntegrationTest$VisibilidadeProcessosTestes.testListarProcessos_GestorRaiz_VeTodos(CDU02IntegrationTest.java:113)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-02: Visualizar Painel > Testes de Visibilidade de Processos > ADMIN deve ver todos os processos, incluindo os com status 'Criado' FAILED
+    java.lang.AssertionError: JSON path "$.content"
+    Expected: a collection with size a value equal to or greater than <4>
+         but: collection size <2> was less than <4>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:88)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.integracao.CDU02IntegrationTest$VisibilidadeProcessosTestes.testListarProcessos_Admin_VeTodos(CDU02IntegrationTest.java:102)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve falhar ao importar de subprocesso inexistente FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Não deve importar nada de subprocesso sem atividades FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar atividades e conhecimentos FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve falhar ao importar para subprocesso em estado inválido FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar e atualizar status se NAO_INICIADO FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar apenas atividades não existentes no destino FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU08IntegrationTest.setUp(CDU08IntegrationTest.java:99)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa com usuário sem permissão (não ADMIN) FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:95)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver atividade sem competência associada FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:95)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver competência sem atividade associada FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:95)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se subprocesso não está no estado correto FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:95)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:95)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-19: Validar Mapa de Competências > Testes para o fluxo de 'Validar Mapa' > Deve validar o mapa, alterar status, registrar movimentação e criar alerta FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU19IntegrationTest.setUp(CDU19IntegrationTest.java:59)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+CDU-19: Validar Mapa de Competências > Testes para o fluxo de 'Apresentar Sugestões' > Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.orElseThrow(Optional.java:377)
+        at sgc.integracao.CDU19IntegrationTest.setUp(CDU19IntegrationTest.java:59)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+> Task :backend:test FAILED
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry reused.

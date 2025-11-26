@@ -265,12 +265,18 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior == null) {
+            throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+        }
+
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(TipoAnalise.CADASTRO)
                 .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                .siglaUnidade(usuario.getUnidade().getSigla())
+                .siglaUnidade(unidadeSuperior.getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                 .build());
 
@@ -283,7 +289,7 @@ public class SubprocessoWorkflowService {
         publicadorDeEventos.publishEvent(EventoSubprocessoCadastroDevolvido.builder()
                 .codSubprocesso(codSubprocesso)
                 .usuario(usuario)
-                .unidadeOrigem(sp.getUnidade().getUnidadeSuperior())
+                .unidadeOrigem(unidadeSuperior)
                 .unidadeDestino(unidadeDevolucao)
                 .observacoes(observacoes)
                 .build());
@@ -351,20 +357,22 @@ public class SubprocessoWorkflowService {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
+        
+        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeAnalise == null) {
+             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+        }
 
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(TipoAnalise.CADASTRO)
                 .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-                .siglaUnidade(usuario.getUnidade().getSigla())
+                .siglaUnidade(unidadeAnalise.getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                 .build());
 
-        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de análise não encontrada."));
-        Unidade unidadeDestino = unidadeRepo.findById(sp.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
+        Unidade unidadeDestino = sp.getUnidade();
 
         if (unidadeDestino.equals(sp.getUnidade())) {
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -388,21 +396,36 @@ public class SubprocessoWorkflowService {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
+        
+        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeAnalise == null) {
+             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+        }
 
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(TipoAnalise.CADASTRO)
                 .acao(TipoAcaoAnalise.ACEITE_REVISAO)
-                .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
+                .siglaUnidade(unidadeAnalise.getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                 .motivo(null)
                 .build());
 
-        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de origem não encontrada."));
-        Unidade unidadeDestino = unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
+        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+        if (unidadeDestino == null) {
+             // If no further superior, maybe it stays here or goes to SEDOC? 
+             // Assuming classic flow, it might stop or go to homologation. 
+             // The original code assumed unitAnalise.getUnidadeSuperior() existed.
+             // We'll keep that assumption but guard it if needed.
+             // For now, let's assume it exists as per original logic.
+             unidadeDestino = unidadeAnalise; // Fallback if top level? Or throw?
+             // Original: unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
+             // Let's try to get it safely.
+             if (unidadeAnalise.getUnidadeSuperior() != null) {
+                 unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+             }
+        }
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         repositorioSubprocesso.save(sp);

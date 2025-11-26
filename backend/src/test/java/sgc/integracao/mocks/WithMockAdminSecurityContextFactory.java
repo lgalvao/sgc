@@ -41,13 +41,17 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
             principal.setTituloEleitoral(tituloAdmin);
             principal.setNome("Admin User");
             principal.setEmail("admin@example.com");
-            principal.setPerfis(Set.of(Perfil.ADMIN));
-            principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+            Unidade u = new Unidade("Unidade Mock", "UM");
+            principal.setUnidadeLotacao(u);
+            principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
             if (dbAvailable) {
                 try { usuarioRepo.save(principal); } catch (Exception e) { }
             }
         } else {
-            principal.setPerfis(Set.of(Perfil.ADMIN));
+            if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
+                 Unidade u = new Unidade("Unidade Mock", "UM");
+                 principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
+            }
             if (dbAvailable) {
                 try { usuarioRepo.save(principal); } catch (Exception e) { }
             }

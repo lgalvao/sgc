@@ -70,9 +70,15 @@ public class CDU02IntegrationTest {
                             "Usuario de Teste",
                             "teste@sgc.com",
                             "123",
-                            unidade,
-                            Arrays.stream(perfis).map(Perfil::valueOf).collect(Collectors.toList())
+                            unidade
                     );
+                    for (String perfilStr : perfis) {
+                         newUser.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
+                                 .usuario(newUser)
+                                 .unidade(unidade)
+                                 .perfil(Perfil.valueOf(perfilStr))
+                                 .build());
+                    }
                     return usuarioRepo.save(newUser);
                 });
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

@@ -347,7 +347,7 @@ class SubprocessoWorkflowServiceTest {
         Usuario user = new Usuario();
         Unidade u = new Unidade();
         u.setSigla("U1");
-        user.setUnidade(u);
+        user.setUnidadeLotacao(u);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -444,10 +444,14 @@ class SubprocessoWorkflowServiceTest {
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setSigla("U1");
+        Unidade sup = new Unidade(); // Unidade Superior
+        sup.setCodigo(20L);
+        sup.setSigla("SUP");
+        u.setUnidadeSuperior(sup);
         sp.setUnidade(u);
 
         Usuario user = new Usuario();
-        user.setUnidade(u);
+        user.setUnidadeLotacao(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(unidadeRepo.findById(10L)).thenReturn(Optional.of(u));
@@ -475,7 +479,7 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(u);
 
         Usuario user = new Usuario();
-        user.setUnidade(u);
+        user.setUnidadeLotacao(u);
 
         Unidade destino = new Unidade();
 

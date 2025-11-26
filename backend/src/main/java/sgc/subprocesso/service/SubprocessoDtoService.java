@@ -74,7 +74,7 @@ public class SubprocessoDtoService {
         log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
         log.debug("Usuário encontrado: {}", usuario);
-        log.debug("Perfis do usuário (from SGRH): {}", usuario.getPerfis());
+        log.debug("Atribuições do usuário (from SGRH): {}", usuario.getTodasAtribuicoes().stream().map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla()).toList());
         log.debug("Perfil solicitado (from request): {}", perfil);
 
         verificarPermissaoVisualizacao(sp, perfil, usuario);
@@ -91,7 +91,10 @@ public class SubprocessoDtoService {
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
-        if (!usuario.getPerfis().contains(perfil)) {
+        boolean hasPerfil = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == perfil);
+        
+        if (!hasPerfil) {
             log.warn("Usuário não possui o perfil solicitado.");
             throw new ErroAccessoNegado("Perfil inválido para o usuário.");
         }
@@ -100,25 +103,28 @@ public class SubprocessoDtoService {
             return;
         }
 
-        Unidade unidadeUsuario = usuario.getUnidade();
         Unidade unidadeAlvo = sp.getUnidade();
 
-        if (unidadeUsuario == null || unidadeAlvo == null) {
+        if (unidadeAlvo == null) {
             throw new ErroAccessoNegado("Unidade não identificada.");
         }
+        
+        boolean hasPermission = usuario.getTodasAtribuicoes().stream()
+                .filter(a -> a.getPerfil() == perfil)
+                .anyMatch(a -> {
+                    Unidade unidadeUsuario = a.getUnidade();
+                    if (perfil == Perfil.GESTOR) {
+                        return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
+                    } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
+                        return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
+                    }
+                    return false;
+                });
 
-        if (perfil == Perfil.GESTOR) {
-            if (isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario)) {
-                return;
-            }
-        } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
-            if (unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo())) {
-                return;
-            }
+        if (!hasPermission) {
+             log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
+             throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
         }
-
-        log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
-        throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
     }
 
     private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {

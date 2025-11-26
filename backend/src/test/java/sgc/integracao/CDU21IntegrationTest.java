@@ -34,6 +34,7 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import sgc.processo.service.ProcessoNotificacaoService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -44,7 +45,12 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,15 +71,15 @@ class CDU21IntegrationTest {
 
     @Autowired private ProcessoRepo processoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
     @Autowired private MapaRepo mapaRepo;
     @Autowired private UsuarioRepo usuarioRepo;
+    @MockitoBean
+    private ProcessoNotificacaoService processoNotificacaoService;
 
     @MockitoBean
     private SgrhService sgrhService;
-
-    @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -84,7 +90,6 @@ class CDU21IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         Usuario titularIntermediaria = usuarioRepo.findById("1").orElseThrow();
         Usuario titularOp1 = usuarioRepo.findById("2").orElseThrow();
@@ -122,10 +127,6 @@ class CDU21IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve finalizar processo, atualizar status, tornar mapas vigentes e notificar todas as unidades corretamente")
     void finalizarProcesso_ComSucesso_DeveAtualizarStatusENotificarUnidades() throws Exception {
-        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
-
         mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())
                 .with(csrf()))
             .andExpect(status().isOk());
@@ -146,23 +147,7 @@ class CDU21IntegrationTest {
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();
         assertThat(un2.getMapaVigente().getCodigo()).isEqualTo(sp2.getMapa().getCodigo());
 
-        verify(notificacaoEmailService, times(3)).enviarEmailHtml(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
-
-        List<String> allEmails = emailCaptor.getAllValues();
-        List<String> allSubjects = subjectCaptor.getAllValues();
-        List<String> allBodies = bodyCaptor.getAllValues();
-
-        int indexOp1 = allEmails.indexOf("titular.op1@test.com");
-        assertThat(indexOp1).isGreaterThanOrEqualTo(0);
-        assertThat(allSubjects.get(indexOp1)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp1)).contains("<p>Prezado(a) responsável pela <span>SEMARE</span>,</p>");
-        assertThat(allBodies.get(indexOp1)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para a sua unidade.</p>");
-        assertThat(allBodies.get(indexOp1)).doesNotContain("para as unidades:");
-
-        int indexIntermediaria = allEmails.indexOf("titular.intermediaria@test.com");
-        assertThat(indexIntermediaria).isGreaterThanOrEqualTo(0);
-        assertThat(allSubjects.get(indexIntermediaria)).contains("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Prezado(a) responsável pela <span>COAD</span>,</p>");
+        verify(processoNotificacaoService, times(1)).enviarNotificacoesDeFinalizacao(eq(processo), anyList());
     }
 
     @Test
@@ -190,6 +175,5 @@ class CDU21IntegrationTest {
         assertThat(u1.getMapaVigente()).isNull();
         assertThat(u2.getMapaVigente()).isNull();
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 }

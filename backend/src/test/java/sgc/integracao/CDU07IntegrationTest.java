@@ -83,7 +83,8 @@ public class CDU07IntegrationTest {
         subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
-        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade, Set.of(Perfil.SERVIDOR));
+        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade);
+        usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.SERVIDOR).build());
         usuarioRepo.save(usuario);
 
         Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);

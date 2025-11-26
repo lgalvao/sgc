@@ -1,0 +1,113 @@
+{
+  "unidades": [
+    {
+      "sigla": "SEDOC",
+      "descricao": "Seção de Desenvolvimento e Capacitação",
+      "tipo": "INTEROPERACIONAL",
+      "subunidades": [
+        {
+          "sigla": "SECRETARIA_1",
+          "descricao": "Secretaria 1",
+          "tipo": "INTEROPERACIONAL",
+          "subunidades": [
+            {
+              "sigla": "ASSESSORIA_11",
+              "descricao": "Assessoria 11",
+              "tipo": "OPERACIONAL",
+              "subunidades": []
+            },
+            {
+              "sigla": "ASSESSORIA_12",
+              "descricao": "Assessoria 12",
+              "tipo": "OPERACIONAL",
+              "subunidades": []
+            },
+            {
+              "sigla": "COORD_11",
+              "descricao": "Coordenadoria 11",
+              "tipo": "INTERMEDIARIA",
+              "subunidades": [
+                {
+                  "sigla": "SECAO_111",
+                  "descricao": "Seção 111",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                },
+                {
+                  "sigla": "SECAO_112",
+                  "descricao": "Seção 112",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                },
+                {
+                  "sigla": "SECAO_113",
+                  "descricao": "Seção 113",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                }
+              ]
+            },
+            {
+              "sigla": "COORD_12",
+              "descricao": "Coordenadoria 12",
+              "tipo": "INTERMEDIARIA",
+              "subunidades": [
+                {
+                  "sigla": "SECAO_121",
+                  "descricao": "Seção 121",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sigla": "SECRETARIA_2",
+          "descricao": "Secretaria 2",
+          "tipo": "INTEROPERACIONAL",
+          "subunidades": [
+            {
+              "sigla": "ASSESSORIA_21",
+              "descricao": "Assessoria 21",
+              "tipo": "OPERACIONAL",
+              "subunidades": []
+            },
+            {
+              "sigla": "COORD_21",
+              "descricao": "Coordenadoria 21",
+              "tipo": "INTERMEDIARIA",
+              "subunidades": [
+                {
+                  "sigla": "SECAO_211",
+                  "descricao": "Seção 211",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                },
+                {
+                  "sigla": "SECAO_212",
+                  "descricao": "Seção 212",
+                  "tipo": "OPERACIONAL",
+                  "subunidades": []
+                }
+              ]
+            },
+            {
+              "sigla": "COORD_22",
+              "descricao": "Coordenadoria 22",
+              "tipo": "INTERMEDIARIA",
+              "subunidades": [
+                {
+                  "sigla": "SECAO_221",
+                  "descricao": "Seção 221",
+                  "tipo": "OPERACIONAL",
+                  "usuarios": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -154,52 +154,52 @@ public class CarregamentoService {
         usuarioRepo.save(new sgc.sgrh.model.Usuario("50006", "Juliana Lima", null, null, unidade10));
 
         sgc.sgrh.model.Usuario usuario1 = usuarioRepo.findById("1").get();
-        usuario1.getPerfis().add(sgc.sgrh.model.Perfil.SERVIDOR);
+        usuario1.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario1).unidade(usuario1.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.SERVIDOR).build());
         usuarioRepo.save(usuario1);
 
         sgc.sgrh.model.Usuario usuario2_2 = usuarioRepo.findById("2").get();
-        usuario2_2.getPerfis().add(sgc.sgrh.model.Perfil.CHEFE);
+        usuario2_2.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario2_2).unidade(usuario2_2.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.CHEFE).build());
         usuarioRepo.save(usuario2_2);
 
         sgc.sgrh.model.Usuario usuario3_2 = usuarioRepo.findById("3").get();
-        usuario3_2.getPerfis().add(sgc.sgrh.model.Perfil.CHEFE);
+        usuario3_2.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario3_2).unidade(usuario3_2.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.CHEFE).build());
         usuarioRepo.save(usuario3_2);
 
         sgc.sgrh.model.Usuario usuario6_3 = usuarioRepo.findById("6").get();
-        usuario6_3.getPerfis().add(sgc.sgrh.model.Perfil.ADMIN);
+        usuario6_3.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario6_3).unidade(usuario6_3.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.ADMIN).build());
         usuarioRepo.save(usuario6_3);
 
         sgc.sgrh.model.Usuario usuario8_2 = usuarioRepo.findById("8").get();
-        usuario8_2.getPerfis().add(sgc.sgrh.model.Perfil.GESTOR);
+        usuario8_2.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario8_2).unidade(usuario8_2.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.GESTOR).build());
         usuarioRepo.save(usuario8_2);
 
         sgc.sgrh.model.Usuario usuario777 = usuarioRepo.findById("777").get();
-        usuario777.getPerfis().add(sgc.sgrh.model.Perfil.CHEFE);
+        usuario777.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario777).unidade(usuario777.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.CHEFE).build());
         usuarioRepo.save(usuario777);
 
         sgc.sgrh.model.Usuario usuario111111111111 = usuarioRepo.findById("111111111111").get();
-        usuario111111111111.getPerfis().add(sgc.sgrh.model.Perfil.ADMIN);
+        usuario111111111111.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario111111111111).unidade(usuario111111111111.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.ADMIN).build());
         usuarioRepo.save(usuario111111111111);
 
         sgc.sgrh.model.Usuario usuario222222222222 = usuarioRepo.findById("222222222222").get();
-        usuario222222222222.getPerfis().add(sgc.sgrh.model.Perfil.GESTOR);
+        usuario222222222222.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario222222222222).unidade(usuario222222222222.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.GESTOR).build());
         usuarioRepo.save(usuario222222222222);
 
         sgc.sgrh.model.Usuario usuario333333333333 = usuarioRepo.findById("333333333333").get();
-        usuario333333333333.getPerfis().add(sgc.sgrh.model.Perfil.CHEFE);
+        usuario333333333333.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario333333333333).unidade(usuario333333333333.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.CHEFE).build());
         usuarioRepo.save(usuario333333333333);
 
         sgc.sgrh.model.Usuario usuario121212121212 = usuarioRepo.findById("121212121212").get();
-        usuario121212121212.getPerfis().add(sgc.sgrh.model.Perfil.CHEFE);
+        usuario121212121212.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario121212121212).unidade(usuario121212121212.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.CHEFE).build());
         usuarioRepo.save(usuario121212121212);
 
         sgc.sgrh.model.Usuario usuario666666666666 = usuarioRepo.findById("666666666666").get();
-        usuario666666666666.getPerfis().add(sgc.sgrh.model.Perfil.GESTOR);
+        usuario666666666666.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario666666666666).unidade(usuario666666666666.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.GESTOR).build());
         usuarioRepo.save(usuario666666666666);
 
         sgc.sgrh.model.Usuario usuario999999999999 = usuarioRepo.findById("999999999999").get();
-        usuario999999999999.getPerfis().add(sgc.sgrh.model.Perfil.ADMIN);
-        usuario999999999999.getPerfis().add(sgc.sgrh.model.Perfil.GESTOR);
+        usuario999999999999.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario999999999999).unidade(usuario999999999999.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.ADMIN).build());
+        usuario999999999999.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario999999999999).unidade(usuario999999999999.getUnidadeLotacao()).perfil(sgc.sgrh.model.Perfil.GESTOR).build());
         usuarioRepo.save(usuario999999999999);
 
         unidade2.setTitular(usuarioRepo.findById("777").get());

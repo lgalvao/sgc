@@ -41,13 +41,18 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
             principal.setTituloEleitoral(tituloGestor);
             principal.setNome("Gestor User");
             principal.setEmail("gestor@example.com");
-            principal.setPerfis(Set.of(Perfil.GESTOR));
-            principal.setUnidade(new Unidade("Unidade Mock", "UO_SUP"));
+            Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+            principal.setUnidadeLotacao(u);
+            principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
+
             if (dbAvailable) {
                 try { usuarioRepo.save(principal); } catch (Exception e) { }
             }
         } else {
-            principal.setPerfis(Set.of(Perfil.GESTOR));
+             if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
+                 Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+                 principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
+             }
             if (dbAvailable) {
                 try { usuarioRepo.save(principal); } catch (Exception e) { }
             }

@@ -240,13 +240,23 @@ public class AlertaService {
                         log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH.", titulo);
                         return sgrhService.buscarUsuarioPorTitulo(tituloStr)
                                 .map(usuarioDto -> {
-                                    Usuario novoUsuario = new Usuario()
-                                            .setTituloEleitoral(usuarioDto.getTitulo())
-                                            .setNome(usuarioDto.getNome())
-                                            .setEmail(usuarioDto.getEmail())
-                                            .setPerfis(java.util.Set.of(Perfil.CHEFE));
+                                    Unidade unidade = unidadeRepo.findById(codUnidade)
+                                            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
 
-                                    unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);
+                                    Usuario novoUsuario = new Usuario();
+                                    novoUsuario.setTituloEleitoral(usuarioDto.getTitulo());
+                                    novoUsuario.setNome(usuarioDto.getNome());
+                                    novoUsuario.setEmail(usuarioDto.getEmail());
+                                    novoUsuario.setUnidadeLotacao(unidade);
+                                    
+                                    sgc.sgrh.model.UsuarioPerfil perfilChefe = sgc.sgrh.model.UsuarioPerfil.builder()
+                                            .usuario(novoUsuario)
+                                            .unidade(unidade)
+                                            .perfil(Perfil.CHEFE)
+                                            .build();
+                                            
+                                    novoUsuario.getAtribuicoes().add(perfilChefe);
+
                                     return novoUsuario;
                                 })
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));

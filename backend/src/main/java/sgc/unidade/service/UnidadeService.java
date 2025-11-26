@@ -68,7 +68,7 @@ public class UnidadeService {
     }
 
     public List<ServidorDto> buscarServidoresPorUnidade(Long codigoUnidade) {
-        List<Usuario> usuarios = usuarioRepo.findByUnidadeCodigo(codigoUnidade);
+        List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
         
         return usuarios.stream()
             .map(u -> new ServidorDto(
@@ -76,7 +76,7 @@ public class UnidadeService {
                 u.getNome(),
                 u.getTituloEleitoral(),
                 u.getEmail(),
-                u.getUnidade().getCodigo()
+                u.getUnidadeLotacao().getCodigo()
             ))
             .toList();
     }

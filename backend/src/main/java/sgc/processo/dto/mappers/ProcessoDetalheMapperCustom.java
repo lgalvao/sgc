@@ -56,7 +56,8 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         }
         Usuario user = (Usuario) principal;
         return processo.getParticipantes().stream()
-                .anyMatch(unidade -> unidade.getCodigo().equals(user.getUnidade().getCodigo()));
+                .anyMatch(unidade -> user.getTodasAtribuicoes().stream()
+                        .anyMatch(attr -> attr.getUnidade().getCodigo().equals(unidade.getCodigo())));
     }
 
     private boolean isCurrentUserAdmin() {

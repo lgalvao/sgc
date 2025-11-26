@@ -56,8 +56,10 @@ class UsuarioServiceTest {
             "Usuário de Teste",
             "teste@email.com",
             "1234",
-            unidadeMock,
-            Set.of(Perfil.ADMIN, Perfil.CHEFE));
+            unidadeMock);
+            
+        usuarioMock.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuarioMock).unidade(unidadeMock).perfil(Perfil.ADMIN).build());
+        usuarioMock.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuarioMock).unidade(unidadeMock).perfil(Perfil.CHEFE).build());
     }
 
     @Test
