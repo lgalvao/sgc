@@ -2,60 +2,70 @@
   "unidades": [
     {
       "sigla": "SEDOC",
-      "descricao": "Seção de Desenvolvimento e Capacitação",
+      "nome": "Seção de Desenvolvimento e Capacitação",
       "tipo": "INTEROPERACIONAL",
+      "situacao": "ATIVA",
       "subunidades": [
         {
           "sigla": "SECRETARIA_1",
-          "descricao": "Secretaria 1",
+          "nome": "Secretaria 1",
           "tipo": "INTEROPERACIONAL",
+          "situacao": "ATIVA",
           "subunidades": [
             {
               "sigla": "ASSESSORIA_11",
-              "descricao": "Assessoria 11",
+              "nome": "Assessoria 11",
               "tipo": "OPERACIONAL",
+              "situacao": "ATIVA",
               "subunidades": []
             },
             {
               "sigla": "ASSESSORIA_12",
-              "descricao": "Assessoria 12",
+              "nome": "Assessoria 12",
               "tipo": "OPERACIONAL",
+              "situacao": "ATIVA",
               "subunidades": []
             },
             {
               "sigla": "COORD_11",
-              "descricao": "Coordenadoria 11",
+              "nome": "Coordenadoria 11",
               "tipo": "INTERMEDIARIA",
+              "situacao": "ATIVA",
               "subunidades": [
                 {
                   "sigla": "SECAO_111",
-                  "descricao": "Seção 111",
+                  "nome": "Seção 111",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 },
                 {
                   "sigla": "SECAO_112",
-                  "descricao": "Seção 112",
+                  "nome": "Seção 112",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 },
                 {
                   "sigla": "SECAO_113",
-                  "descricao": "Seção 113",
+                  "nome": "Seção 113",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 }
               ]
             },
             {
               "sigla": "COORD_12",
-              "descricao": "Coordenadoria 12",
+              "nome": "Coordenadoria 12",
               "tipo": "INTERMEDIARIA",
+              "situacao": "ATIVA",
               "subunidades": [
                 {
                   "sigla": "SECAO_121",
-                  "descricao": "Seção 121",
+                  "nome": "Seção 121",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 }
               ]
@@ -64,43 +74,50 @@
         },
         {
           "sigla": "SECRETARIA_2",
-          "descricao": "Secretaria 2",
+          "nome": "Secretaria 2",
           "tipo": "INTEROPERACIONAL",
+          "situacao": "ATIVA",
           "subunidades": [
             {
               "sigla": "ASSESSORIA_21",
-              "descricao": "Assessoria 21",
+              "nome": "Assessoria 21",
               "tipo": "OPERACIONAL",
+              "situacao": "ATIVA",
               "subunidades": []
             },
             {
               "sigla": "COORD_21",
-              "descricao": "Coordenadoria 21",
+              "nome": "Coordenadoria 21",
               "tipo": "INTERMEDIARIA",
+              "situacao": "ATIVA",
               "subunidades": [
                 {
                   "sigla": "SECAO_211",
-                  "descricao": "Seção 211",
+                  "nome": "Seção 211",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 },
                 {
                   "sigla": "SECAO_212",
-                  "descricao": "Seção 212",
+                  "nome": "Seção 212",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "subunidades": []
                 }
               ]
             },
             {
               "sigla": "COORD_22",
-              "descricao": "Coordenadoria 22",
+              "nome": "Coordenadoria 22",
               "tipo": "INTERMEDIARIA",
+              "situacao": "ATIVA",
               "subunidades": [
                 {
                   "sigla": "SECAO_221",
-                  "descricao": "Seção 221",
+                  "nome": "Seção 221",
                   "tipo": "OPERACIONAL",
+                  "situacao": "ATIVA",
                   "usuarios": []
                 }
               ]
