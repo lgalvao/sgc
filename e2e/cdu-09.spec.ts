@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     adicionarAtividade,
     adicionarConhecimentoNaAtividade,
@@ -19,7 +19,7 @@ import {
     verificarMensagemSucesso,
     verificarModalHistoricoAnalise,
     verificarUrlDoPainel,
-} from '../helpers';
+} from './helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
     test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar', async ({page}) => {

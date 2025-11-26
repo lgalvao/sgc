@@ -73,36 +73,3 @@ export async function excluirCompetencia(page: Page, descricao: string): Promise
 export async function clicarBotaoImpactosMapa(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.IMPACTO_NO_MAPA}).click();
 }
-
-/**
- * Navega para a página de ajuste do mapa.
- * @param page A instância da página do Playwright.
- * @param processoId O ID do processo.
- * @param siglaUnidade A sigla da unidade.
- */
-export async function irParaAjusteMapa(page: Page, processoId: number, siglaUnidade: string): Promise<void> {
-    await page.goto(`/processo/${processoId}/${siglaUnidade}/mapa-ajuste`);
-}
-
-/**
- * Submete o ajuste do mapa.
- * @param page A instância da página do Playwright.
- */
-export async function submeterAjusteMapa(page: Page): Promise<void> {
-    await page.getByRole('button', { name: /Submeter ajuste/i }).click();
-}
-
-/**
- * Disponibiliza o mapa.
- * @param page A instância da página do Playwright.
- * @param data A data de disponibilização.
- * @param observacoes As observações.
- */
-export async function disponibilizarMapa(page: Page, data: string, observacoes: string): Promise<void> {
-    await page.getByRole('button', { name: /Disponibilizar mapa/i }).click();
-    const modal = page.locator('.modal.show');
-    await modal.waitFor({ state: 'visible' });
-    await modal.locator('input[type="date"]').fill(data);
-    await modal.locator('textarea').fill(observacoes);
-    await modal.getByRole('button', { name: /Confirmar/i }).click();
-}

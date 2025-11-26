@@ -11,7 +11,7 @@ Este diretório contém os testes End-to-End (E2E) da aplicação, que garantem 
 
 A organização dos testes E2E segue uma estrutura lógica para facilitar a manutenção e a localização dos testes:
 
--   `e2e/cdu/`: Contém os arquivos de teste principais, organizados por "Caso de Uso" (CDU). Cada arquivo `.spec.ts` representa um fluxo de usuário ou funcionalidade específica a ser testada.
+-   `e2e` (raiz): Contém os arquivos de teste principais, organizados por "Caso de Uso" (CDU). Cada arquivo `.spec.ts` representa um fluxo de usuário ou funcionalidade específica a ser testada.
 -   `e2e/helpers/`: Este diretório agrupa funções e dados reutilizáveis para os testes, promovendo a padronização e evitando duplicação de código.
     -   `acoes/`: Funções que realizam ações na interface do usuário (ex: `clicarBotao`, `preencherFormularioLogin`).
     -   `dados/`: Constantes e dados de teste (ex: `USUARIOS`, `SELETORES`, `URLS`).

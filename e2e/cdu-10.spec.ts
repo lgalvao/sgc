@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     adicionarAtividade,
     adicionarConhecimentoNaAtividade,
@@ -15,7 +15,7 @@ import {
     verificarMensagemSucesso,
     verificarModalHistoricoAnalise,
     verificarUrlDoPainel,
-} from '../helpers';
+} from './helpers';
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
     test('deve disponibilizar a revisão após corrigir atividades incompletas', async ({page}) => {

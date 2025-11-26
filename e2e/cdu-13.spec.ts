@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     aceitarCadastro,
     adicionarAtividade,
@@ -22,7 +22,7 @@ import {
     verificarModalHistoricoAnaliseAberto,
     verificarUrl,
     verificarUrlDoPainel,
-} from '../helpers';
+} from './helpers';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
     let processo: any;

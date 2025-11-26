@@ -76,26 +76,6 @@ export async function cancelarModal(page: Page): Promise<void> {
 }
 
 /**
- * Abre o modal para disponibilizar o mapa.
- * @param page A instância da página do Playwright.
- */
-export async function abrirModalDisponibilizarMapa(page: Page): Promise<void> {
-    await page.getByRole('button', { name: /Disponibilizar mapa/i }).click();
-}
-
-/**
- * Preenche o modal de disponibilização de mapa.
- * @param page A instância da página do Playwright.
- * @param data A data de disponibilização.
- * @param observacoes As observações.
- */
-export async function preencherModalDisponibilizarMapa(page: Page, data: string, observacoes: string): Promise<void> {
-    const modal = page.locator('.modal.show');
-    await modal.locator('input[type="date"]').fill(data);
-    await modal.locator('textarea').fill(observacoes);
-}
-
-/**
  * Fecha um alerta clicando no botão de fechar.
  * @param page A instância da página do Playwright.
  */

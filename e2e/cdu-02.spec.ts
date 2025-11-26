@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { vueTest as test } from '../support/vue-specific-setup';
+import { vueTest as test } from './support/vue-specific-setup';
 import {
     criarEIniciarProcessoBasico,
     criarProcessoBasico,

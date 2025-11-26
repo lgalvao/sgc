@@ -56,11 +56,7 @@ export async function removerAtividade(page: Page, nomeAtividade: string): Promi
 export async function editarConhecimento(page: Page, nomeAtividade: string, nomeAtual: string, nomeNovo: string): Promise<void> {
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeAtual});
-
     await conhecimento.locator(SELETORES.BTN_EDITAR_CONHECIMENTO).click();
-
-    // After clicking edit, the text is replaced by input, so we search for the input within the card
-    // We assume only one knowledge is being edited at a time
     await cardAtividade.locator(SELETORES.INPUT_EDITAR_CONHECIMENTO).fill(nomeNovo);
     await cardAtividade.locator(SELETORES.BTN_SALVAR_EDICAO_CONHECIMENTO).click();
 }
@@ -75,20 +71,4 @@ export async function removerConhecimento(page: Page, nomeAtividade: string, nom
     const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento});
     await conhecimento.locator(SELETORES.BTN_REMOVER_CONHECIMENTO).click();
-}
-
-/**
- * Associa todas as atividades a uma competência.
- * @param page A instância da página do Playwright.
- * @param nomeCompetencia O nome da competência à qual as atividades serão associadas.
- */
-export async function associarTodasAtividadesACompetencia(page: Page, nomeCompetencia: string): Promise<void> {
-    await page.locator('.competencia-card').filter({ hasText: nomeCompetencia }).click();
-    const atividades = await page.locator('.atividade-card-item').all();
-    for (const atividade of atividades) {
-        if (!(await atividade.isChecked())) {
-            await atividade.click();
-        }
-    }
-    await page.getByTestId('btn-criar-competencia').click();
 }

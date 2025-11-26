@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {navegarParaCriacaoProcesso} from '~/helpers';
-import {aguardarTabelaProcessosCarregada} from '../verificacoes/verificacoes-processo';
+import {aguardarTabelaProcessosCarregada} from '~/helpers';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.

@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     acessarAnaliseRevisaoComoAdmin,
     acessarAnaliseRevisaoComoGestor,
@@ -16,7 +16,7 @@ import {
     verificarCadastroDevolvidoComSucesso,
     verificarModalFechado,
     verificarModalHistoricoAnaliseAberto,
-} from '../helpers';
+} from './helpers';
 
 test.describe('CDU-14: Analisar revisão de cadastro de atividades e conhecimentos', () => {
     let processo: any;

@@ -1,4 +1,4 @@
-import { vueTest as test } from '../support/vue-specific-setup';
+import { vueTest as test } from './support/vue-specific-setup';
 import { PaginaLogin, PaginaPainel } from '~/helpers';
 import { USUARIOS } from '~/helpers/dados/constantes';
 import { loginComoAdmin, loginComoChefe, loginComMultiPerfilAdmin } from '~/helpers/auth';

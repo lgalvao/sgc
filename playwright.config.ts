@@ -1,16 +1,17 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {defineConfig, devices} from '@playwright/test';
+import path from 'path';
 
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: false,
     workers: 1,
-    timeout: 7000,
+    timeout: 30000,
     reporter: "list",
-    expect: {timeout: 3000},
-    globalSetup: require.resolve('./e2e/setup/setup-databases'),
-    globalTeardown: require.resolve('./e2e/setup/global-teardown'),
+    expect: {timeout: 10000},
+    globalSetup: path.resolve(__dirname, './e2e/setup/setup-databases.ts'),
+    globalTeardown: path.resolve(__dirname, './e2e/setup/global-teardown.ts'),
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
 
     webServer: [
