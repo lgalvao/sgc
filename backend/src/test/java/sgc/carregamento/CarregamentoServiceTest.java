@@ -24,7 +24,6 @@ import sgc.unidade.model.VinculacaoUnidadeRepo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled("Este teste foi desabilitado porque depende de IDs manuais, o que entra em conflito com a geração automática de IDs do restante da aplicação.")
 @SpringBootTest
 @ActiveProfiles("e2e")
 @DisplayName("Testes do CarregamentoService")
