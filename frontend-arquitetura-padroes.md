@@ -6,30 +6,30 @@ Este documento consolida os padrões de arquitetura, convenções de código e m
 
 O frontend do SGC é uma Single Page Application (SPA) construída com tecnologias modernas do ecossistema Vue.js.
 
--   **Framework Principal:** [Vue.js 3](https://vuejs.org/) (Composition API via `<script setup>`)
+-   **Framework Principal:** [Vue.js 3.5](https://vuejs.org/) (Composition API via `<script setup>`)
 -   **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 -   **Build Tool:** [Vite](https://vitejs.dev/)
 -   **Gerenciamento de Estado:** [Pinia](https://pinia.vuejs.org/)
 -   **Roteamento:** [Vue Router](https://router.vuejs.org/)
 -   **Componentes UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/) (baseado em Bootstrap 5)
 -   **Comunicação HTTP:** [Axios](https://axios-http.com/)
--   **Testes:** [Vitest](https://vitest.dev/) (Unitários/Integração) e [Playwright](https://playwright.dev/) (E2E)
+-   **Testes:** [Vitest](https://vitest.dev/) (Unitários)
 
 ## 2. Estrutura de Diretórios
 
 A estrutura do projeto (`frontend/src/`) segue uma organização por responsabilidade técnica:
 
-| Diretório | Responsabilidade |
-|-----------|------------------|
-| `views/` | **Páginas** completas da aplicação. São componentes "inteligentes" associados a rotas. Orquestram o carregamento de dados e a interação do usuário. |
-| `components/` | **Componentes de UI** reutilizáveis e "burros" (agnósticos). Recebem dados via props e comunicam ações via eventos. |
-| `stores/` | **Gerenciamento de Estado**. Contém as stores do Pinia, separadas por domínio (ex: `processos.ts`, `usuarios.ts`). |
-| `services/` | **Camada de Serviço**. Encapsula as chamadas HTTP para o backend. |
-| `router/` | **Configuração de Rotas**. Definições modulares das rotas da aplicação. |
-| `mappers/` | **Transformação de Dados**. Funções puras que convertem DTOs da API para interfaces do frontend e vice-versa. |
-| `types/` | **Definições de Tipos**. Interfaces TypeScript que definem os contratos de dados (ex: `Processo`, `Unidade`). |
-| `composables/` | **Lógica Reutilizável**. Hooks customizados da Composition API (ex: lógica compartilhada entre componentes). |
-| `utils/` | **Utilitários**. Funções auxiliares genéricas. |
+| Diretório      | Responsabilidade                                                                                                                                    |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `views/`       | **Páginas** completas da aplicação. São componentes "inteligentes" associados a rotas. Orquestram o carregamento de dados e a interação do usuário. |
+| `components/`  | **Componentes de UI** reutilizáveis e "burros" (agnósticos). Recebem dados via props e comunicam ações via eventos.                                 |
+| `stores/`      | **Gerenciamento de Estado**. Contém as stores do Pinia, separadas por domínio (ex: `processos.ts`, `usuarios.ts`).                                  |
+| `services/`    | **Camada de Serviço**. Encapsula as chamadas HTTP para o backend.                                                                                   |
+| `router/`      | **Configuração de Rotas**. Definições modulares das rotas da aplicação.                                                                             |
+| `mappers/`     | **Transformação de Dados**. Funções puras que convertem DTOs da API para interfaces do frontend e vice-versa.                                       |
+| `types/`       | **Definições de Tipos**. Interfaces TypeScript que definem os contratos de dados (ex: `Processo`, `Unidade`).                                       |
+| `composables/` | **Lógica Reutilizável**. Hooks customizados da Composition API (ex: lógica compartilhada entre componentes).                                        |
+| `utils/`       | **Utilitários**. Funções auxiliares genéricas.                                                                                                      |
 
 ## 3. Arquitetura e Fluxo de Dados
 

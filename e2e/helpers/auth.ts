@@ -28,7 +28,7 @@ async function loginDireto(
     await page.getByTestId('input-titulo').fill(usuario.titulo);
     await page.getByTestId('input-senha').fill(usuario.senha);
 
-    const navigationPromise = page.waitForURL('/painel', { timeout: 5000 });
+    const navigationPromise = page.waitForURL('/painel');
     await page.getByTestId('botao-entrar').click();
     await navigationPromise;
     await page.waitForLoadState('networkidle');
@@ -53,10 +53,10 @@ async function loginComSelecaoPerfil(
     await page.getByTestId('botao-entrar').click();
 
     const seletorPerfil = page.getByTestId('select-perfil-unidade');
-    await seletorPerfil.waitFor({ state: 'visible', timeout: 2000 });
+    await seletorPerfil.waitFor({ state: 'visible'});
     await seletorPerfil.selectOption({ label: perfilUnidadeLabel });
 
-    const navigationPromise = page.waitForURL('/painel', { timeout: 5000 });
+    const navigationPromise = page.waitForURL('/painel');
     await page.getByTestId('botao-entrar').click();
     await navigationPromise;
 

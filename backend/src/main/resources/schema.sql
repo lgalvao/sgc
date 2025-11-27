@@ -2,11 +2,11 @@ create schema if not exists sgc;
 
 create table if not exists sgc.usuario
 (
-    titulo_eleitoral       varchar(255) not null,
-    unidade_lotacao_codigo bigint,
-    ramal                  varchar(20),
-    email                  varchar(255),
-    nome                   varchar(255),
+    titulo_eleitoral varchar(255) not null,
+    unidade_codigo   bigint,
+    ramal            varchar(20),
+    email            varchar(255),
+    nome             varchar(255),
     primary key (titulo_eleitoral)
 );
 
@@ -91,7 +91,7 @@ create table if not exists sgc.alerta
 
 create table if not exists sgc.alerta_usuario
 (
-    alerta_codigo            bigint       not null,
+    alerta_codigo            bigint not null,
     data_hora_leitura        timestamp(6),
     usuario_titulo_eleitoral varchar(255) not null,
     primary key (alerta_codigo, usuario_titulo_eleitoral)
@@ -127,8 +127,8 @@ create table if not exists sgc.atribuicao_temporaria
     data_termino   timestamp(6),
     unidade_codigo bigint,
     usuario_titulo varchar(255),
-    perfil         varchar(255) check (perfil in ('ADMIN', 'GESTOR', 'CHEFE', 'SERVIDOR')),
     justificativa  varchar(500),
+    perfil         varchar(255) check (perfil in ('ADMIN', 'GESTOR', 'CHEFE', 'SERVIDOR')),
     primary key (codigo)
 );
 
@@ -213,68 +213,68 @@ create table if not exists sgc.vinculacao_unidade
 
 -- Foreign Keys (H2 compatible)
 alter table if exists sgc.alerta
-    add constraint if not exists fk_alerta_processo foreign key (processo_codigo) references sgc.processo;
+    add constraint fk_alerta_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.alerta
-    add constraint if not exists fk_alerta_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
+    add constraint fk_alerta_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
 alter table if exists sgc.alerta
-    add constraint if not exists fk_alerta_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
+    add constraint fk_alerta_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
 alter table if exists sgc.alerta
-    add constraint if not exists fk_alerta_usuario_destino foreign key (usuario_destino_titulo) references sgc.usuario;
+    add constraint fk_alerta_usuario_destino foreign key (usuario_destino_titulo) references sgc.usuario;
 alter table if exists sgc.alerta_usuario
-    add constraint if not exists fk_alerta_usuario_alerta foreign key (alerta_codigo) references sgc.alerta;
+    add constraint fk_alerta_usuario_alerta foreign key (alerta_codigo) references sgc.alerta;
 alter table if exists sgc.alerta_usuario
-    add constraint if not exists fk_alerta_usuario_usuario foreign key (usuario_titulo_eleitoral) references sgc.usuario;
+    add constraint fk_alerta_usuario_usuario foreign key (usuario_titulo_eleitoral) references sgc.usuario;
 alter table if exists sgc.analise
-    add constraint if not exists fk_analise_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
+    add constraint fk_analise_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
 alter table if exists sgc.atividade
-    add constraint if not exists fk_atividade_mapa foreign key (mapa_codigo) references sgc.mapa;
+    add constraint fk_atividade_mapa foreign key (mapa_codigo) references sgc.mapa;
 alter table if exists sgc.atribuicao_temporaria
-    add constraint if not exists fk_atribuicao_temporaria_unidade foreign key (unidade_codigo) references sgc.unidade;
+    add constraint fk_atribuicao_temporaria_unidade foreign key (unidade_codigo) references sgc.unidade;
 alter table if exists sgc.atribuicao_temporaria
-    add constraint if not exists fk_atribuicao_temporaria_usuario foreign key (usuario_titulo) references sgc.usuario;
+    add constraint fk_atribuicao_temporaria_usuario foreign key (usuario_titulo) references sgc.usuario;
 alter table if exists sgc.competencia
-    add constraint if not exists fk_competencia_mapa foreign key (mapa_codigo) references sgc.mapa;
+    add constraint fk_competencia_mapa foreign key (mapa_codigo) references sgc.mapa;
 alter table if exists sgc.competencia_atividade
-    add constraint if not exists fk_competencia_atividade_atividade foreign key (atividade_codigo) references sgc.atividade;
+    add constraint fk_competencia_atividade_atividade foreign key (atividade_codigo) references sgc.atividade;
 alter table if exists sgc.competencia_atividade
-    add constraint if not exists fk_competencia_atividade_competencia foreign key (competencia_codigo) references sgc.competencia;
+    add constraint fk_competencia_atividade_competencia foreign key (competencia_codigo) references sgc.competencia;
 alter table if exists sgc.conhecimento
-    add constraint if not exists fk_conhecimento_atividade foreign key (atividade_codigo) references sgc.atividade;
+    add constraint fk_conhecimento_atividade foreign key (atividade_codigo) references sgc.atividade;
 alter table if exists sgc.mapa
-    add constraint if not exists fk_mapa_unidade foreign key (unidade_codigo) references sgc.unidade;
+    add constraint fk_mapa_unidade foreign key (unidade_codigo) references sgc.unidade;
 alter table if exists sgc.movimentacao
-    add constraint if not exists fk_movimentacao_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
+    add constraint fk_movimentacao_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
 alter table if exists sgc.movimentacao
-    add constraint if not exists fk_movimentacao_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
+    add constraint fk_movimentacao_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
 alter table if exists sgc.movimentacao
-    add constraint if not exists fk_movimentacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
+    add constraint fk_movimentacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
 alter table if exists sgc.movimentacao
-    add constraint if not exists fk_movimentacao_usuario foreign key (usuario_codigo) references sgc.usuario;
+    add constraint fk_movimentacao_usuario foreign key (usuario_codigo) references sgc.usuario;
 alter table if exists sgc.notificacao
-    add constraint if not exists fk_notificacao_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
+    add constraint fk_notificacao_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
 alter table if exists sgc.notificacao
-    add constraint if not exists fk_notificacao_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
+    add constraint fk_notificacao_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
 alter table if exists sgc.notificacao
-    add constraint if not exists fk_notificacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
+    add constraint fk_notificacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;
 alter table if exists sgc.subprocesso
-    add constraint if not exists fk_subprocesso_mapa foreign key (mapa_codigo) references sgc.mapa;
+    add constraint fk_subprocesso_mapa foreign key (mapa_codigo) references sgc.mapa;
 alter table if exists sgc.subprocesso
-    add constraint if not exists fk_subprocesso_processo foreign key (processo_codigo) references sgc.processo;
+    add constraint fk_subprocesso_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.subprocesso
-    add constraint if not exists fk_subprocesso_unidade foreign key (unidade_codigo) references sgc.unidade;
+    add constraint fk_subprocesso_unidade foreign key (unidade_codigo) references sgc.unidade;
 alter table if exists sgc.unidade
-    add constraint if not exists fk_unidade_titular foreign key (titular_titulo) references sgc.usuario;
+    add constraint fk_unidade_titular foreign key (titular_titulo) references sgc.usuario;
 alter table if exists sgc.unidade
-    add constraint if not exists fk_unidade_mapa_vigente foreign key (mapa_vigente_codigo) references sgc.mapa;
+    add constraint fk_unidade_mapa_vigente foreign key (mapa_vigente_codigo) references sgc.mapa;
 alter table if exists sgc.unidade
-    add constraint if not exists fk_unidade_superior foreign key (unidade_superior_codigo) references sgc.unidade;
+    add constraint fk_unidade_superior foreign key (unidade_superior_codigo) references sgc.unidade;
 alter table if exists sgc.usuario
-    add constraint if not exists fk_usuario_unidade_lotacao foreign key (unidade_lotacao_codigo) references sgc.unidade;
+    add constraint fk_usuario_unidade foreign key (unidade_codigo) references sgc.unidade;
 alter table if exists sgc.usuario_perfil
-    add constraint if not exists fk_usuario_perfil_usuario foreign key (usuario_titulo_eleitoral) references sgc.usuario;
+    add constraint fk_usuario_perfil_usuario foreign key (usuario_titulo_eleitoral) references sgc.usuario;
 alter table if exists sgc.usuario_perfil
-    add constraint if not exists fk_usuario_perfil_unidade foreign key (unidade_codigo) references sgc.unidade;
+    add constraint fk_usuario_perfil_unidade foreign key (unidade_codigo) references sgc.unidade;
 alter table if exists sgc.vinculacao_unidade
-    add constraint if not exists fk_vinculacao_unidade_anterior foreign key (unidade_anterior_codigo) references sgc.unidade;
+    add constraint fk_vinculacao_unidade_anterior foreign key (unidade_anterior_codigo) references sgc.unidade;
 alter table if exists sgc.vinculacao_unidade
-    add constraint if not exists fk_vinculacao_unidade_atual foreign key (unidade_atual_codigo) references sgc.unidade;
+    add constraint fk_vinculacao_unidade_atual foreign key (unidade_atual_codigo) references sgc.unidade;

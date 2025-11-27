@@ -27,7 +27,7 @@ import {
  * NOTA: Usa test.describe.serial() porque os testes criam e modificam estados de processos.
  * Limpa apenas processos em EM_ANDAMENTO antes de cada teste (não toca em dados estáticos).
  */
-test.describe.serial('CDU-04: Iniciar processo', () => {
+test.describe('CDU-04: Iniciar processo', () => {
     test.beforeEach(async ({page}) => {
         await loginComoAdmin(page);
         await limparProcessosEmAndamento(page);
@@ -58,7 +58,7 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         await iniciarResponsePromise; // Wait for the API call to complete successfully
 
         // 5. Verificar que processo aparece no painel
-        await verificarProcessoIniciadoComSucesso(page, TEXTOS.PROCESSO_INICIADO);
+        await verificarProcessoIniciadoComSucesso(page, descricao);
 
         // 6. Verificar que subprocessos foram criados
         const subprocessos = await verificarCriacaoSubprocessos(page, String(processoId));
@@ -110,7 +110,7 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         );
         await confirmarIniciacaoProcesso(page);
         await iniciarResponsePromise;
-        await verificarProcessoIniciadoComSucesso(page, TEXTOS.PROCESSO_INICIADO);
+        await verificarProcessoIniciadoComSucesso(page, descricao);
 
         // 2. Abrir processo iniciado → botões Editar/Remover/Iniciar não aparecem
         await clicarProcessoNaTabela(page, descricao);

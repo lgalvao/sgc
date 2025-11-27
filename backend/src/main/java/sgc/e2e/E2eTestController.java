@@ -147,6 +147,7 @@ public class E2eTestController {
                     "mensagem", "Banco de dados isolado criado com sucesso"
             ));
         } catch (Exception e) {
+            log.error("Erro ao criar banco isolado: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "erro",
                     "mensagem", "Erro ao criar banco isolado: " + e.getMessage()

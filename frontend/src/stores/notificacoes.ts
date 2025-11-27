@@ -38,8 +38,8 @@ export const useNotificacoesStore = defineStore("notificacoes", () => {
         id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
       timestamp: new Date(),
       mostrar: true,
-      // Preservar testId se fornecido
-      testId: (notificacao as any).testId,
+      // Preservar testId se fornecido, ou gerar um padrão
+      testId: (notificacao as any).testId || `notificacao-${notificacao.tipo}`,
       // Duração padrão das notificações de sucesso (3s) — alinhado aos testes unitários
         duracao:
             notificacao.duracao ?? (notificacao.tipo === "success" ? 3000 : 0),

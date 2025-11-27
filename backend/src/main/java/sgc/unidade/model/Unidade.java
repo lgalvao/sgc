@@ -16,6 +16,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@AttributeOverrides({
+    @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
+})
 public class Unidade extends EntidadeBase {
     public Unidade(Long codigo, String nome, String sigla, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
         super(codigo);

@@ -37,7 +37,7 @@ public class Usuario implements Serializable, UserDetails {
     private String ramal;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_lotacao_codigo")
+    @JoinColumn(name = "unidade_codigo")
     private Unidade unidadeLotacao;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

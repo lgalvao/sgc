@@ -16,19 +16,17 @@ import {
     verificarPaginaEdicaoProcesso
 } from '~/helpers';
 
-test.describe.serial('CDU-06: Detalhar processo', () => {
+test.describe('CDU-06: Detalhar processo', () => {
     test('deve mostrar detalhes do processo para ADMIN', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - ADMIN';
         await loginComoAdmin(page);
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SGP', 'COEDE']);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Wait for the form to load
         await verificarPaginaEdicaoProcesso(page);
         await iniciarProcesso(page);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Now it's in EM_ANDAMENTO and should show the detail view
         await verificarElementosDetalhesProcessoVisiveis(page);
     });
 
@@ -38,7 +36,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SGP', 'COEDE']);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Wait for the form to load
         await verificarPaginaEdicaoProcesso(page);
         await iniciarProcesso(page);
         await aguardarProcessoNoPainel(page, nomeProcesso);
@@ -54,7 +51,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['SGP', 'COEDE']);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Should be in CadProcesso (CRIADO state)
         await verificarBotaoIniciarProcessoVisivel(page);
         await verificarBotaoFinalizarProcessoInvisivel(page);
     });
@@ -65,12 +61,10 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['COJUR', 'COSIS']);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Wait for the form to load
         await verificarPaginaEdicaoProcesso(page);
         await iniciarProcesso(page);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Now it's EM_ANDAMENTO
         await verificarBotaoIniciarProcessoInvisivel(page);
         await verificarBotaoFinalizarProcessoVisivel(page);
     });
@@ -81,7 +75,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', ['COSINF', 'SEDESENV']);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await clicarProcessoNaTabela(page, nomeProcesso);
-        // Wait for the form to load
         await verificarPaginaEdicaoProcesso(page);
         await iniciarProcesso(page);
         await aguardarProcessoNoPainel(page, nomeProcesso);

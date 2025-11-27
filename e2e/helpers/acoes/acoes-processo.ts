@@ -98,7 +98,7 @@ export async function preencherFormularioProcesso(
 
     // Aguarda checkboxes explicitamente se o tipo exigir carregamento dinâmico
     if (tipo === 'REVISAO' || tipo === 'DIAGNOSTICO') {
-        await page.waitForSelector('.form-check-input[type="checkbox"]:not([disabled])', { timeout: 30000 });
+        await page.waitForSelector('.form-check-input[type="checkbox"]:not([disabled])');
     }
     
     if (sticChecked) {

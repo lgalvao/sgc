@@ -16,6 +16,10 @@
           Nenhum processo encontrado.
         </div>
       </template>
+
+      <template #cell(situacao)="data">
+        {{ formatarSituacao(data.value) }}
+      </template>
     </BTable>
   </div>
 </template>
@@ -64,4 +68,13 @@ const handleSortChange = (ctx: any) => {
 const handleSelecionarProcesso = (processo: ProcessoResumo) => {
   emit("selecionarProcesso", processo);
 };
+
+function formatarSituacao(situacao: string): string {
+  const mapa: Record<string, string> = {
+    EM_ANDAMENTO: "Em Andamento",
+    FINALIZADO: "Finalizado",
+    CRIADO: "Criado",
+  };
+  return mapa[situacao] || situacao;
+}
 </script>

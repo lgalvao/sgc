@@ -339,7 +339,7 @@ async function confirmarIniciarProcesso() {
       unidadesSelecionadas.value,
     );
     notificacoesStore.sucesso(
-      "Processo iniciado",
+      "Processo iniciado!",
       "O processo foi iniciado! Notificações enviadas às unidades.",
     );
     await router.push("/painel");

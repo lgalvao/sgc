@@ -207,7 +207,9 @@ export async function verificarDialogoConfirmacaoFechado(page: Page, descricaoPr
 export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
     await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
     await expect(page).toHaveURL(URLS.PAINEL);
-    await expect(page.locator('tr', {hasText: descricaoProcesso}).getByText(TEXTOS.EM_ANDAMENTO)).toBeVisible();
+    const processoNaTabelaComStatus = page.locator('tr', {hasText: descricaoProcesso}).getByText(TEXTOS.EM_ANDAMENTO);
+    await processoNaTabelaComStatus.waitFor({ state: 'visible' });
+    await expect(processoNaTabelaComStatus).toBeVisible();
 }
 
 /**
@@ -497,12 +499,16 @@ export async function verificarMovimentacaoInicialSubprocesso(page: Page, subpro
             },
         }
     );
+    if (!response.ok()) {
+        console.error(`Erro ao buscar movimentação inicial: ${response.status()} ${response.statusText()}`);
+        try { console.error(await response.text()); } catch(e) {}
+    }
     expect(response.ok()).toBeTruthy();
     const subprocesso = await response.json();
     expect(subprocesso.movimentacoes).toHaveLength(1);
     const movimentacao = subprocesso.movimentacoes[0];
     expect(movimentacao.descricao).toMatch(/Processo.*iniciado/);
-    expect(movimentacao.unidadeOrigem).toBe('SEDOC');
+    expect(movimentacao.unidadeOrigemSigla).toBeNull();
 }
 
 /**

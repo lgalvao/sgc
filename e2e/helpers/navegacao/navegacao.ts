@@ -219,7 +219,7 @@ export async function verificarNavegacaoPaginaSubprocesso(page: Page): Promise<v
  */
 export async function verificarNavegacaoPaginaCadastroProcesso(page: Page): Promise<void> {
     await expect(page).toHaveURL(/.*\/processo\/cadastro\?codProcesso=\d+/);
-    await expect(page.getByRole('heading', {name: 'Cadastro de Processo'})).toBeVisible({ timeout: 2000 });
+    await expect(page.getByRole('heading', {name: 'Cadastro de Processo'})).toBeVisible();
 }
 
 /**

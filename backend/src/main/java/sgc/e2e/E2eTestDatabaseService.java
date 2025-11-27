@@ -49,10 +49,9 @@ public class E2eTestDatabaseService {
             log.trace("Creating new isolated DB for testId: {}", testId);
 
             // 1. Create a new H2 in-memory data source with a unique name
+            // Initialize with schema creation in the JDBC URL
             String jdbcUrl = String.format(
-                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC",
-                    testId
-            );
+                    "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS sgc", testId);
 
             DataSource dataSource = DataSourceBuilder.create()
                     .url(jdbcUrl)
@@ -62,28 +61,44 @@ public class E2eTestDatabaseService {
                     .build();
 
             try (Connection conn = dataSource.getConnection()) {
-                conn.setSchema("SGC");
-                executeSqlScripts(conn, new ClassPathResource("/schema.sql"));
+                // Set the default schema for this connection
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute("SET SCHEMA sgc");
+                    log.info("Schema sgc set as default.");
+                }
+
+                ClassPathResource schemaResource = new ClassPathResource("/schema.sql");
+                if (!schemaResource.exists()) {
+                    log.error("Schema SQL resource not found: /schema.sql");
+                    throw new RuntimeException("Schema SQL resource not found: /schema.sql");
+                }
+                try {
+                    executeSqlScripts(conn, schemaResource);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to execute schema.sql: " + ex.getMessage(), ex);
+                }
 
                 // Temporarily disable referential integrity for data loading
                 setReferentialIntegrity(conn, false);
-                executeSqlScripts(conn, new ClassPathResource("/data-minimal.sql"));
+                ClassPathResource dataMinimalResource = new ClassPathResource("/data-minimal.sql");
+                if (!dataMinimalResource.exists()) {
+                    log.error("Data Minimal SQL resource not found: /data-minimal.sql");
+                    throw new RuntimeException("Data Minimal SQL resource not found: /data-minimal.sql");
+                }
+                try {
+                    executeSqlScripts(conn, dataMinimalResource);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to execute data-minimal.sql: " + ex.getMessage(), ex);
+                }
                 setReferentialIntegrity(conn, true);
-
-
-                // Programmatic insertion of user '1' removed as it is already in data-minimal.sql
-
-                // Explicitly commit the transaction
-                // conn.commit(); // Removed due to auto-commit being true by default on H2 connections
-
-
             }
 
             log.debug("Successfully created isolated DB for testId: {}", testId);
             return dataSource;
         } catch (Exception e) {
             log.error("Failed to create DataSource for testId: {}", testId, e);
-            throw new RuntimeException("Failed to create DataSource for testId: " + testId, e);
+            throw new RuntimeException(
+                    "Failed to create DataSource for testId: " + testId + " - Cause: " + e.getMessage(), e);
         }
     }
 
@@ -91,12 +106,12 @@ public class E2eTestDatabaseService {
         DataSource dataSource = dataSources.remove(testId);
         if (dataSource != null) {
             try (Connection conn = dataSource.getConnection();
-                 Statement stmt = conn.createStatement()) {
+                    Statement stmt = conn.createStatement()) {
                 stmt.execute("DROP ALL OBJECTS");
             } catch (Exception e) {
                 log.error("Failed to cleanup DB objects for testId: {}", testId, e);
             }
-            
+
             if (dataSource instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) dataSource).close();
