@@ -1,5 +1,5 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,15 +14,15 @@ import {
     buscarSubprocessoPorProcessoEUnidade,
     fetchSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
 } from "@/services/subprocessoService";
-import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
-import {useProcessosStore} from "@/stores/processos";
+import { usePerfilStore } from "@/stores/perfil"; // Adicionar esta linha
+import { useProcessosStore } from "@/stores/processos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import {useNotificacoesStore} from "./notificacoes";
+import { useNotificacoesStore } from "./notificacoes";
 
 async function _executarAcao(
     acao: () => Promise<any>,
@@ -67,13 +67,22 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             let unidadeCodigo: number | null = null;
 
             if (perfil && unidadeSelecionadaCodigo) {
-                const perfilUnidade = perfilStore.perfisUnidades.find(
-                    (pu) =>
-                        pu.perfil === perfil &&
-                        pu.unidade.codigo === unidadeSelecionadaCodigo,
-                );
-                if (perfilUnidade) {
-                    unidadeCodigo = perfilUnidade.unidade.codigo;
+                unidadeCodigo = unidadeSelecionadaCodigo;
+
+                // Optional: Validate against perfisUnidades if available
+                if (perfilStore.perfisUnidades.length > 0) {
+                    const perfilUnidade = perfilStore.perfisUnidades.find(
+                        (pu) =>
+                            pu.perfil === perfil &&
+                            pu.unidade.codigo === unidadeSelecionadaCodigo,
+                    );
+                    if (perfilUnidade) {
+                        unidadeCodigo = perfilUnidade.unidade.codigo;
+                    } else {
+                        // If profiles are loaded but selected unit is not found, it might be invalid
+                        // But let's trust localStorage for now to support page reloads
+                        console.warn("Selected unit not found in loaded profiles");
+                    }
                 }
             }
 

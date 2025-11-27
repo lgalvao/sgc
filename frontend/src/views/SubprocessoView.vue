@@ -43,7 +43,6 @@
 <script lang="ts" setup>
 import {BContainer} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
-import {useRoute} from "vue-router";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
@@ -53,16 +52,14 @@ import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
 
-defineProps<{ codProcesso: number; siglaUnidade: string }>();
+const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
-const route = useRoute();
 const subprocessosStore = useSubprocessosStore();
 const notificacoesStore = useNotificacoesStore();
 const mapaStore = useMapasStore();
 
 const mostrarModalAlterarDataLimite = ref(false);
-
-const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
+const codSubprocesso = ref<number | null>(null);
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
@@ -78,8 +75,16 @@ const dataLimite = computed(() =>
 );
 
 onMounted(async () => {
-  await subprocessosStore.fetchSubprocessoDetalhe(codSubprocesso.value);
-  await mapaStore.fetchMapaCompleto(codSubprocesso.value);
+  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+      props.codProcesso,
+      props.siglaUnidade,
+  );
+
+  if (id) {
+    codSubprocesso.value = id;
+    await subprocessosStore.fetchSubprocessoDetalhe(id);
+    await mapaStore.fetchMapaCompleto(id);
+  }
 });
 
 function abrirModalAlterarDataLimite() {

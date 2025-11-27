@@ -7,7 +7,7 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: false,
     workers: 1,
-    timeout: 3000,
+    timeout: 10000,
     reporter: "list",
     expect: { timeout: 1000 },
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

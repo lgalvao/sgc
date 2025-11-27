@@ -5,7 +5,6 @@ import lombok.Getter;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07).
+ * DTO com os detalhes necessários para a tela de Detalhes do Subprocesso
+ * (CDU-07).
  */
 @Getter
 @Builder
@@ -33,17 +33,17 @@ public class SubprocessoDetalheDto {
     private final SubprocessoPermissoesDto permissoes;
 
     public static SubprocessoDetalheDto of(Subprocesso sp,
-                                           Usuario responsavel,
-                                           List<Movimentacao> movimentacoes,
-                                           MovimentacaoMapper movimentacaoMapper,
-                                           SubprocessoPermissoesDto permissoes) {
+            Usuario responsavel,
+            List<Movimentacao> movimentacoes,
+            MovimentacaoMapper movimentacaoMapper,
+            SubprocessoPermissoesDto permissoes) {
         UnidadeDto unidadeDto = null;
         if (sp.getUnidade() != null) {
             unidadeDto = UnidadeDto.builder()
-                .codigo(sp.getUnidade().getCodigo())
-                .sigla(HtmlUtils.escapeHtml(sp.getUnidade().getSigla()))
-                .nome(HtmlUtils.escapeHtml(sp.getUnidade().getNome()))
-                .build();
+                    .codigo(sp.getUnidade().getCodigo())
+                    .sigla(sp.getUnidade().getSigla())
+                    .nome(sp.getUnidade().getNome())
+                    .build();
         }
 
         Usuario titular = (sp.getUnidade() != null) ? sp.getUnidade().getTitular() : null;
@@ -58,28 +58,28 @@ public class SubprocessoDetalheDto {
             }
 
             responsavelDto = ResponsavelDto.builder()
-                .nome(HtmlUtils.escapeHtml(responsavel.getNome()))
-                .ramal(HtmlUtils.escapeHtml(responsavel.getRamal()))
-                .email(HtmlUtils.escapeHtml(responsavel.getEmail()))
-                .tipoResponsabilidade(tipo)
-                .build();
+                    .nome(responsavel.getNome())
+                    .ramal(responsavel.getRamal())
+                    .email(responsavel.getEmail())
+                    .tipoResponsabilidade(tipo)
+                    .build();
         }
 
         ResponsavelDto titularDto = null;
         // Titular só é exibido se não for o responsável
         if (titular != null && !isTitularResponsavel) {
             titularDto = ResponsavelDto.builder()
-                .nome(HtmlUtils.escapeHtml(titular.getNome()))
-                .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
-                .email(HtmlUtils.escapeHtml(titular.getEmail()))
-                .build();
+                    .nome(titular.getNome())
+                    .ramal(titular.getRamal())
+                    .email(titular.getEmail())
+                    .build();
         }
 
         String localizacaoAtual = null;
         if (movimentacoes != null && !movimentacoes.isEmpty()) {
             Movimentacao m = movimentacoes.getFirst();
             if (m.getUnidadeDestino() != null) {
-                localizacaoAtual = HtmlUtils.escapeHtml(m.getUnidadeDestino().getSigla());
+                localizacaoAtual = m.getUnidadeDestino().getSigla();
             }
         }
 
@@ -91,20 +91,20 @@ public class SubprocessoDetalheDto {
         }
 
         return SubprocessoDetalheDto.builder()
-            .unidade(unidadeDto)
-            .titular(titularDto)
-            .responsavel(responsavelDto)
-            .situacao(sp.getSituacao().name())
-            .situacaoLabel(sp.getSituacao().getDescricao())
-            .localizacaoAtual(localizacaoAtual)
-            .processoDescricao(sp.getProcesso() != null ? HtmlUtils.escapeHtml(sp.getProcesso().getDescricao()) : null)
-            .tipoProcesso(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)
-            .prazoEtapaAtual(prazoEtapaAtual)
-            .isEmAndamento(sp.isEmAndamento())
-            .etapaAtual(sp.getEtapaAtual())
-            .movimentacoes(movimentacoesDto)
-            .permissoes(permissoes)
-            .build();
+                .unidade(unidadeDto)
+                .titular(titularDto)
+                .responsavel(responsavelDto)
+                .situacao(sp.getSituacao().name())
+                .situacaoLabel(sp.getSituacao().getDescricao())
+                .localizacaoAtual(localizacaoAtual)
+                .processoDescricao(sp.getProcesso() != null ? sp.getProcesso().getDescricao() : null)
+                .tipoProcesso(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)
+                .prazoEtapaAtual(prazoEtapaAtual)
+                .isEmAndamento(sp.isEmAndamento())
+                .etapaAtual(sp.getEtapaAtual())
+                .movimentacoes(movimentacoesDto)
+                .permissoes(permissoes)
+                .build();
     }
 
     @Getter

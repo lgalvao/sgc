@@ -28,7 +28,8 @@ import java.util.List;
 
 /**
  * Configuração de segurança permissiva para o perfil 'e2e' usado em testes E2E.
- * Permite acesso a todos os endpoints sem autenticação para facilitar testes automatizados.
+ * Permite acesso a todos os endpoints sem autenticação para facilitar testes
+ * automatizados.
  */
 @Configuration
 @EnableWebSecurity
@@ -39,11 +40,12 @@ public class ConfigSegurancaE2E {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
                 .addFilterBefore(new OncePerRequestFilter() {
                     @Override
-                    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+                    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                            @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+                            throws ServletException, IOException {
                         String header = request.getHeader("Authorization");
                         if (header != null && header.startsWith("Bearer ")) {
                             String token = header.substring(7);
@@ -53,8 +55,12 @@ public class ConfigSegurancaE2E {
                                 JsonNode node = mapper.readTree(json);
                                 if (node.has("tituloEleitoral")) {
                                     String username = node.get("tituloEleitoral").asText();
+                                    // Create a UserDetails object instead of just passing the string username
+                                    org.springframework.security.core.userdetails.User user = new org.springframework.security.core.userdetails.User(
+                                            username, "", Collections.emptyList());
+
                                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                            username, null, Collections.emptyList());
+                                            user, null, user.getAuthorities());
                                     SecurityContextHolder.getContext().setAuthentication(auth);
                                 }
                             } catch (Exception e) {
