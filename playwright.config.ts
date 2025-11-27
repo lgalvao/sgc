@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import {defineConfig, devices} from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import * as path from "node:path";
 
 export default defineConfig({
@@ -10,16 +10,15 @@ export default defineConfig({
 
     timeout: 3000,
     reporter: "list",
-    expect: {timeout: 1000},
-    globalSetup: path.resolve(__dirname, './e2e/setup/setup-databases.ts'),
-    globalTeardown: path.resolve(__dirname, './e2e/setup/global-teardown.ts'),
-    projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
+    expect: { timeout: 1000 },
+
+    projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
     webServer: [
         {
             command: 'npm --prefix ./frontend run dev',
             url: 'http://localhost:5173',
             reuseExistingServer: !process.env.CI,
-            stdout: 'pipe',
+            stdout: 'ignore',
             stderr: 'pipe',
         },
         {

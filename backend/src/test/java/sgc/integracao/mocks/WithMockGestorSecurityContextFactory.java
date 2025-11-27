@@ -11,8 +11,6 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Set;
-
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
 

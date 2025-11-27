@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { buscarTodosUsuarios } from "@/services/usuarioService";
-import type { Usuario } from "@/types/tipos";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {buscarTodosUsuarios} from "@/services/usuarioService";
+import type {Usuario} from "@/types/tipos";
 
 export const useUsuariosStore = defineStore("usuarios", () => {
     const usuarios = ref<Usuario[]>([]);

@@ -46,9 +46,12 @@ management:
       enabled: false
 
 logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{36}:%line - %msg%n"
+    file: "%d{HH:mm:ss} %-5level %logger{36}:%line - %msg%n"
   level:
     root: INFO
-    sgc: DEBUG
+    sgc: INFO
     org.springframework: INFO
     org.springframework.jdbc: INFO
     org.springframework.boot.autoconfigure: ERROR

@@ -1,5 +1,5 @@
-import { Page } from '@playwright/test';
-import { USUARIOS } from './dados/constantes';
+import {Page} from '@playwright/test';
+import {USUARIOS} from './dados/constantes';
 
 /**
  * Realiza o login direto para usuários com um único perfil.

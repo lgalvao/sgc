@@ -1,16 +1,11 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { mapMapaVisualizacaoToAtividades } from "@/mappers/mapas";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {mapMapaVisualizacaoToAtividades} from "@/mappers/mapas";
 import * as atividadeService from "@/services/atividadeService";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {
-    Atividade,
-    Conhecimento,
-    CriarAtividadeRequest,
-    CriarConhecimentoRequest,
-} from "@/types/tipos";
-import { useNotificacoesStore } from "./notificacoes";
+import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
+import {useNotificacoesStore} from "./notificacoes";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());

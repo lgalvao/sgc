@@ -1,9 +1,8 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
-import { useMapasStore } from "@/stores/mapas";
-import { TipoImpactoCompetencia } from "@/types/impacto";
+import {TipoImpactoCompetencia} from "@/types/impacto";
 
 vi.mock("@/services/mapaService", () => ({
   verificarImpactos: vi.fn(),

@@ -31,7 +31,6 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

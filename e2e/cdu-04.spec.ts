@@ -11,14 +11,13 @@ import {
     verificarCriacaoSubprocessos,
     verificarMapaVazioCriadoParaSubprocesso,
     verificarModalConfirmacaoIniciacaoProcesso,
-    verificarMovimentacaoInicialSubprocesso,
     verificarModalFechado,
+    verificarMovimentacaoInicialSubprocesso,
     verificarPaginaDetalheProcesso,
     verificarPaginaEdicaoProcesso,
     verificarProcessoBloqueadoParaEdicao,
     verificarProcessoIniciadoComSucesso,
-    verificarValorCampoDescricao,
-    TEXTOS
+    verificarValorCampoDescricao
 } from '~/helpers';
 
 /**

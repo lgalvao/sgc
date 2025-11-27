@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type { ImpactoMapa } from "@/types/impacto";
+import type {ImpactoMapa} from "@/types/impacto";
 import type {
     Competencia,
     DisponibilizarMapaRequest,
@@ -12,7 +12,7 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
-import { useNotificacoesStore } from "./notificacoes";
+import {useNotificacoesStore} from "./notificacoes";
 
 export const useMapasStore = defineStore("mapas", () => {
     const mapaCompleto = ref<MapaCompleto | null>(null);

@@ -1,12 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {
-    type Mapa,
-    type SubprocessoPermissoes,
-    TipoProcesso,
-    type Unidade,
-} from "@/types/tipos";
+import {type Mapa, type SubprocessoPermissoes, TipoProcesso, type Unidade,} from "@/types/tipos";
 import SubprocessoCards from "../SubprocessoCards.vue";
 
 const pushMock = vi.fn();

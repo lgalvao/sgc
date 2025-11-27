@@ -78,12 +78,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useUsuariosStore} from "@/stores/usuarios";
-import type {
-  MapaCompleto,
-  Responsavel,
-  Unidade,
-  Usuario,
-} from "@/types/tipos";
+import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 
 const props = defineProps<{ codUnidade: number }>();

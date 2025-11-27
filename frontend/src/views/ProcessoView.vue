@@ -60,9 +60,7 @@ import {BAlert, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ModalAcaoBloco, {
-  type UnidadeSelecao,
-} from "@/components/ModalAcaoBloco.vue";
+import ModalAcaoBloco, {type UnidadeSelecao,} from "@/components/ModalAcaoBloco.vue";
 import ModalFinalizacao from "@/components/ModalFinalizacao.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import ProcessoDetalhes from "@/components/ProcessoDetalhes.vue";

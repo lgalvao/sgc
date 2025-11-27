@@ -1,11 +1,7 @@
-import { mount, type VueWrapper } from "@vue/test-utils";
-import { BTable } from "bootstrap-vue-next";
-import { describe, expect, it } from "vitest";
-import {
-  type ProcessoResumo,
-  SituacaoProcesso,
-  TipoProcesso,
-} from "@/types/tipos";
+import {mount, type VueWrapper} from "@vue/test-utils";
+import {BTable} from "bootstrap-vue-next";
+import {describe, expect, it} from "vitest";
+import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
 
 // Mock de dados de processo

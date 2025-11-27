@@ -1,13 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {
-    mapVWUsuariosArray,
-    mapVWUsuarioToServidor,
-} from "@/mappers/servidores";
-import {
-    mapUnidade,
-    mapUnidadeSnapshot,
-    mapUnidadesArray,
-} from "@/mappers/unidades";
+import {mapVWUsuariosArray, mapVWUsuarioToServidor,} from "@/mappers/servidores";
+import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
 import type {Alerta, Mapa, MapaAjuste, MapaVisualizacao} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
@@ -23,11 +16,7 @@ import {
     mapMapaDtoToModel,
     mapMapaVisualizacaoToAtividades,
 } from "../mapas";
-import {
-    mapProcessoDetalheDtoToFrontend,
-    mapProcessoDtoToFrontend,
-    mapProcessoResumoDtoToFrontend,
-} from "../processos";
+import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
 import {mapPerfilUnidadeToFrontend, mapUsuarioToFrontend} from "../sgrh";
 
 describe("mappers/alertas", () => {

@@ -16,7 +16,9 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 

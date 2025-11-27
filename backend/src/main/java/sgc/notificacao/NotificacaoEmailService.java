@@ -119,7 +119,7 @@ public class NotificacaoEmailService {
             try {
                 log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, emailDto.getDestinatario());
                 enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado na tentativa {} para: {}", tentativa, emailDto.getDestinatario());
+                log.info("E-mail enviado {} para: {}", tentativa, emailDto.getDestinatario());
                 return CompletableFuture.completedFuture(true);
             } catch (Exception e) {
                 excecaoFinal = e;

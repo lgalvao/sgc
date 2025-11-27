@@ -239,14 +239,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BButton,
-  BCard,
-  BContainer,
-  BFormInput,
-  BFormSelect,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BContainer, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useProcessosStore} from "@/stores/processos";

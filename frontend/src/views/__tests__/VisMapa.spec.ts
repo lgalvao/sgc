@@ -1,13 +1,13 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createMemoryHistory, createRouter } from "vue-router";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createMemoryHistory, createRouter} from "vue-router";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { SituacaoSubprocesso } from "@/types/tipos";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {SituacaoSubprocesso} from "@/types/tipos";
 import VisMapa from "../VisMapa.vue";
 
 const router = createRouter({

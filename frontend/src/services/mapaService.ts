@@ -1,16 +1,7 @@
 import {AxiosError} from "axios";
-import {
-    mapImpactoMapaDtoToModel,
-    mapMapaAjusteDtoToModel,
-    mapMapaCompletoDtoToModel,
-} from "@/mappers/mapas";
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from "@/mappers/mapas";
 import type {ImpactoMapa} from "@/types/impacto";
-import type {
-    DisponibilizarMapaRequest,
-    MapaAjuste,
-    MapaCompleto,
-    MapaVisualizacao,
-} from "@/types/tipos";
+import type {DisponibilizarMapaRequest, MapaAjuste, MapaCompleto, MapaVisualizacao,} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 export async function obterMapaVisualizacao(

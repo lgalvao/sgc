@@ -1,13 +1,8 @@
-import { expect } from '@playwright/test';
-import { vueTest as test } from './support/vue-specific-setup';
-import {
-    criarEIniciarProcessoBasico,
-    criarProcessoBasico,
-    verificarNavegacaoPaginaCadastroProcesso,
-} from '~/helpers';
-import { PaginaLogin } from '~/helpers/pages/login-page';
-import { PaginaPainel } from '~/helpers/pages/painel-page';
-import { USUARIOS } from '~/helpers/dados/constantes';
+import {vueTest as test} from './support/vue-specific-setup';
+import {criarEIniciarProcessoBasico, criarProcessoBasico, verificarNavegacaoPaginaCadastroProcesso,} from '~/helpers';
+import {PaginaLogin} from '~/helpers/pages/login-page';
+import {PaginaPainel} from '~/helpers/pages/painel-page';
+import {USUARIOS} from '~/helpers/dados/constantes';
 
 test.describe('CDU-02: Visualizar Painel', () => {
     // Clean up of 'processos em andamento' is removed as the fixture now guarantees an isolated DB per test.

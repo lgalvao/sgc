@@ -34,25 +34,15 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-import sgc.unidade.model.SituacaoUnidade;
-import sgc.unidade.model.TipoUnidade;
 
 import java.time.LocalDateTime;
-
 import java.util.List;
 
-
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.hamcrest.Matchers.is;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 

@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import type { AnaliseCadastro, AnaliseValidacao } from "@/types/tipos";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
 

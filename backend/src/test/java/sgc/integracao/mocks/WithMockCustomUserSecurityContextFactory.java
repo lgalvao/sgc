@@ -12,7 +12,6 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Component
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {

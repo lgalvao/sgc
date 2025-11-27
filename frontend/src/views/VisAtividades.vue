@@ -168,14 +168,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormTextarea,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";

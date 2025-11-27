@@ -1,6 +1,5 @@
 package sgc.service;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,12 +10,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
@@ -25,6 +24,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -64,16 +64,10 @@ public class SubprocessoServiceActionsTest {
     private ProcessoRepo processoRepo;
 
     @Autowired
-    private AlertaRepo alertaRepo;
+    private MapaRepo mapaRepo;
 
     @Autowired
-    private sgc.mapa.model.MapaRepo mapaRepo;
-
-    @Autowired
-    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
-
-    @Autowired
-    private EntityManager entityManager;
+    private MovimentacaoRepo movimentacaoRepo;
 
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;
@@ -130,15 +124,19 @@ public class SubprocessoServiceActionsTest {
 
             subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo())
+                    .stream().findFirst();
             assertTrue(analise.isPresent());
-            assertEquals(OBSERVACOES, analise.orElseThrow(() -> new AssertionError("Análise não encontrada.")).getObservacoes());
+            assertEquals(OBSERVACOES,
+                    analise.orElseThrow(() -> new AssertionError("Análise não encontrada.")).getObservacoes());
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertEquals(1, movimentacoes.size());
             assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().getDescricao());
 
-            verify(subprocessoNotificacaoService, times(1)).notificarAceiteCadastro(any(Subprocesso.class), any(Unidade.class));
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteCadastro(any(Subprocesso.class),
+                    any(Unidade.class));
         }
     }
 
@@ -151,11 +149,10 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
-
             subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação."));
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação."));
             assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
         }
     }
@@ -171,20 +168,25 @@ public class SubprocessoServiceActionsTest {
 
             subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo())
+                    .stream().findFirst();
             assertTrue(analise.isPresent());
             assertEquals(OBSERVACOES, analise.get().getObservacoes());
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertEquals(1, movimentacoes.size());
-            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().getDescricao());
+            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita",
+                    movimentacoes.getFirst().getDescricao());
 
-            verify(subprocessoNotificacaoService, times(1)).notificarAceiteRevisaoCadastro(any(Subprocesso.class), any(Unidade.class));
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteRevisaoCadastro(any(Subprocesso.class),
+                    any(Unidade.class));
         }
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class,
+                    () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -192,7 +194,8 @@ public class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
+            assertThrows(IllegalStateException.class,
+                    () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
         }
     }
 
@@ -205,25 +208,30 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-            // Primeiro, aceitar a revisão para que a situação mude para AGUARDANDO_HOMOLOGACAO_CADASTRO
+            // Primeiro, aceitar a revisão para que a situação mude para
+            // AGUARDANDO_HOMOLOGACAO_CADASTRO
             subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            // Recarregar o subprocesso do repositório para garantir que o estado esteja atualizado
+            // Recarregar o subprocesso do repositório para garantir que o estado esteja
+            // atualizado
             Subprocesso subprocessoAposAceite = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após aceite da revisão."));
 
             when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class)))
                     .thenReturn(ImpactoMapaDto.semImpacto());
 
-            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, usuario);
+            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES,
+                    usuario);
 
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
             assertEquals(SituacaoSubprocesso.MAPA_HOMOLOGADO, spAtualizado.getSituacao());
         }
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class,
+                    () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -231,7 +239,8 @@ public class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta_homologar() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
+            assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService
+                    .homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
         }
     }
 
@@ -246,7 +255,9 @@ public class SubprocessoServiceActionsTest {
 
             subprocessoWorkflowService.devolverCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após devolução."));
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após devolução."));
+
             assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
             assertNull(spAtualizado.getDataFimEtapa1());
         }

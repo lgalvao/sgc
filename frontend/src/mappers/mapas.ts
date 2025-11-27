@@ -1,8 +1,4 @@
-import type {
-    AtividadeImpactada,
-    CompetenciaImpactada,
-    ImpactoMapa,
-} from "@/types/impacto";
+import type {AtividadeImpactada, CompetenciaImpactada, ImpactoMapa,} from "@/types/impacto";
 import type {
     Atividade,
     AtividadeVisualizacao,

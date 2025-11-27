@@ -1,12 +1,12 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { mapUnidadesArray } from "@/mappers/unidades";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import {mapUnidadesArray} from "@/mappers/unidades";
 import {
     buscarArvoreComElegibilidade,
     buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
-import type { Unidade } from "@/types/tipos";
+import type {Unidade} from "@/types/tipos";
 
 export const useUnidadesStore = defineStore("unidades", () => {
     const unidades = ref<Unidade[]>([]);

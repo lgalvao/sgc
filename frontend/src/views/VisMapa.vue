@@ -317,14 +317,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormTextarea,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

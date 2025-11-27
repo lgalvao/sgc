@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { buscarTodasAtribuicoes } from "@/services/atribuicaoTemporariaService";
-import type { AtribuicaoTemporaria } from "@/types/tipos";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
+import type {AtribuicaoTemporaria} from "@/types/tipos";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",

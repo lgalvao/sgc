@@ -2,16 +2,16 @@ package sgc.unidade.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
-import sgc.processo.model.TipoProcesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 

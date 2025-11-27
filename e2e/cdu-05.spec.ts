@@ -1,7 +1,6 @@
-import { vueTest as test } from './support/vue-specific-setup';
-import { expect } from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
+import {expect} from '@playwright/test';
 import {
-    abrirProcessoPorNome,
     aguardarTabelaProcessosCarregada,
     cancelarIniciacaoProcesso,
     clicarBotaoIniciarProcesso,
@@ -11,11 +10,13 @@ import {
     criarProcessoBasico,
     gerarNomeUnico,
     limparProcessosEmAndamento,
+    loginComo,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     navegarParaHome,
     preencherFormularioProcesso,
     selecionarUnidadesPorSigla,
+    USUARIOS,
     verificarAlertaNaTabela,
     verificarBotaoIniciarProcessoInvisivel,
     verificarBotaoIniciarProcessoVisivel,
@@ -23,15 +24,12 @@ import {
     verificarCamposProcessoDesabilitados,
     verificarCriacaoSubprocessos,
     verificarModalConfirmacaoIniciacaoProcesso,
-    verificarMovimentacaoInicialSubprocesso,
     verificarModalFechado,
-    verificarPaginaCadastroProcesso,
+    verificarMovimentacaoInicialSubprocesso,
     verificarPaginaDetalheProcesso,
     verificarPaginaEdicaoProcesso,
     verificarSituacaoProcesso,
-    verificarUrlDoPainel,
-    loginComo,
-    USUARIOS
+    verificarUrlDoPainel
 } from '~/helpers';
 
 /**

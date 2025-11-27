@@ -11,8 +11,6 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Set;
-
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
 
     @Autowired(required = false)

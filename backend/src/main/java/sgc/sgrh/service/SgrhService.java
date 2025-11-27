@@ -1,9 +1,9 @@
 package sgc.sgrh.service;
 
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -23,13 +23,9 @@ import java.util.stream.Collectors;
 public class SgrhService {
     final UnidadeRepo unidadeRepo;
     final UsuarioRepo usuarioRepo;
-
-    // Mapa estático para controle de mocks em testes E2E
     public static final Map<String, List<PerfilDto>> perfisMock = new ConcurrentHashMap<>();
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        log.warn("MOCK SGRH: Buscando usuário por título.");
-
         return Optional.of(UsuarioDto.builder()
                 .titulo(titulo)
                 .nome("Usuário Mock %s".formatted(titulo))
@@ -63,7 +59,6 @@ public class SgrhService {
             log.info("Retornando perfis mockados para o usuário {}", titulo);
             return perfisMock.get(titulo);
         }
-        log.warn("MOCK SGRH: Buscando perfis do usuário (padrão).");
 
         if ("1".equals(titulo)) { // Servidor Ana Paula Souza (SESEL)
             return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(10L).unidadeNome("SESEL").perfil("SERVIDOR").build());
@@ -131,18 +126,15 @@ public class SgrhService {
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        log.warn("MOCK SGRH: Buscando unidade por código.");
         Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
         return Optional.ofNullable(unidadesMock.get(codigo));
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        log.warn("MOCK SGRH: Listando unidades ativas");
         return new ArrayList<>(criarUnidadesMock().values());
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        log.warn("MOCK SGRH: Buscando subunidades.");
         return criarUnidadesMock().values().stream()
                 .filter(u -> codigoPai.equals(u.getCodigoPai()))
                 .collect(Collectors.toList());
@@ -180,7 +172,6 @@ public class SgrhService {
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Buscando responsável da unidade.");
         return Optional.of(ResponsavelDto.builder()
                 .unidadeCodigo(unidadeCodigo)
                 .titularTitulo("123456789012")
@@ -202,7 +193,6 @@ public class SgrhService {
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
-        log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
         return titulos.stream().collect(Collectors.toMap(titulo -> titulo, titulo -> UsuarioDto.builder()
                 .titulo(titulo)
                 .nome("Usuário Mock %s".formatted(titulo))
@@ -219,12 +209,10 @@ public class SgrhService {
     }
 
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Verificando se o usuário tem perfil na unidade.");
         return "ADMIN".equals(perfil) && unidadeCodigo == 1L;
     }
 
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        log.warn("MOCK SGRH: Buscando unidades onde o usuário tem perfil.");
         return switch (perfil) {
             case "ADMIN" -> List.of(1L);
             case "GESTOR" -> List.of(2L, 3L);

@@ -132,12 +132,7 @@
 import {BButton, BModal} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, ref} from "vue";
-import {
-  type EmailContent,
-  type Notificacao,
-  type TipoNotificacao,
-  useNotificacoesStore,
-} from "@/stores/notificacoes";
+import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore,} from "@/stores/notificacoes";
 import {formatDateTimeBR} from "@/utils";
 
 interface Props {

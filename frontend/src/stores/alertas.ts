@@ -1,10 +1,10 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import type { Page } from "@/services/painelService";
-import type { Alerta } from "@/types/tipos";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import type {Page} from "@/services/painelService";
+import type {Alerta} from "@/types/tipos";
 import * as alertaService from "../services/alertaService";
 import * as painelService from "../services/painelService";
-import { usePerfilStore } from "./perfil";
+import {usePerfilStore} from "./perfil";
 
 export const useAlertasStore = defineStore("alertas", () => {
     const alertas = ref<Alerta[]>([]);

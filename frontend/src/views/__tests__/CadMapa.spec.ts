@@ -1,17 +1,17 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { computed, defineComponent } from "vue";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {computed, defineComponent} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 // Import services to mock
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadesService from "@/services/unidadesService";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useMapasStore } from "@/stores/mapas";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useUnidadesStore } from "@/stores/unidades";
-import { Perfil } from "@/types/tipos";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {Perfil} from "@/types/tipos";
 import CadMapa from "@/views/CadMapa.vue";
 
 const { pushMock } = vi.hoisted(() => {

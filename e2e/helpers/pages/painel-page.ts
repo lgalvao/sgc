@@ -1,5 +1,5 @@
-import { expect, Page } from '@playwright/test';
-import { SELETORES, URLS, USUARIOS, TEXTOS } from '../dados';
+import {expect, Page} from '@playwright/test';
+import {SELETORES, TEXTOS, URLS, USUARIOS} from '../dados';
 
 /**
  * Representa a página do Painel (Dashboard)

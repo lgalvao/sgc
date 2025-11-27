@@ -10,32 +10,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @Profile("e2e")
 @RequiredArgsConstructor
 @Slf4j
-public class E2eDatabaseConfig implements WebMvcConfigurer {
-    private final E2eTestRequestInterceptor e2eTestRequestInterceptor;
+public class E2eDatabaseConfig {
     private final E2eTestDatabaseService e2eTestDatabaseService;
     private final ResourceLoader resourceLoader;
-
-    /**
-     * Registers the interceptor to capture the X-Test-ID header.
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(e2eTestRequestInterceptor);
-    }
 
     /**
      * Defines the properties for the default E2E data source (H2).
@@ -47,48 +33,27 @@ public class E2eDatabaseConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Creates the default DataSource bean used when no X-Test-ID is present.
+     * Creates the primary DataSource bean for the application when profile 'e2e' is
+     * active.
      */
     @Bean
-    public DataSource defaultE2eDataSource(@Qualifier("e2eDataSourceProperties") DataSourceProperties properties) {
-        DataSource defaultDataSource = properties.initializeDataSourceBuilder().build();
-        try (Connection connection = defaultDataSource.getConnection()) {
+    @Primary
+    public DataSource dataSource(@Qualifier("e2eDataSourceProperties") DataSourceProperties properties) {
+        DataSource dataSource = properties.initializeDataSourceBuilder().build();
+        try (Connection connection = dataSource.getConnection()) {
             try (Statement stmt = connection.createStatement()) {
                 stmt.execute("CREATE SCHEMA IF NOT EXISTS SGC");
             }
             connection.setSchema("SGC");
             e2eTestDatabaseService.executeSqlScripts(connection, resourceLoader.getResource("classpath:schema.sql"));
-            // Temporarily disable referential integrity for data loading
+
             e2eTestDatabaseService.setReferentialIntegrity(connection, false);
             e2eTestDatabaseService.executeSqlScripts(connection, resourceLoader.getResource("classpath:data-minimal.sql"));
-            // Re-enable referential integrity
             e2eTestDatabaseService.setReferentialIntegrity(connection, true);
         } catch (Exception e) {
-            log.error("Failed to initialize default E2E data source. Original exception: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to initialize default E2E data source", e);
+            log.error("Failed to initialize E2E data source. Original exception: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to initialize E2E data source", e);
         }
-        return defaultDataSource;
-    }
-
-
-    /**
-     * The primary DataSource bean for the application when profile 'e2e' is active.
-     * This is a routing DataSource that delegates to the correct in-memory H2 database
-     * based on the X-Test-ID header captured by the interceptor.
-     */
-    @Bean
-    @Primary
-    public DataSource dataSource(DataSource defaultE2eDataSource) {
-        E2eDataSourceRouter router = new E2eDataSourceRouter(e2eTestDatabaseService);
-        router.setDefaultDataSource(defaultE2eDataSource); // Set the default data source
-        
-        // Provide a dummy targetDataSources map to satisfy AbstractRoutingDataSource's requirement
-        // The actual routing logic is in determineTargetDataSource
-        Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put("dummy", defaultE2eDataSource); // Add at least one entry
-        router.setTargetDataSources(targetDataSources);
-        
-        router.afterPropertiesSet(); // Ensures the router is initialized
-        return router;
+        return dataSource;
     }
 }

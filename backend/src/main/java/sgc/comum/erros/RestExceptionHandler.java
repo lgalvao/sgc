@@ -21,8 +21,8 @@ import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 

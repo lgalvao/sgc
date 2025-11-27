@@ -6,16 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.Unidade;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import java.time.LocalDateTime;
-import sgc.unidade.model.AtribuicaoTemporaria;
 
 @Entity
 @Table(name = "USUARIO", schema = "sgc")

@@ -17,7 +17,6 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.service.UnidadeService;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 

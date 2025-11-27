@@ -101,9 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import { BFormCheckbox } from "bootstrap-vue-next";
-import { computed, ref, watch } from "vue";
-import type { Unidade } from "@/types/tipos";
+import {BFormCheckbox} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import type {Unidade} from "@/types/tipos";
 
 interface Props {
   unidades: Unidade[];

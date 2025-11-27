@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "3.5.8"
     id("io.spring.dependency-management") version "1.1.7"
     java
 }
@@ -122,7 +122,7 @@ tasks.withType<JavaCompile> {
 tasks.register<BootRun>("bootRunE2E") {
     group = "Application"
     description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
-    jvmArgs = listOf("-Dspring.profiles.active=e2e", "-Dlogging.level.sgc=DEBUG")
+    jvmArgs = listOf("-Dspring.profiles.active=e2e")
     mainClass.set("sgc.Sgc")
     classpath = sourceSets["main"].runtimeClasspath
     isIgnoreExitValue = true

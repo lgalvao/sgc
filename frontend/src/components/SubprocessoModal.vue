@@ -46,12 +46,7 @@
 <script lang="ts" setup>
 import {BButton, BFormGroup, BFormInput, BModal} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
-import {
-  formatDateBR,
-  formatDateForInput,
-  isDateValidAndFuture,
-  parseDate,
-} from "@/utils";
+import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate,} from "@/utils";
 
 interface Props {
   mostrarModal: boolean;

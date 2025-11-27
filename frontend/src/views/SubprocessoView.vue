@@ -51,11 +51,7 @@ import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {
-  type Movimentacao,
-  type SubprocessoDetalhe,
-  TipoProcesso,
-} from "@/types/tipos";
+import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
 
 defineProps<{ codProcesso: number; siglaUnidade: string }>();
 

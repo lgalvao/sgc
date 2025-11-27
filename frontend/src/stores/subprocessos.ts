@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,15 +14,15 @@ import {
     buscarSubprocessoPorProcessoEUnidade,
     fetchSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
 } from "@/services/subprocessoService";
-import { usePerfilStore } from "@/stores/perfil"; // Adicionar esta linha
-import { useProcessosStore } from "@/stores/processos";
+import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {useProcessosStore} from "@/stores/processos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import { useNotificacoesStore } from "./notificacoes";
+import {useNotificacoesStore} from "./notificacoes";
 
 async function _executarAcao(
     acao: () => Promise<any>,

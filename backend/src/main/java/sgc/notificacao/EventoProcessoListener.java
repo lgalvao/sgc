@@ -2,7 +2,6 @@ package sgc.notificacao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -114,7 +113,7 @@ public class EventoProcessoListener {
             if (unidadeOpt.isEmpty()) {
                 boolean isE2E = Arrays.asList(environment.getActiveProfiles()).contains("e2e");
                 if (isE2E) {
-                    log.warn("Unidade não encontrada no SGRH: {} (ignorado no perfil e2e)", codigoUnidade);
+                    log.warn("Unidade não encontrada no SGRH: {}", codigoUnidade);
                     return;
                 }
                 throw new ErroEntidadeNaoEncontrada("Unidade", "não encontrada no SGRH: %d".formatted(codigoUnidade));

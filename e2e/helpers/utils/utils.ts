@@ -1,5 +1,5 @@
-import { Page } from '@playwright/test';
-import { logger } from './logger';
+import {Page} from '@playwright/test';
+import {logger} from './logger';
 
 /**
  * Gera um nome único adicionando um timestamp a um prefixo.

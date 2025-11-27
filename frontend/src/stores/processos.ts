@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import type { Page } from "@/services/painelService";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import type {Page} from "@/services/painelService";
 import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,

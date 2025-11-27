@@ -158,29 +158,16 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BContainer,
-  BForm,
-  BFormGroup,
-  BFormInput,
-  BFormSelect,
-  BModal,
-} from "bootstrap-vue-next";
-import { nextTick, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import {BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import { TEXTOS } from "@/constants";
+import {TEXTOS} from "@/constants";
 import * as processoService from "@/services/processoService";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useUnidadesStore } from "@/stores/unidades";
-import {
-  AtualizarProcessoRequest,
-  CriarProcessoRequest,
-  Processo as ProcessoModel,
-  TipoProcesso,
-} from "@/types/tipos";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso,} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 

@@ -3,13 +3,13 @@ package sgc.subprocesso.model;
 import org.junit.jupiter.api.Test;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
+import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import sgc.sgrh.model.Usuario;
 
 class ModeloTest {
     @Test

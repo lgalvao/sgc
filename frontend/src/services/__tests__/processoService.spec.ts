@@ -1,20 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
-import {
-    afterEach,
-    beforeAll,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type Mock,
-    vi,
-} from "vitest";
+import {afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi,} from "vitest";
 import apiClient from "@/axios-setup";
-import {
-    type AtualizarProcessoRequest,
-    type CriarProcessoRequest,
-    TipoProcesso,
-} from "@/types/tipos";
+import {type AtualizarProcessoRequest, type CriarProcessoRequest, TipoProcesso,} from "@/types/tipos";
 import * as service from "../processoService";
 
 vi.mock("@/axios-setup", () => {

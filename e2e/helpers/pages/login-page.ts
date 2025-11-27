@@ -1,5 +1,5 @@
-import { expect, Page } from '@playwright/test';
-import { URLS, SELETORES, TEXTOS } from '../dados';
+import {expect, Page} from '@playwright/test';
+import {SELETORES, TEXTOS, URLS} from '../dados';
 
 export class PaginaLogin {
     constructor(private readonly page: Page) {}

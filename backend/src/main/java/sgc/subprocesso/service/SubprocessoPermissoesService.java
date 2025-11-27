@@ -8,8 +8,6 @@ import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class SubprocessoPermissoesService {

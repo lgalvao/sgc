@@ -1,10 +1,6 @@
 import {describe, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
-import {
-    buscarArvoreComElegibilidade,
-    buscarTodasUnidades,
-    buscarUnidadePorSigla,
-} from "../unidadesService";
+import {buscarArvoreComElegibilidade, buscarTodasUnidades, buscarUnidadePorSigla,} from "../unidadesService";
 
 vi.mock("@/axios-setup");
 

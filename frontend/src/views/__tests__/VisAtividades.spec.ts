@@ -1,12 +1,9 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { computed, nextTick } from "vue";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {computed, nextTick} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
-import * as mapaService from "@/services/mapaService";
-import * as processoService from "@/services/processoService";
-import * as unidadesService from "@/services/unidadesService";
-import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import VisAtividades from "@/views/VisAtividades.vue";
 
 const pushMock = vi.fn();

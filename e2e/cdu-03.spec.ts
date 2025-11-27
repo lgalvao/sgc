@@ -1,5 +1,5 @@
-import { vueTest as test } from './support/vue-specific-setup';
-import { PaginaPainel, PaginaProcesso } from '~/helpers';
+import {vueTest as test} from './support/vue-specific-setup';
+import {PaginaPainel, PaginaProcesso} from '~/helpers';
 import {expect} from "@playwright/test";
 
 test.describe('CDU-03: Manter processo', () => {

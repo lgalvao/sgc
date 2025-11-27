@@ -1,8 +1,8 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
-import { BFormInput } from "bootstrap-vue-next";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { computed } from "vue";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {BFormInput} from "bootstrap-vue-next";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {computed} from "vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
@@ -13,12 +13,12 @@ import * as mapaService from "@/services/mapaService";
 import * as processoService from "@/services/processoService";
 
 import * as unidadesService from "@/services/unidadesService";
-import { useAnalisesStore } from "@/stores/analises";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import {useAnalisesStore} from "@/stores/analises";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadAtividades from "@/views/CadAtividades.vue";
 
 const pushMock = vi.fn();

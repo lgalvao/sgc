@@ -1,7 +1,7 @@
-import { vueTest as test } from './support/vue-specific-setup';
-import { PaginaLogin, PaginaPainel } from '~/helpers';
-import { USUARIOS } from '~/helpers/dados/constantes';
-import { loginComoAdmin, loginComoChefe, loginComMultiPerfilAdmin } from '~/helpers/auth';
+import {vueTest as test} from './support/vue-specific-setup';
+import {PaginaLogin, PaginaPainel} from '~/helpers';
+import {USUARIOS} from '~/helpers/dados/constantes';
+import {loginComMultiPerfilAdmin, loginComoAdmin, loginComoChefe} from '~/helpers/auth';
 
 test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
     test.describe('Login Convencional (via UI)', () => {

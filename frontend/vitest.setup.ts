@@ -1,6 +1,6 @@
-import { config } from "@vue/test-utils";
-import { createBootstrap } from "bootstrap-vue-next";
-import { vi } from "vitest";
+import {config} from "@vue/test-utils";
+import {createBootstrap} from "bootstrap-vue-next";
+import {vi} from "vitest";
 
 vi.mock("bootstrap", () => ({
   Tooltip: class Tooltip {

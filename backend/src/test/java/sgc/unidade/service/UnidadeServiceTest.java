@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.MapaRepo;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -23,7 +23,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UnidadeServiceTest {

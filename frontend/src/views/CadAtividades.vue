@@ -346,29 +346,19 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  BCard,
-  BCardBody,
-  BCol,
-  BContainer,
-  BForm,
-  BFormInput,
-  BModal,
-} from "bootstrap-vue-next";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal,} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
-import { usePerfil } from "@/composables/usePerfil";
-import { useAnalisesStore } from "@/stores/analises";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useMapasStore } from "@/stores/mapas";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useUnidadesStore } from "@/stores/unidades";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAnalisesStore} from "@/stores/analises";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
 import {
   type Atividade,
   type Conhecimento,

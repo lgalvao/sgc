@@ -17,12 +17,9 @@
 </template>
 
 <script lang="ts" setup>
-import { BToast, type BaseColorVariant } from "bootstrap-vue-next";
-import { storeToRefs } from "pinia";
-import {
-  TipoNotificacao,
-  useNotificacoesStore,
-} from "@/stores/notificacoes";
+import {type BaseColorVariant, BToast} from "bootstrap-vue-next";
+import {storeToRefs} from "pinia";
+import {TipoNotificacao, useNotificacoesStore,} from "@/stores/notificacoes";
 
 const notificacoesStore = useNotificacoesStore();
 const { notificacoes: storeNotificacoes } = storeToRefs(notificacoesStore);

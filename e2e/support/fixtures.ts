@@ -7,7 +7,6 @@
  * a execução paralela sem conflitos de estado.
  */
 import { test as base } from '@playwright/test';
-import { v4 as uuidv4 } from 'uuid'; // For generating unique test IDs
 import { debug as debugLog, logger } from '../helpers/utils/logger';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:10000';
@@ -18,44 +17,23 @@ type MyFixtures = {
 };
 
 export const test = base.extend<MyFixtures>({
-    // Override the default 'page' fixture to include database setup/teardown
+    // Override the default 'page' fixture to include database setup
     page: async ({ page }, use, testInfo) => {
-        const testId = `test-${uuidv4()}`; // Generate a unique ID for this test run
-
-        // 1. Create isolated database for this test
+        // 1. Reset database state before each test
         try {
-            const createDbResponse = await page.request.post(`${BACKEND_URL}/api/e2e/setup/create-isolated-db`, {
-                data: { testId: testId }
-            });
-            if (!createDbResponse.ok()) {
-                const errorBody = await createDbResponse.json();
-                throw new Error(`Failed to create isolated DB for testId ${testId}: ${createDbResponse.status()} - ${JSON.stringify(errorBody)}`);
+            const resetResponse = await page.request.post(`${BACKEND_URL}/api/e2e/dados-teste/recarregar`);
+            if (!resetResponse.ok()) {
+                const errorBody = await resetResponse.json().catch(() => ({}));
+                throw new Error(`Failed to reset DB for test ${testInfo.title}: ${resetResponse.status()} - ${JSON.stringify(errorBody)}`);
             }
-            debugLog(`[${testInfo.title}] Created isolated DB: ${testId}`);
+            debugLog(`[${testInfo.title}] Database reset successful`);
         } catch (error) {
-            logger.error(`[${testInfo.title}] Error during DB creation:`, error);
+            logger.error(`[${testInfo.title}] Error during DB reset:`, error);
             throw error;
         }
 
-        // 2. Set X-Test-ID header for all requests made by this page context
-        await page.context().setExtraHTTPHeaders({ 'X-Test-ID': testId });
-
-        // 3. Use the page (run the actual test)
+        // 2. Use the page (run the actual test)
         await use(page);
-
-        // 4. Clean up the isolated database after the test
-        try {
-            const cleanupDbResponse = await page.request.post(`${BACKEND_URL}/api/e2e/setup/cleanup-db/${testId}`);
-            if (!cleanupDbResponse.ok()) {
-                // Log warning but don't fail the test just for cleanup
-                const errorBody = await cleanupDbResponse.json().catch(() => ({})); 
-                console.warn(`[${testInfo.title}] Warning: Failed to clean up isolated DB for testId ${testId}: ${cleanupDbResponse.status()}`, errorBody);
-            } else {
-                debugLog(`[${testInfo.title}] Cleaned up isolated DB: ${testId}`);
-            }
-        } catch (error) {
-            console.warn(`[${testInfo.title}] Warning: Error during DB cleanup:`, error);
-        }
     },
 });
 

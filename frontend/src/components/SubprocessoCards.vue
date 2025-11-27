@@ -116,15 +116,10 @@
 </template>
 
 <script lang="ts" setup>
-import { BCard, BCardText, BCardTitle, BCol, BRow } from "bootstrap-vue-next";
-import { useRouter } from "vue-router";
-import {
-  type Mapa,
-  type MapaCompleto,
-  SubprocessoPermissoes,
-  TipoProcesso,
-} from "@/types/tipos";
-import { badgeClass, situacaoLabel } from "@/utils";
+import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
+import {type Mapa, type MapaCompleto, SubprocessoPermissoes, TipoProcesso,} from "@/types/tipos";
+import {badgeClass, situacaoLabel} from "@/utils";
 
 const TipoProcessoEnum = TipoProcesso;
 
