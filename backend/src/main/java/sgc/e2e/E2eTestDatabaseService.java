@@ -128,8 +128,11 @@ public class E2eTestDatabaseService {
     }
 
     public void reloadDatabaseScripts(Connection conn, ResourceLoader resourceLoader) throws Exception {
-        // First, ensure the schema is created and tables exist
-        executeSqlScripts(conn, new ClassPathResource("/schema.sql"));
+        // NOTE: We do NOT re-execute schema.sql here because the schema is already
+        // created
+        // by Spring Boot during test context initialization. Re-executing it would
+        // cause
+        // errors when trying to add foreign key constraints that already exist.
 
         // Temporarily disable referential integrity for data loading
         setReferentialIntegrity(conn, false);
