@@ -6,6 +6,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -31,48 +33,49 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @Profile("e2e")
+@Slf4j
 public class ConfigSegurancaE2E {
     @Bean("e2eSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            )
-            .addFilterBefore(new OncePerRequestFilter() {
-                @Override
-                protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-                    String header = request.getHeader("Authorization");
-                    if (header != null && header.startsWith("Bearer ")) {
-                        String token = header.substring(7);
-                        try {
-                            String json = new String(Base64.getDecoder().decode(token));
-                            ObjectMapper mapper = new ObjectMapper();
-                            JsonNode node = mapper.readTree(json);
-                            if (node.has("tituloEleitoral")) {
-                                String username = node.get("tituloEleitoral").asText();
-                                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                        username, null, Collections.emptyList());
-                                SecurityContextHolder.getContext().setAuthentication(auth);
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(new OncePerRequestFilter() {
+                    @Override
+                    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+                        String header = request.getHeader("Authorization");
+                        if (header != null && header.startsWith("Bearer ")) {
+                            String token = header.substring(7);
+                            try {
+                                String json = new String(Base64.getDecoder().decode(token));
+                                ObjectMapper mapper = new ObjectMapper();
+                                JsonNode node = mapper.readTree(json);
+                                if (node.has("tituloEleitoral")) {
+                                    String username = node.get("tituloEleitoral").asText();
+                                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                            username, null, Collections.emptyList());
+                                    SecurityContextHolder.getContext().setAuthentication(auth);
+                                }
+                            } catch (Exception e) {
+                                // Ignorar tokens inválidos em E2E, mas logar
+                                log.warn("Erro ao processar token E2E: {}", e.getMessage());
                             }
-                        } catch (Exception e) {
-                            // Ignorar tokens inválidos em E2E
-                            System.err.println("Erro ao processar token E2E: " + e.getMessage());
                         }
+                        filterChain.doFilter(request, response);
                     }
-                    filterChain.doFilter(request, response);
-                }
-            }, UsernamePasswordAuthenticationFilter.class)
-            .csrf(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(request -> {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:5173"));
-                config.setAllowedMethods(List.of("*"));
-                config.setAllowedHeaders(List.of("*"));
-                config.setAllowCredentials(true);
-                return config;
-            }));
+                }, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:5173"));
+                    config.setAllowedMethods(List.of("*"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }));
         return http.build();
     }
 }

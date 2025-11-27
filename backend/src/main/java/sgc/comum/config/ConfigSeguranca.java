@@ -43,7 +43,6 @@ public class ConfigSeguranca {
                     "/api/usuarios/autenticar",
                     "/api/usuarios/autorizar",
                     "/api/usuarios/entrar",
-                    "/api/test/**",
                     "/actuator/**"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
