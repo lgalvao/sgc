@@ -1,6 +1,6 @@
-import {expect, Page} from '@playwright/test';
-import {SELETORES, TEXTOS, URLS} from '../dados';
-import {esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel} from './verificacoes-basicas';
+import { expect, Page } from '@playwright/test';
+import { SELETORES, TEXTOS, URLS } from '../dados';
+import { esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel } from './verificacoes-basicas';
 
 /**
  * Verifica se a página atual é a de edição de processo.
@@ -86,7 +86,7 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
     await expect(page).toHaveURL(URLS.PAINEL);
 
     // 3) Ausência na tabela
-    const linhaProcesso = page.locator('[data-testid="tabela-processos"] tbody tr').filter({hasText: descricaoProcesso});
+    const linhaProcesso = page.locator('[data-testid="tabela-processos"] tbody tr').filter({ hasText: descricaoProcesso });
     await expect(linhaProcesso).not.toBeVisible();
 }
 
@@ -95,7 +95,7 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).toBeVisible();
+    await expect(page.getByRole('button', { name: TEXTOS.FINALIZAR_PROCESSO })).toBeVisible();
 }
 
 /**
@@ -103,7 +103,7 @@ export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promis
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoFinalizarProcessoInvisivel(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).not.toBeVisible();
+    await expect(page.getByRole('button', { name: TEXTOS.FINALIZAR_PROCESSO })).not.toBeVisible();
 }
 
 /**
@@ -113,11 +113,11 @@ export async function verificarBotaoFinalizarProcessoInvisivel(page: Page): Prom
 export async function verificarModalFinalizacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await expect(modal.getByRole('heading', {name: TEXTOS.FINALIZACAO_PROCESSO})).toBeVisible();
+    await expect(modal.getByRole('heading', { name: TEXTOS.FINALIZACAO_PROCESSO })).toBeVisible();
     await expect(modal.getByText(TEXTOS.CONFIRMA_FINALIZACAO)).toBeVisible();
     await expect(modal.getByText(TEXTOS.CONFIRMACAO_VIGENCIA_MAPAS)).toBeVisible();
-    await expect(modal.getByRole('button', {name: TEXTOS.CONFIRMAR})).toBeVisible();
-    await expect(modal.getByRole('button', {name: TEXTOS.CANCELAR})).toBeVisible();
+    await expect(modal.getByRole('button', { name: TEXTOS.CONFIRMAR })).toBeVisible();
+    await expect(modal.getByRole('button', { name: TEXTOS.CANCELAR })).toBeVisible();
 }
 
 /**
@@ -142,7 +142,7 @@ export async function verificarFinalizacaoBloqueada(page: Page): Promise<void> {
  * @param nomeProcesso O nome do processo.
  */
 export async function verificarProcessoFinalizadoNoPainel(page: Page, nomeProcesso: string): Promise<void> {
-    const linhaProcesso = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: nomeProcesso});
+    const linhaProcesso = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({ hasText: nomeProcesso });
     await expect(linhaProcesso).toContainText(TEXTOS.FINALIZADO);
 }
 
@@ -207,7 +207,7 @@ export async function verificarDialogoConfirmacaoFechado(page: Page, descricaoPr
 export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
     await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
     await expect(page).toHaveURL(URLS.PAINEL);
-    const processoNaTabelaComStatus = page.locator('tr', {hasText: descricaoProcesso}).getByText(TEXTOS.EM_ANDAMENTO);
+    const processoNaTabelaComStatus = page.locator('tr', { hasText: descricaoProcesso }).getByText(TEXTOS.EM_ANDAMENTO);
     await processoNaTabelaComStatus.waitFor({ state: 'visible' });
     await expect(processoNaTabelaComStatus).toBeVisible();
 }
@@ -269,7 +269,7 @@ export async function verificarValorCampoDescricao(page: Page, valor: string): P
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<void> {
-    await expect(page.locator(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`)).toBeVisible();
+    await expect(page.locator(SELETORES.BTN_INICIAR_PROCESSO)).toBeVisible();
 }
 
 /**
@@ -277,7 +277,7 @@ export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoIniciarProcessoInvisivel(page: Page): Promise<void> {
-    await expect(page.locator(`[data-testid="btn-iniciar-processo"]`)).not.toBeVisible();
+    await expect(page.locator(SELETORES.BTN_INICIAR_PROCESSO)).not.toBeVisible();
 }
 
 /**
@@ -308,8 +308,8 @@ export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Pr
     await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
     await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
     await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);
-    await expect(modal.getByRole('button', {name: /confirmar/i})).toBeVisible();
-    await expect(modal.getByRole('button', {name: /cancelar/i})).toBeVisible();
+    await expect(modal.getByRole('button', { name: /confirmar/i })).toBeVisible();
+    await expect(modal.getByRole('button', { name: /cancelar/i })).toBeVisible();
 }
 
 /**
@@ -318,9 +318,9 @@ export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Pr
  */
 export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<void> {
     // Verificar que botões de edição não estão disponíveis
-    await expect(page.getByRole('button', {name: /^salvar$/i})).not.toBeVisible();
-    await expect(page.getByRole('button', {name: /^remover$/i})).not.toBeVisible();
-    await expect(page.getByRole('button', {name: /^iniciar processo$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /^salvar$/i })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /^remover$/i })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /^iniciar processo$/i })).not.toBeVisible();
 }
 
 /**
@@ -356,7 +356,7 @@ export async function verificarQuantidadeProcessosNaTabela(page: Page, quantidad
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoRemoverVisivel(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Remover$/i })).toBeVisible();
 }
 
 /**
@@ -364,7 +364,7 @@ export async function verificarBotaoRemoverVisivel(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoRemoverInvisivel(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: /^Remover$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /^Remover$/i })).not.toBeVisible();
 }
 
 /**
@@ -373,7 +373,7 @@ export async function verificarBotaoRemoverInvisivel(page: Page): Promise<void> 
  * @param sigla A sigla da unidade.
  */
 export async function verificarCheckboxUnidadeMarcado(page: Page, sigla: string): Promise<void> {
-     await expect(page.locator(`#chk-${sigla}`)).toBeChecked();
+    await expect(page.locator(`#chk-${sigla}`)).toBeChecked();
 }
 
 /**
@@ -431,7 +431,7 @@ export async function verificarCriacaoSubprocessos(page: Page, processoId: strin
     const response = await page.request.get(`http://localhost:10000/api/processos/${processoId}/subprocessos`);
     if (!response.ok()) {
         console.error(`Erro ao buscar subprocessos: ${response.status()} ${response.statusText()}`);
-        try { console.error(await response.text()); } catch(e) {}
+        try { console.error(await response.text()); } catch (e) { }
     }
     expect(response.ok()).toBeTruthy();
     const subprocessos = await response.json();
@@ -462,7 +462,7 @@ export async function verificarCamposProcessoDesabilitados(page: Page): Promise<
  */
 export async function verificarSituacaoProcesso(page: Page, nomeProcesso: string, situacao: string | RegExp): Promise<void> {
     const tabela = page.getByTestId('tabela-processos');
-    const linha = tabela.locator('tr').filter({hasText: nomeProcesso});
+    const linha = tabela.locator('tr').filter({ hasText: nomeProcesso });
     await expect(linha).toBeVisible();
     await expect(linha).toContainText(situacao);
 }
@@ -501,7 +501,7 @@ export async function verificarMovimentacaoInicialSubprocesso(page: Page, subpro
     );
     if (!response.ok()) {
         console.error(`Erro ao buscar movimentação inicial: ${response.status()} ${response.statusText()}`);
-        try { console.error(await response.text()); } catch(e) {}
+        try { console.error(await response.text()); } catch (e) { }
     }
     expect(response.ok()).toBeTruthy();
     const subprocesso = await response.json();

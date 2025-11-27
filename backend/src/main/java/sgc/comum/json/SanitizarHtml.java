@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @JsonDeserialize(using = HtmlSanitizingDeserializer.class)
-public @interface SanitizeHtml {
+public @interface SanitizarHtml {
 }

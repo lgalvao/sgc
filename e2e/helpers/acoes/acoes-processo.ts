@@ -1,6 +1,6 @@
-import {expect, Page} from '@playwright/test';
-import {SELETORES, TEXTOS} from '../dados';
-import {aguardarTabelaProcessosCarregada, navegarParaCriacaoProcesso} from '~/helpers';
+import { expect, Page } from '@playwright/test';
+import { SELETORES, TEXTOS } from '../dados';
+import { aguardarTabelaProcessosCarregada, navegarParaCriacaoProcesso } from '~/helpers';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
@@ -10,6 +10,7 @@ import {aguardarTabelaProcessosCarregada, navegarParaCriacaoProcesso} from '~/he
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
+        await page.locator(seletorCheckbox).waitFor({ state: "visible" });
         await page.locator(seletorCheckbox).check();
     }
 }
@@ -38,7 +39,7 @@ export async function selecionarUnidadeDisponivel(page: Page, index: number = 0)
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoSalvar(page: Page): Promise<void> {
-    await page.getByRole('button', {name: /Salvar/i}).click();
+    await page.getByRole('button', { name: /Salvar/i }).click();
 }
 
 /**
@@ -46,7 +47,7 @@ export async function clicarBotaoSalvar(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoRemover(page: Page): Promise<void> {
-    await page.getByRole('button', {name: /^Remover$/i}).click();
+    await page.getByRole('button', { name: /^Remover$/i }).click();
 }
 
 /**
@@ -99,7 +100,7 @@ export async function preencherFormularioProcesso(
     if (tipo === 'REVISAO' || tipo === 'DIAGNOSTICO') {
         await page.waitForSelector('.form-check-input[type="checkbox"]:not([disabled])');
     }
-    
+
     if (sticChecked) {
         await page.check(SELETORES.CHECKBOX_STIC);
     }
@@ -129,6 +130,8 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
+    await page.locator(SELETORES.BTN_INICIAR_PROCESSO).waitFor({ state: "visible" });
+    await expect(page.locator(SELETORES.BTN_INICIAR_PROCESSO)).toBeEnabled();
     await page.locator(SELETORES.BTN_INICIAR_PROCESSO).click();
 }
 
@@ -144,6 +147,9 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     await expect(confirmButton).toBeVisible();
     await expect(confirmButton).toBeEnabled();
     await confirmButton.click({ force: true });
+
+    // Wait for modal animation to complete
+    await expect(modal).not.toBeVisible();
 }
 
 /**
@@ -154,6 +160,9 @@ export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await expect(modal).toBeVisible();
     await modal.locator(SELETORES.BTN_MODAL_CANCELAR).click();
+
+    // Wait for modal animation to complete
+    await expect(modal).not.toBeVisible();
 }
 
 /**
@@ -184,14 +193,24 @@ export async function criarProcessoBasico(
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarUnidadesPorSigla(page, siglas);
 
-    const btnSalvar = page.getByRole('button', {name: /salvar/i});
-    await btnSalvar.click();
+    const btnSalvar = page.getByRole('button', { name: /salvar/i });
+    // await page.waitForLoadState('networkidle'); // Removing flaky wait
+    await btnSalvar.waitFor({ state: "visible" });
+    await btnSalvar.click({ force: true });
 
     const response = await responsePromise;
     const data = await response.json();
     const processoId = data.codigo;
 
     await page.waitForURL(/\/painel/);
+
+    // Wait for success notification to disappear to avoid layout shifts
+    const notification = page.locator('.alert, .notification').first();
+    if (await notification.isVisible()) {
+        await notification.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {
+            // Notification might auto-dismiss or not exist, ignore timeout
+        });
+    }
 
     return processoId;
 }
@@ -216,7 +235,6 @@ export async function criarEIniciarProcessoBasico(
     await abrirProcessoPorNome(page, descricao);
     await iniciarProcessoMapeamento(page);
     await confirmarIniciacaoProcesso(page);
-    await page.waitForURL(/\/painel/);
     return processoId;
 }
 
@@ -228,7 +246,7 @@ export async function criarEIniciarProcessoBasico(
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     await aguardarTabelaProcessosCarregada(page);
-    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, {hasText: descricao});
+    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr`, { hasText: descricao });
     await row.first().click();
 
     // Aguardar navegação para página de cadastro
@@ -260,18 +278,18 @@ export async function criarProcessoCompleto(
         response.request().method() === 'POST' &&
         response.status() === 201
     );
-    
+
     await navegarParaCriacaoProcesso(page);
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarUnidadesPorSigla(page, siglas);
-    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
-    
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
+
     const response = await responsePromise;
     const data = await response.json();
     const processoId = data.codigo;
-    
+
     await page.waitForURL(/\/painel/);
-    
+
     return { processo: { codigo: processoId, descricao } };
 }
 
@@ -280,7 +298,7 @@ export async function criarProcessoCompleto(
  * @param page A instância da página do Playwright.
  */
 export async function tentarSalvarProcessoVazio(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 }
 
 /**
@@ -292,7 +310,7 @@ export async function tentarSalvarProcessoVazio(page: Page): Promise<void> {
 export async function criarProcessoSemUnidades(page: Page, descricao: string, tipo: string): Promise<void> {
     // Usa uma data padrão se não fornecida, já que dataLimite agora é obrigatório em preencherFormularioProcesso
     await preencherFormularioProcesso(page, descricao, tipo, '2025-12-31');
-    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 }
 
 /**
@@ -311,7 +329,7 @@ export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso:
  */
 export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
     await page.locator(SELETORES.CAMPO_DESCRICAO).fill(novaDescricao);
-    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 }
 
 
@@ -336,7 +354,7 @@ export async function criarProcessoMapeamentoCompleto(page: Page, descricao: str
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoFinalizarProcesso(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO}).click();
+    await page.getByRole('button', { name: TEXTOS.FINALIZAR_PROCESSO }).click();
 }
 
 /**
@@ -354,7 +372,7 @@ export async function abrirModalFinalizacaoProcesso(page: Page): Promise<void> {
  */
 export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -381,7 +399,7 @@ export async function disponibilizarCadastro(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function abrirModalDevolucao(page: Page): Promise<void> {
-    await page.getByRole('button', {name: 'Devolver para ajustes'}).click();
+    await page.getByRole('button', { name: 'Devolver para ajustes' }).click();
 }
 
 /**
@@ -395,7 +413,7 @@ export async function devolverParaAjustes(page: Page, observacao: string): Promi
     await expect(modal).toBeVisible();
 
     await modal.getByLabel('Observação').fill(observacao);
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -409,10 +427,10 @@ export async function devolverCadastro(page: Page, processo: {
     codigo: any;
     descricao: string
 }, nomeUnidade: string, observacao: string): Promise<void> {
-    const {loginComoGestor, navegarParaProcessoPorId} = await import("../navegacao");
+    const { loginComoGestor, navegarParaProcessoPorId } = await import("../navegacao");
     await loginComoGestor(page);
     await navegarParaProcessoPorId(page, processo.codigo);
-    const {acessarAnaliseRevisaoComoGestor} = await import("../navegacao");
+    const { acessarAnaliseRevisaoComoGestor } = await import("../navegacao");
     await acessarAnaliseRevisaoComoGestor(page, processo.codigo, nomeUnidade);
     await devolverParaAjustes(page, observacao);
 }
@@ -424,7 +442,7 @@ export async function devolverCadastro(page: Page, processo: {
  */
 export async function aceitarCadastro(page: Page, observacao: string = ''): Promise<void> {
     // "Registrar aceite" OR "Validar"
-    await page.getByRole('button', {name: /Registrar aceite|Validar/}).click();
+    await page.getByRole('button', { name: /Registrar aceite|Validar/ }).click();
 
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
@@ -433,7 +451,7 @@ export async function aceitarCadastro(page: Page, observacao: string = ''): Prom
         await modal.getByLabel('Observação').fill(observacao);
     }
 
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -444,14 +462,14 @@ export async function aceitarCadastro(page: Page, observacao: string = ''): Prom
 export async function registrarAceiteRevisao(page: Page, observacao: string = ''): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
 
-    await page.getByRole('button', {name: TEXTOS.REGISTRAR_ACEITE}).click();
+    await page.getByRole('button', { name: TEXTOS.REGISTRAR_ACEITE }).click();
     await expect(modal).toBeVisible();
 
     if (observacao) {
         await modal.locator('textarea, input').first().fill(observacao);
     }
 
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -461,7 +479,7 @@ export async function registrarAceiteRevisao(page: Page, observacao: string = ''
  */
 export async function homologarCadastro(page: Page, observacao: string = ''): Promise<void> {
     // "Homologar" OR "Validar"
-    await page.getByRole('button', {name: /Homologar|Validar/}).click();
+    await page.getByRole('button', { name: /Homologar|Validar/ }).click();
 
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
@@ -470,7 +488,7 @@ export async function homologarCadastro(page: Page, observacao: string = ''): Pr
         await modal.getByLabel(/observa/i).fill(observacao);
     }
 
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -478,7 +496,7 @@ export async function homologarCadastro(page: Page, observacao: string = ''): Pr
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}).click();
+    await page.getByRole('button', { name: TEXTOS.INICIAR_PROCESSO }).click();
 }
 
 /**
@@ -488,8 +506,23 @@ export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
  */
 export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): Promise<void> {
     await page.waitForSelector(SELETORES.TABELA_PROCESSOS);
-    const processo = page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).filter({hasText: nomeProcesso});
+    const processo = page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).filter({ hasText: nomeProcesso });
     await processo.click();
+
+    // Wait for navigation and form to load
+    await page.waitForURL(/\/processo\/(cadastro\?codProcesso=\d+|\d+)$/);
+
+    // Wait for the description field to be populated (indicates form is loaded)
+    const descricaoField = page.locator(SELETORES.CAMPO_DESCRICAO);
+    await descricaoField.waitFor({ state: 'visible' });
+
+    // Wait for the field to have the expected value (form data loaded)
+    await expect(descricaoField).toHaveValue(new RegExp(nomeProcesso.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+
+    // Wait for the "Remover" button to be visible.
+    // This button is only rendered (v-if="processoEditando") when the process data is fully loaded into the Vue component.
+    // This guarantees that the component state is ready for interaction (e.g. "Iniciar processo").
+    await page.getByRole('button', { name: /^Remover$/i }).waitFor({ state: 'visible' });
 }
 
 /**
@@ -500,7 +533,7 @@ export async function iniciarProcesso(page: Page): Promise<void> {
     await clicarBotaoIniciarProcesso(page);
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -508,10 +541,10 @@ export async function iniciarProcesso(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
+    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -519,8 +552,8 @@ export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function cancelarRemocaoProcesso(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
-    await page.getByRole('button', {name: TEXTOS.CANCELAR}).click();
+    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
+    await page.getByRole('button', { name: TEXTOS.CANCELAR }).click();
 }
 
 /**
@@ -528,8 +561,8 @@ export async function cancelarRemocaoProcesso(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function confirmarInicializacaoProcesso(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}).click();
-    await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await page.getByRole('button', { name: TEXTOS.INICIAR_PROCESSO }).click();
+    await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
@@ -537,7 +570,7 @@ export async function confirmarInicializacaoProcesso(page: Page): Promise<void> 
  * @param page A instância da página do Playwright.
  */
 export async function removerProcessoConfirmandoNoModal(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
+    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
     await page.locator('.modal.show .btn-danger').click();
 }
 
@@ -547,7 +580,7 @@ export async function removerProcessoConfirmandoNoModal(page: Page): Promise<voi
  * @param nomeUnidade O nome da unidade.
  */
 export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: string): Promise<void> {
-    const unidadeRow = page.locator(SELETORES.LINHA_TABELA_ARVORE).filter({hasText: nomeUnidade}).first();
+    const unidadeRow = page.locator(SELETORES.LINHA_TABELA_ARVORE).filter({ hasText: nomeUnidade }).first();
     await unidadeRow.click();
 }
 

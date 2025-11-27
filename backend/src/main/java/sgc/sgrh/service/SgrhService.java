@@ -223,12 +223,13 @@ public class SgrhService {
 
     private Map<Long, UnidadeDto> criarUnidadesMock() {
         Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
+        unidadesDto.put(1L, UnidadeDto.builder().codigo(1L).nome("Secretaria do Tribunal").sigla("SEDOC").codigoPai(null).tipo("INTEROPERACIONAL").isElegivel(false).build());
         unidadesDto.put(2L, UnidadeDto.builder().codigo(2L).nome("Secretaria de Informática e Comunicações").sigla("STIC").codigoPai(null).tipo("INTEROPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(3L, UnidadeDto.builder().codigo(3L).nome("Secretaria de Gestao de Pessoas").sigla("SGP").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(200L, UnidadeDto.builder().codigo(200L).nome("Secretaria de Gestao de Pessoas").sigla("SGP").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
         unidadesDto.put(6L, UnidadeDto.builder().codigo(6L).nome("Coordenadoria de Sistemas").sigla("COSIS").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
         unidadesDto.put(7L, UnidadeDto.builder().codigo(7L).nome("Coordenadoria de Suporte e Infraestrutura").sigla("COSINF").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
         unidadesDto.put(14L, UnidadeDto.builder().codigo(14L).nome("Coordenadoria Jurídica").sigla("COJUR").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(4L, UnidadeDto.builder().codigo(4L).nome("Coordenadoria de Educação Especial").sigla("COEDE").codigoPai(3L).tipo("INTERMEDIARIA").isElegivel(false).build());
+        unidadesDto.put(4L, UnidadeDto.builder().codigo(4L).nome("Coordenadoria de Educação Especial").sigla("COEDE").codigoPai(200L).tipo("INTERMEDIARIA").isElegivel(false).build());
         unidadesDto.put(8L, UnidadeDto.builder().codigo(8L).nome("Seção de Desenvolvimento de Sistemas").sigla("SEDESENV").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
         unidadesDto.put(9L, UnidadeDto.builder().codigo(9L).nome("Seção de Dados e Inteligência Artificial").sigla("SEDIA").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
         unidadesDto.put(10L, UnidadeDto.builder().codigo(10L).nome("Seção de Sistemas Eleitorais").sigla("SESEL").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
@@ -237,6 +238,12 @@ public class SgrhService {
         unidadesDto.put(13L, UnidadeDto.builder().codigo(13L).nome("Seção de Processos").sigla("SEPRO").codigoPai(14L).tipo("OPERACIONAL").isElegivel(false).build());
         unidadesDto.put(15L, UnidadeDto.builder().codigo(15L).nome("Seção de Documentação").sigla("SEDOC").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
         unidadesDto.put(5L, UnidadeDto.builder().codigo(5L).nome("Seção Magistrados e Requisitados").sigla("SEMARE").codigoPai(4L).tipo("OPERACIONAL").isElegivel(false).build());
+
+        // Units from data-minimal.sql and CarregamentoService
+        unidadesDto.put(201L, UnidadeDto.builder().codigo(201L).nome("Coordenadoria de Atenção ao Servidor").sigla("CAS").codigoPai(200L).tipo("INTEROPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(202L, UnidadeDto.builder().codigo(202L).nome("Seção de Atenção ao Servidor").sigla("SAS").codigoPai(201L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(900L, UnidadeDto.builder().codigo(900L).nome("CDU04-UNIT").sigla("CDU04-UNIT").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
+        unidadesDto.put(903L, UnidadeDto.builder().codigo(903L).nome("CDU05-ALERT-UNIT").sigla("CDU05-ALERT-UNIT").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
         return unidadesDto;
     }
 }

@@ -7,18 +7,16 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: false,
     workers: 1,
-
     timeout: 3000,
     reporter: "list",
     expect: { timeout: 1000 },
-
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
     webServer: [
         {
             command: 'npm --prefix ./frontend run dev',
             url: 'http://localhost:5173',
             reuseExistingServer: !process.env.CI,
-            stdout: 'ignore',
+            stdout: 'pipe',
             stderr: 'pipe',
         },
         {

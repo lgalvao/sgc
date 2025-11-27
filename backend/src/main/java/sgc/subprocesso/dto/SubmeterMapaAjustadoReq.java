@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizeHtml;
+import sgc.comum.json.SanitizarHtml;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SubmeterMapaAjustadoReq {
     @NotBlank(message = "O campo 'observacoes' é obrigatório.")
-    @SanitizeHtml
+    @SanitizarHtml
     private String observacoes;
 
     @NotNull(message = "O campo 'dataLimiteEtapa2' é obrigatório.")

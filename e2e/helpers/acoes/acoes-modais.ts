@@ -1,5 +1,5 @@
-import {Page} from '@playwright/test';
-import {SELETORES, TEXTOS} from '../dados';
+import { Page } from '@playwright/test';
+import { SELETORES, TEXTOS } from '../dados';
 
 /**
  * AÇÕES ESPECÍFICAS PARA MODAIS
@@ -21,7 +21,10 @@ export async function cancelarNoModal(page: Page): Promise<void> {
  */
 export async function confirmarNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await modal.locator(SELETORES.BTN_MODAL_CONFIRMAR).click();
+    await modal.locator(SELETORES.BTN_MODAL_CONFIRMAR).click({ force: true });
+
+    // Wait for modal animation to complete
+    await modal.waitFor({ state: 'hidden' });
 }
 
 /**
@@ -39,7 +42,7 @@ export async function confirmarRemocaoNoModal(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function abrirDialogoRemocaoProcesso(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
+    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
 }
 
 /**

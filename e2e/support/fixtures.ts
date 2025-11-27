@@ -32,7 +32,25 @@ export const test = base.extend<MyFixtures>({
             throw error;
         }
 
-        // 2. Use the page (run the actual test)
+        // 2. Disable animations globally
+        await page.addStyleTag({
+            content: `
+                *, *::before, *::after {
+                    transition: none !important;
+                    animation: none !important;
+                }
+                .modal.fade .modal-dialog {
+                    transition: none !important;
+                    transform: none !important;
+                }
+                .fade {
+                    transition: none !important;
+                    opacity: 1 !important;
+                }
+            `
+        });
+
+        // 3. Use the page (run the actual test)
         await use(page);
     },
 });

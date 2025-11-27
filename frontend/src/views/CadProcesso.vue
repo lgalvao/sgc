@@ -65,6 +65,7 @@
 
       <BButton
         variant="primary"
+        data-testid="btn-salvar"
         @click="salvarProcesso"
       >
         Salvar
@@ -81,6 +82,7 @@
         v-if="processoEditando"
         variant="danger"
         class="ms-2"
+        data-testid="btn-remover"
         @click="abrirModalRemocao"
       >
         Remover
@@ -191,6 +193,16 @@ onMounted(async () => {
       await processosStore.fetchProcessoDetalhe(Number(codProcesso));
       const processo = processosStore.processoDetalhe;
       if (processo) {
+        // Redirect if process is not in CRIADO state (cannot be edited)
+        if (processo.situacao !== 'CRIADO') {
+          notificacoesStore.aviso(
+            "Processo em andamento",
+            "Este processo já foi iniciado e não pode ser editado."
+          );
+          await router.push(`/processo/${processo.codigo}`);
+          return;
+        }
+
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;

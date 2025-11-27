@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class CarregamentoService {
-
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final AnaliseRepo analiseRepo;
@@ -80,14 +79,8 @@ public class CarregamentoService {
         Unidade u10 = unidadeRepo.save(new Unidade(null, "Seção de Sistemas Eleitorais", "SESEL", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u6));
 
         Unidade u11 = unidadeRepo.save(new Unidade(null, "Seção de Infraestrutura", "SENIC", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u7));
-
         Unidade u12 = unidadeRepo.save(new Unidade(null, "Seção Jurídica", "SEJUR", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u14));
-        Unidade u13 = unidadeRepo.save(new Unidade(null, "Seção de Processos", "SEPRO", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u14));
-        Unidade u15 = unidadeRepo.save(new Unidade(null, "Seção de Documentação", "SEDOC", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u2));
-
         Unidade u102 = unidadeRepo.save(new Unidade(null, "SUB-UNIT", "SUB-UNIT", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u101));
-
-        Unidade u202 = unidadeRepo.save(new Unidade(null, "Seção de Atenção ao Servidor", "SAS", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u201));
 
         unidadeRepo.save(new Unidade(null, "CDU04-UNIT", "CDU04-UNIT", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u2));
         unidadeRepo.save(new Unidade(null, "CDU05-REV-UNIT", "CDU05-REV-UNIT", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, u2));
@@ -253,7 +246,6 @@ public class CarregamentoService {
     @Transactional
     public void removerDados() {
         // Limpar relacionamentos e tabelas filhas primeiro
-        
         // Break Unidade relationships
         unidadeRepo.findAll().forEach(u -> {
             u.setTitular(null);
@@ -282,13 +274,11 @@ public class CarregamentoService {
         atribuicaoTemporariaRepo.deleteAllInBatch();
         vinculacaoUnidadeRepo.deleteAllInBatch();
 
-        // Users have CascadeType.ALL on atribuicoes (UsuarioPerfil)
-        // Standard deleteAll to trigger cascading deletes
-        usuarioRepo.deleteAll(); 
+        // Users have CascadeType.ALL on atribuicoes (UsuarioPerfil); standard deleteAll to trigger cascading deletes
+        usuarioRepo.deleteAll();
         usuarioRepo.flush(); 
         
         unidadeRepo.deleteAllInBatch();
         mapaRepo.deleteAllInBatch();
     }
-
 }

@@ -1,8 +1,8 @@
-import {vueTest as test} from './support/vue-specific-setup';
-import {criarEIniciarProcessoBasico, criarProcessoBasico, verificarNavegacaoPaginaCadastroProcesso,} from '~/helpers';
-import {PaginaLogin} from '~/helpers/pages/login-page';
-import {PaginaPainel} from '~/helpers/pages/painel-page';
-import {USUARIOS} from '~/helpers/dados/constantes';
+import { vueTest as test } from './support/vue-specific-setup';
+import { criarEIniciarProcessoBasico, criarProcessoBasico, verificarNavegacaoPaginaCadastroProcesso, } from '~/helpers';
+import { PaginaLogin } from '~/helpers/pages/login-page';
+import { PaginaPainel } from '~/helpers/pages/painel-page';
+import { USUARIOS } from '~/helpers/dados/constantes';
 
 test.describe('CDU-02: Visualizar Painel', () => {
     // Clean up of 'processos em andamento' is removed as the fixture now guarantees an isolated DB per test.
@@ -14,9 +14,12 @@ test.describe('CDU-02: Visualizar Painel', () => {
 
             await test.step('Preparação: Criar dados como ADMIN', async () => {
                 await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
-                
+
                 const nomeProcesso = `Processo Servidor SESEL ${Date.now()}`;
                 await criarEIniciarProcessoBasico(page, nomeProcesso, 'MAPEAMENTO', ['SESEL'], '2025-12-31');
+
+                // Ensure we're back at the painel before switching users
+                await page.waitForURL(/\/painel/);
             });
 
             await test.step('Ação: Logar como SERVIDOR', async () => {
@@ -42,7 +45,7 @@ test.describe('CDU-02: Visualizar Painel', () => {
             const loginPage = new PaginaLogin(page);
             await loginPage.realizarLogin(USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
 
-            nomeProcessoSgp = `Processo da SGP para CDU-02 ${Date.now()}`;
+            nomeProcessoSgp = `Processo SGP ${Date.now()}`;
             await criarEIniciarProcessoBasico(page, nomeProcessoSgp, 'MAPEAMENTO', ['SGP'], '2025-12-31');
 
             nomeProcessoCojur = `Processo COJUR - Fora da SGP ${Date.now()}`;
@@ -85,7 +88,7 @@ test.describe('CDU-02: Visualizar Painel', () => {
             // Since we are in the same test execution (same page), we are logged in.
             // But to be consistent with the previous test block structure...
             // Actually, we are already logged in from beforeEach.
-            
+
             await painelPage.clicarProcessoNaTabela(new RegExp(nomeProcessoTeste));
             await verificarNavegacaoPaginaCadastroProcesso(page);
         });

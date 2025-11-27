@@ -1,9 +1,11 @@
 package sgc.util;
 
+import sgc.comum.json.SanitizarHtml;
+
 /**
  * Utilitário para escapar caracteres HTML em strings para exibição segura em páginas web.
  * <p>
- * Diferente de {@link sgc.comum.json.SanitizeHtml} que sanitiza HTML durante desserialização
+ * Diferente de {@link SanitizarHtml} que sanitiza HTML durante desserialização
  * (ao receber dados do cliente), este utilitário escapa HTML durante serialização
  * (ao enviar dados para o cliente).
  * <p>
