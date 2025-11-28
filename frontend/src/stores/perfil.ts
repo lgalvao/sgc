@@ -33,11 +33,13 @@ export const usePerfilStore = defineStore("perfil", () => {
         localStorage.setItem("idServidor", String(novoId));
     }
 
-    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number) {
+    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string) {
         perfilSelecionado.value = perfil;
         unidadeSelecionada.value = unidadeCodigo;
+        unidadeSelecionadaSigla.value = unidadeSigla;
         localStorage.setItem("perfilSelecionado", perfil);
         localStorage.setItem("unidadeSelecionada", unidadeCodigo.toString());
+        localStorage.setItem("unidadeSelecionadaSigla", unidadeSigla);
     }
 
     function definirToken(token: string) {
@@ -81,6 +83,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 definirPerfilUnidade(
                     loginResponse.perfil as unknown as Perfil,
                     loginResponse.unidadeCodigo,
+                    perfilUnidadeSelecionado.unidade.sigla,
                 );
                 definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
                 definirToken(loginResponse.token); // Adicionar esta linha
@@ -102,6 +105,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         definirPerfilUnidade(
             loginResponse.perfil as unknown as Perfil,
             loginResponse.unidadeCodigo,
+            perfilUnidade.unidade.sigla,
         );
         definirServidorId(loginResponse.tituloEleitoral);
         definirToken(loginResponse.token);
