@@ -19,7 +19,6 @@ export interface Notificacao {
   tipo: TipoNotificacao;
   titulo: string;
   mensagem: string;
-  // Opcional: identificador estável para testes E2E (ex.: 'notificacao-remocao')
   testId?: string;
   emailContent?: EmailContent; // Para notificações de email
   duracao?: number; // em milissegundos

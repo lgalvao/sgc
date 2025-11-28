@@ -100,7 +100,7 @@ public class CDU07IntegrationTest {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())
                         .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.nome").value("Se&ccedil;&atilde;o de Sistemas Eleitorais"))
+                .andExpect(jsonPath("$.unidade.nome").value("Seção de Sistemas Eleitorais"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
                 .andExpect(jsonPath("$.localizacaoAtual").value(UNIDADE_SIGLA))
                 .andExpect(jsonPath("$.processoDescricao").value("Processo de Teste"))

@@ -30,5 +30,4 @@ app.use(createBootstrap());
 
 app.mount("#app");
 
-// Expose Pinia instance globally for Playwright testing (optional, for dev/test environments)
 window.__pinia__ = pinia;

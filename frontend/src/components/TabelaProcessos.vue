@@ -18,7 +18,7 @@
       </template>
 
       <template #cell(situacao)="data">
-        {{ formatarSituacao(data.value) }}
+        {{ formatarSituacao(data.value as string) }}
       </template>
     </BTable>
   </div>

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -23,9 +24,9 @@ import java.util.regex.Pattern;
 
 @Service
 @Primary
-@org.springframework.context.annotation.Profile("!e2e,!test")
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
 public class NotificacaoEmailService {
     private final JavaMailSender enviadorDeEmail;
     private final NotificacaoRepo repositorioNotificacao;

@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,25 +14,22 @@ import {
     buscarSubprocessoPorProcessoEUnidade,
     fetchSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
 } from "@/services/subprocessoService";
-import { usePerfilStore } from "@/stores/perfil"; // Adicionar esta linha
-import { useProcessosStore } from "@/stores/processos";
+import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {useProcessosStore} from "@/stores/processos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import { useNotificacoesStore } from "./notificacoes";
+import {useNotificacoesStore} from "./notificacoes";
 
-async function _executarAcao(
-    acao: () => Promise<any>,
-    sucessoMsg: string,
-    erroMsg: string,
-): Promise<boolean> {
+async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroMsg: string): Promise<boolean> {
     const notificacoes = useNotificacoesStore();
     try {
         await acao();
         notificacoes.sucesso(sucessoMsg, `${sucessoMsg}.`);
+
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
             await processosStore.fetchProcessoDetalhe(
@@ -58,51 +55,42 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     async function fetchSubprocessoDetalhe(id: number) {
+        const perfilStore = usePerfilStore();
         const notificacoes = useNotificacoesStore();
-        const perfilStore = usePerfilStore(); // Adicionar esta linha
+        const perfil = perfilStore.perfilSelecionado;
+        const codUnidadeSel = perfilStore.unidadeSelecionada;
+        let codUnidade: number | null = null;
+
+        if (perfil) {
+            if (perfilStore.perfisUnidades.length > 0) {
+                const perfilUnidade = perfilStore.perfisUnidades.find(
+                    (pu) => pu.perfil === perfil && (codUnidadeSel ? pu.unidade.codigo === codUnidadeSel : true)
+                );
+                if (perfilUnidade) codUnidade = perfilUnidade.unidade.codigo;
+            }
+        }
+
+        if (!perfil || codUnidade === null) {
+            notificacoes.erro(
+                "Erro ao buscar detalhes do subprocesso",
+                "Informações de perfil ou unidade não disponíveis.",
+            );
+            subprocessoDetalhe.value = null;
+            return;
+        }
+
         try {
-            // Obter perfil e codUnidade do perfilStore
-            const perfil = perfilStore.perfilSelecionado;
-            const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
-            let unidadeCodigo: number | null = null;
-
-            if (perfil && unidadeSelecionadaCodigo) {
-                unidadeCodigo = unidadeSelecionadaCodigo;
-
-                // Optional: Validate against perfisUnidades if available
-                if (perfilStore.perfisUnidades.length > 0) {
-                    const perfilUnidade = perfilStore.perfisUnidades.find(
-                        (pu) =>
-                            pu.perfil === perfil &&
-                            pu.unidade.codigo === unidadeSelecionadaCodigo,
-                    );
-                    if (perfilUnidade) {
-                        unidadeCodigo = perfilUnidade.unidade.codigo;
-                    } else {
-                        // If profiles are loaded but selected unit is not found, it might be invalid
-                        // But let's trust localStorage for now to support page reloads
-                        console.warn("Selected unit not found in loaded profiles");
-                    }
-                }
-            }
-
-            if (perfil && unidadeCodigo !== null) {
-                subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
-                    id,
-                    perfil,
-                    unidadeCodigo,
-                );
-            } else {
-                notificacoes.erro(
-                    "Erro ao buscar detalhes do subprocesso",
-                    "Informações de perfil ou unidade não disponíveis.",
-                );
-            }
+            subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
+                id,
+                perfil,
+                codUnidade,
+            );
         } catch {
             notificacoes.erro(
                 "Erro ao buscar detalhes do subprocesso",
                 "Não foi possível carregar as informações.",
             );
+            subprocessoDetalhe.value = null;
         }
     }
 
@@ -112,10 +100,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     ): Promise<number | null> {
         const notificacoes = useNotificacoesStore();
         try {
-            const dto = await buscarSubprocessoPorProcessoEUnidade(
-                codProcesso,
-                siglaUnidade,
-            );
+            const dto = await buscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
         } catch {
             notificacoes.erro(
@@ -161,10 +146,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 "Cadastro homologado",
                 "Erro ao homologar",
             ),
-        devolverRevisaoCadastro: (
-            codSubrocesso: number,
-            req: DevolverCadastroRequest,
-        ) =>
+        devolverRevisaoCadastro: (codSubrocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
                 () => devolverRevisaoCadastro(codSubrocesso, req),
                 "Revisão devolvida",

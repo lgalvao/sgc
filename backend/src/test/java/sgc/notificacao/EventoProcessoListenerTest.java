@@ -257,34 +257,6 @@ class EventoProcessoListenerTest {
     }
 
     @Test
-    @DisplayName("Erro ao buscar unidade no SGRH e nao eh e2e")
-    void erroUnidadeSgrhNaoE2E() {
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
-        when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.empty());
-        when(environment.getActiveProfiles()).thenReturn(new String[]{"dev"});
-
-        ouvinteDeEvento.aoIniciarProcesso(evento);
-
-        // Should catch ErroEntidadeNaoEncontrada and log
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Erro ao buscar unidade no SGRH e eh e2e")
-    void erroUnidadeSgrhE2E() {
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
-        when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.empty());
-        when(environment.getActiveProfiles()).thenReturn(new String[]{"e2e"});
-
-        ouvinteDeEvento.aoIniciarProcesso(evento);
-
-        // Should return early without exception logic
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-    }
-
-    @Test
     @DisplayName("Erro ao enviar email substituto")
     void erroEmailSubstituto() {
         UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);

@@ -31,4 +31,3 @@ logging:
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO
-    sgc.e2e: INFO

@@ -19,13 +19,10 @@ export const useProcessosStore = defineStore("processos", () => {
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
 
-    const getUnidadesDoProcesso = computed(
+    const getUnidadesProcesso = computed(
         () =>
             (idProcesso: number): ProcessoResumo[] => {
-                if (
-                    processoDetalhe.value &&
-                    processoDetalhe.value.codigo === idProcesso
-                ) {
+                if (processoDetalhe.value && processoDetalhe.value.codigo === idProcesso) {
                     return processoDetalhe.value.resumoSubprocessos;
                 }
                 return [];
@@ -66,14 +63,10 @@ export const useProcessosStore = defineStore("processos", () => {
     }
 
     async function criarProcesso(payload: CriarProcessoRequest) {
-        const novoProcesso = await processoService.criarProcesso(payload);
-        return novoProcesso;
+        return await processoService.criarProcesso(payload);
     }
 
-    async function atualizarProcesso(
-        idProcesso: number,
-        payload: AtualizarProcessoRequest,
-    ) {
+    async function atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
         await processoService.atualizarProcesso(idProcesso, payload);
     }
 
@@ -81,19 +74,13 @@ export const useProcessosStore = defineStore("processos", () => {
         await processoService.excluirProcesso(idProcesso);
     }
 
-    async function iniciarProcesso(
-        idProcesso: number,
-        tipo: TipoProcesso,
-        unidadesIds: number[],
-    ) {
+    async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
-        // Após iniciar, é uma boa prática recarregar os detalhes para refletir a mudança de estado
         await fetchProcessoDetalhe(idProcesso);
     }
 
     async function finalizarProcesso(idProcesso: number) {
         await processoService.finalizarProcesso(idProcesso);
-        // Após finalizar, recarregar os detalhes para refletir a mudança de estado
         await fetchProcessoDetalhe(idProcesso);
     }
 
@@ -108,10 +95,7 @@ export const useProcessosStore = defineStore("processos", () => {
         await fetchProcessoDetalhe(payload.codProcesso);
     }
 
-    async function alterarDataLimiteSubprocesso(
-        id: number,
-        dados: { novaData: string },
-    ) {
+    async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
         await processoService.alterarDataLimiteSubprocesso(id, dados);
         if (processoDetalhe.value) {
             await fetchProcessoDetalhe(processoDetalhe.value.codigo);
@@ -127,9 +111,7 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function validarMapa(id: number) {
         await processoService.validarMapa(id);
-        if (processoDetalhe.value) {
-            await fetchProcessoDetalhe(processoDetalhe.value.codigo);
-        }
+        if (processoDetalhe.value) await fetchProcessoDetalhe(processoDetalhe.value.codigo);
     }
 
     return {
@@ -138,7 +120,7 @@ export const useProcessosStore = defineStore("processos", () => {
         processoDetalhe,
         subprocessosElegiveis,
         processosFinalizados,
-        getUnidadesDoProcesso,
+        getUnidadesDoProcesso: getUnidadesProcesso,
         fetchProcessosPainel,
         fetchProcessosFinalizados,
         fetchProcessoDetalhe,

@@ -118,7 +118,7 @@ A resposta de erro segue o padrão JSON definido na classe `ErroApi`.
 - **Spring Boot 3.5.7**: Framework base.
 - **Lombok**: Para redução de boilerplate (Getters, Setters, Builders).
 - **MapStruct**: Para conversão eficiente entre Entity e DTO.
-- **H2 Database**: Banco em memória para perfil `e2e` e `test`.
+- **H2 Database**: Banco em memória para perfil de testes
 - **PostgreSQL**: Banco de produção.
 
 ## 6. Desvios dos Padrões Identificados

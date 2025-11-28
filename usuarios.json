@@ -1,7 +1,7 @@
 [
   {
     "titulo_eleitoral": "111111",
-    "nome": "Freddie Mercury",
+    "nome": "ADMIN_SEDOC_E_CHEFE_SEDOC",
     "perfis_unidades": [
       { "perfil": "ADMIN", "sigla": "SEDOC" },
       { "perfil": "CHEFE", "sigla": "SEDOC" }
@@ -10,7 +10,7 @@
   },
   {
     "titulo_eleitoral": "222222",
-    "nome": "Ozzy Osbourne",
+    "nome": "GESTOR_COORD_11",
     "perfis_unidades": [
       { "perfil": "GESTOR", "sigla": "COORD_11" }
     ],
@@ -18,7 +18,7 @@
   },
   {
     "titulo_eleitoral": "333333",
-    "nome": "Joan Jett",
+    "nome": "CHEFE_SECAO_111",
     "perfis_unidades": [
       { "perfil": "CHEFE", "sigla": "SECAO_111" }
     ],
@@ -26,7 +26,7 @@
   },
   {
     "titulo_eleitoral": "444444",
-    "nome": "Kurt Cobain",
+    "nome": "SERVIDOR_SECAO_111",
     "perfis_unidades": [
       { "perfil": "SERVIDOR", "sigla": "SECAO_111" }
     ],

@@ -78,7 +78,7 @@ public class SgrhController {
         usuarioService.entrar(request);
         LoginResp response = new LoginResp(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
 
-        // Gerar JWT simulado para perfil e2e
+        // Gerar JWT simulado
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> claims = new HashMap<>();

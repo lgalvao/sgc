@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,16 +16,15 @@ import java.util.Arrays;
 
 @Component
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
-
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
+
+    @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-
         Unidade unidade = null;
         boolean dbAvailable = false;
         if (unidadeRepo != null) {
@@ -32,7 +32,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 unidade = unidadeRepo.findById(customUser.unidadeId()).orElse(null);
                 dbAvailable = true;
             } catch (Exception e) {
-                unidade = null;
+                System.err.println(e.getMessage());
             }
         }
 
@@ -54,7 +54,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         });
 
         if (dbAvailable && usuarioRepo != null) {
-            try { usuarioRepo.save(principal); } catch (Exception e) { }
+            try { usuarioRepo.save(principal); } catch (Exception ignored) { }
         }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

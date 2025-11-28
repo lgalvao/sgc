@@ -17,7 +17,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Profile("!e2e & !test")
+@Profile("!test")
 public class ConfigSeguranca {
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.

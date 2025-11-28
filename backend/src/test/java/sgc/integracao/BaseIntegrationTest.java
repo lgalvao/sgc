@@ -19,7 +19,6 @@ import sgc.unidade.model.UnidadeRepo;
 @Transactional
 @Import(TestConfig.class)
 public abstract class BaseIntegrationTest {
-
     @Autowired
     protected MockMvc mockMvc;
 

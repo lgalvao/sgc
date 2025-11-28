@@ -4,7 +4,6 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.5.x-green.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.x-blue.svg)](https://www.typescriptlang.org/)
-[![Playwright](https://img.shields.io/badge/Playwright-E2E%20Tests-45ba4b.svg)](https://playwright.dev/)
 
 Sistema para gerenciar sistematicamente as competências técnicas das unidades organizacionais do TRE-PE, incluindo mapeamento, revisão e diagnóstico de competências.
 
@@ -45,7 +44,6 @@ O SGC permite:
 **Testes:**
 - JUnit 5 (testes unitários do backend)
 - Vitest (testes unitários do frontend)
-- Playwright (testes E2E - organizados por casos de uso)
 
 ### Estrutura do Projeto
 
@@ -67,7 +65,6 @@ sgc/
 │   │   └── comum/        # Componentes compartilhados (DTOs, exceções)
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
-│       ├── application-e2e.yml     # Testes E2E (H2)
 │       └── data.sql             # Dados iniciais para testes
 │
 ├── frontend/             # Aplicação Vue.js
@@ -83,18 +80,6 @@ sgc/
 │      ├── constants/    # Constantes e enums
 │      ├── types/        # Tipos e interfaces (TypeScript)
 │      └── test-utils/   # Utilitários para testes
-│   
-├── e2e/                  # Testes End-to-End (Playwright)
-│   ├── cdu-01.spec.ts    # Login e autenticação
-│   ├── cdu-02.spec.ts    # Criar processo
-│   ├── ...               # 21 casos de uso
-│   ├── helpers/          # Funções auxiliares
-│   │   ├── acoes/        # Ações por domínio
-│   │   ├── verificacoes/ # Verificações por domínio
-│   │   ├── navegacao/    # Navegação e rotas
-│   │   └── dados/        # Constantes de testes
-│   └── support/          # Configurações de testes
-│
 ├── reqs/                 # Documentação de requisitos
 │   ├── cdu-01.md         # Caso de uso 01: Login
 │   ├── cdu-02.md         # Caso de uso 02: Criar processo
@@ -102,8 +87,6 @@ sgc/
 │   └── _informacoes-gerais.md
 │
 ├── build.gradle.kts      # Build raiz (multi-projeto)
-├── package.json          # Scripts E2E
-├── playwright.config.ts  # Configuração Playwright
 └── AGENTS.md             # Guia para agentes de IA
 ```
 
@@ -124,50 +107,6 @@ git clone https://github.com/lgalvao/sgc.git
 cd sgc
 ```
 
-### 2. Desenvolvimento Local (Recomendado)
-
-Para iniciar o ambiente de desenvolvimento completo (backend e frontend), utilize o script `dev:e2e` na raiz do projeto:
-
-```bash
-npm run dev:e2e
-```
-Este comando iniciará:
-- O **backend** em `http://localhost:10000` (usando H2 em memória com dados de teste).
-- O **frontend** em `http://localhost:5173`.
-
-Alternativamente, você pode iniciar o backend e o frontend separadamente:
-
-#### Terminal 1: Backend
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
-```
-- Usa H2 em memória (sem PostgreSQL necessário)
-- Carrega dados de teste do data.sql
-- API disponível em: `http://localhost:10000`
-- Swagger UI: `http://localhost:10000/swagger-ui.html`
-
-#### Terminal 2: Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-- Aplicação disponível em: `http://localhost:5173`
-
-### 3. Acesso ao Sistema
-
-**Usuários de teste (perfil `e2e`):**
-
-| Usuário | Título | Senha | Perfil | Unidade |
-|---------|--------|-------|--------|---------|
-| Ricardo Alves | `6` | `123` | ADMIN | STIC |
-| Paulo Horta | `8` | `123` | GESTOR | SEDESENV |
-| Carlos Henrique Lima | `2` | `123` | CHEFE | SGP |
-| Ana Paula Souza | `1` | `123` | SERVIDOR | SESEL |
-| Usuario Multi Perfil | `999999999999` | `123` | ADMIN + GESTOR | STIC |
-
----
-
 ## 🧪 Testes
 
 ### Testes Unitários Backend (JUnit)
@@ -184,27 +123,6 @@ npm run test:unit
 ```
 
 ## 📊 Perfis Spring
-
-O projeto usa **3 perfis distintos**:
-
-| Perfil | Quando Usar | Banco | Carrega data.sql? | Porta |
-|--------|-------------|-------|-------------------|-------|
-| **default** | Produção/Homologação | PostgreSQL | ✅ | 10000 |
-| **e2e** | Desenvolvimento e Testes E2E | H2 | ✅ | 10000 |
-| **test** | Testes JUnit (auto) | H2 | ❌ | N/A |
-
-### Comandos por Perfil
-
-```bash
-# Produção (PostgreSQL)
-./gradlew :backend:bootRun
-
-# Desenvolvimento (H2 + dados de teste)
-./gradlew :backend:bootRunE2E
-
-# Testes JUnit (automático)
-./gradlew :backend:test
-```
 
 ---
 
@@ -228,21 +146,6 @@ Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vin
 Sistema orientado a eventos que reage aos eventos de domínio:
 - **Alertas**: Visíveis na interface do usuário
 - **Notificações**: E-mails assíncronos
-
----
-
-## 🔐 Segurança
-
-⚠️ **Estado Atual:** Segurança em transição (desenvolvimento)
-
-- `SecurityConfig.java`: Temporariamente desabilitado (`@Profile("disabled-for-now")`)
-- `E2eSecurityConfig.java`: Ativo - permite todas as requisições
-- Autenticação JWT mockada (token Base64 não validado)
-
-**Para produção:**
-1. Implementar filtro JWT com validação real
-2. Reativar `SecurityConfig` com `@Profile("!e2e")`
-3. Restringir `E2eSecurityConfig` com `@Profile("e2e")`
 
 ---
 

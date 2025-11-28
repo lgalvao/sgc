@@ -27,7 +27,6 @@ export async function iniciarProcesso(
     tipo: string,
     unidadesIds: number[],
 ): Promise<void> {
-    console.log(`Iniciando processo ${id} com tipo ${tipo} e unidades ${unidadesIds}`);
     await apiClient.post(`/processos/${id}/iniciar`, {
         tipo,
         unidades: unidadesIds

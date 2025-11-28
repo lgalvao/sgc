@@ -31,6 +31,5 @@ backend/bin/
 *.class
 /frontend/tsconfig.tsbuildinfo
 /node_modules/
-e2e-log-problems.md
 !backend/build/reports/tests/test/index.html
 /backend/target/

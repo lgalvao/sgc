@@ -57,13 +57,7 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 
 ## 5. Testes e Qualidade
 
-### 5.1. Playwright (E2E)
--   **Seletores:** Use SEMPRE `data-testid` para selecionar elementos. Isso torna os testes resilientes a mudanças de layout.
--   **Helpers:** Utilize as funções em `e2e/helpers/` para ações comuns.
--   **Ambiente:** Os testes E2E rodam com um banco H2 em memória (perfil `e2e`), garantindo isolamento e rapidez.
-
-### 5.2. Ferramentas de Verificação
+### 5.1. Ferramentas de Verificação
 Antes de submeter alterações, execute:
--   **`npm run validate`** (na raiz): Roda todas as verificações de qualidade.
 -   **`npm run typecheck`**: Verifica tipagem TypeScript.
 -   **`npm run lint`**: Verifica estilo de código.

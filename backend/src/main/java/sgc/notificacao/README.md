@@ -57,8 +57,8 @@ graph TD
   - **Assíncrono (`@Async`):** O envio é executado em uma thread separada para não bloquear a requisição original.
   - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
   - **Retentativas:** Em caso de falha, tenta reenviar o e-mail até 3 vezes com backoff exponencial.
-
-- **`NotificacaoEmailServiceMock`**: Implementação "no-op" usada nos perfis `e2e` e `test` para evitar envio real de e-mails durante testes.
+    
+- **`NotificacaoEmailServiceMock`**: Implementação "no-op" a ser usada em testes.
 
 - **`NotificacaoModelosService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando templates Thymeleaf.
 

@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -13,14 +14,12 @@ import sgc.unidade.model.Unidade;
 
 @Component
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
-
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-
         String tituloAdmin = "111111111111";
 
         Usuario principal = null;
@@ -30,7 +29,7 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
                 principal = usuarioRepo.findById(tituloAdmin).orElse(null);
                 dbAvailable = true;
             } catch (Exception e) {
-                principal = null;
+                System.err.println(e.getMessage());
             }
         }
         
@@ -50,19 +49,15 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
                  Unidade u = new Unidade("Unidade Mock", "UM");
                  principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
             }
-            if (dbAvailable) {
-                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            try {
+                usuarioRepo.save(principal);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
-
         context.setAuthentication(auth);
-
         return context;
     }
 }
-
-
-
-

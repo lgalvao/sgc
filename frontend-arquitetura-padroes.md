@@ -103,24 +103,9 @@ flowchart LR
 -   **Tipagem Estrita:** Evitar `any`. Usar interfaces definidas em `frontend/src/types/`.
 -   **Props de Componentes:** Usar interface genérica com `defineProps<Props>()`.
 
-## 6. Estratégia de Testes
-
-### 6.1. Testes Unitários e de Integração (Vitest)
+### 6. Testes Unitários e de Integração (Vitest)
 -   **Localização:** Arquivos `*.spec.ts` ou `*.test.ts` próximos ao código fonte ou em diretórios `__tests__`.
 -   **Escopo:**
     -   **Unitários:** Testar funções isoladas (utils, mappers) e componentes simples.
     -   **Integração:** Testar Stores e Views (montando o componente e mockando serviços/stores).
 -   **Execução:** `npm run test:unit`.
-
-### 6.2. Testes End-to-End (Playwright)
--   **Localização:** Diretório `e2e/` na raiz do projeto.
--   **Padrão:** Baseados em Casos de Uso (CDU).
--   **Seletores:** Uso obrigatório de atributos `data-testid` nos elementos do frontend para garantir robustez.
--   **Execução:** `npm run test:e2e` (Requer backend rodando com perfil `e2e`).
-
-## 7. Desvios e Observações
-
-Durante a análise, foram identificados os seguintes pontos que merecem atenção:
-
-1.  **Biblioteca de UI:**
-    -   Confirma-se o uso extensivo de `bootstrap-vue-next`. Novos desenvolvimentos devem priorizar o uso dos componentes desta biblioteca (`<BButton>`, `<BCard>`) em vez de elementos HTML nativos com classes CSS do Bootstrap, para manter a consistência visual e funcional.

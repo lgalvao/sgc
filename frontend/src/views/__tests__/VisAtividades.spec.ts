@@ -1,10 +1,10 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {computed, nextTick} from "vue";
-import * as usePerfilModule from "@/composables/usePerfil";
+import {nextTick} from "vue";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import VisAtividades from "@/views/VisAtividades.vue";
+import {usePerfilStore} from "@/stores/perfil";
 
 const pushMock = vi.fn();
 
@@ -17,10 +17,6 @@ vi.mock("vue-router", () => ({
     afterEach: vi.fn(),
   }),
   createWebHistory: () => ({}),
-}));
-
-vi.mock("@/composables/usePerfil", () => ({
-  usePerfil: vi.fn(),
 }));
 
 vi.mock("@/services/mapaService", () => ({
@@ -43,13 +39,6 @@ describe("VisAtividades.vue", () => {
   let wrapper: any;
 
   function createWrapper(perfil: Perfil, situacao: SituacaoSubprocesso) {
-    vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-      perfilSelecionado: computed(() => perfil),
-      servidorLogado: computed(() => null),
-      unidadeSelecionada: computed(() => null),
-      getPerfisDoServidor: vi.fn(),
-    } as any);
-
     const wrapper = mount(VisAtividades, {
       props: {
         codProcesso: 1,
@@ -58,7 +47,7 @@ describe("VisAtividades.vue", () => {
       global: {
         plugins: [
           createTestingPinia({
-            stubActions: false,
+            stubActions: true,
             initialState: {
               processos: {
                 processoDetalhe: {
@@ -85,6 +74,9 @@ describe("VisAtividades.vue", () => {
         ],
       },
     });
+
+    const perfilStore = usePerfilStore();
+    perfilStore.perfilSelecionado = perfil;
 
     return { wrapper };
   }

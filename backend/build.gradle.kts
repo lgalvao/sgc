@@ -118,12 +118,3 @@ tasks.withType<JavaCompile> {
         encoding = "UTF-8"
     }
 }
-
-tasks.register<BootRun>("bootRunE2E") {
-    group = "Application"
-    description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
-    jvmArgs = listOf("-Dspring.profiles.active=e2e")
-    mainClass.set("sgc.Sgc")
-    classpath = sourceSets["main"].runtimeClasspath
-    isIgnoreExitValue = true
-}

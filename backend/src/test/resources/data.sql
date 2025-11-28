@@ -1,12 +1,3 @@
--- UNIQUE_IDENTIFIER_GEMINI_20251123
--- Last modified: 2025-11-23 11:15:00
--- =================================================================================================
--- DADOS DE REFERÊNCIA MÍNIMOS PARA TESTES E2E
--- Contém apenas dados essenciais e estáveis: Unidades, Usuários, Perfis e Mapas Vigentes.
--- TAMBÉM CONTÉM DADOS TRANSACIONAIS (PROCESSOS, SUBPROCESSOS, ALERTAS, MOVIMENTACOES) PARA TESTES E2E ESPECÍFICOS.
--- =================================================================================================
-
--- Deletar dados transacionais para garantir idempotência, mesmo em bancos de dados isolados
 DELETE FROM SGC.MOVIMENTACAO;
 DELETE FROM SGC.ALERTA_USUARIO;
 DELETE FROM SGC.ALERTA;
@@ -219,7 +210,7 @@ VALUES (100007, 111111111111, 'ADMIN', 100);
 INSERT INTO SGC.USUARIO_PERFIL (id, usuario_titulo_eleitoral, perfil, unidade_codigo)
 VALUES (100008, 222222222222, 'GESTOR', 101);
 INSERT INTO SGC.USUARIO_PERFIL (id, usuario_titulo_eleitoral, perfil, unidade_codigo)
-VALUES (100009, 333333333333, 'CHEFE', 8);
+VALUES (100009, 333333333333, 'CHEFE', 9);
 INSERT INTO SGC.USUARIO_PERFIL (id, usuario_titulo_eleitoral, perfil, unidade_codigo)
 VALUES (100010, 121212121212, 'CHEFE', 12);
 INSERT INTO SGC.USUARIO_PERFIL (id, usuario_titulo_eleitoral, perfil, unidade_codigo)
@@ -288,9 +279,6 @@ INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30001, 201, '
 INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40001, 30001, 'Atendimento ao público');
 INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30001, 20001);
 
--- -------------------------------------------------------------------------------------------------
--- PROCESSOS, SUBPROCESSOS, ALERTAS, MOVIMENTACOES (para testes E2E)
--- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
 VALUES (50000, 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO');
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
@@ -333,15 +321,15 @@ INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codig
 VALUES (1700, 1700, 8, 1700, 'REVISAO_CADASTRO_HOMOLOGADA', '2025-12-31 23:59:59');
 
 
--- Processo 1900 (para CDU-19)
-INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
-VALUES (1900, 'Processo para CDU-19', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1900, 9);
+-- Process 1900 (para CDU-19) - COMENTADO PARA NÃO BLOQUEAR TESTES DE CDU-10 (Unit 9 ocupada)
+-- INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+-- VALUES (1900, 'Processo para CDU-19', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
+-- INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1900, 9);
 
 -- Mapa e Subprocesso para CDU-19
-INSERT INTO SGC.MAPA (codigo) VALUES (1900);
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
-VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', '2025-12-31 23:59:59');
+-- INSERT INTO SGC.MAPA (codigo) VALUES (1900);
+-- INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+-- VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', '2025-12-31 23:59:59');
 
 -- Processo CRIADO (para CDU-02 teste de Admin)
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)

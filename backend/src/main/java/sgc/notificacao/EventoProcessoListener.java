@@ -111,11 +111,6 @@ public class EventoProcessoListener {
         try {
             Optional<UnidadeDto> unidadeOpt = sgrhService.buscarUnidadePorCodigo(codigoUnidade);
             if (unidadeOpt.isEmpty()) {
-                boolean isE2E = Arrays.asList(environment.getActiveProfiles()).contains("e2e");
-                if (isE2E) {
-                    log.warn("Unidade não encontrada no SGRH: {}", codigoUnidade);
-                    return;
-                }
                 throw new ErroEntidadeNaoEncontrada("Unidade", "não encontrada no SGRH: %d".formatted(codigoUnidade));
             }
             UnidadeDto unidade = unidadeOpt.get();

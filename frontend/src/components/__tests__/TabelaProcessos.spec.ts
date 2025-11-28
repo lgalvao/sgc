@@ -73,13 +73,13 @@ describe("TabelaProcessos.vue", () => {
     expect(cells[0].text()).toBe("Processo Alpha");
     expect(cells[1].text()).toBe("MAPEAMENTO");
     expect(cells[2].text()).toBe("UNID1, UNID2");
-    expect(cells[3].text()).toBe("EM_ANDAMENTO");
+    expect(cells[3].text()).toBe("Em Andamento");
 
     const cells2 = rows[1].findAll("td");
     expect(cells2[0].text()).toBe("Processo Beta");
     expect(cells2[1].text()).toBe("REVISAO");
     expect(cells2[2].text()).toBe("UNID3");
-    expect(cells2[3].text()).toBe("FINALIZADO");
+    expect(cells2[3].text()).toBe("Finalizado");
   });
 
   it("deve emitir o evento ordenar ao receber o evento sort-changed", async () => {

@@ -55,7 +55,7 @@ graph TD
 ### 3. `config`
 - **Responsabilidade:** Centraliza as classes de configuração do Spring.
 - **Componentes Notáveis:**
-  - `ConfigSeguranca` / `ConfigSegurancaE2E`: Configurações do Spring Security.
+  - `ConfigSeguranca`: Configurações do Spring Security.
   - `ConfigWeb`: Configurações de CORS e MVC.
   - `ConfigThymeleaf`: Configuração do template engine para e-mails.
 

@@ -14,7 +14,6 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 @TestConfiguration
 @Profile("test")
 public class TestEventConfig {
-    
     @Bean
     @Primary
     public EventoProcessoListener eventoProcessoListener() {
