@@ -4,7 +4,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createMemoryHistory, createRouter} from "vue-router";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import { ToastService } from "@/services/toastService"; // Import ToastService
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {SituacaoSubprocesso} from "@/types/tipos";
@@ -31,6 +31,17 @@ const router = createRouter({
     },
   ],
 });
+
+// Mock ToastService
+vi.mock("@/services/toastService", () => ({
+  ToastService: {
+    sucesso: vi.fn(),
+    erro: vi.fn(),
+    aviso: vi.fn(),
+    info: vi.fn(),
+  },
+  registerToast: vi.fn(),
+}));
 
 describe("VisMapa.vue", () => {
   beforeEach(async () => {
@@ -222,7 +233,7 @@ describe("VisMapa.vue", () => {
   it("opens validar modal and confirms", async () => {
     const wrapper = mountComponent();
     const store = useProcessosStore();
-    const notificacoes = useNotificacoesStore();
+    vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
 
     await wrapper.find('[data-testid="validar-btn"]').trigger("click");
     await wrapper.vm.$nextTick();
@@ -233,12 +244,13 @@ describe("VisMapa.vue", () => {
     await confirmBtn.trigger("click");
 
     expect(store.validarMapa).toHaveBeenCalledWith(10);
-    expect(notificacoes.sucesso).toHaveBeenCalled();
+    expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
   });
 
   it("opens sugestoes modal and confirms", async () => {
     const wrapper = mountComponent();
     const store = useProcessosStore();
+    vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
 
     await wrapper
       .find('[data-testid="apresentar-sugestoes-btn"]')
@@ -256,6 +268,7 @@ describe("VisMapa.vue", () => {
     expect(store.apresentarSugestoes).toHaveBeenCalledWith(10, {
       sugestoes: "Minhas sugestões",
     });
+    expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
   });
 
   it("opens devolucao modal and confirms (GESTOR)", async () => {
@@ -274,6 +287,7 @@ describe("VisMapa.vue", () => {
       },
     });
     const store = useSubprocessosStore();
+    vi.spyOn(ToastService, "erro"); // Spy on ToastService
 
     await wrapper.find('[data-testid="devolver-ajustes-btn"]').trigger("click");
     await wrapper.vm.$nextTick();
@@ -291,6 +305,7 @@ describe("VisMapa.vue", () => {
     expect(store.devolverRevisaoCadastro).toHaveBeenCalledWith(10, {
       observacoes: "Ajustar X",
     });
+    expect(ToastService.erro).not.toHaveBeenCalled(); // Should not show error on success
   });
 
   it("opens aceitar modal and confirms (GESTOR)", async () => {
@@ -411,3 +426,4 @@ describe("VisMapa.vue", () => {
     expect(wrapper.text()).toContain("Sugestões registradas");
   });
 });
+
