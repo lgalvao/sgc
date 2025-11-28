@@ -9,7 +9,6 @@ vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
 vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
 vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
-vi.mock("../notificacoes", () => ({useNotificacoesStore: vi.fn(() => ({}))}));
 
 describe("useProcessosStore", () => {
     let store: ReturnType<typeof useProcessosStore>;

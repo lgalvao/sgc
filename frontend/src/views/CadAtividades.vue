@@ -346,7 +346,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal,} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal, useToast} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
@@ -355,7 +355,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -392,8 +392,10 @@ const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
-const notificacoesStore = useNotificacoesStore();
+
 const router = useRouter();
+const toast = useToast(); // Instantiate useToast
+
 useMapasStore();
 
 const unidade = computed(() => unidadesStore.unidade);
@@ -544,10 +546,11 @@ function cancelarEdicaoAtividade() {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  notificacoesStore.sucesso(
-    "Importação Concluída",
-    "As atividades foram importadas para o seu mapa.",
-  );
+  toast.show({
+    title: "Importação Concluída",
+    body: "As atividades foram importadas para o seu mapa.",
+    props: { variant: 'success', value: true },
+  });
 }
 
 const { perfilSelecionado } = usePerfil();
@@ -616,10 +619,11 @@ function disponibilizarCadastro() {
     : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
-    notificacoesStore.erro(
-      "Ação não permitida",
-      `Ação permitida apenas na situação: "${situacaoEsperada}".`,
-    );
+    toast.show({
+      title: "Ação não permitida",
+      body: `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
 
@@ -628,10 +632,11 @@ function disponibilizarCadastro() {
     const atividadesDescricoes = atividadesSemConhecimento.value
       .map((a) => `- ${a.descricao}`)
       .join("\n");
-    notificacoesStore.aviso(
-      "Atividades Incompletas",
-      `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
-    );
+    toast.show({
+      title: "Atividades Incompletas",
+      body: `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
+      props: { variant: 'warning', value: true },
+    });
     return;
   }
 
@@ -741,8 +746,6 @@ function fecharModalImpacto() {
   border-top-right-radius: 0.375rem;
 }
 
-.atividade-titulo-card .atividade-descricao {
+.atividade-titulo-card {
   font-size: 1.1rem;
 }
-
-</style>

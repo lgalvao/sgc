@@ -41,22 +41,23 @@
 </template>
 
 <script lang="ts" setup>
-import {BContainer} from "bootstrap-vue-next";
+import {BContainer, useToast} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const subprocessosStore = useSubprocessosStore();
-const notificacoesStore = useNotificacoesStore();
+
 const mapaStore = useMapasStore();
+const toast = useToast(); // Instantiate toast
 
 const mostrarModalAlterarDataLimite = ref(false);
 const codSubprocesso = ref<number | null>(null);
@@ -91,10 +92,11 @@ function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
     mostrarModalAlterarDataLimite.value = true;
   } else {
-    notificacoesStore.erro(
-        "Ação não permitida",
-        "Você não tem permissão para alterar a data limite.",
-    );
+    toast.show({
+        title: "Ação não permitida",
+        body: "Você não tem permissão para alterar a data limite.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 
@@ -113,15 +115,17 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
         {novaData},
     );
     fecharModalAlterarDataLimite();
-    notificacoesStore.sucesso(
-        "Data limite alterada",
-        "A data limite foi alterada com sucesso!",
-    );
+    toast.show({
+        title: "Data limite alterada",
+        body: "A data limite foi alterada com sucesso!",
+        props: { variant: 'success', value: true },
+    });
   } catch {
-    notificacoesStore.erro(
-        "Erro ao alterar data limite",
-        "Não foi possível alterar a data limite.",
-    );
+    toast.show({
+        title: "Erro ao alterar data limite",
+        body: "Não foi possível alterar a data limite.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 </script>

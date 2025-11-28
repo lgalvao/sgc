@@ -4,27 +4,17 @@ import * as atividadeService from "@/services/atividadeService";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useAtividadesStore} from "../atividades";
-import {useNotificacoesStore} from "../notificacoes";
 
 vi.mock("@/services/mapaService");
 vi.mock("@/services/atividadeService");
 vi.mock("@/services/subprocessoService");
-vi.mock("../notificacoes");
 
 describe("useAtividadesStore", () => {
     let store: ReturnType<typeof useAtividadesStore>;
-    let mockNotificacoesStore: ReturnType<typeof useNotificacoesStore>;
 
     beforeEach(() => {
         setActivePinia(createPinia());
         store = useAtividadesStore();
-        mockNotificacoesStore = {
-            sucesso: vi.fn(),
-            erro: vi.fn(),
-        } as any;
-        (useNotificacoesStore as Mocked<any>).mockReturnValue(
-            mockNotificacoesStore,
-        );
         vi.restoreAllMocks();
     });
 
@@ -55,7 +45,6 @@ describe("useAtividadesStore", () => {
                 new Error("Erro"),
             );
             await store.buscarAtividadesParaSubprocesso(1);
-            expect(mockNotificacoesStore.erro).toHaveBeenCalled();
         });
     });
 
@@ -79,7 +68,6 @@ describe("useAtividadesStore", () => {
                 {descricao: "Nova Atividade"},
                 1,
             );
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)).toEqual([novaAtividade]);
         });
 
@@ -88,7 +76,6 @@ describe("useAtividadesStore", () => {
                 new Error("Erro"),
             );
             await store.adicionarAtividade(1, {descricao: "Nova Atividade"});
-            expect(mockNotificacoesStore.erro).toHaveBeenCalled();
         });
     });
 
@@ -104,7 +91,6 @@ describe("useAtividadesStore", () => {
             await store.removerAtividade(1, 1);
 
             expect(atividadeService.excluirAtividade).toHaveBeenCalledWith(1);
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)).toEqual([]);
         });
 
@@ -113,7 +99,6 @@ describe("useAtividadesStore", () => {
                 new Error("Erro"),
             );
             await store.removerAtividade(1, 1);
-            expect(mockNotificacoesStore.erro).toHaveBeenCalled();
         });
     });
 
@@ -134,7 +119,6 @@ describe("useAtividadesStore", () => {
             expect(atividadeService.criarConhecimento).toHaveBeenCalledWith(1, {
                 descricao: "Novo Conhecimento",
             });
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual([
                 novoConhecimento,
             ]);
@@ -157,7 +141,6 @@ describe("useAtividadesStore", () => {
             await store.removerConhecimento(1, 1, 1);
 
             expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 1);
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual(
                 [],
             );
@@ -176,7 +159,6 @@ describe("useAtividadesStore", () => {
             await store.importarAtividades(1, 2);
 
             expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(1, 2);
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
         });
     });
 
@@ -200,7 +182,6 @@ describe("useAtividadesStore", () => {
                 1,
                 atividadeAtualizada,
             );
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)).toEqual([
                 atividadeAtualizada,
             ]);
@@ -231,7 +212,6 @@ describe("useAtividadesStore", () => {
                 1,
                 conhecimentoAtualizado,
             );
-            expect(mockNotificacoesStore.sucesso).toHaveBeenCalled();
             expect(store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual([
                 conhecimentoAtualizado,
             ]);

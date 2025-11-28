@@ -132,11 +132,11 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal, useToast,} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Competencia, MapaCompleto} from "@/types/tipos";
@@ -146,7 +146,8 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate useToast
+
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => route.params.siglaUnidade as string);
@@ -231,10 +232,11 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar diagnóstico
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  notificacoesStore.sucesso(
-      "Diagnóstico finalizado",
-      "O diagnóstico da equipe foi concluído!",
-  );
+  toast.show({
+      title: "Diagnóstico finalizado",
+      body: "O diagnóstico da equipe foi concluído!",
+      props: { variant: 'success', value: true },
+  });
 
   fecharModalConfirmacao();
   router.push("/painel");

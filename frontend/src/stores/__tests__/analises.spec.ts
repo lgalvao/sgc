@@ -9,11 +9,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesValidacao: vi.fn(),
 }));
 
-vi.mock("@/stores/notificacoes", () => ({
-    useNotificacoesStore: vi.fn(() => ({
-        erro: vi.fn(),
-    })),
-}));
+
 
 describe("useAnalisesStore", () => {
     let store: ReturnType<typeof useAnalisesStore>;

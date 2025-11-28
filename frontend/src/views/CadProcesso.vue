@@ -160,13 +160,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
+import {BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal, useToast,} from "bootstrap-vue-next";
 import {nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import {TEXTOS} from "@/constants";
+// import {TEXTOS} from "@/constants"; // Removed
 import * as processoService from "@/services/processoService";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso,} from "@/types/tipos";
@@ -181,7 +181,8 @@ const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate toast
+
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
@@ -195,10 +196,11 @@ onMounted(async () => {
       if (processo) {
         // Redirect if process is not in CRIADO state (cannot be edited)
         if (processo.situacao !== 'CRIADO') {
-          notificacoesStore.aviso(
-            "Processo em andamento",
-            "Este processo já foi iniciado e não pode ser editado."
-          );
+          toast.show({
+            title: "Processo em andamento",
+            body: "Este processo já foi iniciado e não pode ser editado.",
+            props: { variant: 'warning', value: true },
+          });
           await router.push(`/processo/${processo.codigo}`);
           return;
         }
@@ -215,10 +217,11 @@ onMounted(async () => {
         await nextTick();
       }
     } catch (error) {
-      notificacoesStore.erro(
-        "Erro ao carregar processo",
-        "Não foi possível carregar os detalhes do processo.",
-      );
+      toast.show({
+        title: "Erro ao carregar processo",
+        body: "Não foi possível carregar os detalhes do processo.",
+        props: { variant: 'danger', value: true },
+      });
       console.error("Erro ao carregar processo:", error);
     }
   } else {
@@ -242,19 +245,28 @@ function limparCampos() {
 
 async function salvarProcesso() {
   if (!descricao.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
+    toast.show({
+      title: "Dados incompletos",
+      body: "Preencha a descrição.",
+      props: { variant: 'danger', value: true },
+    });
     console.log("Validation error in salvarProcesso: Preencha a descrição.");
     return;
   }
   if (unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-      "Dados incompletos",
-      "Pelo menos uma unidade participante deve ser incluída.",
-    );
+    toast.show({
+      title: "Dados incompletos",
+      body: "Pelo menos uma unidade participante deve ser incluída.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
   if (!dataLimite.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
+    toast.show({
+      title: "Dados incompletos",
+      body: "Preencha a data limite.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
 
@@ -271,10 +283,11 @@ async function salvarProcesso() {
         processoEditando.value.codigo,
         request,
       );
-      notificacoesStore.sucesso(
-        "Processo alterado",
-        "O processo foi alterado!",
-      );
+      toast.show({
+        title: "Processo alterado",
+        body: "O processo foi alterado!",
+        props: { variant: 'success', value: true },
+      });
       await router.push("/painel");
     } else {
       const request: CriarProcessoRequest = {
@@ -284,33 +297,47 @@ async function salvarProcesso() {
         unidades: unidadesSelecionadas.value,
       };
       await processosStore.criarProcesso(request);
-      notificacoesStore.sucesso("Processo criado", "O processo foi criado!");
+      toast.show({
+        title: "Processo criado",
+        body: "O processo foi criado!",
+        props: { variant: 'success', value: true },
+      });
       await router.push("/painel");
     }
     limparCampos();
   } catch (error) {
-    notificacoesStore.erro(
-      "Erro ao salvar processo",
-      "Não foi possível salvar o processo. Verifique os dados e tente novamente.",
-    );
+    toast.show({
+      title: "Erro ao salvar processo",
+      body: "Não foi possível salvar o processo. Verifique os dados e tente novamente.",
+      props: { variant: 'danger', value: true },
+    });
     console.error("Erro ao salvar processo:", error);
   }
 }
 
 async function abrirModalConfirmacao() {
   if (!descricao.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
+    toast.show({
+      title: "Dados incompletos",
+      body: "Preencha a descrição.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
   if (unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-      "Dados incompletos",
-      "Pelo menos uma unidade participante deve ser incluída.",
-    );
+    toast.show({
+      title: "Dados incompletos",
+      body: "Pelo menos uma unidade participante deve ser incluída.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
   if (!dataLimite.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
+    toast.show({
+      title: "Dados incompletos",
+      body: "Preencha a data limite.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
 
@@ -324,10 +351,11 @@ function fecharModalConfirmacao() {
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
   if (!processoEditando.value) {
-    notificacoesStore.erro(
-      "Salve o processo",
-      "Você precisa salvar o processo antes de poder iniciá-lo.",
-    );
+    toast.show({
+      title: "Salve o processo",
+      body: "Você precisa salvar o processo antes de poder iniciá-lo.",
+      props: { variant: 'danger', value: true },
+    });
     return;
   }
 
@@ -337,20 +365,22 @@ async function confirmarIniciarProcesso() {
       tipo.value as TipoProcesso,
       unidadesSelecionadas.value,
     );
-    notificacoesStore.sucesso(
-      "Processo iniciado!",
-      "O processo foi iniciado! Notificações enviadas às unidades.",
-    );
+    toast.show({
+      title: "Processo iniciado!",
+      body: "O processo foi iniciado! Notificações enviadas às unidades.",
+      props: { variant: 'success', value: true },
+    });
     await router.push("/painel");
     if (!processoEditando.value) {
       // Only clear fields if it was a new process
       limparCampos();
     }
   } catch (error) {
-    notificacoesStore.erro(
-      "Erro ao iniciar processo",
-      "Não foi possível iniciar o processo. Tente novamente.",
-    );
+    toast.show({
+      title: "Erro ao iniciar processo",
+      body: "Não foi possível iniciar o processo. Tente novamente.",
+      props: { variant: 'danger', value: true },
+    });
     console.error("Erro ao iniciar processo:", error);
   }
 }
@@ -367,11 +397,10 @@ async function confirmarRemocao() {
   if (processoEditando.value) {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
-      notificacoesStore.adicionarNotificacao({
-        tipo: "success",
-        titulo: "Processo removido",
-        mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
-        testId: "notificacao-remocao",
+      toast.show({
+        title: "Processo removido",
+        body: `Processo ${descricao.value} removido com sucesso.`,
+        props: { variant: 'success', value: true },
       });
       await router.push("/painel");
       if (!processoEditando.value) {
@@ -379,10 +408,11 @@ async function confirmarRemocao() {
         limparCampos();
       }
     } catch (error) {
-      notificacoesStore.erro(
-        "Erro ao remover processo",
-        "Não foi possível remover o processo. Tente novamente.",
-      );
+      toast.show({
+        title: "Erro ao remover processo",
+        body: "Não foi possível remover o processo. Tente novamente.",
+        props: { variant: 'danger', value: true },
+      });
       console.error("Erro ao remover processo:", error);
     }
   }

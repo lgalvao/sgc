@@ -3,7 +3,7 @@
  */
 
 import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from "@/constants/situacoes";
-import type {TipoNotificacao} from "@/stores/notificacoes";
+// import type {TipoNotificacao} from "@/stores/notificacoes"; // Removed
 
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
@@ -20,7 +20,10 @@ export function situacaoLabel(situacao?: string | null): string {
 }
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====
-export const iconeTipo = (tipo: TipoNotificacao): string => {
+// Define local type for iconeTipo since TipoNotificacao was removed
+type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
+
+export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
   switch (tipo) {
       case "success":
           return "bi bi-check-circle-fill text-success";

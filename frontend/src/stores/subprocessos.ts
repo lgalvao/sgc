@@ -22,13 +22,13 @@ import type {
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import {useNotificacoesStore} from "./notificacoes";
+import { ToastService } from "@/services/toastService"; // Import ToastService
 
 async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroMsg: string): Promise<boolean> {
-    const notificacoes = useNotificacoesStore();
+    // const notificacoes = useNotificacoesStore(); // Remove this line
     try {
         await acao();
-        notificacoes.sucesso(sucessoMsg, `${sucessoMsg}.`);
+        ToastService.sucesso(sucessoMsg, `${sucessoMsg}.`); // Use ToastService
 
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
@@ -36,7 +36,7 @@ async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroM
         }
         return true;
     } catch {
-        notificacoes.erro(erroMsg, `Não foi possível concluir a ação: ${erroMsg}.`);
+        ToastService.erro(erroMsg, `Não foi possível concluir a ação: ${erroMsg}.`); // Use ToastService
         return false;
     }
 }
@@ -54,7 +54,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
     async function buscarSubprocessoDetalhe(id: number) {
         const perfilStore = usePerfilStore();
-        const notificacoes = useNotificacoesStore();
+        // const notificacoes = useNotificacoesStore(); // Remove this line
         const perfil = perfilStore.perfilSelecionado;
         const codUnidadeSel = perfilStore.unidadeSelecionada;
         let codUnidade: number | null = null;
@@ -69,7 +69,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
 
         if (!perfil || codUnidade === null) {
-            notificacoes.erro(
+            ToastService.erro( // Use ToastService
                 "Erro ao buscar detalhes do subprocesso",
                 "Informações de perfil ou unidade não disponíveis.",
             );
@@ -84,7 +84,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 codUnidade,
             );
         } catch {
-            notificacoes.erro(
+            ToastService.erro( // Use ToastService
                 "Erro ao buscar detalhes do subprocesso",
                 "Não foi possível carregar as informações.",
             );
@@ -96,12 +96,12 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
-        const notificacoes = useNotificacoesStore();
+        // const notificacoes = useNotificacoesStore(); // Remove this line
         try {
             const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
         } catch {
-            notificacoes.erro(
+            ToastService.erro( // Use ToastService
                 "Erro",
                 "Não foi possível encontrar o subprocesso para esta unidade.",
             );

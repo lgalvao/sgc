@@ -38,25 +38,11 @@
       @fechar="fecharModalFinalizacao"
       @confirmar="confirmarFinalizacao"
     />
-
-    <!-- Alerta de sucesso -->
-    <BAlert
-      v-if="mostrarAlertaSucesso"
-      variant="success"
-      class="position-fixed"
-      style="top: 20px; right: 20px; z-index: 9999;"
-      dismissible
-      :model-value="true"
-      @dismissed="mostrarAlertaSucesso = false"
-    >
-      <i class="bi bi-check-circle" />
-      Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco!
-    </BAlert>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BContainer} from "bootstrap-vue-next";
+import {BContainer, useToast} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -65,7 +51,7 @@ import ModalFinalizacao from "@/components/ModalFinalizacao.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import ProcessoDetalhes from "@/components/ProcessoDetalhes.vue";
 import TreeTable from "@/components/TreeTableView.vue";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
@@ -88,12 +74,12 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const {processoDetalhe, subprocessosElegiveis} = storeToRefs(processosStore);
 const perfilStore = usePerfilStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate toast
+
 
 const mostrarModalBloco = ref(false);
 const tipoAcaoBloco = ref<"aceitar" | "homologar">("aceitar");
 const unidadesSelecionadasBloco = ref<UnidadeSelecao[]>([]);
-const mostrarAlertaSucesso = ref(false);
 const mostrarModalFinalizacao = ref(false);
 
 const codProcesso = computed(() =>
@@ -188,16 +174,18 @@ async function executarFinalizacao() {
   if (!processo.value) return;
   try {
     await processosStore.finalizarProcesso(processo.value.codigo);
-    notificacoesStore.sucesso(
-        "Processo finalizado",
-        "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
-    );
+    toast.show({
+        title: "Processo finalizado",
+        body: "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
+        props: { variant: 'success', value: true },
+    });
     await router.push("/painel");
   } catch {
-    notificacoesStore.erro(
-        "Erro ao finalizar processo",
-        "Ocorreu um erro durante a finalização. Tente novamente.",
-    );
+    toast.show({
+        title: "Erro ao finalizar processo",
+        body: "Ocorreu um erro durante a finalização. Tente novamente.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 
@@ -230,10 +218,11 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       .filter((u) => u.selecionada)
       .map((u) => u.sigla);
   if (unidadesSelecionadas.length === 0) {
-    notificacoesStore.erro(
-        "Nenhuma unidade selecionada",
-        "Selecione ao menos uma unidade para processar.",
-    );
+    toast.show({
+        title: "Nenhuma unidade selecionada",
+        body: "Selecione ao menos uma unidade para processar.",
+        props: { variant: 'danger', value: true },
+    });
     return;
   }
   try {
@@ -243,17 +232,19 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       tipoAcao: tipoAcaoBloco.value,
       unidadeUsuario: String(perfilStore.unidadeSelecionada) || "",
     });
-    mostrarAlertaSucesso.value = true;
+    toast.show({
+        title: `Cadastros ${tipoAcaoBloco.value === 'aceitar' ? 'aceitos' : 'homologados'} em bloco!`,
+        body: `Operação de ${tipoAcaoBloco.value} em bloco concluída com sucesso!`,
+        props: { variant: 'success', value: true },
+    });
     fecharModalBloco();
-    setTimeout(() => {
-      mostrarAlertaSucesso.value = false;
-      router.push("/painel");
-    }, 2000);
+    await router.push("/painel");
   } catch {
-    notificacoesStore.erro(
-        "Erro ao processar em bloco",
-        "Ocorreu um erro ao processar os cadastros em bloco.",
-    );
+    toast.show({
+        title: "Erro ao processar em bloco",
+        body: "Ocorreu um erro ao processar os cadastros em bloco.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 

@@ -1,7 +1,8 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import { ToastService } from "@/services/toastService";
+
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
@@ -14,7 +15,7 @@ export const useAnalisesStore = defineStore("analises", () => {
     });
 
     async function buscarAnalisesCadastro(codSubrocesso: number) {
-        const notificacoes = useNotificacoesStore();
+        
         try {
             const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
             const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
@@ -26,7 +27,7 @@ export const useAnalisesStore = defineStore("analises", () => {
                 ...analisesFiltradas,
             ]);
         } catch {
-            notificacoes.erro(
+            ToastService.erro(
                 "Erro",
                 "Erro ao buscar histórico de análises de cadastro.",
             );
@@ -34,7 +35,7 @@ export const useAnalisesStore = defineStore("analises", () => {
     }
 
     async function buscarAnalisesValidacao(codSubrocesso: number) {
-        const notificacoes = useNotificacoesStore();
+        
         try {
             const analises =
                 await analiseService.listarAnalisesValidacao(codSubrocesso);
@@ -47,7 +48,7 @@ export const useAnalisesStore = defineStore("analises", () => {
                 ...analisesFiltradas,
             ]);
         } catch {
-            notificacoes.erro(
+            ToastService.erro(
                 "Erro",
                 "Erro ao buscar histórico de análises de validação.",
             );

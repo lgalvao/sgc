@@ -108,16 +108,17 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
+import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption, useToast,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {PerfilUnidade} from "@/mappers/sgrh";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {usePerfilStore} from "@/stores/perfil";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate toast
+
 
 const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");
@@ -144,10 +145,11 @@ const handleLogin = async () => {
 
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
-      notificacoesStore.erro(
-        "Dados incompletos",
-        "Por favor, preencha título e senha.",
-      );
+      toast.show({
+        title: "Dados incompletos",
+        body: "Por favor, preencha título e senha.",
+        props: { variant: 'danger', value: true },
+      });
       return;
     }
 
@@ -168,20 +170,26 @@ const handleLogin = async () => {
           // So we just redirect.
           await router.push("/painel");
         } else {
-          notificacoesStore.erro(
-            "Perfis indisponíveis",
-            "Nenhum perfil/unidade disponível para este usuário.",
-          );
+          toast.show({
+            title: "Perfis indisponíveis",
+            body: "Nenhum perfil/unidade disponível para este usuário.",
+            props: { variant: 'danger', value: true },
+          });
         }
       } else {
-        notificacoesStore.erro(
-          "Falha na autenticação",
-          "Título ou senha inválidos.",
-        );
+        toast.show({
+          title: "Falha na autenticação",
+          body: "Título ou senha inválidos.",
+          props: { variant: 'danger', value: true },
+        });
       }
     } catch (error) {
       console.error("Erro no login:", error);
-      notificacoesStore.erro("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.");
+      toast.show({
+        title: "Erro no sistema",
+        body: "Ocorreu um erro ao tentar realizar o login.",
+        props: { variant: 'danger', value: true },
+      });
     }
   } else if (loginStep.value === 2) {
     // Step 2: Profile Selection
@@ -194,10 +202,18 @@ const handleLogin = async () => {
         await router.push("/painel");
       } catch (error) {
         console.error("Erro ao selecionar perfil:", error);
-         notificacoesStore.erro("Erro", "Falha ao selecionar o perfil.");
+        toast.show({
+          title: "Erro",
+          body: "Falha ao selecionar o perfil.",
+          props: { variant: 'danger', value: true },
+        });
       }
     } else {
-       notificacoesStore.erro("Seleção necessária", "Por favor, selecione um perfil.");
+      toast.show({
+        title: "Seleção necessária",
+        body: "Por favor, selecione um perfil.",
+        props: { variant: 'danger', value: true },
+      });
     }
   }
 };

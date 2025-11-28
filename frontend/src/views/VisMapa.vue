@@ -317,7 +317,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal, useToast,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -325,7 +325,7 @@ import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -338,7 +338,8 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 const unidadesStore = useUnidadesStore();
 const mapaStore = useMapasStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate toast
+
 const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
 const {perfilSelecionado} = usePerfil();
@@ -499,20 +500,22 @@ async function confirmarSugestoes() {
 
     fecharModalSugestoes();
 
-    notificacoesStore.sucesso(
-        "Sugestões apresentadas",
-        "Sugestões submetidas para análise da unidade superior",
-    );
+    toast.show({
+        title: "Sugestões apresentadas",
+        body: "Sugestões submetidas para análise da unidade superior",
+        props: { variant: 'success', value: true },
+    });
 
     await router.push({
       name: "Subprocesso",
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    notificacoesStore.erro(
-        "Erro ao apresentar sugestões",
-        "Ocorreu um erro. Tente novamente.",
-    );
+    toast.show({
+        title: "Erro ao apresentar sugestões",
+        body: "Ocorreu um erro. Tente novamente.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 
@@ -523,20 +526,22 @@ async function confirmarValidacao() {
 
     fecharModalValidar();
 
-    notificacoesStore.sucesso(
-        "Mapa validado",
-        "Mapa validado e submetido para análise da unidade superior",
-    );
+    toast.show({
+        title: "Mapa validado",
+        body: "Mapa validado e submetido para análise da unidade superior",
+        props: { variant: 'success', value: true },
+    });
 
     await router.push({
       name: "Subprocesso",
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    notificacoesStore.erro(
-        "Erro ao validar mapa",
-        "Ocorreu um erro. Tente novamente.",
-    );
+    toast.show({
+        title: "Erro ao validar mapa",
+        body: "Ocorreu um erro. Tente novamente.",
+        props: { variant: 'danger', value: true },
+    });
   }
 }
 
@@ -571,44 +576,3 @@ async function confirmarDevolucao() {
   await router.push({name: "Painel"});
 }
 </script>
-
-<style scoped>
-.competencia-card {
-  transition: box-shadow 0.2s;
-}
-
-.competencia-titulo-card {
-  background: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
-  width: calc(100% + 1.5rem);
-}
-
-.competencia-titulo-card .competencia-descricao {
-  font-size: 1.1rem;
-}
-
-.atividade-associada-card-item {
-  background-color: transparent;
-}
-
-.atividade-associada-descricao {
-  color: var(--bs-body-color);
-  font-weight: bold;
-}
-
-.conhecimentos-atividade {
-  margin-top: 0.25rem;
-  font-size: 0.9rem;
-}
-
-.conhecimentos-atividade {
-  border-radius: 0.25rem;
-  font-weight: normal;
-}
-</style>

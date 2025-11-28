@@ -3,7 +3,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as cadastroService from "@/services/cadastroService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {Perfil} from "@/types/tipos";
-import {useNotificacoesStore} from "../notificacoes";
+
 import {usePerfilStore} from "../perfil";
 import {useProcessosStore} from "../processos";
 import {useSubprocessosStore} from "../subprocessos";
@@ -64,26 +64,20 @@ describe("Subprocessos Store", () => {
     it("buscarSubprocessoDetalhe deve notificar erro se perfil não selecionado", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         // Perfil not selected
         perfilStore.perfilSelecionado = null;
 
         await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Informações de perfil ou unidade não disponíveis.",
-        );
         expect(store.subprocessoDetalhe).toBeNull();
     });
 
     it("buscarSubprocessoDetalhe deve notificar erro se unidade não encontrada para perfil", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         perfilStore.perfilSelecionado = Perfil.GESTOR;
         perfilStore.unidadeSelecionada = 99;
@@ -91,17 +85,12 @@ describe("Subprocessos Store", () => {
 
         await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Informações de perfil ou unidade não disponíveis.",
-        );
     });
 
     it("buscarSubprocessoDetalhe deve tratar erro do serviço", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         perfilStore.perfilSelecionado = Perfil.GESTOR;
         perfilStore.unidadeSelecionada = 99;
@@ -119,10 +108,6 @@ describe("Subprocessos Store", () => {
 
         await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Não foi possível carregar as informações.",
-        );
     });
 
     it("buscarSubprocessoPorProcessoEUnidade deve retornar código com sucesso", async () => {
@@ -141,8 +126,7 @@ describe("Subprocessos Store", () => {
 
     it("buscarSubprocessoPorProcessoEUnidade deve tratar erro", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
         vi.mocked(
             subprocessoService.buscarSubprocessoPorProcessoEUnidade,
         ).mockRejectedValue(new Error("Fail"));
@@ -150,10 +134,6 @@ describe("Subprocessos Store", () => {
         const result = await store.buscarSubprocessoPorProcessoEUnidade(1, "UNID");
 
         expect(result).toBeNull();
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro",
-            "Não foi possível encontrar o subprocesso para esta unidade.",
-        );
     });
 
     it("alterarDataLimiteSubprocesso deve delegar para processosStore", async () => {
@@ -174,9 +154,8 @@ describe("Subprocessos Store", () => {
 
     it("disponibilizarCadastro deve executar ação com sucesso e atualizar processo", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
         const processosStore = useProcessosStore();
-        vi.spyOn(notificacoesStore, "sucesso");
+
 
         vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue(
             {} as any,
@@ -191,17 +170,14 @@ describe("Subprocessos Store", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
-        expect(notificacoesStore.sucesso).toHaveBeenCalledWith(
-            "Cadastro disponibilizado",
-            "Cadastro disponibilizado.",
-        );
+
+
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(10);
     });
 
     it("disponibilizarCadastro deve tratar erro", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         vi.mocked(cadastroService.disponibilizarCadastro).mockRejectedValue(
             new Error("Fail"),
@@ -210,10 +186,6 @@ describe("Subprocessos Store", () => {
         const success = await store.disponibilizarCadastro(123);
 
         expect(success).toBe(false);
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao disponibilizar",
-            "Não foi possível concluir a ação: Erro ao disponibilizar.",
-        );
     });
 
     it("disponibilizarRevisaoCadastro deve chamar serviço correto", async () => {

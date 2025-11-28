@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
+import {BToastOrchestrator, useToast} from "bootstrap-vue-next";
+import { registerToast } from "@/services/toastService";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
 import MainNavbar from "./components/MainNavbar.vue";
 
-import SistemaNotificacoesToast from "./components/SistemaNotificacoesToast.vue";
+
 
 interface PackageJson {
   version: string;
@@ -13,6 +15,7 @@ interface PackageJson {
 }
 
 const route = useRoute();
+const toast = useToast();
 
 const hideExtrasOnce = ref(false);
 
@@ -45,9 +48,14 @@ const shouldShowNavBarExtras = computed(() => {
   if (route.path === "/painel") return false;
   return !hideExtrasOnce.value;
 });
+
+onMounted(() => {
+  registerToast(toast);
+});
 </script>
 
 <template>
+  <BToastOrchestrator />
   <MainNavbar v-if="route.path !== '/login'" />
   <div
     v-if="shouldShowNavBarExtras"
@@ -58,7 +66,7 @@ const shouldShowNavBarExtras = computed(() => {
     </div>
   </div>
   <router-view />
-  <SistemaNotificacoesToast />
+
   <footer
     v-if="route.path !== '/login'"
     class="bg-light text-muted border-top mt-4"

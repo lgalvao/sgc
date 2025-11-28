@@ -180,12 +180,12 @@ import {
   BFormInput,
   BFormSelect,
   BFormTextarea,
-  BModal,
+  BModal, useToast,
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Competencia, MapaCompleto} from "@/types/tipos";
@@ -195,7 +195,8 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const toast = useToast(); // Instantiate toast
+
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => route.params.siglaUnidade as string);
@@ -244,10 +245,11 @@ const mostrarModalConfirmacao = ref(false);
 
 function adicionarOcupacao() {
   if (!novaOcupacao.value.nome.trim() || !novaOcupacao.value.descricao.trim()) {
-    notificacoesStore.erro(
-        "Dados incompletos",
-        "Preencha nome e descrição da ocupação.",
-    );
+    toast.show({
+        title: "Dados incompletos",
+        body: "Preencha nome e descrição da ocupação.",
+        props: { variant: 'danger', value: true },
+    });
     return;
   }
 
@@ -266,15 +268,20 @@ function adicionarOcupacao() {
     competenciasCriticas: [],
   };
 
-  notificacoesStore.sucesso(
-      "Ocupação adicionada",
-      "Ocupação crítica adicionada!",
-  );
+  toast.show({
+      title: "Ocupação adicionada",
+      body: "Ocupação crítica adicionada!",
+      props: { variant: 'success', value: true },
+  });
 }
 
 function removerOcupacao(index: number) {
   ocupacoesCriticas.value.splice(index, 1);
-  notificacoesStore.sucesso("Ocupação removida", "Ocupação crítica removida!");
+  toast.show({
+      title: "Ocupação removida",
+      body: "Ocupação crítica removida!",
+      props: { variant: 'success', value: true },
+  });
 }
 
 function finalizarIdentificacao() {
@@ -291,26 +298,13 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar identificação
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  notificacoesStore.sucesso(
-      "Identificação finalizada",
-      "A identificação de ocupações críticas foi concluída!",
-  );
+  toast.show({
+      title: "Identificação finalizada",
+      body: "A identificação de ocupações críticas foi concluída!",
+      props: { variant: 'success', value: true },
+  });
 
   fecharModalConfirmacao();
   router.push("/painel");
 }
 </script>
-
-<style scoped>
-.card {
-  transition: box-shadow 0.2s;
-}
-
-.card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.border {
-  border-color: var(--bs-border-color) !important;
-}
-</style>

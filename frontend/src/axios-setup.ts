@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "./router";
-import {useNotificacoesStore} from "./stores/notificacoes";
+import { ToastService } from "@/services/toastService";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
@@ -11,7 +11,6 @@ const apiClient = axios.create({
 
 const handleResponseError = (error: any) => {
   try {
-    const notificacoesStore = useNotificacoesStore();
       if (error && typeof error === "object" && "response" in error) {
       const { status, data } = (error as any).response;
       // Do not show global popups for these statuses, they will be handled locally
@@ -23,31 +22,30 @@ const handleResponseError = (error: any) => {
       }
 
       if (status === 401) {
-          notificacoesStore.erro(
+          ToastService.erro(
               "Não Autorizado",
               "Sua sessão expirou ou você não está autenticado. Faça login novamente.",
           );
           router.push("/login");
       } else if (data && data.message) {
         // For other errors (like 500), show a generic popup
-          notificacoesStore.erro("Erro Inesperado", data.message);
+          ToastService.erro("Erro Inesperado", data.message);
       } else {
-          notificacoesStore.erro(
+          ToastService.erro(
               "Erro Inesperado",
               "Ocorreu um erro. Tente novamente mais tarde.",
           );
       }
       } else if (error && typeof error === "object" && "request" in error) {
-          notificacoesStore.erro(
+          ToastService.erro(
               "Erro de Rede",
               "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
           );
       } else if (error && typeof error === "object" && "message" in error) {
-          notificacoesStore.erro("Erro", (error as any).message);
+          ToastService.erro("Erro", (error as any).message);
     }
   } catch (storeError) {
-    // Pinia store may not be available in test environments
-      console.error("Erro ao acessar store de notificações:", storeError);
+      console.error("Erro ao exibir notificação:", storeError);
   }
   return Promise.reject(error);
 };

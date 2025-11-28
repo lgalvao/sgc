@@ -1,53 +1,32 @@
-import { test, expect, Page } from '@playwright/test';
-
-async function login(page: Page, user: string, pass: string, profileLabel?: string) {
-    await page.getByTestId('input-titulo').fill(user);
-    await page.getByTestId('input-senha').fill(pass);
-    await page.getByTestId('botao-entrar').click();
-
-    const secaoPerfilUnidade = page.getByTestId('secao-perfil-unidade');
-    if (await secaoPerfilUnidade.isVisible()) {
-        await expect(page.getByTestId('select-perfil-unidade')).toBeVisible();
-        if (profileLabel) {
-            await page.getByTestId('select-perfil-unidade').selectOption({ label: profileLabel });
-        } else {
-            await page.getByTestId('select-perfil-unidade').selectOption({ index: 1 });
-        }
-        await page.waitForLoadState('networkidle');
-        await page.getByTestId('botao-entrar').click({ force: true });
-    }
-    await expect(page).toHaveURL(/\/painel/);
-}
+import {expect, Page, test} from '@playwright/test';
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/login');
+    test.beforeEach(async ({page}) => await page.goto('/login'));
+
+    test('Deve exibir erro com credenciais inválidas', async ({page}) => {
+        await autenticar(page, '00000000000', 'senhaerrada'); // Usuário inexistente, senha errada
+        await expect(page.getByText('Título ou senha inválidos.')).toBeVisible();
     });
 
-    test('Deve exibir erro com credenciais inválidas', async ({ page }) => {
-        await page.getByTestId('input-titulo').fill('00000000000'); // Usuário inexistente
-        await page.getByTestId('input-senha').fill('senhaerrada');
-        await page.getByTestId('botao-entrar').click();
-    });
-
-    test('Deve realizar login com sucesso (Perfil Único)', async ({ page }) => {
+    test('Deve realizar login com sucesso (Perfil Único)', async ({page}) => {
         // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
-        await login(page, '222222', 'qualquer');
+        await loginUnicoPerfil(page, '222222', 'senha');
+        await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Deve exibir seleção de perfil se houver múltiplos', async ({ page }) => {
+    test('Deve exibir seleção de perfil se houver múltiplos', async ({page}) => {
         // Usuário 111111 (ADMIN_SEDOC_E_CHEFE_SEDOC) tem múltiplos perfis
-        await login(page, '111111', 'qualquer');
+        await loginMultiplosPerfis(page, '111111', 'senha', 'ADMIN - SEDOC');
+        await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Deve exibir estrutura das telas após login', async ({ page }) => {
-        // Login com ADMIN da SEDOC (111111)
-        await login(page, '111111', 'qualquer', 'ADMIN - SEDOC');
-
+    test('Deve exibir estrutura das telas após login', async ({page}) => {
+        // Login com ADMIN - SEDOC (111111)
+        await loginMultiplosPerfis(page, '111111', 'senha', 'ADMIN - SEDOC');
         await expect(page).toHaveURL(/\/painel/);
 
         // Verifica Barra de Navegação
-        await expect(page.getByRole('link', { name: 'SGC' })).toBeVisible();
+        await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
         await expect(page.getByText('Painel')).toBeVisible();
         await expect(page.getByText('Minha unidade')).toBeVisible();
         await expect(page.getByText('Relatórios')).toBeVisible();
@@ -66,4 +45,27 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('© SESEL/COSIS/TRE-PE')).toBeVisible();
     });
 
+    async function autenticar(page: Page, usuario: string, senha: string) {
+        await page.getByTestId('input-titulo').fill(usuario);
+        await page.getByTestId('input-senha').fill(senha);
+        await page.getByTestId('botao-entrar').click();
+    }
+
+    async function loginUnicoPerfil(page: Page, usuario: string, senha: string) {
+        await autenticar(page, usuario, senha);
+    }
+
+    async function loginMultiplosPerfis(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+        await autenticar(page, usuario, senha);
+
+        // Se há mais de um perfil deve aparecer a seção de escolha de perfil-unidade
+        await expect(page.getByTestId('secao-perfil-unidade')).toBeVisible();
+
+        const selectPerfil = page.getByTestId('select-perfil-unidade');
+        await expect(selectPerfil).toBeVisible();
+
+        await selectPerfil.selectOption({label: perfilUnidade});
+        await page.waitForLoadState('networkidle');
+        await page.getByTestId('botao-entrar').click();
+    }
 });

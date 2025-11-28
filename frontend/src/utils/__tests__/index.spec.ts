@@ -36,7 +36,7 @@ describe("utilitários", () => {
         });
 
         it("deve retornar o ícone padrão para tipos desconhecidos", () => {
-            expect(iconeTipo("any" as "success")).toBe("bi bi-bell-fill");
+            expect(iconeTipo("any" as LocalTipoNotificacao)).toBe("bi bi-bell-fill");
         });
     });
 
