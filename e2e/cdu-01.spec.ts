@@ -1,4 +1,25 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+async function login(page: Page, user: string, pass: string, profileLabel?: string) {
+    await page.getByTestId('input-titulo').fill(user);
+    await page.getByTestId('input-senha').fill(pass);
+    await page.getByTestId('botao-entrar').click();
+
+    const secaoPerfilUnidade = page.getByTestId('secao-perfil-unidade');
+    if (await secaoPerfilUnidade.isVisible()) {
+        await expect(page.getByTestId('select-perfil-unidade')).toBeVisible();
+        if (profileLabel) {
+            await page.getByTestId('select-perfil-unidade').selectOption({ label: profileLabel });
+        } else {
+            await page.getByTestId('select-perfil-unidade').selectOption({ index: 1 });
+        }
+        await page.waitForTimeout(500); // Espera estabilização do DOM
+        await page.getByTestId('botao-entrar').click({ force: true });
+    }
+    await expect(page).toHaveURL(/\/painel/);
+}
+
+
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     test.beforeEach(async ({ page }) => {
@@ -6,54 +27,24 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir erro com credenciais inválidas', async ({ page }) => {
-        await page.fill('[data-testid="input-titulo"]', '00000000000'); // Usuário inexistente
-        await page.fill('[data-testid="input-senha"]', 'senhaerrada');
-        await page.click('[data-testid="botao-entrar"]');
+        await page.getByTestId('input-titulo').fill('00000000000'); // Usuário inexistente
+        await page.getByTestId('input-senha').fill('senhaerrada');
+        await page.getByTestId('botao-entrar').click();
     });
 
     test('Deve realizar login com sucesso (Perfil Único)', async ({ page }) => {
-        // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil no JSON
-        await page.fill('[data-testid="input-titulo"]', '222222');
-        await page.fill('[data-testid="input-senha"]', 'qualquer');
-        await page.click('[data-testid="botao-entrar"]');
-
-        await expect(page).toHaveURL(/\/painel/);
+        // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
+        await login(page, '222222', 'qualquer');
     });
 
     test('Deve exibir seleção de perfil se houver múltiplos', async ({ page }) => {
         // Usuário 111111 (ADMIN_SEDOC_E_CHEFE_SEDOC) tem múltiplos perfis
-        await page.fill('[data-testid="input-titulo"]', '111111');
-        await page.fill('[data-testid="input-senha"]', 'qualquer');
-        await page.click('[data-testid="botao-entrar"]');
-
-        // Deve ver seleção de perfil
-        await expect(page.getByTestId('secao-perfil-unidade')).toBeVisible({ timeout: 10000 });
-        await expect(page.getByTestId('select-perfil-unidade')).toBeVisible();
-
-        // Seleciona um e continua
-        await page.selectOption('[data-testid="select-perfil-unidade"]', { index: 1 });
-        await page.waitForTimeout(500); // Espera estabilização do DOM
-        await page.waitForTimeout(2000); // Espera renderizar debug
-        await page.click('[data-testid="botao-entrar"]', { force: true });
-
-        await expect(page).toHaveURL(/\/painel/);
+        await login(page, '111111', 'qualquer');
     });
 
     test('Deve exibir estrutura das telas após login', async ({ page }) => {
-        // Login com ADMIN (111111)
-        await page.fill('[data-testid="input-titulo"]', '111111');
-        await page.fill('[data-testid="input-senha"]', 'qualquer');
-        await page.click('[data-testid="botao-entrar"]');
-
-        // Seleciona perfil se necessário (ADMIN tem 2)
-        try {
-            await expect(page.getByTestId('select-perfil-unidade')).toBeVisible({ timeout: 5000 });
-            await page.selectOption('[data-testid="select-perfil-unidade"]', { label: 'ADMIN - SEDOC' });
-            await page.click('[data-testid="botao-entrar"]');
-        } catch (e) {
-            // Se não aparecer, assume que logou direto (o que não deve acontecer para ADMIN, mas previne falha se mudar)
-            console.log('Seleção de perfil não apareceu ou não foi necessária.');
-        }
+        // Login com ADMIN da SEDOC (111111)
+        await login(page, '111111', 'qualquer', 'ADMIN - SEDOC');
 
         await expect(page).toHaveURL(/\/painel/);
 
@@ -65,7 +56,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('Histórico')).toBeVisible();
 
         // Verifica Informações do Usuário
-        await expect(page.getByText(/ADMIN - (SEDOC|1)/)).toBeVisible();
+        await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
 
         // Verifica Ícone de Configurações de Admin
         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
