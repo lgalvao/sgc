@@ -12,11 +12,11 @@ export async function buscarTodasAtribuicoes() {
 }
 
 export async function criarAtribuicaoTemporaria(
-    idUnidade: number,
+    codUnidade: number,
     request: CriarAtribuicaoTemporariaRequest,
 ): Promise<void> {
     await apiClient.post(
-        `/unidades/${idUnidade}/atribuicoes-temporarias`,
+        `/unidades/${codUnidade}/atribuicoes-temporarias`,
         request,
     );
 }

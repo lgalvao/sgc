@@ -16,7 +16,7 @@ export interface Page<T> {
 
 export async function listarProcessos(
     perfil: string,
-    unidade?: number,
+    codUnidade?: number,
     page: number = 0,
     size: number = 20,
     sort?: keyof ProcessoResumo,
@@ -27,8 +27,8 @@ export async function listarProcessos(
         page,
         size,
     };
-    if (unidade !== undefined && unidade !== null) {
-        params.unidade = unidade;
+    if (codUnidade !== undefined && codUnidade !== null) {
+        params.unidade = codUnidade;
     }
     if (sort) {
         params.sort = `${sort},${order}`;
@@ -44,7 +44,7 @@ export async function listarProcessos(
 
 export async function listarAlertas(
     usuarioTitulo?: number,
-    unidade?: number,
+    codUnidade?: number,
     page: number = 0,
     size: number = 20,
     sort?: "data" | "processo",
@@ -57,8 +57,8 @@ export async function listarAlertas(
     if (usuarioTitulo !== undefined && usuarioTitulo !== null) {
         params.usuarioTitulo = usuarioTitulo;
     }
-    if (unidade !== undefined && unidade !== null) {
-        params.unidade = unidade;
+    if (codUnidade !== undefined && codUnidade !== null) {
+        params.unidade = codUnidade;
     }
     if (sort) {
         params.sort = `${sort},${order}`;

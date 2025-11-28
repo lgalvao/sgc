@@ -52,11 +52,11 @@ describe("atividadeService", () => {
         expect(result[0]).toHaveProperty("mapped", true);
     });
 
-    it("obterAtividadePorId should fetch and map an atividade", async () => {
+    it("obterAtividadePorCodigo should fetch and map an atividade", async () => {
         const dto = {id: 1, descricao: "Atividade DTO"};
         mockApi.get.mockResolvedValue({data: dto});
 
-        const result = await service.obterAtividadePorId(1);
+        const result = await service.obterAtividadePorCodigo(1);
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
         expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(dto);
@@ -170,9 +170,9 @@ describe("atividadeService", () => {
         await expect(service.listarAtividades()).rejects.toThrow("Failed");
     });
 
-    it("obterAtividadePorId should throw error on failure", async () => {
+    it("obterAtividadePorCodigo should throw error on failure", async () => {
         mockApi.get.mockRejectedValue(new Error("Failed"));
-        await expect(service.obterAtividadePorId(1)).rejects.toThrow("Failed");
+        await expect(service.obterAtividadePorCodigo(1)).rejects.toThrow("Failed");
     });
 
     it("criarAtividade should throw error on failure", async () => {

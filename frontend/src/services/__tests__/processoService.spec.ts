@@ -71,9 +71,9 @@ describe("processoService", () => {
         expect(mockApi.get).toHaveBeenCalledWith("/processos/finalizados");
     });
 
-    it("obterProcessoPorId should get from the correct endpoint", async () => {
+    it("obterProcessoPorCodigo should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: {}});
-        await service.obterProcessoPorId(1);
+        await service.obterProcessoPorCodigo(1);
         expect(mockApi.get).toHaveBeenCalledWith("/processos/1");
     });
 

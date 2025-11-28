@@ -86,9 +86,9 @@ public class UnidadeService {
         return resultado;
     }
 
-    public void criarAtribuicaoTemporaria(Long idUnidade, CriarAtribuicaoTemporariaRequest request) {
-        Unidade unidade = unidadeRepo.findById(idUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + idUnidade + " não encontrada"));
+    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+        Unidade unidade = unidadeRepo.findById(codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codUnidade + " não encontrada"));
 
         Usuario usuario = usuarioRepo.findById(request.tituloEleitoralServidor())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
@@ -192,9 +192,9 @@ public class UnidadeService {
                 false);
     }
 
-    public UnidadeDto buscarPorId(Long id) {
-        Unidade unidade = unidadeRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + id + " não encontrada"));
+    public UnidadeDto buscarPorCodigo(Long codigo) {
+        Unidade unidade = unidadeRepo.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codigo + " não encontrada"));
 
         Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
 
@@ -208,9 +208,9 @@ public class UnidadeService {
                 false);
     }
 
-    public UnidadeDto buscarArvore(Long id) {
+    public UnidadeDto buscarArvore(Long codigo) {
         List<UnidadeDto> todas = buscarTodasUnidades();
-        return buscarNaHierarquia(todas, id);
+        return buscarNaHierarquia(todas, codigo);
     }
 
     public List<String> buscarSiglasSubordinadas(String sigla) {
@@ -236,11 +236,11 @@ public class UnidadeService {
         return null;
     }
 
-    private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long id) {
+    private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
         for (UnidadeDto u : lista) {
-            if (u.getCodigo().equals(id)) return u;
+            if (u.getCodigo().equals(codigo)) return u;
             if (u.getSubunidades() != null) {
-                UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), id);
+                UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), codigo);
                 if (found != null) return found;
             }
         }

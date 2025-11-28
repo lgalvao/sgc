@@ -22,7 +22,7 @@ describe("subprocessoService", () => {
             await subprocessoService.importarAtividades(1, 2);
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/importar-atividades",
-                {subprocessoOrigemId: 2},
+                {codSubprocessoOrigem: 2},
             );
         });
 

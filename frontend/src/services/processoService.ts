@@ -23,22 +23,22 @@ export async function buscarProcessosFinalizados(): Promise<ProcessoResumo[]> {
 }
 
 export async function iniciarProcesso(
-    id: number,
+    codProcesso: number,
     tipo: string,
-    unidadesIds: number[],
+    codigosUnidades: number[],
 ): Promise<void> {
-    await apiClient.post(`/processos/${id}/iniciar`, {
+    await apiClient.post(`/processos/${codProcesso}/iniciar`, {
         tipo,
-        unidades: unidadesIds
+        unidades: codigosUnidades
     });
 }
 
-export async function finalizarProcesso(id: number): Promise<void> {
-    await apiClient.post(`/processos/${id}/finalizar`);
+export async function finalizarProcesso(codProcesso: number): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/finalizar`);
 }
 
-export async function obterProcessoPorId(id: number): Promise<Processo> {
-    const response = await apiClient.get<Processo>(`/processos/${id}`);
+export async function obterProcessoPorCodigo(codProcesso: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${codProcesso}`);
     return response.data;
 }
 
@@ -57,8 +57,8 @@ export async function excluirProcesso(codProcesso: number): Promise<void> {
     await apiClient.post(`/processos/${codProcesso}/excluir`);
 }
 
-export async function obterDetalhesProcesso(id: number): Promise<Processo> {
-    const response = await apiClient.get<Processo>(`/processos/${id}/detalhes`);
+export async function obterDetalhesProcesso(codProcesso: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${codProcesso}/detalhes`);
     return response.data;
 }
 
@@ -84,26 +84,26 @@ export async function buscarSubprocessosElegiveis(
 }
 
 export async function alterarDataLimiteSubprocesso(
-    id: number,
+    codSubprocesso: number,
     dados: { novaData: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/alterar-data-limite`, {id, ...dados});
+    await apiClient.post(`/processos/alterar-data-limite`, {id: codSubprocesso, ...dados});
 }
 
 export async function apresentarSugestoes(
-    id: number,
+    codProcesso: number,
     dados: { sugestoes: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/apresentar-sugestoes`, {id, ...dados});
+    await apiClient.post(`/processos/apresentar-sugestoes`, {id: codProcesso, ...dados});
 }
 
-export async function validarMapa(id: number): Promise<void> {
-    await apiClient.post(`/processos/validar-mapa`, {id});
+export async function validarMapa(codProcesso: number): Promise<void> {
+    await apiClient.post(`/processos/validar-mapa`, {id: codProcesso});
 }
 
 export async function buscarSubprocessos(
-    processoId: number,
+    codProcesso: number,
 ): Promise<Subprocesso[]> {
-    const response = await apiClient.get(`/processos/${processoId}/subprocessos`);
+    const response = await apiClient.get(`/processos/${codProcesso}/subprocessos`);
     return response.data;
 }

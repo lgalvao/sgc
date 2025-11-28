@@ -23,16 +23,16 @@ public class UnidadeController {
 
     /**
      * Cria uma nova atribuição temporária para um servidor em uma unidade.
-     * @param idUnidade O ID da unidade.
+     * @param codUnidade O Código da unidade.
      * @param request Os dados da atribuição.
      * @return Resposta vazia com status 201 (Created).
      */
-    @PostMapping("/{idUnidade}/atribuicoes-temporarias")
+    @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
-        @PathVariable Long idUnidade,
+        @PathVariable Long codUnidade,
         @RequestBody CriarAtribuicaoTemporariaRequest request
     ) {
-        unidadeService.criarAtribuicaoTemporaria(idUnidade, request);
+        unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.created(null).build();
     }
 
@@ -112,24 +112,24 @@ public class UnidadeController {
     }
 
     /**
-     * Busca uma unidade específica pelo seu ID.
-     * @param id O ID da unidade.
+     * Busca uma unidade específica pelo seu código.
+     * @param codigo O código da unidade.
      * @return Os dados da unidade.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<UnidadeDto> buscarUnidadePorId(@PathVariable Long id) {
-        UnidadeDto unidade = unidadeService.buscarPorId(id);
+    @GetMapping("/{codigo}")
+    public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
+        UnidadeDto unidade = unidadeService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(unidade);
     }
 
     /**
      * Busca a árvore de uma unidade específica (incluindo subunidades).
-     * @param id O ID da unidade.
+     * @param codigo O código da unidade.
      * @return A unidade com sua árvore de subunidades.
      */
-    @GetMapping("/{id}/arvore")
-    public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long id) {
-        UnidadeDto unidade = unidadeService.buscarArvore(id);
+    @GetMapping("/{codigo}/arvore")
+    public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
+        UnidadeDto unidade = unidadeService.buscarArvore(codigo);
         if (unidade == null) {
             return ResponseEntity.notFound().build();
         }

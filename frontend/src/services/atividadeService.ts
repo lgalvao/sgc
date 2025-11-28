@@ -12,8 +12,8 @@ export async function listarAtividades(): Promise<Atividade[]> {
   return response.data.map(mapAtividadeDtoToModel);
 }
 
-export async function obterAtividadePorId(id: number): Promise<Atividade> {
-  const response = await apiClient.get<any>(`/atividades/${id}`);
+export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
+  const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
   return mapAtividadeDtoToModel(response.data);
 }
 
@@ -42,21 +42,21 @@ export async function excluirAtividade(codAtividade: number): Promise<void> {
 }
 
 export async function listarConhecimentos(
-    atividadeId: number,
+    codAtividade: number,
 ): Promise<Conhecimento[]> {
     const response = await apiClient.get<any[]>(
-        `/atividades/${atividadeId}/conhecimentos`,
+        `/atividades/${codAtividade}/conhecimentos`,
     );
     return response.data.map(mapConhecimentoDtoToModel);
 }
 
 export async function criarConhecimento(
-    atividadeId: number,
+    codAtividade: number,
     request: CriarConhecimentoRequest,
 ): Promise<Conhecimento> {
     const requestDto = mapCriarConhecimentoRequestToDto(request);
     const response = await apiClient.post<any>(
-        `/atividades/${atividadeId}/conhecimentos`,
+        `/atividades/${codAtividade}/conhecimentos`,
         requestDto,
     );
     return mapConhecimentoDtoToModel(response.data);

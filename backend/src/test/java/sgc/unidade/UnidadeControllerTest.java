@@ -111,7 +111,7 @@ class UnidadeControllerTest {
     @Test
     @DisplayName("buscarUnidadePorId deve retornar unidade")
     void buscarUnidadePorId() throws Exception {
-        when(unidadeService.buscarPorId(1L)).thenReturn(new UnidadeDto());
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(new UnidadeDto());
 
         mockMvc.perform(get("/api/unidades/1"))
                 .andExpect(status().isOk());

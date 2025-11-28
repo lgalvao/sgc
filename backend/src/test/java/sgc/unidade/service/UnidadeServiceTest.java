@@ -138,8 +138,8 @@ class UnidadeServiceTest {
     }
 
     @Test
-    @DisplayName("buscarPorId deve retornar unidade se existir")
-    void buscarPorId() {
+    @DisplayName("buscarPorCodigo deve retornar unidade se existir")
+    void buscarPorCodigo() {
         Long id = 1L;
         Unidade unidade = new Unidade("Nome", "SIGLA");
         unidade.setCodigo(id);
@@ -147,18 +147,18 @@ class UnidadeServiceTest {
 
         when(unidadeRepo.findById(id)).thenReturn(Optional.of(unidade));
 
-        UnidadeDto dto = unidadeService.buscarPorId(id);
+        UnidadeDto dto = unidadeService.buscarPorCodigo(id);
 
         assertThat(dto.getCodigo()).isEqualTo(id);
     }
 
     @Test
-    @DisplayName("buscarPorId deve lançar exceção se não encontrar")
-    void buscarPorIdException() {
+    @DisplayName("buscarPorCodigo deve lançar exceção se não encontrar")
+    void buscarPorCodigoException() {
         Long id = 99L;
         when(unidadeRepo.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> unidadeService.buscarPorId(id))
+        assertThatThrownBy(() -> unidadeService.buscarPorCodigo(id))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

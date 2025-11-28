@@ -73,7 +73,7 @@ public class SubprocessoCadastroController {
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
         if (faltando != null && !faltando.isEmpty()) {
             var lista = faltando.stream()
-                    .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
+                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
                     .toList();
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.", Map.of("atividadesSemConhecimento", lista));
         }
@@ -99,7 +99,7 @@ public class SubprocessoCadastroController {
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (faltando != null && !faltando.isEmpty()) {
             var lista = faltando.stream()
-                    .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
+                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
                     .toList();
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.", Map.of("atividadesSemConhecimento", lista));
         }
@@ -271,7 +271,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @RequestBody @Valid ImportarAtividadesReq request
     ) {
-        subprocessoMapaService.importarAtividades(codigo, request.getSubprocessoOrigemId());
+        subprocessoMapaService.importarAtividades(codigo, request.getCodSubprocessoOrigem());
         return Map.of("message", "Atividades importadas.");
     }
 }

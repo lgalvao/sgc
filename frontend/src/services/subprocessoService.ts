@@ -3,28 +3,28 @@ import type {Competencia, MapaCompleto} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
-  subprocessoOrigemId: number;
+  codSubprocessoOrigem: number;
 }
 
 export async function importarAtividades(
-    codSubrocessoDestino: number,
-    codSubrocessoOrigem: number,
+    codSubprocessoDestino: number,
+    codSubprocessoOrigem: number,
 ): Promise<void> {
     const request: ImportarAtividadesRequest = {
-        subprocessoOrigemId: codSubrocessoOrigem,
+        codSubprocessoOrigem: codSubprocessoOrigem,
     };
     await apiClient.post(
-        `/subprocessos/${codSubrocessoDestino}/importar-atividades`,
+        `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
         request,
     );
 }
 
 export async function buscarSubprocessoDetalhe(
-    id: number,
+    codSubprocesso: number,
     perfil: string,
     unidadeCodigo: number,
 ) {
-  const response = await apiClient.get(`/subprocessos/${id}`, {
+  const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
     params: { perfil, unidadeUsuario: unidadeCodigo },
   });
   return response.data;
@@ -64,10 +64,10 @@ export async function atualizarCompetencia(
 
 export async function removerCompetencia(
     codSubprocesso: number,
-    idCompetencia: number,
+    codCompetencia: number,
 ): Promise<MapaCompleto> {
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencias/${idCompetencia}/remover`,
+        `/subprocessos/${codSubprocesso}/competencias/${codCompetencia}/remover`,
     );
     return mapMapaCompletoDtoToModel(response.data);
 }

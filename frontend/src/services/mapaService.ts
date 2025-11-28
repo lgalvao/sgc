@@ -5,21 +5,21 @@ import type {DisponibilizarMapaRequest, MapaAjuste, MapaCompleto, MapaVisualizac
 import apiClient from "../axios-setup";
 
 export async function obterMapaVisualizacao(
-    codSubrocesso: number,
+    codSubprocesso: number,
 ): Promise<MapaVisualizacao> {
     const response = await apiClient.get<MapaVisualizacao>(
-        `/subprocessos/${codSubrocesso}/mapa-visualizacao`,
+        `/subprocessos/${codSubprocesso}/mapa-visualizacao`,
     );
   return response.data;
 }
 
-export async function verificarImpactosMapa(id: number): Promise<ImpactoMapa> {
-  const response = await apiClient.get(`/subprocessos/${id}/impactos-mapa`);
+export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
+  const response = await apiClient.get(`/subprocessos/${codSubprocesso}/impactos-mapa`);
   return mapImpactoMapaDtoToModel(response.data);
 }
 
-export async function obterMapaCompleto(id: number): Promise<MapaCompleto> {
-  const response = await apiClient.get(`/subprocessos/${id}/mapa-completo`);
+export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
+  const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-completo`);
   return mapMapaCompletoDtoToModel(response.data);
 }
 
@@ -34,8 +34,8 @@ export async function salvarMapaCompleto(
   return mapMapaCompletoDtoToModel(response.data);
 }
 
-export async function obterMapaAjuste(id: number): Promise<MapaAjuste> {
-  const response = await apiClient.get(`/subprocessos/${id}/mapa-ajuste`);
+export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> {
+  const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-ajuste`);
   return mapMapaAjusteDtoToModel(response.data);
 }
 
