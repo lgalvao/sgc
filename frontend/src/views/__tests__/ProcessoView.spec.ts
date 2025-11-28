@@ -3,7 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 // Mock services
 import * as processoService from "@/services/processoService";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import { ToastService } from "@/services/toastService"; // Import ToastService
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import ProcessoView from "@/views/ProcessoView.vue";
@@ -36,6 +36,17 @@ vi.mock("@/services/processoService", () => ({
     finalizarProcesso: vi.fn(),
     processarAcaoEmBloco: vi.fn(),
     buscarProcessosFinalizados: vi.fn(),
+}));
+
+// Mock ToastService
+vi.mock("@/services/toastService", () => ({
+  ToastService: {
+    sucesso: vi.fn(),
+    erro: vi.fn(),
+    aviso: vi.fn(),
+    info: vi.fn(),
+  },
+  registerToast: vi.fn(),
 }));
 
 // Stubs
@@ -103,9 +114,9 @@ const createWrapper = (customState = {}) => {
 
     const processosStore = useProcessosStore();
     const perfilStore = usePerfilStore();
-    const notificacoesStore = useNotificacoesStore();
+    // const notificacoesStore = useNotificacoesStore(); // Removed
 
-    return {wrapper, processosStore, perfilStore, notificacoesStore};
+    return {wrapper, processosStore, perfilStore};
 };
 
 describe("ProcessoView.vue", () => {
@@ -208,16 +219,19 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve confirmar finalização", async () => {
-        const {wrapper: w, notificacoesStore} = createWrapper();
+        // const {wrapper: w, notificacoesStore} = createWrapper(); // Modified
+        const {wrapper: w} = createWrapper();
         wrapper = w;
         await flushPromises();
+
+        vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
 
         const modal = wrapper.findComponent(ModalFinalizacaoStub);
         modal.vm.$emit("confirmar");
         await flushPromises();
 
         expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(notificacoesStore.sucesso).toHaveBeenCalled();
+        expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
@@ -240,6 +254,8 @@ describe("ProcessoView.vue", () => {
         wrapper = w;
         await flushPromises();
 
+        vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
+
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         modal.vm.$emit("confirmar", [{sigla: "TU", selecionada: true}]);
         await flushPromises();
@@ -251,6 +267,7 @@ describe("ProcessoView.vue", () => {
                 tipoAcao: "aceitar",
             }),
         );
+        expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
 
         // Verificar se a busca foi realizada novamente
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2);
