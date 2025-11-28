@@ -11,8 +11,6 @@ import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
 import * as mapaService from "@/services/mapaService";
 import * as processoService from "@/services/processoService";
-import { ToastService } from "@/services/toastService"; // Import ToastService
-
 import * as unidadesService from "@/services/unidadesService";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
@@ -22,6 +20,17 @@ import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadAtividades from "@/views/CadAtividades.vue";
 
 const pushMock = vi.fn();
+const toastShowMock = vi.fn();
+
+vi.mock("bootstrap-vue-next", async () => {
+  const actual = await vi.importActual("bootstrap-vue-next");
+  return {
+    ...actual,
+    useToast: () => ({
+      show: toastShowMock,
+    }),
+  };
+});
 
 vi.mock("vue-router", () => ({
   useRouter: () => ({
@@ -60,6 +69,9 @@ vi.mock("@/services/cadastroService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
   importarAtividades: vi.fn(),
+  adicionarCompetencia: vi.fn(),
+  atualizarCompetencia: vi.fn(),
+  removerCompetencia: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
@@ -530,18 +542,15 @@ describe("CadAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    // Import store to spy on it
-    const avisoSpy = vi.spyOn(ToastService, "aviso"); // Use ToastService
-
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
     await flushPromises();
 
-    expect(avisoSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Atividades Incompletas"),
-      expect.stringContaining(
-        "As seguintes atividades não têm conhecimentos associados",
-      ),
+    expect(toastShowMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Atividades Incompletas",
+        body: expect.stringContaining("As seguintes atividades não têm conhecimentos associados"),
+      }),
     );
-    expect(avisoSpy.mock.calls[0][1]).toContain("Atividade 2");
+    expect(toastShowMock.mock.calls[0][0].body).toContain("Atividade 2");
   });
 });
