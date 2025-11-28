@@ -61,7 +61,7 @@ describe("useMapasStore", () => {
             );
             store.mapaCompleto = {} as any; // Pre-set state
 
-            await store.buscarMapaCompleto(codSubrocesso);
+            await expect(store.buscarMapaCompleto(codSubrocesso)).rejects.toThrow("Failed");
 
             expect(store.mapaCompleto).toBeNull();
         });
@@ -256,7 +256,7 @@ describe("useMapasStore", () => {
             );
             store.mapaVisualizacao = {} as any; // Pre-set state
 
-            await store.buscarMapaVisualizacao(codSubrocesso);
+            await expect(store.buscarMapaVisualizacao(codSubrocesso)).rejects.toThrow("Failed");
 
             expect(store.mapaVisualizacao).toBeNull();
         });
