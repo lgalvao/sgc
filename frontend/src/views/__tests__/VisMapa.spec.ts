@@ -43,6 +43,28 @@ vi.mock("@/services/toastService", () => ({
   registerToast: vi.fn(),
 }));
 
+// Mock useToast from bootstrap-vue-next
+vi.mock("bootstrap-vue-next", async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        useToast: () => ({
+            show: (options: any) => {
+                const variant = options.props?.variant || 'info';
+                if (variant === 'success') {
+                    ToastService.sucesso(options.title, options.body);
+                } else if (variant === 'danger') {
+                    ToastService.erro(options.title, options.body);
+                } else if (variant === 'warning') {
+                    ToastService.aviso(options.title, options.body);
+                } else {
+                    ToastService.info(options.title, options.body);
+                }
+            },
+        }),
+    };
+});
+
 describe("VisMapa.vue", () => {
   beforeEach(async () => {
     vi.clearAllMocks();

@@ -4,6 +4,7 @@ import {mapMapaVisualizacaoToAtividades} from "@/mappers/mapas";
 import * as atividadeService from "@/services/atividadeService";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
+import { ToastService } from "@/services/toastService"; // Import ToastService
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 
 
@@ -18,31 +19,56 @@ export const useAtividadesStore = defineStore("atividades", () => {
     );
 
     async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
-        const mapa = await mapaService.obterMapaVisualizacao(codSubrocesso);
-        const atividades = mapMapaVisualizacaoToAtividades(mapa);
-        atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        try {
+            const mapa = await mapaService.obterMapaVisualizacao(codSubrocesso);
+            const atividades = mapMapaVisualizacaoToAtividades(mapa);
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        } catch (error) {
+            ToastService.erro(
+                "Erro ao buscar atividades",
+                "Não foi possível carregar as atividades para o subprocesso.",
+            );
+            atividadesPorSubprocesso.value.set(codSubrocesso, []);
+            throw error; // Re-throw to propagate error to UI
+        }
     }
 
     async function adicionarAtividade(
         codSubrocesso: number,
         request: CriarAtividadeRequest,
     ) {
-        const novaAtividade = await atividadeService.criarAtividade(
-            request,
-            codSubrocesso,
-        );
-        const atividades =
-            atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        atividades.push(novaAtividade);
-        atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
-        await buscarAtividadesParaSubprocesso(codSubrocesso);
+        try {
+            const novaAtividade = await atividadeService.criarAtividade(
+                request,
+                codSubrocesso,
+            );
+            const atividades =
+                atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+            atividades.push(novaAtividade);
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            // After adding, re-fetch to ensure data consistency, especially if backend logic changes
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.");
+            throw error;
+        }
     }
 
     async function removerAtividade(codSubrocesso: number, atividadeId: number) {
-        await atividadeService.excluirAtividade(atividadeId);
-        let atividades = atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        atividades = atividades.filter((a) => a.codigo !== atividadeId);
-        atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        try {
+            await atividadeService.excluirAtividade(atividadeId);
+            atividadesPorSubprocesso.value.set(
+                codSubrocesso,
+                (atividadesPorSubprocesso.value.get(codSubrocesso) || []).filter(
+                    (a) => a.codigo !== atividadeId,
+                ),
+            );
+            // Re-fetch to ensure data consistency
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao remover atividade", "Não foi possível remover a atividade.");
+            throw error;
+        }
     }
 
     async function adicionarConhecimento(
@@ -50,16 +76,27 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         request: CriarConhecimentoRequest,
     ) {
-        const novoConhecimento = await atividadeService.criarConhecimento(
-            atividadeId,
-            request,
-        );
-        const atividades =
-            atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        const atividade = atividades.find((a) => a.codigo === atividadeId);
-        if (atividade) {
-            atividade.conhecimentos.push(novoConhecimento);
-            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        try {
+            const novoConhecimento = await atividadeService.criarConhecimento(
+                atividadeId,
+                request,
+            );
+            const updatedAtividades = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((a) => {
+                if (a.codigo === atividadeId) {
+                    return {
+                        ...a,
+                        conhecimentos: [...a.conhecimentos, novoConhecimento],
+                    };
+                }
+                return a;
+            });
+            atividadesPorSubprocesso.value.set(codSubrocesso, updatedAtividades);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao adicionar conhecimento", "Não foi possível adicionar o conhecimento.");
+            throw error;
         }
     }
 
@@ -68,15 +105,27 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         conhecimentoId: number,
     ) {
-        await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-        const atividades =
-            atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        const atividade = atividades.find((a) => a.codigo === atividadeId);
-        if (atividade) {
-            atividade.conhecimentos = atividade.conhecimentos.filter(
-                (c) => c.id !== conhecimentoId,
-            );
+        try {
+            await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+            let atividades =
+                (atividadesPorSubprocesso.value.get(codSubrocesso) || []).map(
+                    (a) => {
+                        if (a.codigo === atividadeId) {
+                            return {
+                                ...a,
+                                conhecimentos: a.conhecimentos.filter(
+                                    (c) => c.id !== conhecimentoId,
+                                ),
+                            };
+                        }
+                        return a;
+                    },
+                );
             atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao remover conhecimento", "Não foi possível remover o conhecimento.");
+            throw error;
         }
     }
 
@@ -84,12 +133,17 @@ export const useAtividadesStore = defineStore("atividades", () => {
         codSubrocessoDestino: number,
         codSubrocessoOrigem: number,
     ) {
-        await subprocessoService.importarAtividades(
-            codSubrocessoDestino,
-            codSubrocessoOrigem,
-        );
-        // Recarregar as atividades do subprocesso de destino para refletir a importação
-        await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
+        try {
+            await subprocessoService.importarAtividades(
+                codSubrocessoDestino,
+                codSubrocessoOrigem,
+            );
+            // Recarregar as atividades do subprocesso de destino para refletir a importação
+            await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
+        } catch (error) {
+            ToastService.erro("Erro ao importar atividades", "Não foi possível importar as atividades.");
+            throw error;
+        }
     }
 
     async function atualizarAtividade(
@@ -97,16 +151,19 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadeId: number,
         data: Atividade,
     ) {
-        const atividadeAtualizada = await atividadeService.atualizarAtividade(
-            atividadeId,
-            data,
-        );
-        const atividades =
-            atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        const index = atividades.findIndex((a) => a.codigo === atividadeId);
-        if (index !== -1) {
-            atividades[index] = atividadeAtualizada;
-            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        try {
+            const atividadeAtualizada = await atividadeService.atualizarAtividade(
+                atividadeId,
+                data,
+            );
+            const atividadesAtualizadas = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((a) => (a.codigo === atividadeId ? atividadeAtualizada : a));
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao atualizar atividade", "Não foi possível atualizar a atividade.");
+            throw error;
         }
     }
 
@@ -116,23 +173,31 @@ export const useAtividadesStore = defineStore("atividades", () => {
         conhecimentoId: number,
         data: Conhecimento,
     ) {
-        const conhecimentoAtualizado =
-            await atividadeService.atualizarConhecimento(
-                atividadeId,
-                conhecimentoId,
-                data,
-            );
-        const atividades =
-            atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-        const atividade = atividades.find((a) => a.codigo === atividadeId);
-        if (atividade) {
-            const index = atividade.conhecimentos.findIndex(
-                (c) => c.id === conhecimentoId,
-            );
-            if (index !== -1) {
-                atividade.conhecimentos[index] = conhecimentoAtualizado;
-                atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
-            }
+        try {
+            const conhecimentoAtualizado =
+                await atividadeService.atualizarConhecimento(
+                    atividadeId,
+                    conhecimentoId,
+                    data,
+                );
+            const atividadesAtualizadas = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((atividade) => {
+                if (atividade.codigo === atividadeId) {
+                    return {
+                        ...atividade,
+                        conhecimentos: atividade.conhecimentos.map((c) =>
+                            c.id === conhecimentoId ? conhecimentoAtualizado : c,
+                        ),
+                    };
+                }
+                return atividade;
+            });
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            ToastService.erro("Erro ao atualizar conhecimento", "Não foi possível atualizar o conhecimento.");
+            throw error;
         }
     }
 

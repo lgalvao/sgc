@@ -21,7 +21,7 @@ export function situacaoLabel(situacao?: string | null): string {
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====
 // Define local type for iconeTipo since TipoNotificacao was removed
-type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
+export type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
 
 export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
   switch (tipo) {

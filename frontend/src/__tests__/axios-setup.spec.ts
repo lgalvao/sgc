@@ -1,9 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
-import {useNotificacoesStore} from "@/stores/notificacoes";
-// Import axios-setup AFTER mocking
-import "../axios-setup";
+import { ToastService } from "@/services/toastService"; // Import ToastService
 
 // Hoist mock instance so it's shared between module and test
 const { mockInstance } = vi.hoisted(() => {
@@ -40,13 +38,34 @@ vi.mock("axios", async (importOriginal) => {
     };
 });
 
+// Mock ToastService
+vi.mock("@/services/toastService", () => {
+    const mockToastService = {
+        sucesso: vi.fn(),
+        erro: vi.fn(),
+        aviso: vi.fn(),
+        info: vi.fn(),
+    };
+    return {
+        ToastService: mockToastService,
+        registerToast: vi.fn(),
+        // Export the mockToastService for direct access in tests
+        mockToastService,
+    };
+});
+
+// Import the exported mockToastService
+import { mockToastService } from "@/services/toastService";
+
 describe("axios-setup", () => {
     let requestInterceptor: (config: any) => any;
     let responseErrorInterceptor: (error: any) => any;
 
-    beforeAll(() => {
+    beforeAll(async () => {
+        // Import axios-setup AFTER mocking its dependencies
+        await import("../axios-setup"); // Use dynamic import
+
         // Access interceptors from the hoisted mock instance
-        // These calls happened when '../axios-setup' was imported
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
         const responseUseCalls = mockInstance.interceptors.response.use.mock.calls;
 
@@ -60,6 +79,11 @@ describe("axios-setup", () => {
 
     beforeEach(async () => {
         setActivePinia(createPinia());
+        // Reset ToastService mocks before each test
+        mockToastService.sucesso.mockClear();
+        mockToastService.erro.mockClear();
+        mockToastService.aviso.mockClear();
+        mockToastService.info.mockClear();
     });
 
     afterEach(() => {
@@ -81,12 +105,11 @@ describe("axios-setup", () => {
     });
 
     it("response error interceptor should redirect to login on 401", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        vi.spyOn(ToastService, "erro"); // Spy on ToastService.erro
 
         const error = {response: {status: 401}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith(
+        expect(ToastService.erro).toHaveBeenCalledWith(
             "Não Autorizado",
             expect.stringContaining("Sua sessão expirou"),
         );
@@ -94,32 +117,29 @@ describe("axios-setup", () => {
     });
 
     it("response error interceptor should not show global error for 400, 404, 409, 422", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        vi.spyOn(ToastService, "erro"); // Spy on ToastService.erro
 
         const error = {response: {status: 400}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).not.toHaveBeenCalled();
+        expect(ToastService.erro).not.toHaveBeenCalled();
     });
 
     it("response error interceptor should show unexpected error for 500", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        vi.spyOn(ToastService, "erro"); // Spy on ToastService.erro
 
         const error = {
             response: {status: 500, data: {message: "Server Error"}},
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith("Erro Inesperado", "Server Error");
+        expect(ToastService.erro).toHaveBeenCalledWith("Erro Inesperado", "Server Error");
     });
 
     it("response error interceptor should show network error", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        vi.spyOn(ToastService, "erro"); // Spy on ToastService.erro
 
         const error = {request: {}}; // No response, but request exists -> Network error usually
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith(
+        expect(ToastService.erro).toHaveBeenCalledWith(
             "Erro de Rede",
             expect.stringContaining("Não foi possível conectar"),
         );

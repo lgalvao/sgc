@@ -9,6 +9,7 @@ import {
     iconeTipo,
     isDateValidAndFuture,
     parseDate,
+    type LocalTipoNotificacao, // Import LocalTipoNotificacao
 } from "@/utils";
 
 describe("utilitários", () => {

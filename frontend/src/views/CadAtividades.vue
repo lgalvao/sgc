@@ -746,6 +746,4 @@ function fecharModalImpacto() {
   border-top-right-radius: 0.375rem;
 }
 
-.atividade-titulo-card {
-  font-size: 1.1rem;
-}
+

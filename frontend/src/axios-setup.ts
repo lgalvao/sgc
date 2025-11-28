@@ -17,9 +17,10 @@ const handleResponseError = (error: any) => {
       const isHandledInline = [400, 404, 409, 422].includes(status);
 
       if (isHandledInline) {
-        // Just forward the error to the local handler
-        return Promise.reject(error);
-      }
+        // Just forward the error to the local handler without showing a global toast
+                        return Promise.reject(error); // Correctly return the rejected promise
+                        // Removed `return;` as it's redundant after `return Promise.reject`
+              }
 
       if (status === 401) {
           ToastService.erro(
