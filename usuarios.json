@@ -3,8 +3,14 @@
     "titulo_eleitoral": "111111",
     "nome": "ADMIN_SEDOC_E_CHEFE_SEDOC",
     "perfis_unidades": [
-      { "perfil": "ADMIN", "sigla": "SEDOC" },
-      { "perfil": "CHEFE", "sigla": "SEDOC" }
+      {
+        "perfil": "ADMIN",
+        "sigla": "SEDOC"
+      },
+      {
+        "perfil": "CHEFE",
+        "sigla": "SEDOC"
+      }
     ],
     "unidade_lotacao": "SEDOC"
   },
@@ -12,7 +18,10 @@
     "titulo_eleitoral": "222222",
     "nome": "GESTOR_COORD_11",
     "perfis_unidades": [
-      { "perfil": "GESTOR", "sigla": "COORD_11" }
+      {
+        "perfil": "GESTOR",
+        "sigla": "COORD_11"
+      }
     ],
     "unidade_lotacao": "COORD_11"
   },
@@ -20,15 +29,25 @@
     "titulo_eleitoral": "333333",
     "nome": "CHEFE_SECAO_111",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_111" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_111"
+      }
     ],
     "unidade_lotacao": "SECAO_111"
   },
   {
     "titulo_eleitoral": "444444",
-    "nome": "SERVIDOR_SECAO_111",
+    "nome": "SERVIDOR_SECAO_111_E_CHEFE_SECAO_112",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_111" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_111"
+      },
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_112"
+      }
     ],
     "unidade_lotacao": "SECAO_111"
   },
@@ -36,7 +55,10 @@
     "titulo_eleitoral": "555555",
     "nome": "David Bowie",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "ASSESSORIA_11" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "ASSESSORIA_11"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_11"
   },
@@ -44,8 +66,14 @@
     "titulo_eleitoral": "666666",
     "nome": "Robert Plant",
     "perfis_unidades": [
-      { "perfil": "ADMIN", "sigla": "SEDOC" },
-      { "perfil": "SERVIDOR", "sigla": "SEDOC" }
+      {
+        "perfil": "ADMIN",
+        "sigla": "SEDOC"
+      },
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SEDOC"
+      }
     ],
     "unidade_lotacao": "SEDOC"
   },
@@ -53,7 +81,10 @@
     "titulo_eleitoral": "777777",
     "nome": "Janis Joplin",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "ASSESSORIA_21" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "ASSESSORIA_21"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_21"
   },
@@ -61,7 +92,10 @@
     "titulo_eleitoral": "888888",
     "nome": "Jimi Hendrix",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "ASSESSORIA_22" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "ASSESSORIA_22"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_22"
   },
@@ -69,7 +103,10 @@
     "titulo_eleitoral": "999999",
     "nome": "Roger Waters",
     "perfis_unidades": [
-      { "perfil": "GESTOR", "sigla": "COORD_21" }
+      {
+        "perfil": "GESTOR",
+        "sigla": "COORD_21"
+      }
     ],
     "unidade_lotacao": "COORD_21"
   },
@@ -77,7 +114,10 @@
     "titulo_eleitoral": "101010",
     "nome": "Debbie Harry",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_211" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_211"
+      }
     ],
     "unidade_lotacao": "SECAO_211"
   },
@@ -85,7 +125,10 @@
     "titulo_eleitoral": "121212",
     "nome": "Steven Tyler",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_212" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_212"
+      }
     ],
     "unidade_lotacao": "SECAO_212"
   },
@@ -93,7 +136,10 @@
     "titulo_eleitoral": "131313",
     "nome": "Mick Jagger",
     "perfis_unidades": [
-      { "perfil": "GESTOR", "sigla": "COORD_22" }
+      {
+        "perfil": "GESTOR",
+        "sigla": "COORD_22"
+      }
     ],
     "unidade_lotacao": "COORD_22"
   },
@@ -101,7 +147,10 @@
     "titulo_eleitoral": "141414",
     "nome": "Tina Turner",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_221" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_221"
+      }
     ],
     "unidade_lotacao": "SECAO_221"
   },
@@ -109,23 +158,21 @@
     "titulo_eleitoral": "151515",
     "nome": "Axl Rose",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "ASSESSORIA_12" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "ASSESSORIA_12"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_12"
-  },
-  {
-    "titulo_eleitoral": "161616",
-    "nome": "Geddy Lee",
-    "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_112" }
-    ],
-    "unidade_lotacao": "SECAO_112"
   },
   {
     "titulo_eleitoral": "171717",
     "nome": "Lemmy Kilmister",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_121" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_121"
+      }
     ],
     "unidade_lotacao": "SECAO_121"
   },
@@ -133,23 +180,21 @@
     "titulo_eleitoral": "181818",
     "nome": "Pete Townshend",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECAO_212" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECAO_212"
+      }
     ],
     "unidade_lotacao": "SECAO_212"
-  },
-  {
-    "titulo_eleitoral": "191919",
-    "nome": "Paul McCartney",
-    "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SEDOC" }
-    ],
-    "unidade_lotacao": "SEDOC"
   },
   {
     "titulo_eleitoral": "202020",
     "nome": "John Lennon",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECRETARIA_1" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECRETARIA_1"
+      }
     ],
     "unidade_lotacao": "SECRETARIA_1"
   },
@@ -157,15 +202,21 @@
     "titulo_eleitoral": "212121",
     "nome": "George Harrison",
     "perfis_unidades": [
-      { "perfil": "CHEFE", "sigla": "SECRETARIA_2" }
+      {
+        "perfil": "CHEFE",
+        "sigla": "SECRETARIA_2"
+      }
     ],
     "unidade_lotacao": "SECRETARIA_2"
   },
   {
-    "titulo_eleitoral": "222222",
+    "titulo_eleitoral": "222223",
     "nome": "Ringo Starr",
     "perfis_unidades": [
-      { "perfil": "GESTOR", "sigla": "COORD_12" }
+      {
+        "perfil": "GESTOR",
+        "sigla": "COORD_12"
+      }
     ],
     "unidade_lotacao": "COORD_12"
   },
@@ -173,7 +224,10 @@
     "titulo_eleitoral": "232323",
     "nome": "Bon Jovi",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "ASSESSORIA_11" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "ASSESSORIA_11"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_11"
   },
@@ -181,7 +235,10 @@
     "titulo_eleitoral": "242424",
     "nome": "Jon Lord",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "ASSESSORIA_12" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "ASSESSORIA_12"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_12"
   },
@@ -189,7 +246,10 @@
     "titulo_eleitoral": "252525",
     "nome": "Bruce Springsteen",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_112" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_112"
+      }
     ],
     "unidade_lotacao": "SECAO_112"
   },
@@ -197,7 +257,10 @@
     "titulo_eleitoral": "262626",
     "nome": "Chuck Berry",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_121" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_121"
+      }
     ],
     "unidade_lotacao": "SECAO_121"
   },
@@ -205,7 +268,10 @@
     "titulo_eleitoral": "272727",
     "nome": "Elton John",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "ASSESSORIA_21" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "ASSESSORIA_21"
+      }
     ],
     "unidade_lotacao": "ASSESSORIA_21"
   },
@@ -213,7 +279,10 @@
     "titulo_eleitoral": "282828",
     "nome": "Eric Clapton",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_211" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_211"
+      }
     ],
     "unidade_lotacao": "SECAO_211"
   },
@@ -221,7 +290,10 @@
     "titulo_eleitoral": "292929",
     "nome": "Flea",
     "perfis_unidades": [
-      { "perfil": "SERVIDOR", "sigla": "SECAO_221" }
+      {
+        "perfil": "SERVIDOR",
+        "sigla": "SECAO_221"
+      }
     ],
     "unidade_lotacao": "SECAO_221"
   }

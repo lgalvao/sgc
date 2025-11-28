@@ -53,39 +53,45 @@ public class UsuarioService {
             }
         }
 
-        // 3. Perfil SERVIDOR na unidade de lotação (se não houver outro perfil para ela)
+        // 3. Perfil SERVIDOR na unidade de lotação (se não houver outro perfil para
+        // ela)
         Unidade lotacao = usuario.getUnidadeLotacao();
         if (lotacao != null) {
             boolean jaTemPerfilNaLotacao = perfis.stream()
-                    .anyMatch(p -> p.getUnidade().getCodigo().equals(lotacao.getCodigo()) && !p.getPerfil().equals(Perfil.SERVIDOR));
+                    .anyMatch(p -> p.getUnidade().getCodigo().equals(lotacao.getCodigo())
+                            && !p.getPerfil().equals(Perfil.SERVIDOR));
 
             if (!jaTemPerfilNaLotacao) {
-                boolean isOperacional = lotacao.getTipo() == TipoUnidade.OPERACIONAL || lotacao.getTipo() == TipoUnidade.INTEROPERACIONAL;
-                // Lógica do frontend: só adiciona SERVIDOR se for OPERACIONAL (ou INTEROPERACIONAL)
+                boolean isOperacional = lotacao.getTipo() == TipoUnidade.OPERACIONAL
+                        || lotacao.getTipo() == TipoUnidade.INTEROPERACIONAL;
+                // Lógica do frontend: só adiciona SERVIDOR se for OPERACIONAL (ou
+                // INTEROPERACIONAL)
                 // "if (isOperacional && !hasNonServidorProfileForPrincipalUnit)"
                 if (isOperacional) {
-                     PerfilUnidade puServidor = new PerfilUnidade(Perfil.SERVIDOR, toUnidadeDto(lotacao));
-                     if (!contemPerfilUnidade(perfis, puServidor)) {
-                         perfis.add(puServidor);
-                     }
+                    PerfilUnidade puServidor = new PerfilUnidade(Perfil.SERVIDOR, toUnidadeDto(lotacao));
+                    if (!contemPerfilUnidade(perfis, puServidor)) {
+                        perfis.add(puServidor);
+                    }
                 }
             }
         }
 
+        log.info("Usuário {} tem {} perfis autorizados.", tituloEleitoral, perfis.size());
         return perfis;
     }
 
     private boolean contemPerfilUnidade(List<PerfilUnidade> lista, PerfilUnidade novo) {
-        return lista.stream().anyMatch(p -> 
-            p.getPerfil().equals(novo.getPerfil()) && 
-            p.getUnidade().getCodigo().equals(novo.getUnidade().getCodigo())
-        );
+        return lista.stream().anyMatch(p -> p.getPerfil().equals(novo.getPerfil()) &&
+                p.getUnidade().getCodigo().equals(novo.getUnidade().getCodigo()));
     }
 
     private Perfil determinarPerfilPorUnidade(Unidade unidade) {
-        if ("SEDOC".equals(unidade.getSigla())) return Perfil.ADMIN;
-        if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) return Perfil.GESTOR;
-        if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) return Perfil.CHEFE;
+        if ("SEDOC".equals(unidade.getSigla()))
+            return Perfil.ADMIN;
+        if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA)
+            return Perfil.GESTOR;
+        if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL)
+            return Perfil.CHEFE;
         return Perfil.SERVIDOR;
     }
 
@@ -101,12 +107,14 @@ public class UsuarioService {
     }
 
     public void entrar(String tituloEleitoral, PerfilUnidade pu) {
-        log.info("Usuário {} entrou com sucesso. Perfil: {}, Unidade: {}", tituloEleitoral, pu.getPerfil(), pu.getSiglaUnidade());
+        log.info("Usuário {} entrou com sucesso. Perfil: {}, Unidade: {}", tituloEleitoral, pu.getPerfil(),
+                pu.getSiglaUnidade());
     }
 
     public void entrar(EntrarReq request) {
         Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Unidade não encontrada com código: " + request.getUnidadeCodigo()));
         Perfil perfil = Perfil.valueOf(request.getPerfil());
         PerfilUnidade pu = new PerfilUnidade(perfil, toUnidadeDto(unidade));
         this.entrar(request.getTituloEleitoral(), pu);

@@ -1,7 +1,7 @@
-import {defineStore} from "pinia";
-import {computed, ref} from "vue";
-import type {PerfilUnidade} from "@/mappers/sgrh";
-import type {Perfil} from "@/types/tipos";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import type { PerfilUnidade } from "@/mappers/sgrh";
+import type { Perfil } from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 
 export const usePerfilStore = defineStore("perfil", () => {
@@ -66,6 +66,9 @@ export const usePerfilStore = defineStore("perfil", () => {
                 ),
             ];
             definirPerfis(listaPerfis);
+
+            console.log("Store: Perfis recebidos:", responsePerfisUnidades);
+            console.log("Store: Quantidade:", responsePerfisUnidades.length);
 
             // Se houver apenas uma opção, seleciona automaticamente
             if (responsePerfisUnidades.length === 1) {

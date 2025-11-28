@@ -88,6 +88,9 @@
             </BFormSelect>
           </div>
 
+          <div class="mb-3 text-danger">
+            DEBUG: Step={{ loginStep }}, Perfis={{ perfisUnidadesDisponiveis.length }}
+          </div>
           <BButton
             variant="primary"
             class="w-100 login-btn"
@@ -137,44 +140,64 @@ watch(perfisUnidadesDisponiveis, (newVal) => {
 });
 
 const handleLogin = async () => {
+  console.log("handleLogin chamado. loginStep:", loginStep.value);
+
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
       notificacoesStore.erro(
-          "Dados incompletos",
-          "Por favor, preencha título e senha.",
+        "Dados incompletos",
+        "Por favor, preencha título e senha.",
       );
       return;
     }
 
-    const sucessoAutenticacao = await perfilStore.loginCompleto(
-        titulo.value,
-        senha.value,
-    );
+    try {
+      const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
-    if (sucessoAutenticacao) {
-      if (perfilStore.perfisUnidades.length > 1) {
-        loginStep.value = 2;
-      } else if (perfilStore.perfisUnidades.length === 1) {
-        await router.push("/painel");
-      } else {
-        notificacoesStore.erro(
+      if (sucessoAutenticacao) {
+        console.log("Perfis carregados:", perfilStore.perfisUnidades.length);
+        if (perfilStore.perfisUnidades.length > 1) {
+          loginStep.value = 2;
+          // CRITICAL: Stop here to let the user select a profile
+          return; 
+        } else if (perfilStore.perfisUnidades.length === 1) {
+          // Auto-login for single profile is handled inside loginCompleto or here if needed
+          // But based on store logic, loginCompleto might not do the final 'entrar' if it returns true?
+          // Let's check store logic. 
+          // Store's loginCompleto DOES call 'entrar' if length === 1.
+          // So we just redirect.
+          await router.push("/painel");
+        } else {
+          notificacoesStore.erro(
             "Perfis indisponíveis",
             "Nenhum perfil/unidade disponível para este usuário.",
-        );
-      }
-    } else {
-      notificacoesStore.erro(
+          );
+        }
+      } else {
+        notificacoesStore.erro(
           "Falha na autenticação",
           "Título ou senha inválidos.",
-      );
+        );
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
+      notificacoesStore.erro("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.");
     }
-  } else {
+  } else if (loginStep.value === 2) {
+    // Step 2: Profile Selection
     if (parSelecionado.value) {
-      await perfilStore.selecionarPerfilUnidade(
+      try {
+        await perfilStore.selecionarPerfilUnidade(
           Number(titulo.value),
           parSelecionado.value,
-      );
-      await router.push("/painel");
+        );
+        await router.push("/painel");
+      } catch (error) {
+        console.error("Erro ao selecionar perfil:", error);
+         notificacoesStore.erro("Erro", "Falha ao selecionar o perfil.");
+      }
+    } else {
+       notificacoesStore.erro("Seleção necessária", "Por favor, selecione um perfil.");
     }
   }
 };

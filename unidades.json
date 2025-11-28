@@ -86,6 +86,13 @@
               "subunidades": []
             },
             {
+              "sigla": "ASSESSORIA_22",
+              "nome": "Assessoria 22",
+              "tipo": "OPERACIONAL",
+              "situacao": "ATIVA",
+              "subunidades": []
+            },
+            {
               "sigla": "COORD_21",
               "nome": "Coordenadoria 21",
               "tipo": "INTERMEDIARIA",

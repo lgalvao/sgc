@@ -33,3 +33,4 @@ backend/bin/
 /node_modules/
 !backend/build/reports/tests/test/index.html
 /backend/target/
+.DS_Store

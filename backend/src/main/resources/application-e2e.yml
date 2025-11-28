@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:sgc-e2e;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: sgc
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      schema-locations: file:../e2e/setup/schema.sql
+      data-locations: file:../e2e/setup/seed.sql
