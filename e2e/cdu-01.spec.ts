@@ -13,13 +13,11 @@ async function login(page: Page, user: string, pass: string, profileLabel?: stri
         } else {
             await page.getByTestId('select-perfil-unidade').selectOption({ index: 1 });
         }
-        await page.waitForTimeout(500); // Espera estabilização do DOM
+        await page.waitForLoadState('networkidle');
         await page.getByTestId('botao-entrar').click({ force: true });
     }
     await expect(page).toHaveURL(/\/painel/);
 }
-
-
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     test.beforeEach(async ({ page }) => {
