@@ -30,8 +30,6 @@ export const iconeTipo = (tipo: TipoNotificacao): string => {
           return "bi bi-exclamation-triangle-fill text-warning";
       case "info":
           return "bi bi-info-circle-fill text-info";
-      case "email":
-          return "bi bi-envelope-fill text-primary";
       default:
           return "bi bi-bell-fill";
   }

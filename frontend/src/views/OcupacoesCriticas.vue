@@ -201,16 +201,17 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => route.params.siglaUnidade as string);
 
 const unidade = computed(() =>
-    unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value),
+    unidadesStore.unidade,
 );
 const nomeUnidade = computed(() => unidade.value?.nome || "");
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(siglaUnidade.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   // Correção temporária: usando codProcesso como codSubrocesso
-  await mapasStore.fetchMapaCompleto(codProcesso.value);
+  await mapasStore.buscarMapaCompleto(codProcesso.value);
 });
 
 const mapa = computed<MapaCompleto | null>(() => {

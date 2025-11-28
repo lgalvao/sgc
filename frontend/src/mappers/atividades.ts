@@ -1,9 +1,5 @@
 import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
 
-// Os DTOs do backend podem ter uma estrutura ligeiramente diferente.
-// Por enquanto, vamos assumir que são semelhantes aos modelos do frontend.
-// Se forem diferentes, essas funções de mapeamento farão a conversão.
-
 export function mapAtividadeDtoToModel(dto: any): Atividade {
   return {
     codigo: dto.codigo,

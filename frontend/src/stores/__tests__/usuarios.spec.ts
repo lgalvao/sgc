@@ -43,32 +43,32 @@ describe("useUsuariosStore", () => {
     });
 
     describe("actions", () => {
-        it("fetchUsuarios should fetch and set usuarios", async () => {
+        it("buscarUsuarios should fetch and set usuarios", async () => {
             usuariosStore.usuarios = [];
-            await usuariosStore.fetchUsuarios();
+            await usuariosStore.buscarUsuarios();
             expect(usuarioService.buscarTodosUsuarios).toHaveBeenCalledTimes(1);
             expect(usuariosStore.usuarios.length).toBe(2);
         });
 
-        it("fetchUsuarios should handle errors", async () => {
+        it("buscarUsuarios should handle errors", async () => {
             vi.mocked(usuarioService.buscarTodosUsuarios).mockRejectedValue(
                 new Error("Failed"),
             );
-            await usuariosStore.fetchUsuarios();
+            await usuariosStore.buscarUsuarios();
             expect(usuariosStore.error).toContain("Falha ao carregar usuários");
         });
     });
 
     describe("getters", () => {
-        it("getUsuarioById should return the correct usuario by ID", () => {
-            const usuario = usuariosStore.getUsuarioById(1);
+        it("obterUsuarioPorId should return the correct usuario by ID", () => {
+            const usuario = usuariosStore.obterUsuarioPorId(1);
             expect(usuario).toBeDefined();
             expect(usuario?.codigo).toBe(1);
             expect(usuario?.nome).toBe("Ana Paula Souza");
         });
 
-        it("getUsuarioById should return undefined if no matching usuario is found", () => {
-            const usuario = usuariosStore.getUsuarioById(999);
+        it("obterUsuarioPorId should return undefined if no matching usuario is found", () => {
+            const usuario = usuariosStore.obterUsuarioPorId(999);
             expect(usuario).toBeUndefined();
         });
     });

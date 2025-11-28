@@ -334,10 +334,10 @@ const codSubrocesso = ref<number | null>(null);
 
 onMounted(async () => {
   // Carrega unidade diretamente
-  await unidadesStore.fetchUnidade(siglaUnidade.value);
+  await unidadesStore.buscarUnidade(siglaUnidade.value);
 
   // Busca ID do subprocesso
-  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       codProcesso.value,
       siglaUnidade.value,
   );
@@ -345,9 +345,9 @@ onMounted(async () => {
   if (id) {
     codSubrocesso.value = id;
     await Promise.all([
-      mapasStore.fetchMapaCompleto(id),
-      subprocessosStore.fetchSubprocessoDetalhe(id),
-      atividadesStore.fetchAtividadesParaSubprocesso(id),
+      mapasStore.buscarMapaCompleto(id),
+      subprocessosStore.buscarSubprocessoDetalhe(id),
+      atividadesStore.buscarAtividadesParaSubprocesso(id),
     ]);
   }
 });
@@ -356,7 +356,7 @@ const atividades = computed<Atividade[]>(() => {
   if (typeof codSubrocesso.value !== "number") {
     return [];
   }
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
 });
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);

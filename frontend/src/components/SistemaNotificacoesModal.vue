@@ -66,20 +66,6 @@
           <p class="mb-1">
             {{ notificacao.mensagem }}
           </p>
-          <div
-            v-if="notificacao.tipo === 'email' && notificacao.emailContent"
-            class="mt-2"
-          >
-            <BButton
-              variant="outline-primary"
-              size="sm"
-              data-testid="btn-ver-email"
-              @click="mostrarEmail(notificacao)"
-            >
-              <i class="bi bi-envelope me-1" />
-              Ver e-mail completo
-            </BButton>
-          </div>
         </div>
       </div>
     </div>
@@ -93,46 +79,13 @@
       </BButton>
     </template>
   </BModal>
-
-  <!-- Modal para visualizar e-mail completo -->
-  <BModal
-    v-model="emailModalVisivel"
-    title="E-mail Simulado"
-    size="lg"
-    centered
-    hide-footer
-  >
-    <div v-if="emailAtual">
-      <div class="mb-3">
-        <strong>Assunto:</strong> {{ emailAtual.assunto }}
-      </div>
-      <div class="mb-3">
-        <strong>Destinatário:</strong> {{ emailAtual.destinatario }}
-      </div>
-      <div class="mb-3">
-        <strong>Corpo:</strong>
-        <div class="mt-2 p-3 bg-light rounded">
-          <pre style="white-space: pre-wrap; font-family: inherit;">{{ emailAtual.corpo }}</pre>
-        </div>
-      </div>
-    </div>
-    <template #footer>
-      <BButton
-        variant="secondary"
-        data-testid="btn-modal-fechar"
-        @click="fecharEmailModal"
-      >
-        Fechar
-      </BButton>
-    </template>
-  </BModal>
 </template>
 
 <script lang="ts" setup>
 import {BButton, BModal} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, ref} from "vue";
-import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore,} from "@/stores/notificacoes";
+import {type Notificacao, type TipoNotificacao, useNotificacoesStore,} from "@/stores/notificacoes";
 import {formatDateTimeBR} from "@/utils";
 
 interface Props {
@@ -148,10 +101,6 @@ const emit = defineEmits<{
 const notificacoesStore = useNotificacoesStore();
 const {notificacoes} = storeToRefs(notificacoesStore);
 const {removerNotificacao, limparTodas} = notificacoesStore;
-
-// Estado para modal de email
-const emailModalVisivel = ref(false);
-const emailAtual = ref<EmailContent | null>(null);
 
 const notificacoesOrdenadas = computed(() => {
   return [...notificacoes.value].sort(
@@ -169,8 +118,6 @@ const classeNotificacao = (notificacao: Notificacao): string => {
       return "border-warning";
     case "info":
       return "border-info";
-    case "email":
-      return "border-primary";
     default:
       return "";
   }
@@ -186,8 +133,6 @@ const iconeTipo = (tipo: TipoNotificacao): string => {
       return "bi bi-exclamation-triangle-fill text-warning";
     case "info":
       return "bi bi-info-circle-fill text-info";
-    case "email":
-      return "bi bi-envelope-fill text-primary";
     default:
       return "bi bi-bell-fill";
   }
@@ -195,18 +140,6 @@ const iconeTipo = (tipo: TipoNotificacao): string => {
 
 const formatarDataHora = (date: Date): string => {
   return formatDateTimeBR(date);
-};
-
-const mostrarEmail = (notificacao: Notificacao) => {
-  if (notificacao.emailContent) {
-    emailAtual.value = notificacao.emailContent;
-    emailModalVisivel.value = true;
-  }
-};
-
-const fecharEmailModal = () => {
-  emailModalVisivel.value = false;
-  emailAtual.value = null;
 };
 
 const fecharModal = () => {

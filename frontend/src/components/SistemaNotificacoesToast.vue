@@ -35,8 +35,6 @@ const getVariant = (tipo: TipoNotificacao): keyof BaseColorVariant => {
       return "warning";
     case "info":
       return "info";
-    case "email":
-      return "primary";
     default:
       return "info";
   }

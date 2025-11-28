@@ -19,7 +19,7 @@ export const useProcessosStore = defineStore("processos", () => {
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
 
-    const getUnidadesProcesso = computed(
+    const obterUnidadesProcesso = computed(
         () =>
             (idProcesso: number): ProcessoResumo[] => {
                 if (processoDetalhe.value && processoDetalhe.value.codigo === idProcesso) {
@@ -29,7 +29,7 @@ export const useProcessosStore = defineStore("processos", () => {
             },
     );
 
-    async function fetchProcessosPainel(
+    async function buscarProcessosPainel(
         perfil: string,
         unidade: number,
         page: number,
@@ -49,17 +49,17 @@ export const useProcessosStore = defineStore("processos", () => {
         processosPainelPage.value = response;
     }
 
-    async function fetchProcessosFinalizados() {
-        processosFinalizados.value = await processoService.fetchProcessosFinalizados();
+    async function buscarProcessosFinalizados() {
+        processosFinalizados.value = await processoService.buscarProcessosFinalizados();
     }
 
-    async function fetchProcessoDetalhe(idProcesso: number) {
+    async function buscarProcessoDetalhe(idProcesso: number) {
         processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
     }
 
-    async function fetchSubprocessosElegiveis(idProcesso: number) {
+    async function buscarSubprocessosElegiveis(idProcesso: number) {
         subprocessosElegiveis.value =
-            await processoService.fetchSubprocessosElegiveis(idProcesso);
+            await processoService.buscarSubprocessosElegiveis(idProcesso);
     }
 
     async function criarProcesso(payload: CriarProcessoRequest) {
@@ -76,12 +76,12 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
-        await fetchProcessoDetalhe(idProcesso);
+        await buscarProcessoDetalhe(idProcesso);
     }
 
     async function finalizarProcesso(idProcesso: number) {
         await processoService.finalizarProcesso(idProcesso);
-        await fetchProcessoDetalhe(idProcesso);
+        await buscarProcessoDetalhe(idProcesso);
     }
 
     async function processarCadastroBloco(payload: {
@@ -92,26 +92,26 @@ export const useProcessosStore = defineStore("processos", () => {
     }) {
         await processoService.processarAcaoEmBloco(payload);
         // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
-        await fetchProcessoDetalhe(payload.codProcesso);
+        await buscarProcessoDetalhe(payload.codProcesso);
     }
 
     async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
         await processoService.alterarDataLimiteSubprocesso(id, dados);
         if (processoDetalhe.value) {
-            await fetchProcessoDetalhe(processoDetalhe.value.codigo);
+            await buscarProcessoDetalhe(processoDetalhe.value.codigo);
         }
     }
 
     async function apresentarSugestoes(id: number, dados: { sugestoes: string }) {
         await processoService.apresentarSugestoes(id, dados);
         if (processoDetalhe.value) {
-            await fetchProcessoDetalhe(processoDetalhe.value.codigo);
+            await buscarProcessoDetalhe(processoDetalhe.value.codigo);
         }
     }
 
     async function validarMapa(id: number) {
         await processoService.validarMapa(id);
-        if (processoDetalhe.value) await fetchProcessoDetalhe(processoDetalhe.value.codigo);
+        if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
     }
 
     return {
@@ -120,11 +120,11 @@ export const useProcessosStore = defineStore("processos", () => {
         processoDetalhe,
         subprocessosElegiveis,
         processosFinalizados,
-        getUnidadesDoProcesso: getUnidadesProcesso,
-        fetchProcessosPainel,
-        fetchProcessosFinalizados,
-        fetchProcessoDetalhe,
-        fetchSubprocessosElegiveis,
+        obterUnidadesDoProcesso: obterUnidadesProcesso,
+        buscarProcessosPainel,
+        buscarProcessosFinalizados,
+        buscarProcessoDetalhe,
+        buscarSubprocessosElegiveis,
         criarProcesso,
         atualizarProcesso,
         removerProcesso,

@@ -74,6 +74,7 @@ class UsuarioServiceTest {
         String tituloEleitoral = "123456789";
 
         when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
+        when(unidadeRepo.findByTitularTituloEleitoral(tituloEleitoral)).thenReturn(List.of());
 
         List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
 
@@ -82,7 +83,57 @@ class UsuarioServiceTest {
         assertThat(resultado).extracting(pu -> pu.getUnidade().getSigla()).allMatch(sigla -> sigla.equals("SEDOC"));
 
         verify(usuarioRepo, times(1)).findById(tituloEleitoral);
-        verifyNoInteractions(sgrhService, unidadeRepo);
+        verify(unidadeRepo, times(1)).findByTitularTituloEleitoral(tituloEleitoral);
+        verifyNoInteractions(sgrhService);
+    }
+
+    @Test
+    @DisplayName("Deve incluir perfil de titular (GESTOR para Intermediária)")
+    void autorizar_deveIncluirPerfilDeTitular() {
+        String tituloEleitoral = "123456789";
+        
+        // Unidade onde o usuário é titular
+        Unidade unidadeTitular = new Unidade("Coordenação", "COORD");
+        unidadeTitular.setCodigo(2L);
+        unidadeTitular.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
+        when(unidadeRepo.findByTitularTituloEleitoral(tituloEleitoral)).thenReturn(List.of(unidadeTitular));
+
+        List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
+
+        // Deve ter os 2 originais + 1 de titular
+        assertThat(resultado).hasSize(3);
+        
+        // Verifica se o perfil GESTOR foi adicionado para a unidade COORD
+        boolean temGestorCoord = resultado.stream().anyMatch(pu -> 
+            pu.getPerfil() == Perfil.GESTOR && 
+            pu.getUnidade().getSigla().equals("COORD")
+        );
+        assertThat(temGestorCoord).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve incluir perfil SERVIDOR padrão para lotação operacional se não houver outro")
+    void autorizar_deveIncluirPerfilServidorPadrao() {
+        String tituloEleitoral = "987654321";
+        
+        Unidade lotacao = new Unidade("Seção Operacional", "SEOP");
+        lotacao.setCodigo(3L);
+        lotacao.setTipo(TipoUnidade.OPERACIONAL);
+        
+        Usuario usuarioSemPerfil = new Usuario(tituloEleitoral, "User Sem Perfil", "email", "123", lotacao);
+        // Sem atribuições explícitas
+        
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioSemPerfil));
+        when(unidadeRepo.findByTitularTituloEleitoral(tituloEleitoral)).thenReturn(List.of());
+
+        List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
+
+        assertThat(resultado).hasSize(1);
+        PerfilUnidade pu = resultado.get(0);
+        assertThat(pu.getPerfil()).isEqualTo(Perfil.SERVIDOR);
+        assertThat(pu.getUnidade().getSigla()).isEqualTo("SEOP");
     }
 
     @Test

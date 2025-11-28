@@ -92,18 +92,18 @@ const mapasStore = useMapasStore();
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
 onMounted(async () => {
-  await unidadesStore.fetchUnidadesParaProcesso("");
+  await unidadesStore.buscarArvoreUnidade(codigo.value);
 });
 
 const unidadeOriginal = computed<Unidade | null>(
-    () => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null,
+    () => unidadesStore.unidade,
 );
 
 const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   const unidade = unidadeOriginal.value;
   if (!unidade) return null;
 
-  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorUnidade(
+  const atribuicoes = atribuicaoTemporariaStore.obterAtribuicoesPorUnidade(
       unidade.sigla,
   );
   const hoje = new Date();
@@ -143,7 +143,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
     return (
-        usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) ||
+        usuariosStore.obterUsuarioPorId(unidadeOriginal.value.idServidorTitular) ||
         null
     );
   }
@@ -159,7 +159,7 @@ const responsavelDetalhes = computed<Usuario | null>(() => {
     return null;
   }
   return (
-      usuariosStore.getUsuarioById(
+      usuariosStore.obterUsuarioPorId(
           unidadeComResponsavelDinamico.value.responsavel.codigo,
       ) || null
   );

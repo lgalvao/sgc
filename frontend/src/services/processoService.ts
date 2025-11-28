@@ -15,7 +15,7 @@ export async function criarProcesso(
     return response.data;
 }
 
-export async function fetchProcessosFinalizados(): Promise<ProcessoResumo[]> {
+export async function buscarProcessosFinalizados(): Promise<ProcessoResumo[]> {
     const response = await apiClient.get<ProcessoResumo[]>(
         "/processos/finalizados",
     );
@@ -74,7 +74,7 @@ export async function processarAcaoEmBloco(payload: {
     );
 }
 
-export async function fetchSubprocessosElegiveis(
+export async function buscarSubprocessosElegiveis(
     codProcesso: number,
 ): Promise<SubprocessoElegivel[]> {
     const response = await apiClient.get<SubprocessoElegivel[]>(

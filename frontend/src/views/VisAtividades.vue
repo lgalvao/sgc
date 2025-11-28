@@ -266,7 +266,7 @@ const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
   if (codSubrocesso.value === undefined) return [];
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -275,9 +275,9 @@ const isRevisao = computed(
 );
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
   }
 });
 

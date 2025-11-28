@@ -20,4 +20,6 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
 
     List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo);
+
+    List<Unidade> findByTitularTituloEleitoral(String tituloEleitoral);
 }

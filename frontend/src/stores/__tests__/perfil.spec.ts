@@ -65,14 +65,14 @@ describe("usePerfilStore", () => {
     describe("actions", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
-        it("setServidorId should update idServidor and store it in localStorage", () => {
-            perfilStore.setServidorId(15);
+        it("definirServidorId should update idServidor and store it in localStorage", () => {
+            perfilStore.definirServidorId(15);
             expect(perfilStore.servidorId).toBe(15);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("idServidor", "15");
         });
 
-        it("setPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
-            perfilStore.setPerfilUnidade(Perfil.ADMIN, 123);
+        it("definirPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
+            perfilStore.definirPerfilUnidade(Perfil.ADMIN, 123);
             expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(perfilStore.unidadeSelecionada).toBe(123);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(

@@ -21,7 +21,7 @@ const mockAnalises = [
 
 vi.mock("@/stores/analises", () => ({
   useAnalisesStore: vi.fn(() => ({
-    getAnalisesPorSubprocesso: (codSubprocesso: number) => {
+    obterAnalisesPorSubprocesso: (codSubprocesso: number) => {
       return codSubprocesso === 1 ? mockAnalises : [];
     },
   })),

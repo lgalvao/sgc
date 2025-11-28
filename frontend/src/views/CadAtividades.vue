@@ -414,7 +414,7 @@ const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
     if (codSubrocesso.value === undefined) return [];
     return atividadesStore
-      .getAtividadesPorSubprocesso(codSubrocesso.value)
+      .obterAtividadesPorSubprocesso(codSubrocesso.value)
       .map((a) => ({ ...a, novoConhecimento: "" }));
   },
   set: () => {},
@@ -578,11 +578,11 @@ const atividadesSemConhecimento = ref<Atividade[]>([]);
 
 
 onMounted(async () => {
-  await unidadesStore.fetchUnidade(props.sigla);
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(props.sigla);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
-    await analisesStore.fetchAnalisesCadastro(codSubrocesso.value);
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+    await analisesStore.buscarAnalisesCadastro(codSubrocesso.value);
   }
 });
 
@@ -594,7 +594,7 @@ function validarAtividades(): Atividade[] {
 
 const historicoAnalises = computed(() => {
   if (!codSubrocesso.value) return [];
-  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value);
+  return analisesStore.obterAnalisesPorSubprocesso(codSubrocesso.value);
 });
 
 function formatarData(data: string): string {

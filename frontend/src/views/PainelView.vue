@@ -71,13 +71,13 @@ const asc = ref(true);
 
 onMounted(async () => {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    processosStore.fetchProcessosPainel(
+    processosStore.buscarProcessosPainel(
         perfil.perfilSelecionado,
         Number(perfil.unidadeSelecionada),
         0,
         10,
     ); // Paginação inicial
-    alertasStore.fetchAlertas(
+    alertasStore.buscarAlertas(
         Number(perfil.servidorId) || 0,
         Number(perfil.unidadeSelecionada),
         0,
@@ -95,7 +95,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  processosStore.fetchProcessosPainel(
+  processosStore.buscarProcessosPainel(
     perfil.perfilSelecionado!,
     Number(perfil.unidadeSelecionada),
     0,
@@ -131,7 +131,7 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaCriterio.value = campo;
     alertaAsc.value = campo === "data" ? false : true;
   }
-  alertasStore.fetchAlertas(
+  alertasStore.buscarAlertas(
     Number(perfil.servidorId) || 0,
     Number(perfil.unidadeSelecionada),
     0,

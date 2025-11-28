@@ -28,7 +28,7 @@ describe("useAtividadesStore", () => {
         vi.restoreAllMocks();
     });
 
-    describe("fetchAtividadesParaSubprocesso", () => {
+    describe("buscarAtividadesParaSubprocesso", () => {
         it("deve buscar e mapear as atividades", async () => {
             const mockMapaVisualizacao = {
                 competencias: [
@@ -42,7 +42,7 @@ describe("useAtividadesStore", () => {
             const spy = vi
                 .spyOn(mapaService, "obterMapaVisualizacao")
                 .mockResolvedValue(mockMapaVisualizacao as any);
-            await store.fetchAtividadesParaSubprocesso(1);
+            await store.buscarAtividadesParaSubprocesso(1);
             expect(spy).toHaveBeenCalledWith(1);
             const expectedAtividades = [
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
@@ -54,7 +54,7 @@ describe("useAtividadesStore", () => {
             vi.spyOn(mapaService, "obterMapaVisualizacao").mockRejectedValue(
                 new Error("Erro"),
             );
-            await store.fetchAtividadesParaSubprocesso(1);
+            await store.buscarAtividadesParaSubprocesso(1);
             expect(mockNotificacoesStore.erro).toHaveBeenCalled();
         });
     });

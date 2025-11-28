@@ -20,7 +20,7 @@ export const useMapasStore = defineStore("mapas", () => {
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
 
-    async function fetchMapaVisualizacao(codSubrocesso: number) {
+    async function buscarMapaVisualizacao(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             mapaVisualizacao.value =
@@ -34,7 +34,7 @@ export const useMapasStore = defineStore("mapas", () => {
         }
     }
 
-    async function fetchMapaCompleto(codSubrocesso: number) {
+    async function buscarMapaCompleto(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
@@ -126,7 +126,7 @@ export const useMapasStore = defineStore("mapas", () => {
         }
     }
 
-    async function fetchMapaAjuste(codSubrocesso: number) {
+    async function buscarMapaAjuste(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             mapaAjuste.value = await mapaService.obterMapaAjuste(codSubrocesso);
@@ -155,7 +155,7 @@ export const useMapasStore = defineStore("mapas", () => {
         }
     }
 
-    async function fetchImpactoMapa(codSubrocesso: number) {
+    async function buscarImpactoMapa(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             impactoMapa.value =
@@ -194,15 +194,15 @@ export const useMapasStore = defineStore("mapas", () => {
         mapaAjuste,
         impactoMapa,
         mapaVisualizacao,
-        fetchMapaVisualizacao,
-        fetchMapaCompleto,
+        buscarMapaVisualizacao,
+        buscarMapaCompleto,
         salvarMapa,
         adicionarCompetencia,
         atualizarCompetencia,
         removerCompetencia,
-        fetchMapaAjuste,
+        buscarMapaAjuste,
         salvarAjustes,
-        fetchImpactoMapa,
+        buscarImpactoMapa,
         disponibilizarMapa,
     };
 });

@@ -63,11 +63,11 @@ const configuracoesStore = useConfiguracoesStore();
 const mensagemSucesso = ref("");
 
 onMounted(() => {
-  configuracoesStore.loadConfiguracoes();
+  configuracoesStore.carregarConfiguracoes();
 });
 
 const salvarConfiguracoes = () => {
-  if (configuracoesStore.saveConfiguracoes()) {
+  if (configuracoesStore.salvarConfiguracoes()) {
     mensagemSucesso.value = "Configurações salvas!";
     setTimeout(() => {
       mensagemSucesso.value = "";

@@ -3,6 +3,9 @@ import {ref} from "vue";
 import {mapUnidadesArray} from "@/mappers/unidades";
 import {
     buscarArvoreComElegibilidade,
+    buscarArvoreUnidade as serviceBuscarArvoreUnidade,
+    buscarSubordinadas as serviceBuscarSubordinadas,
+    buscarSuperior as serviceBuscarSuperior,
     buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
@@ -14,7 +17,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
-    async function fetchUnidadesParaProcesso(
+    async function buscarUnidadesParaProcesso(
         tipoProcesso: string,
         codProcesso?: number,
     ) {
@@ -33,7 +36,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         }
     }
 
-    async function fetchUnidade(sigla: string) {
+    async function buscarUnidade(sigla: string) {
         isLoading.value = true;
         error.value = null;
         try {
@@ -46,7 +49,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         }
     }
 
-    async function fetchUnidadePorCodigo(codigo: number) {
+    async function buscarUnidadePorCodigo(codigo: number) {
         isLoading.value = true;
         error.value = null;
         try {
@@ -59,83 +62,41 @@ export const useUnidadesStore = defineStore("unidades", () => {
         }
     }
 
-    function pesquisarUnidadePorCodigo(
-        codigo: number,
-        units: Unidade[] = unidades.value,
-    ): Unidade | null {
-        for (const unit of units) {
-            if (unit.codigo === codigo) return unit;
-            if (unit.filhas) {
-                const found = pesquisarUnidadePorCodigo(codigo, unit.filhas);
-                if (found) return found;
-            }
+    async function buscarArvoreUnidade(codigo: number) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await serviceBuscarArvoreUnidade(codigo);
+            unidade.value = response as unknown as Unidade;
+        } catch (err: any) {
+            error.value = "Falha ao carregar unidade: " + err.message;
+        } finally {
+            isLoading.value = false;
         }
-        return null;
     }
 
-    function pesquisarUnidadePorSigla(
-        sigla: string,
-        units: Unidade[] = unidades.value,
-    ): Unidade | null {
-        for (const unit of units) {
-            if (unit.sigla === sigla) return unit;
-            if (unit.filhas) {
-                const found = pesquisarUnidadePorSigla(sigla, unit.filhas);
-                if (found) return found;
-            }
+    async function obterUnidadesSubordinadas(siglaUnidade: string): Promise<string[]> {
+        isLoading.value = true;
+        try {
+            return await serviceBuscarSubordinadas(siglaUnidade);
+        } catch (err: any) {
+            error.value = "Falha ao buscar subordinadas: " + err.message;
+            return [];
+        } finally {
+            isLoading.value = false;
         }
-        return null;
     }
 
-    function getUnidadesSubordinadas(siglaUnidade: string): string[] {
-        const unidadesEncontradas: string[] = [];
-        const stack: Unidade[] = [];
-
-        const unidadeRaiz = pesquisarUnidadePorSigla(siglaUnidade);
-        if (unidadeRaiz) {
-            stack.push(unidadeRaiz);
-            while (stack.length > 0) {
-                const currentUnidade = stack.pop()!;
-                unidadesEncontradas.push(currentUnidade.sigla);
-                if (currentUnidade.filhas) {
-                    for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                        stack.push(currentUnidade.filhas[i]);
-                    }
-                }
-            }
+    async function obterUnidadeSuperior(siglaUnidade: string): Promise<string | null> {
+        isLoading.value = true;
+        try {
+            return await serviceBuscarSuperior(siglaUnidade);
+        } catch (err: any) {
+            error.value = "Falha ao buscar superior: " + err.message;
+            return null;
+        } finally {
+            isLoading.value = false;
         }
-        return unidadesEncontradas;
-    }
-
-    function getUnidadeSuperior(siglaUnidade: string): string | null {
-        const stack: { unit: Unidade; parentSigla: string | null }[] = [];
-
-        for (const u of unidades.value) {
-            stack.push({ unit: u, parentSigla: null });
-        }
-
-        while (stack.length > 0) {
-            const { unit: currentUnidade, parentSigla: currentParentSigla } =
-                stack.pop()!;
-
-            if (currentUnidade.sigla === siglaUnidade) {
-                return currentParentSigla;
-            }
-
-            if (currentUnidade.filhas) {
-                for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                    stack.push({
-                        unit: currentUnidade.filhas[i],
-                        parentSigla: currentUnidade.sigla,
-                    });
-                }
-            }
-        }
-        return null;
-    }
-
-    function getUnidadeImediataSuperior(siglaUnidade: string): string | null {
-        return getUnidadeSuperior(siglaUnidade);
     }
 
     return {
@@ -143,13 +104,11 @@ export const useUnidadesStore = defineStore("unidades", () => {
         unidade,
         isLoading,
         error,
-        fetchUnidadesParaProcesso,
-        fetchUnidade,
-        fetchUnidadePorCodigo,
-        pesquisarUnidadePorCodigo,
-        pesquisarUnidadePorSigla,
-        getUnidadesSubordinadas,
-        getUnidadeSuperior,
-        getUnidadeImediataSuperior,
+        buscarUnidadesParaProcesso,
+        buscarUnidade,
+        buscarUnidadePorCodigo,
+        buscarArvoreUnidade,
+        obterUnidadesSubordinadas,
+        obterUnidadeSuperior,
     };
 });

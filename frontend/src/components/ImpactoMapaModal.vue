@@ -196,7 +196,7 @@ watch(
             );
 
         if (unidadeParticipante && unidadeParticipante.codSubprocesso) {
-          await mapasStore.fetchImpactoMapa(unidadeParticipante.codSubprocesso);
+          await mapasStore.buscarImpactoMapa(unidadeParticipante.codSubprocesso);
         } else {
           // Fallback ou erro se não encontrar subprocesso
           console.error(

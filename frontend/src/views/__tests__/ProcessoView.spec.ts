@@ -32,10 +32,10 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/services/processoService", () => ({
     obterDetalhesProcesso: vi.fn(),
-    fetchSubprocessosElegiveis: vi.fn(),
+    buscarSubprocessosElegiveis: vi.fn(),
     finalizarProcesso: vi.fn(),
     processarAcaoEmBloco: vi.fn(),
-    fetchProcessosFinalizados: vi.fn(),
+    buscarProcessosFinalizados: vi.fn(),
 }));
 
 // Stubs
@@ -143,7 +143,7 @@ describe("ProcessoView.vue", () => {
       vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
           mockProcesso as any,
       );
-      vi.mocked(processoService.fetchSubprocessosElegiveis).mockResolvedValue(
+      vi.mocked(processoService.buscarSubprocessosElegiveis).mockResolvedValue(
           mockSubprocessosElegiveis as any,
       );
   });
@@ -158,7 +158,7 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-        expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(1);
+        expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(1);
 
         const detalhes = wrapper.findComponent(ProcessoDetalhesStub);
         expect(detalhes.props("descricao")).toBe("Test Process");

@@ -50,7 +50,7 @@ vi.mock("@/services/mapaService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
   buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-  fetchSubprocessoDetalhe: vi.fn(),
+  buscarSubprocessoDetalhe: vi.fn(),
   adicionarCompetencia: vi.fn(),
   atualizarCompetencia: vi.fn(),
   removerCompetencia: vi.fn(),
@@ -146,7 +146,6 @@ describe("CadMapa.vue", () => {
       perfilSelecionado: { value: Perfil.CHEFE },
       servidorLogado: { value: null },
       unidadeSelecionada: { value: null },
-      getPerfisDoServidor: vi.fn(),
     } as any);
 
     const wrapper = mount(CadMapa, {
@@ -238,7 +237,7 @@ describe("CadMapa.vue", () => {
     vi.mocked(
       subprocessoService.buscarSubprocessoPorProcessoEUnidade,
     ).mockResolvedValue({ codigo: 123 } as any);
-    vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue({
+    vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
       permissoes: { podeVisualizarImpacto: true },
     } as any);
     vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(
@@ -441,7 +440,7 @@ describe("CadMapa.vue", () => {
   });
 
   it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {
-    vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue({
+    vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
       permissoes: { podeVisualizarImpacto: false },
     } as any);
 

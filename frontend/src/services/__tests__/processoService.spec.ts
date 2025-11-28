@@ -65,9 +65,9 @@ describe("processoService", () => {
         expect(mockApi.post).toHaveBeenCalledWith("/processos/1/excluir");
     });
 
-    it("fetchProcessosFinalizados should get from the correct endpoint", async () => {
+    it("buscarProcessosFinalizados should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: []});
-        await service.fetchProcessosFinalizados();
+        await service.buscarProcessosFinalizados();
         expect(mockApi.get).toHaveBeenCalledWith("/processos/finalizados");
     });
 
@@ -114,9 +114,9 @@ describe("processoService", () => {
         );
     });
 
-    it("fetchSubprocessosElegiveis should get from the correct endpoint", async () => {
+    it("buscarSubprocessosElegiveis should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: []});
-        await service.fetchSubprocessosElegiveis(1);
+        await service.buscarSubprocessosElegiveis(1);
         expect(mockApi.get).toHaveBeenCalledWith(
             "/processos/1/subprocessos-elegiveis",
         );

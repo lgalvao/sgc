@@ -380,9 +380,9 @@ const subprocesso = computed(() => {
 const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
-    await mapaStore.fetchMapaVisualizacao(codSubprocesso.value);
+    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
   }
 });
 
@@ -420,7 +420,7 @@ const historicoAnalise = computed(() => {
   if (!codSubprocesso.value) return [];
 
   return analisesStore
-      .getAnalisesPorSubprocesso(codSubprocesso.value)
+      .obterAnalisesPorSubprocesso(codSubprocesso.value)
       .map((analise) => ({
         codigo: analise.codigo,
         data: new Date(analise.dataHora).toLocaleString("pt-BR"),

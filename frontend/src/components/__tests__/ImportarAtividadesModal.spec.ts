@@ -43,14 +43,14 @@ vi.mock("@/stores/processos", () => ({
   useProcessosStore: () => ({
     processosPainel: mockProcessos,
     processoDetalhe: mockProcessoDetalhe,
-    fetchProcessosPainel: vi.fn(),
-    fetchProcessoDetalhe: vi.fn(),
+    buscarProcessosPainel: vi.fn(),
+    buscarProcessoDetalhe: vi.fn(),
   }),
 }));
 vi.mock("@/stores/atividades", () => ({
   useAtividadesStore: () => ({
-    getAtividadesPorSubprocesso: () => mockAtividades,
-    fetchAtividadesParaSubprocesso: vi.fn(),
+    obterAtividadesPorSubprocesso: () => mockAtividades,
+    buscarAtividadesParaSubprocesso: vi.fn(),
     importarAtividades: vi.fn(),
   }),
 }));

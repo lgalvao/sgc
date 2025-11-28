@@ -19,7 +19,7 @@ export async function importarAtividades(
     );
 }
 
-export async function fetchSubprocessoDetalhe(
+export async function buscarSubprocessoDetalhe(
     id: number,
     perfil: string,
     unidadeCodigo: number,

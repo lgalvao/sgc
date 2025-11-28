@@ -11,8 +11,8 @@ import {
     homologarRevisaoCadastro,
 } from "@/services/cadastroService";
 import {
-    buscarSubprocessoPorProcessoEUnidade,
-    fetchSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
+    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
 import {useProcessosStore} from "@/stores/processos";
@@ -32,9 +32,7 @@ async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroM
 
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
-            await processosStore.fetchProcessoDetalhe(
-                processosStore.processoDetalhe.codigo,
-            );
+            await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
         }
         return true;
     } catch {
@@ -54,7 +52,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         await processosStore.alterarDataLimiteSubprocesso(id, dados);
     }
 
-    async function fetchSubprocessoDetalhe(id: number) {
+    async function buscarSubprocessoDetalhe(id: number) {
         const perfilStore = usePerfilStore();
         const notificacoes = useNotificacoesStore();
         const perfil = perfilStore.perfilSelecionado;
@@ -94,13 +92,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
     }
 
-    async function fetchSubprocessoPorProcessoEUnidade(
+    async function buscarSubprocessoPorProcessoEUnidade(
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
         const notificacoes = useNotificacoesStore();
         try {
-            const dto = await buscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+            const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
         } catch {
             notificacoes.erro(
@@ -114,8 +112,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     return {
         subprocessoDetalhe,
         alterarDataLimiteSubprocesso,
-        fetchSubprocessoDetalhe,
-        fetchSubprocessoPorProcessoEUnidade,
+        buscarSubprocessoDetalhe,
+        buscarSubprocessoPorProcessoEUnidade,
         disponibilizarCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubrocesso),
@@ -158,10 +156,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 "Revisão aceita",
                 "Erro ao aceitar",
             ),
-        homologarRevisaoCadastro: (
-            codSubrocesso: number,
-            req: HomologarCadastroRequest,
-        ) =>
+        homologarRevisaoCadastro: (codSubrocesso: number, req: HomologarCadastroRequest) =>
             _executarAcao(
                 () => homologarRevisaoCadastro(codSubrocesso, req),
                 "Revisão homologada",

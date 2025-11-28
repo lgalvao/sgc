@@ -75,7 +75,7 @@ watch(
   () => props.mostrar,
     (newVal) => {
     if (newVal && props.codSubrocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(
+      analises.value = analisesStore.obterAnalisesPorSubprocesso(
           props.codSubrocesso,
       );
     }

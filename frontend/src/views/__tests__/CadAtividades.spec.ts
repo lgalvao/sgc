@@ -111,7 +111,6 @@ describe("CadAtividades.vue", () => {
       perfilSelecionado: computed(() => Perfil.CHEFE),
       servidorLogado: computed(() => null),
       unidadeSelecionada: computed(() => null),
-      getPerfisDoServidor: vi.fn(),
     } as any);
 
     const wrapper = mount(CadAtividades, {

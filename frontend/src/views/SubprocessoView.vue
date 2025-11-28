@@ -75,15 +75,15 @@ const dataLimite = computed(() =>
 );
 
 onMounted(async () => {
-  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,
   );
 
   if (id) {
     codSubprocesso.value = id;
-    await subprocessosStore.fetchSubprocessoDetalhe(id);
-    await mapaStore.fetchMapaCompleto(id);
+    await subprocessosStore.buscarSubprocessoDetalhe(id);
+    await mapaStore.buscarMapaCompleto(id);
   }
 });
 

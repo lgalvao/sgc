@@ -190,7 +190,7 @@ onMounted(async () => {
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
-      await processosStore.fetchProcessoDetalhe(Number(codProcesso));
+      await processosStore.buscarProcessoDetalhe(Number(codProcesso));
       const processo = processosStore.processoDetalhe;
       if (processo) {
         // Redirect if process is not in CRIADO state (cannot be edited)
@@ -208,7 +208,7 @@ onMounted(async () => {
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
-        await unidadesStore.fetchUnidadesParaProcesso(
+        await unidadesStore.buscarUnidadesParaProcesso(
           processo.tipo,
           processo.codigo,
         );
@@ -222,7 +222,7 @@ onMounted(async () => {
       console.error("Erro ao carregar processo:", error);
     }
   } else {
-    await unidadesStore.fetchUnidadesParaProcesso(tipo.value);
+    await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
   }
 });
 
@@ -230,7 +230,7 @@ watch(tipo, async (novoTipo) => {
   const codProcesso = processoEditando.value
     ? processoEditando.value.codigo
     : undefined;
-  await unidadesStore.fetchUnidadesParaProcesso(novoTipo, codProcesso);
+  await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
 });
 
 function limparCampos() {

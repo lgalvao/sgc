@@ -9,15 +9,14 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 export const useAnalisesStore = defineStore("analises", () => {
     const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
 
-    const getAnalisesPorSubprocesso = computed(() => (codSubrocesso: number) => {
+    const obterAnalisesPorSubprocesso = computed(() => (codSubrocesso: number) => {
         return analisesPorSubprocesso.value.get(codSubrocesso) || [];
     });
 
-    async function fetchAnalisesCadastro(codSubrocesso: number) {
+    async function buscarAnalisesCadastro(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
-            const analises =
-                await analiseService.listarAnalisesCadastro(codSubrocesso);
+            const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
             const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
             const analisesFiltradas = analises.filter(
                 (a) => !atuais.some((aa) => aa.codigo === a.codigo),
@@ -34,7 +33,7 @@ export const useAnalisesStore = defineStore("analises", () => {
         }
     }
 
-    async function fetchAnalisesValidacao(codSubrocesso: number) {
+    async function buscarAnalisesValidacao(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             const analises =
@@ -57,8 +56,8 @@ export const useAnalisesStore = defineStore("analises", () => {
 
     return {
         analisesPorSubprocesso,
-        getAnalisesPorSubprocesso,
-        fetchAnalisesCadastro,
-        fetchAnalisesValidacao,
+        obterAnalisesPorSubprocesso,
+        buscarAnalisesCadastro,
+        buscarAnalisesValidacao,
     };
 });

@@ -46,11 +46,11 @@ describe("useProcessosStore", () => {
     });
 
     describe("Actions", () => {
-        describe("fetchProcessosPainel", () => {
+        describe("buscarProcessosPainel", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockPage = {content: [{id: 1}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
-                await store.fetchProcessosPainel("perfil", 1, 0, 10);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10);
                 expect(painelService.listarProcessos).toHaveBeenCalledWith(
                     "perfil",
                     1,
@@ -65,24 +65,24 @@ describe("useProcessosStore", () => {
             it("não deve atualizar o estado em caso de falha", async () => {
                 painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
                 await expect(
-                    store.fetchProcessosPainel("perfil", 1, 0, 10),
+                    store.buscarProcessosPainel("perfil", 1, 0, 10),
                 ).rejects.toThrow(MOCK_ERROR);
             });
         });
 
-        describe("fetchProcessoDetalhe", () => {
+        describe("buscarProcessoDetalhe", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                await store.fetchProcessoDetalhe(1);
+                await store.buscarProcessoDetalhe(1);
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
                 expect(store.processoDetalhe).toEqual(MOCK_PROCESSO_DETALHE);
             });
 
             it("não deve atualizar o estado em caso de falha", async () => {
                 processoService.obterDetalhesProcesso.mockRejectedValue(MOCK_ERROR);
-                await expect(store.fetchProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
+                await expect(store.buscarProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
             });
         });
 
@@ -166,26 +166,26 @@ describe("useProcessosStore", () => {
             });
         });
 
-        describe("fetchProcessosFinalizados", () => {
+        describe("buscarProcessosFinalizados", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockProcessos = [{id: 1}];
-                processoService.fetchProcessosFinalizados.mockResolvedValue(
+                processoService.buscarProcessosFinalizados.mockResolvedValue(
                     mockProcessos as any,
                 );
-                await store.fetchProcessosFinalizados();
-                expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
+                await store.buscarProcessosFinalizados();
+                expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
                 expect(store.processosFinalizados).toEqual(mockProcessos);
             });
         });
 
-        describe("fetchSubprocessosElegiveis", () => {
+        describe("buscarSubprocessosElegiveis", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockSubprocessos = [{id: 1}];
-                processoService.fetchSubprocessosElegiveis.mockResolvedValue(
+                processoService.buscarSubprocessosElegiveis.mockResolvedValue(
                     mockSubprocessos as any,
                 );
-                await store.fetchSubprocessosElegiveis(1);
-                expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(
+                await store.buscarSubprocessosElegiveis(1);
+                expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(
                     1,
                 );
                 expect(store.subprocessosElegiveis).toEqual(mockSubprocessos);

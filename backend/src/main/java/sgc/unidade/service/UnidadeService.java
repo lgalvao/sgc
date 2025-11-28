@@ -207,4 +207,63 @@ public class UnidadeService {
                 new ArrayList<>(),
                 false);
     }
+
+    public UnidadeDto buscarArvore(Long id) {
+        List<UnidadeDto> todas = buscarTodasUnidades();
+        return buscarNaHierarquia(todas, id);
+    }
+
+    public List<String> buscarSiglasSubordinadas(String sigla) {
+        List<UnidadeDto> todas = buscarTodasUnidades();
+        UnidadeDto raiz = buscarNaHierarquiaPorSigla(todas, sigla);
+        
+        if (raiz == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada na hierarquia");
+        }
+
+        List<String> resultado = new ArrayList<>();
+        coletarSiglas(raiz, resultado);
+        return resultado;
+    }
+
+    public String buscarSiglaSuperior(String sigla) {
+        Unidade unidade = unidadeRepo.findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+        
+        if (unidade.getUnidadeSuperior() != null) {
+            return unidade.getUnidadeSuperior().getSigla();
+        }
+        return null;
+    }
+
+    private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long id) {
+        for (UnidadeDto u : lista) {
+            if (u.getCodigo().equals(id)) return u;
+            if (u.getSubunidades() != null) {
+                UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), id);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private UnidadeDto buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
+        for (UnidadeDto u : lista) {
+            if (u.getSigla().equals(sigla)) return u;
+            if (u.getSubunidades() != null) {
+                UnidadeDto found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private void coletarSiglas(UnidadeDto unidade, List<String> resultado) {
+        resultado.add(unidade.getSigla());
+        if (unidade.getSubunidades() != null) {
+            for (UnidadeDto filha : unidade.getSubunidades()) {
+                coletarSiglas(filha, resultado);
+            }
+        }
+    }
 }

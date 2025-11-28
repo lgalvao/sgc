@@ -64,13 +64,13 @@ describe("CadMapa.vue", () => {
         } as any;
 
         const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.fetchSubprocessoPorProcessoEUnidade = vi
+        subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi
             .fn()
             .mockResolvedValue(10);
-        subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({});
+        subprocessosStore.buscarSubprocessoDetalhe = vi.fn().mockResolvedValue({});
 
         const atividadesStore = useAtividadesStore();
-        atividadesStore.fetchAtividadesParaSubprocesso = vi
+        atividadesStore.buscarAtividadesParaSubprocesso = vi
             .fn()
             .mockResolvedValue({});
 
@@ -131,13 +131,13 @@ describe("CadMapa.vue", () => {
 
         const mapasStore = useMapasStore();
         const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.fetchSubprocessoPorProcessoEUnidade = vi
+        subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi
             .fn()
             .mockResolvedValue(10);
-        subprocessosStore.fetchSubprocessoDetalhe = vi.fn().mockResolvedValue({});
+        subprocessosStore.buscarSubprocessoDetalhe = vi.fn().mockResolvedValue({});
 
         const atividadesStore = useAtividadesStore();
-        atividadesStore.fetchAtividadesParaSubprocesso = vi
+        atividadesStore.buscarAtividadesParaSubprocesso = vi
             .fn()
             .mockResolvedValue({});
 

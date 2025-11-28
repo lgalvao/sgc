@@ -10,14 +10,14 @@ import {useNotificacoesStore} from "./notificacoes";
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
 
-    const getAtividadesPorSubprocesso = computed(
+    const obterAtividadesPorSubprocesso = computed(
         () =>
             (codSubrocesso: number): Atividade[] => {
                 return atividadesPorSubprocesso.value.get(codSubrocesso) || [];
             },
     );
 
-    async function fetchAtividadesParaSubprocesso(codSubrocesso: number) {
+    async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
         const notificacoes = useNotificacoesStore();
         try {
             const mapa = await mapaService.obterMapaVisualizacao(codSubrocesso);
@@ -50,8 +50,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
                 "Atividade adicionada",
                 "A nova atividade foi adicionada.",
             );
-            // Opcional: recarregar para garantir consistência total, mas a adição otimista já ajuda.
-            await fetchAtividadesParaSubprocesso(codSubrocesso);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch {
             notificacoes.erro(
                 "Erro ao adicionar atividade",
@@ -150,7 +149,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
                 "As atividades foram importadas.",
             );
             // Recarregar as atividades do subprocesso de destino para refletir a importação
-            await fetchAtividadesParaSubprocesso(codSubrocessoDestino);
+            await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
         } catch {
             notificacoes.erro(
                 "Erro ao importar",
@@ -229,8 +228,8 @@ export const useAtividadesStore = defineStore("atividades", () => {
 
     return {
         atividadesPorSubprocesso,
-        getAtividadesPorSubprocesso,
-        fetchAtividadesParaSubprocesso,
+        obterAtividadesPorSubprocesso,
+        buscarAtividadesParaSubprocesso,
         adicionarAtividade,
         removerAtividade,
         adicionarConhecimento,

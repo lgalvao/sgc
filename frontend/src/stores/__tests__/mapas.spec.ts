@@ -38,7 +38,7 @@ describe("useMapasStore", () => {
         expect(store.impactoMapa).toBeNull();
     });
 
-    describe("fetchMapaCompleto", () => {
+    describe("buscarMapaCompleto", () => {
         it("should call service and update state on success", async () => {
             const mockMapa: MapaCompleto = {
                 codigo: 1,
@@ -49,7 +49,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            await store.fetchMapaCompleto(codSubrocesso);
+            await store.buscarMapaCompleto(codSubrocesso);
 
             expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
             expect(store.mapaCompleto).toEqual(mockMapa);
@@ -61,7 +61,7 @@ describe("useMapasStore", () => {
             );
             store.mapaCompleto = {} as any; // Pre-set state
 
-            await store.fetchMapaCompleto(codSubrocesso);
+            await store.buscarMapaCompleto(codSubrocesso);
 
             expect(store.mapaCompleto).toBeNull();
         });
@@ -91,7 +91,7 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("fetchMapaAjuste", () => {
+    describe("buscarMapaAjuste", () => {
         it("should call service and update state on success", async () => {
             const mockMapa: MapaAjuste = {
                 codigo: 1,
@@ -100,7 +100,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
-            await store.fetchMapaAjuste(codSubrocesso);
+            await store.buscarMapaAjuste(codSubrocesso);
 
             expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubrocesso);
             expect(store.mapaAjuste).toEqual(mockMapa);
@@ -121,7 +121,7 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("fetchImpactoMapa", () => {
+    describe("buscarImpactoMapa", () => {
         it("should call service and update state on success", async () => {
             const mockImpacto: ImpactoMapa = {
                 temImpactos: true,
@@ -138,7 +138,7 @@ describe("useMapasStore", () => {
                 mockImpacto,
             );
 
-            await store.fetchImpactoMapa(codSubrocesso);
+            await store.buscarImpactoMapa(codSubrocesso);
 
             expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(
                 codSubrocesso,
@@ -233,7 +233,7 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("fetchMapaVisualizacao", () => {
+    describe("buscarMapaVisualizacao", () => {
         it("should call service and update state on success", async () => {
             const mockMapa: MapaVisualizacao = {
                 codigo: 1,
@@ -242,7 +242,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
 
-            await store.fetchMapaVisualizacao(codSubrocesso);
+            await store.buscarMapaVisualizacao(codSubrocesso);
 
             expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(
                 codSubrocesso,
@@ -256,7 +256,7 @@ describe("useMapasStore", () => {
             );
             store.mapaVisualizacao = {} as any; // Pre-set state
 
-            await store.fetchMapaVisualizacao(codSubrocesso);
+            await store.buscarMapaVisualizacao(codSubrocesso);
 
             expect(store.mapaVisualizacao).toBeNull();
         });

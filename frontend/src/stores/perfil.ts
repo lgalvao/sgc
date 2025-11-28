@@ -28,23 +28,23 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
 
-    function setServidorId(novoId: string | number) {
+    function definirServidorId(novoId: string | number) {
         servidorId.value = Number(novoId);
         localStorage.setItem("idServidor", String(novoId));
     }
 
-    function setPerfilUnidade(perfil: Perfil, unidadeCodigo: number) {
+    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number) {
         perfilSelecionado.value = perfil;
         unidadeSelecionada.value = unidadeCodigo;
         localStorage.setItem("perfilSelecionado", perfil);
         localStorage.setItem("unidadeSelecionada", unidadeCodigo.toString());
     }
 
-    function setToken(token: string) {
+    function definirToken(token: string) {
         localStorage.setItem("jwtToken", token);
     }
 
-    function setPerfis(novosPerfis: Perfil[]) {
+    function definirPerfis(novosPerfis: Perfil[]) {
         perfis.value = novosPerfis;
         localStorage.setItem("perfis", JSON.stringify(novosPerfis));
     }
@@ -65,7 +65,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                     responsePerfisUnidades.map((p) => p.perfil as unknown as Perfil),
                 ),
             ];
-            setPerfis(listaPerfis);
+            definirPerfis(listaPerfis);
 
             // Se houver apenas uma opção, seleciona automaticamente
             if (responsePerfisUnidades.length === 1) {
@@ -75,12 +75,12 @@ export const usePerfilStore = defineStore("perfil", () => {
                     perfil: perfilUnidadeSelecionado.perfil,
                     unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                 });
-                setPerfilUnidade(
+                definirPerfilUnidade(
                     loginResponse.perfil as unknown as Perfil,
                     loginResponse.unidadeCodigo,
-                ); // Usar loginResponse.codUnidade
-                setServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
-                setToken(loginResponse.token); // Adicionar esta linha
+                );
+                definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
+                definirToken(loginResponse.token); // Adicionar esta linha
             }
             return true;
         }
@@ -96,12 +96,12 @@ export const usePerfilStore = defineStore("perfil", () => {
             perfil: perfilUnidade.perfil,
             unidadeCodigo: perfilUnidade.unidade.codigo,
         });
-        setPerfilUnidade(
+        definirPerfilUnidade(
             loginResponse.perfil as unknown as Perfil,
             loginResponse.unidadeCodigo,
         );
-        setServidorId(loginResponse.tituloEleitoral);
-        setToken(loginResponse.token);
+        definirServidorId(loginResponse.tituloEleitoral);
+        definirToken(loginResponse.token);
     }
 
     return {
@@ -112,10 +112,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfisUnidades,
         perfis,
         isAdmin,
-        setServidorId,
-        setPerfilUnidade,
-        setToken,
-        setPerfis,
+        definirServidorId,
+        definirPerfilUnidade,
         loginCompleto,
         selecionarPerfilUnidade,
     };

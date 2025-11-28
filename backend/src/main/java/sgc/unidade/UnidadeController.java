@@ -121,4 +121,43 @@ public class UnidadeController {
         UnidadeDto unidade = unidadeService.buscarPorId(id);
         return ResponseEntity.ok(unidade);
     }
+
+    /**
+     * Busca a árvore de uma unidade específica (incluindo subunidades).
+     * @param id O ID da unidade.
+     * @return A unidade com sua árvore de subunidades.
+     */
+    @GetMapping("/{id}/arvore")
+    public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long id) {
+        UnidadeDto unidade = unidadeService.buscarArvore(id);
+        if (unidade == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(unidade);
+    }
+
+    /**
+     * Busca as siglas de todas as unidades subordinadas (diretas e indiretas) e a própria unidade.
+     * @param sigla A sigla da unidade raiz.
+     * @return Lista de siglas.
+     */
+    @GetMapping("/sigla/{sigla}/subordinadas")
+    public ResponseEntity<List<String>> buscarSiglasSubordinadas(@PathVariable String sigla) {
+        List<String> siglas = unidadeService.buscarSiglasSubordinadas(sigla);
+        return ResponseEntity.ok(siglas);
+    }
+
+    /**
+     * Busca a sigla da unidade superior imediata.
+     * @param sigla A sigla da unidade.
+     * @return A sigla da unidade superior ou 204 se não houver.
+     */
+    @GetMapping("/sigla/{sigla}/superior")
+    public ResponseEntity<String> buscarSiglaSuperior(@PathVariable String sigla) {
+        String siglaSuperior = unidadeService.buscarSiglaSuperior(sigla);
+        if (siglaSuperior == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(siglaSuperior);
+    }
 }

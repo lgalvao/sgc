@@ -174,7 +174,7 @@ const processosDisponiveis = computed<ProcessoResumo[]>(() => {
 });
 
 onMounted(() => {
-  processosStore.fetchProcessosPainel("ADMIN", 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+  processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
 });
 
 watch(
@@ -225,7 +225,7 @@ function resetModal() {
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   if (processo) {
-    await processosStore.fetchProcessoDetalhe(processo.codigo);
+    await processosStore.buscarProcessoDetalhe(processo.codigo);
     unidadesParticipantes.value =
         processosStore.processoDetalhe?.unidades || [];
   } else {
@@ -238,9 +238,9 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade);
+    await atividadesStore.buscarAtividadesParaSubprocesso(unidadePu.codUnidade);
     const atividadesDaOutraUnidade =
-        atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
+        atividadesStore.obterAtividadesPorSubprocesso(unidadePu.codUnidade);
     atividadesParaImportar.value = atividadesDaOutraUnidade
         ? [...atividadesDaOutraUnidade]
         : [];

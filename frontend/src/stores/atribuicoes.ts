@@ -10,7 +10,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
         const isLoading = ref(false);
         const error = ref<string | null>(null);
 
-        const getAtribuicoesPorServidor = computed(
+        const obterAtribuicoesPorServidor = computed(
             () =>
                 (servidorId: number): AtribuicaoTemporaria[] => {
                     return atribuicoes.value.filter(
@@ -19,7 +19,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                 },
         );
 
-        const getAtribuicoesPorUnidade = computed(
+        const obterAtribuicoesPorUnidade = computed(
             () =>
                 (unidadeSigla: string): AtribuicaoTemporaria[] => {
                     return atribuicoes.value.filter(
@@ -28,7 +28,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                 },
         );
 
-        async function fetchAtribuicoes() {
+        async function buscarAtribuicoes() {
             isLoading.value = true;
             error.value = null;
             try {
@@ -42,7 +42,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                     unidade: a.unidade,
                 })) as AtribuicaoTemporaria[];
             } catch (err: any) {
-                error.value = "Falha ao carregar atribuições: " + err.message;
+                error.value = `Falha ao carregar atribuições: ${err.message}`;
             } finally {
                 isLoading.value = false;
             }
@@ -56,9 +56,9 @@ export const useAtribuicaoTemporariaStore = defineStore(
             atribuicoes,
             isLoading,
             error,
-            getAtribuicoesPorServidor,
-            getAtribuicoesPorUnidade,
-            fetchAtribuicoes,
+            obterAtribuicoesPorServidor,
+            obterAtribuicoesPorUnidade,
+            buscarAtribuicoes,
             criarAtribuicao,
         };
     },

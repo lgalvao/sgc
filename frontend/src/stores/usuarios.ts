@@ -8,11 +8,11 @@ export const useUsuariosStore = defineStore("usuarios", () => {
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
-    const getUsuarioById = computed(() => (id: number): Usuario | undefined => {
+    const obterUsuarioPorId = computed(() => (id: number): Usuario | undefined => {
         return usuarios.value.find((u) => u.codigo === id);
     });
 
-    async function fetchUsuarios() {
+    async function buscarUsuarios() {
         isLoading.value = true;
         error.value = null;
         try {
@@ -32,7 +32,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         usuarios,
         isLoading,
         error,
-        getUsuarioById,
-        fetchUsuarios,
+        obterUsuarioPorId,
+        buscarUsuarios,
     };
 });

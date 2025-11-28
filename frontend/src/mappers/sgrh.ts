@@ -15,7 +15,6 @@ export interface Unidade {
   codigo: number;
   nome: string;
   sigla: string;
-  // Outros campos da Unidade podem ser adicionados conforme necessário
 }
 
 export interface Usuario {

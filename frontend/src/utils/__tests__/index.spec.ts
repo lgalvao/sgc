@@ -33,7 +33,6 @@ describe("utilitários", () => {
                 "bi bi-exclamation-triangle-fill text-warning",
             );
             expect(iconeTipo("info")).toBe("bi bi-info-circle-fill text-info");
-            expect(iconeTipo("email")).toBe("bi bi-envelope-fill text-primary");
         });
 
         it("deve retornar o ícone padrão para tipos desconhecidos", () => {

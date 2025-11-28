@@ -34,10 +34,10 @@ describe("subprocessoService", () => {
         });
     });
 
-    describe("fetchSubprocessoDetalhe", () => {
+    describe("buscarSubprocessoDetalhe", () => {
         it("deve chamar o endpoint correto com os parâmetros corretos", async () => {
             mockedApiClient.get.mockResolvedValue({data: {}});
-            await subprocessoService.fetchSubprocessoDetalhe(1, "perfil", 123);
+            await subprocessoService.buscarSubprocessoDetalhe(1, "perfil", 123);
             expect(mockedApiClient.get).toHaveBeenCalledWith("/subprocessos/1", {
                 params: {perfil: "perfil", unidadeUsuario: 123},
             });

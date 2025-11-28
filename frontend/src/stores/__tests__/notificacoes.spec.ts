@@ -150,13 +150,6 @@ describe("useNotificacoesStore", () => {
             notificacoesStore.sucesso("Teste", "Mensagem", 5000);
             expect(notificacoesStore.notificacoes[0].duracao).toBe(5000);
         });
-
-        it("email should add email notification with custom duration", () => {
-            notificacoesStore.email("Assunto", "Dest", "Corpo");
-            const notificacao = notificacoesStore.notificacoes[0];
-            expect(notificacao.tipo).toBe("email");
-            expect(notificacao.duracao).toBe(10000);
-        });
     });
 
     describe("auto-removal", () => {

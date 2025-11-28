@@ -45,7 +45,7 @@ const criterio = ref<SortCriteria>("descricao");
 const asc = ref(true);
 
 onMounted(async () => {
-  await processosStore.fetchProcessosFinalizados();
+  await processosStore.buscarProcessosFinalizados();
 });
 
 const processosFinalizadosOrdenados = computed(() => {

@@ -5,22 +5,20 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     const diasInativacaoProcesso = ref(10);
     const diasAlertaNovo = ref(7);
 
-    function loadConfiguracoes() {
+    function carregarConfiguracoes() {
         try {
             const savedConfig = localStorage.getItem("appConfiguracoes");
             if (savedConfig) {
                 const parsedConfig = JSON.parse(savedConfig);
-                diasInativacaoProcesso.value =
-                    parsedConfig.diasInativacaoProcesso || diasInativacaoProcesso.value;
-                diasAlertaNovo.value =
-                    parsedConfig.diasAlertaNovo || diasAlertaNovo.value;
+                diasInativacaoProcesso.value = parsedConfig.diasInativacaoProcesso || diasInativacaoProcesso.value;
+                diasAlertaNovo.value = parsedConfig.diasAlertaNovo || diasAlertaNovo.value;
             }
         } catch (e) {
             console.error("Erro ao carregar configurações do localStorage:", e);
         }
     }
 
-    function saveConfiguracoes() {
+    function salvarConfiguracoes() {
         try {
             const configToSave = {
                 diasInativacaoProcesso: diasInativacaoProcesso.value,
@@ -34,20 +32,20 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
         }
     }
 
-    function setDiasInativacaoProcesso(dias: number) {
+    function definirDiasInativacaoProcesso(dias: number) {
         if (dias >= 1) diasInativacaoProcesso.value = dias;
     }
 
-    function setDiasAlertaNovo(dias: number) {
+    function definirDiasAlertaNovo(dias: number) {
         if (dias >= 1) diasAlertaNovo.value = dias;
     }
 
     return {
         diasInativacaoProcesso,
         diasAlertaNovo,
-        loadConfiguracoes,
-        saveConfiguracoes,
-        setDiasInativacaoProcesso,
-        setDiasAlertaNovo,
+        carregarConfiguracoes,
+        salvarConfiguracoes,
+        definirDiasInativacaoProcesso,
+        definirDiasAlertaNovo,
     };
 });

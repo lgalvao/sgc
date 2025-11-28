@@ -60,7 +60,7 @@ describe("useAlertasStore", () => {
     });
 
     describe("actions", () => {
-        it("fetchAlertas should call painelService and update state", async () => {
+        it("buscarAlertas should call painelService and update state", async () => {
             const mockPage = {
                 content: [mockAlerta],
                 totalPages: 1,
@@ -73,7 +73,7 @@ describe("useAlertasStore", () => {
             };
             painelService.listarAlertas.mockResolvedValue(mockPage);
 
-            await alertasStore.fetchAlertas(123, 456, 0, 10);
+            await alertasStore.buscarAlertas(123, 456, 0, 10);
 
             expect(painelService.listarAlertas).toHaveBeenCalledWith(
                 123,
