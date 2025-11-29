@@ -65,6 +65,7 @@
 
       <BButton
         variant="primary"
+        type="button"
         data-testid="btn-salvar"
         @click="salvarProcesso"
       >
