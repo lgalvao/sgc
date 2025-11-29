@@ -101,4 +101,46 @@ describe("ImportarAtividadesModal", () => {
         expect(wrapper.emitted("importar")).toBeTruthy();
         expect(wrapper.emitted("fechar")).toBeTruthy();
   });
+
+    it("deve resetar o modal quando a prop 'mostrar' mudar para true", async () => {
+        // Simulate selecting something first
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+
+        await wrapper.setProps({mostrar: false});
+        await wrapper.setProps({mostrar: true});
+
+        // Check if reset
+        expect((wrapper.vm as any).processoSelecionadoId).toBeNull();
+    });
+
+    it("deve lidar com erro na importação", async () => {
+        // Setup selection
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+        await selects[1].setValue("10");
+        await flushPromises();
+        await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
+
+        mockExecute.mockRejectedValue(new Error("Fail"));
+        const importButton = wrapper.find('[data-testid="btn-importar"]');
+        await importButton.trigger("click");
+
+        expect(mockExecute).toHaveBeenCalled();
+        expect(wrapper.emitted("importar")).toBeFalsy();
+    });
+
+    it("deve limpar seleção se selecionar processo vazio", async () => {
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+        // BFormSelect/setValue might set it as string "1" even if bound to number
+        expect((wrapper.vm as any).processoSelecionadoId).toBe("1");
+
+        await selects[0].setValue(""); // Select placeholder/empty
+        await flushPromises();
+        expect((wrapper.vm as any).processoSelecionadoId).toBe("");
+    });
 });

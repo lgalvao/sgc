@@ -137,6 +137,15 @@ describe("useAtividadesStore", () => {
                 novoConhecimento,
             ]);
         });
+
+        it("deve lidar com erros ao adicionar conhecimento", async () => {
+            vi.spyOn(atividadeService, "criarConhecimento").mockRejectedValue(
+                new Error("Erro"),
+            );
+            await expect(
+                store.adicionarConhecimento(1, 1, {descricao: "Novo"}),
+            ).rejects.toThrow("Erro");
+        });
     });
 
     describe("removerConhecimento", () => {
@@ -169,6 +178,13 @@ describe("useAtividadesStore", () => {
                 [],
             );
         });
+
+        it("deve lidar com erros ao remover conhecimento", async () => {
+            vi.spyOn(atividadeService, "excluirConhecimento").mockRejectedValue(
+                new Error("Erro"),
+            );
+            await expect(store.removerConhecimento(1, 1, 1)).rejects.toThrow("Erro");
+        });
     });
 
     describe("importarAtividades", () => {
@@ -183,6 +199,13 @@ describe("useAtividadesStore", () => {
             await store.importarAtividades(1, 2);
 
             expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(1, 2);
+        });
+
+        it("deve lidar com erros ao importar atividades", async () => {
+            vi.spyOn(subprocessoService, "importarAtividades").mockRejectedValue(
+                new Error("Erro"),
+            );
+            await expect(store.importarAtividades(1, 2)).rejects.toThrow("Erro");
         });
     });
 
@@ -213,6 +236,19 @@ describe("useAtividadesStore", () => {
             expect(store.atividadesPorSubprocesso.get(1)).toEqual([
                 atividadeAtualizada,
             ]);
+        });
+
+        it("deve lidar com erros ao atualizar atividade", async () => {
+            vi.spyOn(atividadeService, "atualizarAtividade").mockRejectedValue(
+                new Error("Erro"),
+            );
+            await expect(
+                store.atualizarAtividade(1, 1, {
+                    codigo: 1,
+                    descricao: "Teste",
+                    conhecimentos: [],
+                }),
+            ).rejects.toThrow("Erro");
         });
     });
 
@@ -253,6 +289,15 @@ describe("useAtividadesStore", () => {
             expect(store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual([
                 conhecimentoAtualizado,
             ]);
+        });
+
+        it("deve lidar com erros ao atualizar conhecimento", async () => {
+            vi.spyOn(atividadeService, "atualizarConhecimento").mockRejectedValue(
+                new Error("Erro"),
+            );
+            await expect(
+                store.atualizarConhecimento(1, 1, 1, {id: 1, descricao: "Teste"}),
+            ).rejects.toThrow("Erro");
         });
     });
 });

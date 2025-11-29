@@ -141,6 +141,12 @@ describe("useUnidadesStore", () => {
       expect(unidadesStore.unidade).toEqual(mockUnit);
     });
 
+    it("buscarArvoreUnidade should handle error", async () => {
+        vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(new Error("Fail"));
+        await unidadesStore.buscarArvoreUnidade(1);
+        expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+    });
+
     it("obterUnidadesSubordinadas should call service", async () => {
       const mockSubordinadas = ["A", "B"];
       vi.mocked(unidadesService.buscarSubordinadas).mockResolvedValue(mockSubordinadas);
@@ -151,6 +157,13 @@ describe("useUnidadesStore", () => {
       expect(result).toEqual(mockSubordinadas);
     });
 
+    it("obterUnidadesSubordinadas should handle error", async () => {
+        vi.mocked(unidadesService.buscarSubordinadas).mockRejectedValue(new Error("Fail"));
+        const result = await unidadesStore.obterUnidadesSubordinadas("TEST");
+        expect(unidadesStore.error).toContain("Falha ao buscar subordinadas");
+        expect(result).toEqual([]);
+    });
+
     it("obterUnidadeSuperior should call service", async () => {
       const mockSuperior = "SUP";
       vi.mocked(unidadesService.buscarSuperior).mockResolvedValue(mockSuperior);
@@ -159,6 +172,13 @@ describe("useUnidadesStore", () => {
       
       expect(unidadesService.buscarSuperior).toHaveBeenCalledWith("TEST");
       expect(result).toEqual(mockSuperior);
+    });
+
+    it("obterUnidadeSuperior should handle error", async () => {
+        vi.mocked(unidadesService.buscarSuperior).mockRejectedValue(new Error("Fail"));
+        const result = await unidadesStore.obterUnidadeSuperior("TEST");
+        expect(unidadesStore.error).toContain("Falha ao buscar superior");
+        expect(result).toBeNull();
     });
   });
 });

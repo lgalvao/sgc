@@ -17,7 +17,12 @@ import {
     mapMapaVisualizacaoToAtividades,
 } from "../mapas";
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
-import {mapPerfilUnidadeToFrontend, mapUsuarioToFrontend} from "../sgrh";
+import {
+    LoginResponseToFrontend,
+    mapPerfilUnidadeToFrontend,
+    mapUsuarioToFrontend,
+    perfisUnidadesParaDominio
+} from "../sgrh";
 
 describe("mappers/alertas", () => {
     it("mapAlertaDtoToFrontend should map all fields correctly", () => {
@@ -247,6 +252,39 @@ describe("mappers/sgrh", () => {
         expect(model.nome).toBe("Usuário Teste");
         expect(model.unidade.sigla).toBe("UT");
         expect(model.perfis).toContain("CHEFE");
+    });
+
+    it("LoginResponseToFrontend should map correctly", () => {
+        const dto = {
+            tituloEleitoral: 123456,
+            perfil: "GESTOR",
+            unidadeCodigo: 10,
+            token: "abc.def.ghi",
+        };
+        const model = LoginResponseToFrontend(dto);
+        expect(model.tituloEleitoral).toBe(123456);
+        expect(model.perfil).toBe("GESTOR");
+        expect(model.unidadeCodigo).toBe(10);
+        expect(model.token).toBe("abc.def.ghi");
+    });
+
+    it("perfisUnidadesParaDominio should map array correctly", () => {
+        const backendData = [
+            {
+                perfil: "GESTOR",
+                unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
+            },
+            {
+                perfil: "SERVIDOR",
+                unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
+            },
+        ];
+        const result = perfisUnidadesParaDominio(backendData);
+        expect(result).toHaveLength(2);
+        expect(result[0].perfil).toBe("GESTOR");
+        expect(result[0].unidade.sigla).toBe("U1");
+        expect(result[0].siglaUnidade).toBe("U1");
+        expect(result[1].perfil).toBe("SERVIDOR");
     });
 });
 

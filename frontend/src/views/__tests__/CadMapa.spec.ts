@@ -450,4 +450,22 @@ describe("CadMapa.vue", () => {
 
     expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(false);
   });
+
+  it("getConhecimentosTooltip deve retornar 'Nenhum conhecimento cadastrado' se vazia", () => {
+      const { wrapper: w } = createWrapper();
+      expect((w.vm as any).getConhecimentosTooltip(101)).toBe("Nenhum conhecimento cadastrado");
+  });
+
+  it("getConhecimentosModal deve retornar 'Nenhum conhecimento' se vazia", () => {
+      const { wrapper: w } = createWrapper();
+      expect((w.vm as any).getConhecimentosModal({ conhecimentos: [] })).toBe("Nenhum conhecimento");
+  });
+
+  it("não deve buscar dados se subprocesso não encontrado", async () => {
+    vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(null);
+    const { wrapper: w } = createWrapper();
+    await flushPromises();
+
+    expect(mapaService.obterMapaCompleto).not.toHaveBeenCalled();
+  });
 });
