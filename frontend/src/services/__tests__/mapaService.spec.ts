@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
 import apiClient from "@/axios-setup";
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from "@/mappers/mapas";
 import * as mapaService from "@/services/mapaService";
+import {AxiosError} from "axios";
 
 vi.mock("@/axios-setup");
 vi.mock("@/mappers/mapas");
@@ -74,5 +75,23 @@ describe("mapaService", () => {
             "/unidades/1/mapa-vigente",
         );
         expect(result).toBe(true);
+    });
+
+    it("verificarMapaVigente deve retornar false em caso de 404", async () => {
+        const error = new AxiosError("Not Found");
+        error.response = { status: 404 } as any;
+        mockedApiClient.get.mockRejectedValue(error);
+
+        const result = await mapaService.verificarMapaVigente(1);
+        expect(result).toBe(false);
+    });
+
+    it("verificarMapaVigente deve lançar exceção para outros erros", async () => {
+        const error = new Error("Erro genérico");
+        mockedApiClient.get.mockRejectedValue(error);
+
+        await expect(mapaService.verificarMapaVigente(1)).rejects.toThrow(
+            "Erro genérico",
+        );
     });
 });

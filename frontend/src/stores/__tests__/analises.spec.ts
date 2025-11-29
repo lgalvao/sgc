@@ -142,5 +142,22 @@ describe("useAnalisesStore", () => {
             );
             expect(store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
         });
+
+        it("should handle error in buscarAnalisesCadastro", async () => {
+            vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
+                new Error("Fail"),
+            );
+            await store.buscarAnalisesCadastro(codSubrocesso);
+            // It just catches and logs toast, state remains or empty
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+        });
+
+        it("should handle error in buscarAnalisesValidacao", async () => {
+            vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
+                new Error("Fail"),
+            );
+            await store.buscarAnalisesValidacao(codSubrocesso);
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+        });
     });
 });
