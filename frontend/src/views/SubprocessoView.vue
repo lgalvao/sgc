@@ -26,6 +26,7 @@
       :mapa="mapa"
       :situacao="subprocesso.situacao"
       :permissoes="subprocesso.permissoes"
+      :cod-subprocesso="codSubprocesso"
     />
 
     <TabelaMovimentacoes :movimentacoes="movimentacoes" />

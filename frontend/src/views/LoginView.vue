@@ -119,6 +119,8 @@ const router = useRouter();
 const perfilStore = usePerfilStore();
 const toast = useToast(); // Instantiate toast
 
+console.log("LoginView setup");
+
 
 const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");

@@ -65,16 +65,25 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
 
         // Acessar subprocesso
         await page.getByText(descricaoMapeamento).click();
-        await page.getByText(UNIDADE_ALVO).click(); // Clica na unidade na árvore ou lista
+        await page.getByRole('cell', { name: UNIDADE_ALVO }).click(); // Clica na unidade na árvore ou lista
 
         // Adicionar Atividade
-        await page.getByText('Atividades e conhecimentos').click();
-        await page.getByTestId('btn-criar-atividade').click();
-        await page.getByTestId('input-descricao-atividade').fill(`Atividade Teste ${timestamp}`);
+        await page.getByTestId('atividades-card').click();
+        await page.waitForTimeout(3000); // Wait for data to load
+        await page.getByTestId('input-nova-atividade').fill(`Atividade Teste ${timestamp}`);
+        await page.getByTestId('btn-adicionar-atividade').click({ force: true });
+
         // Adicionar conhecimento à atividade (necessário para validação)
-        await page.getByTestId('btn-adicionar-conhecimento').click();
-        await page.getByTestId('input-descricao-conhecimento').fill(`Conhecimento Teste ${timestamp}`);
-        await page.getByTestId('btn-salvar-atividade').click();
+        // Wait for the new activity to appear
+        const descricaoAtividade = `Atividade Teste ${timestamp}`;
+        await expect(page.getByText(descricaoAtividade)).toBeVisible();
+
+        // Find the card containing the new activity
+        // We can use filter to find the card that has the text
+        const activityCard = page.locator('.atividade-card').filter({ hasText: descricaoAtividade });
+
+        await activityCard.getByTestId('input-novo-conhecimento').fill('Conhecimento Teste');
+        await activityCard.getByTestId('btn-adicionar-conhecimento').click();
 
         // Voltar para detalhes do subprocesso
         await page.getByTestId('btn-voltar').click();
@@ -143,7 +152,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-modal-confirmar').click();
 
         // 2.4. Verificar redirecionamento e Status
-◊        await expect(page).toHaveURL(/\/painel/);
+        await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, {
             descricao: descricaoRevisao,
             situacao: 'Em andamento',

@@ -409,7 +409,14 @@ const codSubrocesso = computed(
   () =>
     processosStore.processoDetalhe?.unidades.find(
       (u) => u.sigla === unidadeId.value,
-    )?.codUnidade,
+    )?.codSubprocesso,
+);
+
+const codMapa = computed(
+  () =>
+    processosStore.processoDetalhe?.unidades.find(
+      (u) => u.sigla === unidadeId.value,
+    )?.mapaCodigo,
 );
 
 const atividades = computed<AtividadeComEdicao[]>({
@@ -428,12 +435,17 @@ const isRevisao = computed(
 );
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && codSubrocesso.value) {
+  console.log("adicionarAtividade called. Nova atividade:", novaAtividade.value, "CodSubprocesso:", codSubrocesso.value, "CodMapa:", codMapa.value);
+  if (novaAtividade.value?.trim() && codMapa.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(codSubrocesso.value, request);
+    await atividadesStore.adicionarAtividade(codMapa.value, request);
     novaAtividade.value = "";
+    // Refresh activities using subprocess ID
+    if (codSubrocesso.value) {
+        await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+    }
   }
 }
 
@@ -581,6 +593,7 @@ const atividadesSemConhecimento = ref<Atividade[]>([]);
 
 
 onMounted(async () => {
+  console.log("CadAtividades mounted");
   await unidadesStore.buscarUnidade(props.sigla);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {

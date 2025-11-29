@@ -41,7 +41,8 @@ public class PainelService {
      * suas subordinadas. Processos no estado 'CRIADO' são omitidos.
      *
      * @param perfil        O perfil do usuário (obrigatório).
-     * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
+     * @param codigoUnidade O código da unidade do usuário (necessário para perfis
+     *                      não-ADMIN).
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
@@ -51,21 +52,23 @@ public class PainelService {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
+        // DEBUG LOG
+        System.out.println("PainelService.listarProcessos: perfil=" + perfil + ", unidade=" + codigoUnidade);
+
         Page<Processo> processos;
         if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll(pageable);
         } else {
-            if (codigoUnidade == null) return Page.empty(pageable);
+            if (codigoUnidade == null)
+                return Page.empty(pageable);
 
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-
             processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
-                unidadeIds,
-                SituacaoProcesso.CRIADO,
-                pageable
-            );
+                    unidadeIds,
+                    SituacaoProcesso.CRIADO,
+                    pageable);
 
         }
 
@@ -124,11 +127,11 @@ public class PainelService {
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
 
         String unidadesParticipantes = processo.getParticipantes() != null
-            ? processo.getParticipantes().stream()
-                .map(Unidade::getSigla)
-                .sorted()
-                .collect(Collectors.joining(", "))
-            : "";
+                ? processo.getParticipantes().stream()
+                        .map(Unidade::getSigla)
+                        .sorted()
+                        .collect(Collectors.joining(", "))
+                : "";
 
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
@@ -154,8 +157,8 @@ public class PainelService {
         // Para CHEFE ou SERVIDOR, precisamos da sigla da unidade
         if (codigoUnidade != null) {
             return unidadeRepo.findById(codigoUnidade)
-                .map(unidade -> "/processo/" + processo.getCodigo() + "/" + unidade.getSigla())
-                .orElse(null);
+                    .map(unidade -> "/processo/" + processo.getCodigo() + "/" + unidade.getSigla())
+                    .orElse(null);
         }
         return null;
     }
@@ -163,15 +166,15 @@ public class PainelService {
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         String linkDestino = calcularLinkDestinoAlerta(alerta);
         return AlertaDto.builder()
-            .codigo(alerta.getCodigo())
-            .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
-            .descricao(alerta.getDescricao())
-            .dataHora(alerta.getDataHora())
-            .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
-            .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
-            .dataHoraLeitura(dataHoraLeitura)
-            .linkDestino(linkDestino)
-            .build();
+                .codigo(alerta.getCodigo())
+                .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+                .descricao(alerta.getDescricao())
+                .dataHora(alerta.getDataHora())
+                .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
+                .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
+                .dataHoraLeitura(dataHoraLeitura)
+                .linkDestino(linkDestino)
+                .build();
     }
 
     private String calcularLinkDestinoAlerta(Alerta alerta) {

@@ -20,7 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
-public class SgrhController {
+public class UsuarioController {
     private final UsuarioService usuarioService;
 
     /**
@@ -41,7 +41,8 @@ public class SgrhController {
      * <b>Simulação:</b> Este endpoint simula o processo de autenticação.
      *
      * @param request O DTO contendo o título de eleitor e a senha.
-     * @return Um {@link ResponseEntity} com {@code true} se a autenticação for bem-sucedida,
+     * @return Um {@link ResponseEntity} com {@code true} se a autenticação for
+     *         bem-sucedida,
      *         {@code false} caso contrário.
      */
     @PostMapping("/autenticar")
@@ -51,9 +52,11 @@ public class SgrhController {
     }
 
     /**
-     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem acesso.
+     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
+     * acesso.
      * <p>
-     * <b>Simulação:</b> Este endpoint simula a busca de perfis de um usuário no SGRH.
+     * <b>Simulação:</b> Este endpoint simula a busca de perfis de um usuário no
+     * SGRH.
      *
      * @param tituloEleitoral O título de eleitor do usuário.
      * @return Um {@link ResponseEntity} contendo a lista de {@link PerfilUnidade}.
@@ -65,18 +68,22 @@ public class SgrhController {
     }
 
     /**
-     * Finaliza o processo de login, registrando o perfil e a unidade escolhidos pelo usuário.
+     * Finaliza o processo de login, registrando o perfil e a unidade escolhidos
+     * pelo usuário.
      * <p>
-     * <b>Simulação:</b> Este endpoint simula a confirmação do perfil de acesso do usuário
+     * <b>Simulação:</b> Este endpoint simula a confirmação do perfil de acesso do
+     * usuário
      * para a sessão.
      *
-     * @param request O DTO contendo o título de eleitor e o perfil/unidade selecionado.
+     * @param request O DTO contendo o título de eleitor e o perfil/unidade
+     *                selecionado.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/entrar")
     public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
         usuarioService.entrar(request);
-        LoginResp response = new LoginResp(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
+        LoginResp response = new LoginResp(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()),
+                request.getUnidadeCodigo());
 
         // Gerar JWT simulado
         try {

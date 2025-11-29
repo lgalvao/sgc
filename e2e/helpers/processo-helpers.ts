@@ -52,5 +52,5 @@ export async function verificarProcessoNaTabela(page: Page, options: {
 
     const linhaProcesso = page.locator('tr', { has: page.getByText(options.descricao) });
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
-    await expect(linhaProcesso.getByText(options.tipo)).toBeVisible();
+    await expect(linhaProcesso.getByText(options.tipo, { exact: true })).toBeVisible();
 }

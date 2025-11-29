@@ -43,6 +43,8 @@ public class ProcessoDetalheDto {
         private Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
+        private Long mapaCodigo;
+        private Long codSubprocesso;
 
         @Builder.Default
         private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();

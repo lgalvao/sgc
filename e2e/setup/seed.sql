@@ -13,7 +13,6 @@
 -- ============================================================================
 
 -- Seed data generated from JSON
-
 INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL);
 INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (2, 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', 'ATIVA', 1);
 INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (3, 'Assessoria 11', 'ASSESSORIA_11', 'OPERACIONAL', 'ATIVA', 2);
@@ -90,3 +89,22 @@ INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) V
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('282828', 'SERVIDOR', 15);
 INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('292929', 'Flea', 'flea@tre-pe.jus.br', NULL, 18);
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('292929', 'SERVIDOR', 18);
+
+-- Update titulars after users are created
+UPDATE sgc.unidade SET titular_titulo = '111111' WHERE codigo = 1;
+UPDATE sgc.unidade SET titular_titulo = '202020' WHERE codigo = 2;
+UPDATE sgc.unidade SET titular_titulo = '555555' WHERE codigo = 3;
+UPDATE sgc.unidade SET titular_titulo = '151515' WHERE codigo = 4;
+UPDATE sgc.unidade SET titular_titulo = '222222' WHERE codigo = 5;
+UPDATE sgc.unidade SET titular_titulo = '333333' WHERE codigo = 6;
+UPDATE sgc.unidade SET titular_titulo = '444444' WHERE codigo = 7;
+UPDATE sgc.unidade SET titular_titulo = '222223' WHERE codigo = 9;
+UPDATE sgc.unidade SET titular_titulo = '171717' WHERE codigo = 10;
+UPDATE sgc.unidade SET titular_titulo = '212121' WHERE codigo = 11;
+UPDATE sgc.unidade SET titular_titulo = '777777' WHERE codigo = 12;
+UPDATE sgc.unidade SET titular_titulo = '888888' WHERE codigo = 13;
+UPDATE sgc.unidade SET titular_titulo = '999999' WHERE codigo = 14;
+UPDATE sgc.unidade SET titular_titulo = '101010' WHERE codigo = 15;
+UPDATE sgc.unidade SET titular_titulo = '181818' WHERE codigo = 16;
+UPDATE sgc.unidade SET titular_titulo = '131313' WHERE codigo = 17;
+UPDATE sgc.unidade SET titular_titulo = '141414' WHERE codigo = 18;

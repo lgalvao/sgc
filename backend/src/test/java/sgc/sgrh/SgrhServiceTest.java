@@ -25,6 +25,9 @@ class SgrhServiceTest {
     @Mock
     private UnidadeRepo unidadeRepo;
 
+    @Mock
+    private sgc.sgrh.model.UsuarioRepo usuarioRepo;
+
     @InjectMocks
     private SgrhService sgrhService;
 
@@ -54,7 +57,7 @@ class SgrhServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(3, result.size());
-        
+
         UsuarioDto primeiro = result.getFirst();
         assertEquals(TITULO, primeiro.getTitulo());
         assertEquals("joao.silva@tre-pe.jus.br", primeiro.getEmail());
@@ -144,7 +147,7 @@ class SgrhServiceTest {
     void testBuscarUnidadesPorPerfil() {
         List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "ADMIN");
         assertTrue(adminUnits.contains(1L));
-        
+
         List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "GESTOR");
         assertTrue(gestorUnits.contains(2L) || gestorUnits.contains(3L));
     }

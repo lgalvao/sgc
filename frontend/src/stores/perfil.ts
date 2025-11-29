@@ -111,6 +111,21 @@ export const usePerfilStore = defineStore("perfil", () => {
         definirToken(loginResponse.token);
     }
 
+    function logout() {
+        servidorId.value = null;
+        perfilSelecionado.value = null;
+        unidadeSelecionada.value = null;
+        unidadeSelecionadaSigla.value = null;
+        perfisUnidades.value = [];
+        perfis.value = [];
+        localStorage.removeItem("idServidor");
+        localStorage.removeItem("perfilSelecionado");
+        localStorage.removeItem("unidadeSelecionada");
+        localStorage.removeItem("unidadeSelecionadaSigla");
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("perfis");
+    }
+
     return {
         servidorId,
         perfilSelecionado,
@@ -123,5 +138,6 @@ export const usePerfilStore = defineStore("perfil", () => {
         definirPerfilUnidade,
         loginCompleto,
         selecionarPerfilUnidade,
+        logout,
     };
 });

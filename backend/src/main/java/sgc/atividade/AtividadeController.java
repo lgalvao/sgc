@@ -39,7 +39,8 @@ public class AtividadeController {
      * Busca e retorna uma atividade específica pelo seu código.
      *
      * @param codAtividade O código da atividade a ser buscada.
-     * @return Um {@link ResponseEntity} contendo a {@link AtividadeDto} correspondente
+     * @return Um {@link ResponseEntity} contendo a {@link AtividadeDto}
+     *         correspondente
      *         ou um status 404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
@@ -55,29 +56,34 @@ public class AtividadeController {
      * e a persiste, associando-a ao usuário autenticado.
      *
      * @param atividadeDto O DTO contendo os dados da atividade a ser criada.
-     * @param userDetails  Os detalhes do usuário autenticado, injetado pelo Spring Security.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI da nova atividade
+     * @param userDetails  Os detalhes do usuário autenticado, injetado pelo Spring
+     *                     Security.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI da nova
+     *         atividade
      *         no cabeçalho 'Location' e a atividade criada no corpo da resposta.
      */
     @PostMapping
     @Operation(summary = "Cria uma atividade")
-    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
-        var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
+    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto,
+            @AuthenticationPrincipal String username) {
+        var salvo = atividadeService.criar(atividadeDto, username);
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }
-
 
     /**
      * Atualiza os dados de uma atividade existente.
      *
      * @param codAtividade O código da atividade a ser atualizada.
-     * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
-     * @return Um {@link ResponseEntity} com status 200 OK e a {@link AtividadeDto} atualizada.
+     * @param atividadeDto O DTO com os novos dados da atividade. A descrição será
+     *                     sanitizada.
+     * @return Um {@link ResponseEntity} com status 200 OK e a {@link AtividadeDto}
+     *         atualizada.
      */
     @PostMapping("/{codAtividade}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
-    public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long codAtividade, @Valid @RequestBody AtividadeDto atividadeDto) {
+    public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long codAtividade,
+            @Valid @RequestBody AtividadeDto atividadeDto) {
         return ResponseEntity.ok(atividadeService.atualizar(codAtividade, atividadeDto));
     }
 
@@ -101,7 +107,8 @@ public class AtividadeController {
      * Lista todos os conhecimentos associados a uma atividade específica.
      *
      * @param codAtividade O código da atividade pai.
-     * @return Um {@link ResponseEntity} com status 200 OK e a lista de {@link ConhecimentoDto}.
+     * @return Um {@link ResponseEntity} com status 200 OK e a lista de
+     *         {@link ConhecimentoDto}.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
@@ -112,14 +119,16 @@ public class AtividadeController {
     /**
      * Adiciona um novo conhecimento a uma atividade existente.
      *
-     * @param codAtividade     O código da atividade à qual o conhecimento será associado.
+     * @param codAtividade    O código da atividade à qual o conhecimento será
+     *                        associado.
      * @param conhecimentoDto O DTO com os dados do conhecimento a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
      *         conhecimento e o {@link ConhecimentoDto} criado no corpo da resposta.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Cria um conhecimento para uma atividade")
-    public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long codAtividade, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
+    public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long codAtividade,
+            @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
@@ -131,12 +140,15 @@ public class AtividadeController {
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
-     * @return Um {@link ResponseEntity} com status 200 OK e o {@link ConhecimentoDto} atualizado.
+     * @return Um {@link ResponseEntity} com status 200 OK e o
+     *         {@link ConhecimentoDto} atualizado.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
-    public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        return ResponseEntity.ok(atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto));
+    public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long codAtividade,
+            @PathVariable Long codConhecimento, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
+        return ResponseEntity
+                .ok(atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto));
     }
 
     /**
@@ -148,7 +160,8 @@ public class AtividadeController {
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
-    public ResponseEntity<Void> excluirConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento) {
+    public ResponseEntity<Void> excluirConhecimento(@PathVariable Long codAtividade,
+            @PathVariable Long codConhecimento) {
         atividadeService.excluirConhecimento(codAtividade, codConhecimento);
         return ResponseEntity.noContent().build();
     }

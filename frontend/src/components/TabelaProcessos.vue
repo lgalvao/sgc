@@ -20,6 +20,10 @@
       <template #cell(situacao)="data">
         {{ formatarSituacao(data.value as string) }}
       </template>
+
+      <template #cell(tipo)="data">
+        {{ formatarTipo(data.value as string) }}
+      </template>
     </BTable>
   </div>
 </template>
@@ -76,5 +80,14 @@ function formatarSituacao(situacao: string): string {
     CRIADO: "Criado",
   };
   return mapa[situacao] || situacao;
+}
+
+function formatarTipo(tipo: string): string {
+  const mapa: Record<string, string> = {
+    MAPEAMENTO: "Mapeamento",
+    REVISAO: "Revisão",
+    DIAGNOSTICO: "Diagnóstico",
+  };
+  return mapa[tipo] || tipo;
 }
 </script>

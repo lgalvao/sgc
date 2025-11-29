@@ -10,29 +10,23 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
-    final UnidadeRepo unidadeRepo;
-    final UsuarioRepo usuarioRepo;
-    public static final Map<String, List<PerfilDto>> perfisMock = new ConcurrentHashMap<>();
+    private final UnidadeRepo unidadeRepo;
+    private final UsuarioRepo usuarioRepo;
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        return Optional.of(UsuarioDto.builder()
-                .titulo(titulo)
-                .nome("Usuário Mock %s".formatted(titulo))
-                .email("%s@tre-pe.jus.br".formatted(titulo))
-                .matricula("MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))))
-                .cargo("Analista Judiciário")
-                .build());
+        return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
     }
 
     public Usuario buscarUsuarioPorLogin(String login) {
@@ -41,209 +35,182 @@ public class SgrhService {
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {
-        log.warn("MOCK SGRH: Buscando responsável vigente para a sigla {}.", sigla);
-        var unidade = unidadeRepo.findBySigla(sigla).orElse(null);
-        Usuario usuario = new Usuario("responsavel", "Responsável Vigente", "email", "ramal", unidade);
-        if (unidade != null) {
-            usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
-                    .usuario(usuario)
-                    .unidade(unidade)
-                    .perfil(Perfil.CHEFE)
-                    .build());
-        }
-        return usuario;
+        log.debug("Buscando responsável vigente para a sigla {}.", sigla);
+        Unidade unidade = unidadeRepo.findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+
+        return usuarioRepo.findChefeByUnidadeCodigo(unidade.getCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        if (!perfisMock.isEmpty() && perfisMock.containsKey(titulo)) {
-            log.info("Retornando perfis mockados para o usuário {}", titulo);
-            return perfisMock.get(titulo);
-        }
-
-        if ("1".equals(titulo)) { // Servidor Ana Paula Souza (SESEL)
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(10L).unidadeNome("SESEL").perfil("SERVIDOR").build());
-        } else if ("6".equals(titulo)) { // Admin Ricardo Alves (STIC)
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("ADMIN").build());
-        } else if ("777".equals(titulo)) { // Chefe STIC Teste (STIC)
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("CHEFE").build());
-        } else if ("2".equals(titulo)) { // Chefe SGP
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(200L).unidadeNome("SGP").perfil("CHEFE").build());
-        } else if ("3".equals(titulo)) { // Chefe SEDESENV
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(8L).unidadeNome("SEDESENV").perfil("CHEFE").build());
-        } else if ("8".equals(titulo)) { // Gestor Paulo Horta (SEDESENV)
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(8L).unidadeNome("SEDESENV").perfil("GESTOR").build());
-        } else if ("10".equals(titulo)) { // Chefe SEDIA (SEDIA)
-            return List.of(PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(9L).unidadeNome("SEDIA").perfil("CHEFE").build());
-        } else if ("999999999999".equals(titulo)) { // Usuario Multi Perfil (STIC)
-            return List.of(
-                PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("ADMIN").build(),
-                PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("STIC").perfil("GESTOR").build()
-            );
-        }
-
-        // Default behavior for other users if not explicitly mocked
-        return List.of(
-            PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(1L).unidadeNome("SEDOC").perfil("ADMIN").build(),
-            PerfilDto.builder().usuarioTitulo(titulo).unidadeCodigo(2L).unidadeNome("SGP").perfil("GESTOR").build()
-        );
+        return usuarioRepo.findById(titulo)
+                .map(usuario -> usuario.getTodasAtribuicoes().stream()
+                        .map(this::toPerfilDto)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
-        String titulo = email.split("@")[0];
-        return Optional.of(UsuarioDto.builder()
-                .titulo(titulo)
-                .nome("Usuário %s".formatted(titulo))
-                .email(email)
-                .matricula("MAT%d".formatted(titulo.hashCode()))
-                .cargo("Analista Judiciário")
-                .build());
+        return usuarioRepo.findByEmail(email).map(this::toUsuarioDto);
     }
 
     public List<UsuarioDto> buscarUsuariosAtivos() {
-        log.warn("MOCK SGRH: Listando usuários ativos");
-        return List.of(
-                UsuarioDto.builder()
-                        .titulo("123456789012")
-                        .nome("João Silva")
-                        .email("joao.silva@tre-pe.jus.br")
-                        .matricula("MAT001")
-                        .cargo("Analista Judiciário")
-                        .build(),
-                UsuarioDto.builder()
-                        .titulo("987654321098")
-                        .nome("Maria Santos")
-                        .email("maria.santos@tre-pe.jus.br")
-                        .matricula("MAT002")
-                        .cargo("Técnico Judiciário")
-                        .build(),
-                UsuarioDto.builder()
-                        .titulo("111222333444")
-                        .nome("Pedro Oliveira")
-                        .email("pedro.oliveira@tre-pe.jus.br")
-                        .matricula("MAT003")
-                        .cargo("Analista Judiciário")
-                        .build());
+        return usuarioRepo.findAll().stream()
+                .map(this::toUsuarioDto)
+                .collect(Collectors.toList());
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
-        return Optional.ofNullable(unidadesMock.get(codigo));
+        return unidadeRepo.findById(codigo).map(this::toUnidadeDto);
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        return new ArrayList<>(criarUnidadesMock().values());
+        return unidadeRepo.findAll().stream()
+                .map(this::toUnidadeDto)
+                .collect(Collectors.toList());
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        return criarUnidadesMock().values().stream()
-                .filter(u -> codigoPai.equals(u.getCodigoPai()))
+        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
+                .map(this::toUnidadeDto)
                 .collect(Collectors.toList());
     }
 
     public List<UnidadeDto> construirArvoreHierarquica() {
-        log.warn("MOCK SGRH: Construindo árvore hierárquica de unidades");
-        Map<Long, UnidadeDto> todasUnidades = criarUnidadesMock();
+        List<Unidade> todas = unidadeRepo.findAll();
         Map<Long, List<UnidadeDto>> subunidadesPorPai = new HashMap<>();
-        for (UnidadeDto unidade : todasUnidades.values()) {
-            if (unidade.getCodigoPai() != null) {
-                subunidadesPorPai.computeIfAbsent(unidade.getCodigoPai(), x -> new ArrayList<>()).add(unidade);
+        Map<Long, UnidadeDto> dtoMap = new HashMap<>();
+
+        // Primeiro cria todos os DTOs
+        for (Unidade u : todas) {
+            dtoMap.put(u.getCodigo(), toUnidadeDto(u));
+        }
+
+        // Organiza a hierarquia
+        for (Unidade u : todas) {
+            if (u.getUnidadeSuperior() != null) {
+                subunidadesPorPai.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>())
+                        .add(dtoMap.get(u.getCodigo()));
             }
         }
-        return todasUnidades.values().stream()
-                .filter(u -> u.getCodigoPai() == null)
-                .map(u -> construirArvore(u, subunidadesPorPai))
+
+        // Monta a árvore recursivamente (ou apenas associa os filhos já que temos o
+        // mapa)
+        for (UnidadeDto dto : dtoMap.values()) {
+            List<UnidadeDto> filhos = subunidadesPorPai.get(dto.getCodigo());
+            if (filhos != null) {
+                dto.setSubunidades(filhos);
+            }
+        }
+
+        // Retorna apenas as raízes
+        return todas.stream()
+                .filter(u -> u.getUnidadeSuperior() == null)
+                .map(u -> dtoMap.get(u.getCodigo()))
                 .collect(Collectors.toList());
     }
 
-    private UnidadeDto construirArvore(UnidadeDto unidade, Map<Long, List<UnidadeDto>> subunidadesPorPai) {
-        List<UnidadeDto> filhos = subunidadesPorPai.getOrDefault(unidade.getCodigo(), Collections.emptyList())
-                .stream()
-                .map(filho -> construirArvore(filho, subunidadesPorPai))
-                .toList();
+    public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
+        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
+        if (chefes.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
+    }
+
+    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+        List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
+
+        Map<Long, List<Usuario>> chefesPorUnidade = todosChefes.stream()
+                .flatMap(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE
+                                && unidadesCodigos.contains(a.getUnidade().getCodigo()))
+                        .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidade().getCodigo(), u)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        Map<Long, ResponsavelDto> resultado = new HashMap<>();
+        for (Long codigo : unidadesCodigos) {
+            List<Usuario> chefes = chefesPorUnidade.getOrDefault(codigo, Collections.emptyList());
+            if (!chefes.isEmpty()) {
+                resultado.put(codigo, montarResponsavelDto(codigo, chefes));
+            }
+        }
+        return resultado;
+    }
+
+    public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
+        return usuarioRepo.findAllById(titulos).stream()
+                .collect(Collectors.toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
+    }
+
+    public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE)
+                        .map(a -> a.getUnidade().getCodigo())
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .anyMatch(a -> a.getPerfil().name().equals(perfil)
+                                && a.getUnidade().getCodigo().equals(unidadeCodigo)))
+                .orElse(false);
+    }
+
+    public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil().name().equals(perfil))
+                        .map(a -> a.getUnidade().getCodigo())
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    private UsuarioDto toUsuarioDto(Usuario usuario) {
+        return UsuarioDto.builder()
+                .titulo(usuario.getTituloEleitoral())
+                .nome(usuario.getNome())
+                .email(usuario.getEmail())
+                .matricula("MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no título
+                .cargo("Analista Judiciário") // Valor padrão, já que não temos cargo no modelo ainda
+                .build();
+    }
+
+    private UnidadeDto toUnidadeDto(Unidade unidade) {
         return UnidadeDto.builder()
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .codigoPai(unidade.getCodigoPai())
-                .tipo(unidade.getTipo())
-                .subunidades(filhos.isEmpty() ? null : filhos)
-                .isElegivel(false)
+                .codigoPai(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                .tipo(unidade.getTipo().name())
+                .isElegivel(false) // Default
                 .build();
     }
 
-    public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
-        return Optional.of(ResponsavelDto.builder()
+    private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
+        return PerfilDto.builder()
+                .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
+                .unidadeNome(atribuicao.getUnidade().getNome())
+                .perfil(atribuicao.getPerfil().name())
+                .build();
+    }
+
+    private ResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
+        Usuario titular = chefes.get(0);
+        Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
+
+        return ResponsavelDto.builder()
                 .unidadeCodigo(unidadeCodigo)
-                .titularTitulo("123456789012")
-                .titularNome("João Silva (Titular)")
-                .substitutoTitulo("987654321098")
-                .substitutoNome("Maria Santos (Substituto)")
-                .build());
-    }
-
-    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
-        log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
-        return unidadesCodigos.stream().collect(Collectors.toMap(codigo -> codigo, codigo -> ResponsavelDto.builder()
-                .unidadeCodigo(codigo)
-                .titularTitulo(String.format("%012d", codigo))
-                .titularNome("Titular da Unidade " + codigo)
-                .substitutoTitulo(String.format("%012d", codigo + 1000))
-                .substitutoNome("Substituto da Unidade " + codigo)
-                .build()));
-    }
-
-    public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
-        return titulos.stream().collect(Collectors.toMap(titulo -> titulo, titulo -> UsuarioDto.builder()
-                .titulo(titulo)
-                .nome("Usuário Mock %s".formatted(titulo))
-                .email("%s@tre-pe.jus.br".formatted(titulo))
-                .matricula("MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))))
-                .cargo("Analista Judiciário")
-                .build(), (u1, u2) -> u1)
-        );
-    }
-
-    public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        log.warn("MOCK SGRH: Buscando unidades onde o usuário é responsável.");
-        return List.of(1L, 2L, 10L);
-    }
-
-    public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        return "ADMIN".equals(perfil) && unidadeCodigo == 1L;
-    }
-
-    public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        return switch (perfil) {
-            case "ADMIN" -> List.of(1L);
-            case "GESTOR" -> List.of(2L, 3L);
-            case "CHEFE" -> List.of(10L, 11L);
-            default -> List.of(1L, 2L, 10L);
-        };
-    }
-
-    private Map<Long, UnidadeDto> criarUnidadesMock() {
-        Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
-        unidadesDto.put(1L, UnidadeDto.builder().codigo(1L).nome("Secretaria do Tribunal").sigla("SEDOC").codigoPai(null).tipo("INTEROPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(2L, UnidadeDto.builder().codigo(2L).nome("Secretaria de Informática e Comunicações").sigla("STIC").codigoPai(null).tipo("INTEROPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(200L, UnidadeDto.builder().codigo(200L).nome("Secretaria de Gestao de Pessoas").sigla("SGP").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(6L, UnidadeDto.builder().codigo(6L).nome("Coordenadoria de Sistemas").sigla("COSIS").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(7L, UnidadeDto.builder().codigo(7L).nome("Coordenadoria de Suporte e Infraestrutura").sigla("COSINF").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(14L, UnidadeDto.builder().codigo(14L).nome("Coordenadoria Jurídica").sigla("COJUR").codigoPai(2L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(4L, UnidadeDto.builder().codigo(4L).nome("Coordenadoria de Educação Especial").sigla("COEDE").codigoPai(200L).tipo("INTERMEDIARIA").isElegivel(false).build());
-        unidadesDto.put(8L, UnidadeDto.builder().codigo(8L).nome("Seção de Desenvolvimento de Sistemas").sigla("SEDESENV").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(9L, UnidadeDto.builder().codigo(9L).nome("Seção de Dados e Inteligência Artificial").sigla("SEDIA").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(10L, UnidadeDto.builder().codigo(10L).nome("Seção de Sistemas Eleitorais").sigla("SESEL").codigoPai(6L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(11L, UnidadeDto.builder().codigo(11L).nome("Seção de Infraestrutura").sigla("SENIC").codigoPai(7L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(12L, UnidadeDto.builder().codigo(12L).nome("Seção Jurídica").sigla("SEJUR").codigoPai(14L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(13L, UnidadeDto.builder().codigo(13L).nome("Seção de Processos").sigla("SEPRO").codigoPai(14L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(15L, UnidadeDto.builder().codigo(15L).nome("Seção de Documentação").sigla("SEDOC").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(5L, UnidadeDto.builder().codigo(5L).nome("Seção Magistrados e Requisitados").sigla("SEMARE").codigoPai(4L).tipo("OPERACIONAL").isElegivel(false).build());
-
-        // Units from data-minimal.sql and CarregamentoService
-        unidadesDto.put(201L, UnidadeDto.builder().codigo(201L).nome("Coordenadoria de Atenção ao Servidor").sigla("CAS").codigoPai(200L).tipo("INTEROPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(202L, UnidadeDto.builder().codigo(202L).nome("Seção de Atenção ao Servidor").sigla("SAS").codigoPai(201L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(900L, UnidadeDto.builder().codigo(900L).nome("CDU04-UNIT").sigla("CDU04-UNIT").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
-        unidadesDto.put(903L, UnidadeDto.builder().codigo(903L).nome("CDU05-ALERT-UNIT").sigla("CDU05-ALERT-UNIT").codigoPai(2L).tipo("OPERACIONAL").isElegivel(false).build());
-        return unidadesDto;
+                .titularTitulo(titular.getTituloEleitoral())
+                .titularNome(titular.getNome())
+                .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
+                .substitutoNome(substituto != null ? substituto.getNome() : null)
+                .build();
     }
 }

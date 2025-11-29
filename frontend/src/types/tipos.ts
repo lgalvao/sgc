@@ -256,6 +256,7 @@ export interface UnidadeParticipante {
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
     dataLimite: string;
+    mapaCodigo?: number;
     filhos: UnidadeParticipante[];
 }
 

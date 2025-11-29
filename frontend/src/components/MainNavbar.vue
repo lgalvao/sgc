@@ -61,8 +61,9 @@
 
           <BNavItem
             title="Sair"
-            to="/login"
+            href="#"
             data-testid="btn-logout"
+            @click.prevent="handleLogout"
           >
             <i class="bi bi-box-arrow-right fs-5" />
           </BNavItem>
@@ -86,6 +87,12 @@ const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 function navigateFromNavbar(path: string) {
   sessionStorage.setItem("cameFromNavbar", "1");
   router.push(path);
+}
+
+function handleLogout() {
+  console.log("MainNavbar: handleLogout called");
+  perfilStore.logout();
+  router.push("/login");
 }
 
 defineExpose({

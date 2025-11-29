@@ -123,21 +123,23 @@ import {badgeClass, situacaoLabel} from "@/utils";
 
 const TipoProcessoEnum = TipoProcesso;
 
-defineProps<{
+const props = defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;
   permissoes: SubprocessoPermissoes;
+  codSubprocesso?: number | null;
 }>();
 
 const router = useRouter();
 const route = router.currentRoute;
 
 const navegarPara = (routeName: string) => {
-  if (!route.value.params.codSubprocesso) return;
+  const codigo = props.codSubprocesso || Number(route.value.params.codSubprocesso);
+  if (!codigo) return;
   router.push({
     name: routeName,
-    params: { codSubprocesso: route.value.params.codSubprocesso },
+    params: { codSubprocesso: codigo },
   });
 };
 </script>

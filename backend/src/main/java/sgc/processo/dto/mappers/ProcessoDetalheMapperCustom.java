@@ -41,7 +41,7 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
         // Montar a hierarquia de unidades participantes
         montarHierarquiaUnidades(dto, processo, subprocessos);
-        
+
         return dto;
     }
 
@@ -70,8 +70,8 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
     }
 
     protected void montarHierarquiaUnidades(ProcessoDetalheDto dto,
-                                          Processo processo,
-                                          List<Subprocesso> subprocessos) {
+            Processo processo,
+            List<Subprocesso> subprocessos) {
         Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         for (Unidade participante : processo.getParticipantes()) {
             mapaUnidades.put(participante.getCodigo(), delegate.unidadeToUnidadeParticipanteDTO(participante));
@@ -82,6 +82,10 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             if (unidadeDto != null) {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
+                unidadeDto.setCodSubprocesso(sp.getCodigo());
+                if (sp.getMapa() != null) {
+                    unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
+                }
             }
         }
 
@@ -95,16 +99,18 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             }
         }
 
-        // Adiciona unidades raiz E unidades sem pai no mapa (participantes diretos sem hierarquia)
+        // Adiciona unidades raiz E unidades sem pai no mapa (participantes diretos sem
+        // hierarquia)
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            if (unidadeDto.getCodUnidadeSuperior() == null || 
-                !mapaUnidades.containsKey(unidadeDto.getCodUnidadeSuperior())) {
+            if (unidadeDto.getCodUnidadeSuperior() == null ||
+                    !mapaUnidades.containsKey(unidadeDto.getCodUnidadeSuperior())) {
                 dto.getUnidades().add(unidadeDto);
             }
         }
 
         // Ordena as unidades e seus filhos
-        Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator = Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
+        Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator = Comparator
+                .comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
         dto.getUnidades().sort(comparator);
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             unidadeDto.getFilhos().sort(comparator);
