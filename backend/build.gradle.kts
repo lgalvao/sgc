@@ -57,6 +57,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
+    testImplementation("net.jqwik:jqwik:1.9.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
