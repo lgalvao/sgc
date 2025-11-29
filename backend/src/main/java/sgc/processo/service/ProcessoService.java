@@ -92,13 +92,27 @@ public class ProcessoService {
 
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : requisicao.getUnidades()) {
-            participantes.add(unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
+
+            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de
+            // processos
+            // Isso nunca deveria ocorrer em operação normal (frontend filtra), mas protege
+            // contra bugs
+            if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
+                log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}",
+                        unidade.getSigla());
+                throw new IllegalStateException("Erro interno: unidade não elegível foi enviada ao backend");
+            }
+
+            participantes.add(unidade);
         }
 
         if (requisicao.getTipo() == TipoProcesso.REVISAO || requisicao.getTipo() == TipoProcesso.DIAGNOSTICO) {
             getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.getUnidades()))
-                .ifPresent(msg -> { throw new ErroProcesso(msg); });
+                    .ifPresent(msg -> {
+                        throw new ErroProcesso(msg);
+                    });
         }
 
         Processo processo = new Processo();
@@ -132,7 +146,9 @@ public class ProcessoService {
 
         if (requisicao.getTipo() == TipoProcesso.REVISAO || requisicao.getTipo() == TipoProcesso.DIAGNOSTICO) {
             getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.getUnidades()))
-                .ifPresent(msg -> { throw new ErroProcesso(msg); });
+                    .ifPresent(msg -> {
+                        throw new ErroProcesso(msg);
+                    });
         }
 
         Set<Unidade> participantes = new HashSet<>();
@@ -194,7 +210,7 @@ public class ProcessoService {
     @Transactional
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
         Processo processo = processoRepo.findById(codigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -206,8 +222,8 @@ public class ProcessoService {
         }
 
         List<Long> codigosUnidades = participantes.stream()
-            .map(Unidade::getCodigo)
-            .toList();
+                .map(Unidade::getCodigo)
+                .toList();
 
         Optional<String> erroUnidadesAtivas = getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades);
         if (erroUnidadesAtivas.isPresent()) {
@@ -222,11 +238,10 @@ public class ProcessoService {
         processoRepo.save(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoIniciado(
-            processo.getCodigo(),
-            processo.getTipo().name(),
-            LocalDateTime.now(),
-            codigosUnidades
-        ));
+                processo.getCodigo(),
+                processo.getTipo().name(),
+                LocalDateTime.now(),
+                codigosUnidades));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", codigo, codsUnidades.size());
         return List.of();
@@ -236,7 +251,7 @@ public class ProcessoService {
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         log.info("Iniciando processo de revisão para código {} com unidades {}", codigo, codigosUnidades);
         Processo processo = processoRepo.findById(codigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -256,7 +271,7 @@ public class ProcessoService {
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
             criarSubprocessoParaRevisao(processo, unidade);
         }
@@ -265,11 +280,10 @@ public class ProcessoService {
         processoRepo.save(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoIniciado(
-            processo.getCodigo(),
-            processo.getTipo().name(),
-            LocalDateTime.now(),
-            codigosUnidades
-        ));
+                processo.getCodigo(),
+                processo.getTipo().name(),
+                LocalDateTime.now(),
+                codigosUnidades));
 
         log.info("Processo de revisão {} iniciado para {} unidades.", codigo, codigosUnidades.size());
         return List.of();
@@ -289,7 +303,8 @@ public class ProcessoService {
         processo.setDataFinalizacao(LocalDateTime.now());
 
         processoRepo.save(processo);
-        processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, new ArrayList<>(processo.getParticipantes()));
+        processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo,
+                new ArrayList<>(processo.getParticipantes()));
         publicadorEventos.publishEvent(new EventoProcessoFinalizado(this, processo.getCodigo()));
 
         log.info("Processo finalizado: código={}", codigo);
@@ -300,16 +315,16 @@ public class ProcessoService {
             return Optional.empty();
         }
         List<Long> unidadesBloqueadas = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
-            .flatMap(p -> p.getParticipantes().stream())
-            .map(Unidade::getCodigo)
-            .filter(codsUnidades::contains)
-            .distinct()
-            .toList();
+                .flatMap(p -> p.getParticipantes().stream())
+                .map(Unidade::getCodigo)
+                .filter(codsUnidades::contains)
+                .distinct()
+                .toList();
 
         if (!unidadesBloqueadas.isEmpty()) {
             List<String> siglasUnidadesBloqueadas = unidadeRepo.findSiglasByCodigos(unidadesBloqueadas);
             return Optional.of("As seguintes unidades já participam de outro processo ativo: %s"
-                .formatted(String.join(", ", siglasUnidadesBloqueadas)));
+                    .formatted(String.join(", ", siglasUnidadesBloqueadas)));
         }
         return Optional.empty();
     }
@@ -328,16 +343,17 @@ public class ProcessoService {
             List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
             return Optional.of(String.format(
                     "As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: %s",
-                    String.join(", ", siglasUnidadesSemMapa)
-            ));
+                    String.join(", ", siglasUnidadesSemMapa)));
         }
         return Optional.empty();
     }
 
     private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {
-        if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
+        if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo())
+                || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
             Mapa mapa = mapaRepo.save(new Mapa());
-            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
+            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO,
+                    processo.getDataLimite());
             Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
             movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
         }
@@ -350,10 +366,12 @@ public class ProcessoService {
         Long codMapaVigente = unidade.getMapaVigente().getCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO,
+                processo.getDataLimite());
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
-        log.info("Subprocesso {} para revisão criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
+        log.info("Subprocesso {} para revisão criado para unidade {}", subprocessoSalvo.getCodigo(),
+                unidade.getSigla());
     }
 
     private void validarFinalizacaoProcesso(Processo processo) {
@@ -379,8 +397,7 @@ public class ProcessoService {
         if (!pendentes.isEmpty()) {
             String mensagem = String.format(
                     "Não é possível encerrar o processo. Unidades pendentes de homologação:%n- %s",
-                    String.join("%n- ", pendentes)
-            );
+                    String.join("%n- ", pendentes));
             log.warn("Validação de finalização falhou: {} subprocessos não homologados.", pendentes.size());
             throw new ErroProcesso(mensagem);
         }
@@ -393,15 +410,18 @@ public class ProcessoService {
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
-                    .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
-                    .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
             unidade.setMapaVigente(mapaDoSubprocesso);
             unidade.setDataVigenciaMapaAtual(LocalDateTime.now());
             unidadeRepo.save(unidade);
-            log.debug("Mapa vigente para unidade {} definido como mapa {}", unidade.getCodigo(), mapaDoSubprocesso.getCodigo());
+            log.debug("Mapa vigente para unidade {} definido como mapa {}", unidade.getCodigo(),
+                    mapaDoSubprocesso.getCodigo());
         }
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
     }
@@ -420,7 +440,8 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication();
         String username = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 

@@ -1,3 +1,17 @@
+-- ============================================================================
+-- TIPOS DE UNIDADES E ELEGIBILIDADE PARA PROCESSOS
+-- ============================================================================
+-- OPERACIONAIS (elegíveis): ASSESSORIA_11 (3), ASSESSORIA_12 (4)
+--                            SECAO_111 (6), SECAO_112 (7), SECAO_113 (8)
+--                            SECAO_121 (10), ASSESSORIA_21 (12), ASSESSORIA_22 (13)
+--                            SECAO_211 (15), SECAO_212 (16), SECAO_221 (18)
+--
+-- INTERMEDIARIAS (NÃO elegíveis): COORD_11 (5), COORD_12 (9)
+--                                  COORD_21 (14), COORD_22 (17)
+--
+-- INTEROPERACIONAIS (elegíveis): SEDOC (1), SECRETARIA_1 (2), SECRETARIA_2 (11)
+-- ============================================================================
+
 -- Seed data generated from JSON
 
 INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL);
@@ -22,6 +36,8 @@ INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_c
 INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('111111', 'ADMIN_SEDOC_E_CHEFE_SEDOC', 'admin_sedoc_e_chefe_sedoc@tre-pe.jus.br', NULL, 1);
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('111111', 'ADMIN', 1);
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('111111', 'CHEFE', 1);
+INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('191919', 'ADMIN_1_PERFIL', 'admin_unico@tre-pe.jus.br', NULL, 1);
+INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('191919', 'ADMIN', 1);
 INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('222222', 'GESTOR_COORD_11', 'gestor_coord_11@tre-pe.jus.br', NULL, 5);
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('222222', 'GESTOR', 5);
 INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('333333', 'CHEFE_SECAO_111', 'chefe_secao_111@tre-pe.jus.br', NULL, 6);

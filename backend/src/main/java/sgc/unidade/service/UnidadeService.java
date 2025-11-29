@@ -52,8 +52,10 @@ public class UnidadeService {
         for (Unidade u : unidades) {
             Long codigoPai = u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
 
-            // Determine elegibility based on whether unit has vigente map
-            boolean isElegivel = !requerMapaVigente || u.getMapaVigente() != null;
+            // Determine elegibility based on whether unit has vigente map AND is not
+            // INTERMEDIARIA
+            boolean isElegivel = (!requerMapaVigente || u.getMapaVigente() != null)
+                    && u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 
             UnidadeDto dto = new UnidadeDto(
                     u.getCodigo(),
@@ -88,7 +90,8 @@ public class UnidadeService {
 
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
         Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codUnidade + " não encontrada"));
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codUnidade + " não encontrada"));
 
         Usuario usuario = usuarioRepo.findById(request.tituloEleitoralServidor())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
@@ -216,7 +219,7 @@ public class UnidadeService {
     public List<String> buscarSiglasSubordinadas(String sigla) {
         List<UnidadeDto> todas = buscarTodasUnidades();
         UnidadeDto raiz = buscarNaHierarquiaPorSigla(todas, sigla);
-        
+
         if (raiz == null) {
             throw new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada na hierarquia");
         }
@@ -229,7 +232,7 @@ public class UnidadeService {
     public String buscarSiglaSuperior(String sigla) {
         Unidade unidade = unidadeRepo.findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
-        
+
         if (unidade.getUnidadeSuperior() != null) {
             return unidade.getUnidadeSuperior().getSigla();
         }
@@ -238,10 +241,12 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
         for (UnidadeDto u : lista) {
-            if (u.getCodigo().equals(codigo)) return u;
+            if (u.getCodigo().equals(codigo))
+                return u;
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), codigo);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
         }
         return null;
@@ -249,10 +254,12 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
         for (UnidadeDto u : lista) {
-            if (u.getSigla().equals(sigla)) return u;
+            if (u.getSigla().equals(sigla))
+                return u;
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
         }
         return null;

@@ -169,7 +169,7 @@ import * as processoService from "@/services/processoService";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso,} from "@/types/tipos";
+import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso, Unidade} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 
@@ -243,6 +243,19 @@ function limparCampos() {
   unidadesSelecionadas.value = [];
 }
 
+
+// Helper para buscar unidade na árvore
+function findUnidadeById(codigo: number, nodes: Unidade[]): Unidade | null {
+  for (const node of nodes) {
+    if (node.codigo === codigo) return node;
+    if (node.filhas) {
+      const found = findUnidadeById(codigo, node.filhas);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 async function salvarProcesso() {
   if (!descricao.value) {
     toast.show({
@@ -253,14 +266,22 @@ async function salvarProcesso() {
     console.log("Validation error in salvarProcesso: Preencha a descrição.");
     return;
   }
-  if (unidadesSelecionadas.value.length === 0) {
+
+  // Filtrar apenas unidades elegíveis
+  const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
+    const unidade = findUnidadeById(id, unidadesStore.unidades);
+    return unidade && unidade.isElegivel;
+  });
+
+  if (unidadesFiltradas.length === 0) {
     toast.show({
       title: "Dados incompletos",
-      body: "Pelo menos uma unidade participante deve ser incluída.",
+      body: "Pelo menos uma unidade participante elegível deve ser incluída.",
       props: { variant: 'danger', value: true },
     });
     return;
   }
+
   if (!dataLimite.value) {
     toast.show({
       title: "Dados incompletos",
@@ -277,7 +298,7 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value,
+        unidades: unidadesFiltradas,
       };
       await processosStore.atualizarProcesso(
         processoEditando.value.codigo,
@@ -294,7 +315,7 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value,
+        unidades: unidadesFiltradas,
       };
       await processosStore.criarProcesso(request);
       toast.show({

@@ -17,3 +17,13 @@ spring:
       mode: always
       schema-locations: file:../e2e/setup/schema.sql
       data-locations: file:../e2e/setup/seed.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      enabled: true
+

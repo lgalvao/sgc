@@ -1,7 +1,7 @@
 <template>
   <div class="arvore-unidades">
     <template
-      v-for="unidade in unidadesFiltradas"
+      v-for="unidade in unidadesExibidas"
       :key="unidade.sigla"
     >
       <div class="form-check">
@@ -30,6 +30,14 @@
       </div>
 
       <!-- Mostrar filhas se a unidade tem filhas -->
+      <span
+        v-if="unidade.filhas && unidade.filhas.length > 0"
+        class="me-2 cursor-pointer user-select-none"
+        :data-testid="`btn-expand-${unidade.sigla}`"
+        @click="toggleExpand(unidade)"
+      >
+        {{ isExpanded(unidade) ? '[-]' : '[+]' }}
+      </span>
       <div
         v-if="unidade.filhas && unidade.filhas.length"
         class="ms-4"
@@ -44,6 +52,7 @@
               :model-value="isChecked(filha.codigo)"
               :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
               :disabled="!filha.isElegivel"
+              :data-testid="`chk-${filha.sigla}`"
               @update:model-value="(val) => toggle(filha, val as boolean)"
             >
               <label
@@ -75,6 +84,7 @@
                   :id="`chk-${neta.sigla}`"
                   :model-value="isChecked(neta.codigo)"
                   :disabled="!neta.isElegivel"
+                  :data-testid="`chk-${neta.sigla}`"
                   @update:model-value="(val) => toggle(neta, val as boolean)"
                 >
                   <label
@@ -130,14 +140,40 @@ const parentMap = computed(() => {
   return map;
 });
 
-// Filtrar unidades pela função customizada
-const unidadesFiltradas = computed(() => {
-  return props.unidades.filter(props.filtrarPor);
+// Filtrar unidades pela função customizada e ocultar SEDOC (raiz)
+const unidadesExibidas = computed(() => {
+  const filtradas = props.unidades.filter(props.filtrarPor);
+  const lista: Unidade[] = [];
+  
+  for (const u of filtradas) {
+    // Se for SEDOC (pela sigla ou código 1), não mostra ela, mas mostra as filhas
+    if (u.sigla === 'SEDOC' || u.codigo === 1) {
+       if (u.filhas) lista.push(...u.filhas);
+    } else {
+       lista.push(u);
+    }
+  }
+  return lista;
 });
 
 // Verifica se é folha (sem filhas)
 function isFolha(unidade: Unidade): boolean {
   return !unidade.filhas || unidade.filhas.length === 0;
+}
+
+// Busca uma unidade por código na árvore
+function findUnidadeById(codigo: number): Unidade | null {
+  const search = (nodes: Unidade[]): Unidade | null => {
+    for (const node of nodes) {
+      if (node.codigo === codigo) return node;
+      if (node.filhas) {
+        const found = search(node.filhas);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return search(props.unidades);
 }
 
 // Obtém todas subunidades recursivamente
@@ -196,7 +232,13 @@ function toggle(unidade: Unidade, checked: boolean) {
   const idsToToggle = [unidade.codigo, ...getTodasSubunidades(unidade)];
   
   if (checked) {
-    idsToToggle.forEach(id => newSelection.add(id));
+    // Filtrar apenas unidades elegíveis ao adicionar
+    idsToToggle.forEach(id => {
+      const unidadeParaAdicionar = findUnidadeById(id);
+      if (unidadeParaAdicionar?.isElegivel) {
+        newSelection.add(id);
+      }
+    });
   } else {
     idsToToggle.forEach(id => newSelection.delete(id));
   }
@@ -217,7 +259,10 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
     const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
 
     if (allChildrenSelected) {
-      selectionSet.add(parent.codigo);
+      // Apenas adiciona o pai se ele for elegível
+      if (parent.isElegivel) {
+        selectionSet.add(parent.codigo);
+      }
     } else {
       // Se não forem todas as filhas selecionadas, remove o pai
       // EXCETO se o pai for INTEROPERACIONAL (regra 2.3.2.5)
@@ -243,6 +288,21 @@ watch(
     },
     {deep: true},
 );
+
+// Estado de expansão das unidades
+const expandedUnits = ref<Set<number>>(new Set());
+
+function isExpanded(unidade: Unidade): boolean {
+  return expandedUnits.value.has(unidade.codigo);
+}
+
+function toggleExpand(unidade: Unidade) {
+  if (expandedUnits.value.has(unidade.codigo)) {
+    expandedUnits.value.delete(unidade.codigo);
+  } else {
+    expandedUnits.value.add(unidade.codigo);
+  }
+}
 
 // Watch para reagir a mudanças internas e emitir para o pai
 watch(

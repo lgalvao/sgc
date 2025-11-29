@@ -123,8 +123,9 @@ try {
 function checkBackendHealth() {
     return new Promise((resolve) => {
         const check = () => {
-            const req = require('http').get(`http://localhost:${BACKEND_PORT}/actuator/health`, (res) => {
-                if (res.statusCode === 200) {
+            const req = require('http').get(`http://localhost:${BACKEND_PORT}/`, (res) => {
+                // Accept any response (200, 404, etc) - just need server to be responding
+                if (res.statusCode >= 200 && res.statusCode < 500) {
                     console.log('[LIFECYCLE] Backend is healthy!');
                     resolve();
                 } else {
@@ -141,10 +142,37 @@ function checkBackendHealth() {
     });
 }
 
+function checkFrontendHealth() {
+    return new Promise((resolve) => {
+        const check = () => {
+            const req = require('http').get(`http://localhost:${FRONTEND_PORT}`, (res) => {
+                // Accept any 2xx or 3xx response
+                if (res.statusCode >= 200 && res.statusCode < 400) {
+                    console.log('[LIFECYCLE] Frontend is healthy!');
+                    resolve();
+                } else {
+                    setTimeout(check, 1000);
+                }
+            });
+            req.on('error', () => {
+                setTimeout(check, 1000);
+            });
+            req.end();
+        };
+        console.log('[LIFECYCLE] Waiting for Frontend to be healthy...');
+        check();
+    });
+}
+
 startBackend();
-checkBackendHealth().then(() => {
-    startFrontend();
-});
+checkBackendHealth()
+    .then(() => {
+        startFrontend();
+        return checkFrontendHealth();
+    })
+    .then(() => {
+        console.log('[LIFECYCLE] All services ready!');
+    });
 
 // Keep alive
 setInterval(() => { }, 1000);

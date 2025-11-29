@@ -62,6 +62,7 @@
           <BNavItem
             title="Sair"
             to="/login"
+            data-testid="btn-logout"
           >
             <i class="bi bi-box-arrow-right fs-5" />
           </BNavItem>
