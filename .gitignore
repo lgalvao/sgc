@@ -34,3 +34,6 @@ backend/bin/
 !backend/build/reports/tests/test/index.html
 /backend/target/
 .DS_Store
+
+# Jqwik
+.jqwik-database
