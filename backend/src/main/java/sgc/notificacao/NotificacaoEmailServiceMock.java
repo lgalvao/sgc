@@ -9,13 +9,13 @@ import sgc.notificacao.dto.EmailDto;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Mock do serviço de notificações 
+ * Mock do serviço de notificações
  * Herda de NotificacaoEmailService para compatibilidade total.
  * Sobrescreve apenas os métodos públicos para evitar envio real de e-mails.
  */
 @Service
 @Primary
-@Profile("test")
+@Profile({ "test", "e2e" })
 @Slf4j
 public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     public NotificacaoEmailServiceMock() {
@@ -32,7 +32,7 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
         log.debug("[MOCK] E-mail HTML NÃO enviado - Para: {}, Assunto: {}", para, assunto);
     }
-    
+
     @Override
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         log.debug("[MOCK] E-mail assíncrono NÃO enviado - Para: {}", emailDto.getDestinatario());

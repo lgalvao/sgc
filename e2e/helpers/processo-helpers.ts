@@ -17,6 +17,7 @@ export async function criarProcesso(page: Page, options: {
     tipo: 'MAPEAMENTO' | 'REVISAO';
     diasLimite: number;
     unidade: string;
+    expandir?: string[];
 }): Promise<void> {
     await page.getByTestId('btn-criar-processo').click();
     await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -24,6 +25,12 @@ export async function criarProcesso(page: Page, options: {
     await page.getByTestId('input-descricao').fill(options.descricao);
     await page.getByTestId('select-tipo').selectOption(options.tipo);
     await page.getByTestId('input-dataLimite').fill(calcularDataLimite(options.diasLimite));
+
+    if (options.expandir) {
+        for (const sigla of options.expandir) {
+            await page.getByTestId(`btn-expand-${sigla}`).click();
+        }
+    }
 
     // Usar getByTestId ao invés de getByRole para respeitar disabled
     await page.getByTestId(`chk-${options.unidade}`).check();
