@@ -83,10 +83,5 @@ for (const usuario of usuariosData) {
     }
 }
 
-// 3. Update Unidade Titular (Optional, if JSON had this info. It doesn't seem to explicitly say who is titular, 
-// but maybe we can infer or skip for now. The schema has titular_titulo FK to usuario).
-// The original data.sql had updates for titular.
-// For now, we leave titular NULL unless we want to pick one.
-
 fs.writeFileSync(outputPath, sql);
 console.log(`Seed SQL generated at ${outputPath}`);

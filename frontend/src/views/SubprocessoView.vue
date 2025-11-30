@@ -93,7 +93,7 @@ function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
     mostrarModalAlterarDataLimite.value = true;
   } else {
-    toast.show({
+    toast.create({
         title: "Ação não permitida",
         body: "Você não tem permissão para alterar a data limite.",
         props: { variant: 'danger', value: true },
@@ -116,13 +116,13 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
         {novaData},
     );
     fecharModalAlterarDataLimite();
-    toast.show({
+    toast.create({
         title: "Data limite alterada",
         body: "A data limite foi alterada com sucesso!",
         props: { variant: 'success', value: true },
     });
   } catch {
-    toast.show({
+    toast.create({
         title: "Erro ao alterar data limite",
         body: "Não foi possível alterar a data limite.",
         props: { variant: 'danger', value: true },

@@ -47,12 +47,6 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-iniciar-processo').click();
         await page.getByTestId('btn-modal-confirmar').click();
 
-        // Verificar msgs erro
-        const errorToast = page.locator('.toast-body.text-danger');
-        if (await errorToast.isVisible()) {
-            console.log('Error Toast:', await errorToast.textContent());
-        }
-
         await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, { descricao: descricaoMapeamento, situacao: 'Em andamento', tipo: 'Mapeamento' });
 

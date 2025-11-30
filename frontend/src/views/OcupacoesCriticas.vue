@@ -245,7 +245,7 @@ const mostrarModalConfirmacao = ref(false);
 
 function adicionarOcupacao() {
   if (!novaOcupacao.value.nome.trim() || !novaOcupacao.value.descricao.trim()) {
-    toast.show({
+    toast.create({
         title: "Dados incompletos",
         body: "Preencha nome e descrição da ocupação.",
         props: { variant: 'danger', value: true },
@@ -268,7 +268,7 @@ function adicionarOcupacao() {
     competenciasCriticas: [],
   };
 
-  toast.show({
+  toast.create({
       title: "Ocupação adicionada",
       body: "Ocupação crítica adicionada!",
       props: { variant: 'success', value: true },
@@ -277,7 +277,7 @@ function adicionarOcupacao() {
 
 function removerOcupacao(index: number) {
   ocupacoesCriticas.value.splice(index, 1);
-  toast.show({
+  toast.create({
       title: "Ocupação removida",
       body: "Ocupação crítica removida!",
       props: { variant: 'success', value: true },
@@ -298,7 +298,7 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar identificação
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  toast.show({
+  toast.create({
       title: "Identificação finalizada",
       body: "A identificação de ocupações críticas foi concluída!",
       props: { variant: 'success', value: true },

@@ -500,7 +500,7 @@ async function confirmarSugestoes() {
 
     fecharModalSugestoes();
 
-    toast.show({
+    toast.create({
         title: "Sugestões apresentadas",
         body: "Sugestões submetidas para análise da unidade superior",
         props: { variant: 'success', value: true },
@@ -511,7 +511,7 @@ async function confirmarSugestoes() {
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    toast.show({
+    toast.create({
         title: "Erro ao apresentar sugestões",
         body: "Ocorreu um erro. Tente novamente.",
         props: { variant: 'danger', value: true },
@@ -526,7 +526,7 @@ async function confirmarValidacao() {
 
     fecharModalValidar();
 
-    toast.show({
+    toast.create({
         title: "Mapa validado",
         body: "Mapa validado e submetido para análise da unidade superior",
         props: { variant: 'success', value: true },
@@ -537,7 +537,7 @@ async function confirmarValidacao() {
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    toast.show({
+    toast.create({
         title: "Erro ao validar mapa",
         body: "Ocorreu um erro. Tente novamente.",
         props: { variant: 'danger', value: true },

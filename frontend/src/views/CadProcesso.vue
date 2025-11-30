@@ -197,7 +197,7 @@ onMounted(async () => {
       if (processo) {
         // Redirect if process is not in CRIADO state (cannot be edited)
         if (processo.situacao !== 'CRIADO') {
-          toast.show({
+          toast.create({
             title: "Processo em andamento",
             body: "Este processo já foi iniciado e não pode ser editado.",
             props: { variant: 'warning', value: true },
@@ -218,7 +218,7 @@ onMounted(async () => {
         await nextTick();
       }
     } catch (error) {
-      toast.show({
+      toast.create({
         title: "Erro ao carregar processo",
         body: "Não foi possível carregar os detalhes do processo.",
         props: { variant: 'danger', value: true },
@@ -259,12 +259,11 @@ function findUnidadeById(codigo: number, nodes: Unidade[]): Unidade | null {
 
 async function salvarProcesso() {
   if (!descricao.value) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Preencha a descrição.",
       props: { variant: 'danger', value: true },
     });
-    console.log("Validation error in salvarProcesso: Preencha a descrição.");
     return;
   }
 
@@ -275,7 +274,7 @@ async function salvarProcesso() {
   });
 
   if (unidadesFiltradas.length === 0) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Pelo menos uma unidade participante elegível deve ser incluída.",
       props: { variant: 'danger', value: true },
@@ -284,7 +283,7 @@ async function salvarProcesso() {
   }
 
   if (!dataLimite.value) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Preencha a data limite.",
       props: { variant: 'danger', value: true },
@@ -305,7 +304,7 @@ async function salvarProcesso() {
         processoEditando.value.codigo,
         request,
       );
-      toast.show({
+      toast.create({
         title: "Processo alterado",
         body: "O processo foi alterado!",
         props: { variant: 'success', value: true },
@@ -319,7 +318,7 @@ async function salvarProcesso() {
         unidades: unidadesFiltradas,
       };
       await processosStore.criarProcesso(request);
-      toast.show({
+      toast.create({
         title: "Processo criado",
         body: "O processo foi criado!",
         props: { variant: 'success', value: true },
@@ -328,7 +327,7 @@ async function salvarProcesso() {
     }
     limparCampos();
   } catch (error) {
-    toast.show({
+    toast.create({
       title: "Erro ao salvar processo",
       body: "Não foi possível salvar o processo. Verifique os dados e tente novamente.",
       props: { variant: 'danger', value: true },
@@ -339,7 +338,7 @@ async function salvarProcesso() {
 
 async function abrirModalConfirmacao() {
   if (!descricao.value) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Preencha a descrição.",
       props: { variant: 'danger', value: true },
@@ -347,7 +346,7 @@ async function abrirModalConfirmacao() {
     return;
   }
   if (unidadesSelecionadas.value.length === 0) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Pelo menos uma unidade participante deve ser incluída.",
       props: { variant: 'danger', value: true },
@@ -355,7 +354,7 @@ async function abrirModalConfirmacao() {
     return;
   }
   if (!dataLimite.value) {
-    toast.show({
+    toast.create({
       title: "Dados incompletos",
       body: "Preencha a data limite.",
       props: { variant: 'danger', value: true },
@@ -373,7 +372,7 @@ function fecharModalConfirmacao() {
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
   if (!processoEditando.value) {
-    toast.show({
+    toast.create({
       title: "Salve o processo",
       body: "Você precisa salvar o processo antes de poder iniciá-lo.",
       props: { variant: 'danger', value: true },
@@ -387,7 +386,7 @@ async function confirmarIniciarProcesso() {
       tipo.value as TipoProcesso,
       unidadesSelecionadas.value,
     );
-    toast.show({
+    toast.create({
       title: "Processo iniciado!",
       body: "O processo foi iniciado! Notificações enviadas às unidades.",
       props: { variant: 'success', value: true },
@@ -398,7 +397,7 @@ async function confirmarIniciarProcesso() {
       limparCampos();
     }
   } catch (error) {
-    toast.show({
+    toast.create({
       title: "Erro ao iniciar processo",
       body: "Não foi possível iniciar o processo. Tente novamente.",
       props: { variant: 'danger', value: true },
@@ -419,7 +418,7 @@ async function confirmarRemocao() {
   if (processoEditando.value) {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
-      toast.show({
+      toast.create({
         title: "Processo removido",
         body: `Processo ${descricao.value} removido com sucesso.`,
         props: { variant: 'success', value: true },
@@ -430,7 +429,7 @@ async function confirmarRemocao() {
         limparCampos();
       }
     } catch (error) {
-      toast.show({
+      toast.create({
         title: "Erro ao remover processo",
         body: "Não foi possível remover o processo. Tente novamente.",
         props: { variant: 'danger', value: true },

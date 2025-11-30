@@ -18,7 +18,6 @@ function log(prefix, data) {
 }
 
 function startBackend() {
-    console.log('Starting Backend...');
     // Ensure gradlew is executable
     try {
         fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
@@ -63,7 +62,6 @@ function startFrontend() {
 }
 
 function cleanup() {
-    console.log('Cleaning up processes...');
     if (backendProcess) {
         try {
             process.kill(-backendProcess.pid);
@@ -137,7 +135,6 @@ function checkFrontendHealth() {
             const req = require('http').get(`http://localhost:${FRONTEND_PORT}`, (res) => {
                 // Accept any 2xx or 3xx response
                 if (res.statusCode >= 200 && res.statusCode < 400) {
-                    console.log('[LIFECYCLE] Frontend is healthy!');
                     resolve();
                 } else {
                     setTimeout(check, 1000);

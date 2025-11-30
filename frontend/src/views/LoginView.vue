@@ -119,9 +119,6 @@ const router = useRouter();
 const perfilStore = usePerfilStore();
 const toast = useToast(); // Instantiate toast
 
-console.log("LoginView setup");
-
-
 const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");
 const loginStep = ref(1);
@@ -143,11 +140,9 @@ watch(perfisUnidadesDisponiveis, (newVal) => {
 });
 
 const handleLogin = async () => {
-  console.log("handleLogin chamado. loginStep:", loginStep.value);
-
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
-      toast.show({
+      toast.create({
         title: "Dados incompletos",
         body: "Por favor, preencha título e senha.",
         props: { variant: 'danger', value: true },
@@ -159,27 +154,20 @@ const handleLogin = async () => {
       const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
       if (sucessoAutenticacao) {
-        console.log("Perfis carregados:", perfilStore.perfisUnidades.length);
         if (perfilStore.perfisUnidades.length > 1) {
           loginStep.value = 2;
-          // CRITICAL: Stop here to let the user select a profile
-          return; 
+          return;
         } else if (perfilStore.perfisUnidades.length === 1) {
-          // Auto-login for single profile is handled inside loginCompleto or here if needed
-          // But based on store logic, loginCompleto might not do the final 'entrar' if it returns true?
-          // Let's check store logic. 
-          // Store's loginCompleto DOES call 'entrar' if length === 1.
-          // So we just redirect.
           await router.push("/painel");
         } else {
-          toast.show({
+          toast.create({
             title: "Perfis indisponíveis",
             body: "Nenhum perfil/unidade disponível para este usuário.",
             props: { variant: 'danger', value: true },
           });
         }
       } else {
-        toast.show({
+        toast.create({
           title: "Falha na autenticação",
           body: "Título ou senha inválidos.",
           props: { variant: 'danger', value: true },
@@ -187,7 +175,7 @@ const handleLogin = async () => {
       }
     } catch (error) {
       console.error("Erro no login:", error);
-      toast.show({
+      toast.create({
         title: "Erro no sistema",
         body: "Ocorreu um erro ao tentar realizar o login.",
         props: { variant: 'danger', value: true },
@@ -204,14 +192,14 @@ const handleLogin = async () => {
         await router.push("/painel");
       } catch (error) {
         console.error("Erro ao selecionar perfil:", error);
-        toast.show({
+        toast.create({
           title: "Erro",
           body: "Falha ao selecionar o perfil.",
           props: { variant: 'danger', value: true },
         });
       }
     } else {
-      toast.show({
+      toast.create({
         title: "Seleção necessária",
         body: "Por favor, selecione um perfil.",
         props: { variant: 'danger', value: true },

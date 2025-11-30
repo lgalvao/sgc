@@ -33,7 +33,6 @@ function mapAtividadeVisualizacaoToModel(
   export function mapMapaVisualizacaoToAtividades(
     dto: MapaVisualizacao,
   ): Atividade[] {
-    console.log("mapMapaVisualizacaoToAtividades DTO:", JSON.stringify(dto));
     if (!dto) {
       return [];
     }
@@ -43,7 +42,6 @@ function mapAtividadeVisualizacaoToModel(
     const atividadesSemCompetencia = dto.atividadesSemCompetencia || [];
     const todasAtividades = [...atividadesCompetencia, ...atividadesSemCompetencia];
 
-    console.log("mapMapaVisualizacaoToAtividades Result:", JSON.stringify(todasAtividades));
     return todasAtividades.map(mapAtividadeVisualizacaoToModel).filter((a) => a !== null);
   }
 

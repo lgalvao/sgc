@@ -49,7 +49,7 @@ vi.mock("bootstrap-vue-next", async (importOriginal) => {
     return {
         ...actual,
         useToast: () => ({
-            show: (options: any) => {
+            create: (options: any) => {
                 const variant = options.props?.variant || 'info';
                 if (variant === 'success') {
                     ToastService.sucesso(options.title, options.body);

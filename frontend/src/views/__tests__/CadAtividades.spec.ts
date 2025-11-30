@@ -20,14 +20,14 @@ import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadAtividades from "@/views/CadAtividades.vue";
 
 const pushMock = vi.fn();
-const toastShowMock = vi.fn();
+const toastCreateMock = vi.fn();
 
 vi.mock("bootstrap-vue-next", async () => {
   const actual = await vi.importActual("bootstrap-vue-next");
   return {
     ...actual,
     useToast: () => ({
-      show: toastShowMock,
+      create: toastCreateMock,
     }),
   };
 });
@@ -155,6 +155,8 @@ describe("CadAtividades.vue", () => {
                   unidades: [
                     {
                       codUnidade: 123,
+                      codSubprocesso: 123,
+                      mapaCodigo: 456,
                       sigla: "TESTE",
                       situacaoSubprocesso: isRevisao
                         ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
@@ -224,6 +226,8 @@ describe("CadAtividades.vue", () => {
       unidades: [
         {
           codUnidade: 123,
+          codSubprocesso: 123,
+          mapaCodigo: 456,
           sigla: "TESTE",
           situacaoSubprocesso: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
         },
@@ -276,7 +280,7 @@ describe("CadAtividades.vue", () => {
 
     expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
       { descricao: "Nova Atividade" },
-      123,
+      456,
     );
   });
 
@@ -471,6 +475,8 @@ describe("CadAtividades.vue", () => {
       unidades: [
         {
           codUnidade: 123,
+          codSubprocesso: 123,
+          mapaCodigo: 456,
           sigla: "TESTE",
           situacaoSubprocesso:
             SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
@@ -545,12 +551,12 @@ describe("CadAtividades.vue", () => {
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
     await flushPromises();
 
-    expect(toastShowMock).toHaveBeenCalledWith(
+    expect(toastCreateMock).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "Atividades Incompletas",
         body: expect.stringContaining("As seguintes atividades não têm conhecimentos associados"),
       }),
     );
-    expect(toastShowMock.mock.calls[0][0].body).toContain("Atividade 2");
+    expect(toastCreateMock.mock.calls[0][0].body).toContain("Atividade 2");
   });
 });

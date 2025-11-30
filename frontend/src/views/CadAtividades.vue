@@ -425,7 +425,6 @@ const atividades = computed<AtividadeComEdicao[]>({
     const result = atividadesStore
       .obterAtividadesPorSubprocesso(codSubrocesso.value)
       .map((a) => ({ ...a, novoConhecimento: "" }));
-    console.log("CadAtividades computed atividades:", JSON.stringify(result));
     return result;
   },
   set: () => {},
@@ -437,7 +436,6 @@ const isRevisao = computed(
 );
 
 async function adicionarAtividade() {
-  console.log("adicionarAtividade called. Nova atividade:", novaAtividade.value, "CodSubprocesso:", codSubrocesso.value, "CodMapa:", codMapa.value);
   if (novaAtividade.value?.trim() && codMapa.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
@@ -560,7 +558,7 @@ function cancelarEdicaoAtividade() {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  toast.show({
+  toast.create({
     title: "Importação Concluída",
     body: "As atividades foram importadas para o seu mapa.",
     props: { variant: 'success', value: true },
@@ -595,7 +593,6 @@ const atividadesSemConhecimento = ref<Atividade[]>([]);
 
 
 onMounted(async () => {
-  console.log("CadAtividades mounted");
   await unidadesStore.buscarUnidade(props.sigla);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
@@ -634,7 +631,7 @@ function disponibilizarCadastro() {
     : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
-    toast.show({
+    toast.create({
       title: "Ação não permitida",
       body: `Ação permitida apenas na situação: "${situacaoEsperada}".`,
       props: { variant: 'danger', value: true },
@@ -647,7 +644,7 @@ function disponibilizarCadastro() {
     const atividadesDescricoes = atividadesSemConhecimento.value
       .map((a) => `- ${a.descricao}`)
       .join("\n");
-    toast.show({
+    toast.create({
       title: "Atividades Incompletas",
       body: `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
       props: { variant: 'warning', value: true },

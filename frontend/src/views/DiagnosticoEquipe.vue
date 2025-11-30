@@ -232,7 +232,7 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar diagnóstico
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  toast.show({
+  toast.create({
       title: "Diagnóstico finalizado",
       body: "O diagnóstico da equipe foi concluído!",
       props: { variant: 'success', value: true },

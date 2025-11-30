@@ -90,7 +90,6 @@ function navigateFromNavbar(path: string) {
 }
 
 function handleLogout() {
-  console.log("MainNavbar: handleLogout called");
   perfilStore.logout();
   router.push("/login");
 }

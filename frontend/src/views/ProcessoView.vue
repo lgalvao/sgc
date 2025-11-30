@@ -174,14 +174,14 @@ async function executarFinalizacao() {
   if (!processo.value) return;
   try {
     await processosStore.finalizarProcesso(processo.value.codigo);
-    toast.show({
+    toast.create({
         title: "Processo finalizado",
         body: "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
         props: { variant: 'success', value: true },
     });
     await router.push("/painel");
   } catch {
-    toast.show({
+    toast.create({
         title: "Erro ao finalizar processo",
         body: "Ocorreu um erro durante a finalização. Tente novamente.",
         props: { variant: 'danger', value: true },
@@ -218,7 +218,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       .filter((u) => u.selecionada)
       .map((u) => u.sigla);
   if (unidadesSelecionadas.length === 0) {
-    toast.show({
+    toast.create({
         title: "Nenhuma unidade selecionada",
         body: "Selecione ao menos uma unidade para processar.",
         props: { variant: 'danger', value: true },
@@ -232,7 +232,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       tipoAcao: tipoAcaoBloco.value,
       unidadeUsuario: String(perfilStore.unidadeSelecionada) || "",
     });
-    toast.show({
+    toast.create({
         title: `Cadastros ${tipoAcaoBloco.value === 'aceitar' ? 'aceitos' : 'homologados'} em bloco!`,
         body: `Operação de ${tipoAcaoBloco.value} em bloco concluída com sucesso!`,
         props: { variant: 'success', value: true },
@@ -240,7 +240,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
     fecharModalBloco();
     await router.push("/painel");
   } catch {
-    toast.show({
+    toast.create({
         title: "Erro ao processar em bloco",
         body: "Ocorreu um erro ao processar os cadastros em bloco.",
         props: { variant: 'danger', value: true },
