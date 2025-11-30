@@ -42,10 +42,12 @@ export const useAtividadesStore = defineStore("atividades", () => {
                 request,
                 codSubrocesso,
             );
-            const atividades =
-                atividadesPorSubprocesso.value.get(codSubrocesso) || [];
-            atividades.push(novaAtividade);
-            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            if (novaAtividade) {
+                const atividades =
+                    atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+                atividades.push(novaAtividade);
+                atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            }
             // After adding, re-fetch to ensure data consistency, especially if backend logic changes
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {

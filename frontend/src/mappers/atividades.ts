@@ -1,18 +1,20 @@
 import type { Atividade, Conhecimento, CriarConhecimentoRequest, } from "@/types/tipos";
 
 export function mapAtividadeDtoToModel(dto: any): Atividade {
+  if (!dto) return null as any;
   return {
     codigo: dto.codigo,
     descricao: dto.descricao,
     conhecimentos: dto.conhecimentos
-      ? dto.conhecimentos.map(mapConhecimentoDtoToModel)
+      ? dto.conhecimentos.map(mapConhecimentoDtoToModel).filter((c: any) => c !== null)
       : [],
   };
 }
 
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
+  if (!dto) return null as any;
   return {
-    id: dto.id,
+    id: dto.codigo,
     descricao: dto.descricao,
   };
 }
@@ -23,7 +25,7 @@ export function mapCriarAtividadeRequestToDto(
 ): any {
   return {
     ...request,
-    codSubrocesso,
+    mapaCodigo: codSubrocesso,
   };
 }
 

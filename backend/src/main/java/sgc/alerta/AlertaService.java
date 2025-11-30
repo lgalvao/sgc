@@ -123,7 +123,7 @@ public class AlertaService {
             List<Long> codigosUnidades,
             List<Subprocesso> subprocessos) {
 
-        log.info("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
+        log.debug("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long codUnidade : codigosUnidades) {
@@ -134,6 +134,7 @@ public class AlertaService {
                     log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
                     continue;
                 }
+
                 TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().getTipo());
                 String nomeProcesso = processo.getDescricao();
 
@@ -179,7 +180,7 @@ public class AlertaService {
             }
         }
 
-        log.info("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
+        log.debug("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
         return alertasCriados;
     }
 

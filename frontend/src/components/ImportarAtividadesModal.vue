@@ -238,9 +238,9 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(unidadePu.codUnidade);
+    await atividadesStore.buscarAtividadesParaSubprocesso(unidadePu.codSubprocesso);
     const atividadesDaOutraUnidade =
-        atividadesStore.obterAtividadesPorSubprocesso(unidadePu.codUnidade);
+        atividadesStore.obterAtividadesPorSubprocesso(unidadePu.codSubprocesso);
     atividadesParaImportar.value = atividadesDaOutraUnidade
         ? [...atividadesDaOutraUnidade]
         : [];

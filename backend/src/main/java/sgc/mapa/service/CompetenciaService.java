@@ -45,5 +45,8 @@ public class CompetenciaService {
 
         List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
         competencia.setAtividades(new HashSet<>(atividades));
+        for (Atividade atividade : atividades) {
+            atividade.getCompetencias().add(competencia);
+        }
     }
 }

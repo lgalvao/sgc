@@ -77,7 +77,7 @@ public class EventoProcessoListener {
                 return;
             }
 
-            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.getCodProcesso());
+            log.debug("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.getCodProcesso());
 
             // 1. Criar alertas diferenciados por tipo de unidade
             List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
@@ -95,7 +95,7 @@ public class EventoProcessoListener {
                     log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
                 }
             }
-            log.info("Processamento de evento concluído para o processo {}", processo.getCodigo());
+            log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
         } catch (Exception e) {
             log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }

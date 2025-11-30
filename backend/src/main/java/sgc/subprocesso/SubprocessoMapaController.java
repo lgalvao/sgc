@@ -26,6 +26,9 @@ import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class SubprocessoMapaController {
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoConsultaService subprocessoConsultaService;
+    private final UsuarioRepo usuarioRepo;
 
     /**
      * Analisa e retorna os impactos de uma revisão de mapa de competências.
@@ -52,7 +56,9 @@ public class SubprocessoMapaController {
      */
     @GetMapping("/{codigo}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
-    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal String tituloUsuario) {
+        Usuario usuario = usuarioRepo.findById(tituloUsuario)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 
@@ -93,9 +99,9 @@ public class SubprocessoMapaController {
     public MapaCompletoDto salvarMapa(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
-        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, usuario.getTituloEleitoral());
+        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, tituloUsuario);
     }
 
     /**
@@ -121,12 +127,12 @@ public class SubprocessoMapaController {
     public void salvarAjustesMapa(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarAjustesReq request,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
         subprocessoMapaService.salvarAjustesMapa(
                 codigo,
                 request.getCompetencias(),
-                usuario.getTituloEleitoral()
+                tituloUsuario
         );
     }
 
@@ -164,9 +170,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, tituloUsuario);
         return ResponseEntity.ok(mapa);
     }
 
@@ -176,9 +182,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
             @PathVariable Long codigo,
             @RequestBody @Valid CompetenciaReq request,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codigo, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codigo, request, tituloUsuario);
         return ResponseEntity.ok(mapa);
     }
 
@@ -189,9 +195,9 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
             @RequestBody @Valid CompetenciaReq request,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request, tituloUsuario);
         return ResponseEntity.ok(mapa);
     }
 
@@ -201,9 +207,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> removerCompetencia(
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
-            @AuthenticationPrincipal Usuario usuario
+            @AuthenticationPrincipal String tituloUsuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, tituloUsuario);
         return ResponseEntity.ok(mapa);
     }
 
@@ -213,8 +219,10 @@ public class SubprocessoMapaController {
     public ResponseEntity<Void> disponibilizarMapa(
         @PathVariable Long codigo,
         @RequestBody @Valid DisponibilizarMapaRequest request,
-        @AuthenticationPrincipal Usuario usuario
+        @AuthenticationPrincipal String tituloUsuario
     ) {
+        Usuario usuario = usuarioRepo.findById(tituloUsuario)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
         subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
         return ResponseEntity.ok().build();
     }

@@ -48,15 +48,15 @@ public class UsuarioService {
     }
 
     public void entrar(String tituloEleitoral, PerfilUnidade pu) {
-        log.info("Usuário {} entrou com sucesso. Perfil: {}, Unidade: {}", tituloEleitoral, pu.getPerfil(),
+        log.info("Usuário {} entrou. Perfil: {}, Unidade: {}", tituloEleitoral, pu.getPerfil(),
                 pu.getSiglaUnidade());
     }
 
     public void entrar(EntrarReq request) {
         if (!unidadeRepo.existsById(request.getUnidadeCodigo())) {
-            throw new ErroEntidadeNaoEncontrada("Unidade não encontrada com código: " + request.getUnidadeCodigo());
+            throw new ErroEntidadeNaoEncontrada("Unidade não encontrada, código: " + request.getUnidadeCodigo());
         }
-        log.info("Usuário {} entrou com sucesso via request. Perfil: {}, Unidade: {}",
+        log.info("Usuário {} entrou via request. Perfil: {}, Unidade: {}",
                 request.getTituloEleitoral(), request.getPerfil(), request.getUnidadeCodigo());
     }
 }

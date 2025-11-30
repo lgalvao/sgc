@@ -20,7 +20,7 @@
         <BButton
           :disabled="competencias.length === 0"
           variant="outline-success"
-          data-testid="btn-disponibilizar-page"
+          data-testid="btn-disponibilizar-mapa"
           @click="abrirModalDisponibilizar"
         >
           Disponibilizar
@@ -33,7 +33,7 @@
         <BButton
           variant="outline-primary"
           class="mb-3"
-          data-testid="btn-abrir-criar-competencia"
+          data-testid="btn-criar-competencia"
           @click="() => abrirModalCriarNovaCompetencia()"
         >
           <i class="bi bi-plus-lg" /> Criar competência
@@ -134,7 +134,7 @@
         <div class="mb-2">
           <BFormTextarea
             v-model="novaCompetencia.descricao"
-            data-testid="input-nova-competencia"
+            data-testid="input-descricao-competencia"
             placeholder="Descreva a competência"
             rows="3"
           />
@@ -184,7 +184,7 @@
           v-b-tooltip.hover
           variant="primary"
           :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-criar-competencia"
+          data-testid="btn-salvar-competencia"
           title="Criar Competência"
           @click="adicionarCompetenciaEFecharModal"
         >
@@ -246,7 +246,7 @@
         <BButton
           variant="success"
           :disabled="!dataLimiteValidacao"
-          data-testid="btn-disponibilizar"
+          data-testid="btn-modal-confirmar"
           @click="disponibilizarMapa"
         >
           Disponibilizar

@@ -77,6 +77,9 @@ public class AtividadeService {
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
         // Apesar da segurança estar configurada, mantemos esta verificação como proteção extra.
+        if (subprocesso.getUnidade() == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+        }
         if (!usuario.equals(subprocesso.getUnidade().getTitular())) {
             throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
         }
@@ -210,6 +213,9 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            if (subprocesso.getProcesso() == null) {
+                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+            }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
                 subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);

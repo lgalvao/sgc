@@ -1,7 +1,17 @@
 <template>
   <BContainer class="mt-4">
-    <div class="fs-5 w-100 mb-3">
-      {{ siglaUnidade }} - {{ nomeUnidade }}
+    <div class="d-flex align-items-center mb-3">
+      <BButton
+        variant="link"
+        class="p-0 me-3 text-decoration-none"
+        data-testid="btn-voltar"
+        @click="router.back()"
+      >
+        <i class="bi bi-arrow-left fs-4" />
+      </BButton>
+      <div class="fs-5">
+        {{ siglaUnidade }} - {{ nomeUnidade }}
+      </div>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -117,7 +127,7 @@
             <strong
               class="atividade-descricao"
               data-testid="atividade-descricao"
-            >{{ atividade.descricao }}</strong>
+            >{{ atividade?.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <BButton
                 variant="outline-primary"
@@ -183,7 +193,7 @@
                 </BButton>
             </template>
             <template v-else>
-                <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
+                <span data-testid="conhecimento-descricao">{{ conhecimento?.descricao }}</span>
                 <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                   <BButton
                     variant="outline-primary"

@@ -66,11 +66,11 @@ public class SubprocessoNotificacaoService {
         variaveis.put("dataLimite", dataLimite);
 
         String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
-        String corpoUnidade = processarTemplate("email/disponibilizacao-mapa.html", variaveis);
+        String corpoUnidade = processarTemplate("mapa-disponibilizado", variaveis);
         notificacaoEmailService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
         String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
-        String corpoSuperior = processarTemplate("email/disponibilizacao-mapa-superior.html", variaveis);
+        String corpoSuperior = processarTemplate("mapa-disponibilizado", variaveis);
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
             notificacaoEmailService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);

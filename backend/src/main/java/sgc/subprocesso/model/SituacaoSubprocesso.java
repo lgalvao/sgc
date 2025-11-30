@@ -10,7 +10,7 @@ public enum SituacaoSubprocesso {
     CADASTRO_HOMOLOGADO("Cadastro Homologado"),
     MAPA_CRIADO("Mapa Criado"),
     MAPA_ELABORADO("Mapa Elaborado"),
-    MAPA_DISPONIBILIZADO("Mapa Disponibilizado"),
+    MAPA_DISPONIBILIZADO("Mapa disponibilizado"),
     MAPA_COM_SUGESTOES("Mapa com Sugestões"),
     MAPA_VALIDADO("Mapa Validado"),
     MAPA_HOMOLOGADO("Mapa Homologado"),

@@ -121,13 +121,12 @@ class AtividadeControllerTest {
 
             when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
-            Usuario usuario = new Usuario();
-            usuario.setTituloEleitoral("user");
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user(usuario)))
+                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(auth)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -140,13 +139,12 @@ class AtividadeControllerTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
             
-            Usuario usuario = new Usuario();
-            usuario.setTituloEleitoral("user");
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user(usuario)))
+                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(auth)))
                     .andExpect(status().isBadRequest());
         }
     }

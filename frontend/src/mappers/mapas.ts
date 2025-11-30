@@ -13,8 +13,9 @@ import type {
 function mapConhecimentoVisualizacaoToModel(
   dto: ConhecimentoVisualizacao,
 ): Conhecimento {
+  if (!dto) return null as any;
   return {
-    id: dto.id,
+    id: (dto as any).codigo,
     descricao: dto.descricao,
   };
 }
@@ -26,7 +27,7 @@ function mapAtividadeVisualizacaoToModel(
     return {
       codigo: dto.codigo,
       descricao: dto.descricao,
-      conhecimentos: (dto.conhecimentos || []).map(mapConhecimentoVisualizacaoToModel),
+      conhecimentos: (dto.conhecimentos || []).map(mapConhecimentoVisualizacaoToModel).filter((c) => c !== null),
     };
   }
 

@@ -35,7 +35,6 @@ public class SubprocessoMapaWorkflowService {
     private final CompetenciaService competenciaService;
     private final ApplicationEventPublisher publicadorDeEventos;
 
-
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
         log.info("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
 
@@ -58,11 +57,13 @@ public class SubprocessoMapaWorkflowService {
 
     public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        competenciaService.adicionarCompetencia(subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds());
+        competenciaService.adicionarCompetencia(subprocesso.getMapa(), request.getDescricao(),
+                request.getAtividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
-    public MapaCompletoDto atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaReq request, String tituloUsuario) {
+    public MapaCompletoDto atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaReq request,
+            String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(codCompetencia, request.getDescricao(), request.getAtividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
@@ -76,11 +77,16 @@ public class SubprocessoMapaWorkflowService {
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso.findById(codSubprocesso)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
-            throw new ErroMapaEmSituacaoInvalida("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
+        if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO
+                && situacao != SituacaoSubprocesso.MAPA_CRIADO
+                && situacao != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
+            throw new ErroMapaEmSituacaoInvalida(
+                    "Mapa só pode ser editado com cadastro homologado, mapa criado ou cadastro em andamento. Situação atual: %s"
+                            .formatted(situacao));
         }
 
         if (subprocesso.getMapa() == null) {
@@ -90,12 +96,14 @@ public class SubprocessoMapaWorkflowService {
     }
 
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.info("Disponibilizando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, usuario.getTituloEleitoral());
+        log.info("Disponibilizando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso,
+                usuario.getTituloEleitoral());
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(subprocesso);
 
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        subprocesso.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
         repositorioSubprocesso.save(subprocesso);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoMapaDisponibilizado.builder()
@@ -105,7 +113,7 @@ public class SubprocessoMapaWorkflowService {
                 .unidadeDestino(subprocesso.getUnidade())
                 .build());
 
-        log.info("Subprocesso {} atualizado para MAPEAMENTO_CONCLUIDO e mapa disponibilizado.", codSubprocesso);
+        log.info("Subprocesso {} atualizado para MAPA_DISPONIBILIZADO e mapa disponibilizado.", codSubprocesso);
     }
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
@@ -118,19 +126,21 @@ public class SubprocessoMapaWorkflowService {
 
         var atividadesDoSubprocesso = atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
         var atividadesAssociadas = competencias.stream()
-            .flatMap(c -> c.getAtividades().stream())
-            .map(Atividade::getCodigo)
-            .collect(Collectors.toSet());
+                .flatMap(c -> c.getAtividades().stream())
+                .map(Atividade::getCodigo)
+                .collect(Collectors.toSet());
 
         var atividadesNaoAssociadas = atividadesDoSubprocesso.stream()
-            .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
-            .toList();
+                .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
+                .toList();
 
         if (!atividadesNaoAssociadas.isEmpty()) {
             String nomesAtividades = atividadesNaoAssociadas.stream()
-                .map(Atividade::getDescricao)
-                .collect(Collectors.joining(", "));
-            throw new ErroValidacao("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
+                    .map(Atividade::getDescricao)
+                    .collect(Collectors.joining(", "));
+            throw new ErroValidacao(
+                    "Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: "
+                            + nomesAtividades);
         }
     }
 }

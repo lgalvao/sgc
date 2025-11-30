@@ -41,7 +41,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         });
 
         // Iniciar processo
-        await page.getByText(descricaoMapeamento).click();
+        await page.getByRole('row', { name: descricaoMapeamento }).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('input-descricao')).toHaveValue(descricaoMapeamento);
         await page.getByTestId('btn-iniciar-processo').click();
@@ -78,7 +78,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-voltar').click();
 
         // Adicionar Competência
-        await page.getByText('Mapa de competências').click();
+        await page.getByRole('heading', { name: 'Mapa de competências' }).click();
         await page.getByTestId('btn-criar-competencia').click();
         await page.getByTestId('input-descricao-competencia').fill(`Competência Teste ${timestamp}`);
 

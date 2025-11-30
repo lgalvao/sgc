@@ -129,17 +129,25 @@ const props = defineProps<{
   situacao?: string;
   permissoes: SubprocessoPermissoes;
   codSubprocesso?: number | null;
+  codProcesso?: number;
+  siglaUnidade?: string;
 }>();
 
 const router = useRouter();
 const route = router.currentRoute;
 
 const navegarPara = (routeName: string) => {
-  const codigo = props.codSubprocesso || Number(route.value.params.codSubprocesso);
-  if (!codigo) return;
+  const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
+  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
+  
+  if (!codigoProcesso || !sigla) return;
+  
   router.push({
     name: routeName,
-    params: { codSubprocesso: codigo },
+    params: { 
+      codProcesso: codigoProcesso,
+      siglaUnidade: sigla
+    },
   });
 };
 </script>

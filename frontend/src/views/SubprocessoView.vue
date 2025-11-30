@@ -27,6 +27,8 @@
       :situacao="subprocesso.situacao"
       :permissoes="subprocesso.permissoes"
       :cod-subprocesso="codSubprocesso"
+      :cod-processo="props.codProcesso"
+      :sigla-unidade="props.siglaUnidade"
     />
 
     <TabelaMovimentacoes :movimentacoes="movimentacoes" />
