@@ -4,17 +4,17 @@ import {
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
 } from "@/mappers/atividades";
-import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
+import type { Atividade, Conhecimento, CriarConhecimentoRequest, } from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
     const response = await apiClient.get<any[]>("/atividades");
-  return response.data.map(mapAtividadeDtoToModel);
+    return response.data.map(mapAtividadeDtoToModel);
 }
 
 export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
-  const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
-  return mapAtividadeDtoToModel(response.data);
+    const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
+    return mapAtividadeDtoToModel(response.data);
 }
 
 export async function criarAtividade(
@@ -38,7 +38,7 @@ export async function atualizarAtividade(
 }
 
 export async function excluirAtividade(codAtividade: number): Promise<void> {
-  await apiClient.post(`/atividades/${codAtividade}/excluir`);
+    await apiClient.post(`/atividades/${codAtividade}/excluir`);
 }
 
 export async function listarConhecimentos(
@@ -54,7 +54,7 @@ export async function criarConhecimento(
     codAtividade: number,
     request: CriarConhecimentoRequest,
 ): Promise<Conhecimento> {
-    const requestDto = mapCriarConhecimentoRequestToDto(request);
+    const requestDto = mapCriarConhecimentoRequestToDto(request, codAtividade);
     const response = await apiClient.post<any>(
         `/atividades/${codAtividade}/conhecimentos`,
         requestDto,

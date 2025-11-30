@@ -9,7 +9,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
     const SENHA_CHEFE = 'senha';
 
     test('Deve realizar o ciclo completo de Mapeamento e então iniciar um processo de Revisão', async ({ page }) => {
-        test.setTimeout(30000); // Aumenta timeout para fluxo longo
+        test.setTimeout(15000); // Aumenta timeout para fluxo longo
 
         // Debug listeners
         page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
@@ -25,10 +25,10 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         const descricaoRevisao = `Revisão Teste ${timestamp}`;
 
         // ------------------------------------------------------------------------
-        // FASE 1: SETUP - CRIAR MAPA VIGENTE VIA PROCESSO DE MAPEAMENTO
+        // FASE 1: PREPARACAO - CRIAR MAPA VIGENTE VIA PROCESSO DE MAPEAMENTO
         // ------------------------------------------------------------------------
 
-        // 1.1. Admin cria e inicia processo de MAPEAMENTO
+        // Admin cria e inicia processo de MAPEAMENTO
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -47,7 +47,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-iniciar-processo').click();
         await page.getByTestId('btn-modal-confirmar').click();
 
-        // Check for error messages
+        // Verificar msgs erro
         const errorToast = page.locator('.toast-body.text-danger');
         if (await errorToast.isVisible()) {
             console.log('Error Toast:', await errorToast.textContent());
@@ -59,7 +59,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Logout Admin
         await page.getByTestId('btn-logout').click();
 
-        // 1.2. Chefe da Unidade cria Atividade e Competência
+        // Chefe da Unidade cria Atividade e Competência
         await autenticar(page, USUARIO_CHEFE, SENHA_CHEFE);
         await expect(page).toHaveURL(/\/painel/);
 
@@ -69,19 +69,14 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
 
         // Adicionar Atividade
         await page.getByTestId('atividades-card').click();
-        await page.waitForTimeout(3000); // Wait for data to load
         await page.getByTestId('input-nova-atividade').fill(`Atividade Teste ${timestamp}`);
         await page.getByTestId('btn-adicionar-atividade').click({ force: true });
 
         // Adicionar conhecimento à atividade (necessário para validação)
-        // Wait for the new activity to appear
         const descricaoAtividade = `Atividade Teste ${timestamp}`;
         await expect(page.getByText(descricaoAtividade)).toBeVisible();
 
-        // Find the card containing the new activity
-        // We can use filter to find the card that has the text
         const activityCard = page.locator('.atividade-card').filter({ hasText: descricaoAtividade });
-
         await activityCard.getByTestId('input-novo-conhecimento').fill('Conhecimento Teste');
         await activityCard.getByTestId('btn-adicionar-conhecimento').click();
 
@@ -92,12 +87,14 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByText('Mapa de competências').click();
         await page.getByTestId('btn-criar-competencia').click();
         await page.getByTestId('input-descricao-competencia').fill(`Competência Teste ${timestamp}`);
+
         // Vincular atividade
         await page.getByText(`Atividade Teste ${timestamp}`).click();
         await page.getByTestId('btn-salvar-competencia').click();
 
-        // 1.3. Disponibilizar Mapa (Chefe)
+        // Disponibilizar Mapa (Chefe)
         await page.getByTestId('btn-disponibilizar-mapa').click();
+
         // Preencher modal
         await page.getByTestId('input-data-limite').fill('2030-12-31');
         await page.getByTestId('btn-modal-confirmar').click();
@@ -106,7 +103,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await expect(page.getByText('Mapa disponibilizado')).toBeVisible();
         await page.getByTestId('btn-logout').click();
 
-        // 1.4. Admin Homologa e Finaliza
+        // Admin Homologa e Finaliza
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         // Homologar (Acessar subprocesso)

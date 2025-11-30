@@ -57,18 +57,19 @@ Fluxo principal:
 
     12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
     unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
-    ```
-    Assunto: SGC: Início de processo de mapeamento de competências em unidades subordinadas
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE],
-    
-    Comunicamos o início do processo [DESCRIÇÃO_PROCESSO] nas unidades [SIGLAS_UNIDADES_SUBORDINADAS]. Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos. À medida que estas revisões forem sendo
-    disponibilizadas, será possível visualizar e realizar a sua validação.
+   ```text
+         Assunto: SGC: Início de processo de mapeamento de competências em unidades subordinadas
 
-    O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
-    
-    Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
-    ```
+      Prezado(a) responsável pela [SIGLA_UNIDADE],
+      
+      Comunicamos o início do processo [DESCRIÇÃO_PROCESSO] nas unidades [SIGLAS_UNIDADES_SUBORDINADAS]. Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos. À medida que estas revisões forem sendo
+      disponibilizadas, será possível visualizar e realizar a sua validação.
+
+      O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+      
+      Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
+   ```
 
 13. O sistema cria internamente alertas para todas as unidades participantes.
 

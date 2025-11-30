@@ -54,9 +54,6 @@ vi.mock("@/services/toastService", () => {
     };
 });
 
-// Import the exported mockToastService
-import { mockToastService } from "@/services/toastService";
-
 describe("axios-setup", () => {
     let requestInterceptor: (config: any) => any;
     let responseErrorInterceptor: (error: any) => any;
@@ -80,10 +77,10 @@ describe("axios-setup", () => {
     beforeEach(async () => {
         setActivePinia(createPinia());
         // Reset ToastService mocks before each test
-        mockToastService.sucesso.mockClear();
-        mockToastService.erro.mockClear();
-        mockToastService.aviso.mockClear();
-        mockToastService.info.mockClear();
+        (ToastService.sucesso as any).mockClear();
+        (ToastService.erro as any).mockClear();
+        (ToastService.aviso as any).mockClear();
+        (ToastService.info as any).mockClear();
     });
 
     afterEach(() => {

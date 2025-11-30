@@ -310,6 +310,7 @@ export interface MapaVisualizacao {
     codigo: number;
     descricao: string;
     competencias: CompetenciaVisualizacao[];
+    atividadesSemCompetencia?: AtividadeVisualizacao[];
 }
 
 export interface AceitarCadastroRequest {

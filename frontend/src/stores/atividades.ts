@@ -107,7 +107,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         try {
             await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-            let atividades =
+            const atividades =
                 (atividadesPorSubprocesso.value.get(codSubrocesso) || []).map(
                     (a) => {
                         if (a.codigo === atividadeId) {

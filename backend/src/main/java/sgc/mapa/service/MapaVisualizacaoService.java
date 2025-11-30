@@ -28,10 +28,11 @@ public class MapaVisualizacaoService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
+    private final sgc.atividade.model.AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
         if (subprocesso.getMapa() == null) {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado: ", codSubprocesso);
@@ -49,17 +50,7 @@ public class MapaVisualizacaoService {
         List<CompetenciaDto> competenciasDto = competencias.stream().map(competencia -> {
             List<Atividade> atividades = competencia.getAtividades().stream().toList();
 
-            List<AtividadeDto> atividadesDto = atividades.stream().map(atividade -> {
-                List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
-                List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
-                    .map(c -> ConhecimentoDto.builder().codigo(c.getCodigo()).descricao(c.getDescricao()).build())
-                    .toList();
-                return AtividadeDto.builder()
-                        .codigo(atividade.getCodigo())
-                        .descricao(atividade.getDescricao())
-                        .conhecimentos(conhecimentosDto)
-                        .build();
-            }).toList();
+            List<AtividadeDto> atividadesDto = atividades.stream().map(this::mapAtividadeToDto).toList();
 
             return CompetenciaDto.builder()
                     .codigo(competencia.getCodigo())
@@ -68,9 +59,29 @@ public class MapaVisualizacaoService {
                     .build();
         }).toList();
 
+        // Buscar atividades sem competência (orphaned)
+        List<Atividade> todasAtividades = atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+        List<AtividadeDto> atividadesSemCompetencia = todasAtividades.stream()
+                .filter(a -> a.getCompetencias().isEmpty())
+                .map(this::mapAtividadeToDto)
+                .toList();
+
         return MapaVisualizacaoDto.builder()
                 .unidade(unidadeDto)
                 .competencias(competenciasDto)
+                .atividadesSemCompetencia(atividadesSemCompetencia)
+                .build();
+    }
+
+    private AtividadeDto mapAtividadeToDto(Atividade atividade) {
+        List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+        List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
+                .map(c -> ConhecimentoDto.builder().codigo(c.getCodigo()).descricao(c.getDescricao()).build())
+                .toList();
+        return AtividadeDto.builder()
+                .codigo(atividade.getCodigo())
+                .descricao(atividade.getDescricao())
+                .conhecimentos(conhecimentosDto)
                 .build();
     }
 }

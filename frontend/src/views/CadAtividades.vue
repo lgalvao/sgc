@@ -422,9 +422,11 @@ const codMapa = computed(
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
     if (codSubrocesso.value === undefined) return [];
-    return atividadesStore
+    const result = atividadesStore
       .obterAtividadesPorSubprocesso(codSubrocesso.value)
       .map((a) => ({ ...a, novoConhecimento: "" }));
+    console.log("CadAtividades computed atividades:", JSON.stringify(result));
+    return result;
   },
   set: () => {},
 });

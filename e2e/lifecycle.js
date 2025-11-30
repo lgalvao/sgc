@@ -2,7 +2,6 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Configuration
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
@@ -14,9 +13,7 @@ let frontendProcess = null;
 function log(prefix, data) {
     const lines = data.toString().split('\n');
     lines.forEach(line => {
-        if (line.trim()) {
-            console.log(`[${prefix}] ${line}`);
-        }
+        if (line.trim()) console.log(`${line}`);
     });
 }
 
@@ -48,7 +45,6 @@ function startBackend() {
 }
 
 function startFrontend() {
-    console.log('Starting Frontend...');
     frontendProcess = spawn('npm', ['run', 'dev'], {
         cwd: FRONTEND_DIR,
         shell: false,
@@ -69,12 +65,6 @@ function startFrontend() {
 function cleanup() {
     console.log('Cleaning up processes...');
     if (backendProcess) {
-        // On Windows/Shell spawned processes, we might need tree-kill, but for now try simple kill
-        // Since we used shell: true, the PID is the shell, not the java process.
-        // But let's try standard kill first.
-        // Actually, for robust cleanup in CI/Dev, relying on Playwright's process group cleanup is often safer,
-        // but explicit kill helps.
-        // Using negative PID to kill process group if possible
         try {
             process.kill(-backendProcess.pid);
         } catch (e) {
@@ -105,16 +95,17 @@ process.on('SIGINT', () => {
     cleanup();
     process.exit();
 });
+
 process.on('SIGTERM', () => {
     cleanup();
     process.exit();
 });
+
 process.on('exit', () => {
     cleanup();
 });
 
-// Start services
-// Kill existing first
+// Start services, Kill existing first
 try {
     require('child_process').execSync(`lsof -ti:${BACKEND_PORT} | xargs kill -9 2>/dev/null`);
     require('child_process').execSync(`lsof -ti:${FRONTEND_PORT} | xargs kill -9 2>/dev/null`);
@@ -126,7 +117,6 @@ function checkBackendHealth() {
             const req = require('http').get(`http://localhost:${BACKEND_PORT}/`, (res) => {
                 // Accept any response (200, 404, etc) - just need server to be responding
                 if (res.statusCode >= 200 && res.statusCode < 500) {
-                    console.log('[LIFECYCLE] Backend is healthy!');
                     resolve();
                 } else {
                     setTimeout(check, 1000);
@@ -137,7 +127,6 @@ function checkBackendHealth() {
             });
             req.end();
         };
-        console.log('[LIFECYCLE] Waiting for Backend to be healthy...');
         check();
     });
 }
@@ -159,7 +148,6 @@ function checkFrontendHealth() {
             });
             req.end();
         };
-        console.log('[LIFECYCLE] Waiting for Frontend to be healthy...');
         check();
     });
 }
@@ -171,7 +159,7 @@ checkBackendHealth()
         return checkFrontendHealth();
     })
     .then(() => {
-        console.log('[LIFECYCLE] All services ready!');
+        console.log('[LIFECYCLE] Frontend e Backend no ar!');
     });
 
 // Keep alive

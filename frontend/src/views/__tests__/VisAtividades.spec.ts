@@ -133,11 +133,11 @@ describe("VisAtividades.vue", () => {
   it("deve listar atividades e conhecimentos", async () => {
     const { wrapper: w } = createWrapper(
         Perfil.GESTOR,
-        SituacaoSubprocesso.EM_ANDAMENTO,
+        SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
     );
     wrapper = w;
     const atividadesStore = useAtividadesStore();
-    atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([
+    atividadesStore.atividadesPorSubprocesso.set(123, [
       {
         codigo: 1,
         descricao: "Atividade 1",
@@ -157,7 +157,7 @@ describe("VisAtividades.vue", () => {
   it("deve abrir e fechar modal de historico", async () => {
     const { wrapper: w } = createWrapper(
         Perfil.GESTOR,
-        SituacaoSubprocesso.EM_ANDAMENTO,
+        SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
     );
     wrapper = w;
     await flushPromises();
@@ -266,7 +266,7 @@ describe("VisAtividades.vue", () => {
 
   it("deve encontrar unidade em hierarquia complexa", async () => {
       // Setup store with nested units
-      const { wrapper: w } = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.EM_ANDAMENTO);
+      const { wrapper: w } = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
       wrapper = w;
       const unidadesStore = useUnidadesStore();
       unidadesStore.unidades = [{

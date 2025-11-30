@@ -29,8 +29,10 @@ export function mapCriarAtividadeRequestToDto(
 
 export function mapCriarConhecimentoRequestToDto(
   request: CriarConhecimentoRequest,
+  atividadeCodigo: number,
 ): any {
   return {
     descricao: request.descricao,
+    atividadeCodigo,
   };
 }

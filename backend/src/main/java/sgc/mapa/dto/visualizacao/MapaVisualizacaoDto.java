@@ -14,6 +14,7 @@ import java.util.List;
 public class MapaVisualizacaoDto {
     private UnidadeDto unidade;
     private List<CompetenciaDto> competencias;
+    private List<AtividadeDto> atividadesSemCompetencia;
 
     @Data
     @Builder

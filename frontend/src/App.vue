@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
-import {BToastOrchestrator, useToast} from "bootstrap-vue-next";
+import {BOrchestrator, useToast} from "bootstrap-vue-next";
 import { registerToast } from "@/services/toastService";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
@@ -55,8 +55,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <BToastOrchestrator />
-  <MainNavbar v-if="route.path !== '/login'" />
+      <BOrchestrator />  <MainNavbar v-if="route.path !== '/login'" />
   <div
     v-if="shouldShowNavBarExtras"
     class="bg-light border-bottom"

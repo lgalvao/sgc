@@ -87,7 +87,7 @@ describe("mappers/atividades", () => {
 
     it("mapCriarConhecimentoRequestToDto should map correctly", () => {
         const request = {descricao: "Novo Conhecimento"};
-        const dto = mapCriarConhecimentoRequestToDto(request);
+        const dto = mapCriarConhecimentoRequestToDto(request, 1);
         expect(dto.descricao).toBe("Novo Conhecimento");
     });
 });
