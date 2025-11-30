@@ -74,7 +74,7 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoCadastro",
-          params: {codSubprocesso: "123"},
+          params: {codSubprocesso: 123},
       });
     });
 
@@ -95,7 +95,7 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoVisCadastro",
-          params: {codSubprocesso: "123"},
+          params: {codSubprocesso: 123},
       });
     });
 
@@ -112,7 +112,7 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoMapa",
-          params: {codSubprocesso: "123"},
+          params: {codSubprocesso: 123},
       });
     });
 
@@ -129,7 +129,7 @@ describe("SubprocessoCards.vue", () => {
 
             expect(pushMock).toHaveBeenCalledWith({
                 name: "DiagnosticoEquipe",
-                params: {codSubprocesso: "123"},
+                params: {codSubprocesso: 123},
             });
     });
 
@@ -145,7 +145,7 @@ describe("SubprocessoCards.vue", () => {
 
             expect(pushMock).toHaveBeenCalledWith({
                 name: "OcupacoesCriticas",
-                params: {codSubprocesso: "123"},
+                params: {codSubprocesso: 123},
             });
     });
   });

@@ -129,6 +129,7 @@ describe("atividadeService", () => {
 
         expect(mappers.mapCriarConhecimentoRequestToDto).toHaveBeenCalledWith(
             request,
+            1
         );
         expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos",
