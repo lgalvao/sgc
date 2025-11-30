@@ -46,7 +46,7 @@
         class="mb-3"
       >
         <BCard
-          v-if="permissoes.podeVisualizarMapa"
+          v-if="permissoes.podeEditarMapa"
           :class="{ 'disabled-card': !mapa }"
           class="h-100 card-actionable"
           data-testid="mapa-card"
@@ -57,6 +57,24 @@
           </BCardTitle>
           <BCardText class="text-muted">
             Mapa de competências técnicas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(mapa?.situacao)"
+            class="badge"
+          >{{ situacaoLabel(mapa?.situacao) }}</span>
+        </BCard>
+        <BCard
+          v-else-if="permissoes.podeVisualizarMapa"
+          :class="{ 'disabled-card': !mapa }"
+          class="h-100 card-actionable"
+          data-testid="mapa-card-vis"
+          @click="navegarPara('SubprocessoVisMapa')"
+        >
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização do mapa de competências técnicas
           </BCardText>
           <span
             :class="badgeClass(mapa?.situacao)"

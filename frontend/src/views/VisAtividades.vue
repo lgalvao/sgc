@@ -262,7 +262,7 @@ const podeVerImpacto = computed(() => {
   return podeVer && situacaoCorreta;
 });
 
-const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const atividades = computed<Atividade[]>(() => {
   if (codSubrocesso.value === undefined) return [];

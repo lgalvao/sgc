@@ -9,8 +9,14 @@
       >
         <i class="bi bi-arrow-left fs-4" />
       </BButton>
-      <div class="fs-5">
-        {{ siglaUnidade }} - {{ nomeUnidade }}
+      <div class="fs-5 d-flex align-items-center gap-2">
+        <span>{{ siglaUnidade }} - {{ nomeUnidade }}</span>
+        <span
+          v-if="subprocesso"
+          :class="badgeClass(subprocesso.situacaoSubprocesso)"
+          class="badge fs-6"
+          data-testid="situacao-badge"
+        >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
       </div>
     </div>
 
@@ -359,6 +365,7 @@
 import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal, useToast} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import {badgeClass, situacaoLabel} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
@@ -455,6 +462,8 @@ async function adicionarAtividade() {
     // Refresh activities using subprocess ID
     if (codSubrocesso.value) {
         await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+        // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
+        await processosStore.buscarProcessoDetalhe(codProcesso.value);
     }
   }
 }
@@ -471,6 +480,7 @@ async function removerAtividade(idx: number) {
       codSubrocesso.value,
       atividadeRemovida.codigo,
     );
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
   }
 }
 
@@ -487,6 +497,7 @@ async function adicionarConhecimento(idx: number) {
       request,
     );
     atividade.novoConhecimento = "";
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
   }
 }
 

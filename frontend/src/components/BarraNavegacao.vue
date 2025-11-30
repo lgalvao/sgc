@@ -3,6 +3,7 @@
     <BButton
       v-if="shouldShowBackButton"
       class="btn btn-outline-secondary btn-sm"
+      data-testid="btn-voltar"
       @click="goBack"
     >
       <i class="bi bi-arrow-left" /> Voltar

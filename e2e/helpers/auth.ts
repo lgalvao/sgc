@@ -8,6 +8,7 @@ export const USUARIOS = {
     ADMIN_2_PERFIS: { titulo: '111111', senha: 'senha', perfil: 'ADMIN - SEDOC' },
     ADMIN_1_PERFIL: { titulo: '191919', senha: 'senha' },
     GESTOR_COORD: { titulo: '222222', senha: 'senha' },
+    CHEFE_UNIDADE: { titulo: '777777', senha: 'senha' },
     INVALIDO: { titulo: '00000000000', senha: 'senhaerrada' }
 } as const;
 
