@@ -57,11 +57,12 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await autenticar(page, USUARIO_CHEFE, SENHA_CHEFE);
         await expect(page).toHaveURL(/\/painel/);
 
-        // Acessar subprocesso
+        // Acessar subprocesso (CHEFE vai direto para o SubprocessoView ao clicar no processo)
         await page.getByText(descricaoMapeamento).click();
-        await page.getByRole('cell', { name: UNIDADE_ALVO }).click(); // Clica na unidade na árvore ou lista
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);  // Confirm we're on SubprocessoView
 
         // Adicionar Atividade
+        await expect(page.getByTestId('atividades-card')).toBeVisible(); // Wait for card to be visible
         await page.getByTestId('atividades-card').click();
         await page.getByTestId('input-nova-atividade').fill(`Atividade Teste ${timestamp}`);
         await page.getByTestId('btn-adicionar-atividade').click({ force: true });
@@ -92,6 +93,9 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Preencher modal
         await page.getByTestId('input-data-limite').fill('2030-12-31');
         await page.getByTestId('btn-modal-confirmar').click();
+
+        // Voltar para SubprocessoView para verificar status
+        await page.getByRole('button', { name: 'Voltar' }).click();
 
         // Verificar status e logout
         await expect(page.getByText('Mapa disponibilizado')).toBeVisible();

@@ -64,7 +64,7 @@ public class EventoProcessoListener {
     @EventListener
     @Transactional
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
-        log.info("Processando evento de processo iniciado: codProcesso={}, tipo={}",
+        log.debug("Processando evento de processo iniciado: codProcesso={}, tipo={}",
                 evento.getCodProcesso(), evento.getTipo());
         try {
             Processo processo = processoRepo.findById(evento.getCodProcesso())
@@ -85,7 +85,7 @@ public class EventoProcessoListener {
                     evento.getCodUnidades(),
                     subprocessos
             );
-            log.info("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
+            log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
             // 2. Enviar e-mails para cada subprocesso
             for (Subprocesso subprocesso : subprocessos) {
