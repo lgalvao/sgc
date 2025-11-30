@@ -1,16 +1,15 @@
 package sgc.sgrh;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.service.SgrhService;
-import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Map;
@@ -18,36 +17,34 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 class SgrhServiceTest {
-    private static final String TITULO = "123456789012";
-
-    @Mock
-    private UnidadeRepo unidadeRepo;
-
-    @Mock
-    private sgc.sgrh.model.UsuarioRepo usuarioRepo;
-
-    @InjectMocks
+    
+    @Autowired
     private SgrhService sgrhService;
+
+    private static final String TITULO_JOAO = "1";
+    private static final String EMAIL_JOAO = "ana.souza@tre-pe.jus.br";
+    private static final Long COD_UNIT_STIC = 2L;
 
     @Test
     void testBuscarUsuarioPorTitulo() {
-        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO);
+        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO_JOAO);
 
         assertTrue(result.isPresent());
-        assertEquals(TITULO, result.get().getTitulo());
-        assertTrue(result.get().getNome().contains("Usuário Mock"));
+        assertEquals(TITULO_JOAO, result.get().getTitulo());
+        assertEquals("Ana Paula Souza", result.get().getNome());
     }
 
     @Test
     void testBuscarUsuarioPorEmail() {
-        String email = "joao.silva@tre-pe.jus.br";
-        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(email);
+        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(EMAIL_JOAO);
 
         assertTrue(result.isPresent());
-        assertEquals("joao.silva", result.get().getTitulo()); // extracted from email (before @)
-        assertEquals(email, result.get().getEmail());
+        assertEquals(TITULO_JOAO, result.get().getTitulo());
+        assertEquals(EMAIL_JOAO, result.get().getEmail());
     }
 
     @Test
@@ -56,19 +53,15 @@ class SgrhServiceTest {
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        assertEquals(3, result.size());
-
-        UsuarioDto primeiro = result.getFirst();
-        assertEquals(TITULO, primeiro.getTitulo());
-        assertEquals("joao.silva@tre-pe.jus.br", primeiro.getEmail());
+        assertTrue(result.size() > 5); 
     }
 
     @Test
     void testBuscarUnidadePorCodigo() {
-        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(2L);
+        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(COD_UNIT_STIC);
 
         assertTrue(result.isPresent());
-        assertEquals(2L, result.get().getCodigo());
+        assertEquals(COD_UNIT_STIC, result.get().getCodigo());
         assertEquals("Secretaria de Informática e Comunicações", result.get().getNome());
     }
 
@@ -78,18 +71,18 @@ class SgrhServiceTest {
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        assertTrue(result.size() >= 6); // From the mock data in the implementation
+        assertTrue(result.size() > 10);
     }
 
     @Test
     void testBuscarSubunidades() {
-        List<UnidadeDto> result = sgrhService.buscarSubunidades(2L); // STIC
+        // STIC (2) has children: COAD(3), COSIS(6), COSINF(7), COJUR(14), SEDOC(15) + test units (900-904)
+        List<UnidadeDto> result = sgrhService.buscarSubunidades(COD_UNIT_STIC);
 
         assertNotNull(result);
-        // Should return SGP, COSIS, COSINF, COJUR (the direct children of STIC)
-        assertTrue(result.size() >= 4);
+        assertTrue(result.size() >= 5);
         for (UnidadeDto unidade : result) {
-            assertEquals(2L, unidade.getCodigoPai()); // All should have STIC as parent
+            assertEquals(COD_UNIT_STIC, unidade.getCodigoPai());
         }
     }
 
@@ -99,78 +92,89 @@ class SgrhServiceTest {
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        // Should return root units (with no parent)
+        // Roots in data.sql: 1 (TRE), 2 (STIC), 100 (ADMIN), 200 (SGP)
+        assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(1L)));
+        assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(2L)));
+        
         for (UnidadeDto unidade : result) {
-            assertNull(unidade.getCodigoPai()); // All in the list should be roots
+            assertNull(unidade.getCodigoPai());
         }
     }
 
     @Test
     void testBuscarResponsavelUnidade() {
-        Optional<ResponsavelDto> result = sgrhService.buscarResponsavelUnidade(1L);
+        // Unit 2 has User 777 as Chefe
+        Optional<ResponsavelDto> result = sgrhService.buscarResponsavelUnidade(2L);
 
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().getUnidadeCodigo());
-        assertEquals(TITULO, result.get().getTitularTitulo());
-        assertEquals("987654321098", result.get().getSubstitutoTitulo());
+        assertEquals(2L, result.get().getUnidadeCodigo());
+        assertEquals("777", result.get().getTitularTitulo()); 
     }
 
     @Test
     void testBuscarUnidadesOndeEhResponsavel() {
-        List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel(TITULO);
+        // User 777 is Chefe of Unit 2
+        List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel("777");
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        assertTrue(result.contains(1L)); // Should contain at least unit 1
+        assertTrue(result.contains(2L));
     }
 
     @Test
     void testBuscarPerfisUsuario() {
-        List<PerfilDto> result = sgrhService.buscarPerfisUsuario(TITULO);
+        // User 777 has CHEFE on 2
+        List<PerfilDto> result = sgrhService.buscarPerfisUsuario("777");
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        // Check if it contains expected profile
-        assertTrue(result.stream().anyMatch(p -> p.getUsuarioTitulo().equals(TITULO)));
+        assertTrue(result.stream().anyMatch(p -> p.getPerfil().equals("CHEFE") && p.getUnidadeCodigo().equals(2L)));
     }
 
     @Test
     void testUsuarioTemPerfil() {
-        boolean result = sgrhService.usuarioTemPerfil(TITULO, "ADMIN", 1L);
-        assertTrue(result); // According to the mock implementation
+        // User 777 has CHEFE on 2
+        boolean result = sgrhService.usuarioTemPerfil("777", "CHEFE", 2L);
+        assertTrue(result);
 
-        boolean result2 = sgrhService.usuarioTemPerfil(TITULO, "GESTOR", 1L);
-        assertFalse(result2); // According to the mock implementation
+        boolean result2 = sgrhService.usuarioTemPerfil("777", "ADMIN", 2L);
+        assertFalse(result2);
+        
+        // User 6 has ADMIN on 2
+        boolean result3 = sgrhService.usuarioTemPerfil("6", "ADMIN", 2L);
+        assertTrue(result3);
     }
 
     @Test
     void testBuscarUnidadesPorPerfil() {
-        List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "ADMIN");
-        assertTrue(adminUnits.contains(1L));
-
-        List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "GESTOR");
-        assertTrue(gestorUnits.contains(2L) || gestorUnits.contains(3L));
+        // User 6 has ADMIN on 2
+        List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil("6", "ADMIN");
+        assertTrue(adminUnits.contains(2L));
     }
 
     @Test
     void testBuscarResponsaveisUnidades() {
-        List<Long> unidades = List.of(1L, 2L);
+        // Unit 2 (User 777 is CHEFE)
+        // Unit 8 (User 3 is CHEFE)
+        List<Long> unidades = List.of(2L, 8L);
         Map<Long, ResponsavelDto> result = sgrhService.buscarResponsaveisUnidades(unidades);
 
         assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.containsKey(1L));
         assertTrue(result.containsKey(2L));
+        assertTrue(result.containsKey(8L));
+        
+        assertEquals("777", result.get(2L).getTitularTitulo());
+        assertEquals("3", result.get(8L).getTitularTitulo());
     }
 
     @Test
     void testBuscarUsuariosPorTitulos() {
-        List<String> titulos = List.of(TITULO, "987654321098");
+        List<String> titulos = List.of("777", "3");
         Map<String, UsuarioDto> result = sgrhService.buscarUsuariosPorTitulos(titulos);
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertTrue(result.containsKey(TITULO));
-        assertTrue(result.containsKey("987654321098"));
+        assertTrue(result.containsKey("777"));
+        assertTrue(result.containsKey("3"));
     }
 }
