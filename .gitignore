@@ -37,3 +37,6 @@ backend/bin/
 
 # Jqwik
 .jqwik-database
+
+# Test results
+test-results/
