@@ -9,8 +9,6 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
     const SENHA_CHEFE = 'senha';
 
     test('Deve realizar o ciclo completo de Mapeamento e então iniciar um processo de Revisão', async ({ page }) => {
-        test.setTimeout(60000); // Aumenta timeout para fluxo longo
-
         // Debug listeners
         page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
         page.on('pageerror', err => console.log(`PAGE ERROR: ${err.message}`));
@@ -53,72 +51,77 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Logout Admin
         await page.getByTestId('btn-logout').click();
 
-        // 3. CHEFE acessa e cadastra atividades
-        await login(page, USUARIOS.CHEFE_UNIDADE.titulo, USUARIOS.CHEFE_UNIDADE.senha);
+        // Chefe da Unidade cria Atividade e Competência
+        await autenticar(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await expect(page).toHaveURL(/\/painel/);
+
+        // Acessar subprocesso (CHEFE vai direto para o SubprocessoView ao clicar no processo)
         await page.getByText(descricaoMapeamento).click();
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
-
-        // Navegar para o subprocesso da unidade
-        await page.getByText('ASSESSORIA_21').click();
-        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
-
-        // Cadastrar Atividades e Conhecimentos
-        await page.getByTestId('atividades-card').click();
-        await page.getByTestId('input-nova-atividade').fill('Atividade Teste');
-        await page.getByTestId('btn-adicionar-atividade').click();
-        await page.getByTestId('input-novo-conhecimento').first().fill('Conhecimento Teste');
-        await page.getByTestId('btn-adicionar-conhecimento').first().click();
-
-        // Disponibilizar Cadastro (Atividades)
-        // Aguardar atualização do status para evitar flakiness
-        await expect(page.getByTestId('situacao-badge')).toHaveText('Cadastro em andamento');
-
-        await page.getByTestId('btn-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await page.goto('/painel');
-
-        // 4. ADMIN Homologa Cadastro (Atividades)
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByText(descricaoMapeamento).click();
-        await page.getByText(`${UNIDADE_ALVO} - Assessoria 21`).click();
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);  // Confirm we're on SubprocessoView
 
         // Adicionar Atividade
-        await expect(page.getByTestId('atividades-card-vis')).toBeVisible(); // Wait for card to be visible
-        const statusBadge = await page.locator('[data-testid="atividades-card-vis"] .badge').textContent();
-        console.log(`STATUS BADGE: ${statusBadge}`);
-        await page.getByTestId('atividades-card-vis').click();
-        await page.getByTestId('btn-acao-principal-analise').click();
-        await page.getByTestId('btn-modal-confirmar-aceite').click();
-        await expect(page.getByText('Homologação efetivada')).toBeVisible();
+        await expect(page.getByTestId('atividades-card')).toBeVisible(); // Wait for card to be visible
+        await page.getByTestId('atividades-card').click();
+        await page.getByTestId('input-nova-atividade').fill(`Atividade Teste ${timestamp}`);
+        await page.getByTestId('btn-adicionar-atividade').click({ force: true });
+
+        // Adicionar conhecimento à atividade (necessário para validação)
+        const descricaoAtividade = `Atividade Teste ${timestamp}`;
+        await expect(page.getByText(descricaoAtividade)).toBeVisible();
+
+        const activityCard = page.locator('.atividade-card').filter({ hasText: descricaoAtividade });
+        await activityCard.getByTestId('input-novo-conhecimento').fill('Conhecimento Teste');
+        await activityCard.getByTestId('btn-adicionar-conhecimento').click();
+
+        // Voltar para detalhes do subprocesso
         await page.getByTestId('btn-voltar').first().click();
 
-        // 5. ADMIN Cria e Disponibiliza Mapa
-        await page.getByTestId('mapa-card').click();
-
-        // Criar Competência (necessário para disponibilizar)
+        // Adicionar Competência
+        await page.getByRole('heading', { name: 'Mapa de competências' }).click();
         await page.getByTestId('btn-criar-competencia').click();
-        await page.getByTestId('input-descricao-competencia').fill('Competência Teste');
-        await page.getByTestId('atividade-checkbox').first().check();
+        await page.getByTestId('input-descricao-competencia').fill(`Competência Teste ${timestamp}`);
+
+        // Vincular atividade
+        await page.getByText(`Atividade Teste ${timestamp}`).click();
         await page.getByTestId('btn-salvar-competencia').click();
 
-        // Disponibilizar Mapa
+        // Disponibilizar Mapa (Chefe)
         await page.getByTestId('btn-disponibilizar-mapa').click();
-        await page.getByTestId('input-data-limite').fill('2025-12-31');
-        await page.getByTestId('btn-modal-confirmar').click();
-        // Modal fecha, volta para subprocesso ou fica na tela? 
-        // CadMapa.vue TODO diz: "Adicionar redirecionamento para o painel", mas atualmente fecha modal.
-        // Vamos voltar manualmente se necessário.
-        await page.getByTestId('btn-voltar').first().click();
 
-        // 6. ADMIN Homologa Mapa
-        // Agora deve aparecer o card de visualização (mapa-card-vis) pois está disponibilizado
+        // Preencher modal
+        await page.getByTestId('input-data-limite').fill('2030-12-31');
+        await page.getByTestId('btn-modal-confirmar').click();
+
+        // Voltar para SubprocessoView para verificar status
+        await page.getByRole('button', { name: 'Voltar' }).click();
+
+        // Verificar status
+        await expect(page.getByText('Mapa disponibilizado')).toBeVisible();
+
+        // Chefe Valida o Mapa
+        await page.getByTestId('mapa-card-vis').click();
+        await page.getByTestId('validar-btn').click();
+        await page.getByTestId('modal-validar-confirmar').click();
+        await expect(page.getByText('Mapa validado')).toBeVisible();
+
+        // Logout Chefe
+        await page.getByTestId('btn-logout').click();
+
+        // Admin Homologa e Finaliza
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+        // Homologar (Acessar subprocesso)
+        await page.getByText(descricaoMapeamento).click();
+        await page.getByTestId('tree-table-row-12').click();
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
         await page.getByTestId('mapa-card-vis').click();
         await page.getByTestId('btn-registrar-aceite-homologar').click();
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText('Homologação efetivada')).toBeVisible();
+        await expect(page.getByText('Mapa homologado')).toBeVisible();
 
-        // Voltar ao painel para iniciar Revisão
+        // Voltar ao processo e Finalizar
         await page.goto('/painel');
+        await page.getByText(descricaoMapeamento).click();
         await page.getByTestId('btn-finalizar-processo').click();
         await page.getByTestId('btn-modal-confirmar').click();
         await expect(page).toHaveURL(/\/painel/);

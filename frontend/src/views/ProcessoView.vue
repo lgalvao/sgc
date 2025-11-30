@@ -139,6 +139,8 @@ function formatarDadosParaArvore(
 }
 
 function abrirDetalhesUnidade(item: any) {
+  console.log('PROCESSO VIEW DEBUG: row-click', item);
+  console.log('PROCESSO VIEW DEBUG: perfilSelecionado', perfilStore.perfilSelecionado);
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
     if (perfilUsuario === "ADMIN" || perfilUsuario === "GESTOR") {

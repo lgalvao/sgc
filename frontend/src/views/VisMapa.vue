@@ -378,7 +378,7 @@ const subprocesso = computed(() => {
   );
 });
 
-const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
@@ -391,7 +391,7 @@ const podeValidar = computed(() => {
   return (
       perfilSelecionado.value === "CHEFE" &&
       subprocesso.value?.situacaoSubprocesso ===
-      SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
+      SituacaoSubprocesso.MAPA_DISPONIBILIZADO
   );
 });
 

@@ -26,14 +26,16 @@ O SGC permite:
 ### Stack Tecnológico
 
 **Backend:**
+
 - Java 21
 - Spring Boot 3.5.7
 - JPA/Hibernate
 - Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
-- Arquitetura: Em camadas, estruturada por domínio 
+- Arquitetura: Em camadas, estruturada por domínio
 
 **Frontend:**
+
 - Vue.js 3.5 + TypeScript
 - Vite (build)
 - Pinia (estado)
@@ -42,6 +44,7 @@ O SGC permite:
 - Axios (cliente http)
 
 **Testes:**
+
 - JUnit 5 (testes unitários do backend)
 - Vitest (testes unitários do frontend)
 
@@ -110,13 +113,16 @@ cd sgc
 ## 🧪 Testes
 
 ### Testes Unitários Backend (JUnit)
+
 ```bash
 ./gradlew :backend:test
 ```
+
 - Usa perfil `test` automaticamente
 - Banco H2 em memória (limpo a cada teste)
 
 ### Testes Unitários Frontend (Vitest)
+
 ```bash
 cd frontend
 npm run test:unit
@@ -129,21 +135,27 @@ npm run test:unit
 ## 📐 Domínios de Negócio
 
 ### 1. Processo (Orquestrador)
+
 Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Diagnóstico). Publica eventos de domínio para desacoplar módulos.
 
 ### 2. Subprocesso (Máquina de Estados)
+
 Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico imutável de movimentações.
 
 ### 3. Mapa de Competências
+
 Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vinculado a uma unidade e pode ter diferentes situações (ATIVO, ARQUIVADO, etc.).
 
 ### 4. Competências, Atividades e Conhecimentos
+
 - **Competência**: Elemento sintetizante (ex: "Desenvolvimento de Software")
 - **Atividade**: Ação específica (ex: "Desenvolver APIs REST")
 - **Conhecimento**: Saber técnico necessário (ex: "Spring Boot")
 
 ### 5. Notificações e Alertas (Reativos)
+
 Sistema orientado a eventos que reage aos eventos de domínio:
+
 - **Alertas**: Visíveis na interface do usuário
 - **Notificações**: E-mails assíncronos
 
@@ -156,6 +168,7 @@ Sistema orientado a eventos que reage aos eventos de domínio:
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
 
 ### Swagger API
+
 ```
 http://localhost:10000/swagger-ui.html
 http://localhost:10000/api-docs

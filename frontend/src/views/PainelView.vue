@@ -64,6 +64,9 @@ const alertasStore = useAlertasStore();
 const {processosPainel} = storeToRefs(processosStore);
 const {alertas} = storeToRefs(alertasStore);
 
+console.log('PAINEL DEBUG: perfis', perfil.perfis);
+console.log('PAINEL DEBUG: isAdmin', perfil.isAdmin);
+
 const router = useRouter();
 
 const criterio = ref<keyof ProcessoResumo>("descricao");

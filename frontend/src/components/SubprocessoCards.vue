@@ -155,6 +155,9 @@ const router = useRouter();
 const route = router.currentRoute;
 
 const navegarPara = (routeName: string) => {
+  console.log('CARDS DEBUG: permissoes', props.permissoes);
+  console.log('CARDS DEBUG: tipoProcesso', props.tipoProcesso);
+  console.log('CARDS DEBUG: mapa', props.mapa);
   const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
   const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
   

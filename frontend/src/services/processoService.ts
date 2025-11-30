@@ -87,18 +87,18 @@ export async function alterarDataLimiteSubprocesso(
     codSubprocesso: number,
     dados: { novaData: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/alterar-data-limite`, {id: codSubprocesso, ...dados});
+    await apiClient.post(`/processos/alterar-data-limite`, { id: codSubprocesso, ...dados });
 }
 
 export async function apresentarSugestoes(
-    codProcesso: number,
+    codSubprocesso: number,
     dados: { sugestoes: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/apresentar-sugestoes`, {id: codProcesso, ...dados});
+    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, dados);
 }
 
-export async function validarMapa(codProcesso: number): Promise<void> {
-    await apiClient.post(`/processos/validar-mapa`, {id: codProcesso});
+export async function validarMapa(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
 }
 
 export async function buscarSubprocessos(
