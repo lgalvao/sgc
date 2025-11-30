@@ -86,6 +86,11 @@ public class CDU07IntegrationTest {
         usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.SERVIDOR).build());
         usuarioRepo.save(usuario);
 
+        // Create a CHEFE for the unit to avoid 404 in buscarResponsavelVigente
+        Usuario chefe = new Usuario("888888888888", "Chefe SESEL", "chefe@test.com", "124", unidade);
+        chefe.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(chefe).unidade(unidade).perfil(Perfil.CHEFE).build());
+        usuarioRepo.save(chefe);
+
         Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);
         movimentacaoRepo.save(movimentacao);
     }
@@ -111,7 +116,7 @@ public class CDU07IntegrationTest {
         }
 
         @Test
-        @WithMockChefe
+        @WithMockChefe("888888888888")
         @DisplayName("CHEFE pode visualizar o subprocesso da sua unidade")
         void chefePodeVisualizarSuaUnidade() throws Exception {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())

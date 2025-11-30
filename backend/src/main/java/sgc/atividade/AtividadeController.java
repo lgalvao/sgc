@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.ConhecimentoDto;
+import sgc.sgrh.model.Usuario;
 
 import java.net.URI;
 import java.util.List;
@@ -56,8 +57,7 @@ public class AtividadeController {
      * e a persiste, associando-a ao usuário autenticado.
      *
      * @param atividadeDto O DTO contendo os dados da atividade a ser criada.
-     * @param userDetails  Os detalhes do usuário autenticado, injetado pelo Spring
-     *                     Security.
+     * @param usuario      O usuário autenticado, injetado pelo Spring Security.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI da nova
      *         atividade
      *         no cabeçalho 'Location' e a atividade criada no corpo da resposta.
@@ -65,8 +65,8 @@ public class AtividadeController {
     @PostMapping
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto,
-            @AuthenticationPrincipal String username) {
-        var salvo = atividadeService.criar(atividadeDto, username);
+            @AuthenticationPrincipal Usuario usuario) {
+        var salvo = atividadeService.criar(atividadeDto, usuario.getUsername());
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }

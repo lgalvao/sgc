@@ -16,6 +16,7 @@ import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.sgrh.model.Usuario;
 
 import java.util.Collections;
 import java.util.List;
@@ -120,10 +121,13 @@ class AtividadeControllerTest {
 
             when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("user");
+
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("user")))
+                            .with(user(usuario)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -135,11 +139,14 @@ class AtividadeControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para DTO inválido")
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
+            
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("user");
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("user")))
+                            .with(user(usuario)))
                     .andExpect(status().isBadRequest());
         }
     }

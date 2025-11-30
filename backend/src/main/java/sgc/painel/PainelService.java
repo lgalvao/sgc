@@ -52,9 +52,6 @@ public class PainelService {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
-        // DEBUG LOG
-        System.out.println("PainelService.listarProcessos: perfil=" + perfil + ", unidade=" + codigoUnidade);
-
         Page<Processo> processos;
         if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll(pageable);

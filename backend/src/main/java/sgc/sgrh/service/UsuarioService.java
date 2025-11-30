@@ -10,6 +10,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @Slf4j
 public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
+    private final UnidadeRepo unidadeRepo;
 
     public boolean autenticar(String tituloEleitoral, String senha) {
         log.debug("Simulando autenticação para usuário: {}", tituloEleitoral);
@@ -51,6 +53,9 @@ public class UsuarioService {
     }
 
     public void entrar(EntrarReq request) {
+        if (!unidadeRepo.existsById(request.getUnidadeCodigo())) {
+            throw new ErroEntidadeNaoEncontrada("Unidade não encontrada com código: " + request.getUnidadeCodigo());
+        }
         log.info("Usuário {} entrou com sucesso via request. Perfil: {}, Unidade: {}",
                 request.getTituloEleitoral(), request.getPerfil(), request.getUnidadeCodigo());
     }
