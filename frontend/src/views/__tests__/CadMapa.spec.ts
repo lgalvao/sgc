@@ -274,13 +274,13 @@ describe("CadMapa.vue", () => {
     await flushPromises();
 
     await wrapper
-      .find('[data-testid="btn-abrir-criar-competencia"]')
+      .find('[data-testid="btn-criar-competencia"]')
       .trigger("click");
     expect(
       wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-nova-competencia"]');
+    const textarea = wrapper.find('[data-testid="input-descricao-competencia"]');
     await textarea.setValue("Nova Competencia Teste");
 
     // Checkbox interaction
@@ -299,7 +299,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-criar-competencia"]')
+      .find('[data-testid="btn-salvar-competencia"]')
       .trigger("click");
 
     expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
@@ -323,7 +323,7 @@ describe("CadMapa.vue", () => {
       wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-nova-competencia"]');
+    const textarea = wrapper.find('[data-testid="input-descricao-competencia"]');
     await textarea.setValue("Competencia A Editada");
 
     vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue({
@@ -331,7 +331,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-criar-competencia"]')
+      .find('[data-testid="btn-salvar-competencia"]')
       .trigger("click");
 
     expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
@@ -397,7 +397,7 @@ describe("CadMapa.vue", () => {
     await flushPromises();
 
     await wrapper
-      .find('[data-testid="btn-disponibilizar-page"]')
+      .find('[data-testid="btn-disponibilizar-mapa"]')
       .trigger("click");
 
     const modal = wrapper.find('[data-testid="disponibilizar-modal"]');
@@ -412,7 +412,7 @@ describe("CadMapa.vue", () => {
 
     vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
 
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger("click");
 
     expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
       dataLimite: "2023-12-31",
@@ -463,7 +463,7 @@ describe("CadMapa.vue", () => {
 
   it("não deve buscar dados se subprocesso não encontrado", async () => {
     vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(null);
-    const { wrapper: w } = createWrapper();
+    createWrapper();
     await flushPromises();
 
     expect(mapaService.obterMapaCompleto).not.toHaveBeenCalled();

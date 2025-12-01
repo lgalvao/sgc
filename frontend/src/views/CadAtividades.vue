@@ -169,7 +169,7 @@
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
-            <template v-if="conhecimentoEmEdicao?.conhecimentoId === conhecimento.id">
+            <template v-if="conhecimentoEmEdicao && conhecimentoEmEdicao.conhecimentoId === conhecimento.id">
                 <BFormInput
                   v-model="conhecimentoEmEdicao.descricao"
                   class="me-2"

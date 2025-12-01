@@ -15,7 +15,7 @@ function mapConhecimentoVisualizacaoToModel(
 ): Conhecimento {
   if (!dto) return null as any;
   return {
-    id: (dto as any).codigo,
+    id: (dto as any).codigo || dto.id,
     descricao: dto.descricao,
   };
 }

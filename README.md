@@ -14,11 +14,8 @@ Sistema para gerenciar sistematicamente as competências técnicas das unidades 
 O SGC permite:
 
 - **Mapeamento de Competências**: Coleta sistemática de atividades e conhecimentos de cada unidade operacional
-- **Revisão Periódica**: Atualização dos mapas de competencias
-- **Diagnóstico**: Avaliação de importância e domínio das competências, identificando gaps de capacitação
-- **Gestão de Processos**: Workflow completo com máquina de estados e trilha de auditoria
-- **Notificações**: Alertas visuais e notificações por e-mail sobre evolucoes nos processos e subprocessos
-
+- **Revisão Periódica de Competências**: Atualização dos mapas de competencias
+- **Diagnóstico de Competências e Ocupações Críticas**: Avaliação de importância e domínio das competências, identificando gaps
 ---
 
 ## 🏗️ Arquitetura

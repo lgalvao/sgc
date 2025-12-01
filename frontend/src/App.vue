@@ -56,8 +56,8 @@ const shouldShowNavBarExtras = computed(() => {
         dismissible
         class="shadow-sm"
         style="pointer-events: auto; min-width: 300px; max-width: 600px;"
-        @closed="feedbackStore.close()"
         data-testid="global-alert"
+        @closed="feedbackStore.close()"
       >
         <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
             {{ feedbackStore.currentFeedback.title }}

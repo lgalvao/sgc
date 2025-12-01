@@ -117,8 +117,9 @@ describe("VisMapa.vue", () => {
                     {
                       sigla: siglaUnidade,
                       codUnidade: 10,
+                      codSubprocesso: 10,
                       situacaoSubprocesso:
-                        SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+                        SituacaoSubprocesso.MAPA_DISPONIBILIZADO,
                     },
                   ],
                 },
@@ -213,7 +214,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
-              situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+              situacaoSubprocesso: SituacaoSubprocesso.MAPA_DISPONIBILIZADO,
             },
           ],
         },

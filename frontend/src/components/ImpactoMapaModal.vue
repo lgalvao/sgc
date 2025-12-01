@@ -64,7 +64,8 @@
             <i class="bi bi-pencil me-2"/>Atividades Alteradas
           </h5>
           <ul class="list-group">
-            <li v-for="ativ in impacto.atividadesAlteradas"
+            <li
+v-for="ativ in impacto.atividadesAlteradas"
                 :key="ativ.codigo"
                 class="list-group-item">
               <div class="d-flex flex-column">

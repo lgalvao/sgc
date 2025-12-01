@@ -66,7 +66,10 @@ describe("subprocessoService", () => {
             );
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/competencias",
-                mockCompetencia,
+                {
+                    descricao: mockCompetencia.descricao,
+                    atividadesIds: mockCompetencia.atividadesAssociadas,
+                },
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);
@@ -80,7 +83,10 @@ describe("subprocessoService", () => {
             );
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/competencias/1/atualizar",
-                mockCompetencia,
+                {
+                    descricao: mockCompetencia.descricao,
+                    atividadesIds: mockCompetencia.atividadesAssociadas,
+                },
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);

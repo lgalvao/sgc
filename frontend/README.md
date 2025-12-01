@@ -4,14 +4,14 @@ Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema 
 
 ## Tecnologias
 
-- **Framework:** [Vue.js](https://vuejs.org/) 3 (usando a Composition API)
+- **Framework:** [Vue.js](https://vuejs.org/) 3.5 (usando a Composition API)
 - **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool:** [Vite](https://vitejs.dev/)
-- **Gerenciador de Estado:** [Pinia](https://pinia.vuejs.org/)
+- **Builds:** [Vite](https://vitejs.dev/)
+- **Gerenciamento de estado:** [Pinia](https://pinia.vuejs.org/)
 - **Roteamento:** [Vue Router](https://router.vuejs.org/)
-- **Estilização:** [Bootstrap](https://getbootstrap.com/) 5 e [Bootstrap Icons](https://icons.getbootstrap.com/)
-- **Componentes UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/)
-- **Testes:** [Vitest](https://vitest.dev/)
+- **Componentes de UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/)
+- **Ícones:** [Bootstrap Icons](https://icons.getbootstrap.com/)
+- **Testes unitários:** [Vitest](https://vitest.dev/)
 - **Cliente HTTP:** [Axios](https://axios-http.com/)
 
 ### Executando a Aplicação

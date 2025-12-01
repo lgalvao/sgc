@@ -137,17 +137,15 @@ describe("processoService", () => {
         mockApi.post.mockResolvedValue({});
         await service.apresentarSugestoes(1, payload);
         expect(mockApi.post).toHaveBeenCalledWith(
-            "/processos/apresentar-sugestoes",
-            {id: 1, ...payload},
+            "/subprocessos/1/apresentar-sugestoes",
+            payload,
         );
     });
 
     it("validarMapa should post to the correct endpoint", async () => {
         mockApi.post.mockResolvedValue({});
         await service.validarMapa(1);
-        expect(mockApi.post).toHaveBeenCalledWith("/processos/validar-mapa", {
-            id: 1,
-        });
+        expect(mockApi.post).toHaveBeenCalledWith("/subprocessos/1/validar-mapa");
     });
 
     it("buscarSubprocessos should get from the correct endpoint", async () => {
