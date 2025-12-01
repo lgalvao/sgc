@@ -87,9 +87,12 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.atividadeRepo.findBySubprocessoCodigo(cenario.subprocesso.getCodigo()))
             .thenReturn(cenario.atividades);
 
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        req.setDataLimite(java.time.LocalDate.now().plusDays(1));
+
         assertThatCode(() -> mocks.service.disponibilizarMapa(
             cenario.subprocesso.getCodigo(),
-            new DisponibilizarMapaRequest(),
+            req,
             new Usuario()
         )).doesNotThrowAnyException();
     }
@@ -105,9 +108,12 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.atividadeRepo.findBySubprocessoCodigo(cenario.subprocesso.getCodigo()))
             .thenReturn(cenario.atividades);
 
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        req.setDataLimite(java.time.LocalDate.now().plusDays(1));
+
         assertThatThrownBy(() -> mocks.service.disponibilizarMapa(
             cenario.subprocesso.getCodigo(),
-            new DisponibilizarMapaRequest(),
+            req,
             new Usuario()
         ))
         .isInstanceOf(ErroValidacao.class)
@@ -123,9 +129,12 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.competenciaRepo.findByMapaCodigo(cenario.subprocesso.getMapa().getCodigo()))
             .thenReturn(cenario.competencias);
 
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        req.setDataLimite(java.time.LocalDate.now().plusDays(1));
+
         assertThatThrownBy(() -> mocks.service.disponibilizarMapa(
             cenario.subprocesso.getCodigo(),
-            new DisponibilizarMapaRequest(),
+            req,
             new Usuario()
         ))
         .isInstanceOf(ErroValidacao.class)

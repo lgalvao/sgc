@@ -1,0 +1,122 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.integracao.CDU12IntegrationTest
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.semImpactos_QuandoCadastroIdentico(CDU12IntegrationTest.java:134)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades alteradas como uma remoção e uma inserção FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesAlteradas(CDU12IntegrationTest.java:188)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades inseridas FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesInseridas(CDU12IntegrationTest.java:155)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve identificar competências impactadas por remoções e alterações FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveIdentificarCompetenciasImpactadas(CDU12IntegrationTest.java:205)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades removidas e as competências relacionadas FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesRemovidas(CDU12IntegrationTest.java:170)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Borda e Falhas > Não deve detectar impactos se a unidade não possui mapa vigente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$BordaEfalhas.semImpactos_QuandoNaoExisteMapaVigente(CDU12IntegrationTest.java:234)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Borda e Falhas > Deve retornar 404 para subprocesso inexistente FAILED
+    java.lang.AssertionError: Status expected:<404> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$BordaEfalhas.deveRetornar404_QuandoSubprocessoNaoExiste(CDU12IntegrationTest.java:247)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Mapa Ajustado' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.adminPodeAcessar_EmMapaAjustado(CDU12IntegrationTest.java:296)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.chefePodeAcessar_EmRevisaoCadastro(CDU12IntegrationTest.java:263)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.gestorPodeAcessar_EmRevisaoDisponibilizada(CDU12IntegrationTest.java:274)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento' FAILED
+    java.lang.AssertionError: Status expected:<403> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.chefeNaoPodeAcessar_EmSituacaoIncorreta(CDU12IntegrationTest.java:307)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.adminPodeAcessar_EmRevisaoHomologada(CDU12IntegrationTest.java:285)
+
+12 tests completed, 12 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 15s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry stored.

@@ -127,7 +127,9 @@ class SubprocessoMapaWorkflowServiceTest {
         when(repositorioCompetencia.findByMapaCodigo(10L)).thenReturn(List.of(comp));
         when(atividadeRepo.findBySubprocessoCodigo(id)).thenReturn(List.of(ativ));
 
-        service.disponibilizarMapa(id, new DisponibilizarMapaRequest(), new Usuario());
+        DisponibilizarMapaRequest request = new DisponibilizarMapaRequest();
+        request.setDataLimite(java.time.LocalDate.now().plusDays(1));
+        service.disponibilizarMapa(id, request, new Usuario());
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));

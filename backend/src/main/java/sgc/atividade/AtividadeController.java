@@ -65,8 +65,8 @@ public class AtividadeController {
     @PostMapping
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto,
-            @AuthenticationPrincipal String tituloUsuario) {
-        var salvo = atividadeService.criar(atividadeDto, tituloUsuario);
+            @AuthenticationPrincipal Usuario usuario) {
+        var salvo = atividadeService.criar(atividadeDto, usuario.getTituloEleitoral());
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }

@@ -20,4 +20,8 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      */
     @Query("SELECT DISTINCT c FROM Competencia c LEFT JOIN FETCH c.atividades WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query(value = "DELETE FROM sgc.competencia_atividade WHERE competencia_codigo = :competenciaCodigo", nativeQuery = true)
+    void deleteAssociacoes(@Param("competenciaCodigo") Long competenciaCodigo);
 }

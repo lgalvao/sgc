@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -149,7 +149,7 @@ public class CDU01IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Unidade não encontrada com código: " + codigoUnidadeInexistente));
+                .andExpect(jsonPath("$.message").value("Unidade não encontrada, código: " + codigoUnidadeInexistente));
         }
     }
 }

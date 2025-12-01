@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -121,7 +121,9 @@ class AtividadeControllerTest {
 
             when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("user");
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(usuario, "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +141,9 @@ class AtividadeControllerTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
             
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("user");
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(usuario, "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)

@@ -133,7 +133,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 400 se tentar salvar mapa para subprocesso em situação inválida")
     void deveRetornarErroParaSituacaoInvalida() throws Exception {
         // Given
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         subprocessoRepo.save(subprocesso);
 
         var request = new SalvarMapaRequest("Obs", List.of());
@@ -235,7 +235,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         @WithMockGestor
         @DisplayName("Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida")
         void deveRetornarErroParaSituacaoInvalidaCrud() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
             var request = new sgc.subprocesso.dto.CompetenciaReq("Nova Competência", List.of(atividade1.getCodigo()));

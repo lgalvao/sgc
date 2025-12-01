@@ -37,6 +37,10 @@ public class CompetenciaService {
     }
 
     public void removerCompetencia(Long codCompetencia) {
+        if (!competenciaRepo.existsById(codCompetencia)) {
+            throw new ErroEntidadeNaoEncontrada("Competência não encontrada");
+        }
+        competenciaRepo.deleteAssociacoes(codCompetencia);
         competenciaRepo.deleteById(codCompetencia);
     }
 
