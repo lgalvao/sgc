@@ -237,6 +237,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -303,6 +304,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -340,6 +342,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -372,6 +375,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -432,6 +436,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA,
             },
           ],

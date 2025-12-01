@@ -172,7 +172,11 @@ describe("SubprocessoCards.vue", () => {
                 tipoProcesso: TipoProcesso.MAPEAMENTO,
                 mapa: mockMapa,
                 situacao: "Mapa disponibilizado",
-                permissoes: {...defaultPermissoes, podeVisualizarMapa: false},
+                permissoes: {
+                    ...defaultPermissoes,
+                    podeVisualizarMapa: false,
+                    podeEditarMapa: false,
+                },
             });
 
             expect(wrapper.find('[data-testid="mapa-card"]').exists()).toBe(false);

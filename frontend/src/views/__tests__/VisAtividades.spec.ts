@@ -63,6 +63,7 @@ describe("VisAtividades.vue", () => {
                   unidades: [
                     {
                       codUnidade: 123,
+                      codSubprocesso: 123,
                       sigla: "TESTE",
                       situacaoSubprocesso: situacao,
                     },
