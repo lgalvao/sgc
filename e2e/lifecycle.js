@@ -17,18 +17,49 @@ function log(prefix, data) {
     });
 }
 
-function startBackend() {
-    // Ensure gradlew is executable
+const isWindows = process.platform === 'win32';
+
+function killPort(port) {
     try {
-        fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
-    } catch (e) {
-        // Ignore if fails, might already be executable or windows
+        if (isWindows) {
+            const cmd = `netstat -ano | findstr :${port}`;
+            try {
+                const output = require('child_process').execSync(cmd, { stdio: 'pipe' }).toString();
+                const lines = output.split('\n');
+                lines.forEach(line => {
+                    const parts = line.trim().split(/\s+/);
+                    const pid = parts[parts.length - 1];
+                    if (pid && /^\d+$/.test(pid) && pid !== '0') {
+                        try {
+                            require('child_process').execSync(`taskkill /PID ${pid} /F`, { stdio: 'ignore' });
+                        } catch (e) { }
+                    }
+                });
+            } catch (e) {
+                // findstr returns non-zero if not found
+            }
+        } else {
+            require('child_process').execSync(`lsof -ti:${port} | xargs kill -9 2>/dev/null`);
+        }
+    } catch (e) { /* ignore */ }
+}
+
+function startBackend() {
+    // Ensure gradlew is executable (Unix only)
+    if (!isWindows) {
+        try {
+            fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
+        } catch (e) {
+            // Ignore if fails
+        }
     }
 
-    const gradlewPath = path.resolve(BACKEND_DIR, '../gradlew');
+    const gradlewExecutable = isWindows ? 'gradlew.bat' : 'gradlew';
+    const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
+    
     backendProcess = spawn(gradlewPath, ['bootRun', '--args=--spring.profiles.active=e2e'], {
         cwd: BACKEND_DIR,
-        shell: false,
+        shell: isWindows, // Windows often needs shell for .bat
         stdio: ['ignore', 'pipe', 'pipe']
     });
 
@@ -44,9 +75,10 @@ function startBackend() {
 }
 
 function startFrontend() {
-    frontendProcess = spawn('npm', ['run', 'dev'], {
+    const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
+    frontendProcess = spawn(npmExecutable, ['run', 'dev'], {
         cwd: FRONTEND_DIR,
-        shell: false,
+        shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
     });
 
@@ -64,7 +96,11 @@ function startFrontend() {
 function cleanup() {
     if (backendProcess) {
         try {
-            process.kill(-backendProcess.pid);
+            if (isWindows) {
+                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`);
+            } else {
+                process.kill(-backendProcess.pid);
+            }
         } catch (e) {
             try {
                 backendProcess.kill();
@@ -73,7 +109,11 @@ function cleanup() {
     }
     if (frontendProcess) {
         try {
-            process.kill(-frontendProcess.pid);
+             if (isWindows) {
+                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`);
+            } else {
+                process.kill(-frontendProcess.pid);
+            }
         } catch (e) {
             try {
                 frontendProcess.kill();
@@ -82,10 +122,8 @@ function cleanup() {
     }
 
     // Force kill any remaining on ports
-    try {
-        require('child_process').execSync(`lsof -ti:${BACKEND_PORT} | xargs kill -9 2>/dev/null`);
-        require('child_process').execSync(`lsof -ti:${FRONTEND_PORT} | xargs kill -9 2>/dev/null`);
-    } catch (e) { /* ignore */ }
+    killPort(BACKEND_PORT);
+    killPort(FRONTEND_PORT);
 }
 
 // Handle exit signals
@@ -104,10 +142,8 @@ process.on('exit', () => {
 });
 
 // Start services, Kill existing first
-try {
-    require('child_process').execSync(`lsof -ti:${BACKEND_PORT} | xargs kill -9 2>/dev/null`);
-    require('child_process').execSync(`lsof -ti:${FRONTEND_PORT} | xargs kill -9 2>/dev/null`);
-} catch (e) { /* ignore */ }
+killPort(BACKEND_PORT);
+killPort(FRONTEND_PORT);
 
 function checkBackendHealth() {
     return new Promise((resolve) => {

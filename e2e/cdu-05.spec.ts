@@ -26,7 +26,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // FASE 1: PREPARACAO - CRIAR MAPA VIGENTE VIA PROCESSO DE MAPEAMENTO
         // ------------------------------------------------------------------------
 
-        // Admin cria e inicia processo de MAPEAMENTO
+        // Admin cria processo de MAPEAMENTO
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -38,13 +38,14 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
             expandir: ['SECRETARIA_2']
         });
 
-        // Iniciar processo
+        // Navegar para processo criado
         await page.getByRole('row', { name: descricaoMapeamento }).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('input-descricao')).toHaveValue(descricaoMapeamento);
+
+        // Iniciar processo
         await page.getByTestId('btn-iniciar-processo').click();
         await page.getByTestId('btn-modal-confirmar').click();
-
         await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, { descricao: descricaoMapeamento, situacao: 'Em andamento', tipo: 'Mapeamento' });
 
@@ -52,20 +53,21 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-logout').click();
 
         // Chefe da Unidade cria Atividade e Competência
+        //TODO erro aqui: deveria fazer o login; autenticar nao puro nao entra no sistema
         await autenticar(page, USUARIO_CHEFE, SENHA_CHEFE);
         await expect(page).toHaveURL(/\/painel/);
 
         // Acessar subprocesso (CHEFE vai direto para o SubprocessoView ao clicar no processo)
         await page.getByText(descricaoMapeamento).click();
-        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);  // Confirm we're on SubprocessoView
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/); 
 
         // Adicionar Atividade
-        await expect(page.getByTestId('atividades-card')).toBeVisible(); // Wait for card to be visible
+        await expect(page.getByTestId('atividades-card')).toBeVisible(); 
         await page.getByTestId('atividades-card').click();
         await page.getByTestId('input-nova-atividade').fill(`Atividade Teste ${timestamp}`);
         await page.getByTestId('btn-adicionar-atividade').click({ force: true });
 
-        // Adicionar conhecimento à atividade (necessário para validação)
+        // Adicionar conhecimento à atividade
         const descricaoAtividade = `Atividade Teste ${timestamp}`;
         await expect(page.getByText(descricaoAtividade)).toBeVisible();
 
@@ -74,6 +76,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await activityCard.getByTestId('btn-adicionar-conhecimento').click();
 
         // Voltar para detalhes do subprocesso
+        // TODO isso deve falhar, pois há dois botões com o mesmo id (recomendo mudar um deles no codigo de prod)
         await page.getByTestId('btn-voltar').first().click();
 
         // Adicionar Competência
@@ -86,6 +89,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-salvar-competencia').click();
 
         // Disponibilizar Mapa (Chefe)
+        // TODO estranho, porque o chefe nao pode disponibilizar mapa. Quem cuida do mapa é o ADMIN (SEDOC)
         await page.getByTestId('btn-disponibilizar-mapa').click();
 
         // Preencher modal
@@ -128,10 +132,10 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await verificarProcessoNaTabela(page, { descricao: descricaoMapeamento, situacao: 'Finalizado', tipo: 'Mapeamento' });
 
         // ------------------------------------------------------------------------
-        // FASE 2: TESTE CDU-05 - INICIAR PROCESSO DE REVISÃO
+        // FASE 2: TESTE CDU-05 - INICIAR PROCESSO DE REVISÃO -- ESTE É o TESTE EM SI
         // ------------------------------------------------------------------------
 
-        // 2.1. Criar processo de REVISÃO
+        // Criar processo de REVISÃO
         await criarProcesso(page, {
             descricao: descricaoRevisao,
             tipo: 'REVISAO',
@@ -140,20 +144,20 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
             expandir: ['SECRETARIA_2']
         });
 
-        // 2.2. Iniciar processo
+        // Iniciar processo
         await page.getByText(descricaoRevisao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('input-descricao')).toHaveValue(descricaoRevisao);
 
         await page.getByTestId('btn-iniciar-processo').click();
 
-        // 2.3. Verificar Modal e Confirmar
+        // Verificar Modal e Confirmar
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
         await page.getByTestId('btn-modal-confirmar').click();
 
-        // 2.4. Verificar redirecionamento e Status
+        // Verificar redirecionamento e Status
         await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, {
             descricao: descricaoRevisao,
