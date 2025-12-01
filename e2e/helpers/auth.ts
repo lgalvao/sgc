@@ -26,6 +26,10 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
  * Verifica que o login foi bem-sucedido navegando para /painel
  */
 export async function login(page: Page, usuario: string, senha: string) {
+    // Se não estiver na página de login, navega para ela
+    if (!page.url().includes('/login')) {
+        await page.goto('/login');
+    }
     await autenticar(page, usuario, senha);
     await expect(page).toHaveURL(/\/painel/);
 }

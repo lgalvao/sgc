@@ -19,23 +19,17 @@ const FRONTEND_PORT = 5173;
 let backendProcess = null;
 let frontendProcess = null;
 
-// Padrões de log para filtrar (reduzir ruído no agentic loop)
 const LOG_FILTERS = [
-    // Warnings do Lombok (sem solução por ora)
     /WARNING:.*sun\.misc\.Unsafe/,
     /WARNING:.*lombok\.permit\.Permit/,
     /WARNING:.*will be removed in a future release/,
     /WARNING:.*Please consider reporting this to the maintainers/,
     /^> Task :/,
     /logStarted/,
-    /UP_TO_DATE/,
+    /UP-TO-DATE/,
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
     /Starting/,
-    /VITE * ready/,
-    /\[vite\] connecting/,
-    /\[vite\] connected\]/,
-    /Network: use/,
     /^\s*$/
 ];
 

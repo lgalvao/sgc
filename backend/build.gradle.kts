@@ -90,7 +90,7 @@ tasks.withType<Test> {
 
     jvmArgs = listOf(
         "-Dlogging.level.root=INFO",
-        "-Dlogging.level.sgc=DEBUG",
+        "-Dlogging.level.sgc=INFO",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",

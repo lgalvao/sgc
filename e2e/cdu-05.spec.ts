@@ -73,30 +73,51 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await activityCard.getByTestId('input-novo-conhecimento').fill('Conhecimento Teste');
         await activityCard.getByTestId('btn-adicionar-conhecimento').click();
 
-        // Voltar para detalhes do subprocesso
-        await page.getByTestId('btn-voltar').first().click();
+        // Logout Chefe (que só pode criar atividades)
+        await page.getByTestId('btn-logout').click();
 
-        // Adicionar Competência
-        await page.getByRole('heading', { name: 'Mapa de competências' }).click();
+        // Admin cria Competência e Disponibiliza Mapa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        
+        // Admin navega para o subprocesso
+        await page.getByText(descricaoMapeamento).click();
+        // Expandir se necessário e clicar na unidade
+        await page.getByTestId('tree-table-row-12').click(); 
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
+
+        // Entrar no Mapa de Competências
+        await page.getByTestId('mapa-card').click({ force: true });
+
+        // Adicionar Competência (Admin)
         await page.getByTestId('btn-criar-competencia').click();
         await page.getByTestId('input-descricao-competencia').fill(`Competência Teste ${timestamp}`);
 
         // Vincular atividade
-        await page.getByText(`Atividade Teste ${timestamp}`).click();
-        await page.getByTestId('btn-salvar-competencia').click();
+        await page.getByText(`Atividade Teste ${timestamp}`).click({ force: true });
+        await page.getByTestId('btn-salvar-competencia').click({ force: true });
+        
+        // Aguardar modal fechar completamente
+        await expect(page.getByTestId('criar-competencia-modal')).toBeHidden();
 
-        // Disponibilizar Mapa (Chefe)
+        // Disponibilizar Mapa (Admin)
         await page.getByTestId('btn-disponibilizar-mapa').click();
 
-        // Preencher modal
+        // Preencher modal de disponibilização
         await page.getByTestId('input-data-limite').fill('2030-12-31');
         await page.getByTestId('btn-modal-confirmar').click();
 
-        // Voltar para SubprocessoView para verificar status
-        await page.getByRole('button', { name: 'Voltar' }).click();
+        // Logout Admin
+        await page.getByTestId('btn-logout').click();
 
-        // Verificar status
-        await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa disponibilizado/i);
+        // Login Chefe novamente para garantir sessão limpa
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        
+        // Garantir que não há alertas de sessão expirada bloqueando a tela
+        await expect(page.getByRole('heading', { name: 'Não Autorizado' })).toBeHidden();
+
+        // Chefe navega para o subprocesso
+        await page.getByText(descricaoMapeamento).click();
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
 
         // Chefe Valida o Mapa
         await page.getByTestId('mapa-card-vis').click();

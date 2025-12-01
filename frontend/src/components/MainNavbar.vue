@@ -1,71 +1,66 @@
 <template>
   <BNavbar
-    class="navbar-expand-lg navbar-dark bg-dark border-bottom"
-    toggleable="lg"
+      class="navbar-expand-lg navbar-dark bg-dark border-bottom"
+      toggleable="lg"
   >
     <BContainer>
       <BNavbarBrand to="/painel">
         SGC
       </BNavbarBrand>
-      <BNavbarToggle target="navbarNav" />
+      <BNavbarToggle target="navbarNav"/>
 
       <BCollapse
-        id="navbarNav"
-        is-nav
+          id="navbarNav"
+          is-nav
       >
         <BNavbarNav class="me-auto mb-2 mb-lg-0 left-nav">
           <BNavItem
-            href="#"
-            @click.prevent="navigateFromNavbar('/painel')"
+              href="#"
+              @click.prevent="navigateFromNavbar('/painel')"
           >
-            <i class="bi bi-house-door" /> Painel
+            <i class="bi bi-house-door"/> Painel
           </BNavItem>
           <BNavItem
-            href="#"
-            @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
+              href="#"
+              @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
           >
-            <i class="bi bi-person" /> Minha unidade
+            <i class="bi bi-person"/> Minha unidade
           </BNavItem>
           <BNavItem
-            href="#"
-            @click.prevent="navigateFromNavbar('/relatorios')"
+              href="#"
+              @click.prevent="navigateFromNavbar('/relatorios')"
           >
-            <i class="bi bi-bar-chart-line" /> Relatórios
+            <i class="bi bi-bar-chart-line"/> Relatórios
           </BNavItem>
           <BNavItem
-            href="#"
-            @click.prevent="navigateFromNavbar('/historico')"
+              href="#"
+              @click.prevent="navigateFromNavbar('/historico')"
           >
-            <i class="bi bi-clock-history" /> Histórico
+            <i class="bi bi-clock-history"/> Histórico
           </BNavItem>
         </BNavbarNav>
 
         <BNavbarNav class="align-items-center">
           <BNavItem class="me-3 d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 fs-5" />
+            <i class="bi bi-person-circle me-2 fs-5"/>
             <span class="nav-link">
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
           </BNavItem>
 
           <BNavItem
-            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            class="me-2"
-            href="#"
-            title="Configurações do sistema"
-            data-testid="btn-configuracoes"
-            @click.prevent="navigateFromNavbar('/configuracoes')"
+              v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+              class="me-2"
+              href="#"
+              title="Configurações do sistema"
+              data-testid="btn-configuracoes"
+              @click.prevent="navigateFromNavbar('/configuracoes')"
           >
-            <i class="bi bi-gear fs-5" />
+            <i class="bi bi-gear fs-5"/>
           </BNavItem>
 
-          <BNavItem
-            title="Sair"
-            href="#"
-            data-testid="btn-logout"
-            @click.prevent="handleLogout"
-          >
-            <i class="bi bi-box-arrow-right fs-5" />
+          <BNavItem title="Sair" href="#" data-testid="btn-logout" @click.prevent="handleLogout">
+            <i class="bi bi-box-arrow-right fs-5"/>
           </BNavItem>
         </BNavbarNav>
       </BCollapse>

@@ -1,17 +1,16 @@
-import { defineConfig, devices } from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
-    timeout: 15_000,
-    expect: { timeout: 2_000 },
+    timeout: 5_000,
+    expect: {timeout: 1_000},
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: 'dot',
     use: {
-        baseURL: 'http://localhost:5173',
-        trace: 'on-first-retry',
+        baseURL: 'http://localhost:5173'
     },
     webServer: {
         command: 'node e2e/lifecycle.js',
@@ -24,7 +23,7 @@ export default defineConfig({
     projects: [
         {
             name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            use: {...devices['Desktop Chrome']},
         },
     ],
 });

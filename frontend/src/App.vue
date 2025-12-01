@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
 import {useRoute} from "vue-router";
-import {BAlert} from "bootstrap-vue-next";
+import {BAlert, BOrchestrator} from "bootstrap-vue-next";
 import {useFeedbackStore} from "@/stores/feedback";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
@@ -9,6 +9,7 @@ import MainNavbar from "./components/MainNavbar.vue";
 
 interface PackageJson {
   version: string;
+
   [key: string]: any;
 }
 
@@ -49,8 +50,9 @@ const shouldShowNavBarExtras = computed(() => {
 </script>
 
 <template>
+  <BOrchestrator/>
   <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
-      <BAlert
+    <BAlert
         v-model="feedbackStore.currentFeedback.show"
         :variant="feedbackStore.currentFeedback.variant"
         dismissible
@@ -58,30 +60,30 @@ const shouldShowNavBarExtras = computed(() => {
         style="pointer-events: auto; min-width: 300px; max-width: 600px;"
         data-testid="global-alert"
         @closed="feedbackStore.close()"
-      >
-        <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
-            {{ feedbackStore.currentFeedback.title }}
-        </h6>
-        <p class="mb-0">
-            {{ feedbackStore.currentFeedback.message }}
-        </p>
-      </BAlert>
+    >
+      <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
+        {{ feedbackStore.currentFeedback.title }}
+      </h6>
+      <p class="mb-0">
+        {{ feedbackStore.currentFeedback.message }}
+      </p>
+    </BAlert>
   </div>
 
-  <MainNavbar v-if="route.path !== '/login'" />
+  <MainNavbar v-if="route.path !== '/login'"/>
   <div
-    v-if="shouldShowNavBarExtras"
-    class="bg-light border-bottom"
+      v-if="shouldShowNavBarExtras"
+      class="bg-light border-bottom"
   >
     <div class="container py-2">
-      <BarraNavegacao />
+      <BarraNavegacao/>
     </div>
   </div>
-  <router-view />
+  <router-view/>
 
   <footer
-    v-if="route.path !== '/login'"
-    class="bg-light text-muted border-top mt-4"
+      v-if="route.path !== '/login'"
+      class="bg-light text-muted border-top mt-4"
   >
     <div class="container py-3 small d-flex justify-content-between align-items-center">
       <span>Versão {{ version }}</span>

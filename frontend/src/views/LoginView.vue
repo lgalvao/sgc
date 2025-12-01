@@ -88,9 +88,6 @@
             </BFormSelect>
           </div>
 
-          <div class="mb-3 text-danger">
-            DEBUG: Step={{ loginStep }}, Perfis={{ perfisUnidadesDisponiveis.length }}
-          </div>
           <BButton
             variant="primary"
             class="w-100 login-btn"
