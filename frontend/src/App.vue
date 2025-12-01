@@ -1,13 +1,11 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRoute} from "vue-router";
-import {BOrchestrator, useToast} from "bootstrap-vue-next";
-import { registerToast } from "@/services/toastService";
+import {BAlert} from "bootstrap-vue-next";
+import {useFeedbackStore} from "@/stores/feedback";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/BarraNavegacao.vue";
 import MainNavbar from "./components/MainNavbar.vue";
-
-
 
 interface PackageJson {
   version: string;
@@ -15,7 +13,7 @@ interface PackageJson {
 }
 
 const route = useRoute();
-const toast = useToast();
+const feedbackStore = useFeedbackStore();
 
 const hideExtrasOnce = ref(false);
 
@@ -48,14 +46,29 @@ const shouldShowNavBarExtras = computed(() => {
   if (route.path === "/painel") return false;
   return !hideExtrasOnce.value;
 });
-
-onMounted(() => {
-  registerToast(toast);
-});
 </script>
 
 <template>
-      <BOrchestrator />  <MainNavbar v-if="route.path !== '/login'" />
+  <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
+      <BAlert
+        v-model="feedbackStore.currentFeedback.show"
+        :variant="feedbackStore.currentFeedback.variant"
+        dismissible
+        class="shadow-sm"
+        style="pointer-events: auto; min-width: 300px; max-width: 600px;"
+        @closed="feedbackStore.close()"
+        data-testid="global-alert"
+      >
+        <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
+            {{ feedbackStore.currentFeedback.title }}
+        </h6>
+        <p class="mb-0">
+            {{ feedbackStore.currentFeedback.message }}
+        </p>
+      </BAlert>
+  </div>
+
+  <MainNavbar v-if="route.path !== '/login'" />
   <div
     v-if="shouldShowNavBarExtras"
     class="bg-light border-bottom"

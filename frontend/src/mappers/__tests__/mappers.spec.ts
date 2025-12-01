@@ -82,7 +82,7 @@ describe("mappers/atividades", () => {
         const request = {descricao: "Nova Atividade"};
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe("Nova Atividade");
-        expect(dto.codSubrocesso).toBe(123);
+        expect(dto.mapaCodigo).toBe(123);
     });
 
     it("mapCriarConhecimentoRequestToDto should map correctly", () => {

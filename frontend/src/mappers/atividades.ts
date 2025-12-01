@@ -14,7 +14,7 @@ export function mapAtividadeDtoToModel(dto: any): Atividade {
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
   if (!dto) return null as any;
   return {
-    id: dto.codigo,
+    id: dto.id || dto.codigo,
     descricao: dto.descricao,
   };
 }

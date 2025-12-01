@@ -1,3 +1,12 @@
+// Suprimir o DeprecationWarning DEP0190 - é necessário usar shell: true no Windows para .bat/.cmd
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+    if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') {
+        return; // Ignorar este warning específico
+    }
+    console.warn(warning.name, warning.message);
+});
+
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -10,39 +19,47 @@ const FRONTEND_PORT = 5173;
 let backendProcess = null;
 let frontendProcess = null;
 
+// Padrões de log para filtrar (reduzir ruído no agentic loop)
+const LOG_FILTERS = [
+    // Warnings do Lombok (sem solução por ora)
+    /WARNING:.*sun\.misc\.Unsafe/,
+    /WARNING:.*lombok\.permit\.Permit/,
+    /WARNING:.*will be removed in a future release/,
+    /WARNING:.*Please consider reporting this to the maintainers/,
+    /^> Task :/,
+    /logStarted/,
+    /UP_TO_DATE/,
+    /Starting a Gradle Daemon.*Daemons could not be reused/,
+    /Reusing configuration cache/,
+    /Starting/,
+    /VITE * ready/,
+    /\[vite\] connecting/,
+    /\[vite\] connected\]/,
+    /Network: use/,
+    /^\s*$/
+];
+
+/**
+ * Verifica se uma linha deve ser filtrada
+ */
+function shouldFilterLog(line) {
+    return LOG_FILTERS.some(pattern => pattern.test(line));
+}
+
+/**
+ * Loga dados do processo, filtrando mensagens indesejadas
+ */
 function log(prefix, data) {
     const lines = data.toString().split('\n');
     lines.forEach(line => {
-        if (line.trim()) console.log(`${line}`);
+        const trimmed = line.trim();
+        if (trimmed && !shouldFilterLog(line)) {
+            console.log(line);
+        }
     });
 }
 
 const isWindows = process.platform === 'win32';
-
-function killPort(port) {
-    try {
-        if (isWindows) {
-            const cmd = `netstat -ano | findstr :${port}`;
-            try {
-                const output = require('child_process').execSync(cmd, { stdio: 'pipe' }).toString();
-                const lines = output.split('\n');
-                lines.forEach(line => {
-                    const parts = line.trim().split(/\s+/);
-                    const pid = parts[parts.length - 1];
-                    if (pid && /^\d+$/.test(pid) && pid !== '0') {
-                        try {
-                            require('child_process').execSync(`taskkill /PID ${pid} /F`, { stdio: 'ignore' });
-                        } catch (e) { }
-                    }
-                });
-            } catch (e) {
-                // findstr returns non-zero if not found
-            }
-        } else {
-            require('child_process').execSync(`lsof -ti:${port} | xargs kill -9 2>/dev/null`);
-        }
-    } catch (e) { /* ignore */ }
-}
 
 function startBackend() {
     // Ensure gradlew is executable (Unix only)
@@ -54,14 +71,18 @@ function startBackend() {
         }
     }
 
-    const gradlewExecutable = isWindows ? 'gradlew.bat' : 'gradlew';
+    const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
     
-    backendProcess = spawn(gradlewPath, ['bootRun', '--args=--spring.profiles.active=e2e'], {
+    // No Windows, .bat precisa de shell, mas passamos argumentos separadamente para evitar warning
+    // No Unix, não precisa de shell
+    const spawnOptions = {
         cwd: BACKEND_DIR,
-        shell: isWindows, // Windows often needs shell for .bat
+        shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
-    });
+    };
+    
+    backendProcess = spawn(gradlewPath, ['bootRun', '--args=--spring.profiles.active=e2e'], spawnOptions);
 
     backendProcess.stdout.on('data', data => log('BACKEND', data));
     backendProcess.stderr.on('data', data => log('BACKEND_ERR', data));
@@ -76,11 +97,14 @@ function startBackend() {
 
 function startFrontend() {
     const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
-    frontendProcess = spawn(npmExecutable, ['run', 'dev'], {
+    
+    const spawnOptions = {
         cwd: FRONTEND_DIR,
         shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
-    });
+    };
+    
+    frontendProcess = spawn(npmExecutable, ['run', 'dev'], spawnOptions);
 
     frontendProcess.stdout.on('data', data => log('FRONTEND', data));
     frontendProcess.stderr.on('data', data => log('FRONTEND_ERR', data));
@@ -94,10 +118,12 @@ function startFrontend() {
 }
 
 function cleanup() {
+    // Matar apenas os processos que iniciamos, preservando Gradle Daemons
     if (backendProcess) {
         try {
             if (isWindows) {
-                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`);
+                // /T mata a árvore de processos (Spring Boot), mas não afeta Daemons
+                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`, { stdio: 'ignore' });
             } else {
                 process.kill(-backendProcess.pid);
             }
@@ -110,7 +136,7 @@ function cleanup() {
     if (frontendProcess) {
         try {
              if (isWindows) {
-                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`);
+                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`, { stdio: 'ignore' });
             } else {
                 process.kill(-frontendProcess.pid);
             }
@@ -120,10 +146,9 @@ function cleanup() {
             } catch (e2) { /* ignore */ }
         }
     }
-
-    // Force kill any remaining on ports
-    killPort(BACKEND_PORT);
-    killPort(FRONTEND_PORT);
+    
+    // NÃO matar portas - isso mataria os Gradle Daemons!
+    // Os processos Spring Boot e Vite já foram finalizados acima
 }
 
 // Handle exit signals
@@ -141,9 +166,9 @@ process.on('exit', () => {
     cleanup();
 });
 
-// Start services, Kill existing first
-killPort(BACKEND_PORT);
-killPort(FRONTEND_PORT);
+// Start services
+// NÃO matar portas aqui - preserva Gradle Daemons para reutilização
+// Se houver conflito de porta, o processo falhará e será tratado
 
 function checkBackendHealth() {
     return new Promise((resolve) => {

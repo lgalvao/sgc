@@ -1,61 +1,46 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ToastService, registerToast } from '../toastService';
+import { ToastService } from '../toastService';
+import { useFeedbackStore } from '@/stores/feedback';
+import { createPinia, setActivePinia } from 'pinia';
 
 describe('toastService', () => {
-  let mockToastInstance: any;
-
   beforeEach(() => {
-    mockToastInstance = {
-      show: vi.fn(),
-    };
-    // Reset the singleton (though registerToast overwrites it)
-    registerToast(mockToastInstance);
+    setActivePinia(createPinia());
   });
 
-  it('sucesso should call toastInstance.show with success variant', () => {
+  it('sucesso should call store.show with success variant', () => {
+    const store = useFeedbackStore();
+    const showSpy = vi.spyOn(store, 'show');
+
     ToastService.sucesso('Success Title', 'Success Message');
-    expect(mockToastInstance.show).toHaveBeenCalledWith({
-      title: 'Success Title',
-      body: 'Success Message',
-      props: { variant: 'success', value: true },
-    });
+
+    expect(showSpy).toHaveBeenCalledWith('Success Title', 'Success Message', 'success');
   });
 
-  it('erro should call toastInstance.show with danger variant', () => {
+  it('erro should call store.show with danger variant', () => {
+    const store = useFeedbackStore();
+    const showSpy = vi.spyOn(store, 'show');
+
     ToastService.erro('Error Title', 'Error Message');
-    expect(mockToastInstance.show).toHaveBeenCalledWith({
-      title: 'Error Title',
-      body: 'Error Message',
-      props: { variant: 'danger', value: true },
-    });
+
+    expect(showSpy).toHaveBeenCalledWith('Error Title', 'Error Message', 'danger');
   });
 
-  it('aviso should call toastInstance.show with warning variant', () => {
+  it('aviso should call store.show with warning variant', () => {
+    const store = useFeedbackStore();
+    const showSpy = vi.spyOn(store, 'show');
+
     ToastService.aviso('Warning Title', 'Warning Message');
-    expect(mockToastInstance.show).toHaveBeenCalledWith({
-      title: 'Warning Title',
-      body: 'Warning Message',
-      props: { variant: 'warning', value: true },
-    });
+
+    expect(showSpy).toHaveBeenCalledWith('Warning Title', 'Warning Message', 'warning');
   });
 
-  it('info should call toastInstance.show with info variant', () => {
+  it('info should call store.show with info variant', () => {
+    const store = useFeedbackStore();
+    const showSpy = vi.spyOn(store, 'show');
+
     ToastService.info('Info Title', 'Info Message');
-    expect(mockToastInstance.show).toHaveBeenCalledWith({
-      title: 'Info Title',
-      body: 'Info Message',
-      props: { variant: 'info', value: true },
-    });
-  });
 
-  it('should handle missing toastInstance gracefully', () => {
-    // Reset instance to null/undefined indirectly by registering undefined
-    // Or in a real scenario, if it wasn't registered.
-    // Since we can't easily unregister, we can register null (if typescript allows) or undefined.
-    // The type definition says `instance: any`, so we can pass null.
-    registerToast(null);
-
-    // Should not throw
-    expect(() => ToastService.sucesso('Title', 'Message')).not.toThrow();
+    expect(showSpy).toHaveBeenCalledWith('Info Title', 'Info Message', 'info');
   });
 });

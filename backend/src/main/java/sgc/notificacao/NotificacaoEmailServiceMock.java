@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     public NotificacaoEmailServiceMock() {
         super(null, null);
-        log.info(">>> NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados <<<");
+        log.info("NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados");
     }
 
     @Override

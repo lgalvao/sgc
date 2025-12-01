@@ -80,7 +80,7 @@ describe("CadMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         await wrapper
-            .find('[data-testid="btn-abrir-criar-competencia"]')
+            .find('[data-testid="btn-criar-competencia"]')
             .trigger("click");
 
         expect(
@@ -146,7 +146,7 @@ describe("CadMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         await wrapper
-            .find('[data-testid="btn-disponibilizar-page"]')
+            .find('[data-testid="btn-disponibilizar-mapa"]')
             .trigger("click");
         await wrapper
             .find('[data-testid="input-data-limite"]')

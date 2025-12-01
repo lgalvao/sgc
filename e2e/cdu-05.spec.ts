@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login, autenticar, USUARIOS } from './helpers/auth';
+import { login, USUARIOS } from './helpers/auth';
 import { criarProcesso, verificarProcessoNaTabela } from './helpers/processo-helpers';
 
 test.describe('CDU-05 - Iniciar processo de revisão', () => {
@@ -53,9 +53,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-logout').click();
 
         // Chefe da Unidade cria Atividade e Competência
-        //TODO erro aqui: deveria fazer o login; autenticar nao puro nao entra no sistema
-        await autenticar(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await expect(page).toHaveURL(/\/painel/);
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Acessar subprocesso (CHEFE vai direto para o SubprocessoView ao clicar no processo)
         await page.getByText(descricaoMapeamento).click();
@@ -76,7 +74,6 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await activityCard.getByTestId('btn-adicionar-conhecimento').click();
 
         // Voltar para detalhes do subprocesso
-        // TODO isso deve falhar, pois há dois botões com o mesmo id (recomendo mudar um deles no codigo de prod)
         await page.getByTestId('btn-voltar').first().click();
 
         // Adicionar Competência
@@ -89,7 +86,6 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('btn-salvar-competencia').click();
 
         // Disponibilizar Mapa (Chefe)
-        // TODO estranho, porque o chefe nao pode disponibilizar mapa. Quem cuida do mapa é o ADMIN (SEDOC)
         await page.getByTestId('btn-disponibilizar-mapa').click();
 
         // Preencher modal
@@ -100,16 +96,23 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByRole('button', { name: 'Voltar' }).click();
 
         // Verificar status
-        await expect(page.getByText('Mapa disponibilizado')).toBeVisible();
+        await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa disponibilizado/i);
 
         // Chefe Valida o Mapa
         await page.getByTestId('mapa-card-vis').click();
         await page.getByTestId('validar-btn').click();
         await page.getByTestId('modal-validar-confirmar').click();
-        await expect(page.getByText('Mapa validado')).toBeVisible();
+        await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa validado/i);
+
+        // Fechar alerta se estiver visível
+        const alert = page.getByTestId('global-alert');
+        if (await alert.isVisible()) {
+            await alert.getByLabel('Close').click();
+        }
 
         // Logout Chefe
         await page.getByTestId('btn-logout').click();
+        await expect(page).toHaveURL(/\/login/);
 
         // Admin Homologa e Finaliza
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -121,7 +124,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.getByTestId('mapa-card-vis').click();
         await page.getByTestId('btn-registrar-aceite-homologar').click();
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText('Mapa homologado')).toBeVisible();
+        await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa homologado/i);
 
         // Voltar ao processo e Finalizar
         await page.goto('/painel');

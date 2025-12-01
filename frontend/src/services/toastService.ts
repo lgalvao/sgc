@@ -1,43 +1,46 @@
-// Service singleton to bridge non-component code (Stores, Axios) to BootstrapVueNext Toasts
+import { useFeedbackStore } from "@/stores/feedback";
 
-// Define a minimal interface for the Toast Controller methods we use
-interface ToastController {
-  create(options: { title: string; body: string; props?: { variant: string; value: boolean } }): void;
-}
-
-let toastInstance: ToastController | null = null;
-
-export const registerToast = (instance: any) => {
-  toastInstance = instance;
+// Mantemos a exportação vazia de registerToast para não quebrar compatibilidade imediata,
+// mas ela não faz mais nada.
+export const registerToast = (_instance: any) => {
+  // Deprecated: No longer needed with Pinia store
 };
 
 export const ToastService = {
   sucesso(titulo: string, mensagem: string) {
-    toastInstance?.create({
-      title: titulo,
-      body: mensagem,
-      props: { variant: 'success', value: true }
-    });
+    console.log('[ToastService] sucesso:', titulo);
+    try {
+      const store = useFeedbackStore();
+      store.show(titulo, mensagem, 'success');
+    } catch (e) {
+      console.error('[ToastService] Erro ao chamar store:', e);
+    }
   },
   erro(titulo: string, mensagem: string) {
-    toastInstance?.create({
-      title: titulo,
-      body: mensagem,
-      props: { variant: 'danger', value: true }
-    });
+    console.log('[ToastService] erro:', titulo);
+    try {
+      const store = useFeedbackStore();
+      store.show(titulo, mensagem, 'danger');
+    } catch (e) {
+      console.error('[ToastService] Erro ao chamar store:', e);
+    }
   },
   aviso(titulo: string, mensagem: string) {
-    toastInstance?.create({
-      title: titulo,
-      body: mensagem,
-      props: { variant: 'warning', value: true }
-    });
+    console.log('[ToastService] aviso:', titulo);
+    try {
+      const store = useFeedbackStore();
+      store.show(titulo, mensagem, 'warning');
+    } catch (e) {
+      console.error('[ToastService] Erro ao chamar store:', e);
+    }
   },
   info(titulo: string, mensagem: string) {
-    toastInstance?.create({
-      title: titulo,
-      body: mensagem,
-      props: { variant: 'info', value: true }
-    });
+    console.log('[ToastService] info:', titulo);
+    try {
+      const store = useFeedbackStore();
+      store.show(titulo, mensagem, 'info');
+    } catch (e) {
+      console.error('[ToastService] Erro ao chamar store:', e);
+    }
   }
 };

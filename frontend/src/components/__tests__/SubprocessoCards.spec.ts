@@ -12,7 +12,8 @@ vi.mock("vue-router", () => ({
     currentRoute: {
       value: {
         params: {
-            codSubprocesso: "123",
+            codProcesso: "1",
+            siglaUnidade: "TEST",
         },
       },
     },
@@ -74,7 +75,10 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoCadastro",
-          params: {codSubprocesso: 123},
+          params: {
+              codProcesso: 1,
+              siglaUnidade: "TEST",
+          },
       });
     });
 
@@ -95,7 +99,10 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoVisCadastro",
-          params: {codSubprocesso: 123},
+          params: {
+              codProcesso: 1,
+              siglaUnidade: "TEST",
+          },
       });
     });
 
@@ -112,7 +119,10 @@ describe("SubprocessoCards.vue", () => {
 
       expect(pushMock).toHaveBeenCalledWith({
           name: "SubprocessoMapa",
-          params: {codSubprocesso: 123},
+          params: {
+              codProcesso: 1,
+              siglaUnidade: "TEST",
+          },
       });
     });
 
@@ -129,7 +139,10 @@ describe("SubprocessoCards.vue", () => {
 
             expect(pushMock).toHaveBeenCalledWith({
                 name: "DiagnosticoEquipe",
-                params: {codSubprocesso: 123},
+                params: {
+                    codProcesso: 1,
+                    siglaUnidade: "TEST",
+                },
             });
     });
 
@@ -145,7 +158,10 @@ describe("SubprocessoCards.vue", () => {
 
             expect(pushMock).toHaveBeenCalledWith({
                 name: "OcupacoesCriticas",
-                params: {codSubprocesso: 123},
+                params: {
+                    codProcesso: 1,
+                    siglaUnidade: "TEST",
+                },
             });
     });
   });

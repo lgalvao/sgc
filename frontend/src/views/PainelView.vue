@@ -129,7 +129,7 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaAsc.value = !alertaAsc.value;
   } else {
     alertaCriterio.value = campo;
-    alertaAsc.value = campo === "data" ? false : true;
+    alertaAsc.value = campo !== "data";
   }
   alertasStore.buscarAlertas(
     Number(perfil.servidorId) || 0,

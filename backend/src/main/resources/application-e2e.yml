@@ -27,3 +27,20 @@ management:
     health:
       enabled: true
 
+# Configuração de logging otimizada para e2e
+logging:
+  pattern:
+    # Sem timestamp para economizar tokens e melhorar cache
+    # Com localização do código (classe.método:linha) para debug
+    console: "%-5level %logger{36}.%M:%L - %msg%n"
+  level:
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.orm.jpa: ERROR
+    org.springframework.jdbc: ERROR
+    com.zaxxer.hikari: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
+    sgc: INFO

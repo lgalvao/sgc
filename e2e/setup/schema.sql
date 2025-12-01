@@ -29,7 +29,7 @@ create table if not exists sgc.unidade
     sigla                    varchar(20),
     situacao                 varchar(20) check (situacao in ('ATIVA', 'INATIVA')),
     tipo                     varchar(20) check (tipo in
-                                                ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'ADMINISTRATIVA')),
+                                                ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')),
     nome                     varchar(255),
     primary key (codigo)
 );
@@ -197,7 +197,7 @@ create table if not exists sgc.unidade_processo
     sigla                   varchar(20),
     situacao                varchar(20),
     tipo                    varchar(20) check (tipo in
-                                               ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'ADMINISTRATIVA')),
+                                               ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')),
     nome                    varchar(255),
     primary key (codigo)
 );

@@ -9,7 +9,7 @@ const mockUnidades: Unidade[] = [
   {
     sigla: "SEDOC",
     nome: "Seção de Desenvolvimento Organizacional e Capacitação",
-    tipo: "ADMINISTRATIVA",
+    tipo: "INTEROPERACIONAL",
     idServidorTitular: 7,
     responsavel: null,
     codigo: 1,
