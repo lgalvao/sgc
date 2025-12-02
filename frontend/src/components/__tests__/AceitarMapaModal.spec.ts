@@ -44,7 +44,7 @@ describe("AceitarMapaModal.vue", () => {
     it("deve renderizar o modal com o perfil padrão (não ADMIN)", () => {
         const wrapper = createWrapper({perfil: "CHEFE"});
 
-    const corpoModal = wrapper.find('[data-testid="mdl-aceite-mapa-body"]');
+    const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
     expect(corpoModal.exists()).toBe(true);
         expect(corpoModal.text()).toContain("Observações");
         expect(
@@ -55,7 +55,7 @@ describe("AceitarMapaModal.vue", () => {
     it("deve renderizar o modal com o perfil ADMIN", () => {
         const wrapper = createWrapper({perfil: "ADMIN"});
 
-    const corpoModal = wrapper.find('[data-testid="mdl-aceite-mapa-body"]');
+    const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
     expect(corpoModal.exists()).toBe(true);
         expect(corpoModal.text()).toContain(
             "Confirma a homologação do mapa de competências?",
