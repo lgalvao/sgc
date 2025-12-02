@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     :title="tipo === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
     size="lg"
@@ -10,6 +11,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle" />
       Selecione as unidades que terão seus cadastros {{

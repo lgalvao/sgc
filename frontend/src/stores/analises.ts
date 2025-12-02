@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import { ToastService } from "@/services/toastService";
+import { useFeedbackStore } from "@/stores/feedback";
 
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
@@ -9,6 +9,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 
 export const useAnalisesStore = defineStore("analises", () => {
     const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
+    const feedbackStore = useFeedbackStore();
 
     const obterAnalisesPorSubprocesso = computed(() => (codSubrocesso: number) => {
         return analisesPorSubprocesso.value.get(codSubrocesso) || [];
@@ -27,9 +28,10 @@ export const useAnalisesStore = defineStore("analises", () => {
                 ...analisesFiltradas,
             ]);
         } catch {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro",
                 "Erro ao buscar histórico de análises de cadastro.",
+                "danger"
             );
         }
     }
@@ -48,9 +50,10 @@ export const useAnalisesStore = defineStore("analises", () => {
                 ...analisesFiltradas,
             ]);
         } catch {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro",
                 "Erro ao buscar histórico de análises de validação.",
+                "danger"
             );
         }
     }

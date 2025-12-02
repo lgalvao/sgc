@@ -17,6 +17,7 @@
       variant="info"
       class="mt-4"
       :model-value="true"
+      :fade="false"
     >
       Nenhum processo finalizado.
     </BAlert>

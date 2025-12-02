@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BContainer, useToast} from "bootstrap-vue-next";
+import {BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -54,6 +54,7 @@ import TreeTable from "@/components/TreeTableView.vue";
 
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
 
 interface TreeTableItem {
@@ -74,7 +75,7 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const {processoDetalhe, subprocessosElegiveis} = storeToRefs(processosStore);
 const perfilStore = usePerfilStore();
-const toast = useToast(); // Instantiate toast
+const feedbackStore = useFeedbackStore();
 
 
 const mostrarModalBloco = ref(false);
@@ -174,18 +175,18 @@ async function executarFinalizacao() {
   if (!processo.value) return;
   try {
     await processosStore.finalizarProcesso(processo.value.codigo);
-    toast.create({
-        title: "Processo finalizado",
-        body: "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
-        props: { variant: 'success', value: true },
-    });
+    feedbackStore.show(
+        "Processo finalizado",
+        "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
+        "success"
+    );
     await router.push("/painel");
   } catch {
-    toast.create({
-        title: "Erro ao finalizar processo",
-        body: "Ocorreu um erro durante a finalização. Tente novamente.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+        "Erro ao finalizar processo",
+        "Ocorreu um erro durante a finalização. Tente novamente.",
+        "danger"
+    );
   }
 }
 
@@ -218,11 +219,11 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       .filter((u) => u.selecionada)
       .map((u) => u.sigla);
   if (unidadesSelecionadas.length === 0) {
-    toast.create({
-        title: "Nenhuma unidade selecionada",
-        body: "Selecione ao menos uma unidade para processar.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+        "Nenhuma unidade selecionada",
+        "Selecione ao menos uma unidade para processar.",
+        "danger"
+    );
     return;
   }
   try {
@@ -232,19 +233,19 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       tipoAcao: tipoAcaoBloco.value,
       unidadeUsuario: String(perfilStore.unidadeSelecionada) || "",
     });
-    toast.create({
-        title: `Cadastros ${tipoAcaoBloco.value === 'aceitar' ? 'aceitos' : 'homologados'} em bloco!`,
-        body: `Operação de ${tipoAcaoBloco.value} em bloco concluída com sucesso!`,
-        props: { variant: 'success', value: true },
-    });
+    feedbackStore.show(
+        `Cadastros ${tipoAcaoBloco.value === 'aceitar' ? 'aceitos' : 'homologados'} em bloco!`,
+        `Operação de ${tipoAcaoBloco.value} em bloco concluída com sucesso!`,
+        "success"
+    );
     fecharModalBloco();
     await router.push("/painel");
   } catch {
-    toast.create({
-        title: "Erro ao processar em bloco",
-        body: "Ocorreu um erro ao processar os cadastros em bloco.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+        "Erro ao processar em bloco",
+        "Ocorreu um erro ao processar os cadastros em bloco.",
+        "danger"
+    );
   }
 }
 

@@ -121,6 +121,7 @@
 
     <!-- Modal de Criar Nova Competência -->
     <BModal
+      :fade="false"
       v-model="mostrarModalCriarNovaCompetencia"
       :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       size="lg"
@@ -195,6 +196,7 @@
 
     <!-- Modal de Disponibilizar -->
     <BModal
+      :fade="false"
       v-model="mostrarModalDisponibilizar"
       title="Disponibilização do mapa de competências"
       data-testid="disponibilizar-modal"
@@ -231,6 +233,7 @@
         variant="info"
         class="mt-3"
         :model-value="true"
+        :fade="false"
         data-testid="notificacao-disponibilizacao"
       >
         {{ notificacaoDisponibilizacao }}
@@ -256,6 +259,7 @@
 
     <!-- Modal de Exclusão de Competência -->
     <BModal
+      :fade="false"
       v-model="mostrarModalExcluirCompetencia"
       title="Exclusão de competência"
       data-testid="excluir-competencia-modal"

@@ -16,21 +16,11 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadAtividades from "@/views/CadAtividades.vue";
 
 const pushMock = vi.fn();
-const toastCreateMock = vi.fn();
-
-vi.mock("bootstrap-vue-next", async () => {
-  const actual = await vi.importActual("bootstrap-vue-next");
-  return {
-    ...actual,
-    useToast: () => ({
-      create: toastCreateMock,
-    }),
-  };
-});
 
 vi.mock("vue-router", () => ({
   useRouter: () => ({
@@ -84,17 +74,6 @@ vi.mock("@/services/unidadesService", () => ({
 
 vi.mock("@/services/analiseService", () => ({
   listarAnalisesCadastro: vi.fn(),
-}));
-
-// Mock ToastService
-vi.mock("@/services/toastService", () => ({
-  ToastService: {
-    sucesso: vi.fn(),
-    erro: vi.fn(),
-    aviso: vi.fn(),
-    info: vi.fn(),
-  },
-  registerToast: vi.fn(),
 }));
 
 const mockAtividades = [
@@ -205,6 +184,7 @@ describe("CadAtividades.vue", () => {
     const processosStore = useProcessosStore();
     const subprocessosStore = useSubprocessosStore();
     const analisesStore = useAnalisesStore();
+    const feedbackStore = useFeedbackStore(); // Get feedback store
 
     return {
       wrapper,
@@ -212,6 +192,7 @@ describe("CadAtividades.vue", () => {
       processosStore,
       subprocessosStore,
       analisesStore,
+      feedbackStore,
     };
   }
 
@@ -544,19 +525,20 @@ describe("CadAtividades.vue", () => {
       mockMapaVisualizacao([...mockAtividades] as any) as any,
     );
 
-    const { wrapper: w } = createWrapper();
+    const { wrapper: w, feedbackStore } = createWrapper();
     wrapper = w;
     await flushPromises();
+
+    const showSpy = vi.spyOn(feedbackStore, "show");
 
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
     await flushPromises();
 
-    expect(toastCreateMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Atividades Incompletas",
-        body: expect.stringContaining("As seguintes atividades não têm conhecimentos associados"),
-      }),
+    expect(showSpy).toHaveBeenCalledWith(
+      "Atividades Incompletas",
+      expect.stringContaining("As seguintes atividades não têm conhecimentos associados"),
+      "warning"
     );
-    expect(toastCreateMock.mock.calls[0][0].body).toContain("Atividade 2");
+    expect(showSpy.mock.calls[0][1]).toContain("Atividade 2");
   });
 });

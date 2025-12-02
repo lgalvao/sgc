@@ -1,5 +1,6 @@
 <template>
   <BModal
+      :fade="false"
       :model-value="mostrar"
       title="Impacto no Mapa de Competências"
       size="lg"
@@ -16,7 +17,7 @@
     </div>
 
     <div v-else-if="impacto">
-      <BAlert v-if="!impacto.temImpactos" variant="success" :model-value="true">
+      <BAlert v-if="!impacto.temImpactos" variant="success" :model-value="true" :fade="false">
         <i class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
       </BAlert>
 
@@ -120,6 +121,7 @@ v-for="ativ in impacto.atividadesAlteradas"
         v-else
         variant="danger"
         :model-value="true"
+        :fade="false"
     >
       Não foi possível carregar os dados de impacto.
     </BAlert>

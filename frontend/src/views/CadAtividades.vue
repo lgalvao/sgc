@@ -272,6 +272,7 @@
     />
 
     <BModal
+      :fade="false"
       v-model="mostrarModalConfirmacao"
       :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
       centered
@@ -287,6 +288,7 @@
           v-if="atividadesSemConhecimento.length > 0"
           variant="warning"
           :model-value="true"
+          :fade="false"
         >
           <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
           <ul>
@@ -317,6 +319,7 @@
     </BModal>
 
     <BModal
+      :fade="false"
       v-model="mostrarModalHistorico"
       title="Histórico de Análise"
       centered
@@ -362,7 +365,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal, useToast} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";
@@ -372,6 +375,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -409,9 +413,9 @@ const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
+const feedbackStore = useFeedbackStore();
 
 const router = useRouter();
-const toast = useToast(); // Instantiate useToast
 
 useMapasStore();
 
@@ -579,11 +583,11 @@ function cancelarEdicaoAtividade() {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  toast.create({
-    title: "Importação Concluída",
-    body: "As atividades foram importadas para o seu mapa.",
-    props: { variant: 'success', value: true },
-  });
+  feedbackStore.show(
+    "Importação Concluída",
+    "As atividades foram importadas para o seu mapa.",
+    "success"
+  );
 }
 
 const { perfilSelecionado } = usePerfil();
@@ -652,11 +656,11 @@ function disponibilizarCadastro() {
     : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
-    toast.create({
-      title: "Ação não permitida",
-      body: `Ação permitida apenas na situação: "${situacaoEsperada}".`,
-      props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+      "Ação não permitida",
+      `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+      "danger"
+    );
     return;
   }
 
@@ -665,11 +669,11 @@ function disponibilizarCadastro() {
     const atividadesDescricoes = atividadesSemConhecimento.value
       .map((a) => `- ${a.descricao}`)
       .join("\n");
-    toast.create({
-      title: "Atividades Incompletas",
-      body: `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
-      props: { variant: 'warning', value: true },
-    });
+    feedbackStore.show(
+      "Atividades Incompletas",
+      `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
+      "warning"
+    );
     return;
   }
 

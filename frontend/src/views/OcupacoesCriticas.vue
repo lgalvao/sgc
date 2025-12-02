@@ -20,6 +20,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle me-2" />
       Identifique as ocupações críticas da unidade baseadas nas competências avaliadas no diagnóstico.
@@ -145,6 +146,7 @@
 
     <!-- Modal de confirmação -->
     <BModal
+      :fade="false"
       v-model="mostrarModalConfirmacao"
       title="Finalizar Identificação"
       centered
@@ -180,11 +182,12 @@ import {
   BFormInput,
   BFormSelect,
   BFormTextarea,
-  BModal, useToast,
+  BModal,
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -195,7 +198,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const toast = useToast(); // Instantiate toast
+const feedbackStore = useFeedbackStore();
 
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
@@ -245,11 +248,7 @@ const mostrarModalConfirmacao = ref(false);
 
 function adicionarOcupacao() {
   if (!novaOcupacao.value.nome.trim() || !novaOcupacao.value.descricao.trim()) {
-    toast.create({
-        title: "Dados incompletos",
-        body: "Preencha nome e descrição da ocupação.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show("Dados incompletos", "Preencha nome e descrição da ocupação.", "danger");
     return;
   }
 
@@ -268,20 +267,12 @@ function adicionarOcupacao() {
     competenciasCriticas: [],
   };
 
-  toast.create({
-      title: "Ocupação adicionada",
-      body: "Ocupação crítica adicionada!",
-      props: { variant: 'success', value: true },
-  });
+  feedbackStore.show("Ocupação adicionada", "Ocupação crítica adicionada!", "success");
 }
 
 function removerOcupacao(index: number) {
   ocupacoesCriticas.value.splice(index, 1);
-  toast.create({
-      title: "Ocupação removida",
-      body: "Ocupação crítica removida!",
-      props: { variant: 'success', value: true },
-  });
+  feedbackStore.show("Ocupação removida", "Ocupação crítica removida!", "success");
 }
 
 function finalizarIdentificacao() {
@@ -298,11 +289,7 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar identificação
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  toast.create({
-      title: "Identificação finalizada",
-      body: "A identificação de ocupações críticas foi concluída!",
-      props: { variant: 'success', value: true },
-  });
+  feedbackStore.show("Identificação finalizada", "A identificação de ocupações críticas foi concluída!", "success");
 
   fecharModalConfirmacao();
   router.push("/painel");

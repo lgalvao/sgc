@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Importação de atividades"
     size="lg"
@@ -12,6 +13,7 @@
       variant="danger"
       dismissible
       :model-value="true"
+      :fade="false"
       @dismissed="limparErroImportacao"
     >
       {{ erroImportacao }}

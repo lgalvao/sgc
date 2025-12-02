@@ -6,6 +6,7 @@
       v-model="alertState.show"
       :variant="alertState.variant"
       dismissible
+      :fade="false"
       class="mt-3"
     >
       <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
@@ -109,6 +110,7 @@
 
     <!-- Modal de confirmação CDU-05 -->
     <BModal
+      :fade="false"
       v-model="mostrarModalConfirmacao"
       title="Iniciar processo"
       centered
@@ -144,6 +146,7 @@
 
     <!-- Modal de confirmação de remoção -->
     <BModal
+      :fade="false"
       v-model="mostrarModalRemocao"
       title="Remover processo"
       centered
@@ -197,14 +200,21 @@ const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
 
-const alertState = ref({
+interface AlertState {
+  show: boolean;
+  variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+  title: string;
+  body: string;
+}
+
+const alertState = ref<AlertState>({
   show: false,
   variant: 'info',
   title: '',
   body: ''
 });
 
-function mostrarAlerta(variant: string, title: string, body: string) {
+function mostrarAlerta(variant: AlertState['variant'], title: string, body: string) {
   alertState.value = {
     show: true,
     variant,

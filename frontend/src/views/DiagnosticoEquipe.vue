@@ -20,6 +20,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle me-2" />
       Nesta etapa, os servidores da unidade devem avaliar a importância e o domínio das competências da unidade.
@@ -85,6 +86,7 @@
       v-else
       variant="warning"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-exclamation-triangle me-2" />
       Nenhum mapa de competências disponível para diagnóstico.
@@ -92,6 +94,7 @@
 
     <!-- Modal de confirmação -->
     <BModal
+      :fade="false"
       v-model="mostrarModalConfirmacao"
       title="Finalizar Diagnóstico"
       centered
@@ -102,6 +105,7 @@
         v-if="avaliacoesPendentes.length > 0"
         variant="warning"
         :model-value="true"
+        :fade="false"
       >
         <strong>Atenção:</strong> As seguintes competências ainda não foram avaliadas:
         <ul class="mb-0 mt-2">
@@ -132,10 +136,11 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal, useToast,} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -146,7 +151,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const toast = useToast(); // Instantiate useToast
+const feedbackStore = useFeedbackStore();
 
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
@@ -232,11 +237,7 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar diagnóstico
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  toast.create({
-      title: "Diagnóstico finalizado",
-      body: "O diagnóstico da equipe foi concluído!",
-      props: { variant: 'success', value: true },
-  });
+  feedbackStore.show("Diagnóstico finalizado", "O diagnóstico da equipe foi concluído!", "success");
 
   fecharModalConfirmacao();
   router.push("/painel");

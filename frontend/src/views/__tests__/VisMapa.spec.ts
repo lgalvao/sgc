@@ -4,9 +4,9 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createMemoryHistory, createRouter} from "vue-router";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import { ToastService } from "@/services/toastService"; // Import ToastService
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
 import {SituacaoSubprocesso} from "@/types/tipos";
 import VisMapa from "../VisMapa.vue";
 
@@ -32,39 +32,6 @@ const router = createRouter({
   ],
 });
 
-// Mock ToastService
-vi.mock("@/services/toastService", () => ({
-  ToastService: {
-    sucesso: vi.fn(),
-    erro: vi.fn(),
-    aviso: vi.fn(),
-    info: vi.fn(),
-  },
-  registerToast: vi.fn(),
-}));
-
-// Mock useToast from bootstrap-vue-next
-vi.mock("bootstrap-vue-next", async (importOriginal) => {
-    const actual = await importOriginal<any>();
-    return {
-        ...actual,
-        useToast: () => ({
-            create: (options: any) => {
-                const variant = options.props?.variant || 'info';
-                if (variant === 'success') {
-                    ToastService.sucesso(options.title, options.body);
-                } else if (variant === 'danger') {
-                    ToastService.erro(options.title, options.body);
-                } else if (variant === 'warning') {
-                    ToastService.aviso(options.title, options.body);
-                } else {
-                    ToastService.info(options.title, options.body);
-                }
-            },
-        }),
-    };
-});
-
 describe("VisMapa.vue", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -76,7 +43,7 @@ describe("VisMapa.vue", () => {
     // If testing nested units, we might need to push a different route or just rely on the fact that component reads param.
     // Since router is global in this test file setup, we should push before mount if sigla changes.
 
-    return mount(VisMapa, {
+    const wrapper = mount(VisMapa, {
       global: {
         plugins: [
           createTestingPinia({
@@ -154,10 +121,13 @@ describe("VisMapa.vue", () => {
         },
       },
     });
+    
+    const feedbackStore = useFeedbackStore();
+    return { wrapper, feedbackStore };
   };
 
   it("renders correctly with data from store", async () => {
-    const wrapper = mountComponent();
+    const { wrapper } = mountComponent();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe(
@@ -173,7 +143,7 @@ describe("VisMapa.vue", () => {
 
   it("resolves nested unit from store", async () => {
     await router.push("/processo/1/CHILD/vis-mapa");
-    const wrapper = mountComponent(
+    const { wrapper } = mountComponent(
       {
         unidades: {
           unidades: [
@@ -206,7 +176,7 @@ describe("VisMapa.vue", () => {
   });
 
   it("shows buttons for CHEFE when MAPEAMENTO_CONCLUIDO", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "CHEFE" },
       processos: {
         processoDetalhe: {
@@ -229,7 +199,7 @@ describe("VisMapa.vue", () => {
   });
 
   it("shows buttons for GESTOR when MAPA_VALIDADO", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -255,9 +225,9 @@ describe("VisMapa.vue", () => {
   });
 
   it("opens validar modal and confirms", async () => {
-    const wrapper = mountComponent();
+    const { wrapper, feedbackStore } = mountComponent();
     const store = useProcessosStore();
-    vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
+    vi.spyOn(feedbackStore, "show");
 
     await wrapper.find('[data-testid="validar-btn"]').trigger("click");
     await wrapper.vm.$nextTick();
@@ -268,13 +238,13 @@ describe("VisMapa.vue", () => {
     await confirmBtn.trigger("click");
 
     expect(store.validarMapa).toHaveBeenCalledWith(10);
-    expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
+    expect(feedbackStore.show).toHaveBeenCalled();
   });
 
   it("opens sugestoes modal and confirms", async () => {
-    const wrapper = mountComponent();
+    const { wrapper, feedbackStore } = mountComponent();
     const store = useProcessosStore();
-    vi.spyOn(ToastService, "sucesso"); // Spy on ToastService
+    vi.spyOn(feedbackStore, "show");
 
     await wrapper
       .find('[data-testid="apresentar-sugestoes-btn"]')
@@ -292,11 +262,11 @@ describe("VisMapa.vue", () => {
     expect(store.apresentarSugestoes).toHaveBeenCalledWith(10, {
       sugestoes: "Minhas sugestões",
     });
-    expect(ToastService.sucesso).toHaveBeenCalled(); // Check ToastService
+    expect(feedbackStore.show).toHaveBeenCalled();
   });
 
   it("opens devolucao modal and confirms (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper, feedbackStore } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -312,7 +282,7 @@ describe("VisMapa.vue", () => {
       },
     });
     const store = useSubprocessosStore();
-    vi.spyOn(ToastService, "erro"); // Spy on ToastService
+    vi.spyOn(feedbackStore, "show");
 
     await wrapper.find('[data-testid="devolver-ajustes-btn"]').trigger("click");
     await wrapper.vm.$nextTick();
@@ -330,11 +300,11 @@ describe("VisMapa.vue", () => {
     expect(store.devolverRevisaoCadastro).toHaveBeenCalledWith(10, {
       observacoes: "Ajustar X",
     });
-    expect(ToastService.erro).not.toHaveBeenCalled(); // Should not show error on success
+    expect(feedbackStore.show).not.toHaveBeenCalled(); // Should not show error on success (and success toast is not called in this path in component, only navigation)
   });
 
   it("opens aceitar modal and confirms (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -367,7 +337,7 @@ describe("VisMapa.vue", () => {
   });
 
   it("confirms homologacao (ADMIN)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "ADMIN" },
       processos: {
         processoDetalhe: {
@@ -408,7 +378,7 @@ describe("VisMapa.vue", () => {
       },
     ];
 
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       analises: {
         analisesPorSubprocesso: new Map([[10, analisesData]]),
       },
@@ -428,7 +398,7 @@ describe("VisMapa.vue", () => {
   });
 
   it("view suggestions (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {

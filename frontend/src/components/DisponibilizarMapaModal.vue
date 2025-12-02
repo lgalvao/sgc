@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Disponibilizar Mapa"
     header-bg-variant="primary"

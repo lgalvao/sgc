@@ -90,6 +90,7 @@
 
     <!-- Modal de Validação -->
     <BModal
+      :fade="false"
       v-model="mostrarModalValidar"
       :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
       centered
@@ -130,6 +131,7 @@
 
     <!-- Modal de Devolução -->
     <BModal
+      :fade="false"
       v-model="mostrarModalDevolver"
       :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
       centered

@@ -48,6 +48,7 @@
       variant="success"
       class="mt-3"
       :model-value="true"
+      :fade="false"
     >
       {{ mensagemSucesso }}
     </BAlert>

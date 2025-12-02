@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     :title="tipoAcao === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
     size="lg"

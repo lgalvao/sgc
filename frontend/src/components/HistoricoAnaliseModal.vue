@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Histórico de Análises"
     size="lg"
@@ -12,6 +13,7 @@
         v-if="analises.length === 0"
         variant="info"
         :model-value="true"
+        :fade="false"
       >
         Nenhuma análise registrada para este subprocesso.
       </BAlert>

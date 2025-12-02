@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrarModal"
     title="Alterar data limite"
     centered

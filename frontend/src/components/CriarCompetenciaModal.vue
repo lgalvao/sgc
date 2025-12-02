@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
     size="lg"

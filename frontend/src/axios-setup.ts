@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "./router";
-import { ToastService } from "@/services/toastService";
+import { useFeedbackStore } from "@/stores/feedback";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
@@ -10,6 +10,7 @@ const apiClient = axios.create({
 });
 
 const handleResponseError = (error: any) => {
+  const feedbackStore = useFeedbackStore();
   try {
       if (error && typeof error === "object" && "response" in error) {
       const { status, data } = (error as any).response;
@@ -23,27 +24,30 @@ const handleResponseError = (error: any) => {
               }
 
       if (status === 401) {
-          ToastService.erro(
+          feedbackStore.show(
               "Não Autorizado",
               "Sua sessão expirou ou você não está autenticado. Faça login novamente.",
+              "danger"
           );
           router.push("/login");
       } else if (data && data.message) {
         // For other errors (like 500), show a generic popup
-          ToastService.erro("Erro Inesperado", data.message);
+          feedbackStore.show("Erro Inesperado", data.message, "danger");
       } else {
-          ToastService.erro(
+          feedbackStore.show(
               "Erro Inesperado",
               "Ocorreu um erro. Tente novamente mais tarde.",
+              "danger"
           );
       }
       } else if (error && typeof error === "object" && "request" in error) {
-          ToastService.erro(
+          feedbackStore.show(
               "Erro de Rede",
               "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
+              "danger"
           );
       } else if (error && typeof error === "object" && "message" in error) {
-          ToastService.erro("Erro", (error as any).message);
+          feedbackStore.show("Erro", (error as any).message, "danger");
     }
   } catch (storeError) {
       console.error("Erro ao exibir notificação:", storeError);

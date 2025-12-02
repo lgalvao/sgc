@@ -146,6 +146,7 @@
     />
 
     <BModal
+      :fade="false"
       v-model="mostrarModalSugestoes"
       title="Apresentar Sugestões"
       centered
@@ -183,6 +184,7 @@
     </BModal>
 
     <BModal
+      :fade="false"
       v-model="mostrarModalVerSugestoes"
       title="Sugestões"
       centered
@@ -209,6 +211,7 @@
     </BModal>
 
     <BModal
+      :fade="false"
       v-model="mostrarModalValidar"
       title="Validar Mapa de Competências"
       centered
@@ -234,6 +237,7 @@
     </BModal>
 
     <BModal
+      :fade="false"
       v-model="mostrarModalDevolucao"
       title="Devolução"
       centered
@@ -272,6 +276,7 @@
     </BModal>
 
     <BModal
+      :fade="false"
       v-model="mostrarModalHistorico"
       title="Histórico de Análise"
       centered
@@ -317,7 +322,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal, useToast,} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -325,6 +330,7 @@ import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -338,7 +344,7 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 const unidadesStore = useUnidadesStore();
 const mapaStore = useMapasStore();
 const processosStore = useProcessosStore();
-const toast = useToast(); // Instantiate toast
+const feedbackStore = useFeedbackStore();
 
 const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
@@ -500,22 +506,22 @@ async function confirmarSugestoes() {
 
     fecharModalSugestoes();
 
-    toast.create({
-        title: "Sugestões apresentadas",
-        body: "Sugestões submetidas para análise da unidade superior",
-        props: { variant: 'success', value: true },
-    });
+    feedbackStore.show(
+      "Sugestões apresentadas",
+      "Sugestões submetidas para análise da unidade superior",
+      "success"
+    );
 
     await router.push({
       name: "Subprocesso",
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    toast.create({
-        title: "Erro ao apresentar sugestões",
-        body: "Ocorreu um erro. Tente novamente.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+      "Erro ao apresentar sugestões",
+      "Ocorreu um erro. Tente novamente.",
+      "danger"
+    );
   }
 }
 
@@ -526,22 +532,22 @@ async function confirmarValidacao() {
 
     fecharModalValidar();
 
-    toast.create({
-        title: "Mapa validado",
-        body: "Mapa validado e submetido para análise da unidade superior",
-        props: { variant: 'success', value: true },
-    });
+    feedbackStore.show(
+      "Mapa validado",
+      "Mapa validado e submetido para análise da unidade superior",
+      "success"
+    );
 
     await router.push({
       name: "Subprocesso",
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    toast.create({
-        title: "Erro ao validar mapa",
-        body: "Ocorreu um erro. Tente novamente.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show(
+      "Erro ao validar mapa",
+      "Ocorreu um erro. Tente novamente.",
+      "danger"
+    );
   }
 }
 

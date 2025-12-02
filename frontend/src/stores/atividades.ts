@@ -4,12 +4,13 @@ import {mapMapaVisualizacaoToAtividades} from "@/mappers/mapas";
 import * as atividadeService from "@/services/atividadeService";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import { ToastService } from "@/services/toastService"; // Import ToastService
+import { useFeedbackStore } from "@/stores/feedback";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
+    const feedbackStore = useFeedbackStore();
 
     const obterAtividadesPorSubprocesso = computed(
         () =>
@@ -24,9 +25,10 @@ export const useAtividadesStore = defineStore("atividades", () => {
             const atividades = mapMapaVisualizacaoToAtividades(mapa);
             atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao buscar atividades",
                 "Não foi possível carregar as atividades para o subprocesso.",
+                "danger"
             );
             atividadesPorSubprocesso.value.set(codSubrocesso, []);
             throw error; // Re-throw to propagate error to UI
@@ -51,7 +53,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             // After adding, re-fetch to ensure data consistency, especially if backend logic changes
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.");
+            feedbackStore.show("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.", "danger");
             throw error;
         }
     }
@@ -68,7 +70,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             // Re-fetch to ensure data consistency
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao remover atividade", "Não foi possível remover a atividade.");
+            feedbackStore.show("Erro ao remover atividade", "Não foi possível remover a atividade.", "danger");
             throw error;
         }
     }
@@ -97,7 +99,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             atividadesPorSubprocesso.value.set(codSubrocesso, updatedAtividades);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao adicionar conhecimento", "Não foi possível adicionar o conhecimento.");
+            feedbackStore.show("Erro ao adicionar conhecimento", "Não foi possível adicionar o conhecimento.", "danger");
             throw error;
         }
     }
@@ -126,7 +128,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao remover conhecimento", "Não foi possível remover o conhecimento.");
+            feedbackStore.show("Erro ao remover conhecimento", "Não foi possível remover o conhecimento.", "danger");
             throw error;
         }
     }
@@ -143,7 +145,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             // Recarregar as atividades do subprocesso de destino para refletir a importação
             await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
         } catch (error) {
-            ToastService.erro("Erro ao importar atividades", "Não foi possível importar as atividades.");
+            feedbackStore.show("Erro ao importar atividades", "Não foi possível importar as atividades.", "danger");
             throw error;
         }
     }
@@ -164,7 +166,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao atualizar atividade", "Não foi possível atualizar a atividade.");
+            feedbackStore.show("Erro ao atualizar atividade", "Não foi possível atualizar a atividade.", "danger");
             throw error;
         }
     }
@@ -198,7 +200,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
             atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
         } catch (error) {
-            ToastService.erro("Erro ao atualizar conhecimento", "Não foi possível atualizar o conhecimento.");
+            feedbackStore.show("Erro ao atualizar conhecimento", "Não foi possível atualizar o conhecimento.", "danger");
             throw error;
         }
     }

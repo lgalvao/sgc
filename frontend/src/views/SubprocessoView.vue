@@ -44,13 +44,14 @@
 </template>
 
 <script lang="ts" setup>
-import {BContainer, useToast} from "bootstrap-vue-next";
+import {BContainer} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
@@ -60,7 +61,7 @@ const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 const subprocessosStore = useSubprocessosStore();
 
 const mapaStore = useMapasStore();
-const toast = useToast(); // Instantiate toast
+const feedbackStore = useFeedbackStore();
 
 const mostrarModalAlterarDataLimite = ref(false);
 const codSubprocesso = ref<number | null>(null);
@@ -95,11 +96,7 @@ function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
     mostrarModalAlterarDataLimite.value = true;
   } else {
-    toast.create({
-        title: "Ação não permitida",
-        body: "Você não tem permissão para alterar a data limite.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show("Ação não permitida", "Você não tem permissão para alterar a data limite.", "danger");
   }
 }
 
@@ -118,17 +115,9 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
         {novaData},
     );
     fecharModalAlterarDataLimite();
-    toast.create({
-        title: "Data limite alterada",
-        body: "A data limite foi alterada com sucesso!",
-        props: { variant: 'success', value: true },
-    });
+    feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
   } catch {
-    toast.create({
-        title: "Erro ao alterar data limite",
-        body: "Não foi possível alterar a data limite.",
-        props: { variant: 'danger', value: true },
-    });
+    feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
   }
 }
 </script>

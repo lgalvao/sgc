@@ -87,6 +87,7 @@
           variant="success"
           class="mt-3"
           :model-value="true"
+          :fade="false"
         >
           Atribuição criada!
         </BAlert>
@@ -95,6 +96,7 @@
           variant="danger"
           class="mt-3"
           :model-value="true"
+          :fade="false"
         >
           {{ erroApi }}
         </BAlert>

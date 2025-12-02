@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrarModal"
     :title="tituloModal"
     :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"

@@ -5,27 +5,30 @@
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.5.x-green.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.x-blue.svg)](https://www.typescriptlang.org/)
 
-Sistema para gerenciar sistematicamente as competências técnicas das unidades organizacionais do TRE-PE, incluindo mapeamento, revisão e diagnóstico de competências.
+Sistema para gerenciar sistematicamente as competências técnicas das unidades organizacionais do TRE-PE, incluindo
+mapeamento, revisão e diagnóstico de competências.
 
 ---
 
-## 📋 Visão Geral
+## Visão Geral
 
 O SGC permite:
 
 - **Mapeamento de Competências**: Coleta sistemática de atividades e conhecimentos de cada unidade operacional
 - **Revisão Periódica de Competências**: Atualização dos mapas de competencias
-- **Diagnóstico de Competências e Ocupações Críticas**: Avaliação de importância e domínio das competências, identificando gaps
+- **Diagnóstico de Competências e Ocupações Críticas**: Avaliação de importância e domínio das competências,
+  identificando gaps
+
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ### Stack Tecnológico
 
 **Backend:**
 
-- Java 21
-- Spring Boot 3.5.7
+- Java 25
+- Spring Boot 3.5.x
 - JPA/Hibernate
 - Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
@@ -37,17 +40,18 @@ O SGC permite:
 - Vite (build)
 - Pinia (estado)
 - Vue Router (rotas)
-- Bootstrap 5
+- BootstrapVueNext
 - Axios (cliente http)
 
 **Testes:**
 
-- JUnit 5 (testes unitários do backend)
+- JUnit (testes unitários do backend)
 - Vitest (testes unitários do frontend)
+- Playwright (testes end-to-end)
 
 ### Estrutura do Projeto
 
-```
+```text
 sgc/
 ├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
@@ -83,29 +87,14 @@ sgc/
 ├── reqs/                 # Documentação de requisitos
 │   ├── cdu-01.md         # Caso de uso 01: Login
 │   ├── cdu-02.md         # Caso de uso 02: Criar processo
-│   ├── ...               # Ao toodo, 21 casos de uso documentados
-│   └── _informacoes-gerais.md
+│   ├── ...               # 21 casos de uso documentados
+│   └── _intro.md
 │
 ├── build.gradle.kts      # Build raiz (multi-projeto)
 └── AGENTS.md             # Guia para agentes de IA
 ```
 
 ---
-
-## 🚀 Quick Start
-
-### Pré-requisitos
-
-- **Java 21** (OpenJDK ou Oracle JDK)
-- **Node.js 18+** e npm
-- **PostgreSQL 14+** (apenas para produção)
-
-### 1. Clone o Repositório
-
-```bash
-git clone https://github.com/lgalvao/sgc.git
-cd sgc
-```
 
 ## 🧪 Testes
 
@@ -125,36 +114,36 @@ cd frontend
 npm run test:unit
 ```
 
-## 📊 Perfis Spring
-
----
-
 ## 📐 Domínios de Negócio
 
-### 1. Processo (Orquestrador)
+### 1. Processo
 
-Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Diagnóstico). Publica eventos de domínio para desacoplar módulos.
+Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Diagnóstico). Publica eventos de domínio para
+desacoplar módulos.
 
-### 2. Subprocesso (Máquina de Estados)
+### 2. Subprocesso
 
-Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico imutável de movimentações.
+Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico imutável de
+movimentações.
 
 ### 3. Mapa de Competências
 
-Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vinculado a uma unidade e pode ter diferentes situações (ATIVO, ARQUIVADO, etc.).
+Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vinculado a uma unidade e pode ter diferentes
+situações (ATIVO, ARQUIVADO, etc.).
 
 ### 4. Competências, Atividades e Conhecimentos
 
 - **Competência**: Elemento sintetizante (ex: "Desenvolvimento de Software")
 - **Atividade**: Ação específica (ex: "Desenvolver APIs REST")
-- **Conhecimento**: Saber técnico necessário (ex: "Spring Boot")
+- **Conhecimento**: Conhecimento técnico necessário (ex: "Spring Boot")
 
-### 5. Notificações e Alertas (Reativos)
+### 5. Notificações e Alertas
 
-Sistema orientado a eventos que reage aos eventos de domínio:
+Mecanismo orientado a eventos que reage aos eventos de domínio:
 
 - **Alertas**: Visíveis na interface do usuário
 - **Notificações**: E-mails assíncronos
+- **Movimentaçõees**: Registro de mudanças em análise
 
 ---
 
@@ -162,9 +151,10 @@ Sistema orientado a eventos que reage aos eventos de domínio:
 
 - **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
+- **[frontend/README.md](backend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
 
-### Swagger API
+### Especificação OpenAPI e Swagger
 
 ```
 http://localhost:10000/swagger-ui.html

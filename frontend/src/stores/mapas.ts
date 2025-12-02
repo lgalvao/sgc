@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import { ToastService } from "@/services/toastService"; // Import ToastService
+import { useFeedbackStore } from "@/stores/feedback";
 import type {ImpactoMapa} from "@/types/impacto";
 import type {
     Competencia,
@@ -20,15 +20,17 @@ export const useMapasStore = defineStore("mapas", () => {
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
+    const feedbackStore = useFeedbackStore();
 
     async function buscarMapaVisualizacao(codSubrocesso: number) {
         try {
             mapaVisualizacao.value =
                 await mapaService.obterMapaVisualizacao(codSubrocesso);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao buscar mapa de visualização",
                 "Não foi possível carregar o mapa para visualização.",
+                "danger"
             );
             mapaVisualizacao.value = null;
             throw error;
@@ -39,9 +41,10 @@ export const useMapasStore = defineStore("mapas", () => {
         try {
             mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao buscar mapa completo",
                 "Não foi possível carregar o mapa completo.",
+                "danger"
             );
             mapaCompleto.value = null;
             throw error;
@@ -55,7 +58,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 request,
             );
         } catch (error) {
-            ToastService.erro("Erro ao salvar mapa", "Não foi possível salvar o mapa.");
+            feedbackStore.show("Erro ao salvar mapa", "Não foi possível salvar o mapa.", "danger");
             throw error;
         }
     }
@@ -70,9 +73,10 @@ export const useMapasStore = defineStore("mapas", () => {
                 competencia,
             );
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao adicionar competência",
                 "Não foi possível adicionar a competência.",
+                "danger"
             );
             throw error;
         }
@@ -88,9 +92,10 @@ export const useMapasStore = defineStore("mapas", () => {
                 competencia,
             );
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao atualizar competência",
                 "Não foi possível atualizar a competência.",
+                "danger"
             );
             throw error;
         }
@@ -103,9 +108,10 @@ export const useMapasStore = defineStore("mapas", () => {
                 idCompetencia,
             );
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao remover competência",
                 "Não foi possível remover a competência.",
+                "danger"
             );
             throw error;
         }
@@ -115,9 +121,10 @@ export const useMapasStore = defineStore("mapas", () => {
         try {
             mapaAjuste.value = await mapaService.obterMapaAjuste(codSubrocesso);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao buscar mapa de ajuste",
                 "Não foi possível carregar o mapa para ajuste.",
+                "danger"
             );
             mapaAjuste.value = null;
             throw error;
@@ -128,9 +135,10 @@ export const useMapasStore = defineStore("mapas", () => {
         try {
             await mapaService.salvarMapaAjuste(codSubrocesso, request);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao salvar ajustes",
                 "Não foi possível salvar os ajustes do mapa.",
+                "danger"
             );
             throw error;
         }
@@ -141,9 +149,10 @@ export const useMapasStore = defineStore("mapas", () => {
             impactoMapa.value =
                 await mapaService.verificarImpactosMapa(codSubrocesso);
         } catch (error) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao buscar impacto do mapa",
                 "Não foi possível carregar o impacto do mapa.",
+                "danger"
             );
             impactoMapa.value = null;
             throw error;
@@ -157,9 +166,10 @@ export const useMapasStore = defineStore("mapas", () => {
         try {
             await mapaService.disponibilizarMapa(codSubrocesso, request);
         } catch (error: any) {
-            ToastService.erro(
+            feedbackStore.show(
                 "Erro ao disponibilizar mapa",
                 "Não foi possível disponibilizar o mapa.",
+                "danger"
             );
             throw error;
         }

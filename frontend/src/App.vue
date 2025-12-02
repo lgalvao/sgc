@@ -56,6 +56,7 @@ const shouldShowNavBarExtras = computed(() => {
         v-model="feedbackStore.currentFeedback.show"
         :variant="feedbackStore.currentFeedback.variant"
         dismissible
+        :fade="false"
         class="shadow-sm"
         style="pointer-events: auto; min-width: 300px; max-width: 600px;"
         data-testid="global-alert"

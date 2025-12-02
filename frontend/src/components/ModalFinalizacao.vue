@@ -1,7 +1,8 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
-    title="Finalização de processo"
+    :title="processoDescricao ? 'Finalização de processo' : 'Finalização'"
     header-bg-variant="success"
     header-text-variant="white"
     size="lg"
@@ -12,6 +13,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle" />
       Confirma a finalização do processo <strong>{{ processoDescricao }}</strong>?<br>

@@ -96,6 +96,7 @@
 
     <!-- Modal Mapas Vigentes -->
     <BModal
+      :fade="false"
       v-model="mostrarModalMapasVigentes"
       title="Mapas Vigentes"
       size="xl"
@@ -134,6 +135,7 @@
 
     <!-- Modal Diagnósticos de Gaps -->
     <BModal
+      :fade="false"
       v-model="mostrarModalDiagnosticosGaps"
       title="Diagnósticos de Gaps"
       size="xl"
@@ -192,6 +194,7 @@
 
     <!-- Modal Andamento Geral -->
     <BModal
+      :fade="false"
       v-model="mostrarModalAndamentoGeral"
       title="Andamento Geral dos Processos"
       size="xl"

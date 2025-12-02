@@ -114,8 +114,8 @@ A resposta de erro segue o padrão JSON definido na classe `ErroApi`.
 
 ## 5. Tecnologias e Ferramentas
 
-- **Java 21**: Uso de recursos modernos da linguagem.
-- **Spring Boot 3.5.7**: Framework base.
+- **Java 25**
+- **Spring Boot 3.5.x**: Framework base.
 - **Lombok**: Para redução de boilerplate (Getters, Setters, Builders).
 - **MapStruct**: Para conversão eficiente entre Entity e DTO.
 - **H2 Database**: Banco em memória para perfil de testes
