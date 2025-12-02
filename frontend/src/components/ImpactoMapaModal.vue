@@ -16,7 +16,7 @@
       </p>
     </div>
 
-    <div v-else-if="impacto">
+    <div v-else-if="impacto" data-testid="modal-impacto-body">
       <BAlert v-if="!impacto.temImpactos" variant="success" :model-value="true" :fade="false">
         <i class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
       </BAlert>
@@ -27,7 +27,7 @@
           <h5 class="text-success mb-3">
             <i class="bi bi-plus-circle me-2"/>Atividades Inseridas
           </h5>
-          <ul class="list-group">
+          <ul class="list-group" data-testid="lista-atividades-inseridas">
             <li
                 v-for="ativ in impacto.atividadesInseridas"
                 :key="ativ.codigo"
@@ -49,7 +49,7 @@
           <h5 class="text-danger mb-3">
             <i class="bi bi-dash-circle me-2"/>Atividades Removidas
           </h5>
-          <ul class="list-group">
+          <ul class="list-group" data-testid="lista-atividades-removidas">
             <li v-for="ativ in impacto.atividadesRemovidas" :key="ativ.codigo" class="list-group-item">
               <strong class="text-decoration-line-through text-muted">{{ ativ.descricao }}</strong>
             </li>
@@ -64,7 +64,7 @@
           <h5 class="text-primary mb-3">
             <i class="bi bi-pencil me-2"/>Atividades Alteradas
           </h5>
-          <ul class="list-group">
+          <ul class="list-group" data-testid="lista-atividades-alteradas">
             <li
 v-for="ativ in impacto.atividadesAlteradas"
                 :key="ativ.codigo"
@@ -84,6 +84,7 @@ v-for="ativ in impacto.atividadesAlteradas"
         <div
             v-if="impacto.competenciasImpactadas.length > 0"
             class="mb-4"
+            data-testid="lista-competencias-impactadas"
         >
           <h5 class="text-warning mb-3">
             <i class="bi bi-exclamation-triangle me-2"/>Competências Impactadas
@@ -130,6 +131,7 @@ v-for="ativ in impacto.atividadesAlteradas"
       <BButton
           variant="secondary"
           type="button"
+          data-testid="btn-fechar-impacto"
           @click="fechar"
       >
         Fechar

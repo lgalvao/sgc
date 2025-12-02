@@ -7,6 +7,7 @@
     responsive
     data-testid="tbl-alertas"
     :tbody-tr-class="rowClass"
+    :tbody-tr-attr="rowAttr"
     @row-clicked="emit('selecionar-alerta', $event)"
     @sort-changed="handleSortChange"
   >
@@ -48,5 +49,12 @@ const handleSortChange = (ctx: any) => {
   } else if (ctx.sortBy === "processo") {
     emit("ordenar", "processo");
   }
+};
+
+const rowAttr = (item: Alerta | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-alerta-${item.codigo}` };
+  }
+  return {};
 };
 </script>

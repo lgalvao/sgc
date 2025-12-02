@@ -29,7 +29,10 @@
     </div>
 
     <div class="table-responsive w-100">
-      <table class="table table-striped table-hover m-0">
+      <table
+        class="table table-striped table-hover m-0"
+        data-testid="tbl-tree"
+      >
         <colgroup>
           <col
             v-for="(column) in columns"

@@ -20,6 +20,7 @@
         </BButton>
         <BButton
           variant="outline-info"
+          data-testid="btn-vis-atividades-historico"
           @click="abrirModalHistoricoAnalise"
         >
           Histórico de análise

@@ -12,6 +12,7 @@
       <span
         v-if="index === 0 && item.children && item.children.length > 0"
         class="toggle-icon"
+        :data-testid="`btn-toggle-expand-${item.id}`"
         @click.stop="toggleExpand(item.id)"
       >
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']" />
