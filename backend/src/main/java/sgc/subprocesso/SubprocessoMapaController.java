@@ -56,7 +56,16 @@ public class SubprocessoMapaController {
      */
     @GetMapping("/{codigo}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
-    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal String tituloUsuario) {
+    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
+        String tituloUsuario;
+        if (principal instanceof String) {
+            tituloUsuario = (String) principal;
+        } else if (principal instanceof sgc.sgrh.model.Usuario) {
+            tituloUsuario = ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        } else {
+            tituloUsuario = principal != null ? principal.toString() : null;
+        }
+        if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         Usuario usuario = usuarioRepo.findById(tituloUsuario)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
         return impactoMapaService.verificarImpactos(codigo, usuario);
@@ -219,8 +228,17 @@ public class SubprocessoMapaController {
     public ResponseEntity<Void> disponibilizarMapa(
         @PathVariable Long codigo,
         @RequestBody @Valid DisponibilizarMapaRequest request,
-        @AuthenticationPrincipal String tituloUsuario
+        @AuthenticationPrincipal Object principal
     ) {
+        String tituloUsuario;
+        if (principal instanceof String) {
+            tituloUsuario = (String) principal;
+        } else if (principal instanceof sgc.sgrh.model.Usuario) {
+            tituloUsuario = ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        } else {
+            tituloUsuario = principal != null ? principal.toString() : null;
+        }
+        if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         Usuario usuario = usuarioRepo.findById(tituloUsuario)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
         subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);

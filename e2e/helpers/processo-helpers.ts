@@ -19,22 +19,22 @@ export async function criarProcesso(page: Page, options: {
     unidade: string;
     expandir?: string[];
 }): Promise<void> {
-    await page.getByTestId('btn-criar-processo').click();
+    await page.getByTestId('btn-painel-criar-processo').click();
     await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-    await page.getByTestId('input-descricao').fill(options.descricao);
-    await page.getByTestId('select-tipo').selectOption(options.tipo);
-    await page.getByTestId('input-dataLimite').fill(calcularDataLimite(options.diasLimite));
+    await page.getByTestId('inp-processo-descricao').fill(options.descricao);
+    await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
+    await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(options.diasLimite));
 
     if (options.expandir) {
         for (const sigla of options.expandir) {
-            await page.getByTestId(`btn-expand-${sigla}`).click();
+            await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
         }
     }
 
     // Usar getByTestId ao invés de getByRole para respeitar disabled
-    await page.getByTestId(`chk-${options.unidade}`).check();
-    await page.getByTestId('btn-salvar').click();
+    await page.getByTestId(`chk-arvore-unidade-${options.unidade}`).check();
+    await page.getByTestId('btn-processo-salvar').click();
 
     await expect(page).toHaveURL(/\/painel/);
 }
@@ -47,7 +47,7 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     situacao: string;
     tipo: string;
 }): Promise<void> {
-    await expect(page.getByTestId('tabela-processos')).toBeVisible();
+    await expect(page.getByTestId('tbl-processos')).toBeVisible();
     await expect(page.getByText(options.descricao)).toBeVisible();
 
     const linhaProcesso = page.locator('tr', { has: page.getByText(options.descricao) });

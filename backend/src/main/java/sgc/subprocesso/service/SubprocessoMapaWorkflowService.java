@@ -102,6 +102,9 @@ public class SubprocessoMapaWorkflowService {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(subprocesso);
 
+        if (request.getDataLimite() == null) {
+            throw new ErroValidacao("A data limite para validação é obrigatória.");
+        }
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
         repositorioSubprocesso.save(subprocesso);

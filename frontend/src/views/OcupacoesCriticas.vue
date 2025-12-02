@@ -146,8 +146,8 @@
 
     <!-- Modal de confirmação -->
     <BModal
-      :fade="false"
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Finalizar Identificação"
       centered
       hide-footer

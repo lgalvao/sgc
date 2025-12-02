@@ -94,8 +94,8 @@
 
     <!-- Modal de confirmação -->
     <BModal
-      :fade="false"
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Finalizar Diagnóstico"
       centered
       hide-footer

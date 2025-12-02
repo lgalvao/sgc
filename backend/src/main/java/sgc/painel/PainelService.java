@@ -21,7 +21,10 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,12 +126,7 @@ public class PainelService {
                 : null;
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
 
-        String unidadesParticipantes = processo.getParticipantes() != null
-                ? processo.getParticipantes().stream()
-                        .map(Unidade::getSigla)
-                        .sorted()
-                        .collect(Collectors.joining(", "))
-                : "";
+        String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
 
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
@@ -142,6 +140,61 @@ public class PainelService {
                 .unidadesParticipantes(unidadesParticipantes)
                 .linkDestino(linkDestino)
                 .build();
+    }
+
+    private String formatarUnidadesParticipantes(Set<Unidade> participantes) {
+        if (participantes == null || participantes.isEmpty()) {
+            return "";
+        }
+        Map<Long, Unidade> participantesPorCodigo = participantes.stream()
+                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
+        Set<Long> participantesIds = participantesPorCodigo.keySet();
+
+        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds);
+        return unidadesVisiveis.stream()
+                .map(participantesPorCodigo::get)
+                .filter(unidade -> unidade != null && unidade.getSigla() != null)
+                .map(Unidade::getSigla)
+                .sorted()
+                .collect(Collectors.joining(", "));
+    }
+
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds) {
+        Set<Long> visiveis = new LinkedHashSet<>();
+        for (Long unidadeId : participantesIds) {
+            Unidade unidade = unidadeRepo.findById(unidadeId).orElse(null);
+            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds);
+            if (candidato != null) {
+                visiveis.add(candidato);
+            }
+        }
+        return visiveis;
+    }
+
+    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds) {
+        if (unidade == null || !participantesIds.contains(unidade.getCodigo())) {
+            return null;
+        }
+        Unidade atual = unidade;
+        while (true) {
+            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds)) {
+                return atual.getCodigo();
+            }
+            Unidade superior = atual.getUnidadeSuperior();
+            if (superior == null || !participantesIds.contains(superior.getCodigo())) {
+                return atual.getCodigo();
+            }
+            atual = superior;
+        }
+    }
+
+    private boolean todasSubordinadasParticipam(Long codigo, Set<Long> participantesIds) {
+        for (Long subordinadaId : obterIdsUnidadesSubordinadas(codigo)) {
+            if (!participantesIds.contains(subordinadaId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {

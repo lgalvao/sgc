@@ -33,7 +33,7 @@
         <BButton
           variant="outline-primary"
           class="mb-3"
-          data-testid="btn-criar-competencia"
+          data-testid="btn-abrir-criar-competencia"
           @click="() => abrirModalCriarNovaCompetencia()"
         >
           <i class="bi bi-plus-lg" /> Criar competência
@@ -121,8 +121,8 @@
 
     <!-- Modal de Criar Nova Competência -->
     <BModal
-      :fade="false"
       v-model="mostrarModalCriarNovaCompetencia"
+      :fade="false"
       :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       size="lg"
       centered
@@ -196,8 +196,8 @@
 
     <!-- Modal de Disponibilizar -->
     <BModal
-      :fade="false"
       v-model="mostrarModalDisponibilizar"
+      :fade="false"
       title="Disponibilização do mapa de competências"
       data-testid="disponibilizar-modal"
       centered
@@ -259,8 +259,8 @@
 
     <!-- Modal de Exclusão de Competência -->
     <BModal
-      :fade="false"
       v-model="mostrarModalExcluirCompetencia"
+      :fade="false"
       title="Exclusão de competência"
       data-testid="excluir-competencia-modal"
       ok-title="Confirmar"

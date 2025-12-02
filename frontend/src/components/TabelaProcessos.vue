@@ -5,7 +5,7 @@
       :fields="fields"
       hover
       responsive
-      data-testid="tabela-processos"
+      data-testid="tbl-processos"
       :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
       :sort-desc="[!direcaoOrdenacaoAsc]"
       @row-clicked="handleSelecionarProcesso"

@@ -56,20 +56,19 @@ sgc/
 ├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
 │   │   ├── processo/     # Orquestrador dos fluxos de negócio (Mapeamento, Revisão, Diagnóstico)
-│   │   ├── subprocesso/  # Máquina de estados para o workflow de cada unidade
-│   │   ├── mapa/         # Gestão dos mapas de competências (criação, versionamento)
+│   │   ├── subprocesso/  # Workflow de cada unidade dentro de um processo
+│   │   ├── mapa/         # Gestão dos mapas de competências
 │   │   ├── atividade/    # CRUD de atividades e conhecimentos
-│   │   ├── analise/      # Trilha de auditoria imutável
+│   │   ├── analise/      # Trilha de auditoria
 │   │   ├── notificacao/  # Envio de notificações por e-mail
 │   │   ├── alerta/       # Alertas exibidos na interface
 │   │   ├── painel/       # Endpoints para os dashboards
 │   │   ├── sgrh/         # Integração com SGRH (usuários, perfis, unidades)
 │   │   ├── unidade/      # Representação da estrutura organizacional
-│   │   ├── util/         # Classes utilitárias
 │   │   └── comum/        # Componentes compartilhados (DTOs, exceções)
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
-│       └── data.sql             # Dados iniciais para testes
+│       └── application-e2e.yml     # Config para testes end-to-end (H2)
 │
 ├── frontend/             # Aplicação Vue.js
 │   ├── src/
@@ -103,7 +102,6 @@ sgc/
 ```bash
 ./gradlew :backend:test
 ```
-
 - Usa perfil `test` automaticamente
 - Banco H2 em memória (limpo a cada teste)
 
@@ -114,7 +112,7 @@ cd frontend
 npm run test:unit
 ```
 
-## 📐 Domínios de Negócio
+## Domínios de Negócio
 
 ### 1. Processo
 
@@ -123,13 +121,11 @@ desacoplar módulos.
 
 ### 2. Subprocesso
 
-Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico imutável de
-movimentações.
+Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico de movimentações.
 
 ### 3. Mapa de Competências
 
-Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vinculado a uma unidade e pode ter diferentes
-situações (ATIVO, ARQUIVADO, etc.).
+Cada mapa está vinculado a uma unidade e pode ter diferentes situações.
 
 ### 4. Competências, Atividades e Conhecimentos
 

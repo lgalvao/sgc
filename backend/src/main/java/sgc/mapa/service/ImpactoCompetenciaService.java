@@ -29,6 +29,7 @@ public class ImpactoCompetenciaService {
         List<Competencia> competenciasDoMapa = repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
+            if (atividadeDto.getCodigo() == null) continue;
             Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
@@ -46,6 +47,7 @@ public class ImpactoCompetenciaService {
         }
 
         for (AtividadeImpactadaDto atividadeDto : alteradas) {
+            if (atividadeDto.getCodigo() == null) continue;
             Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
@@ -77,6 +79,7 @@ public class ImpactoCompetenciaService {
     }
 
     public List<String> obterCompetenciasDaAtividade(Long codAtividade, Mapa mapaVigente) {
+        if (codAtividade == null) return Collections.emptyList();
         Atividade atividade = atividadeRepo.findById(codAtividade).orElse(null);
         if (atividade == null) return Collections.emptyList();
 

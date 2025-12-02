@@ -146,8 +146,8 @@
     />
 
     <BModal
-      :fade="false"
       v-model="mostrarModalSugestoes"
+      :fade="false"
       title="Apresentar Sugestões"
       centered
       hide-footer
@@ -184,8 +184,8 @@
     </BModal>
 
     <BModal
-      :fade="false"
       v-model="mostrarModalVerSugestoes"
+      :fade="false"
       title="Sugestões"
       centered
       hide-footer
@@ -211,8 +211,8 @@
     </BModal>
 
     <BModal
-      :fade="false"
       v-model="mostrarModalValidar"
+      :fade="false"
       title="Validar Mapa de Competências"
       centered
       hide-footer
@@ -237,8 +237,8 @@
     </BModal>
 
     <BModal
-      :fade="false"
       v-model="mostrarModalDevolucao"
+      :fade="false"
       title="Devolução"
       centered
       hide-footer
@@ -276,8 +276,8 @@
     </BModal>
 
     <BModal
-      :fade="false"
       v-model="mostrarModalHistorico"
+      :fade="false"
       title="Histórico de Análise"
       centered
       size="lg"

@@ -4,7 +4,7 @@
       <BButton
         variant="link"
         class="p-0 me-3 text-decoration-none"
-        data-testid="btn-voltar"
+        data-testid="btn-cad-atividades-voltar"
         @click="router.back()"
       >
         <i class="bi bi-arrow-left fs-4" />
@@ -15,7 +15,7 @@
           v-if="subprocesso"
           :class="badgeClass(subprocesso.situacaoSubprocesso)"
           class="badge fs-6"
-          data-testid="situacao-badge"
+          data-testid="txt-badge-situacao"
         >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
       </div>
     </div>
@@ -29,7 +29,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="impactos-mapa-button"
+          data-testid="btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -52,7 +52,7 @@
         <BButton
           v-if="isChefe"
           variant="outline-success"
-          data-testid="btn-disponibilizar"
+          data-testid="btn-cad-atividades-disponibilizar"
           title="Disponibilizar"
           @click="disponibilizarCadastro"
         >
@@ -69,7 +69,7 @@
       <BCol>
         <BFormInput
           v-model="novaAtividade"
-          data-testid="input-nova-atividade"
+          data-testid="inp-nova-atividade"
           placeholder="Nova atividade"
           type="text"
           aria-label="Nova atividade"
@@ -104,7 +104,7 @@
             <BFormInput
               v-model="atividadeEditada"
               class="me-2 atividade-edicao-input"
-              data-testid="input-editar-atividade"
+              data-testid="inp-editar-atividade"
               aria-label="Editar atividade"
             />
             <BButton
@@ -132,7 +132,7 @@
           <template v-else>
             <strong
               class="atividade-descricao"
-              data-testid="atividade-descricao"
+              data-testid="txt-atividade-descricao"
             >{{ atividade?.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <BButton
@@ -174,7 +174,7 @@
                   v-model="conhecimentoEmEdicao.descricao"
                   class="me-2"
                   size="sm"
-                  data-testid="input-editar-conhecimento"
+                  data-testid="inp-editar-conhecimento"
                   aria-label="Editar conhecimento"
                 />
                 <BButton
@@ -199,7 +199,7 @@
                 </BButton>
             </template>
             <template v-else>
-                <span data-testid="conhecimento-descricao">{{ conhecimento?.descricao }}</span>
+                <span data-testid="txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
                 <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                   <BButton
                     variant="outline-primary"
@@ -233,7 +233,7 @@
               <BFormInput
                 v-model="atividade.novoConhecimento"
                 size="sm"
-                data-testid="input-novo-conhecimento"
+                data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 type="text"
                 aria-label="Novo conhecimento"
@@ -272,8 +272,8 @@
     />
 
     <BModal
-      :fade="false"
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
       centered
       hide-footer
@@ -310,7 +310,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-confirmar-disponibilizacao"
+          data-testid="btn-mdl-disponibilizar-confirmar"
           @click="confirmarDisponibilizacao"
         >
           Confirmar
@@ -319,8 +319,8 @@
     </BModal>
 
     <BModal
-      :fade="false"
       v-model="mostrarModalHistorico"
+      :fade="false"
       title="Histórico de Análise"
       centered
       size="lg"
@@ -329,7 +329,7 @@
       <div class="table-responsive">
         <table
           class="table table-striped"
-          data-testid="historico-analise-tabela"
+          data-testid="tbl-historico-analise"
         >
           <thead>
             <tr>

@@ -31,9 +31,9 @@ management:
 logging:
   pattern:
     # Sem timestamp para economizar tokens e melhorar cache
-    # Com localização do código (classe.método:linha) para debug
-    console: "%-5level %logger{36}.%M:%L - %msg%n"
+    console: "%-5level %logger{30}.%M:%L - %msg%n"
   level:
+    sgc: INFO
     org.hibernate: ERROR
     org.hibernate.SQL: ERROR
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
@@ -43,4 +43,3 @@ logging:
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
-    sgc: DEBUG

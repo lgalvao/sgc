@@ -22,13 +22,6 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
      */
     List<Alerta> findByProcessoCodigo(Long codProcesso);
 
-    @Query("select a.codigo from Alerta a where a.processo.codigo in :procs")
-    List<Long> findIdsByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
-
-    @Modifying
-    @Query("delete from Alerta a where a.processo.codigo in :procs")
-    void deleteByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
-
     /**
      * Busca alertas destinados a um usuário específico, de forma paginada.
      * @param tituloEleitoral O título de eleitor do usuário.

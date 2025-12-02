@@ -24,10 +24,10 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         // Aguarda carregamento dos dados
-        await expect(page.getByTestId('input-descricao')).toHaveValue(descricao);
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
         // 3. Clica em Iniciar
-        await page.getByTestId('btn-iniciar-processo').click();
+        await page.getByTestId('btn-processo-iniciar').click();
 
         // 4. Verifica Modal
         const modal = page.getByRole('dialog');
@@ -35,14 +35,14 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
 
         // 5. Cancela
-        await page.getByTestId('btn-modal-cancelar').click();
+        await page.getByTestId('btn-mdl-iniciar-cancelar').click();
         await expect(modal).not.toBeVisible();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         // 6. Inicia novamente e Confirma
-        await page.getByTestId('btn-iniciar-processo').click();
+        await page.getByTestId('btn-processo-iniciar').click();
         await expect(modal).toBeVisible();
-        await page.getByTestId('btn-modal-confirmar').click();
+        await page.getByTestId('btn-mdl-iniciar-confirmar').click();
 
         // 7. Verifica redirecionamento e Status
         await expect(page).toHaveURL(/\/painel/);

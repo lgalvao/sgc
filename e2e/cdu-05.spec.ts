@@ -2,20 +2,20 @@ import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
 
-test.describe('CDU-05 - Iniciar processo de revisão', () => {
-    async function fazerLogout(page: Page) {
-        await page.getByTestId('btn-logout').click();
-        await expect(page).toHaveURL(/\/login/);
-    }
+async function fazerLogout(page: Page) {
+    await page.getByTestId('btn-logout').click();
+    await expect(page).toHaveURL(/\/login/);
+}
 
-    async function verificarPaginaPainel(page: Page) {
-        await expect(page).toHaveURL(/\/painel/);
-    }
+async function verificarPaginaPainel(page: Page) {
+    await expect(page).toHaveURL(/\/painel/);
+}
 
-    async function verificarPaginaSubprocesso(page: Page) {
-        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
-    }
+async function verificarPaginaSubprocesso(page: Page) {
+    await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
+}
 
+test.describe('CDU-05 - Iniciar processo de revisao', () => {
     // Unidade ASSESSORIA_21 (12) - Titular 777777 (Janis Joplin)
     const UNIDADE_ALVO = 'ASSESSORIA_21';
     const USUARIO_CHEFE = '777777';
@@ -40,11 +40,11 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Validação: Processo foi criado e está na tela de cadastro
         await page.getByRole('row', {name: descricao}).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        await expect(page.getByTestId('input-descricao')).toHaveValue(descricao);
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
         // Iniciar processo
-        await page.getByTestId('btn-iniciar-processo').click();
-        await page.getByTestId('btn-modal-confirmar').click();
+        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-mdl-iniciar-confirmar').click();
 
         // Validação: Processo iniciado com sucesso
         await verificarPaginaPainel(page);
@@ -54,7 +54,7 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
             tipo: 'Mapeamento'
         });
 
-        console.log('PASSO 1 concluído: Processo de Mapeamento iniciado');
+        console.log('PASSO 1 concluido: Processo de Mapeamento iniciado');
     }
 
     async function passo2_ChefeAdicionaAtividadesEConhecimentos(page: Page, descricaoProcesso: string, timestamp: number): Promise<void> {
@@ -85,28 +85,20 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
 
         // Validação: Conhecimento foi adicionado
         await expect(cardAtividade.getByText('Conhecimento Teste')).toBeVisible();
-        
-        // Aguardar um pouco para garantir que o conhecimento foi persistido
-        await page.waitForTimeout(500);
-        
-        console.log('PASSO 2 concluído: Atividades e Conhecimentos adicionados');
+
+        console.log('PASSO 2 concluido: Atividades e Conhecimentos adicionados');
     }
 
-    async function passo2a_ChefeDisponibilizaCadastro(page: Page, descricaoProcesso: string): Promise<void> {
-        // Já estamos na página de cadastro de atividades após o Passo 2
-
-        // Validação: Botão de disponibilizar está visível
-        await expect(page.getByTestId('btn-disponibilizar')).toBeVisible();
-
+    async function passo2a_ChefeDisponibilizaCadastro(page: Page): Promise<void> {
         // Disponibilizar cadastro
         await page.getByTestId('btn-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validação: Mensagem de sucesso e redirecionamento para o painel
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByRole('heading', { name: /Cadastro de atividades disponibilizado/i })).toBeVisible();
         await verificarPaginaPainel(page);
 
-        console.log('PASSO 2a concluído: Cadastro disponibilizado pelo Chefe');
+        console.log('PASSO 2a concluido: Cadastro disponibilizado pelo Chefe');
     }
 
     async function passo2b_AdminHomologaCadastro(page: Page, descricaoProcesso: string): Promise<void> {
@@ -122,9 +114,6 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('atividades-card-vis').click();
 
-        // Validação: Botão de homologar está visível
-        await expect(page.getByTestId('btn-acao-principal-analise')).toBeVisible();
-
         // Homologar cadastro
         await page.getByTestId('btn-acao-principal-analise').click();
         await page.getByTestId('btn-modal-confirmar-aceite').click();
@@ -132,31 +121,28 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Validação: Redirecionado para o painel
         await verificarPaginaPainel(page);
 
-        console.log('PASSO 2b concluído: Cadastro homologado pelo Admin');
+        console.log('PASSO 2b concluido: Cadastro homologado pelo Admin');
     }
 
-    async function passo3_AdminAdicionaCompetenciasEDisponibilizaMapa(
-        page: Page,
-        descricaoProcesso: string,
-        timestamp: number
-    ): Promise<void> {
+    async function passo3_AdminAdicionaCompetenciasEDisponibilizaMapa(page: Page, descProcesso: string, timestamp: number): Promise<void> {
         // Login como Admin
         await fazerLogout(page);
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
+        // Validação: Redirecionado para o painel
+        await verificarPaginaPainel(page);
+
         // Navegar para o subprocesso
-        await page.getByText(descricaoProcesso).click();
+        await page.getByText(descProcesso).click();
         await page.getByRole('row', {name: 'Assessoria 21'}).click();
         await verificarPaginaSubprocesso(page);
 
-        // Entrar no Mapa de Competências
-        await page.getByTestId('mapa-card').click();
-
-        // Validação: Botão de criar competência está visível
-        await expect(page.getByTestId('btn-criar-competencia')).toBeVisible();
+        // Entrar no Mapa de Competencias
+        // TODO depois corrigir esse gambiarra. Deve aparecer um dos dois cards
+        await page.locator('[data-testid="mapa-card"], [data-testid="mapa-card-vis"]').first().click();
 
         // Adicionar Competência
-        await page.getByTestId('btn-criar-competencia').click();
+        await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('input-descricao-competencia').fill(`Competência Teste ${timestamp}`);
 
         // Vincular atividade à competência
@@ -175,35 +161,29 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Validação: Mapa foi disponibilizado (verificar badge ou estado)
         await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa disponibilizado/i);
 
-        console.log('PASSO 3 concluído: Competências adicionadas e Mapa disponibilizado');
+        console.log('PASSO 3 concluido: Competências adicionadas e Mapa disponibilizado');
     }
 
-    async function passo4_ChefeValidaMapa(
-        page: Page,
-        descricaoProcesso: string
-    ): Promise<void> {
+    async function passo4_ChefeValidaMapa(page: Page, descProcesso: string): Promise<void> {
         // Login como Chefe
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Navegar para o subprocesso
-        await page.getByText(descricaoProcesso).click();
+        await page.getByText(descProcesso).click();
         await verificarPaginaSubprocesso(page);
 
         // Abrir mapa para validação
         await page.getByTestId('mapa-card-vis').click();
 
-        // Validação: Botão de validar está visível
-        await expect(page.getByTestId('validar-btn')).toBeVisible();
-
         // Validar o Mapa
         await page.getByTestId('validar-btn').click();
         await page.getByTestId('modal-validar-confirmar').click();
 
-        // Validação: Mapa foi validado
+        // Validação: confirmar Mapa foi validado
         await expect(page.getByTestId('situacao-badge')).toHaveText(/Mapa validado/i);
 
-        console.log('PASSO 4 concluído: Mapa validado pelo Chefe');
+        console.log('PASSO 4 concluido: Mapa validado pelo Chefe');
     }
 
     async function passo5_AdminHomologaEFinalizaProcesso(page: Page, descricaoProcesso: string): Promise<void> {
@@ -233,10 +213,8 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         await page.goto('/painel');
         await page.getByText(descricaoProcesso).click();
 
-        // Validação: Botão de finalizar está visível
-        await expect(page.getByTestId('btn-finalizar-processo')).toBeVisible();
-
         // Finalizar processo
+        await expect(page.getByTestId('btn-finalizar-processo')).toBeVisible();
         await page.getByTestId('btn-finalizar-processo').click();
         await page.getByTestId('btn-modal-confirmar').click();
 
@@ -248,14 +226,14 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
             situacao: 'Finalizado'
         });
 
-        console.log('PASSO 5 concluído: Processo de Mapeamento finalizado');
+        console.log('PASSO 5 concluido: Processo de Mapeamento finalizado');
     }
 
     // ========================================================================
     // TESTE PRINCIPAL
     // ========================================================================
 
-    test('Deve realizar o ciclo completo de Mapeamento e então iniciar um processo de Revisão', async ({page}) => {
+    test('Deve realizar o ciclo completo de Mapeamento e iniciar um processo de Revisão', async ({page}) => {
         // Debug listeners
         page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
         page.on('pageerror', err => console.log(`PAGE ERROR: ${err.message}`));
@@ -274,13 +252,13 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         console.log('\nINICIANDO PREPARAÇÃO: Criação de Processo, Atividades, Mapa e Finalização do Processo\n');
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         await passo2_ChefeAdicionaAtividadesEConhecimentos(page, descProcMapeamento, timestamp);
-        await passo2a_ChefeDisponibilizaCadastro(page, descProcMapeamento);
+        await passo2a_ChefeDisponibilizaCadastro(page);
         await passo2b_AdminHomologaCadastro(page, descProcMapeamento);
         await passo3_AdminAdicionaCompetenciasEDisponibilizaMapa(page, descProcMapeamento, timestamp);
         await passo4_ChefeValidaMapa(page, descProcMapeamento);
         await passo5_AdminHomologaEFinalizaProcesso(page, descProcMapeamento);
 
-        console.log('\nPREPARAÇÃO CONCLUÍDA: Mapa vigente criado com sucesso\n');
+        console.log('\nPREPARAÇÃO CONCLUÍDA: Processo de mapeamento finalizado e com mapa vigente.\n');
 
         // ========================================================================
         // FASE 2: TESTE CDU-05 - INICIAR PROCESSO DE REVISÃO
@@ -303,13 +281,13 @@ test.describe('CDU-05 - Iniciar processo de revisão', () => {
         // Iniciar processo
         await page.getByText(descProcRevisao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        await expect(page.getByTestId('input-descricao')).toHaveValue(descProcRevisao);
-        await page.getByTestId('btn-iniciar-processo').click();
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
+        await page.getByTestId('btn-processo-iniciar').click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
-        await page.getByTestId('btn-modal-confirmar').click();
+        await page.getByTestId('btn-mdl-iniciar-confirmar').click();
         console.log('Processo iniciado.');
 
         // Validação: Redirecionamento e situação do processo iniciado

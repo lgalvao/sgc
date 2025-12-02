@@ -5,7 +5,7 @@
     hover
     striped
     responsive
-    data-testid="tabela-alertas"
+    data-testid="tbl-alertas"
     :tbody-tr-class="rowClass"
     @row-clicked="emit('selecionar-alerta', $event)"
     @sort-changed="handleSortChange"

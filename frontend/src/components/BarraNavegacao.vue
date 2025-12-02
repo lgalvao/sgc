@@ -3,7 +3,7 @@
     <BButton
       v-if="shouldShowBackButton"
       class="btn btn-outline-secondary btn-sm"
-      data-testid="btn-voltar"
+      data-testid="btn-nav-voltar"
       @click="goBack"
     >
       <i class="bi bi-arrow-left" /> Voltar
@@ -12,7 +12,7 @@
     <BBreadcrumb
       v-if="shouldShowBreadcrumbs"
       class="mb-0"
-      data-testid="breadcrumbs"
+      data-testid="nav-breadcrumbs"
     >
       <BBreadcrumbItem
         v-for="(crumb, index) in crumbs"
@@ -24,7 +24,7 @@
           v-if="crumb.isHome"
           aria-label="Início"
           class="bi bi-house-door"
-          data-testid="breadcrumb-home-icon"
+          data-testid="btn-nav-home"
         />
         <span v-else>{{ crumb.label }}</span>
       </BBreadcrumbItem>

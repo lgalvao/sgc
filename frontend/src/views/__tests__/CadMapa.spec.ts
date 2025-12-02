@@ -274,7 +274,7 @@ describe("CadMapa.vue", () => {
     await flushPromises();
 
     await wrapper
-      .find('[data-testid="btn-criar-competencia"]')
+      .find('[data-testid="btn-abrir-criar-competencia"]')
       .trigger("click");
     expect(
       wrapper.find('[data-testid="criar-competencia-modal"]').exists(),

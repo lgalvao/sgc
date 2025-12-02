@@ -7,13 +7,13 @@
       >
         <h2
           class="mb-2 text-center"
-          data-testid="titulo-sgc"
+          data-testid="txt-login-titulo"
         >
           SGC
         </h2>
         <h5
           class="mb-4 text-center text-muted"
-          data-testid="subtitulo-sistema"
+          data-testid="txt-login-subtitulo"
         >
           Sistema de Gestão de Competências
         </h5>
@@ -26,7 +26,7 @@
             <label
               class="form-label"
               for="titulo"
-              data-testid="label-titulo"
+              data-testid="lbl-login-usuario"
             >
               <i class="bi bi-person-circle me-2" />
               Título eleitoral</label>
@@ -37,14 +37,14 @@
               autocomplete="username"
               placeholder="Digite seu título"
               type="text"
-              data-testid="input-titulo"
+              data-testid="inp-login-usuario"
             />
           </div>
           <div class="mb-3">
             <label
               class="form-label"
               for="senha"
-              data-testid="label-senha"
+              data-testid="lbl-login-senha"
             >
               <i class="bi bi-key me-2" />
               Senha</label>
@@ -55,19 +55,19 @@
               autocomplete="current-password"
               placeholder="Digite sua senha"
               type="password"
-              data-testid="input-senha"
+              data-testid="inp-login-senha"
             />
           </div>
 
           <div
             v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
             class="mb-3"
-            data-testid="secao-perfil-unidade"
+            data-testid="sec-login-perfil"
           >
             <label
               class="form-label"
               for="par"
-              data-testid="label-perfil-unidade"
+              data-testid="lbl-login-perfil"
             >Selecione o Perfil e a Unidade</label>
             <BFormSelect
               id="par"
@@ -75,7 +75,7 @@
               :options="perfisUnidadesOptions"
               value-field="value"
               text-field="text"
-              data-testid="select-perfil-unidade"
+              data-testid="sel-login-perfil"
             >
               <template #first>
                 <BFormSelectOption
@@ -92,7 +92,7 @@
             variant="primary"
             class="w-100 login-btn"
             type="submit"
-            data-testid="botao-entrar"
+            data-testid="btn-login-entrar"
             aria-label="Entrar"
           >
             <i class="bi bi-box-arrow-in-right me-2" />

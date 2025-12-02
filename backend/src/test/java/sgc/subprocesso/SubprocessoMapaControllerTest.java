@@ -78,7 +78,7 @@ class SubprocessoMapaControllerTest {
                     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
                         Usuario usuario = new Usuario();
                         usuario.setTituloEleitoral("123");
-                        return usuario;
+                        return usuario.getTituloEleitoral();
                     }
                 })
                 .build();

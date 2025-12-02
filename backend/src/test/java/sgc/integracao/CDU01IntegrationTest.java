@@ -51,7 +51,7 @@ public class CDU01IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow(); // Use existing ADMIN-UNIT from data-postgresql.sql
+        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
     }
 
     @Nested
@@ -60,7 +60,7 @@ public class CDU01IntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            String tituloEleitoral = "111111111111"; // Admin Teste from data-postgresql.sql
+            String tituloEleitoral = "111111111111";
             String senha = "password";
             AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 

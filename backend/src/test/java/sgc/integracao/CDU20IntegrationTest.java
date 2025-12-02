@@ -85,7 +85,6 @@ public class CDU20IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing units from data-postgresql.sql
         unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV

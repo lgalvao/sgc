@@ -13,7 +13,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="impactos-mapa-button"
+          data-testid="btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
@@ -26,7 +26,7 @@
         </BButton>
         <BButton
           variant="secondary"
-          data-testid="btn-devolver"
+          data-testid="btn-acao-devolver"
           title="Devolver para ajustes"
           @click="devolverCadastro"
         >
@@ -34,7 +34,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-acao-principal-analise"
+          data-testid="btn-acao-analisar-principal"
           title="Validar"
           @click="validarCadastro"
         >
@@ -56,7 +56,7 @@
         >
           <strong
             class="atividade-descricao"
-            data-testid="atividade-descricao"
+            data-testid="txt-atividade-descricao"
           >{{ atividade.descricao }}</strong>
         </div>
 
@@ -67,7 +67,7 @@
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
-            <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
+            <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
         </div>
       </BCardBody>
@@ -90,8 +90,8 @@
 
     <!-- Modal de Validação -->
     <BModal
-      :fade="false"
       v-model="mostrarModalValidar"
+      :fade="false"
       :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
       centered
       hide-footer
@@ -131,8 +131,8 @@
 
     <!-- Modal de Devolução -->
     <BModal
-      :fade="false"
       v-model="mostrarModalDevolver"
+      :fade="false"
       :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
       centered
       hide-footer

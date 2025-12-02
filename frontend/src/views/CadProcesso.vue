@@ -24,7 +24,7 @@
           v-model="descricao"
           placeholder="Descreva o processo"
           type="text"
-          data-testid="input-descricao"
+          data-testid="inp-processo-descricao"
         />
       </BFormGroup>
 
@@ -36,7 +36,7 @@
         <BFormSelect
           id="tipo"
           v-model="tipo"
-          data-testid="select-tipo"
+          data-testid="sel-processo-tipo"
           :options="Object.values(TipoProcessoEnum)"
         />
       </BFormGroup>
@@ -70,14 +70,14 @@
           id="dataLimite"
           v-model="dataLimite"
           type="date"
-          data-testid="input-dataLimite"
+          data-testid="inp-processo-data-limite"
         />
       </BFormGroup>
 
       <BButton
         variant="primary"
         type="button"
-        data-testid="btn-salvar"
+        data-testid="btn-processo-salvar"
         @click="salvarProcesso"
       >
         Salvar
@@ -85,7 +85,7 @@
       <BButton
         variant="success"
         class="ms-2"
-        data-testid="btn-iniciar-processo"
+        data-testid="btn-processo-iniciar"
         @click="abrirModalConfirmacao"
       >
         Iniciar processo
@@ -94,7 +94,7 @@
         v-if="processoEditando"
         variant="danger"
         class="ms-2"
-        data-testid="btn-remover"
+        data-testid="btn-processo-remover"
         @click="abrirModalRemocao"
       >
         Remover
@@ -110,8 +110,8 @@
 
     <!-- Modal de confirmação CDU-05 -->
     <BModal
-      :fade="false"
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Iniciar processo"
       centered
       hide-footer
@@ -129,14 +129,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-modal-cancelar"
+          data-testid="btn-mdl-iniciar-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
-          data-testid="btn-modal-confirmar"
+          data-testid="btn-mdl-iniciar-confirmar"
           @click="confirmarIniciarProcesso"
         >
           Confirmar
@@ -146,8 +146,8 @@
 
     <!-- Modal de confirmação de remoção -->
     <BModal
-      :fade="false"
       v-model="mostrarModalRemocao"
+      :fade="false"
       title="Remover processo"
       centered
       hide-footer

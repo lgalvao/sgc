@@ -10,7 +10,7 @@
           :model-value="isChecked(unidade.codigo)"
           :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
           :disabled="!unidade.isElegivel"
-          :data-testid="`chk-${unidade.sigla}`"
+          :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
           @update:model-value="(val) => toggle(unidade, val as boolean)"
         >
           <label
@@ -33,7 +33,7 @@
       <span
         v-if="unidade.filhas && unidade.filhas.length > 0"
         class="me-2 cursor-pointer user-select-none"
-        :data-testid="`btn-expand-${unidade.sigla}`"
+        :data-testid="`btn-arvore-expand-${unidade.sigla}`"
         @click="toggleExpand(unidade)"
       >
         {{ isExpanded(unidade) ? '[-]' : '[+]' }}
@@ -52,7 +52,7 @@
               :model-value="isChecked(filha.codigo)"
               :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
               :disabled="!filha.isElegivel"
-              :data-testid="`chk-${filha.sigla}`"
+              :data-testid="`chk-arvore-unidade-${filha.sigla}`"
               @update:model-value="(val) => toggle(filha, val as boolean)"
             >
               <label
@@ -84,7 +84,7 @@
                   :id="`chk-${neta.sigla}`"
                   :model-value="isChecked(neta.codigo)"
                   :disabled="!neta.isElegivel"
-                  :data-testid="`chk-${neta.sigla}`"
+                  :data-testid="`chk-arvore-unidade-${neta.sigla}`"
                   @update:model-value="(val) => toggle(neta, val as boolean)"
                 >
                   <label

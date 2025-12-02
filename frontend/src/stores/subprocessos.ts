@@ -120,7 +120,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         disponibilizarCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubrocesso),
-                "Cadastro disponibilizado",
+                "Cadastro de atividades disponibilizado",
                 "Erro ao disponibilizar",
             ),
         disponibilizarRevisaoCadastro: (codSubrocesso: number) =>

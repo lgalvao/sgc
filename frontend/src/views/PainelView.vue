@@ -5,7 +5,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
           class="display-6 mb-0"
-          data-testid="titulo-processos"
+          data-testid="txt-painel-titulo-processos"
         >
           Processos
         </div>
@@ -13,7 +13,7 @@
           v-if="perfil.isAdmin"
           :to="{ name: 'CadProcesso' }"
           variant="outline-primary"
-          data-testid="btn-criar-processo"
+          data-testid="btn-painel-criar-processo"
         >
           <i class="bi bi-plus-lg" /> Criar processo
         </BButton>
@@ -31,7 +31,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
           class="mb-0 display-6"
-          data-testid="titulo-alertas"
+          data-testid="txt-painel-titulo-alertas"
         >
           Alertas
         </div>

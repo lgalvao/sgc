@@ -32,14 +32,10 @@ public class ImpactoMapaDto {
      * @return An empty ImpactoMapaDto.
      */
     public static ImpactoMapaDto semImpacto() {
-        // TODO Usar sempre o builder, nao usar construtores enormes
+        // TODO Usar sempre o builder, nao usar esses construtores enormes
         return new ImpactoMapaDto(false, 0, 0, 0, 0, List.of(), List.of(), List.of(), List.of());
     }
 
-    /**
-     * Factory method for creating an ImpactoMapaDto from lists of changes.
-     * It calculates the totals and the 'temImpactos' flag automatically.
-     */
     public static ImpactoMapaDto comImpactos(
             List<AtividadeImpactadaDto> atividadesInseridas,
             List<AtividadeImpactadaDto> atividadesRemovidas,
@@ -47,7 +43,7 @@ public class ImpactoMapaDto {
             List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
         boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
-        // TODO Usar sempre o builder, nao usar construtores enormes
+        // TODO Usar sempre o builder, nao usar esses construtores enormes
         return new ImpactoMapaDto(
                 temImpactos,
                 atividadesInseridas.size(),

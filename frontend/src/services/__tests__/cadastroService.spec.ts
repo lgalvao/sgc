@@ -31,7 +31,7 @@ describe("cadastroService", () => {
     it("disponibilizarCadastro deve chamar o endpoint correto", async () => {
         await testEndpoint(
             cadastroService.disponibilizarCadastro,
-            "/subprocessos/1/disponibilizar",
+            "/subprocessos/1/cadastro/disponibilizar",
         );
     });
 

@@ -97,4 +97,9 @@ public class Usuario implements Serializable, UserDetails {
         this.ramal = ramal;
         this.unidadeLotacao = unidadeLotacao;
     }
+
+    @Override
+    public String toString() {
+        return "Usuario{titulo='%s', nome='%s', unidade=%s}".formatted(tituloEleitoral, nome, unidadeLotacao.getSigla());
+    }
 }

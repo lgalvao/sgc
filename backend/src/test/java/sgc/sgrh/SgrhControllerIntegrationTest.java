@@ -67,13 +67,12 @@ class SgrhControllerIntegrationTest {
     @Test
     @DisplayName("Deve autorizar e retornar perfis")
     void autorizar_deveRetornarPerfis() throws Exception {
-        // Given - Use existing data from database
-        Long tituloEleitoral = 111111111111L; // Admin Teste user from data-postgresql.sql
+        long tituloEleitoral = 111111111111L; // Admin Teste user from data-postgresql.sql
 
         // When/Then
         mockMvc.perform(post(API_URL + "/autorizar")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(tituloEleitoral.toString()))
+                .content(Long.toString(tituloEleitoral)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].perfil").value(Perfil.ADMIN.toString()))

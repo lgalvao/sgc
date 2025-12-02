@@ -63,7 +63,7 @@ describe("BarraNavegacao.vue", () => {
                 getMountOptions(createTestingPinia({createSpy: vi.fn})),
             );
             expect(wrapper.find("button").exists()).toBe(false);
-            expect(wrapper.find('[data-testid="breadcrumbs"]').exists()).toBe(false);
+            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
         });
 
         it("não deve exibir o botão de voltar e os breadcrumbs na página do painel", () => {
@@ -73,7 +73,7 @@ describe("BarraNavegacao.vue", () => {
                 getMountOptions(createTestingPinia({createSpy: vi.fn})),
             );
             expect(wrapper.find("button").exists()).toBe(false);
-            expect(wrapper.find('[data-testid="breadcrumbs"]').exists()).toBe(false);
+            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
         });
 
         it("deve exibir o botão de voltar e os breadcrumbs em outras páginas", () => {
@@ -85,7 +85,7 @@ describe("BarraNavegacao.vue", () => {
                 getMountOptions(createTestingPinia({createSpy: vi.fn})),
             );
             expect(wrapper.find("button").exists()).toBe(true);
-            expect(wrapper.find('[data-testid="breadcrumbs"]').exists()).toBe(true);
+            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(true);
         });
     });
 
@@ -102,7 +102,7 @@ describe("BarraNavegacao.vue", () => {
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(3);
             expect(
-                items[0].find('[data-testid="breadcrumb-home-icon"]').exists(),
+                items[0].find('[data-testid="btn-nav-home"]').exists(),
             ).toBe(true);
             expect(items[1].text()).toBe("Processos");
             expect(items[2].text()).toBe("Detalhes");
@@ -136,7 +136,7 @@ describe("BarraNavegacao.vue", () => {
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(2);
             expect(
-                items[0].find('[data-testid="breadcrumb-home-icon"]').exists(),
+                items[0].find('[data-testid="btn-nav-home"]').exists(),
             ).toBe(true);
             expect(items[1].text()).toBe("Detalhes");
         });
@@ -154,7 +154,7 @@ describe("BarraNavegacao.vue", () => {
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(2);
             expect(
-                items[0].find('[data-testid="breadcrumb-home-icon"]').exists(),
+                items[0].find('[data-testid="btn-nav-home"]').exists(),
             ).toBe(true);
             expect(items[1].text()).toBe("Detalhes");
         });

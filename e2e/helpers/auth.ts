@@ -16,9 +16,9 @@ export const USUARIOS = {
  * Preenche os campos de login e clica no botão entrar
  */
 export async function autenticar(page: Page, usuario: string, senha: string) {
-    await page.getByTestId('input-titulo').fill(usuario);
-    await page.getByTestId('input-senha').fill(senha);
-    await page.getByTestId('botao-entrar').click();
+    await page.getByTestId('inp-login-usuario').fill(usuario);
+    await page.getByTestId('inp-login-senha').fill(senha);
+    await page.getByTestId('btn-login-entrar').click();
 }
 
 /**
@@ -36,6 +36,6 @@ export async function login(page: Page, usuario: string, senha: string) {
  */
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
     await autenticar(page, usuario, senha);
-    await page.getByTestId('select-perfil-unidade').selectOption({ label: perfilUnidade });
-    await page.getByTestId('botao-entrar').click();
+    await page.getByTestId('sel-login-perfil').selectOption({ label: perfilUnidade });
+    await page.getByTestId('btn-login-entrar').click();
 }
