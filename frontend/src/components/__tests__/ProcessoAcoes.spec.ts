@@ -16,7 +16,7 @@ describe("ProcessoAcoes.vue", () => {
             },
         });
 
-        const btn = wrapper.find('[data-testid="btn-aceitar-em-bloco"]');
+        const btn = wrapper.find('[data-testid="btn-acao-bloco-aceitar"]');
         expect(btn.exists()).toBe(true);
         expect(btn.text()).toContain("Aceitar em bloco");
 
@@ -36,7 +36,7 @@ describe("ProcessoAcoes.vue", () => {
             },
         });
 
-        expect(wrapper.find('[data-testid="btn-aceitar-em-bloco"]').exists()).toBe(
+        expect(wrapper.find('[data-testid="btn-acao-bloco-aceitar"]').exists()).toBe(
             false,
         );
     });
@@ -53,7 +53,7 @@ describe("ProcessoAcoes.vue", () => {
             },
         });
 
-        const btn = wrapper.find('[data-testid="btn-abrir-modal-homologar-bloco"]');
+        const btn = wrapper.find('[data-testid="btn-acao-bloco-homologar"]');
         expect(btn.exists()).toBe(true);
         expect(btn.text()).toContain("Homologar em bloco");
 

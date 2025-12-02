@@ -277,10 +277,10 @@ describe("CadMapa.vue", () => {
       .find('[data-testid="btn-abrir-criar-competencia"]')
       .trigger("click");
     expect(
-      wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
+      wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-descricao-competencia"]');
+    const textarea = wrapper.find('[data-testid="inp-mdl-criar-competencia-descricao"]');
     await textarea.setValue("Nova Competencia Teste");
 
     // Checkbox interaction
@@ -299,7 +299,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-salvar-competencia"]')
+      .find('[data-testid="btn-mdl-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
@@ -320,10 +320,10 @@ describe("CadMapa.vue", () => {
       .find('[data-testid="btn-editar-competencia"]')
       .trigger("click");
     expect(
-      wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
+      wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-descricao-competencia"]');
+    const textarea = wrapper.find('[data-testid="inp-mdl-criar-competencia-descricao"]');
     await textarea.setValue("Competencia A Editada");
 
     vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue({
@@ -331,7 +331,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-salvar-competencia"]')
+      .find('[data-testid="btn-mdl-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
@@ -354,7 +354,7 @@ describe("CadMapa.vue", () => {
 
     // Find the modal by data-testid
     const deleteModal = wrapper.findComponent(
-      '[data-testid="excluir-competencia-modal"]',
+      '[data-testid="mdl-excluir-competencia"]',
     );
 
     expect(deleteModal.exists()).toBe(true);
@@ -397,22 +397,22 @@ describe("CadMapa.vue", () => {
     await flushPromises();
 
     await wrapper
-      .find('[data-testid="btn-disponibilizar-mapa"]')
+      .find('[data-testid="btn-cad-mapa-disponibilizar"]')
       .trigger("click");
 
-    const modal = wrapper.find('[data-testid="disponibilizar-modal"]');
+    const modal = wrapper.find('[data-testid="mdl-disponibilizar-mapa"]');
     expect(modal.exists()).toBe(true);
 
     await wrapper
-      .find('[data-testid="input-data-limite"]')
+      .find('[data-testid="inp-mdl-disponibilizar-data"]')
       .setValue("2023-12-31");
     await wrapper
-      .find('[data-testid="input-observacoes-disponibilizacao"]')
+      .find('[data-testid="inp-mdl-disponibilizar-obs"]')
       .setValue("Obs");
 
     vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
 
-    await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mdl-disponibilizar-confirmar"]').trigger("click");
 
     expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
       dataLimite: "2023-12-31",
@@ -425,7 +425,7 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    await wrapper.find('[data-testid="impactos-mapa-button"]').trigger("click");
+    await wrapper.find('[data-testid="btn-impactos-mapa"]').trigger("click");
 
     const impactoModal = wrapper.findComponent({ name: "ImpactoMapaModal" });
     expect(impactoModal.props("mostrar")).toBe(true);
@@ -436,7 +436,7 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {
@@ -448,7 +448,7 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);
   });
 
   it("getConhecimentosTooltip deve retornar 'Nenhum conhecimento cadastrado' se vazia", () => {

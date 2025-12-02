@@ -137,9 +137,6 @@ public class ProcessoController {
      * 'MAPEAMENTO' ou 'REVISAO'.
      *
      * @param codigo       O código do processo a ser iniciado.
-     * @param tipo     O tipo de processo ('MAPEAMENTO' ou 'REVISAO').
-     * @param unidades Uma lista opcional de IDs de unidades para restringir o início
-     *                 do processo a um subconjunto dos participantes.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/iniciar")

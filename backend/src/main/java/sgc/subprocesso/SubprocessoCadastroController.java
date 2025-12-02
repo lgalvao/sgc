@@ -65,7 +65,6 @@ public class SubprocessoCadastroController {
          * etapa de análise.
          *
          * @param codSubprocesso O código do subprocesso.
-         * @param usuario        O usuário autenticado que está realizando a ação.
          * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
          */
         @PostMapping("/{codigo}/cadastro/disponibilizar")
@@ -99,7 +98,6 @@ public class SubprocessoCadastroController {
          * possuem pelo menos um conhecimento associado.
          *
          * @param codigo  O código do subprocesso.
-         * @param usuario O usuário autenticado que está realizando a ação.
          * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
          * @throws ErroValidacao se existirem atividades sem conhecimentos.
          */
@@ -142,8 +140,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo o motivo e as observações da devolução.
-         * @param usuario O usuário autenticado (analista) que está realizando a
-         *                devolução.
          */
         @PostMapping("/{codigo}/devolver-cadastro")
         @Operation(summary = "Devolve o cadastro de atividades para o responsável")
@@ -168,8 +164,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo as observações da aceitação.
-         * @param usuario O usuário autenticado (analista) que está aceitando o
-         *                cadastro.
          */
         @PostMapping("/{codigo}/aceitar-cadastro")
         @Operation(summary = "Aceita o cadastro de atividades")
@@ -193,8 +187,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo as observações da homologação.
-         * @param usuario O usuário autenticado (gestor) que está homologando o
-         *                cadastro.
          */
         @PostMapping("/{codigo}/homologar-cadastro")
         @Operation(summary = "Homologa o cadastro de atividades")
@@ -220,8 +212,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo o motivo e as observações da devolução.
-         * @param usuario O usuário autenticado (analista) que está realizando a
-         *                devolução.
          */
         @PostMapping("/{codigo}/devolver-revisao-cadastro")
         @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
@@ -245,7 +235,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo as observações da aceitação.
-         * @param usuario O usuário autenticado (analista) que está aceitando a revisão.
          */
         @PostMapping("/{codigo}/aceitar-revisao-cadastro")
         @Operation(summary = "Aceita a revisão do cadastro de atividades")
@@ -271,7 +260,6 @@ public class SubprocessoCadastroController {
          *
          * @param codigo  O código do subprocesso.
          * @param request O DTO contendo as observações da homologação.
-         * @param usuario O usuário autenticado (administrador) que está homologando.
          */
         @PostMapping("/{codigo}/homologar-revisao-cadastro")
         @Operation(summary = "Homologa a revisão do cadastro de atividades")

@@ -57,7 +57,6 @@ public class AtividadeController {
      * e a persiste, associando-a ao usuário autenticado.
      *
      * @param atividadeDto O DTO contendo os dados da atividade a ser criada.
-     * @param usuario      O usuário autenticado, injetado pelo Spring Security.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI da nova
      *         atividade
      *         no cabeçalho 'Location' e a atividade criada no corpo da resposta.

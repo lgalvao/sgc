@@ -130,13 +130,13 @@ describe("VisMapa.vue", () => {
     const { wrapper } = mountComponent();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe(
+    expect(wrapper.find('[data-testid="txt-competencia-descricao"]').text()).toBe(
       "Competencia 1",
     );
     expect(wrapper.find(".atividade-associada-descricao").text()).toBe(
       "Atividade 1",
     );
-    expect(wrapper.find('[data-testid="conhecimento-item"]').text()).toBe(
+    expect(wrapper.find('[data-testid="txt-conhecimento-item"]').text()).toBe(
       "Conhecimento 1",
     );
   });
@@ -170,7 +170,7 @@ describe("VisMapa.vue", () => {
     );
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="unidade-info"]').text()).toContain(
+    expect(wrapper.find('[data-testid="txt-header-unidade"]').text()).toContain(
       "CHILD - Child Unit",
     );
   });
@@ -193,9 +193,9 @@ describe("VisMapa.vue", () => {
     await wrapper.vm.$nextTick();
 
     expect(
-      wrapper.find('[data-testid="apresentar-sugestoes-btn"]').exists(),
+      wrapper.find('[data-testid="btn-mapa-sugestoes"]').exists(),
     ).toBe(true);
-    expect(wrapper.find('[data-testid="validar-btn"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="btn-mapa-validar"]').exists()).toBe(true);
   });
 
   it("shows buttons for GESTOR when MAPA_VALIDADO", async () => {
@@ -216,11 +216,11 @@ describe("VisMapa.vue", () => {
     });
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="devolver-ajustes-btn"]').exists()).toBe(
+    expect(wrapper.find('[data-testid="btn-mapa-devolver"]').exists()).toBe(
       true,
     );
     expect(
-      wrapper.find('[data-testid="btn-registrar-aceite-homologar"]').exists(),
+      wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').exists(),
     ).toBe(true);
   });
 
@@ -229,10 +229,10 @@ describe("VisMapa.vue", () => {
     const store = useProcessosStore();
     vi.spyOn(feedbackStore, "show");
 
-    await wrapper.find('[data-testid="validar-btn"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
     await wrapper.vm.$nextTick();
 
-    const confirmBtn = wrapper.find('[data-testid="modal-validar-confirmar"]');
+    const confirmBtn = wrapper.find('[data-testid="btn-mdl-validar-confirmar"]');
     expect(confirmBtn.exists()).toBe(true);
 
     await confirmBtn.trigger("click");
@@ -247,15 +247,15 @@ describe("VisMapa.vue", () => {
     vi.spyOn(feedbackStore, "show");
 
     await wrapper
-      .find('[data-testid="apresentar-sugestoes-btn"]')
+      .find('[data-testid="btn-mapa-sugestoes"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
-    const textarea = wrapper.find('[data-testid="sugestoes-textarea"]');
+    const textarea = wrapper.find('[data-testid="inp-mdl-sugestoes-texto"]');
     await textarea.setValue("Minhas sugestões");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="modal-apresentar-sugestoes-confirmar"]',
+      '[data-testid="btn-mdl-sugestoes-confirmar"]',
     );
     await confirmBtn.trigger("click");
 
@@ -284,16 +284,16 @@ describe("VisMapa.vue", () => {
     const store = useSubprocessosStore();
     vi.spyOn(feedbackStore, "show");
 
-    await wrapper.find('[data-testid="devolver-ajustes-btn"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
     await wrapper.vm.$nextTick();
 
     const textarea = wrapper.find(
-      '[data-testid="observacao-devolucao-textarea"]',
+      '[data-testid="inp-mdl-devolucao-obs"]',
     );
     await textarea.setValue("Ajustar X");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="modal-devolucao-confirmar"]',
+      '[data-testid="btn-mdl-devolucao-confirmar"]',
     );
     await confirmBtn.trigger("click");
 
@@ -322,7 +322,7 @@ describe("VisMapa.vue", () => {
     const store = useSubprocessosStore();
 
     await wrapper
-      .find('[data-testid="btn-registrar-aceite-homologar"]')
+      .find('[data-testid="btn-mapa-homologar-aceite"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -355,7 +355,7 @@ describe("VisMapa.vue", () => {
     const store = useSubprocessosStore();
 
     await wrapper
-      .find('[data-testid="btn-registrar-aceite-homologar"]')
+      .find('[data-testid="btn-mapa-homologar-aceite"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -387,7 +387,7 @@ describe("VisMapa.vue", () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
 
-    const btn = wrapper.find('[data-testid="historico-analise-btn"]');
+    const btn = wrapper.find('[data-testid="btn-mapa-historico"]');
     expect(btn.exists()).toBe(true);
 
     await btn.trigger("click");
@@ -415,7 +415,7 @@ describe("VisMapa.vue", () => {
     });
     await wrapper.vm.$nextTick();
 
-    const btn = wrapper.find('[data-testid="ver-sugestoes-btn"]');
+    const btn = wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]');
     expect(btn.exists()).toBe(true);
 
     await btn.trigger("click");

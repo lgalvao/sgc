@@ -396,13 +396,10 @@ public class SubprocessoWorkflowService {
                 .build());
 
         Unidade unidadeDestino = sp.getUnidade();
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataFimEtapa1(null);
 
-        if (unidadeDestino.equals(sp.getUnidade())) {
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            sp.setDataFimEtapa1(null);
-        }
         repositorioSubprocesso.save(sp);
-
         publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoDevolvida.builder()
                 .codSubprocesso(codSubprocesso)
                 .usuario(usuario)
@@ -438,18 +435,7 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
         if (unidadeDestino == null) {
-            // If no further superior, maybe it stays here or goes to SEDOC?
-            // Assuming classic flow, it might stop or go to homologation.
-            // The original code assumed unitAnalise.getUnidadeSuperior() existed.
-            // We'll keep that assumption but guard it if needed.
-            // For now, let's assume it exists as per original logic.
-            unidadeDestino = unidadeAnalise; // Fallback if top level? Or throw?
-            // Original:
-            // unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
-            // Let's try to get it safely.
-            if (unidadeAnalise.getUnidadeSuperior() != null) {
-                unidadeDestino = unidadeAnalise.getUnidadeSuperior();
-            }
+            unidadeDestino = unidadeAnalise;
         }
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);

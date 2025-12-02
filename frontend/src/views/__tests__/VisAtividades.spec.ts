@@ -106,7 +106,7 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
     await nextTick();
 
-    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
@@ -117,7 +117,7 @@ describe("VisAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
@@ -128,7 +128,7 @@ describe("VisAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="impactos-mapa-button"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);
   });
 
   it("deve listar atividades e conhecimentos", async () => {
@@ -180,12 +180,12 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
 
     // Click validate button
-    const btn = wrapper.find('[data-testid="btn-acao-principal-analise"]');
+    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
     await btn.trigger("click");
     expect(wrapper.vm.mostrarModalValidar).toBe(true);
 
     // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-modal-confirmar-aceite"]');
+    const btnConfirm = wrapper.find('[data-testid="btn-mdl-aceite-confirmar"]');
     await btnConfirm.trigger("click");
 
     expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
@@ -204,11 +204,11 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
 
     // Click validate button
-    const btn = wrapper.find('[data-testid="btn-acao-principal-analise"]');
+    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
     await btn.trigger("click");
 
     // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-modal-confirmar-aceite"]');
+    const btnConfirm = wrapper.find('[data-testid="btn-mdl-aceite-confirmar"]');
     await btnConfirm.trigger("click");
 
     expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
@@ -227,16 +227,16 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
 
     // Click return button
-    const btn = wrapper.find('[data-testid="btn-devolver"]');
+    const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
     await btn.trigger("click");
     expect(wrapper.vm.mostrarModalDevolver).toBe(true);
 
     // Fill observation
-    const textarea = wrapper.find('[data-testid="input-observacao-devolucao"]');
+    const textarea = wrapper.find('[data-testid="inp-mdl-devolucao-obs"]');
     await textarea.setValue("Devolvendo");
 
     // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-modal-confirmar-devolucao"]');
+    const btnConfirm = wrapper.find('[data-testid="btn-mdl-devolucao-confirmar"]');
     await btnConfirm.trigger("click");
 
     expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalledWith(123, {
@@ -258,9 +258,9 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
 
     // Click validate button
-    await wrapper.find('[data-testid="btn-acao-principal-analise"]').trigger("click");
+    await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
     // Confirm
-    await wrapper.find('[data-testid="btn-modal-confirmar-aceite"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mdl-aceite-confirmar"]').trigger("click");
 
     expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
   });
@@ -300,9 +300,9 @@ describe("VisAtividades.vue", () => {
 
     await flushPromises();
 
-    const btn = wrapper.find('[data-testid="btn-acao-principal-analise"]');
+    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
     await btn.trigger("click");
-    await wrapper.find('[data-testid="btn-modal-confirmar-aceite"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mdl-aceite-confirmar"]').trigger("click");
 
     expect(subprocessosStore.homologarCadastro).toHaveBeenCalled();
   });
@@ -319,10 +319,10 @@ describe("VisAtividades.vue", () => {
 
     await flushPromises();
 
-    const btn = wrapper.find('[data-testid="btn-devolver"]');
+    const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
     await btn.trigger("click");
-    await wrapper.find('[data-testid="input-observacao-devolucao"]').setValue("Obs");
-    await wrapper.find('[data-testid="btn-modal-confirmar-devolucao"]').trigger("click");
+    await wrapper.find('[data-testid="inp-mdl-devolucao-obs"]').setValue("Obs");
+    await wrapper.find('[data-testid="btn-mdl-devolucao-confirmar"]').trigger("click");
 
     expect(subprocessosStore.devolverCadastro).toHaveBeenCalled();
   });

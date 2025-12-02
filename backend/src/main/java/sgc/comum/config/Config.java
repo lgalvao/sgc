@@ -8,7 +8,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  * <p>
  * Esta classe é responsável pela configuração do suporte a Web do Spring Data,
  * particularmente para o modo de serialização de Page via DTO.
- *
+ * <p>
  * Nota: ConfigAplicacao é uma classe separada (@ConfigurationProperties) que
  * carrega propriedades da aplicação (ambiente, URLs). As duas classes servem
  * propósitos diferentes e devem ser mantidas separadas.

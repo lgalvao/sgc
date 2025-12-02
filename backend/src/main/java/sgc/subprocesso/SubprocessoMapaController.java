@@ -51,7 +51,6 @@ public class SubprocessoMapaController {
      * competências afetadas.
      *
      * @param codigo  O código do subprocesso em revisão.
-     * @param usuario O usuário autenticado que realiza a verificação.
      * @return Um {@link ImpactoMapaDto} com o detalhamento dos impactos.
      */
     @GetMapping("/{codigo}/impactos-mapa")
@@ -100,7 +99,6 @@ public class SubprocessoMapaController {
      *
      * @param codigo O código do subprocesso.
      * @param request        O DTO contendo as alterações do mapa.
-     * @param usuario        O usuário autenticado que está salvando o mapa.
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
     @PostMapping("/{codigo}/mapa/atualizar")
@@ -129,7 +127,6 @@ public class SubprocessoMapaController {
      *
      * @param codigo O código do subprocesso.
      * @param request        O DTO contendo as competências ajustadas.
-     * @param usuario        O usuário autenticado que está salvando os ajustes.
      */
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
     @Transactional
@@ -170,7 +167,6 @@ public class SubprocessoMapaController {
      *
      * @param codigo O código do subprocesso.
      * @param request        O DTO com a estrutura completa do mapa a ser salvo.
-     * @param usuario        O usuário autenticado que realiza a operação.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
     @PostMapping("/{codigo}/mapa-completo/atualizar")
