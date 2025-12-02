@@ -24,7 +24,7 @@ describe("ModalFinalizacao", () => {
       props: { mostrar: true, processoDescricao },
     });
       await wrapper
-          .find('[data-testid="btn-mdl-finalizar-cancelar"]')
+          .find('[data-testid="btn-finalizar-processo-cancelar"]')
           .trigger("click");
       expect(wrapper.emitted("fechar")).toBeTruthy();
   });
@@ -34,7 +34,7 @@ describe("ModalFinalizacao", () => {
       props: { mostrar: true, processoDescricao },
     });
       await wrapper
-          .find('[data-testid="btn-mdl-finalizar-confirmar"]')
+          .find('[data-testid="btn-finalizar-processo-confirmar"]')
           .trigger("click");
       expect(wrapper.emitted("confirmar")).toBeTruthy();
   });

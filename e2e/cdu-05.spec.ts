@@ -92,7 +92,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
     async function passo2a_ChefeDisponibilizaCadastro(page: Page): Promise<void> {
         // Disponibilizar cadastro
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-mdl-disponibilizar-confirmar').click();
+        await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
 
         // Validação: Mensagem de sucesso e redirecionamento para o painel
         await expect(page.getByRole('heading', { name: /Cadastro de atividades disponibilizado/i })).toBeVisible();
@@ -116,7 +116,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Homologar cadastro
         await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('btn-mdl-aceite-confirmar').click();
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
         // Validação: Redirecionado para o painel
         await verificarPaginaPainel(page);

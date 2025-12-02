@@ -310,7 +310,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-mdl-disponibilizar-confirmar"
+          data-testid="btn-disponibilizar-cadastro-confirmar"
           @click="confirmarDisponibilizacao"
         >
           Confirmar
