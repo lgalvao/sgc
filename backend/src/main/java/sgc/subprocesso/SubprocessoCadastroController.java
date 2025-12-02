@@ -146,7 +146,8 @@ public class SubprocessoCadastroController {
         public void devolverCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody DevolverCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -170,7 +171,8 @@ public class SubprocessoCadastroController {
         public void aceitarCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody AceitarCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -193,7 +195,8 @@ public class SubprocessoCadastroController {
         public void homologarCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody HomologarCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -218,7 +221,8 @@ public class SubprocessoCadastroController {
         public void devolverRevisaoCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody DevolverCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -241,7 +245,8 @@ public class SubprocessoCadastroController {
         public void aceitarRevisaoCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody AceitarCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -267,7 +272,8 @@ public class SubprocessoCadastroController {
         public void homologarRevisaoCadastro(
                         @PathVariable Long codigo,
                         @Valid @RequestBody HomologarCadastroReq request,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));

@@ -70,7 +70,7 @@ describe("SubprocessoCards.vue", () => {
           permissoes: {...defaultPermissoes, podeEditarMapa: true},
       });
 
-      const card = wrapper.find('[data-testid="atividades-card"]');
+      const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
             await card.trigger("click");
 
       expect(pushMock).toHaveBeenCalledWith({
@@ -94,7 +94,7 @@ describe("SubprocessoCards.vue", () => {
           },
       });
 
-      const card = wrapper.find('[data-testid="atividades-card-vis"]');
+      const card = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
             await card.trigger("click");
 
       expect(pushMock).toHaveBeenCalledWith({
@@ -114,7 +114,7 @@ describe("SubprocessoCards.vue", () => {
           permissoes: {...defaultPermissoes, podeVisualizarMapa: true},
       });
 
-      const card = wrapper.find('[data-testid="mapa-card"]');
+      const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
             await card.trigger("click");
 
       expect(pushMock).toHaveBeenCalledWith({
@@ -134,7 +134,7 @@ describe("SubprocessoCards.vue", () => {
                 permissoes: {...defaultPermissoes, podeVisualizarDiagnostico: true},
             });
 
-            const card = wrapper.find('[data-testid="diagnostico-card"]');
+            const card = wrapper.find('[data-testid="card-subprocesso-diagnostico"]');
             await card.trigger("click");
 
             expect(pushMock).toHaveBeenCalledWith({
@@ -153,7 +153,7 @@ describe("SubprocessoCards.vue", () => {
                 situacao: "Em andamento",
             });
 
-            const card = wrapper.find('[data-testid="ocupacoes-card"]');
+            const card = wrapper.find('[data-testid="card-subprocesso-ocupacoes"]');
             await card.trigger("click");
 
             expect(pushMock).toHaveBeenCalledWith({
@@ -179,7 +179,7 @@ describe("SubprocessoCards.vue", () => {
                 },
             });
 
-            expect(wrapper.find('[data-testid="mapa-card"]').exists()).toBe(false);
+            expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(false);
         });
   });
 });

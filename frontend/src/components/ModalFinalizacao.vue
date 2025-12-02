@@ -23,14 +23,14 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-mdl-finalizar-cancelar"
+        data-testid="btn-finalizar-processo-cancelar"
         @click="emit('fechar')"
       >
         <i class="bi bi-x-circle" /> Cancelar
       </BButton>
       <BButton
         variant="success"
-        data-testid="btn-mdl-finalizar-confirmar"
+        data-testid="btn-finalizar-processo-confirmar"
         @click="emit('confirmar')"
       >
         <i class="bi bi-check-circle" />

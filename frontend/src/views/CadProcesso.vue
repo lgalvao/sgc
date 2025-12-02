@@ -129,14 +129,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-iniciar-cancelar"
+          data-testid="btn-iniciar-processo-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
-          data-testid="btn-mdl-iniciar-confirmar"
+          data-testid="btn-iniciar-processo-confirmar"
           @click="confirmarIniciarProcesso"
         >
           Confirmar

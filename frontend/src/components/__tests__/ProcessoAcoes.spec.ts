@@ -73,7 +73,7 @@ describe("ProcessoAcoes.vue", () => {
             },
         });
 
-        const btn = wrapper.find('[data-testid="btn-finalizar-processo"]');
+        const btn = wrapper.find('[data-testid="btn-processo-finalizar"]');
         expect(btn.exists()).toBe(true);
         expect(btn.text()).toContain("Finalizar processo");
 

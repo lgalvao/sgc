@@ -44,7 +44,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-mdl-iniciar-confirmar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Validação: Processo iniciado com sucesso
         await verificarPaginaPainel(page);
@@ -216,7 +216,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         // Finalizar processo
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
         await page.getByTestId('btn-processo-finalizar').click();
-        await page.getByTestId('btn-mdl-finalizar-confirmar').click();
+        await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
         // Validação: Processo finalizado com sucesso
         await verificarPaginaPainel(page);
@@ -287,7 +287,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
-        await page.getByTestId('btn-mdl-iniciar-confirmar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
         console.log('Processo iniciado.');
 
         // Validação: Redirecionamento e situação do processo iniciado
