@@ -7,7 +7,7 @@
       <BButton
         v-if="perfil === 'GESTOR'"
         variant="outline-primary"
-        data-testid="btn-aceitar-em-bloco"
+        data-testid="btn-acao-bloco-aceitar"
         @click="emit('aceitarBloco')"
       >
         <i class="bi bi-check-circle me-1" />
@@ -16,7 +16,7 @@
       <BButton
         v-if="perfil === 'ADMIN'"
         variant="outline-success"
-        data-testid="btn-abrir-modal-homologar-bloco"
+        data-testid="btn-acao-bloco-homologar"
         @click="emit('homologarBloco')"
       >
         <i class="bi bi-check-all me-1" />
@@ -27,7 +27,7 @@
       v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
       variant="danger"
       class="mt-3"
-      data-testid="btn-finalizar-processo"
+      data-testid="btn-processo-finalizar"
       @click="emit('finalizar')"
     >
       Finalizar processo

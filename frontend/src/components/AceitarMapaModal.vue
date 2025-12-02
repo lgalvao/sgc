@@ -9,7 +9,7 @@
     hide-footer
     @hide="$emit('fecharModal')"
   >
-    <div data-testid="modal-aceite-body">
+    <div data-testid="mdl-aceite-mapa-body">
       <p v-if="perfil === 'ADMIN'">
         {{ corpoModal }}
       </p>
@@ -28,7 +28,7 @@
           v-model="observacao"
           rows="4"
           placeholder="Digite suas observações sobre o mapa..."
-          data-testid="observacao-aceite-textarea"
+          data-testid="inp-mdl-aceite-mapa-obs"
         />
         <div class="form-text">
           As observações serão registradas junto com a validação do mapa.
@@ -39,7 +39,7 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="modal-aceite-cancelar"
+        data-testid="btn-mdl-aceite-mapa-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
@@ -47,7 +47,7 @@
       </BButton>
       <BButton
         variant="success"
-        data-testid="modal-aceite-confirmar"
+        data-testid="btn-mdl-aceite-mapa-confirmar"
         @click="$emit('confirmarAceitacao', observacao)"
       >
         <i class="bi bi-check-circle me-1" />

@@ -8,7 +8,7 @@
         <BCard
           v-if="permissoes.podeEditarMapa"
           class="h-100 card-actionable"
-          data-testid="atividades-card"
+          data-testid="card-subprocesso-atividades"
           @click="navegarPara('SubprocessoCadastro')"
         >
           <BCardTitle>
@@ -25,7 +25,7 @@
         <BCard
           v-else-if="permissoes.podeVisualizarMapa"
           class="h-100 card-actionable"
-          data-testid="atividades-card-vis"
+          data-testid="card-subprocesso-atividades-vis"
           @click="navegarPara('SubprocessoVisCadastro')"
         >
           <BCardTitle>
@@ -49,7 +49,7 @@
           v-if="permissoes.podeEditarMapa"
           :class="{ 'disabled-card': !mapa }"
           class="h-100 card-actionable"
-          data-testid="mapa-card"
+          data-testid="card-subprocesso-mapa"
           @click="navegarPara('SubprocessoMapa')"
         >
           <BCardTitle>
@@ -67,7 +67,7 @@
           v-else-if="permissoes.podeVisualizarMapa"
           :class="{ 'disabled-card': !mapa }"
           class="h-100 card-actionable"
-          data-testid="mapa-card-vis"
+          data-testid="card-subprocesso-mapa-vis"
           @click="navegarPara('SubprocessoVisMapa')"
         >
           <BCardTitle>
@@ -92,7 +92,7 @@
         <BCard
           v-if="permissoes.podeVisualizarDiagnostico"
           class="h-100 card-actionable"
-          data-testid="diagnostico-card"
+          data-testid="card-subprocesso-diagnostico"
           @click="navegarPara('DiagnosticoEquipe')"
         >
           <BCardTitle>
@@ -114,7 +114,7 @@
       >
         <BCard
           class="h-100 card-actionable"
-          data-testid="ocupacoes-card"
+          data-testid="card-subprocesso-ocupacoes"
           @click="navegarPara('OcupacoesCriticas')"
         >
           <BCardTitle>

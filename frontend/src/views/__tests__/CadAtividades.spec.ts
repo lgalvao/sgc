@@ -355,10 +355,10 @@ describe("CadAtividades.vue", () => {
       ],
     } as any);
 
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-confirmar-disponibilizacao"]',
+      '[data-testid="btn-mdl-disponibilizar-confirmar"]',
     );
     await confirmBtn.trigger("click");
     await flushPromises();
@@ -390,11 +390,11 @@ describe("CadAtividades.vue", () => {
     await wrapper.find('[data-testid="btn-editar-atividade"]').trigger("click");
 
     expect(
-      wrapper.find('[data-testid="input-editar-atividade"]').exists(),
+      wrapper.find('[data-testid="inp-editar-atividade"]').exists(),
     ).toBe(true);
 
     await wrapper
-      .find('[data-testid="input-editar-atividade"]')
+      .find('[data-testid="inp-editar-atividade"]')
       .setValue("Atividade Editada");
 
     vi.mocked(atividadeService.atualizarAtividade).mockResolvedValue({
@@ -426,11 +426,11 @@ describe("CadAtividades.vue", () => {
       .trigger("click");
 
     expect(
-      wrapper.find('[data-testid="input-editar-conhecimento"]').exists(),
+      wrapper.find('[data-testid="inp-editar-conhecimento"]').exists(),
     ).toBe(true);
 
     await wrapper
-      .find('[data-testid="input-editar-conhecimento"]')
+      .find('[data-testid="inp-editar-conhecimento"]')
       .setValue("Conhecimento Editado");
 
     vi.mocked(atividadeService.atualizarConhecimento).mockResolvedValue({
@@ -479,10 +479,10 @@ describe("CadAtividades.vue", () => {
       cadastroService.disponibilizarRevisaoCadastro,
     ).mockResolvedValue();
 
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-confirmar-disponibilizacao"]',
+      '[data-testid="btn-mdl-disponibilizar-confirmar"]',
     );
     await confirmBtn.trigger("click");
     await flushPromises();
@@ -531,7 +531,7 @@ describe("CadAtividades.vue", () => {
 
     const showSpy = vi.spyOn(feedbackStore, "show");
 
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
     await flushPromises();
 
     expect(showSpy).toHaveBeenCalledWith(

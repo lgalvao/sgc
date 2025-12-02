@@ -1,19 +1,19 @@
 <template>
   <BCard
     class="mb-4"
-    data-testid="subprocesso-header"
+    data-testid="header-subprocesso"
     no-body
   >
     <BCardBody>
       <p
         class="text-muted small mb-1"
-        data-testid="processo-info"
+        data-testid="txt-header-processo"
       >
         Processo: {{ processoDescricao }}
       </p>
       <h2
         class="display-6 mb-3"
-        data-testid="unidade-info"
+        data-testid="txt-header-unidade"
       >
         {{ unidadeSigla }} - {{ unidadeNome }}
       </h2>
@@ -22,7 +22,7 @@
         <span
           :class="badgeClass(situacao)"
           class="badge"
-          data-testid="situacao-badge"
+          data-testid="txt-badge-situacao"
         >{{ situacao }}</span>
       </p>
 

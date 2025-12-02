@@ -12,7 +12,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="impactos-mapa-button"
+          data-testid="btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -20,7 +20,7 @@
         <BButton
           :disabled="competencias.length === 0"
           variant="outline-success"
-          data-testid="btn-disponibilizar-mapa"
+          data-testid="btn-cad-mapa-disponibilizar"
           @click="abrirModalDisponibilizar"
         >
           Disponibilizar
@@ -43,7 +43,7 @@
           v-for="comp in competencias"
           :key="comp.codigo"
           class="mb-2 competencia-card"
-          data-testid="competencia-item"
+          data-testid="card-competencia"
           no-body
         >
           <BCardBody>
@@ -52,7 +52,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="competencia-descricao"
+                data-testid="txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <BButton
@@ -93,7 +93,7 @@
                       v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
                       v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
                       class="badge bg-secondary ms-2"
-                      data-testid="badge-conhecimentos"
+                      data-testid="txt-badge-conhecimentos"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
@@ -126,7 +126,7 @@
       :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       size="lg"
       centered
-      data-testid="criar-competencia-modal"
+      data-testid="mdl-criar-competencia"
       @hidden="fecharModalCriarNovaCompetencia"
     >
       <!-- Conteúdo do card movido para cá -->
@@ -135,7 +135,7 @@
         <div class="mb-2">
           <BFormTextarea
             v-model="novaCompetencia.descricao"
-            data-testid="input-descricao-competencia"
+            data-testid="inp-mdl-criar-competencia-descricao"
             placeholder="Descreva a competência"
             rows="3"
           />
@@ -158,14 +158,14 @@
                 :id="`atv-${atividade.codigo}`"
                 v-model="atividadesSelecionadas"
                 :value="atividade.codigo"
-                data-testid="atividade-checkbox"
+                data-testid="chk-mdl-criar-competencia-atividade"
               >
                 {{ atividade.descricao }}
                 <span
                   v-if="atividade.conhecimentos.length > 0"
                   v-b-tooltip.html.right="getConhecimentosModal(atividade)"
                   class="badge bg-secondary ms-2"
-                  data-testid="badge-conhecimentos"
+                  data-testid="txt-badge-conhecimentos"
                 >
                   {{ atividade.conhecimentos.length }}
                 </span>
@@ -185,7 +185,7 @@
           v-b-tooltip.hover
           variant="primary"
           :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-salvar-competencia"
+          data-testid="btn-mdl-criar-competencia-salvar"
           title="Criar Competência"
           @click="adicionarCompetenciaEFecharModal"
         >
@@ -199,7 +199,7 @@
       v-model="mostrarModalDisponibilizar"
       :fade="false"
       title="Disponibilização do mapa de competências"
-      data-testid="disponibilizar-modal"
+      data-testid="mdl-disponibilizar-mapa"
       centered
       @hidden="fecharModalDisponibilizar"
     >
@@ -211,7 +211,7 @@
         <BFormInput
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          data-testid="input-data-limite"
+          data-testid="inp-mdl-disponibilizar-data"
           type="date"
         />
       </div>
@@ -223,7 +223,7 @@
         <BFormTextarea
           id="observacoes"
           v-model="observacoesDisponibilizacao"
-          data-testid="input-observacoes-disponibilizacao"
+          data-testid="inp-mdl-disponibilizar-obs"
           rows="3"
           placeholder="Digite observações sobre a disponibilização..."
         />
@@ -234,14 +234,14 @@
         class="mt-3"
         :model-value="true"
         :fade="false"
-        data-testid="notificacao-disponibilizacao"
+        data-testid="alert-mdl-disponibilizar"
       >
         {{ notificacaoDisponibilizacao }}
       </BAlert>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-modal-cancelar"
+          data-testid="btn-mdl-disponibilizar-cancelar"
           @click="fecharModalDisponibilizar"
         >
           Cancelar
@@ -249,7 +249,7 @@
         <BButton
           variant="success"
           :disabled="!dataLimiteValidacao"
-          data-testid="btn-modal-confirmar"
+          data-testid="btn-mdl-disponibilizar-confirmar"
           @click="disponibilizarMapa"
         >
           Disponibilizar
@@ -262,7 +262,7 @@
       v-model="mostrarModalExcluirCompetencia"
       :fade="false"
       title="Exclusão de competência"
-      data-testid="excluir-competencia-modal"
+      data-testid="mdl-excluir-competencia"
       ok-title="Confirmar"
       cancel-title="Cancelar"
       ok-variant="danger"

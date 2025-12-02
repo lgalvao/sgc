@@ -9,7 +9,7 @@
           v-if="podeValidar"
           variant="outline-warning"
           title="Apresentar sugestões"
-          data-testid="apresentar-sugestoes-btn"
+          data-testid="btn-mapa-sugestoes"
           @click="abrirModalSugestoes"
         >
           Apresentar sugestões
@@ -18,7 +18,7 @@
           v-if="podeValidar"
           variant="outline-success"
           title="Validar mapa"
-          data-testid="validar-btn"
+          data-testid="btn-mapa-validar"
           @click="abrirModalValidar"
         >
           Validar
@@ -28,7 +28,7 @@
           v-if="podeValidar && temHistoricoAnalise"
           variant="outline-secondary"
           title="Histórico de análise"
-          data-testid="historico-analise-btn"
+          data-testid="btn-mapa-historico"
           @click="verHistorico"
         >
           Histórico de análise
@@ -39,7 +39,7 @@
           v-show="podeVerSugestoes"
           variant="outline-info"
           title="Ver sugestões"
-          data-testid="ver-sugestoes-btn"
+          data-testid="btn-mapa-ver-sugestoes"
           @click="verSugestoes"
         >
           Ver sugestões
@@ -48,7 +48,7 @@
           v-if="podeAnalisar"
           variant="outline-secondary"
           title="Histórico de análise"
-          data-testid="historico-analise-btn-gestor"
+          data-testid="btn-mapa-historico-gestor"
           @click="verHistorico"
         >
           Histórico de análise
@@ -57,7 +57,7 @@
           v-if="podeAnalisar"
           variant="outline-danger"
           title="Devolver para ajustes"
-          data-testid="devolver-ajustes-btn"
+          data-testid="btn-mapa-devolver"
           @click="abrirModalDevolucao"
         >
           Devolver para ajustes
@@ -65,7 +65,7 @@
         <BButton
           v-if="podeAnalisar"
           variant="outline-success"
-          data-testid="btn-registrar-aceite-homologar"
+          data-testid="btn-mapa-homologar-aceite"
           title="Aceitar"
           @click="abrirModalAceitar"
         >
@@ -92,7 +92,7 @@
           v-for="comp in mapa?.competencias"
           :key="comp.codigo"
           class="mb-3 competencia-card"
-          data-testid="competencia-block"
+          data-testid="card-competencia"
           no-body
         >
           <BCardBody class="py-2">
@@ -101,7 +101,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="competencia-descricao"
+                data-testid="txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
@@ -111,7 +111,7 @@
               >
                 <BCard
                   class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
-                  data-testid="atividade-item"
+                  data-testid="card-atividade-associada"
                   no-body
                 >
                   <BCardBody class="d-flex align-items-center py-1 px-2">
@@ -122,7 +122,7 @@
                       v-for="conhecimento in atv.conhecimentos"
                       :key="conhecimento.descricao"
                       class="me-3 mb-1"
-                      data-testid="conhecimento-item"
+                      data-testid="txt-conhecimento-item"
                     >
                       {{ conhecimento.descricao }}
                     </span>
@@ -162,20 +162,20 @@
           v-model="sugestoes"
           rows="5"
           placeholder="Digite suas sugestões para o mapa de competências..."
-          data-testid="sugestoes-textarea"
+          data-testid="inp-mdl-sugestoes-texto"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-apresentar-sugestoes-cancelar"
+          data-testid="btn-mdl-sugestoes-cancelar"
           @click="fecharModalSugestoes"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
-          data-testid="modal-apresentar-sugestoes-confirmar"
+          data-testid="btn-mdl-sugestoes-confirmar"
           @click="confirmarSugestoes"
         >
           Confirmar
@@ -196,13 +196,13 @@
           v-model="sugestoesVisualizacao"
           rows="5"
           readonly
-          data-testid="sugestoes-visualizacao-textarea"
+          data-testid="txt-mdl-ver-sugestoes"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-sugestoes-fechar"
+          data-testid="btn-mdl-ver-sugestoes-fechar"
           @click="fecharModalVerSugestoes"
         >
           Fechar
@@ -221,14 +221,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-validar-cancelar"
+          data-testid="btn-mdl-validar-cancelar"
           @click="fecharModalValidar"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
-          data-testid="modal-validar-confirmar"
+          data-testid="btn-mdl-validar-confirmar"
           @click="confirmarValidacao"
         >
           Validar
@@ -254,20 +254,20 @@
           v-model="observacaoDevolucao"
           rows="3"
           placeholder="Digite observações sobre a devolução..."
-          data-testid="observacao-devolucao-textarea"
+          data-testid="inp-mdl-devolucao-obs"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-devolucao-cancelar"
+          data-testid="btn-mdl-devolucao-cancelar"
           @click="fecharModalDevolucao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="danger"
-          data-testid="modal-devolucao-confirmar"
+          data-testid="btn-mdl-devolucao-confirmar"
           @click="confirmarDevolucao"
         >
           Confirmar
@@ -285,7 +285,7 @@
     >
       <table
         class="table table-striped"
-        data-testid="tabela-historico"
+        data-testid="tbl-historico-analise"
       >
         <thead>
           <tr>
@@ -299,7 +299,7 @@
           <tr
             v-for="item in historicoAnalise"
             :key="item.codigo"
-            data-testid="historico-item"
+            data-testid="row-historico"
           >
             <td>{{ item.data }}</td>
             <td>{{ item.unidade }}</td>
@@ -311,7 +311,7 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-historico-fechar"
+          data-testid="btn-mdl-historico-fechar"
           @click="fecharModalHistorico"
         >
           Fechar

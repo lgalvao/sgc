@@ -108,7 +108,7 @@
         <BFormTextarea
           id="observacaoValidacao"
           v-model="observacaoValidacao"
-          data-testid="input-observacao-aceite"
+          data-testid="inp-mdl-aceite-obs"
           rows="3"
         />
       </div>
@@ -121,7 +121,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-modal-confirmar-aceite"
+          data-testid="btn-mdl-aceite-confirmar"
           @click="confirmarValidacao"
         >
           Confirmar
@@ -146,7 +146,7 @@
         <BFormTextarea
           id="observacaoDevolucao"
           v-model="observacaoDevolucao"
-          data-testid="input-observacao-devolucao"
+          data-testid="inp-mdl-devolucao-obs"
           rows="3"
         />
       </div>
@@ -159,7 +159,7 @@
         </BButton>
         <BButton
           variant="danger"
-          data-testid="btn-modal-confirmar-devolucao"
+          data-testid="btn-mdl-devolucao-confirmar"
           @click="confirmarDevolucao"
         >
           Confirmar

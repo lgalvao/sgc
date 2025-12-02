@@ -72,7 +72,8 @@ public class SubprocessoCadastroController {
         @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
         public ResponseEntity<RespostaDto> disponibilizarCadastro(
                         @PathVariable("codigo") Long codSubprocesso,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -106,7 +107,8 @@ public class SubprocessoCadastroController {
         @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
 
         public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long codigo,
-                        @AuthenticationPrincipal String tituloUsuario) {
+                        @AuthenticationPrincipal Object principal) {
+                String tituloUsuario = extractTituloUsuario(principal);
                 Usuario usuario = usuarioRepo.findById(tituloUsuario)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
                                                 tituloUsuario));
@@ -305,4 +307,10 @@ public class SubprocessoCadastroController {
                 subprocessoMapaService.importarAtividades(codigo, request.getCodSubprocessoOrigem());
                 return Map.of("message", "Atividades importadas.");
         }
+
+    private String extractTituloUsuario(Object principal) {
+        if (principal instanceof String) return (String) principal;
+        if (principal instanceof sgc.sgrh.model.Usuario) return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        return principal != null ? principal.toString() : null;
+    }
 }
