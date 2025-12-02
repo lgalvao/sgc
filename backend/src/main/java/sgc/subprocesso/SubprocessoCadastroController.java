@@ -17,9 +17,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.SgrhService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
@@ -38,7 +36,6 @@ public class SubprocessoCadastroController {
         private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
                         .toFactory();
 
-        private final UsuarioRepo usuarioRepo;
         private final SubprocessoService subprocessoService;
         private final SubprocessoDtoService subprocessoDtoService;
         private final SubprocessoWorkflowService subprocessoWorkflowService;
@@ -146,9 +143,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody DevolverCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.devolverCadastro(
@@ -171,9 +166,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody AceitarCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.aceitarCadastro(
@@ -195,9 +188,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody HomologarCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.homologarCadastro(
@@ -221,9 +212,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody DevolverCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.devolverRevisaoCadastro(
@@ -245,9 +234,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody AceitarCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.aceitarRevisaoCadastro(
@@ -272,9 +259,7 @@ public class SubprocessoCadastroController {
                         @Valid @RequestBody HomologarCadastroReq request,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
                 subprocessoWorkflowService.homologarRevisaoCadastro(

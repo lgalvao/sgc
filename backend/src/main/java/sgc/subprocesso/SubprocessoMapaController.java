@@ -56,14 +56,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
-        String tituloUsuario;
-        if (principal instanceof String) {
-            tituloUsuario = (String) principal;
-        } else if (principal instanceof sgc.sgrh.model.Usuario) {
-            tituloUsuario = ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
-        } else {
-            tituloUsuario = principal != null ? principal.toString() : null;
-        }
+        String tituloUsuario = extractTituloUsuario(principal);
         if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
@@ -105,9 +98,9 @@ public class SubprocessoMapaController {
     public MapaCompletoDto salvarMapa(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
-        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, tituloUsuario);
+        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, extractTituloUsuario(principal));
     }
 
     /**
@@ -132,12 +125,12 @@ public class SubprocessoMapaController {
     public void salvarAjustesMapa(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarAjustesReq request,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
         subprocessoMapaService.salvarAjustesMapa(
                 codigo,
                 request.getCompetencias(),
-                tituloUsuario
+                extractTituloUsuario(principal)
         );
     }
 
@@ -174,9 +167,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, tituloUsuario);
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, extractTituloUsuario(principal));
         return ResponseEntity.ok(mapa);
     }
 
@@ -186,9 +179,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
             @PathVariable Long codigo,
             @RequestBody @Valid CompetenciaReq request,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codigo, request, tituloUsuario);
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codigo, request, extractTituloUsuario(principal));
         return ResponseEntity.ok(mapa);
     }
 
@@ -199,9 +192,9 @@ public class SubprocessoMapaController {
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
             @RequestBody @Valid CompetenciaReq request,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request, tituloUsuario);
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request, extractTituloUsuario(principal));
         return ResponseEntity.ok(mapa);
     }
 
@@ -211,9 +204,9 @@ public class SubprocessoMapaController {
     public ResponseEntity<MapaCompletoDto> removerCompetencia(
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
-            @AuthenticationPrincipal String tituloUsuario
+            @AuthenticationPrincipal Object principal
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, tituloUsuario);
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, extractTituloUsuario(principal));
         return ResponseEntity.ok(mapa);
     }
 
@@ -225,17 +218,16 @@ public class SubprocessoMapaController {
         @RequestBody @Valid DisponibilizarMapaRequest request,
         @AuthenticationPrincipal Object principal
     ) {
-        String tituloUsuario;
-        if (principal instanceof String) {
-            tituloUsuario = (String) principal;
-        } else if (principal instanceof sgc.sgrh.model.Usuario) {
-            tituloUsuario = ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
-        } else {
-            tituloUsuario = principal != null ? principal.toString() : null;
-        }
+        String tituloUsuario = extractTituloUsuario(principal);
         if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
         return ResponseEntity.ok().build();
+    }
+
+    private String extractTituloUsuario(Object principal) {
+        if (principal instanceof String) return (String) principal;
+        if (principal instanceof sgc.sgrh.model.Usuario) return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        return principal != null ? principal.toString() : null;
     }
 }

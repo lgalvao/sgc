@@ -27,6 +27,7 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
@@ -41,6 +42,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,7 +57,7 @@ class SubprocessoMapaControllerTest {
     @Mock private SubprocessoDtoService subprocessoDtoService;
     @Mock private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     @Mock private SubprocessoConsultaService subprocessoConsultaService;
-    @Mock private sgc.sgrh.model.UsuarioRepo usuarioRepo;
+    @Mock private SgrhService sgrhService;
 
     @InjectMocks private SubprocessoMapaController controller;
 
@@ -67,6 +69,10 @@ class SubprocessoMapaControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        lenient().when(sgrhService.buscarUsuarioPorLogin("123")).thenReturn(usuario);
+
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestExceptionHandler())
                 .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
@@ -77,10 +83,7 @@ class SubprocessoMapaControllerTest {
 
                     @Override
                     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-                        Usuario usuario = new Usuario();
-                        usuario.setTituloEleitoral("123");
-                        org.mockito.Mockito.lenient().when(usuarioRepo.findById(usuario.getTituloEleitoral())).thenReturn(java.util.Optional.of(usuario));
-                        return usuario.getTituloEleitoral();
+                        return "123";
                     }
                 })
                 .build();
@@ -123,7 +126,7 @@ class SubprocessoMapaControllerTest {
     void salvarMapa() throws Exception {
         SalvarMapaRequest req = new SalvarMapaRequest();
         req.setObservacoes("obs");
-        req.setCompetencias(List.of()); // Valid if empty list allowed by annotation, check DTO
+        req.setCompetencias(List.of());
 
         when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any())).thenReturn(new MapaCompletoDto());
 

@@ -1,0 +1,12 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+> Task :backend:test
+
+BUILD SUCCESSFUL in 1m 28s
+5 actionable tasks: 3 executed, 2 up-to-date
+Configuration cache entry stored.
