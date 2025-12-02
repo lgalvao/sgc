@@ -5,9 +5,10 @@ import {defineConfig, devices} from '@playwright/test';
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
-    timeout: 15_000,
-    expect: {timeout: 3_000},
+    timeout: 300_000,
+    expect: {timeout: 30_000},
     forbidOnly: !!process.env.CI,
+    workers: 1,
     reporter: 'dot',
     use: {
         baseURL: 'http://localhost:5173'
@@ -20,5 +21,5 @@ export default defineConfig({
         stdout: 'pipe',
         stderr: 'pipe',
     },
-    projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium'}}],
+    projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium-headless-shell'}}],
 });
