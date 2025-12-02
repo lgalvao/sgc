@@ -13,6 +13,8 @@
       :items="movimentacoes"
       :fields="fields"
       primary-key="codigo"
+      data-testid="tbl-movimentacoes"
+      :tbody-tr-attr="rowAttr"
     >
       <template #cell(dataHora)="data">
         {{ formatDateTimeBR(data.item.dataHora) }}
@@ -37,4 +39,11 @@ const fields = ref([
   {key: "unidadeDestino", label: "Unidade Destino"},
   {key: "descricao", label: "Descrição"},
 ]);
+
+const rowAttr = (item: Movimentacao | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-movimentacao-${item.codigo}` };
+  }
+  return {};
+};
 </script>

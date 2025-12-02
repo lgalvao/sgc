@@ -38,6 +38,7 @@
               <BFormCheckbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
+                :data-testid="'chk-unidade-' + unidade.sigla"
               />
             </td>
             <td><strong>{{ unidade.sigla }}</strong></td>
@@ -51,12 +52,14 @@
     <template #footer>
       <BButton
         variant="secondary"
+        data-testid="btn-modal-cancelar"
         @click="emit('fechar')"
       >
         <i class="bi bi-x-circle" /> Cancelar
       </BButton>
       <BButton
         :variant="tipo === 'aceitar' ? 'primary' : 'success'"
+        data-testid="btn-confirmar-acao-bloco"
         @click="emit('confirmar', unidades)"
       >
         <i :class="tipo === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

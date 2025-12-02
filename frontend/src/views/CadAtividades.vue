@@ -37,6 +37,7 @@
         <BButton
           v-if="isChefe && historicoAnalises.length > 0"
           variant="outline-info"
+          data-testid="btn-cad-atividades-historico"
           @click="abrirModalHistorico"
         >
           Histórico de análise
@@ -44,6 +45,7 @@
         <BButton
           v-if="isChefe"
           variant="outline-primary"
+          data-testid="btn-cad-atividades-importar"
           title="Importar"
           @click="mostrarModalImportar = true"
         >

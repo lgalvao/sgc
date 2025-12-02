@@ -31,6 +31,7 @@
             <tr
               v-for="(analise, index) in analises"
               :key="index"
+              :data-testid="`row-historico-${index}`"
             >
               <td>{{ formatarData(analise.dataHora) }}</td>
               <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>

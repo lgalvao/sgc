@@ -10,6 +10,7 @@
       <div class="d-flex gap-2">
         <BButton
           variant="outline-success"
+          data-testid="btn-finalizar-identificacao"
           @click="finalizarIdentificacao"
         >
           <i class="bi bi-check-circle me-2" />Finalizar Identificação
@@ -67,6 +68,7 @@
           <BButton
             variant="outline-danger"
             size="sm"
+            data-testid="btn-remover-ocupacao"
             @click="removerOcupacao(index)"
           >
             <i class="bi bi-trash" />
@@ -90,6 +92,7 @@
               v-model="novaOcupacao.nome"
               type="text"
               required
+              data-testid="inp-ocupacao-nome"
             />
           </div>
           <div class="col-md-6">
@@ -104,6 +107,7 @@
                 { value: 4, text: '4 - Alto' },
                 { value: 5, text: '5 - Muito Alto' },
               ]"
+              data-testid="sel-ocupacao-criticidade"
             />
           </div>
           <div class="col-12">
@@ -112,6 +116,7 @@
               v-model="novaOcupacao.descricao"
               rows="3"
               required
+              data-testid="txt-ocupacao-descricao"
             />
           </div>
           <div class="col-12">
@@ -126,6 +131,7 @@
                   :id="'comp-' + competencia.codigo"
                   v-model="novaOcupacao.competenciasCriticas"
                   :value="competencia.descricao"
+                  :data-testid="`chk-ocupacao-competencia-${competencia.codigo}`"
                 >
                   {{ competencia.descricao }}
                 </BFormCheckbox>
@@ -136,6 +142,7 @@
             <BButton
               type="submit"
               variant="primary"
+              data-testid="btn-adicionar-ocupacao"
             >
               <i class="bi bi-plus-circle me-2" />Adicionar Ocupação
             </BButton>
@@ -156,12 +163,14 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
+          data-testid="btn-modal-confirmar"
           @click="confirmarFinalizacao"
         >
           Confirmar

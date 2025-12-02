@@ -13,6 +13,7 @@
           min="1"
           required
           type="number"
+          data-testid="inp-config-dias-inativacao"
         />
         <div class="form-text">
           Dias depois da finalização de um processo para que seja considerado inativo.
@@ -30,6 +31,7 @@
           min="1"
           required
           type="number"
+          data-testid="inp-config-dias-alerta"
         />
         <div class="form-text">
           Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.
@@ -39,6 +41,7 @@
       <BButton
         variant="primary"
         type="submit"
+        data-testid="btn-config-salvar"
       >
         Salvar
       </BButton>

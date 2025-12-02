@@ -51,6 +51,7 @@
       >
         <BButton
           variant="outline-primary"
+          data-testid="btn-alterar-data-limite"
           @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1" />

@@ -7,6 +7,7 @@
         :checked="isChecked(unidade.sigla)"
         class="form-check-input"
         type="checkbox"
+        :data-testid="`chk-unidade-tree-${unidade.sigla}`"
         :indeterminate.prop="isIndeterminate(unidade) !== false"
         @change="() => toggleUnidade(unidade)"
       >

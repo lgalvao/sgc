@@ -103,6 +103,7 @@
                     variant="outline-secondary"
                     size="sm"
                     class="botao-acao-inline"
+                    data-testid="btn-remover-atividade-associada"
                     title="Remover Atividade"
                     @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >

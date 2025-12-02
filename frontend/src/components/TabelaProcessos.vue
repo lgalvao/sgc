@@ -6,6 +6,7 @@
       hover
       responsive
       data-testid="tbl-processos"
+      :tbody-tr-attr="rowAttr"
       :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
       :sort-desc="[!direcaoOrdenacaoAsc]"
       @row-clicked="handleSelecionarProcesso"
@@ -90,4 +91,11 @@ function formatarTipo(tipo: string): string {
   };
   return mapa[tipo] || tipo;
 }
+
+const rowAttr = (item: ProcessoResumo | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-processo-${item.codigo}` };
+  }
+  return {};
+};
 </script>

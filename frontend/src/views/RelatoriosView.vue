@@ -14,6 +14,7 @@
         <BFormSelect
           id="filtroTipo"
           v-model="filtroTipo"
+          data-testid="sel-filtro-tipo"
           :options="[
             { value: '', text: 'Todos' },
             { value: 'Mapeamento', text: 'Mapeamento' },
@@ -31,6 +32,7 @@
           id="filtroDataInicio"
           v-model="filtroDataInicio"
           type="date"
+          data-testid="inp-filtro-data-inicio"
         />
       </div>
       <div class="col-md-4">
@@ -42,6 +44,7 @@
           id="filtroDataFim"
           v-model="filtroDataFim"
           type="date"
+          data-testid="inp-filtro-data-fim"
         />
       </div>
     </div>
@@ -51,6 +54,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-mapas"
           @click="abrirModalMapasVigentes"
         >
           <h5 class="card-title">
@@ -66,6 +70,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-gaps"
           @click="abrirModalDiagnosticosGaps"
         >
           <h5 class="card-title">
@@ -81,6 +86,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-andamento"
           @click="abrirModalAndamentoGeral"
         >
           <h5 class="card-title">

@@ -10,6 +10,7 @@
       <div class="d-flex gap-2">
         <BButton
           variant="outline-success"
+          data-testid="btn-finalizar-diagnostico"
           @click="finalizarDiagnostico"
         >
           <i class="bi bi-check-circle me-2" />Finalizar Diagnóstico
@@ -46,6 +47,7 @@
             <label class="form-label fw-bold">Importância da competência:</label>
             <BFormSelect
               v-model="avaliacoes[competencia.codigo].importancia"
+              :data-testid="`sel-importancia-${competencia.codigo}`"
               :options="[
                 { value: 1, text: '1 - Muito baixa' },
                 { value: 2, text: '2 - Baixa' },
@@ -60,6 +62,7 @@
             <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
             <BFormSelect
               v-model="avaliacoes[competencia.codigo].dominio"
+              :data-testid="`sel-dominio-${competencia.codigo}`"
               :options="[
                 { value: 1, text: '1 - Muito baixo' },
                 { value: 2, text: '2 - Baixo' },
@@ -76,6 +79,7 @@
               v-model="avaliacoes[competencia.codigo].observacoes"
               rows="2"
               placeholder="Comentários sobre esta competência..."
+              :data-testid="`txt-obs-${competencia.codigo}`"
             />
           </div>
         </BCard>
@@ -120,12 +124,14 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
+          data-testid="btn-modal-confirmar"
           @click="confirmarFinalizacao"
         >
           Confirmar

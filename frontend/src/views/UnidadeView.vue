@@ -42,6 +42,7 @@
         <BButton
           v-if="mapaVigente"
           variant="outline-success"
+          data-testid="btn-mapa-vigente"
           @click="visualizarMapa"
         >
           <i

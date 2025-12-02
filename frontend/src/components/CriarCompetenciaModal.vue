@@ -36,6 +36,7 @@
               v-model="atividadesSelecionadas"
               :value="atividade.codigo"
               class="form-check-input me-2"
+              :data-testid="`chk-atividade-${atividade.codigo}`"
             >
               {{ atividade.descricao }}
               <span
