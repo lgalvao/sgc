@@ -26,7 +26,7 @@ import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.service.SgrhService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @RestController
@@ -41,7 +41,7 @@ public class SubprocessoMapaController {
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoConsultaService subprocessoConsultaService;
-    private final UsuarioRepo usuarioRepo;
+    private final SgrhService sgrhService;
 
     /**
      * Analisa e retorna os impactos de uma revisão de mapa de competências.
@@ -65,8 +65,7 @@ public class SubprocessoMapaController {
             tituloUsuario = principal != null ? principal.toString() : null;
         }
         if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
-        Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
+        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 
@@ -235,8 +234,7 @@ public class SubprocessoMapaController {
             tituloUsuario = principal != null ? principal.toString() : null;
         }
         if (tituloUsuario == null) throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
-        Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado", tituloUsuario));
+        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
         return ResponseEntity.ok().build();
     }
