@@ -108,6 +108,11 @@ class CDU14IntegrationTest {
         when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString())).thenReturn(List.of(
                 new PerfilDto(chefe.getTituloEleitoral().toString(), 102L, "SA", Perfil.CHEFE.name())
         ));
+
+        when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString())).thenReturn(admin);
+        when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString())).thenReturn(gestor);
+        when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString())).thenReturn(chefe);
+
         Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
         unidadeAdmin.setTitular(admin);
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();

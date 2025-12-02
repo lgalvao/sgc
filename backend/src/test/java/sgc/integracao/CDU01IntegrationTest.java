@@ -149,7 +149,7 @@ public class CDU01IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Unidade não encontrada com código: " + codigoUnidadeInexistente));
+                .andExpect(jsonPath("$.message").value("Unidade não encontrada, código: " + codigoUnidadeInexistente));
         }
     }
 }
