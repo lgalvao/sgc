@@ -18,6 +18,7 @@ import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.service.SgrhService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
@@ -37,6 +38,7 @@ public class SubprocessoCadastroController {
         private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
                         .toFactory();
 
+        private final UsuarioRepo usuarioRepo;
         private final SubprocessoService subprocessoService;
         private final SubprocessoDtoService subprocessoDtoService;
         private final SubprocessoWorkflowService subprocessoWorkflowService;
@@ -44,7 +46,7 @@ public class SubprocessoCadastroController {
         private final AnaliseMapper analiseMapper;
 
         private final SubprocessoMapaService subprocessoMapaService;
-        private final UsuarioRepo usuarioRepo;
+        private final SgrhService sgrhService;
 
         /**
          * Obtém o histórico de análises da fase de cadastro de um subprocesso.
@@ -73,9 +75,7 @@ public class SubprocessoCadastroController {
                         @PathVariable("codigo") Long codSubprocesso,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
                 if (faltando != null && !faltando.isEmpty()) {
                         var lista = faltando.stream()
@@ -107,9 +107,7 @@ public class SubprocessoCadastroController {
         public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long codigo,
                         @AuthenticationPrincipal Object principal) {
                 String tituloUsuario = extractTituloUsuario(principal);
-                Usuario usuario = usuarioRepo.findById(tituloUsuario)
-                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado",
-                                                tituloUsuario));
+                Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
                 List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
                 if (faltando != null && !faltando.isEmpty()) {
                         var lista = faltando.stream()
