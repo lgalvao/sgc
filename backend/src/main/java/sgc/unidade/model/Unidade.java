@@ -3,9 +3,11 @@ package sgc.unidade.model;
 import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
+import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,18 +19,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @AttributeOverrides({
-    @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
+        @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
 })
 public class Unidade extends EntidadeBase {
-    public Unidade(Long codigo, String nome, String sigla, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
-        super(codigo);
-        this.nome = nome;
-        this.sigla = sigla;
-        this.tipo = tipo;
-        this.situacao = situacao;
-        this.unidadeSuperior = unidadeSuperior;
-    }
-
     public Unidade(String nome, String sigla) {
         super();
         this.nome = nome;
@@ -37,23 +30,13 @@ public class Unidade extends EntidadeBase {
         this.tipo = TipoUnidade.OPERACIONAL;
     }
 
-    public Unidade(String nome, String sigla, Usuario titular, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
-        super();
-        this.nome = nome;
-        this.sigla = sigla;
-        this.titular = titular;
-        this.tipo = tipo;
-        this.situacao = situacao;
-        this.unidadeSuperior = unidadeSuperior;
-    }
-
     @Column(name = "nome")
     private String nome;
 
     @Column(name = "sigla", length = 20)
     private String sigla;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "titular_titulo")
     private Usuario titular;
 
@@ -71,10 +54,10 @@ public class Unidade extends EntidadeBase {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mapa_vigente_codigo")
-    private sgc.mapa.model.Mapa mapaVigente;
+    private Mapa mapaVigente;
 
     @Column(name = "data_vigencia_mapa_atual")
-    private java.time.LocalDateTime dataVigenciaMapaAtual;
+    private LocalDateTime dataVigenciaMapa;
 
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default

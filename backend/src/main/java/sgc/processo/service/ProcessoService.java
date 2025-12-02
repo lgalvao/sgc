@@ -418,7 +418,7 @@ public class ProcessoService {
                             "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
             unidade.setMapaVigente(mapaDoSubprocesso);
-            unidade.setDataVigenciaMapaAtual(LocalDateTime.now());
+            unidade.setDataVigenciaMapa(LocalDateTime.now());
             unidadeRepo.save(unidade);
             log.debug("Mapa vigente para unidade {} definido como mapa {}", unidade.getCodigo(),
                     mapaDoSubprocesso.getCodigo());

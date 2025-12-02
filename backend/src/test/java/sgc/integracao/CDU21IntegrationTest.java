@@ -135,7 +135,7 @@ class CDU21IntegrationTest {
         Unidade un1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
         Subprocesso sp1 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo())).findFirst().orElseThrow();
         assertThat(un1.getMapaVigente().getCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(un1.getDataVigenciaMapaAtual()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(un1.getDataVigenciaMapa()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
 
         Unidade un2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();

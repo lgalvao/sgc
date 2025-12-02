@@ -12,6 +12,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
 import sgc.sgrh.model.Usuario;
@@ -23,6 +24,9 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
+
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPA_AJUSTADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
 
 @Service
 @RequiredArgsConstructor
@@ -77,28 +81,41 @@ public class SubprocessoWorkflowService {
     }
 
     private void validarSubprocessoParaDisponibilizacao(Subprocesso sp, Usuario usuario, Long codSubprocesso) {
-        if (!sp.getUnidade().getTitular().equals(usuario)) {
-            throw new ErroAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
+        Unidade unidadeSubprocesso = sp.getUnidade();
+        Usuario titularUnidade = unidadeSubprocesso.getTitular();
+
+        if (!titularUnidade.equals(usuario)) {
+            String msg = "Usuário %s não é o titular da unidade (%s). Titular é %s".formatted(
+                    usuario.getTituloEleitoral(),
+                    unidadeSubprocesso.getSigla(),
+                    titularUnidade.getTituloEleitoral());
+            throw new ErroAccessoNegado(msg);
         }
         if (!subprocessoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
         }
-        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
+        Mapa mapa = sp.getMapa();
+        if (mapa == null || mapa.getCodigo() == null) {
+            // TODO usar uma execção de negócio específica
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
-        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+
     }
 
     @Transactional
-    public void disponibilizarMapa(Long codSubprocesso, String observacoes, LocalDateTime dataLimiteEtapa2, Usuario usuario) {
+    public void disponibilizarMapa(Long codSubprocesso, String observacoes, LocalDateTime dataLimiteEtapa2,
+            Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
-        if (situacaoAtual != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA && situacaoAtual != SituacaoSubprocesso.MAPA_AJUSTADO) {
-            throw new IllegalStateException("O mapa de competências só pode ser disponibilizado a partir dos estados 'Revisão de Cadastro Homologada' ou 'Mapa Ajustado'. Estado atual: " + situacaoAtual);
+        if (situacaoAtual != REVISAO_CADASTRO_HOMOLOGADA && situacaoAtual != MAPA_AJUSTADO) {
+            // TODO usar uma execção de negócio específica
+            throw new IllegalStateException(
+                    "O mapa de competências só pode ser disponibilizado a partir dos estados 'Revisão de Cadastro Homologada' ou 'Mapa Ajustado'. Estado atual: "
+                            + situacaoAtual);
         }
-
         if (sp.getMapa() == null) {
+            // TODO usar uma execção de negócio específica
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
 
@@ -116,7 +133,8 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC").orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
 
         publicadorDeEventos.publishEvent(EventoSubprocessoMapaDisponibilizado.builder()
                 .codSubprocesso(codSubprocesso)
@@ -235,7 +253,8 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+                .orElseThrow(() -> new IllegalStateException(
+                        "Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
         publicadorDeEventos.publishEvent(EventoSubprocessoMapaHomologado.builder()
                 .codSubprocesso(codSubprocesso)
@@ -267,7 +286,7 @@ public class SubprocessoWorkflowService {
     @Transactional
     public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        
+
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior == null) {
             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
@@ -338,7 +357,8 @@ public class SubprocessoWorkflowService {
         }
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+                .orElseThrow(() -> new IllegalStateException(
+                        "Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
         sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
@@ -357,12 +377,13 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
+            throw new IllegalStateException(
+                    "Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
-        
+
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
-             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+            throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
@@ -396,12 +417,13 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
+            throw new IllegalStateException(
+                    "Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
-        
+
         Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
         if (unidadeAnalise == null) {
-             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
+            throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
@@ -416,17 +438,18 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
         if (unidadeDestino == null) {
-             // If no further superior, maybe it stays here or goes to SEDOC? 
-             // Assuming classic flow, it might stop or go to homologation. 
-             // The original code assumed unitAnalise.getUnidadeSuperior() existed.
-             // We'll keep that assumption but guard it if needed.
-             // For now, let's assume it exists as per original logic.
-             unidadeDestino = unidadeAnalise; // Fallback if top level? Or throw?
-             // Original: unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
-             // Let's try to get it safely.
-             if (unidadeAnalise.getUnidadeSuperior() != null) {
-                 unidadeDestino = unidadeAnalise.getUnidadeSuperior();
-             }
+            // If no further superior, maybe it stays here or goes to SEDOC?
+            // Assuming classic flow, it might stop or go to homologation.
+            // The original code assumed unitAnalise.getUnidadeSuperior() existed.
+            // We'll keep that assumption but guard it if needed.
+            // For now, let's assume it exists as per original logic.
+            unidadeDestino = unidadeAnalise; // Fallback if top level? Or throw?
+            // Original:
+            // unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
+            // Let's try to get it safely.
+            if (unidadeAnalise.getUnidadeSuperior() != null) {
+                unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+            }
         }
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
@@ -446,7 +469,8 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro aguardando homologação.");
+            throw new IllegalStateException(
+                    "Ação de homologar só pode ser executada em revisões de cadastro aguardando homologação.");
         }
 
         var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
@@ -455,9 +479,10 @@ public class SubprocessoWorkflowService {
             sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         } else {
             Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                    .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
 
             publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoHomologada.builder()
                     .codSubprocesso(codSubprocesso)

@@ -33,11 +33,16 @@ public class SubprocessoPermissoesService {
                 return SubprocessoPermissoesDto.builder()
                                 .podeVerPagina(isAdmin || isGestor || isChefeDaUnidade)
                                 .podeEditarMapa(
-                                                isChefeDaUnidade &&
-                                                                (situacao == SituacaoSubprocesso.NAO_INICIADO
-                                                                                || situacao == SituacaoSubprocesso.MAPA_ELABORADO
-                                                                                || situacao == SituacaoSubprocesso.MAPA_AJUSTADO
-                                                                                || situacao == SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO))
+                                                (isAdmin &&
+                                                                (situacao == SituacaoSubprocesso.CADASTRO_HOMOLOGADO
+                                                                                || situacao == SituacaoSubprocesso.MAPA_CRIADO
+                                                                                || situacao == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                                                                                || situacao == SituacaoSubprocesso.MAPA_AJUSTADO))
+                                                                ||
+                                                                (isChefeDaUnidade &&
+                                                                                (situacao == SituacaoSubprocesso.NAO_INICIADO
+                                                                                                || situacao == SituacaoSubprocesso.MAPA_ELABORADO
+                                                                                                || situacao == SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO)))
                                 .podeVisualizarMapa(true)
                                 .podeDisponibilizarCadastro(
                                                 isChefeDaUnidade && situacao == SituacaoSubprocesso.MAPA_ELABORADO)

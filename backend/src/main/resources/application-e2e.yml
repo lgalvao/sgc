@@ -43,4 +43,4 @@ logging:
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
-    sgc: INFO
+    sgc: DEBUG

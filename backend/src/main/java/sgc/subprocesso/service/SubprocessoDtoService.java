@@ -28,7 +28,6 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.util.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class SubprocessoDtoService {
 
         Subprocesso sp = repositorioSubprocesso.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
-        log.debug("Subprocesso encontrado: {}", sp);
+        log.debug("Subprocesso encontrado: {}", sp.getCodigo());
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -88,7 +87,7 @@ public class SubprocessoDtoService {
     private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
         boolean hasPerfil = usuario.getTodasAtribuicoes().stream()
                 .anyMatch(a -> a.getPerfil() == perfil);
-        
+
         if (!hasPerfil) {
             log.warn("Usuário não possui o perfil solicitado.");
             throw new ErroAccessoNegado("Perfil inválido para o usuário.");
@@ -103,7 +102,7 @@ public class SubprocessoDtoService {
         if (unidadeAlvo == null) {
             throw new ErroAccessoNegado("Unidade não identificada.");
         }
-        
+
         boolean hasPermission = usuario.getTodasAtribuicoes().stream()
                 .filter(a -> a.getPerfil() == perfil)
                 .anyMatch(a -> {
@@ -117,8 +116,8 @@ public class SubprocessoDtoService {
                 });
 
         if (!hasPermission) {
-             log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
-             throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
+            log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
+            throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
         }
     }
 
@@ -159,7 +158,7 @@ public class SubprocessoDtoService {
 
         return SubprocessoCadastroDto.builder()
                 .subprocessoId(sp.getCodigo())
-                .unidadeSigla(HtmlUtils.escapeHtml(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null))
+                .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
                 .atividades(atividadesComConhecimentos)
                 .build();
     }
