@@ -135,7 +135,7 @@
         <div class="mb-2">
           <BFormTextarea
             v-model="novaCompetencia.descricao"
-            data-testid="inp-mdl-criar-competencia-descricao"
+            data-testid="inp-criar-competencia-descricao"
             placeholder="Descreva a competência"
             rows="3"
           />
@@ -158,7 +158,7 @@
                 :id="`atv-${atividade.codigo}`"
                 v-model="atividadesSelecionadas"
                 :value="atividade.codigo"
-                data-testid="chk-mdl-criar-competencia-atividade"
+                data-testid="chk-criar-competencia-atividade"
               >
                 {{ atividade.descricao }}
                 <span
@@ -185,7 +185,7 @@
           v-b-tooltip.hover
           variant="primary"
           :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-mdl-criar-competencia-salvar"
+          data-testid="btn-criar-competencia-salvar"
           title="Criar Competência"
           @click="adicionarCompetenciaEFecharModal"
         >
@@ -211,7 +211,7 @@
         <BFormInput
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          data-testid="inp-mdl-disponibilizar-data"
+          data-testid="inp-disponibilizar-mapa-data"
           type="date"
         />
       </div>
@@ -223,7 +223,7 @@
         <BFormTextarea
           id="observacoes"
           v-model="observacoesDisponibilizacao"
-          data-testid="inp-mdl-disponibilizar-obs"
+          data-testid="inp-disponibilizar-mapa-obs"
           rows="3"
           placeholder="Digite observações sobre a disponibilização..."
         />
@@ -234,14 +234,14 @@
         class="mt-3"
         :model-value="true"
         :fade="false"
-        data-testid="alert-mdl-disponibilizar"
+        data-testid="alert-disponibilizar-mapa"
       >
         {{ notificacaoDisponibilizacao }}
       </BAlert>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-disponibilizar-cancelar"
+          data-testid="btn-disponibilizar-mapa-cancelar"
           @click="fecharModalDisponibilizar"
         >
           Cancelar
@@ -249,7 +249,7 @@
         <BButton
           variant="success"
           :disabled="!dataLimiteValidacao"
-          data-testid="btn-mdl-disponibilizar-confirmar"
+          data-testid="btn-disponibilizar-mapa-confirmar"
           @click="disponibilizarMapa"
         >
           Disponibilizar

@@ -143,11 +143,11 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Adicionar Competência
         await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('inp-mdl-criar-competencia-descricao').fill(`Competência Teste ${timestamp}`);
+        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Teste ${timestamp}`);
 
         // Vincular atividade à competência
         await page.getByText(`Atividade Teste ${timestamp}`).click();
-        await page.getByTestId('btn-mdl-criar-competencia-salvar').click();
+        await page.getByTestId('btn-criar-competencia-salvar').click();
 
         // Validação: Modal fechou e competência foi criada
         await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
@@ -155,8 +155,8 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Disponibilizar Mapa
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-        await page.getByTestId('inp-mdl-disponibilizar-data').fill('2030-12-31');
-        await page.getByTestId('btn-mdl-disponibilizar-confirmar').click();
+        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
+        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
         // Validação: Mapa foi disponibilizado (verificar badge ou estado)
         await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
@@ -178,7 +178,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Validar o Mapa
         await page.getByTestId('btn-mapa-validar').click();
-        await page.getByTestId('btn-mdl-validar-confirmar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         // Validação: confirmar Mapa foi validado
         await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa validado/i);
@@ -204,7 +204,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
         // Homologar o Mapa
         await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-mdl-aceite-mapa-confirmar').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         // Validação: Mapa foi homologado
         await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa homologado/i);

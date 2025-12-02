@@ -232,7 +232,7 @@ describe("VisMapa.vue", () => {
     await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
     await wrapper.vm.$nextTick();
 
-    const confirmBtn = wrapper.find('[data-testid="btn-mdl-validar-confirmar"]');
+    const confirmBtn = wrapper.find('[data-testid="btn-validar-mapa-confirmar"]');
     expect(confirmBtn.exists()).toBe(true);
 
     await confirmBtn.trigger("click");
@@ -251,11 +251,11 @@ describe("VisMapa.vue", () => {
       .trigger("click");
     await wrapper.vm.$nextTick();
 
-    const textarea = wrapper.find('[data-testid="inp-mdl-sugestoes-texto"]');
+    const textarea = wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]');
     await textarea.setValue("Minhas sugestões");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-mdl-sugestoes-confirmar"]',
+      '[data-testid="btn-sugestoes-mapa-confirmar"]',
     );
     await confirmBtn.trigger("click");
 
@@ -288,12 +288,12 @@ describe("VisMapa.vue", () => {
     await wrapper.vm.$nextTick();
 
     const textarea = wrapper.find(
-      '[data-testid="inp-mdl-devolucao-obs"]',
+      '[data-testid="inp-devolucao-mapa-obs"]',
     );
     await textarea.setValue("Ajustar X");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-mdl-devolucao-confirmar"]',
+      '[data-testid="btn-devolucao-mapa-confirmar"]',
     );
     await confirmBtn.trigger("click");
 

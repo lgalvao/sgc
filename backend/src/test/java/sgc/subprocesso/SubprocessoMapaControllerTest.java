@@ -55,6 +55,7 @@ class SubprocessoMapaControllerTest {
     @Mock private SubprocessoDtoService subprocessoDtoService;
     @Mock private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     @Mock private SubprocessoConsultaService subprocessoConsultaService;
+    @Mock private sgc.sgrh.model.UsuarioRepo usuarioRepo;
 
     @InjectMocks private SubprocessoMapaController controller;
 
@@ -78,6 +79,7 @@ class SubprocessoMapaControllerTest {
                     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
                         Usuario usuario = new Usuario();
                         usuario.setTituloEleitoral("123");
+                        org.mockito.Mockito.lenient().when(usuarioRepo.findById(usuario.getTituloEleitoral())).thenReturn(java.util.Optional.of(usuario));
                         return usuario.getTituloEleitoral();
                     }
                 })

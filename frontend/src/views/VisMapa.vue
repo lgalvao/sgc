@@ -162,20 +162,20 @@
           v-model="sugestoes"
           rows="5"
           placeholder="Digite suas sugestões para o mapa de competências..."
-          data-testid="inp-mdl-sugestoes-texto"
+          data-testid="inp-sugestoes-mapa-texto"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-sugestoes-cancelar"
+          data-testid="btn-sugestoes-mapa-cancelar"
           @click="fecharModalSugestoes"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
-          data-testid="btn-mdl-sugestoes-confirmar"
+          data-testid="btn-sugestoes-mapa-confirmar"
           @click="confirmarSugestoes"
         >
           Confirmar
@@ -196,13 +196,13 @@
           v-model="sugestoesVisualizacao"
           rows="5"
           readonly
-          data-testid="txt-mdl-ver-sugestoes"
+          data-testid="txt-ver-sugestoes-mapa"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-ver-sugestoes-fechar"
+          data-testid="btn-ver-sugestoes-mapa-fechar"
           @click="fecharModalVerSugestoes"
         >
           Fechar
@@ -221,14 +221,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-validar-cancelar"
+          data-testid="btn-validar-mapa-cancelar"
           @click="fecharModalValidar"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-mdl-validar-confirmar"
+          data-testid="btn-validar-mapa-confirmar"
           @click="confirmarValidacao"
         >
           Validar
@@ -254,20 +254,20 @@
           v-model="observacaoDevolucao"
           rows="3"
           placeholder="Digite observações sobre a devolução..."
-          data-testid="inp-mdl-devolucao-obs"
+          data-testid="inp-devolucao-mapa-obs"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-devolucao-cancelar"
+          data-testid="btn-devolucao-mapa-cancelar"
           @click="fecharModalDevolucao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="danger"
-          data-testid="btn-mdl-devolucao-confirmar"
+          data-testid="btn-devolucao-mapa-confirmar"
           @click="confirmarDevolucao"
         >
           Confirmar
@@ -311,7 +311,7 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-mdl-historico-fechar"
+          data-testid="btn-historico-analise-fechar"
           @click="fecharModalHistorico"
         >
           Fechar

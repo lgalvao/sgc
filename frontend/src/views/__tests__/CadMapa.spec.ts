@@ -280,7 +280,7 @@ describe("CadMapa.vue", () => {
       wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="inp-mdl-criar-competencia-descricao"]');
+    const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
     await textarea.setValue("Nova Competencia Teste");
 
     // Checkbox interaction
@@ -299,7 +299,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-mdl-criar-competencia-salvar"]')
+      .find('[data-testid="btn-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
@@ -323,7 +323,7 @@ describe("CadMapa.vue", () => {
       wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="inp-mdl-criar-competencia-descricao"]');
+    const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
     await textarea.setValue("Competencia A Editada");
 
     vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue({
@@ -331,7 +331,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-mdl-criar-competencia-salvar"]')
+      .find('[data-testid="btn-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
@@ -404,15 +404,15 @@ describe("CadMapa.vue", () => {
     expect(modal.exists()).toBe(true);
 
     await wrapper
-      .find('[data-testid="inp-mdl-disponibilizar-data"]')
+      .find('[data-testid="inp-disponibilizar-mapa-data"]')
       .setValue("2023-12-31");
     await wrapper
-      .find('[data-testid="inp-mdl-disponibilizar-obs"]')
+      .find('[data-testid="inp-disponibilizar-mapa-obs"]')
       .setValue("Obs");
 
     vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
 
-    await wrapper.find('[data-testid="btn-mdl-disponibilizar-confirmar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
     expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
       dataLimite: "2023-12-31",

@@ -89,7 +89,7 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
 
         assertThatCode(() -> mocks.service.disponibilizarMapa(
             cenario.subprocesso.getCodigo(),
-            new DisponibilizarMapaRequest(),
+            new DisponibilizarMapaRequest(){ { setDataLimite(java.time.LocalDate.now().plusDays(1)); } },
             new Usuario()
         )).doesNotThrowAnyException();
     }
@@ -107,7 +107,7 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
 
         assertThatThrownBy(() -> mocks.service.disponibilizarMapa(
             cenario.subprocesso.getCodigo(),
-            new DisponibilizarMapaRequest(),
+            new DisponibilizarMapaRequest(){ { setDataLimite(java.time.LocalDate.now().plusDays(1)); } },
             new Usuario()
         ))
         .isInstanceOf(ErroValidacao.class)
