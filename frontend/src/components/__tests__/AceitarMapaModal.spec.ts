@@ -48,7 +48,7 @@ describe("AceitarMapaModal.vue", () => {
     expect(corpoModal.exists()).toBe(true);
         expect(corpoModal.text()).toContain("Observações");
         expect(
-            wrapper.find('[data-testid="inp-mdl-aceite-mapa-obs"]').exists(),
+            wrapper.find('[data-testid="inp-aceite-mapa-obs"]').exists(),
         ).toBe(true);
   });
 
@@ -70,7 +70,7 @@ describe("AceitarMapaModal.vue", () => {
     const wrapper = createWrapper();
 
         await wrapper
-            .find('[data-testid="btn-mdl-aceite-mapa-cancelar"]')
+            .find('[data-testid="btn-aceite-mapa-cancelar"]')
             .trigger("click");
         expect(wrapper.emitted("fecharModal")).toBeTruthy();
   });
@@ -84,7 +84,7 @@ describe("AceitarMapaModal.vue", () => {
     await nativeTextarea.setValue(observacao);
 
         await wrapper
-            .find('[data-testid="btn-mdl-aceite-mapa-confirmar"]')
+            .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
@@ -95,7 +95,7 @@ describe("AceitarMapaModal.vue", () => {
     const wrapper = createWrapper();
 
         await wrapper
-            .find('[data-testid="btn-mdl-aceite-mapa-confirmar"]')
+            .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
