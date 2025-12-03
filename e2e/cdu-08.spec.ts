@@ -4,9 +4,9 @@ import { criarProcesso } from './helpers/processo-helpers';
 import * as AtividadeHelpers from './helpers/atividade-helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
-    const UNIDADE_ALVO = 'SECAO_212';
-    const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_212.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_212.senha;
+    const UNIDADE_ALVO = 'ASSESSORIA_11';
+    const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({ page }) => {
         test.setTimeout(120000);
@@ -22,7 +22,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_21'],
+                expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
             await page.getByTestId('btn-logout').click();
@@ -136,7 +136,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 tipo: 'REVISAO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_21'],
+                expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
             await page.getByTestId('btn-logout').click();
