@@ -18,6 +18,7 @@ export async function criarProcesso(page: Page, options: {
     diasLimite: number;
     unidade: string;
     expandir?: string[];
+    iniciar?: boolean;
 }): Promise<void> {
     await page.getByTestId('btn-painel-criar-processo').click();
     await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -34,7 +35,13 @@ export async function criarProcesso(page: Page, options: {
 
     // Usar getByTestId ao invés de getByRole para respeitar disabled
     await page.getByTestId(`chk-arvore-unidade-${options.unidade}`).check();
-    await page.getByTestId('btn-processo-salvar').click();
+
+    if (options.iniciar) {
+        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+    } else {
+        await page.getByTestId('btn-processo-salvar').click();
+    }
 
     await expect(page).toHaveURL(/\/painel/);
 }

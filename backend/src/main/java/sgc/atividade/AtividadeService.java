@@ -106,7 +106,6 @@ public class AtividadeService {
                     atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
                     var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
                     existente.setDescricao(entidadeParaAtualizar.getDescricao());
-                    existente.setMapa(entidadeParaAtualizar.getMapa());
 
                     var atualizado = atividadeRepo.save(existente);
                     return atividadeMapper.toDto(atualizado);

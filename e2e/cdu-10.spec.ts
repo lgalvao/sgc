@@ -28,7 +28,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro', () => {
             tipo: 'REVISAO',
             diasLimite: 5,
             unidade: unidadeSigla,
-            expandir: ['COORD_11']
+            iniciar: true
         });
         await context.close();
     });
