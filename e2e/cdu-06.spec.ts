@@ -3,7 +3,7 @@ import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/processo-helpers';
 
 test.describe('CDU-06 - Detalhar processo', () => {
-    const UNIDADE_ALVO = 'ASSESSORIA_21';
+    const UNIDADE_ALVO = 'ASSESSORIA_22';
 
     test('Deve exibir detalhes do processo para ADMIN', async ({page}) => {
         const timestamp = Date.now();
@@ -36,7 +36,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         // Verificar unidade participante
         await verificarUnidadeParticipante(page, {
-            sigla: 'ASSESSORIA_21',
+            sigla: 'ASSESSORIA_22',
             situacao: 'NAO_INICIADO',
             dataLimite: '/'
         });
