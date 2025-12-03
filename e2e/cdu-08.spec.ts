@@ -1,89 +1,156 @@
 import { expect, test } from '@playwright/test';
 import { login, USUARIOS } from './helpers/auth';
 import { criarProcesso } from './helpers/processo-helpers';
+import * as AtividadeHelpers from './helpers/atividade-helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_21'; // Unidade do Chefe (Janis Joplin)
     const CHEFE_UNIDADE = '777777';
     const SENHA_CHEFE = 'senha';
 
-    test('Fluxo principal: adicionar, editar e remover atividades e conhecimentos', async ({ page }) => {
-        // Aumentar timeout pois esse teste envolve criação de processo e varias interações
-        test.setTimeout(60000);
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({ page }) => {
+        test.setTimeout(120000);
 
         const timestamp = Date.now();
-        const descricao = `Processo CDU-08 ${timestamp}`;
+        const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
-        // 1. ADMIN cria processo
-        await page.goto('/login');
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await criarProcesso(page, {
-            descricao,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2'],
-            iniciar: true
+        await test.step('1. Setup: Criar Processo de Mapeamento', async () => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: UNIDADE_ALVO,
+                expandir: ['SECRETARIA_2'],
+                iniciar: true
+            });
+            await page.getByTestId('btn-logout').click();
         });
-        await page.getByTestId('btn-logout').click();
 
-        // 2. CHEFE loga e acessa
-        await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-        await page.waitForLoadState('networkidle');
+        await test.step('2. Acessar tela de Atividades', async () => {
+            await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
+            await page.waitForLoadState('networkidle');
+            await page.getByText(descricaoProcesso).click();
+            await AtividadeHelpers.navegarParaAtividades(page);
+        });
 
-        await page.getByText(descricao).click();
-
-        // Entrar em atividades
-        await page.getByTestId('card-subprocesso-atividades').click();
-        await expect(page.getByTestId('form-nova-atividade')).toBeVisible();
-
-        // 3. Adicionar Atividade
         const atividade1 = `Atividade 1 ${timestamp}`;
-        await page.getByTestId('inp-nova-atividade').fill(atividade1);
-        await page.getByTestId('btn-adicionar-atividade').click();
-        await expect(page.getByText(atividade1)).toBeVisible();
+        await test.step('3. Adicionar Atividade e Conhecimento', async () => {
+            await AtividadeHelpers.adicionarAtividade(page, atividade1);
 
-        // 4. Adicionar Conhecimento
-        // Usar filter para pegar o card correto
-        const cardAtiv = page.locator('.atividade-card').first();
+            // Verifica mudança de status
+            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
-        const conhecimento1 = `Conhecimento 1 ${timestamp}`;
-        await cardAtiv.getByTestId('inp-novo-conhecimento').fill(conhecimento1);
-        await cardAtiv.getByTestId('btn-adicionar-conhecimento').click();
-        await expect(cardAtiv.getByText(conhecimento1)).toBeVisible();
+            const conhecimento1 = `Conhecimento 1 ${timestamp}`;
+            await AtividadeHelpers.adicionarConhecimento(page, atividade1, conhecimento1);
+        });
 
-        // 5. Editar Atividade
-        const atividade1Editada = `${atividade1} EDITADA`;
-        await cardAtiv.hover();
-        await cardAtiv.getByTestId('btn-editar-atividade').click({ force: true });
-        await cardAtiv.getByTestId('inp-editar-atividade').fill(atividade1Editada);
-        await cardAtiv.getByTestId('btn-salvar-edicao-atividade').click();
+        await test.step('4. Editar e Remover', async () => {
+            const atividade1Editada = `${atividade1} EDITADA`;
+            await AtividadeHelpers.editarAtividade(page, atividade1, atividade1Editada);
 
-        // Atualizar referencia do card pois o texto mudou
-        const cardAtivEditada = page.locator('.atividade-card').first();
-        await expect(cardAtivEditada).toContainText(atividade1Editada);
+            const conhecimento1 = `Conhecimento 1 ${timestamp}`;
+            const conhecimento1Editado = `${conhecimento1} EDITADO`;
 
-        // 6. Editar Conhecimento
-        const conhecimento1Editado = `${conhecimento1} EDITADO`;
-        // Encontrar a linha do conhecimento para fazer hover
-        const linhaConhecimento = cardAtivEditada.locator('.group-conhecimento').first();
-        await linhaConhecimento.hover();
-        await linhaConhecimento.getByTestId('btn-editar-conhecimento').click({ force: true });
-        await linhaConhecimento.getByTestId('inp-editar-conhecimento').fill(conhecimento1Editado);
-        await linhaConhecimento.getByTestId('btn-salvar-edicao-conhecimento').click();
-        await expect(cardAtivEditada.getByText(conhecimento1Editado)).toBeVisible();
+            await AtividadeHelpers.editarConhecimento(page, atividade1Editada, conhecimento1, conhecimento1Editado);
+            await AtividadeHelpers.removerConhecimento(page, atividade1Editada, conhecimento1Editado);
+            await AtividadeHelpers.removerAtividade(page, atividade1Editada);
+        });
 
-        // 7. Remover Conhecimento
-        const linhaConhecimentoEditado = cardAtivEditada.locator('.group-conhecimento').first();
-        page.once('dialog', dialog => dialog.accept()); // Aceitar confirmação
-        await linhaConhecimentoEditado.hover();
-        await linhaConhecimentoEditado.getByTestId('btn-remover-conhecimento').click({ force: true });
-        await expect(cardAtivEditada.getByText(conhecimento1Editado)).toBeHidden();
+        await test.step('5. Importar Atividades (Mockado)', async () => {
+             // Mock para retornar processos finalizados
+             await page.route('**/api/processos/painel*', async route => {
+                await route.fulfill({
+                    json: [{
+                        codigo: 999,
+                        descricao: 'Processo Finalizado Mock',
+                        situacao: 'FINALIZADO',
+                        tipo: 'MAPEAMENTO',
+                        dataLimite: '2023-12-31',
+                        dataCriacao: '2023-01-01',
+                        unidadeCodigo: 1,
+                        unidadeNome: 'Unidade Mock'
+                    }]
+                });
+            });
 
-        // 8. Remover Atividade
-        page.once('dialog', dialog => dialog.accept()); // Aceitar confirmação
-        await cardAtivEditada.hover();
-        await cardAtivEditada.getByTestId('btn-remover-atividade').click({ force: true });
-        await expect(page.getByText(atividade1Editada)).toBeHidden();
+            // Mock detalhes do processo finalizado
+            await page.route('**/api/processos/999*', async route => {
+                 await route.fulfill({
+                    json: {
+                        codigo: 999,
+                        descricao: 'Processo Finalizado Mock',
+                        unidades: [{ codUnidade: 888, sigla: 'UNIDADE_MOCK', codSubprocesso: 777 }]
+                    }
+                 });
+            });
+
+            // Mock atividades do subprocesso de origem (777)
+            await page.route('**/api/subprocessos/777/mapa-visualizacao', async route => {
+                 await route.fulfill({
+                    json: {
+                        competencias: [{
+                            atividades: [
+                                { codigo: 101, descricao: 'Atividade Importada 1', conhecimentos: [] }
+                            ]
+                        }],
+                        atividadesSemCompetencia: []
+                    }
+                 });
+            });
+
+            // Mock da ação de importar
+            await page.route('**/api/subprocessos/*/importar-atividades', async route => {
+                await route.fulfill({ status: 200, json: { message: 'Ok' } });
+            });
+
+            await AtividadeHelpers.importarAtividades(page, 'Processo Finalizado Mock', 'UNIDADE_MOCK', [101]);
+            await expect(page.getByText('Importação Concluída')).toBeVisible();
+        });
+
+        await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
+             await AtividadeHelpers.verificarBotaoImpacto(page, false);
+        });
+
+        await test.step('7. Disponibilizar', async () => {
+            const ativFinal = `Atividade Final ${timestamp}`;
+            await AtividadeHelpers.adicionarAtividade(page, ativFinal);
+            await AtividadeHelpers.adicionarConhecimento(page, ativFinal, 'Conhecimento Final');
+
+            await AtividadeHelpers.disponibilizarCadastro(page);
+            await expect(page).toHaveURL(/\/painel/);
+        });
+    });
+
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({ page }) => {
+        test.setTimeout(120000);
+        const timestamp = Date.now();
+        const descricao = `Processo CDU-08 Rev ${timestamp}`;
+
+        await test.step('Setup: Criar Processo de Revisão', async () => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await criarProcesso(page, {
+                descricao,
+                tipo: 'REVISAO',
+                diasLimite: 30,
+                unidade: UNIDADE_ALVO,
+                expandir: ['SECRETARIA_2'],
+                iniciar: true
+            });
+            await page.getByTestId('btn-logout').click();
+        });
+
+        await test.step('Verificar Botão Impacto', async () => {
+            await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
+            await page.waitForLoadState('networkidle');
+            await page.getByText(descricao).click();
+            await AtividadeHelpers.navegarParaAtividades(page);
+
+            await AtividadeHelpers.verificarBotaoImpacto(page, true);
+            await AtividadeHelpers.abrirModalImpacto(page);
+            await AtividadeHelpers.fecharModalImpacto(page);
+        });
     });
 });
