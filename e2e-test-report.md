@@ -72,3 +72,13 @@ Os seguintes testes no arquivo `cdu-09.spec.ts` foram pulados, provavelmente dev
 1.  Cenario 1: Validacao - Atividade sem conhecimento
 2.  Cenario 2: Fluxo Feliz - Disponibilizar Cadastro
 3.  Cenario 3: Devolucao e Historico de Analise
+
+## Correções Aplicadas
+
+### CDU-06 e CDU-07 - Detalhar processo e subprocesso
+**Problema:** Os testes falhavam na criação de processos com a mensagem implícita de que a unidade já participava de um processo ativo (causando falha no redirecionamento para o painel). Isso ocorria porque os testes utilizavam a unidade `ASSESSORIA_21`, que fica com um processo ativo (`EM_ANDAMENTO`) ao final da execução do teste `CDU-05`.
+**Solução:**
+1.  Adicionado o usuário `CHEFE_ASSESSORIA_22` (Jimi Hendrix) em `e2e/helpers/auth.ts`.
+2.  Atualizado `e2e/cdu-06.spec.ts` para utilizar a unidade `ASSESSORIA_22` no primeiro caso de teste.
+3.  Atualizado `e2e/cdu-07.spec.ts` para utilizar a unidade `ASSESSORIA_22` e o respectivo chefe.
+**Resultado Esperado:** Os testes devem passar pois utilizarão uma unidade livre, evitando conflitos com o estado deixado pelo `CDU-05`.

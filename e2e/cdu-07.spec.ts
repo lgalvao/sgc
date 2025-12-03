@@ -3,9 +3,9 @@ import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
-    const UNIDADE_ALVO = 'ASSESSORIA_21';
-    const CHEFE_UNIDADE = USUARIOS.CHEFE_UNIDADE.titulo; // 777777
-    const SENHA_CHEFE = USUARIOS.CHEFE_UNIDADE.senha;
+    const UNIDADE_ALVO = 'ASSESSORIA_22';
+    const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_22.titulo; // 888888
+    const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_22.senha;
 
     test('Deve exibir detalhes do subprocesso para CHEFE', async ({page}) => {
         const timestamp = Date.now();
@@ -42,13 +42,13 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await page.getByText(descricao, {exact: true}).click();
 
         // Verificar URL (deve conter ID e Sigla)
-        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_22$/);
 
         // 3. Verificar seções da tela
 
         // Seção Dados da Unidade
         await verificarDetalhesSubprocesso(page, {
-            sigla: 'ASSESSORIA_21',
+            sigla: 'ASSESSORIA_22',
             situacao: 'Não Iniciado', // Ajustado conforme o UI
             prazo: '/'
         });
