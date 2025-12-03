@@ -67,9 +67,14 @@ export async function atualizarConhecimento(
     codConhecimento: number,
     request: Conhecimento,
 ): Promise<Conhecimento> {
+    const payload = {
+        codigo: request.id,
+        atividadeCodigo: codAtividade,
+        descricao: request.descricao,
+    };
     const response = await apiClient.post<any>(
         `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`,
-        request,
+        payload,
     );
     return mapConhecimentoDtoToModel(response.data);
 }

@@ -160,7 +160,7 @@ describe("VisMapa.vue", () => {
               {
                 sigla: "CHILD",
                 codUnidade: 11,
-                situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+                situacaoSubprocesso: SituacaoSubprocesso.CONCLUIDO,
               },
             ],
           },
@@ -407,7 +407,7 @@ describe("VisMapa.vue", () => {
               sigla: "TEST",
               codUnidade: 10,
               codSubprocesso: 10,
-              situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA,
+              situacaoSubprocesso: SituacaoSubprocesso.MAPA_COM_SUGESTOES,
             },
           ],
         },

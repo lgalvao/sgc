@@ -114,6 +114,11 @@ export const useProcessosStore = defineStore("processos", () => {
         if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
     }
 
+    async function homologarValidacao(id: number) {
+        await processoService.homologarValidacao(id);
+        if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+    }
+
     return {
         processosPainel,
         processosPainelPage,
@@ -134,5 +139,6 @@ export const useProcessosStore = defineStore("processos", () => {
         alterarDataLimiteSubprocesso,
         apresentarSugestoes,
         validarMapa,
+        homologarValidacao,
     };
 });

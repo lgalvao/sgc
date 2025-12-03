@@ -350,7 +350,7 @@ describe("CadAtividades.vue", () => {
           codUnidade: 123,
           sigla: "TESTE",
           situacaoSubprocesso:
-            SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES,
+            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
         },
       ],
     } as any);
