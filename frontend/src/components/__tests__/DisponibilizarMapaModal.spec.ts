@@ -19,7 +19,7 @@ describe("DisponibilizarMapaModal", () => {
       },
       ...globalComponents,
     });
-        expect(wrapper.find('[data-testid="input-data-limite"]').exists()).toBe(
+        expect(wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]').exists()).toBe(
             false,
         );
   });
@@ -67,7 +67,7 @@ describe("DisponibilizarMapaModal", () => {
       ...globalComponents,
     });
 
-        await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger("click");
+        await wrapper.find('[data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
   });
 

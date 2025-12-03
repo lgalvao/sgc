@@ -13,7 +13,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="btn-impactos-mapa"
+          data-testid="vis-atividades__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}

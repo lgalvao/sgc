@@ -50,13 +50,28 @@ describe("useProcessosStore", () => {
                 const mockPage = {content: [{id: 1}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await store.buscarProcessosPainel("perfil", 1, 0, 10);
+                const calls = painelService.listarProcessos.mock.calls[0];
+                expect(calls[0]).toBe("perfil");
+                expect(calls[1]).toBe(1);
+                expect(calls[2]).toBe(0);
+                expect(calls[3]).toBe(10);
+                // sort and order may be undefined by default
+                expect(calls[4]).toBeUndefined();
+                expect(calls[5]).toBeUndefined();
+                expect(store.processosPainel).toEqual(mockPage.content);
+            });
+
+            it("deve respeitar ordenacao personalizada", async () => {
+                const mockPage = {content: [{id: 2}], totalPages: 1};
+                painelService.listarProcessos.mockResolvedValue(mockPage as any);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
                 expect(painelService.listarProcessos).toHaveBeenCalledWith(
                     "perfil",
                     1,
                     0,
                     10,
-                    undefined,
-                    undefined,
+                    "descricao",
+                    "asc",
                 );
                 expect(store.processosPainel).toEqual(mockPage.content);
             });

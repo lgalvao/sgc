@@ -31,7 +31,7 @@
       <button
         class="btn btn-secondary"
         type="button"
-        data-testid="btn-modal-cancelar"
+        data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar

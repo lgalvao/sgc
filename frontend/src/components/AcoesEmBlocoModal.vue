@@ -46,7 +46,7 @@
       <button
         type="button"
         class="btn btn-secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="acoes-em-bloco-modal__btn-modal-cancelar"
         @click="fechar"
       >
         <i class="bi bi-x-circle" /> Cancelar
@@ -55,7 +55,7 @@
         type="button"
         class="btn"
         :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
-        data-testid="btn-confirmar-acao-bloco"
+        data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"
         @click="confirmar"
       >
         <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

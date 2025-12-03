@@ -107,7 +107,7 @@
       <BButton
         variant="outline-secondary"
         type="button"
-        data-testid="btn-modal-cancelar"
+        data-testid="importar-atividades-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar

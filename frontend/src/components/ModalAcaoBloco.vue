@@ -52,14 +52,14 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="modal-acao-bloco__btn-modal-cancelar"
         @click="emit('fechar')"
       >
         <i class="bi bi-x-circle" /> Cancelar
       </BButton>
       <BButton
         :variant="tipo === 'aceitar' ? 'primary' : 'success'"
-        data-testid="btn-confirmar-acao-bloco"
+        data-testid="modal-acao-bloco__btn-confirmar-acao-bloco"
         @click="emit('confirmar', unidades)"
       >
         <i :class="tipo === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

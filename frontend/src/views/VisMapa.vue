@@ -92,7 +92,7 @@
           v-for="comp in mapa?.competencias"
           :key="comp.codigo"
           class="mb-3 competencia-card"
-          data-testid="card-competencia"
+          data-testid="vis-mapa__card-competencia"
           no-body
         >
           <BCardBody class="py-2">
@@ -101,7 +101,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="txt-competencia-descricao"
+                data-testid="vis-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
@@ -582,3 +582,4 @@ async function confirmarDevolucao() {
   await router.push({name: "Painel"});
 }
 </script>
+

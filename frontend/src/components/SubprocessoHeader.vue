@@ -13,7 +13,7 @@
       </p>
       <h2
         class="display-6 mb-3"
-        data-testid="txt-header-unidade"
+        data-testid="subprocesso-header__txt-header-unidade"
       >
         {{ unidadeSigla }} - {{ unidadeNome }}
       </h2>
@@ -22,7 +22,7 @@
         <span
           :class="badgeClass(situacao)"
           class="badge"
-          data-testid="txt-badge-situacao"
+          data-testid="subprocesso-header__txt-badge-situacao"
         >{{ situacao }}</span>
       </p>
 

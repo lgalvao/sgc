@@ -5,7 +5,7 @@
         <BButton
           v-if="perfilStore.perfilSelecionado === 'ADMIN'"
           variant="outline-primary"
-          data-testid="btn-criar-atribuicao"
+          data-testid="unidade-view__btn-criar-atribuicao"
           @click="irParaCriarAtribuicao"
         >
           Criar atribuição

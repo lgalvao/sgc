@@ -12,7 +12,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="btn-impactos-mapa"
+          data-testid="cad-mapa__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -43,7 +43,7 @@
           v-for="comp in competencias"
           :key="comp.codigo"
           class="mb-2 competencia-card"
-          data-testid="card-competencia"
+          data-testid="cad-mapa__card-competencia"
           no-body
         >
           <BCardBody>
@@ -52,7 +52,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="txt-competencia-descricao"
+                data-testid="cad-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <BButton
@@ -93,7 +93,7 @@
                       v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
                       v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
                       class="badge bg-secondary ms-2"
-                      data-testid="txt-badge-conhecimentos"
+                      data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
@@ -166,7 +166,7 @@
                   v-if="atividade.conhecimentos.length > 0"
                   v-b-tooltip.html.right="getConhecimentosModal(atividade)"
                   class="badge bg-secondary ms-2"
-                  data-testid="txt-badge-conhecimentos"
+                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
                 >
                   {{ atividade.conhecimentos.length }}
                 </span>

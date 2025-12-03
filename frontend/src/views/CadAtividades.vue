@@ -15,7 +15,7 @@
           v-if="subprocesso"
           :class="badgeClass(subprocesso.situacaoSubprocesso)"
           class="badge fs-6"
-          data-testid="txt-badge-situacao"
+          data-testid="cad-atividades__txt-badge-situacao"
         >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
       </div>
     </div>
@@ -29,7 +29,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="btn-impactos-mapa"
+          data-testid="cad-atividades__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -134,7 +134,7 @@
           <template v-else>
             <strong
               class="atividade-descricao"
-              data-testid="txt-atividade-descricao"
+              data-testid="cad-atividades__txt-atividade-descricao"
             >{{ atividade?.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <BButton
@@ -201,7 +201,7 @@
                 </BButton>
             </template>
             <template v-else>
-                <span data-testid="txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
+                <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
                 <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                   <BButton
                     variant="outline-primary"
@@ -331,7 +331,7 @@
       <div class="table-responsive">
         <table
           class="table table-striped"
-          data-testid="tbl-historico-analise"
+          data-testid="cad-atividades__tbl-historico-analise"
         >
           <thead>
             <tr>
@@ -787,3 +787,4 @@ function fecharModalImpacto() {
 
 
 </style>
+

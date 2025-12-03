@@ -55,7 +55,7 @@ describe("SubprocessoModal", () => {
     const wrapper = mount(SubprocessoModal, {
       props: { mostrarModal: true, dataLimiteAtual, etapaAtual: 1 },
     });
-      await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger("click");
+      await wrapper.find('[data-testid="subprocesso-modal__btn-modal-cancelar"]').trigger("click");
       expect(wrapper.emitted("fecharModal")).toBeTruthy();
   });
 

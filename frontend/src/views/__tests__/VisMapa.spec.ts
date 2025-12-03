@@ -130,7 +130,7 @@ describe("VisMapa.vue", () => {
     const { wrapper } = mountComponent();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="txt-competencia-descricao"]').text()).toBe(
+    expect(wrapper.find('[data-testid="vis-mapa__txt-competencia-descricao"]').text()).toBe(
       "Competencia 1",
     );
     expect(wrapper.find(".atividade-associada-descricao").text()).toBe(

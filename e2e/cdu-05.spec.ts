@@ -38,7 +38,14 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         // Validação: Processo foi criado e está na tela de cadastro
-        await page.getByRole('row', {name: descricao}).click();
+        await verificarProcessoNaTabela(page, {
+            descricao,
+            situacao: 'Criado',
+            tipo: 'Mapeamento'
+        });
+
+        const linhaProcesso = page.locator('tr', {has: page.getByText(descricao)});
+        await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
@@ -138,7 +145,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Entrar no Mapa de Competencias
-        // TODO depois corrigir esse gambiarra. Deve aparecer um dos dois cards
+        // TODO depois corrigir essa gambiarra. Deve aparecer um dos dois cards
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
 
         // Adicionar Competência

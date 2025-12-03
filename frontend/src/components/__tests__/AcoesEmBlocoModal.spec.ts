@@ -20,7 +20,7 @@ describe("AcoesEmBlocoModal", () => {
 
       expect(wrapper.find(".table").exists()).toBe(true);
       expect(
-          wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').text(),
+          wrapper.find('[data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"]').text(),
       ).toContain("Aceitar");
   });
 
@@ -35,7 +35,7 @@ describe("AcoesEmBlocoModal", () => {
 
       expect(wrapper.find(".table").exists()).toBe(true);
       expect(
-          wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').text(),
+          wrapper.find('[data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"]').text(),
       ).toContain("Homologar");
   });
 
@@ -67,7 +67,7 @@ describe("AcoesEmBlocoModal", () => {
       },
     });
 
-      await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger("click");
+      await wrapper.find('[data-testid="acoes-em-bloco-modal__btn-modal-cancelar"]').trigger("click");
       expect(wrapper.emitted()).toHaveProperty("fechar");
   });
 
@@ -84,7 +84,7 @@ describe("AcoesEmBlocoModal", () => {
 
     await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
       await wrapper
-          .find('[data-testid="btn-confirmar-acao-bloco"]')
+          .find('[data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"]')
           .trigger("click");
 
       expect(wrapper.emitted()).toHaveProperty("confirmar");
@@ -108,7 +108,7 @@ describe("AcoesEmBlocoModal", () => {
     await wrapper.find('[data-testid="chk-unidade-UND1"]').setValue(false);
     await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
         await wrapper
-            .find('[data-testid="btn-confirmar-acao-bloco"]')
+            .find('[data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"]')
             .trigger("click");
 
         expect(alertSpy).toHaveBeenCalledWith(

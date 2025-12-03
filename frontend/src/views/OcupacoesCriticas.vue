@@ -163,14 +163,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-modal-cancelar"
+          data-testid="ocupacoes-criticas__btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-modal-confirmar"
+          data-testid="ocupacoes-criticas__btn-modal-confirmar"
           @click="confirmarFinalizacao"
         >
           Confirmar

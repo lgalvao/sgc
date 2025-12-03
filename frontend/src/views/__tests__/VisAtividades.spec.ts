@@ -106,7 +106,7 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
     await nextTick();
 
-    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
@@ -117,7 +117,7 @@ describe("VisAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
@@ -128,7 +128,7 @@ describe("VisAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(false);
   });
 
   it("deve listar atividades e conhecimentos", async () => {

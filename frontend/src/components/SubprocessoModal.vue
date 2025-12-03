@@ -25,7 +25,7 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="subprocesso-modal__btn-modal-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />

@@ -59,7 +59,7 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="criar-competencia-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
@@ -67,7 +67,7 @@
       <BButton
         :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
         variant="primary"
-        data-testid="btn-modal-confirmar"
+        data-testid="criar-competencia-modal__btn-modal-confirmar"
         @click="salvar"
       >
         <i class="bi bi-save" /> Salvar

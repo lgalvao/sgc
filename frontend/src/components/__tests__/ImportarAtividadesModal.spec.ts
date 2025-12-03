@@ -67,7 +67,7 @@ describe("ImportarAtividadesModal", () => {
   });
 
   it('deve emitir "fechar" ao clicar em Cancelar', async () => {
-      await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger("click");
+      await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
       expect(wrapper.emitted("fechar")).toBeTruthy();
   });
 

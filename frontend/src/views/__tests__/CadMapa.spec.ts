@@ -425,7 +425,7 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    await wrapper.find('[data-testid="btn-impactos-mapa"]').trigger("click");
+    await wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').trigger("click");
 
     const impactoModal = wrapper.findComponent({ name: "ImpactoMapaModal" });
     expect(impactoModal.props("mostrar")).toBe(true);
@@ -436,7 +436,7 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {

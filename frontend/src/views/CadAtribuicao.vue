@@ -66,7 +66,7 @@
           </div>
           <BButton
             variant="primary"
-            data-testid="btn-criar-atribuicao"
+            data-testid="cad-atribuicao__btn-criar-atribuicao"
             type="submit"
           >
             Criar
