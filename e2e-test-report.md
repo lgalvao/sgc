@@ -76,22 +76,25 @@ Os seguintes testes no arquivo `cdu-09.spec.ts` foram pulados, provavelmente dev
 ## Correções Aplicadas
 
 ### CDU-06 - Detalhar processo
-**Problema:** Falha ao criar processo para `ASSESSORIA_21` (unidade ocupada pelo `CDU-05`).
-**Solução:** Atualizado para usar `ASSESSORIA_22`. (Mantido da iteração anterior).
-
-### CDU-07, CDU-08 e CDU-09 - Conflito de Unidades
-**Problema:**
-1.  `CDU-07` falhava ao usar `ASSESSORIA_22`, pois esta unidade ficava ocupada ("Em andamento") após a execução do `CDU-06`.
-2.  `CDU-08` e `CDU-09` falhavam ao usar `ASSESSORIA_21`, que permanecia ocupada após o `CDU-05`.
-O sistema bloqueia a criação de novos processos para unidades que já participam de um processo em andamento, causando falhas de redirecionamento (permanecendo na tela de cadastro) e timeouts.
+**Problema:** Falha persistente ao criar processo para `ASSESSORIA_22`. Embora `ASSESSORIA_22` seja tecnicamente diferente de `ASSESSORIA_21` (usada no `CDU-05`), ambas residem na mesma árvore hierárquica (`SECRETARIA_2`). O processo de revisão do `CDU-05` pode estar causando efeitos colaterais em toda a ramificação da `SECRETARIA_2`.
 
 **Solução:**
-1.  **Isolamento de Unidades:** Cada teste E2E crítico agora utiliza uma unidade exclusiva para evitar conflitos de estado.
-    *   `CDU-07` agora utiliza `SECAO_211` (Unidade 15).
-    *   `CDU-08` agora utiliza `SECAO_212` (Unidade 16).
-    *   `CDU-09` agora utiliza `SECAO_221` (Unidade 18).
-2.  **Atualização de Helpers:** Adicionados os usuários chefes correspondentes (`CHEFE_SECAO_211`, `CHEFE_SECAO_212`, `CHEFE_SECAO_221`) ao arquivo `e2e/helpers/auth.ts`.
-3.  **Atualização dos Testes:** Os arquivos `cdu-07.spec.ts`, `cdu-08.spec.ts` e `cdu-09.spec.ts` foram refatorados para usar as novas unidades e expandir os nós corretos da árvore (`SECRETARIA_2`, `COORD_21`, `COORD_22`).
+1.  **Isolamento Completo de Ramificação:** O teste foi movido para a ramificação da `SECRETARIA_1`, que é totalmente independente da execução do `CDU-05`.
+    *   `CDU-06` agora utiliza `ASSESSORIA_12` (Unidade 4, sob `SECRETARIA_1`).
+2.  **Atualização de Helpers:** Adicionado o usuário chefe correspondente (`CHEFE_ASSESSORIA_12`) ao arquivo `e2e/helpers/auth.ts`.
+3.  **Atualização do Teste:** O arquivo `cdu-06.spec.ts` foi atualizado para usar `ASSESSORIA_12` e expandir a árvore `SECRETARIA_1`.
+
+### CDU-07 - Detalhar subprocesso
+**Problema:** Similar ao CDU-06, o uso de `SECAO_211` (sob `SECRETARIA_2`) estava sujeito a conflitos ou estados inconsistentes deixados pelo `CDU-05`.
+
+**Solução:**
+1.  **Isolamento Completo de Ramificação:** O teste foi movido para a ramificação da `SECRETARIA_1`.
+    *   `CDU-07` agora utiliza `SECAO_121` (Unidade 10, sob `SECRETARIA_1` -> `COORD_12`).
+2.  **Atualização de Helpers:** Adicionado o usuário chefe correspondente (`CHEFE_SECAO_121`) ao arquivo `e2e/helpers/auth.ts`.
+3.  **Atualização do Teste:** O arquivo `cdu-07.spec.ts` foi atualizado para usar `SECAO_121` e expandir a árvore `SECRETARIA_1` -> `COORD_12`.
+
+### CDU-08 e CDU-09 - Conflito de Unidades
+**Status:** Os testes `CDU-08` e `CDU-09` ainda utilizam unidades sob a árvore `SECRETARIA_2` (`SECAO_212` e `SECAO_221`). Se as falhas persistirem por motivos semelhantes, recomenda-se mover também estes testes para a árvore `SECRETARIA_1` (ex: `SECAO_112`, `SECAO_113`) ou `SECRETARIA_1` -> `COORD_12` (ex: `SECAO_121` se não conflitar).
 
 **Resultado Esperado:**
-Eliminação das falhas em cascata causadas por unidades presas em processos anteriores. Cada teste deve rodar de forma independente com sua própria unidade e usuário.
+Eliminação das falhas de criação de processo nos CDUs 06 e 07 ao utilizar uma hierarquia de unidades (Secretaria 1) que não é tocada pelo teste anterior (CDU-05), garantindo um estado limpo para a execução.

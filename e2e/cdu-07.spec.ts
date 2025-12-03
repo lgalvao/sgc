@@ -3,9 +3,9 @@ import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
-    const UNIDADE_ALVO = 'SECAO_211';
-    const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_211.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_211.senha;
+    const UNIDADE_ALVO = 'SECAO_121';
+    const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
 
     test('Deve exibir detalhes do subprocesso para CHEFE', async ({page}) => {
         const timestamp = Date.now();
@@ -20,7 +20,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_21'],
+            expandir: ['SECRETARIA_1', 'COORD_12'],
             iniciar: true
         });
 
@@ -42,13 +42,13 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await page.getByText(descricao, {exact: true}).click();
 
         // Verificar URL (deve conter ID e Sigla)
-        await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_211$/);
+        await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121$/);
 
         // 3. Verificar seções da tela
 
         // Seção Dados da Unidade
         await verificarDetalhesSubprocesso(page, {
-            sigla: 'SECAO_211',
+            sigla: 'SECAO_121',
             situacao: 'Não Iniciado', // Ajustado conforme o UI
             prazo: '/'
         });
