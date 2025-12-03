@@ -24,7 +24,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoNotificacaoService;
@@ -48,164 +47,179 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
 @Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    ProcessoRepo processoRepo;
+        @Autowired
+        ProcessoRepo processoRepo;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+        @Autowired
+        private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+        @Autowired
+        private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
+        @Autowired
+        private AlertaRepo alertaRepo;
 
-    @Autowired
-    private AlertaRepo alertaRepo;
+        @Autowired
+        private MovimentacaoRepo movimentacaoRepo;
 
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+        @MockitoSpyBean
+        private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    @MockitoSpyBean
-    private SubprocessoNotificacaoService subprocessoNotificacaoService;
+        @MockitoSpyBean
+        private NotificacaoEmailService notificacaoEmailService;
 
-    @MockitoSpyBean
-    private NotificacaoEmailService notificacaoEmailService;
+        private Subprocesso subprocesso;
+        private Unidade unidadeSuperior;
+        private Unidade unidadeSuperiorSuperior;
 
+        @BeforeEach
+        void setUp() {
+                unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
+                unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+                Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
 
-    private Subprocesso subprocesso;
-    private Unidade unidadeSuperior;
-    private Unidade unidadeSuperiorSuperior;
+                Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO,
+                                SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
+                subprocesso = subprocessoRepo.save(
+                                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO,
+                                                LocalDateTime.now()));
+                subprocessoRepo.flush();
+        }
 
-    @BeforeEach
-    void setUp() {
-        unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
+        @Test
+        @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
+        @WithMockChefe()
+        void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
+                // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
+                doNothing().when(notificacaoEmailService).enviarEmail(any(), any(), any());
 
-        Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
-        subprocesso = subprocessoRepo.save(
-                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, LocalDateTime.now())
-        );
-        subprocessoRepo.flush();
-    }
+                // Devolução do mapa
+                DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
+                mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType("application/json")
+                                .content(objectMapper.writeValueAsString(devolverReq)))
+                                .andExpect(status().isOk());
 
-    @Test
-    @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockChefe()
-    void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
-        // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
-        doNothing().when(notificacaoEmailService).enviarEmail(any(), any(), any());
+                // Verificação do histórico após devolução
+                String responseDevolucao = mockMvc
+                                .perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                                                .with(csrf()))
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+                List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao = objectMapper
+                                .readValue(responseDevolucao, new TypeReference<>() {
+                                });
 
-        // Devolução do mapa
-        DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
-        mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(devolverReq)))
-                .andExpect(status().isOk());
+                assertThat(historicoDevolucao).hasSize(1);
+                assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
+                assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
+                assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
 
-        // Verificação do histórico após devolução
-        String responseDevolucao = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                        .with(csrf()))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<>() {
-        });
+                // Adicionar verificação de Movimentacao e Alerta após devolução
+                List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo
+                                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+                assertThat(movimentacoesDevolucao).hasSize(1);
+                assertThat(movimentacoesDevolucao.getFirst().getDescricao())
+                                .isEqualTo("Devolução da validação do mapa de competências para ajustes");
+                assertThat(movimentacoesDevolucao.getFirst().getUnidadeOrigem().getSigla())
+                                .isEqualTo(unidadeSuperior.getSigla());
+                assertThat(movimentacoesDevolucao.getFirst().getUnidadeDestino().getSigla())
+                                .isEqualTo(subprocesso.getUnidade().getSigla());
 
-        assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-        assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
+                List<Alerta> alertasDevolucao = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+                assertThat(alertasDevolucao).hasSize(1);
+                assertThat(alertasDevolucao.getFirst().getDescricao()).contains(
+                                "Cadastro de atividades e conhecimentos da unidade SEDESENV devolvido para ajustes");
+                assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
+                                .isEqualTo(subprocesso.getUnidade().getSigla());
 
-        // Adicionar verificação de Movimentacao e Alerta após devolução
-        List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-        assertThat(movimentacoesDevolucao).hasSize(1);
-        assertThat(movimentacoesDevolucao.getFirst().getDescricao()).isEqualTo("Devolução da validação do mapa de competências para ajustes");
-        assertThat(movimentacoesDevolucao.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-        assertThat(movimentacoesDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
+                // Unidade inferior valida o mapa novamente
+                mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                                .with(csrf()))
+                                .andExpect(status().isOk());
 
-        List<Alerta> alertasDevolucao = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
-        assertThat(alertasDevolucao).hasSize(1);
-        assertThat(alertasDevolucao.getFirst().getDescricao()).contains("Cadastro de atividades e conhecimentos da unidade SEDESENV devolvido para ajustes");
-        assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
+                // Chefe da unidade superior aceita a validação
+                mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+                                .with(csrf()))
+                                .andExpect(status().isOk());
 
-        // Unidade inferior valida o mapa novamente
-        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
-                        .with(csrf()))
-                .andExpect(status().isOk());
+                // Verificação do histórico após aceite
+                String responseAceite = mockMvc
+                                .perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                                                .with(csrf()))
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+                List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite = objectMapper
+                                .readValue(responseAceite, new TypeReference<>() {
+                                });
 
-        // Chefe da unidade superior aceita a validação
-        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
-                        .with(csrf()))
-                .andExpect(status().isOk());
+                assertThat(historicoAceite).hasSize(2);
+                assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+                assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
 
-        // Verificação do histórico após aceite
-        String responseAceite = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                        .with(csrf()))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {
-        });
+                // Adicionar verificação de Movimentacao e Alerta após aceite
+                List<Movimentacao> movimentacoesAceite = movimentacaoRepo
+                                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+                assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
+                assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+                assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla())
+                                .isEqualTo(unidadeSuperior.getSigla());
+                assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla())
+                                .isEqualTo(unidadeSuperiorSuperior.getSigla());
 
-        assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
+                List<Alerta> alertasAceite = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+                assertThat(alertasAceite).hasSize(3); // devolução + validação + aceite
 
-        // Adicionar verificação de Movimentacao e Alerta após aceite
-        List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-        assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
-        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
-        assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-        assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+                // Verifica o alerta de aceite para a unidade hierarquicamente superior
+                Alerta alertaDeAceite = alertasAceite.stream()
+                                .filter(a -> a.getUnidadeDestino().getSigla()
+                                                .equals(unidadeSuperiorSuperior.getSigla()))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError(
+                                                "Alerta de aceite para unidade superior não encontrado"));
 
-        List<Alerta> alertasAceite = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
-        assertThat(alertasAceite).hasSize(3); // devolução + validação + aceite
+                assertThat(alertaDeAceite.getDescricao())
+                                .contains("Validação do mapa de competências da SEDESENV submetida para análise");
+        }
 
-        // Verifica o alerta de aceite para a unidade hierarquicamente superior
-        Alerta alertaDeAceite = alertasAceite.stream()
-                .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
+        @Test
+        @DisplayName("ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta")
+        @WithMockAdmin
+        void testHomologarValidacao_Sucesso() throws Exception {
+                // Cenário: Subprocesso já validado e pronto para homologação
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+                subprocessoRepo.save(subprocesso);
+                subprocessoRepo.flush();
 
-        assertThat(alertaDeAceite.getDescricao()).contains("Validação do mapa de competências da SEDESENV submetida para análise");
-    }
+                // Ação
+                mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
+                                .with(csrf()))
+                                .andExpect(status().isOk());
 
-    @Test
-    @DisplayName("ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta")
-    @WithMockAdmin
-    void testHomologarValidacao_Sucesso() throws Exception {
-        // Cenário: Subprocesso já validado e pronto para homologação
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
-        subprocessoRepo.save(subprocesso);
-        subprocessoRepo.flush();
+                // Verificações
+                Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+                assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
 
-        // Ação
-        mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
-                        .with(csrf()))
-                .andExpect(status().isOk());
+                List<Movimentacao> movimentacoes = movimentacaoRepo
+                                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+                assertThat(movimentacoes).hasSize(1); // Apenas a movimentação de homologação
+                assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
+                assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+                assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
-        // Verificações
-        Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+                assertThat(alertas).hasSize(1);
+                assertThat(alertas.getFirst().getDescricao())
+                                .contains("Mapa de competências do processo Processo de Teste homologado");
+                assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-        assertThat(movimentacoes).hasSize(1); // Apenas a movimentação de homologação
-        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
-        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
-        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
-
-        List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
-        assertThat(alertas).hasSize(1);
-        assertThat(alertas.getFirst().getDescricao()).contains("Mapa de competências do processo Processo de Teste homologado");
-        assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
-
-        verify(subprocessoNotificacaoService, times(1)).notificarHomologacaoMapa(spAtualizado);
-    }
+                verify(subprocessoNotificacaoService, times(1)).notificarHomologacaoMapa(spAtualizado);
+        }
 }

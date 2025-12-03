@@ -16,14 +16,12 @@ import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.sgrh.model.Usuario;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -121,12 +119,14 @@ class AtividadeControllerTest {
 
             when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user",
+                    "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(auth)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto))
+                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                            .authentication(auth)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -138,13 +138,15 @@ class AtividadeControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para DTO inválido")
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
-            
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "N/A", java.util.Collections.emptyList());
+
+            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user",
+                    "N/A", java.util.Collections.emptyList());
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(auth)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto))
+                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                            .authentication(auth)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -161,8 +163,8 @@ class AtividadeControllerTest {
             when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
             mockMvc.perform(post("/api/atividades/1/atualizar").with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.descricao").value(DESCRICAO_ATUALIZADA));
         }
@@ -172,11 +174,12 @@ class AtividadeControllerTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             var atividadeDto = new AtividadeDto(99L, null, "Tanto faz");
 
-            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class))).thenThrow(new ErroEntidadeNaoEncontrada(""));
+            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class)))
+                    .thenThrow(new ErroEntidadeNaoEncontrada(""));
 
             mockMvc.perform(post("/api/atividades/99/atualizar").with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
         }
     }
@@ -233,11 +236,12 @@ class AtividadeControllerTest {
             var conhecimentoDto = new ConhecimentoDto(null, 1L, NOVO_CONHECIMENTO);
             var conhecimentoSalvoDto = new ConhecimentoDto(1L, 1L, NOVO_CONHECIMENTO);
 
-            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoSalvoDto);
+            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class)))
+                    .thenReturn(conhecimentoSalvoDto);
 
             mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_CONHECIMENTOS_1))
                     .andExpect(jsonPath("$.codigo").value(1L));
@@ -248,11 +252,12 @@ class AtividadeControllerTest {
         void deveAtualizarConhecimento() throws Exception {
             var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Atualizado");
 
-            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
+            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class)))
+                    .thenReturn(conhecimentoDto);
 
             mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.descricao").value("Atualizado"));
         }

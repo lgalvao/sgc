@@ -57,7 +57,12 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 
 ## 5. Testes e Qualidade
 
-### 5.1. Ferramentas de Verificação
-Antes de submeter alterações, execute:
+Antes de submeter alterações no **frontend**, execute (dentro de `frontend`):
 -   **`npm run typecheck`**: Verifica tipagem TypeScript.
 -   **`npm run lint`**: Verifica estilo de código.
+
+Antes de submeter alterações no **backend**, execute (na raiz):
+-   **`./gradlew :backend:test`**: Testes unitários/integração em Junit.
+
+## 6. Testes E2E (Playwright)
+Os testes de ponta a ponta (E2E) validam o funcionamento integrado do Frontend e Backend.

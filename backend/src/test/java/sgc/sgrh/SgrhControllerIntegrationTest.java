@@ -16,7 +16,6 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
 @DisplayName("Testes de Integração do SgrhController")
 class SgrhControllerIntegrationTest {
 
@@ -50,19 +49,16 @@ class SgrhControllerIntegrationTest {
     @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() throws Exception {
         AutenticacaoReq request = AutenticacaoReq.builder()
-            .tituloEleitoral("123456789101")
-            .senha("senha")
-            .build();
+                .tituloEleitoral("123456789101")
+                .senha("senha")
+                .build();
 
         mockMvc.perform(post(API_URL + "/autenticar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").value(true));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(true));
     }
-
-    @Autowired
-    private UsuarioRepo usuarioRepo;
 
     @Test
     @DisplayName("Deve autorizar e retornar perfis")
@@ -73,24 +69,24 @@ class SgrhControllerIntegrationTest {
         mockMvc.perform(post(API_URL + "/autorizar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Long.toString(tituloEleitoral)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$[0].perfil").value(Perfil.ADMIN.toString()))
-            .andExpect(jsonPath("$[0].unidade.sigla").value("ADMIN-UNIT"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].perfil").value(Perfil.ADMIN.toString()))
+                .andExpect(jsonPath("$[0].unidade.sigla").value("ADMIN-UNIT"));
     }
 
     @Test
     @DisplayName("Deve entrar")
     void entrar_deveRetornarOk() throws Exception {
         EntrarReq request = EntrarReq.builder()
-            .tituloEleitoral("123456789101")
-            .perfil(Perfil.CHEFE.toString())
-            .unidadeCodigo(unidade.getCodigo())
-            .build();
+                .tituloEleitoral("123456789101")
+                .perfil(Perfil.CHEFE.toString())
+                .unidadeCodigo(unidade.getCodigo())
+                .build();
 
         mockMvc.perform(post(API_URL + "/entrar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(request)))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 }

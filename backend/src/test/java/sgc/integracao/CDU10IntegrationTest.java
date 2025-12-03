@@ -26,7 +26,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
@@ -45,7 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe("333333333333")
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class,
+        sgc.integracao.mocks.TestThymeleafConfig.class })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
 class CDU10IntegrationTest {
@@ -67,8 +67,6 @@ class CDU10IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
@@ -84,13 +82,14 @@ class CDU10IntegrationTest {
     void setUp() {
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
         unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
-        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO,
+                SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
-        subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapa, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
+        subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapa,
+                SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
     }
 
@@ -100,7 +99,8 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var competencia = competenciaRepo
+                    .save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
             var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
@@ -113,10 +113,12 @@ class CDU10IntegrationTest {
                     .andExpect(jsonPath("$.message", is("Revisão do cadastro de atividades disponibilizada")));
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNotNull();
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização da revisão do cadastro de atividades");
@@ -126,13 +128,13 @@ class CDU10IntegrationTest {
             var alertas = alertaRepo.findByProcessoCodigo(subprocessoRevisao.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL disponibilizado para análise");
+            assertThat(alerta.getDescricao())
+                    .isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             verify(subprocessoNotificacaoService).notificarDisponibilizacaoRevisaoCadastro(
                     org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                    org.mockito.ArgumentMatchers.any(Unidade.class)
-            );
+                    org.mockito.ArgumentMatchers.any(Unidade.class));
         }
 
         @Test
@@ -145,7 +147,8 @@ class CDU10IntegrationTest {
                     .andExpect(status().isUnprocessableEntity());
 
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();
-            assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            assertThat(subprocessoNaoAlterado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         }
     }
 

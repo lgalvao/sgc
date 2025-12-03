@@ -26,7 +26,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -64,8 +63,6 @@ class CDU11IntegrationTest {
     private AtividadeRepo atividadeRepo;
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
-    @Autowired
-    private UsuarioRepo usuarioRepo;
 
     // Test data
     private Unidade unidade;
@@ -76,15 +73,16 @@ class CDU11IntegrationTest {
     void setUp() {
         // Unidade e Chefe
         unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
 
         // Processo
-        processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
+        processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO,
+                LocalDateTime.now().plusDays(30));
         processoRepo.save(processo);
 
         // Mapa e Subprocesso
         var mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
+                processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
         // Atividades e Conhecimentos
@@ -117,7 +115,8 @@ class CDU11IntegrationTest {
                     // Valida a primeira atividade e seu conhecimento
                     .andExpect(jsonPath("$.atividades[0].descricao", is("Analisar documentação")))
                     .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(1)))
-                    .andExpect(jsonPath("$.atividades[0].conhecimentos[0].descricao", is("Interpretação de textos técnicos")))
+                    .andExpect(jsonPath("$.atividades[0].conhecimentos[0].descricao",
+                            is("Interpretação de textos técnicos")))
                     // Valida a segunda atividade e seus conhecimentos
                     .andExpect(jsonPath("$.atividades[1].descricao", is("Elaborar relatórios")))
                     .andExpect(jsonPath("$.atividades[1].conhecimentos", hasSize(2)))
@@ -168,7 +167,8 @@ class CDU11IntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
-            Subprocesso subprocessoSemAtividades = new Subprocesso(processo, unidade, new Mapa(), SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
+            Subprocesso subprocessoSemAtividades = new Subprocesso(processo, unidade, new Mapa(),
+                    SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             mapaRepo.save(subprocessoSemAtividades.getMapa());
             subprocessoRepo.save(subprocessoSemAtividades);
 
@@ -183,14 +183,16 @@ class CDU11IntegrationTest {
         @DisplayName("Deve retornar uma atividade com a lista de conhecimentos vazia")
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
             Mapa mapaNovo = mapaRepo.save(new Mapa());
-            Subprocesso subprocessoAtividadeSemConhecimento = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
+            Subprocesso subprocessoAtividadeSemConhecimento = new Subprocesso(processo, unidade, mapaNovo,
+                    SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
             Atividade atividadeSemConhecimento = new Atividade(mapaNovo, "Atividade sem conhecimento");
             atividadeRepo.save(atividadeSemConhecimento);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.subprocessoId", is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
+                    .andExpect(
+                            jsonPath("$.subprocessoId", is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(1)))
                     .andExpect(jsonPath("$.atividades[0].descricao", is("Atividade sem conhecimento")))
                     .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(0)));

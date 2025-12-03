@@ -8,7 +8,10 @@ export default defineConfig({
     timeout: 10_000,
     expect: {timeout: 3_000},
     forbidOnly: !!process.env.CI,
-    reporter: 'dot',
+    reporter: [
+        ['dot'],
+        ['json', { outputFile: 'test-results/results.json' }]
+    ],
     use: {baseURL: 'http://localhost:5173'},
     webServer: {
         command: 'node e2e/lifecycle.js',

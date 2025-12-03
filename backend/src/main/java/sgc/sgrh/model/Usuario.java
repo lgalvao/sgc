@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.Unidade;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Usuario implements Serializable, UserDetails {
+public class Usuario implements UserDetails {
     @Id
     @Column(name = "titulo_eleitoral")
     private String tituloEleitoral;
@@ -51,7 +50,7 @@ public class Usuario implements Serializable, UserDetails {
         if (atribuicoesTemporarias != null) {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                 if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now)) &&
-                    (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
+                        (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
                     todas.add(new UsuarioPerfil(null, this, temp.getUnidade(), temp.getPerfil()));
                 }
             }
@@ -61,8 +60,10 @@ public class Usuario implements Serializable, UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Usuario usuario = (Usuario) o;
         return Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
     }
@@ -100,6 +101,7 @@ public class Usuario implements Serializable, UserDetails {
 
     @Override
     public String toString() {
-        return "Usuario{titulo='%s', nome='%s', unidade=%s}".formatted(tituloEleitoral, nome, unidadeLotacao.getSigla());
+        return "Usuario{titulo='%s', nome='%s', unidade=%s}".formatted(tituloEleitoral, nome,
+                unidadeLotacao.getSigla());
     }
 }

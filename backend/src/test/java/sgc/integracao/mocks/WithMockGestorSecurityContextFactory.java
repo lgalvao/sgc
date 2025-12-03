@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.model.SituacaoUnidade;
 import sgc.unidade.model.Unidade;
 
 @Component
@@ -40,7 +39,8 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
             principal.setEmail("gestor@example.com");
             Unidade u = new Unidade("Unidade Mock", "UO_SUP");
             principal.setUnidadeLotacao(u);
-            principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
+            principal.getAtribuicoes().add(
+                    sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
 
             if (dbAvailable) {
                 try {
@@ -52,7 +52,8 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
         } else {
             if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 Unidade u = new Unidade("Unidade Mock", "UO_SUP");
-                principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
+                principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u)
+                        .perfil(Perfil.GESTOR).build());
             }
             try {
                 usuarioRepo.save(principal);
@@ -61,7 +62,8 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
             }
         }
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password",
+                principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
     }

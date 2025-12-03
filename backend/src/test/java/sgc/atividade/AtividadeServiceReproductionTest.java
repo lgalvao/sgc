@@ -15,7 +15,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.processo.model.Processo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import java.util.Optional;

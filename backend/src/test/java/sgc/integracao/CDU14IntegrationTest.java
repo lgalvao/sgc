@@ -17,9 +17,7 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.dto.ProcessoDto;
@@ -56,299 +54,300 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class, sgc.integracao.mocks.TestEventConfig.class})
+@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class,
+                sgc.integracao.mocks.TestEventConfig.class })
 @org.springframework.transaction.annotation.Transactional
 class CDU14IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
-    private AlertaRepo alertaRepo;
-    @Autowired
-    private AnaliseRepo analiseRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
-    @Autowired
-    private jakarta.persistence.EntityManager entityManager;
-    @MockitoBean
-    private SgrhService sgrhService;
+        @Autowired
+        private MockMvc mockMvc;
+        @Autowired
+        private ObjectMapper objectMapper;
+        @Autowired
+        private SubprocessoRepo subprocessoRepo;
+        @Autowired
+        private UnidadeRepo unidadeRepo;
+        @Autowired
+        private UsuarioRepo usuarioRepo;
+        @Autowired
+        private AlertaRepo alertaRepo;
+        @Autowired
+        private AnaliseRepo analiseRepo;
+        @Autowired
+        private MapaRepo mapaRepo;
+        @Autowired
+        private AtividadeRepo atividadeRepo;
+        @Autowired
+        private MovimentacaoRepo movimentacaoRepo;
+        @Autowired
+        private jakarta.persistence.EntityManager entityManager;
+        @MockitoBean
+        private SgrhService sgrhService;
 
-    private Unidade unidade;
-    private Usuario chefe, gestor, admin;
-
-    @BeforeEach
-    void setUp() {
-        unidade = unidadeRepo.findById(102L).orElseThrow();
-        admin = usuarioRepo.findById("111111111111").orElseThrow();
-        gestor = usuarioRepo.findById("222222222222").orElseThrow();
-        chefe = usuarioRepo.findById("333333333333").orElseThrow();
-
-        // Configuração do Mock SgrhService
-        when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString())).thenReturn(List.of(
-                new PerfilDto(admin.getTituloEleitoral().toString(), 100L, "SEDOC", Perfil.ADMIN.name())
-        ));
-        when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString())).thenReturn(List.of(
-                new PerfilDto(gestor.getTituloEleitoral().toString(), 101L, "DA", Perfil.GESTOR.name())
-        ));
-        when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString())).thenReturn(List.of(
-                new PerfilDto(chefe.getTituloEleitoral().toString(), 102L, "SA", Perfil.CHEFE.name())
-        ));
-
-        when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString())).thenReturn(admin);
-        when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString())).thenReturn(gestor);
-        when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString())).thenReturn(chefe);
-
-        Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        unidadeAdmin.setTitular(admin);
-        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
-        unidadeGestor.setTitular(gestor);
-        unidade.setTitular(chefe);
-        unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
-    }
-
-    // Métodos de setup
-    private Long criarEComecarProcessoDeRevisao() throws Exception {
-        ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
-        
-        Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        subprocessoRepo.save(sp);
-        return sp.getCodigo();
-    }
-
-
-    @Nested
-    @DisplayName("Fluxo de Devolução")
-    class Devolucao {
-        @Test
-        @DisplayName("GESTOR deve devolver, alterando status e criando registros")
-        void gestorDevolveRevisao() throws Exception {
-
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                            .with(csrf()).with(user(chefe)))
-                    .andExpect(status().isOk());
-
-            mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(gestor))
-                            .contentType("application/json")
-                            .content("{\"motivo\": \"Teste\", \"observacoes\": \"Ajustar\"}"))
-                    .andExpect(status().isOk());
-
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
-            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
-        }
-    }
-
-    @Nested
-    @DisplayName("Fluxo de Aceite")
-    class Aceite {
-        @Test
-        @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
-        void gestorAceitaRevisao() throws Exception {
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                            .with(csrf()).with(user(chefe)))
-                    .andExpect(status().isOk());
-
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(gestor))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"OK\"}"))
-                    .andExpect(status().isOk());
-
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-            assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
-            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
-        }
-    }
-
-    @Nested
-    @DisplayName("Fluxo de Homologação")
-    class Homologacao {
-        private Long subprocessoId;
+        private Unidade unidade;
+        private Usuario chefe, gestor, admin;
 
         @BeforeEach
-        void setUpHomologacao() throws Exception {
-            subprocessoId = criarEComecarProcessoDeRevisao();
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                            .with(csrf()).with(user(chefe)))
-                    .andExpect(status().isOk());
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(gestor))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"OK\"}"))
-                    .andExpect(status().isOk());
+        void setUp() {
+                unidade = unidadeRepo.findById(102L).orElseThrow();
+                admin = usuarioRepo.findById("111111111111").orElseThrow();
+                gestor = usuarioRepo.findById("222222222222").orElseThrow();
+                chefe = usuarioRepo.findById("333333333333").orElseThrow();
+
+                // Configuração do Mock SgrhService
+                when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString())).thenReturn(List.of(
+                                new PerfilDto(admin.getTituloEleitoral().toString(), 100L, "SEDOC",
+                                                Perfil.ADMIN.name())));
+                when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString())).thenReturn(List.of(
+                                new PerfilDto(gestor.getTituloEleitoral().toString(), 101L, "DA",
+                                                Perfil.GESTOR.name())));
+                when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString())).thenReturn(List.of(
+                                new PerfilDto(chefe.getTituloEleitoral().toString(), 102L, "SA", Perfil.CHEFE.name())));
+
+                when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString())).thenReturn(admin);
+                when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString())).thenReturn(gestor);
+                when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString())).thenReturn(chefe);
+
+                Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
+                unidadeAdmin.setTitular(admin);
+                Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
+                unidadeGestor.setTitular(gestor);
+                unidade.setTitular(chefe);
+                unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
         }
 
-        @Test
-        @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
-        void adminHomologaSemImpactos() throws Exception {
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(admin))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"Homologado\"}"))
-                    .andExpect(status().isOk());
+        // Métodos de setup
+        private Long criarEComecarProcessoDeRevisao() throws Exception {
+                ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
 
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst()
+                                .orElseThrow();
+                sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                subprocessoRepo.save(sp);
+                return sp.getCodigo();
         }
 
-        @Test
-        @DisplayName("ADMIN homologa COM impactos, alterando status e criando movimentação")
-        void adminHomologaComImpactos() throws Exception {
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+        @Nested
+        @DisplayName("Fluxo de Devolução")
+        class Devolucao {
+                @Test
+                @DisplayName("GESTOR deve devolver, alterando status e criando registros")
+                void gestorDevolveRevisao() throws Exception {
 
-            Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
-            atividadeRepo.delete(atividadeExistente);
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
 
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(admin))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"Homologado com impacto\"}"))
-                    .andExpect(status().isOk());
+                        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                                        .with(csrf()).with(user(chefe)))
+                                        .andExpect(status().isOk());
 
-            sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(4);
-        }
-    }
+                        mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(gestor))
+                                        .contentType("application/json")
+                                        .content("{\"motivo\": \"Teste\", \"observacoes\": \"Ajustar\"}"))
+                                        .andExpect(status().isOk());
 
-    @Nested
-    @DisplayName("Endpoints de Consulta")
-    class EndpointsDeConsulta {
-        @Test
-        @DisplayName("Deve retornar histórico de análise corretamente")
-        void deveRetornarHistoricoDeAnalise() throws Exception {
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                            .with(csrf()).with(user(chefe)))
-                    .andExpect(status().isOk());
-
-            mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(gestor))
-                            .contentType("application/json")
-                            .content("{\"motivo\": \"Teste Histórico\", \"observacoes\": \"Registrando análise\"}"))
-                    .andExpect(status().isOk());
-
-            mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", subprocessoId)
-                            .with(user(gestor)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)))
-                    .andExpect(jsonPath("$[0].observacoes", is("Registrando análise")));
+                        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
+                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
+                        assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
+                }
         }
 
-        @Test
-        @DisplayName("Deve retornar impactos no mapa corretamente")
-        void deveRetornarImpactosNoMapa() throws Exception {
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+        @Nested
+        @DisplayName("Fluxo de Aceite")
+        class Aceite {
+                @Test
+                @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
+                void gestorAceitaRevisao() throws Exception {
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
+                        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                                        .with(csrf()).with(user(chefe)))
+                                        .andExpect(status().isOk());
 
-            Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
-            atividadeRepo.delete(atividadeExistente);
+                        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(gestor))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"OK\"}"))
+                                        .andExpect(status().isOk());
 
-            mockMvc.perform(get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
-                            .with(user(chefe)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.temImpactos", is(true)))
-                    .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
-                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(1)))
-                    .andExpect(jsonPath("$.competenciasImpactadas[0].tipoImpacto", is("ATIVIDADE_REMOVIDA")));
-        }
-    }
-
-    @Nested
-    @DisplayName("Falhas e Segurança")
-    class FalhasESeguranca {
-        @Test
-        @DisplayName("CHEFE não pode homologar revisão")
-        void chefeNaoPodeHomologar() throws Exception {
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                            .with(csrf()).with(user(chefe)))
-                    .andExpect(status().isOk());
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(gestor))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"OK\"}"))
-                    .andExpect(status().isOk());
-
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(chefe))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"Tudo certo por mim\"}"))
-                    .andExpect(status().isForbidden());
+                        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
+                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
+                        assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
+                }
         }
 
-        @Test
-        @DisplayName("Não pode homologar em estado inválido")
-        void naoPodeHomologarEmEstadoInvalido() throws Exception {
-            Long subprocessoId = criarEComecarProcessoDeRevisao();
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                            .with(csrf()).with(user(admin))
-                            .contentType("application/json")
-                            .content("{\"observacoes\": \"Homologado fora de hora\"}"))
-                    .andExpect(status().isConflict());
+        @Nested
+        @DisplayName("Fluxo de Homologação")
+        class Homologacao {
+                private Long subprocessoId;
+
+                @BeforeEach
+                void setUpHomologacao() throws Exception {
+                        subprocessoId = criarEComecarProcessoDeRevisao();
+                        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                                        .with(csrf()).with(user(chefe)))
+                                        .andExpect(status().isOk());
+                        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(gestor))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"OK\"}"))
+                                        .andExpect(status().isOk());
+                }
+
+                @Test
+                @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
+                void adminHomologaSemImpactos() throws Exception {
+                        mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(admin))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"Homologado\"}"))
+                                        .andExpect(status().isOk());
+
+                        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                }
+
+                @Test
+                @DisplayName("ADMIN homologa COM impactos, alterando status e criando movimentação")
+                void adminHomologaComImpactos() throws Exception {
+                        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+
+                        Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream()
+                                        .findFirst().orElseThrow();
+                        atividadeRepo.delete(atividadeExistente);
+
+                        mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(admin))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"Homologado com impacto\"}"))
+                                        .andExpect(status().isOk());
+
+                        sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+                        assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(4);
+                }
         }
-    }
 
-    private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
-        Map<String, Object> criarReqMap = Map.of(
-                "descricao", "Processo Revisão",
-                "tipo", "REVISAO",
-                "dataLimiteEtapa1", LocalDateTime.now().plusDays(10).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
-                "unidades", List.of(unidade.getCodigo())
-        );
-        String reqJson = objectMapper.writeValueAsString(criarReqMap);
+        @Nested
+        @DisplayName("Endpoints de Consulta")
+        class EndpointsDeConsulta {
+                @Test
+                @DisplayName("Deve retornar histórico de análise corretamente")
+                void deveRetornarHistoricoDeAnalise() throws Exception {
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
+                        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                                        .with(csrf()).with(user(chefe)))
+                                        .andExpect(status().isOk());
 
-        String resJson = mockMvc.perform(post("/api/processos")
-                        .with(csrf()).with(user(gestor))
-                        .contentType("application/json").content(reqJson))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+                        mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(gestor))
+                                        .contentType("application/json")
+                                        .content("{\"motivo\": \"Teste Histórico\", \"observacoes\": \"Registrando análise\"}"))
+                                        .andExpect(status().isOk());
 
-        ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
+                        mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", subprocessoId)
+                                        .with(user(gestor)))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$", hasSize(1)))
+                                        .andExpect(jsonPath("$[0].observacoes", is("Registrando análise")));
+                }
 
-        Map<String, Object> iniciarReqMap = Map.of(
-                "tipo", "REVISAO",
-                "unidades", List.of(unidade.getCodigo())
-        );
-        String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
+                @Test
+                @DisplayName("Deve retornar impactos no mapa corretamente")
+                void deveRetornarImpactosNoMapa() throws Exception {
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
+                        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
-        mockMvc.perform(post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
-                        .with(csrf()).with(user(gestor))
-                        .contentType("application/json")
-                        .content(iniciarReqJson))
-                .andExpect(status().isOk());
+                        Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream()
+                                        .findFirst().orElseThrow();
+                        atividadeRepo.delete(atividadeExistente);
 
-        entityManager.flush();
-        entityManager.clear();
+                        mockMvc.perform(get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
+                                        .with(user(chefe)))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$.temImpactos", is(true)))
+                                        .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
+                                        .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
+                                                        hasSize(1)))
+                                        .andExpect(jsonPath("$.competenciasImpactadas[0].tipoImpacto",
+                                                        is("ATIVIDADE_REMOVIDA")));
+                }
+        }
 
-        Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
-        Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
-        sp.setMapa(mapaRevisao);
-        subprocessoRepo.save(sp);
+        @Nested
+        @DisplayName("Falhas e Segurança")
+        class FalhasESeguranca {
+                @Test
+                @DisplayName("CHEFE não pode homologar revisão")
+                void chefeNaoPodeHomologar() throws Exception {
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
+                        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                                        .with(csrf()).with(user(chefe)))
+                                        .andExpect(status().isOk());
+                        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(gestor))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"OK\"}"))
+                                        .andExpect(status().isOk());
 
-        return processoDto;
-    }
+                        mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(chefe))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"Tudo certo por mim\"}"))
+                                        .andExpect(status().isForbidden());
+                }
+
+                @Test
+                @DisplayName("Não pode homologar em estado inválido")
+                void naoPodeHomologarEmEstadoInvalido() throws Exception {
+                        Long subprocessoId = criarEComecarProcessoDeRevisao();
+                        mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                                        .with(csrf()).with(user(admin))
+                                        .contentType("application/json")
+                                        .content("{\"observacoes\": \"Homologado fora de hora\"}"))
+                                        .andExpect(status().isConflict());
+                }
+        }
+
+        private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
+                Map<String, Object> criarReqMap = Map.of(
+                                "descricao", "Processo Revisão",
+                                "tipo", "REVISAO",
+                                "dataLimiteEtapa1",
+                                LocalDateTime.now().plusDays(10)
+                                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
+                                "unidades", List.of(unidade.getCodigo()));
+                String reqJson = objectMapper.writeValueAsString(criarReqMap);
+
+                String resJson = mockMvc.perform(post("/api/processos")
+                                .with(csrf()).with(user(gestor))
+                                .contentType("application/json").content(reqJson))
+                                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+                ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
+
+                Map<String, Object> iniciarReqMap = Map.of(
+                                "tipo", "REVISAO",
+                                "unidades", List.of(unidade.getCodigo()));
+                String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
+
+                mockMvc.perform(post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
+                                .with(csrf()).with(user(gestor))
+                                .contentType("application/json")
+                                .content(iniciarReqJson))
+                                .andExpect(status().isOk());
+
+                entityManager.flush();
+                entityManager.clear();
+
+                Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst()
+                                .orElseThrow();
+                Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
+                sp.setMapa(mapaRevisao);
+                subprocessoRepo.save(sp);
+
+                return processoDto;
+        }
 }

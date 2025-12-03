@@ -86,10 +86,7 @@ public class SubprocessoServiceActionsTest {
 
     @BeforeEach
     void setUp() {
-        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
-
-        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
         usuario = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
     }
 

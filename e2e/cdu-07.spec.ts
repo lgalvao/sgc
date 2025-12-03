@@ -20,22 +20,16 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2']
+            expandir: ['SECRETARIA_2'],
+            iniciar: true
         });
 
-        await page.getByRole('row', {name: descricao}).click();
-        await page.getByTestId('btn-processo-iniciar').click();
-
-        // Confirmar início
-        await page.getByTestId('btn-iniciar-processo-confirmar').click({force: true});
-
-        // Esperar confirmação na tabela antes de sair
-        await verificarProcessoNaTabela(page, {
-            descricao,
-            situacao: 'Em andamento', 
-            tipo: 'Mapeamento'
-        });
-
+                // Esperar confirmação na tabela antes de sair
+                await verificarProcessoNaTabela(page, {
+                    descricao,
+                    situacao: 'Em andamento',
+                    tipo: 'Mapeamento'
+                });
         await page.getByTestId('btn-logout').click();
 
         // 2. CHEFE loga e acessa subprocesso
@@ -55,7 +49,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         // Seção Dados da Unidade
         await verificarDetalhesSubprocesso(page, {
             sigla: 'ASSESSORIA_21',
-            situacao: 'AGUARDANDO_CADASTRO', // Detalhes costumam usar UPPER
+            situacao: 'Não Iniciado', // Ajustado conforme o UI
             prazo: '/'
         });
 

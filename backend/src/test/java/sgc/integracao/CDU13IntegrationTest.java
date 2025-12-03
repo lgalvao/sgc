@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest {
@@ -85,12 +85,9 @@ public class CDU13IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Usuario titular = usuarioRepo.findById("333333333333").orElseThrow();
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        Usuario gestorDaUnidade = usuarioRepo.findById("222222222222").orElseThrow();
         unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
         Usuario adminUser = usuarioRepo.findById("111111111111").orElseThrow();
-        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
 
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -106,7 +103,8 @@ public class CDU13IntegrationTest {
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado
-        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior, "Disponibilização inicial", adminUser);
+        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior,
+                "Disponibilização inicial", adminUser);
         movimentacaoRepo.save(movimentacaoInicial);
     }
 
@@ -117,7 +115,7 @@ public class CDU13IntegrationTest {
         @Test
         @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
         @WithMockGestor("666666666666")
-            // Simula um usuário com perfil de gestor
+        // Simula um usuário com perfil de gestor
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             String observacoes = "Favor revisar a atividade X e Y.";
@@ -147,7 +145,8 @@ public class CDU13IntegrationTest {
             assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // 3. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de devolução
             Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
             assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
@@ -184,10 +183,12 @@ public class CDU13IntegrationTest {
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("666666666666"); // From @WithMockGestor("666666666666")
+            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("666666666666"); // From
+                                                                                                // @WithMockGestor("666666666666")
 
             // 2. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de aceite
             Movimentacao movimentacaoAceite = movimentacoes.getFirst();
             assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
@@ -203,7 +204,7 @@ public class CDU13IntegrationTest {
         @Test
         @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
         @WithMockAdmin
-            // Simula um usuário com perfil de ADMIN
+        // Simula um usuário com perfil de ADMIN
         void homologarCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             HomologarCadastroReq requestBody = new HomologarCadastroReq("Homologado via teste.");
@@ -224,12 +225,14 @@ public class CDU13IntegrationTest {
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
 
             // 2. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de homologação
             Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
             assertThat(movimentacaoHomologacao.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
             assertThat(movimentacaoHomologacao.getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
-            assertThat(movimentacaoHomologacao.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos homologado");
+            assertThat(movimentacaoHomologacao.getDescricao())
+                    .isEqualTo("Cadastro de atividades e conhecimentos homologado");
         }
     }
 
@@ -264,13 +267,16 @@ public class CDU13IntegrationTest {
                     .andExpect(status().isOk());
 
             // When
-            String jsonResponse = mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", subprocesso.getCodigo())
-                    .accept(MediaType.APPLICATION_JSON))
+            String jsonResponse = mockMvc
+                    .perform(get("/api/subprocessos/{id}/historico-cadastro", subprocesso.getCodigo())
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             // Then
-            List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+            List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
+                    new TypeReference<>() {
+                    });
 
             assertThat(historico).hasSize(2);
 

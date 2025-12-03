@@ -51,6 +51,7 @@ export async function removerAtividade(page: Page, descricao: string) {
 }
 
 export async function disponibilizarCadastro(page: Page) {
+    // Clica no botão que abre o modal de confirmação
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
     // Modal confirmation

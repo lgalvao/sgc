@@ -3,7 +3,6 @@ package sgc.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
@@ -21,7 +20,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +50,6 @@ public class EventoProcessoListener {
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo repoSubprocesso;
-    private final Environment environment;
 
     /**
      * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando

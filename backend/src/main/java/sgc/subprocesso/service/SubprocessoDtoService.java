@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.atividade.model.Atividade;
@@ -44,7 +43,6 @@ public class SubprocessoDtoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final AnaliseService analiseService;
-    private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
@@ -68,7 +66,8 @@ public class SubprocessoDtoService {
         log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
         log.debug("Usuário encontrado: {}", usuario);
-        log.debug("Atribuições do usuário (de SGRH): {}", usuario.getTodasAtribuicoes().stream().map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla()).toList());
+        log.debug("Atribuições do usuário (de SGRH): {}", usuario.getTodasAtribuicoes().stream()
+                .map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla()).toList());
         log.debug("Perfil solicitado (de request): {}", perfil);
 
         verificarPermissaoVisualizacao(sp, perfil, usuario);
@@ -76,7 +75,8 @@ public class SubprocessoDtoService {
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
         log.debug("Responsável encontrado: {}", responsavel);
 
-        List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movimentacoes = repositorioMovimentacao
+                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
         SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
         log.debug("Permissões calculadas: {}", permissoes);
@@ -140,7 +140,8 @@ public class SubprocessoDtoService {
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
             List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
-            if (atividades == null) atividades = emptyList();
+            if (atividades == null)
+                atividades = emptyList();
 
             for (Atividade a : atividades) {
                 List<Conhecimento> ks = repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
@@ -166,7 +167,8 @@ public class SubprocessoDtoService {
     @Transactional(readOnly = true)
     public SugestoesDto obterSugestoes(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         return SugestoesDto.of(sp);
     }
@@ -182,13 +184,13 @@ public class SubprocessoDtoService {
 
         Long codMapa = sp.getMapa().getCodigo();
 
-        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
+        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream()
+                .findFirst()
                 .orElse(null);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
-
 
         return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
     }
@@ -204,7 +206,9 @@ public class SubprocessoDtoService {
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d"
+                                .formatted(codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
 }

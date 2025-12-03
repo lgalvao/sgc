@@ -1,7 +1,6 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,28 +16,9 @@ import sgc.atividade.model.AtividadeRepo;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para ImpactoAtividadeService")
 class ImpactoAtividadeServiceTest {
-
     @InjectMocks
     private ImpactoAtividadeService impactoAtividadeService;
 
     @Mock
     private AtividadeRepo atividadeRepo;
-
-    @Nested
-    @DisplayName("Testes para detecção de atividades inseridas")
-    class InseridasTestes {
-        // TODO: Adicionar testes
-    }
-
-    @Nested
-    @DisplayName("Testes para detecção de atividades removidas")
-    class RemovidasTestes {
-        // TODO: Adicionar testes
-    }
-
-    @Nested
-    @DisplayName("Testes para detecção de atividades alteradas")
-    class AlteradasTestes {
-        // TODO: Adicionar testes
-    }
 }
