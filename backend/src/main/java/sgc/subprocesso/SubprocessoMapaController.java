@@ -183,6 +183,30 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
+    // Compatibilidade: aceitar POST para atualizar e remover competências (frontend antigo)
+    @PostMapping("/{codigo}/competencias/{codCompetencia}/atualizar")
+    @Transactional
+    public ResponseEntity<MapaCompletoDto> atualizarCompetenciaPost(
+            @PathVariable Long codigo,
+            @PathVariable Long codCompetencia,
+            @RequestBody @Valid CompetenciaReq request,
+            @AuthenticationPrincipal Object principal) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request,
+                extractTituloUsuario(principal));
+        return ResponseEntity.ok(mapa);
+    }
+
+    @PostMapping("/{codigo}/competencias/{codCompetencia}/remover")
+    @Transactional
+    public ResponseEntity<MapaCompletoDto> removerCompetenciaPost(
+            @PathVariable Long codigo,
+            @PathVariable Long codCompetencia,
+            @AuthenticationPrincipal Object principal) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia,
+                extractTituloUsuario(principal));
+        return ResponseEntity.ok(mapa);
+    }
+
     @PutMapping("/{codigo}/competencias/{codCompetencia}")
     @Transactional
     @Operation(summary = "Atualiza uma competência existente em um mapa")

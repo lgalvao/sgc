@@ -16,7 +16,19 @@ export function badgeClass(situacao: string): string {
 // ===== LABELS DE SITUAÇÃO =====
 export function situacaoLabel(situacao?: string | null): string {
     if (!situacao) return "Não disponibilizado";
-  return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
+
+    const backendLabels: Record<string, string> = {
+        MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+        MAPA_VALIDADO: "Mapa validado",
+        MAPA_HOMOLOGADO: "Mapa homologado",
+        CADASTRO_HOMOLOGADO: "Cadastro homologado",
+        CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
+        CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
+    };
+
+    if (backendLabels[situacao]) return backendLabels[situacao];
+
+    return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
 }
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====

@@ -141,12 +141,15 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 "Cadastro aceito",
                 "Erro ao aceitar",
             ),
-        homologarCadastro: (codSubrocesso: number, req: HomologarCadastroRequest) =>
-            _executarAcao(
+        homologarCadastro: async (codSubrocesso: number, req: HomologarCadastroRequest) => {
+            const ok = await _executarAcao(
                 () => homologarCadastro(codSubrocesso, req),
                 "Cadastro homologado",
                 "Erro ao homologar",
-            ),
+            );
+            if (ok) await buscarSubprocessoDetalhe(codSubrocesso);
+            return ok;
+        },
         devolverRevisaoCadastro: (codSubrocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
                 () => devolverRevisaoCadastro(codSubrocesso, req),
@@ -159,11 +162,14 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 "Revisão aceita",
                 "Erro ao aceitar",
             ),
-        homologarRevisaoCadastro: (codSubrocesso: number, req: HomologarCadastroRequest) =>
-            _executarAcao(
+        homologarRevisaoCadastro: async (codSubrocesso: number, req: HomologarCadastroRequest) => {
+            const ok = await _executarAcao(
                 () => homologarRevisaoCadastro(codSubrocesso, req),
                 "Revisão homologada",
                 "Erro ao homologar",
-            ),
+            );
+            if (ok) await buscarSubprocessoDetalhe(codSubrocesso);
+            return ok;
+        },
     };
 });

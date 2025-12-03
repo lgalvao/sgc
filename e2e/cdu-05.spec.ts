@@ -149,6 +149,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
 
         // Adicionar Competência
+        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible({ timeout: 30000 });
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Teste ${timestamp}`);
 

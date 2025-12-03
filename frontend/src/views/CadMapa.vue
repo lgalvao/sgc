@@ -2,6 +2,7 @@
   <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
+      <span class="ms-3" data-testid="txt-badge-situacao">{{ situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacaoSubprocesso) }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -34,7 +35,7 @@
           variant="outline-primary"
           class="mb-3"
           data-testid="btn-abrir-criar-competencia"
-          @click="() => abrirModalCriarNovaCompetencia()"
+          @click="abrirModalCriarLimpo"
         >
           <i class="bi bi-plus-lg" /> Criar competência
         </BButton>
@@ -300,6 +301,7 @@ import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import { situacaoLabel } from "@/utils";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -387,7 +389,7 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   if (competenciaParaEditar) {
     novaCompetencia.value.descricao = competenciaParaEditar.descricao;
     atividadesSelecionadas.value = [
-      ...competenciaParaEditar.atividadesAssociadas,
+      ...(competenciaParaEditar.atividadesAssociadas || []),
     ];
     competenciaSendoEditada.value = competenciaParaEditar;
   } else {
@@ -395,6 +397,11 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
   }
+}
+
+function abrirModalCriarLimpo() {
+  competenciaSendoEditada.value = null;
+  abrirModalCriarNovaCompetencia();
 }
 
 function fecharModalCriarNovaCompetencia() {
@@ -440,7 +447,7 @@ function getConhecimentosModal(atividade: Atividade): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
-function adicionarCompetenciaEFecharModal() {
+async function adicionarCompetenciaEFecharModal() {
   if (
       !novaCompetencia.value.descricao ||
       atividadesSelecionadas.value.length === 0
@@ -448,23 +455,28 @@ function adicionarCompetenciaEFecharModal() {
     return;
 
   const competencia: Competencia = {
-    codigo: competenciaSendoEditada.value?.codigo || 0,
+    // deixe undefined para novas competências e permita backend atribuir o id
+    codigo: competenciaSendoEditada.value?.codigo ?? undefined,
     descricao: novaCompetencia.value.descricao,
     atividadesAssociadas: atividadesSelecionadas.value,
-  };
+  } as any;
 
-  if (competenciaSendoEditada.value) {
-    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
-  } else {
-    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+  try {
+    if (competenciaSendoEditada.value) {
+      await mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
+    } else {
+      await mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+    }
+
+    // Recarregar mapa completo para garantir que novas competências tenham seus códigos
+    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
+  } finally {
+    // Limpar formulário e fechar modal independente do resultado (o feedbackStore já notifica erros)
+    novaCompetencia.value.descricao = "";
+    atividadesSelecionadas.value = [];
+    competenciaSendoEditada.value = null;
+    fecharModalCriarNovaCompetencia();
   }
-
-  // Limpar formulário
-  novaCompetencia.value.descricao = "";
-  atividadesSelecionadas.value = [];
-  competenciaSendoEditada.value = null;
-
-  fecharModalCriarNovaCompetencia();
 }
 
 function excluirCompetencia(codigo: number) {
@@ -516,6 +528,9 @@ async function disponibilizarMapa() {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
     });
+    // Recarregar mapa para atualizar a situacao exibida
+    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
     fecharModalDisponibilizar();
     // TODO: Adicionar redirecionamento para o painel
   } catch {

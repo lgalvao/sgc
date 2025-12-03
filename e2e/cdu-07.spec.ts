@@ -24,12 +24,12 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             iniciar: true
         });
 
-                // Esperar confirmação na tabela antes de sair
-                await verificarProcessoNaTabela(page, {
-                    descricao,
-                    situacao: 'Em andamento',
-                    tipo: 'Mapeamento'
-                });
+        // Esperar confirmação na tabela antes de sair
+        await verificarProcessoNaTabela(page, {
+            descricao,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
         await page.getByTestId('btn-logout').click();
 
         // 2. CHEFE loga e acessa subprocesso

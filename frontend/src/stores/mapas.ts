@@ -72,6 +72,10 @@ export const useMapasStore = defineStore("mapas", () => {
                 codSubrocesso,
                 competencia,
             );
+            // Garantir que o mapa foi recarregado com códigos corretos
+            if (mapaCompleto.value && mapaCompleto.value.competencias.some(c => !c.codigo || c.codigo === 0)) {
+                await buscarMapaCompleto(codSubrocesso);
+            }
         } catch (error) {
             feedbackStore.show(
                 "Erro ao adicionar competência",
@@ -86,6 +90,16 @@ export const useMapasStore = defineStore("mapas", () => {
         codSubrocesso: number,
         competencia: Competencia,
     ) {
+        if (!competencia || !competencia.codigo) {
+            // Evitar chamada ao backend com id inválido
+            feedbackStore.show(
+                "Erro ao atualizar competência",
+                "Código da competência inválido.",
+                "danger"
+            );
+            throw new Error("Código da competência inválido");
+        }
+
         try {
             mapaCompleto.value = await subprocessoService.atualizarCompetencia(
                 codSubrocesso,
@@ -102,6 +116,15 @@ export const useMapasStore = defineStore("mapas", () => {
     }
 
     async function removerCompetencia(codSubrocesso: number, idCompetencia: number) {
+        if (!idCompetencia || idCompetencia === 0) {
+            feedbackStore.show(
+                "Erro ao remover competência",
+                "Código da competência inválido.",
+                "danger"
+            );
+            throw new Error("Código da competência inválido");
+        }
+
         try {
             mapaCompleto.value = await subprocessoService.removerCompetencia(
                 codSubrocesso,

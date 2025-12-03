@@ -249,9 +249,8 @@ const isHomologacao = computed(() => {
   const {situacaoSubprocesso} = subprocesso.value;
   return (
       perfilSelecionado.value === Perfil.ADMIN &&
-      (situacaoSubprocesso ===
-          SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES ||
-          situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA)
+      (situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
+          situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO)
   );
 });
 
