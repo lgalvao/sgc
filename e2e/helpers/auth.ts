@@ -10,6 +10,9 @@ export const USUARIOS = {
     GESTOR_COORD: { titulo: '222222', senha: 'senha' },
     CHEFE_UNIDADE: { titulo: '777777', senha: 'senha' }, // Janis Joplin (Assessoria 21)
     CHEFE_ASSESSORIA_22: { titulo: '888888', senha: 'senha' }, // Jimi Hendrix (Assessoria 22)
+    CHEFE_SECAO_211: { titulo: '101010', senha: 'senha' }, // Debbie Harry (Seção 211)
+    CHEFE_SECAO_212: { titulo: '181818', senha: 'senha' }, // Pete Townshend (Seção 212)
+    CHEFE_SECAO_221: { titulo: '141414', senha: 'senha' }, // Tina Turner (Seção 221)
     INVALIDO: { titulo: '00000000000', senha: 'senhaerrada' }
 } as const;
 

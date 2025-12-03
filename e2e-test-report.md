@@ -75,10 +75,23 @@ Os seguintes testes no arquivo `cdu-09.spec.ts` foram pulados, provavelmente dev
 
 ## Correções Aplicadas
 
-### CDU-06 e CDU-07 - Detalhar processo e subprocesso
-**Problema:** Os testes falhavam na criação de processos com a mensagem implícita de que a unidade já participava de um processo ativo (causando falha no redirecionamento para o painel). Isso ocorria porque os testes utilizavam a unidade `ASSESSORIA_21`, que fica com um processo ativo (`EM_ANDAMENTO`) ao final da execução do teste `CDU-05`.
+### CDU-06 - Detalhar processo
+**Problema:** Falha ao criar processo para `ASSESSORIA_21` (unidade ocupada pelo `CDU-05`).
+**Solução:** Atualizado para usar `ASSESSORIA_22`. (Mantido da iteração anterior).
+
+### CDU-07, CDU-08 e CDU-09 - Conflito de Unidades
+**Problema:**
+1.  `CDU-07` falhava ao usar `ASSESSORIA_22`, pois esta unidade ficava ocupada ("Em andamento") após a execução do `CDU-06`.
+2.  `CDU-08` e `CDU-09` falhavam ao usar `ASSESSORIA_21`, que permanecia ocupada após o `CDU-05`.
+O sistema bloqueia a criação de novos processos para unidades que já participam de um processo em andamento, causando falhas de redirecionamento (permanecendo na tela de cadastro) e timeouts.
+
 **Solução:**
-1.  Adicionado o usuário `CHEFE_ASSESSORIA_22` (Jimi Hendrix) em `e2e/helpers/auth.ts`.
-2.  Atualizado `e2e/cdu-06.spec.ts` para utilizar a unidade `ASSESSORIA_22` no primeiro caso de teste.
-3.  Atualizado `e2e/cdu-07.spec.ts` para utilizar a unidade `ASSESSORIA_22` e o respectivo chefe.
-**Resultado Esperado:** Os testes devem passar pois utilizarão uma unidade livre, evitando conflitos com o estado deixado pelo `CDU-05`.
+1.  **Isolamento de Unidades:** Cada teste E2E crítico agora utiliza uma unidade exclusiva para evitar conflitos de estado.
+    *   `CDU-07` agora utiliza `SECAO_211` (Unidade 15).
+    *   `CDU-08` agora utiliza `SECAO_212` (Unidade 16).
+    *   `CDU-09` agora utiliza `SECAO_221` (Unidade 18).
+2.  **Atualização de Helpers:** Adicionados os usuários chefes correspondentes (`CHEFE_SECAO_211`, `CHEFE_SECAO_212`, `CHEFE_SECAO_221`) ao arquivo `e2e/helpers/auth.ts`.
+3.  **Atualização dos Testes:** Os arquivos `cdu-07.spec.ts`, `cdu-08.spec.ts` e `cdu-09.spec.ts` foram refatorados para usar as novas unidades e expandir os nós corretos da árvore (`SECRETARIA_2`, `COORD_21`, `COORD_22`).
+
+**Resultado Esperado:**
+Eliminação das falhas em cascata causadas por unidades presas em processos anteriores. Cada teste deve rodar de forma independente com sua própria unidade e usuário.

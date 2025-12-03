@@ -13,15 +13,15 @@ async function verificarPaginaPainel(page: Page) {
 }
 
 async function verificarPaginaSubprocesso(page: Page) {
-    await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
+    await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);
 }
 
 test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
     test.describe.configure({ mode: 'serial' });
 
-    const UNIDADE_ALVO = 'ASSESSORIA_21';
-    const USUARIO_CHEFE = '777777';
-    const SENHA_CHEFE = 'senha';
+    const UNIDADE_ALVO = 'SECAO_221';
+    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-09 ${timestamp}`;
@@ -35,7 +35,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2']
+            expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
         // Iniciar processo
@@ -55,7 +55,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
 
         // Se cair na tela de processo (lista de unidades), clicar na unidade
         if (page.url().match(/\/processo\/\d+$/)) {
-             await page.getByRole('row', {name: 'Assessoria 21'}).click();
+             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
 
         await verificarPaginaSubprocesso(page);
@@ -92,7 +92,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcesso).click();
         if (page.url().match(/\/processo\/\d+$/)) {
-             await page.getByRole('row', {name: 'Assessoria 21'}).click();
+             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
         await navegarParaAtividades(page);
 
@@ -117,7 +117,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         // Verificar status no subprocesso
         await page.getByText(descProcesso).click();
         if (page.url().match(/\/processo\/\d+$/)) {
-             await page.getByRole('row', {name: 'Assessoria 21'}).click();
+             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText('Cadastro disponibilizado');
     });
@@ -128,7 +128,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Assessoria 21'}).click();
+        await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Entrar na visualizacao de atividades
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -149,7 +149,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
 
         await page.getByText(descProcesso).click();
         if (page.url().match(/\/processo\/\d+$/)) {
-             await page.getByRole('row', {name: 'Assessoria 21'}).click();
+             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
 
         // Verificar status 'Cadastro em andamento'
