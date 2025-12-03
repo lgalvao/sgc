@@ -93,8 +93,17 @@ Os seguintes testes no arquivo `cdu-09.spec.ts` foram pulados, provavelmente dev
 2.  **Atualização de Helpers:** Adicionado o usuário chefe correspondente (`CHEFE_SECAO_121`) ao arquivo `e2e/helpers/auth.ts`.
 3.  **Atualização do Teste:** O arquivo `cdu-07.spec.ts` foi atualizado para usar `SECAO_121` e expandir a árvore `SECRETARIA_1` -> `COORD_12`.
 
-### CDU-08 e CDU-09 - Conflito de Unidades
-**Status:** Os testes `CDU-08` e `CDU-09` ainda utilizam unidades sob a árvore `SECRETARIA_2` (`SECAO_212` e `SECAO_221`). Se as falhas persistirem por motivos semelhantes, recomenda-se mover também estes testes para a árvore `SECRETARIA_1` (ex: `SECAO_112`, `SECAO_113`) ou `SECRETARIA_1` -> `COORD_12` (ex: `SECAO_121` se não conflitar).
+### CDU-08 - Manter cadastro de atividades e conhecimentos
+**Problema:** O teste falhava ao tentar criar processos para `SECAO_212` (sob `SECRETARIA_2`), provavelmente devido a conflitos de estado com `CDU-05`.
+
+**Solução:**
+1.  **Isolamento Completo de Ramificação:** O teste foi movido para a ramificação da `SECRETARIA_1`.
+    *   `CDU-08` agora utiliza `ASSESSORIA_11` (Unidade 3, sob `SECRETARIA_1`).
+2.  **Atualização de Helpers:** Adicionado o usuário chefe correspondente (`CHEFE_ASSESSORIA_11`) ao arquivo `e2e/helpers/auth.ts`.
+3.  **Atualização do Teste:** O arquivo `cdu-08.spec.ts` foi atualizado para usar `ASSESSORIA_11` e expandir a árvore `SECRETARIA_1`.
+
+### CDU-09 - Disponibilizar cadastro de atividades e conhecimentos
+**Status:** O teste `CDU-09` ainda utiliza `SECAO_221` (sob `SECRETARIA_2`) e apresenta Timeout. Recomenda-se futura migração para a árvore `SECRETARIA_1` se as falhas persistirem.
 
 **Resultado Esperado:**
-Eliminação das falhas de criação de processo nos CDUs 06 e 07 ao utilizar uma hierarquia de unidades (Secretaria 1) que não é tocada pelo teste anterior (CDU-05), garantindo um estado limpo para a execução.
+Eliminação das falhas de criação de processo nos CDUs 06, 07 e 08 ao utilizar uma hierarquia de unidades (Secretaria 1) isolada do teste CDU-05.
