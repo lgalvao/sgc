@@ -335,7 +335,7 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {SituacaoSubprocesso, type Unidade} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso, type Unidade} from "@/types/tipos";
 
 const route = useRoute();
 const router = useRouter();
@@ -384,6 +384,7 @@ const subprocesso = computed(() => {
   );
 });
 
+const processo = computed(() => processosStore.processoDetalhe);
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 onMounted(async () => {
@@ -408,14 +409,14 @@ const podeAnalisar = computed(() => {
       (subprocesso.value?.situacaoSubprocesso ===
           SituacaoSubprocesso.MAPA_VALIDADO ||
           subprocesso.value?.situacaoSubprocesso ===
-          SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
+          SituacaoSubprocesso.MAPA_COM_SUGESTOES)
   );
 });
 
 const podeVerSugestoes = computed(() => {
   return (
       subprocesso.value?.situacaoSubprocesso ===
-      SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
+      SituacaoSubprocesso.MAPA_COM_SUGESTOES
   );
 });
 
@@ -556,11 +557,16 @@ async function confirmarAceitacao(observacoes?: string) {
 
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === "ADMIN";
+  const tipoProcesso = processo.value?.tipo;
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
-      observacoes: observacoes || "",
-    });
+    if (tipoProcesso === TipoProcesso.REVISAO) {
+      await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+        observacoes: observacoes || "",
+      });
+    } else {
+      await processosStore.homologarValidacao(codSubprocesso.value);
+    }
   } else {
     await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {
       observacoes: observacoes || "",
@@ -568,7 +574,10 @@ async function confirmarAceitacao(observacoes?: string) {
   }
 
   fecharModalAceitar();
-  await router.push({name: "Painel"});
+  await router.push({
+    name: "Subprocesso",
+    params: { codProcesso: codProcesso.value, siglaUnidade: sigla.value },
+  });
 }
 
 async function confirmarDevolucao() {

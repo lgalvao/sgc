@@ -104,8 +104,8 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
     prazo: string | RegExp,
     titular?: string
 }) {
-    // Usar test-id que sabemos existir pelo erro anterior
-    await expect(page.getByTestId('txt-header-unidade')).toContainText(dados.sigla);
+    // Usar test-id correto definido no SubprocessoHeader.vue
+    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText(dados.sigla);
 
     if (dados.titular) {
         await expect(page.getByText(dados.titular).first()).toBeVisible();

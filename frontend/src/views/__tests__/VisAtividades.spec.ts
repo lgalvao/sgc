@@ -171,7 +171,7 @@ describe("VisAtividades.vue", () => {
   it("deve validar cadastro (Homologar) e redirecionar", async () => {
     const { wrapper: w } = createWrapper(
         Perfil.ADMIN,
-        SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES,
+        SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
     );
     wrapper = w;
     const subprocessosStore = useSubprocessosStore();
@@ -291,7 +291,7 @@ describe("VisAtividades.vue", () => {
   it("deve validar cadastro (Homologar Mapeamento)", async () => {
     const { wrapper: w } = createWrapper(
         Perfil.ADMIN,
-        SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES,
+        SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
         TipoProcesso.MAPEAMENTO
     );
     wrapper = w;
