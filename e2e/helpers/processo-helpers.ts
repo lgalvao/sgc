@@ -113,3 +113,11 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
 
     await expect(page.getByText(dados.situacao).first()).toBeVisible();
 }
+
+export async function verificarPaginaPainel(page: Page) {
+    await expect(page).toHaveURL(/\/painel/);
+}
+
+export async function verificarPaginaSubprocesso(page: Page) {
+    await expect(page).toHaveURL(/\/processo\/\d+\/[A-Z0-9_]+$/);
+}

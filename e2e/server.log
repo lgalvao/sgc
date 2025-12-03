@@ -1,27 +1,27 @@
-[FRONTEND]   [32m[1mVITE[22m v7.2.6[39m  [2mready in [0m[1m522[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.2.6[39m  [2mready in [0m[1m366[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
 [BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 191919 entrou via request. Perfil: ADMIN, Unidade: 1
 [BACKEND] INFO  s.p.service.ProcessoService.criar:124 - Processo 1 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_11
 [BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:241 - Processo de mapeamento 1 iniciado para 1 unidades.
-[BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 777777 entrou via request. Perfil: CHEFE, Unidade: 12
+[BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 555555 entrou via request. Perfil: CHEFE, Unidade: 3
 [BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 191919 entrou via request. Perfil: ADMIN, Unidade: 1
 [BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 191919 entrou via request. Perfil: ADMIN, Unidade: 1
 [BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:98 - Disponibilizando mapa do subprocesso: codSubprocesso=1, usuario=191919
 [BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:118 - Subprocesso 1 atualizado para MAPA_DISPONIBILIZADO e mapa disponibilizado.
-[BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 777777 entrou via request. Perfil: CHEFE, Unidade: 12
+[BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 555555 entrou via request. Perfil: CHEFE, Unidade: 3
 [BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 191919 entrou via request. Perfil: ADMIN, Unidade: 1
 [BACKEND] INFO  s.p.service.ProcessoService.finalizar:289 - Iniciando finalização do processo: código=1
 [BACKEND] INFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:399 - Validação OK: 1 subprocessos homologados.
 [BACKEND] INFO  s.p.service.ProcessoService.tornarMapasVigentes:403 - Tornando mapas vigentes para o processo 1
 [BACKEND] INFO  s.p.service.ProcessoService.tornarMapasVigentes:421 - Mapas de 1 subprocessos foram definidos como vigentes.
 [BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarNotificacoesDeFinalizacao:40 - Enviando notificações de finalização para o processo 1
-[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailUnidadeFinal:83 - E-mail de finalização (unidade final) enviado para ASSESSORIA_21 (janis.joplin@tre-pe.jus.br)
+[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailUnidadeFinal:83 - E-mail de finalização (unidade final) enviado para ASSESSORIA_11 (david.bowie@tre-pe.jus.br)
 [BACKEND] INFO  s.p.service.ProcessoService.finalizar:305 - Processo finalizado: código=1
 [BACKEND] INFO  s.sgrh.service.UsuarioService.entrar:59 - Usuário 191919 entrou via request. Perfil: ADMIN, Unidade: 1
 [BACKEND] INFO  s.p.service.ProcessoService.criar:124 - Processo 2 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoRevisao:247 - Iniciando processo de revisão para código 2 com unidades [12]
-[BACKEND] INFO  s.p.service.ProcessoService.criarSubprocessoParaRevisao:368 - Subprocesso 2 para revisão criado para unidade ASSESSORIA_21
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoRevisao:247 - Iniciando processo de revisão para código 2 com unidades [3]
+[BACKEND] INFO  s.p.service.ProcessoService.criarSubprocessoParaRevisao:368 - Subprocesso 2 para revisão criado para unidade ASSESSORIA_11
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_11
 [BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoRevisao:283 - Processo de revisão 2 iniciado para 1 unidades.

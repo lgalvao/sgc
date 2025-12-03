@@ -66,25 +66,25 @@
   },
   "suites": [
     {
-      "title": "cdu-05.spec.ts",
-      "file": "cdu-05.spec.ts",
+      "title": "cdu-10.spec.ts",
+      "file": "cdu-10.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "CDU-05 - Iniciar processo de revisao",
-          "file": "cdu-05.spec.ts",
-          "line": 18,
+          "title": "CDU-10 - Disponibilizar revisão do cadastro de atividades",
+          "file": "cdu-10.spec.ts",
+          "line": 6,
           "column": 6,
           "specs": [
             {
-              "title": "Fase 1: Ciclo completo de Mapeamento",
+              "title": "Prep 1: Mapeamento - Criar e Iniciar",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 15000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -94,31 +94,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15798,
+                      "duration": 3803,
                       "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\nINICIANDO FASE 1: Criação de Processo, Atividades e Mapa, e Finalização do Processo\n\n"
-                        },
-                        {
-                          "text": "PAGE LOG: [vite] connecting...\n"
-                        },
-                        {
-                          "text": "PAGE LOG: [vite] connected.\n"
-                        },
-                        {
-                          "text": "PAGE LOG: [vite] connecting...\n"
-                        },
-                        {
-                          "text": "PAGE LOG: [vite] connected.\n"
-                        },
-                        {
-                          "text": "\nFASE 1 CONCLUÍDA: Processo de mapeamento finalizado e com mapa vigente.\n\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-03T19:08:14.983Z",
+                      "startTime": "2025-12-03T20:17:08.678Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -126,18 +107,18 @@
                   "status": "expected"
                 }
               ],
-              "id": "10dc4dcc138274e23fe8-239beddbd6653dbd0a2f",
-              "file": "cdu-05.spec.ts",
-              "line": 247,
+              "id": "d31b9ec1e370066a9293-0f67e975407e93750f54",
+              "file": "cdu-10.spec.ts",
+              "line": 35,
               "column": 9
             },
             {
-              "title": "Fase 2: Iniciar processo de Revisão",
+              "title": "Prep 2: Mapeamento - Chefe cadastra Atividade",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 15000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -147,22 +128,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3370,
+                      "duration": 3173,
                       "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\nINICIANDO FASE 2: Iniciar processo de Revisão\n\n"
-                        },
-                        {
-                          "text": "Processo de Revisão criado\n"
-                        },
-                        {
-                          "text": "Processo iniciado.\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-03T19:08:30.969Z",
+                      "startTime": "2025-12-03T20:17:12.626Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -170,10 +141,388 @@
                   "status": "expected"
                 }
               ],
-              "id": "10dc4dcc138274e23fe8-83480e023f8a6122d53d",
-              "file": "cdu-05.spec.ts",
-              "line": 266,
+              "id": "d31b9ec1e370066a9293-ca5fc9d13399602f2b29",
+              "file": "cdu-10.spec.ts",
+              "line": 59,
               "column": 9
+            },
+            {
+              "title": "Prep 3: Mapeamento - Admin Homologa Cadastro",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1764,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:15.819Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-a875bc0a7bd48561ae6e",
+              "file": "cdu-10.spec.ts",
+              "line": 78,
+              "column": 9
+            },
+            {
+              "title": "Prep 4: Mapeamento - Admin cria Competencia e Disponibiliza Mapa",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3297,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:17.624Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-cb7eafc608444d3daaf8",
+              "file": "cdu-10.spec.ts",
+              "line": 89,
+              "column": 9
+            },
+            {
+              "title": "Prep 5: Mapeamento - Chefe Valida Mapa",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1991,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:20.936Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-8a668c22d0515ad971df",
+              "file": "cdu-10.spec.ts",
+              "line": 109,
+              "column": 9
+            },
+            {
+              "title": "Prep 6: Mapeamento - Admin Homologa e Finaliza",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:22.963Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-8d0017ad6ce5369cd9e3",
+              "file": "cdu-10.spec.ts",
+              "line": 122,
+              "column": 9
+            },
+            {
+              "title": "Passo 7: Admin cria e inicia processo de Revisão",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3393,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:28.197Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-4aadc986c06d3c9170a9",
+              "file": "cdu-10.spec.ts",
+              "line": 142,
+              "column": 9
+            },
+            {
+              "title": "Passo 8: Chefe tenta disponibilizar sem conhecimento (Validação)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/e2e/cdu-10.spec.ts",
+                        "line": 168,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:31.629Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/e2e/cdu-10.spec.ts",
+                            "line": 168,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-470f15c3d44c35491ee5",
+              "file": "cdu-10.spec.ts",
+              "line": 168,
+              "column": 10
+            },
+            {
+              "title": "Passo 9: Chefe corrige e disponibiliza",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/e2e/cdu-10.spec.ts",
+                        "line": 185,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:31.630Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/e2e/cdu-10.spec.ts",
+                            "line": 185,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-c4aac1e8b5a59739f6c4",
+              "file": "cdu-10.spec.ts",
+              "line": 185,
+              "column": 10
+            },
+            {
+              "title": "Passo 10: Admin devolve cadastro",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/e2e/cdu-10.spec.ts",
+                        "line": 207,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:31.632Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/e2e/cdu-10.spec.ts",
+                            "line": 207,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-e545f2c6da81cfeb9b8f",
+              "file": "cdu-10.spec.ts",
+              "line": 207,
+              "column": 10
+            },
+            {
+              "title": "Passo 11: Chefe verifica histórico e disponibiliza novamente",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/e2e/cdu-10.spec.ts",
+                        "line": 220,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-03T20:17:31.633Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/e2e/cdu-10.spec.ts",
+                            "line": 220,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d31b9ec1e370066a9293-993ca5728d3beb70931d",
+              "file": "cdu-10.spec.ts",
+              "line": 220,
+              "column": 10
             }
           ]
         }
@@ -182,10 +531,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-03T19:07:50.639Z",
-    "duration": 43838.444,
-    "expected": 2,
-    "skipped": 0,
+    "startTime": "2025-12-03T20:16:54.859Z",
+    "duration": 36952.546,
+    "expected": 7,
+    "skipped": 4,
     "unexpected": 0,
     "flaky": 0
   }
