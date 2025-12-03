@@ -54,7 +54,6 @@ public class ProcessoService {
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
-    @SuppressWarnings("unused")
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
@@ -95,38 +94,34 @@ public class ProcessoService {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
-            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de
-            // processos
-            // Isso nunca deveria ocorrer em operação normal (frontend filtra), mas protege
-            // contra bugs
+            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de  processos
             if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
-                log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}",
-                        unidade.getSigla());
+                log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}", unidade.getSigla());
                 throw new IllegalStateException("Erro interno: unidade não elegível foi enviada ao backend");
             }
-
             participantes.add(unidade);
         }
 
-        if (requisicao.getTipo() == TipoProcesso.REVISAO || requisicao.getTipo() == TipoProcesso.DIAGNOSTICO) {
-            getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.getUnidades()))
-                    .ifPresent(msg -> {
-                        throw new ErroProcesso(msg);
-                    });
+        TipoProcesso tipoProcesso = requisicao.getTipo();
+
+        if (tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO) {
+            getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.getUnidades())).ifPresent(msg -> {
+                throw new ErroProcesso(msg);
+            });
         }
 
-        Processo processo = new Processo();
-        processo.setDescricao(requisicao.getDescricao());
-        processo.setTipo(requisicao.getTipo());
-        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
-        processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setDataCriacao(LocalDateTime.now());
-        processo.setParticipantes(participantes);
+        Processo processo = new Processo()
+                .setDescricao(requisicao.getDescricao())
+                .setTipo(tipoProcesso)
+                .setDataLimite(requisicao.getDataLimiteEtapa1())
+                .setSituacao(SituacaoProcesso.CRIADO)
+                .setDataCriacao(LocalDateTime.now())
+                .setParticipantes(participantes);
 
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
-        log.info("Processo '{}' (código {}) criado.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
+        log.info("Processo {} criado.", processoSalvo.getCodigo());
 
         return processoMapper.toDto(processoSalvo);
     }

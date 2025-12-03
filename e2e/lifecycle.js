@@ -15,21 +15,55 @@ const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
 const FRONTEND_PORT = 5173;
+const LOG_FILE = path.resolve(__dirname, 'server.log');
+
+// Limpar arquivo de log ao iniciar
+try {
+    fs.writeFileSync(LOG_FILE, '');
+} catch (e) {
+    console.error('Não foi possível criar o arquivo de log:', e.message);
+}
 
 let backendProcess = null;
 let frontendProcess = null;
 
 const LOG_FILTERS = [
+    // Warnings do Lombok e Java
     /WARNING:.*sun\.misc\.Unsafe/,
     /WARNING:.*lombok\.permit\.Permit/,
     /WARNING:.*will be removed in a future release/,
     /WARNING:.*Please consider reporting this to the maintainers/,
+    
+    // Gradle
     /^> Task :/,
     /logStarted/,
     /UP-TO-DATE/,
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
     /Starting/,
+    
+    // Spring Boot - Inicialização
+    /The following.*profile.*is active/,
+    /Initializing Spring/,
+    /Initializing Spring embedded WebApplicationContext/,
+    /Initializing Spring DispatcherServlet/,
+    /Started .* in .* seconds/,
+    /Tomcat started on port/,
+    /Tomcat initialized with port/,
+    
+    // Vite - Inicialização
+    /^> sgc@.*dev$/,
+    /^> vite$/,
+    /VITE v.* ready in/,
+    /➜  Local:/,
+    /➜  Network:/,
+    /use --host to expose/,
+    
+    // Logs de serviços mockados (já sabemos que estão ativos)
+    /NotificacaoEmailServiceMock.*ATIVADO/,
+    /E-mails serão mockados/,
+    
+    // Linhas vazias
     /^\s*$/
 ];
 
@@ -49,6 +83,9 @@ function log(prefix, data) {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
             console.log(line);
+            try {
+                fs.appendFileSync(LOG_FILE, `[${prefix}] ${line}\n`);
+            } catch (e) { /* ignore */ }
         }
     });
 }

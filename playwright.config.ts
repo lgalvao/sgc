@@ -5,18 +5,15 @@ import {defineConfig, devices} from '@playwright/test';
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
-    timeout: 15_000,
+    timeout: 10_000,
     expect: {timeout: 3_000},
     forbidOnly: !!process.env.CI,
-    workers: 1,
     reporter: 'dot',
-    use: {
-        baseURL: 'http://localhost:5173'
-    },
+    use: {baseURL: 'http://localhost:5173'},
     webServer: {
         command: 'node e2e/lifecycle.js',
         url: 'http://localhost:5173',
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: true,
         timeout: 300 * 1000,
         stdout: 'pipe',
         stderr: 'pipe',

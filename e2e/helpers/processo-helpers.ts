@@ -27,6 +27,9 @@ export async function criarProcesso(page: Page, options: {
     await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
     await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(options.diasLimite));
 
+    // Aguardar que as unidades sejam carregadas antes de interagir com a árvore
+    await expect(page.getByText('Carregando unidades...')).toBeHidden();
+
     if (options.expandir) {
         for (const sigla of options.expandir) {
             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
@@ -75,9 +78,12 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
     tipo: string,
     situacao: string
 }) {
-    await expect(page.getByTestId('txt-processo-descricao')).toHaveText(dados.descricao);
-    await expect(page.getByTestId('txt-processo-tipo')).toHaveText(dados.tipo);
-    await expect(page.getByTestId('txt-processo-situacao')).toHaveText(dados.situacao);
+    // Verificar descrição usando o test-id existente
+    await expect(page.getByTestId('processo-info')).toHaveText(dados.descricao);
+    
+    // Verificar tipo e situação usando getByText
+    await expect(page.getByText(`Tipo: ${dados.tipo}`)).toBeVisible();
+    await expect(page.getByText(`Situação: ${dados.situacao}`)).toBeVisible();
 }
 
 export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {

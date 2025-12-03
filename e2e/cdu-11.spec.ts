@@ -8,27 +8,28 @@ import {
     disponibilizarCadastro
 } from './helpers/atividade-helpers';
 
-test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
+test.describe('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
     const timestamp = Date.now();
     const nomeProcesso = `Processo CDU-11 ${timestamp}`;
-    const unidadeSigla = 'SECAO_111';
+    const siglaUnidade = 'SECAO_111';
     const gestorUsuario = '222222';
     const chefeUsuario = '333333';
     const senhaPadrao = 'senha';
-    const atvDesc = `Atividade CDU-11 ${timestamp}`;
-    const conhDesc = `Conhecimento CDU-11 ${timestamp}`;
+    const descAtividade = `Atividade CDU-11 ${timestamp}`;
+    const descConhecimento = `Conhecimento CDU-11 ${timestamp}`;
 
     test.beforeAll(async ({ browser }) => {
-        // 1. Criar Processo (Gestor)
         let context = await browser.newContext();
         let page = await context.newPage();
+
+        // 1. Criar Processo (Gestor)
         await page.goto('/');
         await login(page, gestorUsuario, senhaPadrao);
         await criarProcesso(page, {
             descricao: nomeProcesso,
             tipo: 'REVISAO',
             diasLimite: 5,
-            unidade: unidadeSigla,
+            unidade: siglaUnidade,
             iniciar: true
         });
         await context.close();
@@ -40,8 +41,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, chefeUsuario, senhaPadrao);
         await page.getByText(nomeProcesso).click();
         await navegarParaAtividades(page);
-        await adicionarAtividade(page, atvDesc);
-        await adicionarConhecimento(page, atvDesc, conhDesc);
+        await adicionarAtividade(page, descAtividade);
+        await adicionarConhecimento(page, descAtividade, descConhecimento);
         await disponibilizarCadastro(page);
         await context.close();
     });
@@ -54,20 +55,19 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByText(nomeProcesso).click();
 
         // 2. Clicar na unidade subordinada na lista de participantes
-        // Assume que o nome da unidade é um link para os detalhes do subprocesso
-        await page.getByRole('link', { name: unidadeSigla }).click();
+        await page.getByRole('link', { name: siglaUnidade }).click();
 
         // 3. Ir para Atividades
         await navegarParaAtividades(page, { visualizacao: true });
 
         // 4. Verificar conteúdo
-        await expect(page.getByText(atvDesc)).toBeVisible();
-        await expect(page.getByText(conhDesc)).toBeVisible();
+        await expect(page.getByText(descAtividade)).toBeVisible();
+        await expect(page.getByText(descConhecimento)).toBeVisible();
 
         // 5. Verificar modo somente leitura (ausência de botões de edição)
         await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();
 
-        const card = page.locator('.atividade-card', { has: page.getByText(atvDesc) });
+        const card = page.locator('.atividade-card', { has: page.getByText(descAtividade) });
         await expect(card.getByTestId('btn-editar-atividade')).toBeHidden();
         await expect(card.getByTestId('btn-remover-atividade')).toBeHidden();
     });
@@ -81,7 +81,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Já deve cair nos detalhes do subprocesso
         await navegarParaAtividades(page, { visualizacao: true });
 
-        await expect(page.getByText(atvDesc)).toBeVisible();
+        await expect(page.getByText(descAtividade)).toBeVisible();
         await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();
     });
 });

@@ -9,25 +9,25 @@ import {
     verificarSituacaoSubprocesso
 } from './helpers/atividade-helpers';
 
-test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro', () => {
+test.describe('CDU-10 - Disponibilizar revisão do cadastro', () => {
     const timestamp = Date.now();
     const nomeProcesso = `Processo CDU-10 ${timestamp}`;
-    const unidadeSigla = 'SECAO_111';
-    const gestorUsuario = '222222'; // GESTOR_COORD_11
-    const chefeUsuario = '333333'; // CHEFE_SECAO_111
+    const siglaUnidade = 'SECAO_111';
+    const usuarioGestor = '222222'; // GESTOR_COORD_11
+    const usuarioChefe = '333333'; // CHEFE_SECAO_111
     const senhaPadrao = 'senha';
 
     test.beforeAll(async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
         await page.goto('/');
-        await login(page, gestorUsuario, senhaPadrao);
+        await login(page, usuarioGestor, senhaPadrao);
 
         await criarProcesso(page, {
             descricao: nomeProcesso,
             tipo: 'REVISAO',
             diasLimite: 5,
-            unidade: unidadeSigla,
+            unidade: siglaUnidade,
             iniciar: true
         });
         await context.close();
@@ -35,11 +35,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro', () => {
 
     test('Deve validar atividades sem conhecimento e permitir disponibilizar após correção', async ({ page }) => {
         await page.goto('/');
-        await login(page, chefeUsuario, senhaPadrao);
+        await login(page, usuarioChefe, senhaPadrao);
 
         // 1. Acessar o processo
         await page.getByText(nomeProcesso).click();
-        await expect(page.getByTestId('txt-header-unidade')).toContainText(unidadeSigla);
+        await expect(page.getByTestId('txt-header-unidade')).toContainText(siglaUnidade);
 
         // 2. Ir para Atividades
         await navegarParaAtividades(page);

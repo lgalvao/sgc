@@ -7,7 +7,7 @@ import {
     adicionarConhecimento
 } from './helpers/atividade-helpers';
 
-test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
+test.describe('CDU-12 - Verificar impactos no mapa de competências', () => {
     const timestamp = Date.now();
     const nomeProcesso = `Processo CDU-12 ${timestamp}`;
     const unidadeSigla = 'SECAO_111';

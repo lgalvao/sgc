@@ -249,7 +249,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         // FASE 1: PREPARAÇÃO - CRIAR MAPA VIGENTE VIA PROCESSO DE MAPEAMENTO
         // ========================================================================
 
-        console.log('\nINICIANDO PREPARAÇÃO: Criação de Processo, Atividades, Mapa e Finalização do Processo\n');
+        console.log('\nINICIANDO PREPARAÇÃO PARA TESTE: Criação de Processo, Atividades e Mapa, e Finalização do Processo\n');
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         await passo2_ChefeAdicionaAtividadesEConhecimentos(page, descProcMapeamento, timestamp);
         await passo2a_ChefeDisponibilizaCadastro(page);

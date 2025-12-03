@@ -12,7 +12,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades', () => {
     const nomeProcesso = `Processo CDU-09 ${timestamp}`;
     const unidadeSigla = 'SECAO_111'; // Unidade gerida pelo CHEFE
     const gestorUsuario = '222222';
-    const chefeUsuario = '333333';
+    const usuarioChefe = '333333';
     const senhaPadrao = 'senha';
 
     test.beforeAll(async ({ browser }) => {
@@ -36,7 +36,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades', () => {
     test('Deve disponibilizar o cadastro após inserir atividades', async ({ page }) => {
         // 1. Login Chefe
         await page.goto('/');
-        await login(page, chefeUsuario, senhaPadrao);
+        await login(page, usuarioChefe, senhaPadrao);
 
         // 2. Acessar Subprocesso
         await page.getByText(nomeProcesso).click();
