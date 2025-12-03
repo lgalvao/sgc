@@ -54,3 +54,49 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
     await expect(linhaProcesso.getByText(options.tipo, { exact: true })).toBeVisible();
 }
+
+// === NOVOS HELPERS ===
+
+export interface UnidadeParticipante {
+    sigla: string;
+    situacao: string;
+    dataLimite: string | RegExp;
+}
+
+export async function verificarDetalhesProcesso(page: Page, dados: {
+    descricao: string,
+    tipo: string,
+    situacao: string
+}) {
+    await expect(page.getByTestId('txt-processo-descricao')).toHaveText(dados.descricao);
+    await expect(page.getByTestId('txt-processo-tipo')).toHaveText(dados.tipo);
+    await expect(page.getByTestId('txt-processo-situacao')).toHaveText(dados.situacao);
+}
+
+export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {
+    const row = page.getByRole('row', { name: new RegExp(unidade.sigla, 'i') });
+    await expect(row).toBeVisible();
+    await expect(row).toContainText(unidade.situacao);
+
+    if (unidade.dataLimite instanceof RegExp) {
+         await expect(row).toHaveText(unidade.dataLimite);
+    } else {
+         await expect(row).toContainText(unidade.dataLimite);
+    }
+}
+
+export async function verificarDetalhesSubprocesso(page: Page, dados: {
+    sigla: string,
+    situacao: string,
+    prazo: string | RegExp,
+    titular?: string
+}) {
+    // Usar test-id que sabemos existir pelo erro anterior
+    await expect(page.getByTestId('txt-header-unidade')).toContainText(dados.sigla);
+
+    if (dados.titular) {
+        await expect(page.getByText(dados.titular).first()).toBeVisible();
+    }
+
+    await expect(page.getByText(dados.situacao).first()).toBeVisible();
+}

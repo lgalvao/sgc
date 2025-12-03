@@ -1,0 +1,182 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "SGC" [ref=e6] [cursor=pointer]:
+        - /url: /painel
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Painel" [ref=e10] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e11]: 
+              - text: Painel
+          - listitem [ref=e12]:
+            - link " Minha unidade" [ref=e13] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e14]: 
+              - text: Minha unidade
+          - listitem [ref=e15]:
+            - link " Relatórios" [ref=e16] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e17]: 
+              - text: Relatórios
+          - listitem [ref=e18]:
+            - link " Histórico" [ref=e19] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e20]: 
+              - text: Histórico
+        - list [ref=e21]:
+          - listitem [ref=e22]:
+            - link " ADMIN - SEDOC" [ref=e23] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e24]: 
+              - generic [ref=e25]: ADMIN - SEDOC
+          - listitem "Configurações do sistema" [ref=e26]:
+            - link "" [ref=e27] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e28]: 
+          - listitem "Sair" [ref=e29]:
+            - link "" [ref=e30] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e31]: 
+  - generic [ref=e34]:
+    - button " Voltar" [ref=e35] [cursor=pointer]:
+      - generic [ref=e36]: 
+      - text: Voltar
+    - navigation "breadcrumb" [ref=e37]:
+      - list [ref=e38]:
+        - listitem [ref=e39]:
+          - generic "Início" [ref=e41]: 
+  - generic [ref=e42]:
+    - heading "Cadastro de processo" [level=2] [ref=e43]
+    - alert [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "Dados incompletos" [level=4] [ref=e47]
+          - paragraph [ref=e48]: Preencha a descrição.
+        - button "Close" [ref=e49] [cursor=pointer]
+    - generic [ref=e50]:
+      - group [ref=e51]:
+        - generic [ref=e52]: Descrição
+        - textbox "Descrição" [ref=e53]:
+          - /placeholder: Descreva o processo
+          - text: Processo CDU-06 1764720228762
+      - group [ref=e54]:
+        - generic [ref=e55]: Tipo
+        - combobox "Tipo" [ref=e56]:
+          - option "MAPEAMENTO" [selected]
+          - option "REVISAO"
+          - option "DIAGNOSTICO"
+      - group "Unidades participantes" [ref=e57]:
+        - generic [ref=e58]: Unidades participantes
+        - generic [ref=e60]:
+          - generic [ref=e62]:
+            - checkbox "SECRETARIA_1 - Secretaria 1" [ref=e63]
+            - generic [ref=e65]:
+              - strong [ref=e66]: SECRETARIA_1
+              - text: "- Secretaria 1"
+          - text: "[+]"
+          - generic [ref=e67]:
+            - generic [ref=e69]:
+              - checkbox "ASSESSORIA_11 - Assessoria 11" [ref=e70]
+              - generic [ref=e72]:
+                - strong [ref=e73]: ASSESSORIA_11
+                - text: "- Assessoria 11"
+            - generic [ref=e75]:
+              - checkbox "ASSESSORIA_12 - Assessoria 12" [ref=e76]
+              - generic [ref=e78]:
+                - strong [ref=e79]: ASSESSORIA_12
+                - text: "- Assessoria 12"
+            - generic [ref=e81]:
+              - checkbox "COORD_11 - Coordenadoria 11 Não elegível" [disabled]
+              - generic [ref=e83]:
+                - strong [ref=e84]: COORD_11
+                - text: "- Coordenadoria 11"
+                - generic [ref=e85]: Não elegível
+            - generic [ref=e86]:
+              - generic [ref=e88]:
+                - checkbox "SECAO_111 - Seção 111" [ref=e89]
+                - generic [ref=e91]:
+                  - strong [ref=e92]: SECAO_111
+                  - text: "- Seção 111"
+              - generic [ref=e94]:
+                - checkbox "SECAO_112 - Seção 112" [ref=e95]
+                - generic [ref=e97]:
+                  - strong [ref=e98]: SECAO_112
+                  - text: "- Seção 112"
+              - generic [ref=e100]:
+                - checkbox "SECAO_113 - Seção 113" [ref=e101]
+                - generic [ref=e103]:
+                  - strong [ref=e104]: SECAO_113
+                  - text: "- Seção 113"
+            - generic [ref=e106]:
+              - checkbox "COORD_12 - Coordenadoria 12 Não elegível" [disabled]
+              - generic [ref=e108]:
+                - strong [ref=e109]: COORD_12
+                - text: "- Coordenadoria 12"
+                - generic [ref=e110]: Não elegível
+            - generic [ref=e113]:
+              - checkbox "SECAO_121 - Seção 121" [ref=e114]
+              - generic [ref=e116]:
+                - strong [ref=e117]: SECAO_121
+                - text: "- Seção 121"
+          - generic [ref=e119]:
+            - checkbox "SECRETARIA_2 - Secretaria 2" [checked=mixed] [ref=e120]
+            - generic [ref=e122]:
+              - strong [ref=e123]: SECRETARIA_2
+              - text: "- Secretaria 2"
+          - text: "[+]"
+          - generic [ref=e124]:
+            - generic [ref=e126]:
+              - checkbox "ASSESSORIA_21 - Assessoria 21" [checked] [ref=e127]
+              - generic [ref=e129]:
+                - strong [ref=e130]: ASSESSORIA_21
+                - text: "- Assessoria 21"
+            - generic [ref=e132]:
+              - checkbox "ASSESSORIA_22 - Assessoria 22" [ref=e133]
+              - generic [ref=e135]:
+                - strong [ref=e136]: ASSESSORIA_22
+                - text: "- Assessoria 22"
+            - generic [ref=e138]:
+              - checkbox "COORD_21 - Coordenadoria 21 Não elegível" [disabled]
+              - generic [ref=e140]:
+                - strong [ref=e141]: COORD_21
+                - text: "- Coordenadoria 21"
+                - generic [ref=e142]: Não elegível
+            - generic [ref=e143]:
+              - generic [ref=e145]:
+                - checkbox "SECAO_211 - Seção 211" [ref=e146]
+                - generic [ref=e148]:
+                  - strong [ref=e149]: SECAO_211
+                  - text: "- Seção 211"
+              - generic [ref=e151]:
+                - checkbox "SECAO_212 - Seção 212" [ref=e152]
+                - generic [ref=e154]:
+                  - strong [ref=e155]: SECAO_212
+                  - text: "- Seção 212"
+            - generic [ref=e157]:
+              - checkbox "COORD_22 - Coordenadoria 22 Não elegível" [disabled]
+              - generic [ref=e159]:
+                - strong [ref=e160]: COORD_22
+                - text: "- Coordenadoria 22"
+                - generic [ref=e161]: Não elegível
+            - generic [ref=e164]:
+              - checkbox "SECAO_221 - Seção 221" [ref=e165]
+              - generic [ref=e167]:
+                - strong [ref=e168]: SECAO_221
+                - text: "- Seção 221"
+      - group [ref=e169]:
+        - generic [ref=e170]: Data limite
+        - textbox "Data limite" [ref=e171]: 2026-01-02
+      - button "Salvar" [ref=e172] [cursor=pointer]
+      - button "Iniciar processo" [active] [ref=e173] [cursor=pointer]
+      - button "Remover" [ref=e174] [cursor=pointer]
+      - button "Cancelar" [ref=e175] [cursor=pointer]
+  - contentinfo [ref=e176]:
+    - generic [ref=e177]:
+      - generic [ref=e178]: Versão 1.0.0
+      - generic [ref=e179]: © SESEL/COSIS/TRE-PE
+```

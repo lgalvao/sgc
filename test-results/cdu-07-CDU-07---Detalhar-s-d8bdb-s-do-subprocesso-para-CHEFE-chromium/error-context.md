@@ -1,0 +1,94 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "SGC" [ref=e6] [cursor=pointer]:
+        - /url: /painel
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Painel" [ref=e10] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e11]: 
+              - text: Painel
+          - listitem [ref=e12]:
+            - link " Minha unidade" [ref=e13] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e14]: 
+              - text: Minha unidade
+          - listitem [ref=e15]:
+            - link " Relatórios" [ref=e16] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e17]: 
+              - text: Relatórios
+          - listitem [ref=e18]:
+            - link " Histórico" [ref=e19] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e20]: 
+              - text: Histórico
+        - list [ref=e21]:
+          - listitem [ref=e22]:
+            - link " ADMIN - SEDOC" [ref=e23] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e24]: 
+              - generic [ref=e25]: ADMIN - SEDOC
+          - listitem "Configurações do sistema" [ref=e26]:
+            - link "" [ref=e27] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e28]: 
+          - listitem "Sair" [ref=e29]:
+            - link "" [ref=e30] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e31]: 
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]: Processos
+        - button " Criar processo" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: 
+          - text: Criar processo
+      - table [ref=e40]:
+        - rowgroup [ref=e41]:
+          - row "Descrição Tipo Unidades Participantes Situação" [ref=e42]:
+            - columnheader "Descrição" [ref=e43] [cursor=pointer]:
+              - text: Descrição
+              - img [ref=e44]: 
+            - columnheader "Tipo" [ref=e46] [cursor=pointer]:
+              - text: Tipo
+              - img [ref=e47]: 
+            - columnheader "Unidades Participantes" [ref=e49]
+            - columnheader "Situação" [ref=e50] [cursor=pointer]:
+              - text: Situação
+              - img [ref=e51]: 
+        - rowgroup [ref=e53]:
+          - row "Processo CDU-06 1764720228762 Mapeamento ASSESSORIA_21 Criado" [ref=e54]:
+            - cell "Processo CDU-06 1764720228762" [ref=e55]
+            - cell "Mapeamento" [ref=e56]
+            - cell "ASSESSORIA_21" [ref=e57]
+            - cell "Criado" [ref=e58]
+          - row "Processo CDU-07 1764720246893 Mapeamento ASSESSORIA_21 Em Andamento" [ref=e59]:
+            - cell "Processo CDU-07 1764720246893" [ref=e60]
+            - cell "Mapeamento" [ref=e61]
+            - cell "ASSESSORIA_21" [ref=e62]
+            - cell "Em Andamento" [ref=e63]
+    - generic [ref=e64]:
+      - generic [ref=e66]: Alertas
+      - table [ref=e68]:
+        - rowgroup [ref=e69]:
+          - row "Data/Hora Descrição Processo Origem" [ref=e70]:
+            - columnheader "Data/Hora" [ref=e71] [cursor=pointer]:
+              - text: Data/Hora
+              - img [ref=e72]: 
+            - columnheader "Descrição" [ref=e74]
+            - columnheader "Processo" [ref=e75] [cursor=pointer]:
+              - text: Processo
+              - img [ref=e76]: 
+            - columnheader "Origem" [ref=e78]
+        - rowgroup
+  - contentinfo [ref=e79]:
+    - generic [ref=e80]:
+      - generic [ref=e81]: Versão 1.0.0
+      - generic [ref=e82]: © SESEL/COSIS/TRE-PE
+```
