@@ -25,7 +25,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             tipo: 'REVISAO',
             diasLimite: 5,
             unidade: unidadeSigla,
-            expandir: ['COORD_11']
+            iniciar: true
         });
         await context.close();
     });

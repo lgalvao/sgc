@@ -31,7 +31,7 @@ test.describe.serial('CDU-08 - Manter cadastro de atividades e conhecimentos', (
             tipo: 'MAPEAMENTO',
             diasLimite: 5,
             unidade: unidadeSigla,
-            expandir: ['COORD_11']
+            iniciar: true
         });
 
         await context.close();

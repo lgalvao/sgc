@@ -28,7 +28,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 5,
             unidade: unidadeSigla,
-            expandir: ['COORD_11']
+            iniciar: true
         });
         await context.close();
     });
@@ -51,7 +51,11 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades', () => {
         await disponibilizarCadastro(page);
 
         // 6. Verificar Resultado
-        await expect(page).toHaveURL(/\/subprocesso\/\d+/);
+        await expect(page).toHaveURL(/\/painel/);
+
+        // Voltar para o subprocesso
+        await page.getByText(nomeProcesso).click();
+
         await expect(page.getByTestId('txt-situacao-subprocesso')).toHaveText(/Cadastro realizado/i);
 
         // Verificar timeline se possível

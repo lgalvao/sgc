@@ -1,7 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
-export async function navegarParaAtividades(page: Page) {
-    await page.getByTestId('card-atividades-conhecimentos').click();
+export async function navegarParaAtividades(page: Page, options?: { visualizacao?: boolean }) {
+    const testId = options?.visualizacao ? 'card-subprocesso-atividades-vis' : 'card-subprocesso-atividades';
+    await page.getByTestId(testId).click();
     // Assuming the title is present as h1 or similar. Vue has <h1 ...>Atividades e conhecimentos</h1>
     await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
 }
@@ -24,24 +25,26 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
 
 export async function editarAtividade(page: Page, descricaoAtual: string, novaDescricao: string) {
     const card = page.locator('.atividade-card', { has: page.getByText(descricaoAtual) });
+    const row = card.locator('.atividade-hover-row');
 
-    await card.hover();
+    await row.hover();
     await card.getByTestId('btn-editar-atividade').click();
 
-    await card.getByTestId('inp-editar-atividade').fill(novaDescricao);
-    await card.getByTestId('btn-salvar-edicao-atividade').click();
+    await page.locator(`input[value="${descricaoAtual}"]`).fill(novaDescricao);
+    await page.getByTestId('btn-salvar-edicao-atividade').click();
 
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
 
 export async function removerAtividade(page: Page, descricao: string) {
     const card = page.locator('.atividade-card', { has: page.getByText(descricao) });
+    const row = card.locator('.atividade-hover-row');
 
     page.once('dialog', async dialog => {
         await dialog.accept();
     });
 
-    await card.hover();
+    await row.hover();
     await card.getByTestId('btn-remover-atividade').click();
 
     await expect(page.getByText(descricao)).toBeHidden();

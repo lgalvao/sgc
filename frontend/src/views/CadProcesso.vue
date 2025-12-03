@@ -363,22 +363,40 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (!processoEditando.value) {
-    mostrarAlerta('danger', "Salve o processo", "Você precisa salvar o processo antes de poder iniciá-lo.");
-    return;
+
+  let codigoProcesso = processoEditando.value?.codigo;
+
+  if (!codigoProcesso) {
+    // Se não houver processo salvo, cria antes de iniciar
+    const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
+      const unidade = findUnidadeById(id, unidadesStore.unidades);
+      return unidade && unidade.isElegivel;
+    });
+
+    try {
+      const request: CriarProcessoRequest = {
+        descricao: descricao.value,
+        tipo: tipo.value as TipoProcesso,
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesFiltradas,
+      };
+      const novoProcesso = await processosStore.criarProcesso(request);
+      codigoProcesso = novoProcesso.codigo;
+    } catch (error) {
+      mostrarAlerta('danger', "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+      console.error("Erro ao criar processo:", error);
+      return;
+    }
   }
 
   try {
     await processosStore.iniciarProcesso(
-      processoEditando.value.codigo,
+      codigoProcesso,
       tipo.value as TipoProcesso,
       unidadesSelecionadas.value,
     );
     await router.push("/painel");
-    if (!processoEditando.value) {
-      // Only clear fields if it was a new process
-      limparCampos();
-    }
+    limparCampos();
   } catch (error) {
     mostrarAlerta('danger', "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
     console.error("Erro ao iniciar processo:", error);

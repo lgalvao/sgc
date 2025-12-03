@@ -29,7 +29,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             tipo: 'REVISAO',
             diasLimite: 5,
             unidade: unidadeSigla,
-            expandir: ['COORD_11']
+            iniciar: true
         });
         await context.close();
 
@@ -58,7 +58,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByRole('link', { name: unidadeSigla }).click();
 
         // 3. Ir para Atividades
-        await navegarParaAtividades(page);
+        await navegarParaAtividades(page, { visualizacao: true });
 
         // 4. Verificar conteúdo
         await expect(page.getByText(atvDesc)).toBeVisible();
@@ -79,7 +79,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByText(nomeProcesso).click();
 
         // Já deve cair nos detalhes do subprocesso
-        await navegarParaAtividades(page);
+        await navegarParaAtividades(page, { visualizacao: true });
 
         await expect(page.getByText(atvDesc)).toBeVisible();
         await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();

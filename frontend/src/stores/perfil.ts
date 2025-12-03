@@ -27,6 +27,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     );
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
+    const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
 
     function definirServidorId(novoId: string | number) {
         servidorId.value = Number(novoId);
@@ -131,6 +132,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfisUnidades,
         perfis,
         isAdmin,
+        isGestor,
         definirServidorId,
         definirPerfilUnidade,
         loginCompleto,
