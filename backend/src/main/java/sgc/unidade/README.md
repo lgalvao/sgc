@@ -1,4 +1,5 @@
 # Pacote Unidade
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 
@@ -56,3 +57,4 @@ graph TD
 ## Gerenciamento de Dados
 - **Leitura:** Diversos serviços utilizam o `UnidadeRepo` para buscar informações estruturais.
 - **Escrita:** A estrutura básica (entidade `Unidade`) é sincronizada via `SgrhService`. No entanto, o módulo permite operações específicas como a criação de `AtribuicaoTemporaria` via API.
+

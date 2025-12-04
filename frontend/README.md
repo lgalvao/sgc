@@ -1,4 +1,5 @@
 # Frontend SGC
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema de Gestão de Competências). Este documento serve como um guia para desenvolvedores, detalhando a arquitetura, as tecnologias e as convenções do projeto.
 

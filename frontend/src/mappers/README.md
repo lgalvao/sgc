@@ -1,4 +1,5 @@
 # Mappers (Mapeadores de Dados)
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém funções puras responsáveis por transformar dados entre o formato da API (DTOs do Backend) e o formato utilizado internamente pelo Frontend (Interfaces TypeScript e Stores).
 

@@ -1,4 +1,5 @@
 # Pacote Comum
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência.
@@ -77,3 +78,4 @@ public Recurso buscar(Long codigo) {
         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Recurso", codigo));
 }
 ```
+

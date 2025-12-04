@@ -1,4 +1,5 @@
 # SGC - Sistema de Gestão de Competências
+Última atualização: 2025-12-04 14:18:38Z
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -156,3 +157,4 @@ Mecanismo orientado a eventos que reage aos eventos de domínio:
 http://localhost:10000/swagger-ui.html
 http://localhost:10000/api-docs
 ```
+

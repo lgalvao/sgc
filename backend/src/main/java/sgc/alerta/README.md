@@ -1,4 +1,5 @@
 # Módulo de Alerta
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote é responsável por criar e gerenciar **alertas internos** do sistema, que são notificações exibidas na interface do usuário. Ele funciona de maneira reativa, "escutando" eventos de domínio publicados por outros módulos (como o `processo`) e gerando os alertas correspondentes.
@@ -66,3 +67,4 @@ graph TD
 ### DTOs (`dto`)
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
 - **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
+

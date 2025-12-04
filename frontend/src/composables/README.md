@@ -1,4 +1,5 @@
 # Composables (Vue Composition API)
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém **Composables** do Vue.js. Composables são funções que encapsulam lógica de estado com a Composition API para ser reutilizada entre componentes.
 
@@ -16,3 +17,4 @@ Por convenção, o nome dessas funções começa com `use` (ex: `usePerfil`).
     - **Cálculo de Perfis:** Determina dinamicamente quais perfis (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) um usuário possui com base em sua lotação, titularidade de unidades e atribuições temporárias.
     - **Estado do Usuário:** Fornece propriedades computadas reativas para o `servidorLogado`, `perfilSelecionado` e `unidadeSelecionada`.
     - **Integração com Stores:** Orquestra dados das stores `useUsuariosStore`, `useUnidadesStore` e `useAtribuicaoTemporariaStore`.
+

@@ -1,4 +1,5 @@
 # Pacote SGRH e Usuário
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
@@ -65,3 +66,4 @@ graph TD
 ## Propósito e Uso
 - **Para autenticação e autorização**, o Spring Security interage com o `UsuarioRepo` para carregar os dados do usuário.
 - **Para obter dados de RH (unidades, responsáveis, etc.)**, outros serviços devem injetar e utilizar o `SgrhService`.
+

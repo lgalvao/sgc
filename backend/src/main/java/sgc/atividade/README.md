@@ -1,4 +1,5 @@
 # Módulo de Atividade
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote gerencia a entidade `Atividade`, que representa uma tarefa ou atribuição dentro de um `Mapa` de competências.
@@ -70,3 +71,4 @@ graph TD
 
 ## Propósito da Centralização
 A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter endpoints soltos para conhecimentos, o acesso hierárquico `/api/atividades/{atividadeId}/conhecimentos` garante que todo conhecimento esteja sempre corretamente vinculado à sua atividade pai.
+

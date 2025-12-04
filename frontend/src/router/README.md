@@ -1,4 +1,5 @@
 # Router (Roteamento)
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém a configuração do **Vue Router**, responsável pela navegação entre as páginas da aplicação.
 
@@ -30,3 +31,4 @@ Para evitar um arquivo de rotas gigante e incontrolável, as definições de rot
 ## Convenções
 - **Lazy Loading:** As views devem ser importadas dinamicamente (ex: `component: () => import('../views/MinhaView.vue')`) para otimizar o carregamento inicial da aplicação (Code Splitting).
 - **Meta Fields:** O campo `meta` é usado para definir propriedades da rota, como `requiresAuth` (se exige login) e `breadcrumb` (para navegação).
+

@@ -1,4 +1,5 @@
 # Módulo de Notificação e Orquestração de Eventos
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote tem uma dupla responsabilidade:
@@ -70,3 +71,4 @@ graph TD
 - **Desacoplamento:** O `ProcessoService` não sabe como as notificações ou alertas são tratados. Ele apenas anuncia que "algo aconteceu".
 - **Robustez:** O envio assíncrono de e-mails torna o sistema resiliente a falhas temporárias na infraestrutura de e-mail.
 - **Centralização da Lógica Reativa:** O `EventoProcessoListener` centraliza a resposta aos eventos de domínio, tornando o fluxo de trabalho reativo claro e fácil de entender.
+

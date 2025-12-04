@@ -1,4 +1,5 @@
 # Módulo de Processo
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências" ou "Revisão de Mapas".
@@ -67,3 +68,4 @@ graph TD
 3. Para cada unidade participante, o serviço cria um `Subprocesso`.
 4. Se for um processo de **REVISAO**, o `CopiaMapaService` (do módulo `mapa`) é invocado para duplicar o mapa vigente da unidade.
 5. Ao final, um `EventoProcessoIniciado` é publicado, disparando alertas e e-mails através dos listeners no pacote `notificacao`.
+

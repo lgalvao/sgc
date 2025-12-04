@@ -1,4 +1,5 @@
 # Stores (Gerenciamento de Estado - Pinia)
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém as **Stores do Pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
 
@@ -31,3 +32,4 @@ A função de setup deve retornar um objeto contendo:
 ## Boas Práticas
 - **Single Source of Truth:** Evite duplicar dados entre stores e componentes.
 - **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante.
+

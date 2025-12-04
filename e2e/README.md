@@ -1,4 +1,5 @@
 # E2E Testing Documentation
+Última atualização: 2025-12-04 14:18:38Z
 
 This directory contains the End-to-End (E2E) tests for the SGC project, built with [Playwright](https://playwright.dev/).
 
@@ -46,3 +47,4 @@ The `e2e/lifecycle.js` script is configured in `playwright.config.ts` as the `we
 2. Waiting for the Backend to be healthy.
 3. Starting the Frontend (Vite) on port `5173`.
 4. Cleaning up processes after tests complete.
+

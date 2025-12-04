@@ -1,4 +1,5 @@
 # Módulo de Análise
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote é responsável por registrar o **histórico de decisões** tomadas durante o ciclo de vida de um `Subprocesso`. Ele funciona como uma trilha de auditoria, armazenando as justificativas, observações e ações (aceite, devolução) que ocorrem durante as etapas de revisão de um mapa de competências.
@@ -58,3 +59,4 @@ graph TD
 
 ## Propósito e Uso
 A principal função deste módulo é fornecer **rastreabilidade**. A abordagem de modelo genérico com um campo de "tipo" foi utilizada para registrar o histórico de decisões em diferentes etapas do workflow sem duplicar estruturas de dados.
+
