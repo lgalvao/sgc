@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import sgc.processo.service.ProcessoService;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.service.SgrhService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -31,14 +31,14 @@ class E2eControllerTest { // Alterado aqui
     private ProcessoService processoService;
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private SgrhService sgrhService;
 
     private E2eController controller; // Já está correto
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new E2eController(jdbcTemplate, dataSource, processoService, unidadeRepo);
+        controller = new E2eController(jdbcTemplate, dataSource, processoService, sgrhService);
     }
 
     @Test

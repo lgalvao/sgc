@@ -65,6 +65,10 @@ public class SgrhService {
         return unidadeRepo.findById(codigo).map(this::toUnidadeDto);
     }
 
+    public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
+        return unidadeRepo.findBySigla(sigla).map(this::toUnidadeDto);
+    }
+
     public List<UnidadeDto> buscarUnidadesAtivas() {
         return unidadeRepo.findAll().stream()
                 .map(this::toUnidadeDto)

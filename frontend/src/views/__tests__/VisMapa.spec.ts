@@ -7,7 +7,7 @@ import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
-import {SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import VisMapa from "../VisMapa.vue";
 
 const router = createRouter({
@@ -341,6 +341,7 @@ describe("VisMapa.vue", () => {
       perfil: { perfilSelecionado: "ADMIN" },
       processos: {
         processoDetalhe: {
+          tipo: TipoProcesso.REVISAO,
           unidades: [
             {
               sigla: "TEST",
