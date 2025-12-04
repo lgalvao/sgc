@@ -72,3 +72,7 @@ graph TD
 - **Robustez:** O envio assíncrono de e-mails torna o sistema resiliente a falhas temporárias na infraestrutura de e-mail.
 - **Centralização da Lógica Reativa:** O `EventoProcessoListener` centraliza a resposta aos eventos de domínio, tornando o fluxo de trabalho reativo claro e fácil de entender.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

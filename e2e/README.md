@@ -48,3 +48,7 @@ The `e2e/lifecycle.js` script is configured in `playwright.config.ts` as the `we
 3. Starting the Frontend (Vite) on port `5173`.
 4. Cleaning up processes after tests complete.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

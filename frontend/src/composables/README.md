@@ -18,3 +18,7 @@ Por convenção, o nome dessas funções começa com `use` (ex: `usePerfil`).
     - **Estado do Usuário:** Fornece propriedades computadas reativas para o `servidorLogado`, `perfilSelecionado` e `unidadeSelecionada`.
     - **Integração com Stores:** Orquestra dados das stores `useUsuariosStore`, `useUnidadesStore` e `useAtribuicaoTemporariaStore`.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

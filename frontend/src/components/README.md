@@ -102,3 +102,7 @@ Tabela hierárquica genérica com suporte a expansão/colapso de linhas.
 ### UnidadeTreeItem.vue
 Item recursivo para a árvore de seleção de unidades (`ArvoreUnidades`).
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

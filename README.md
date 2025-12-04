@@ -158,3 +158,7 @@ http://localhost:10000/swagger-ui.html
 http://localhost:10000/api-docs
 ```
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

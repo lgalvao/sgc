@@ -72,3 +72,7 @@ graph TD
 ## Propósito da Centralização
 A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter endpoints soltos para conhecimentos, o acesso hierárquico `/api/atividades/{atividadeId}/conhecimentos` garante que todo conhecimento esteja sempre corretamente vinculado à sua atividade pai.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

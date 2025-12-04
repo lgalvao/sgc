@@ -68,3 +68,7 @@ graph TD
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
 - **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

@@ -38,3 +38,7 @@ Diferente dos componentes "burros" (`src/components`), as views são "inteligent
 - **`RelatoriosView.vue`**: Geração e visualização de relatórios gerenciais.
 - **`ConfiguracoesView.vue`**: Configurações do sistema (acesso restrito a administradores).
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

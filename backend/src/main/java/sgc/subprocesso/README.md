@@ -106,3 +106,7 @@ stateDiagram-v2
 ## Trilha de Auditoria (`Movimentacao`)
 Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem fez o quê e quando.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

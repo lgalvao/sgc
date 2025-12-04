@@ -18,3 +18,7 @@ Este diretório contém funções puras responsáveis por transformar dados entr
 - **`servidores.ts`**: Mapeia dados de servidores (usuários).
 - **`sgrh.ts`**: Mapeia dados vindos da integração com o SGRH (unidades, perfis).
 - **`unidades.ts`**: Transforma dados da estrutura organizacional.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

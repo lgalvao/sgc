@@ -58,3 +58,7 @@ graph TD
 - **Leitura:** Diversos serviços utilizam o `UnidadeRepo` para buscar informações estruturais.
 - **Escrita:** A estrutura básica (entidade `Unidade`) é sincronizada via `SgrhService`. No entanto, o módulo permite operações específicas como a criação de `AtribuicaoTemporaria` via API.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

@@ -33,3 +33,7 @@ A função de setup deve retornar um objeto contendo:
 - **Single Source of Truth:** Evite duplicar dados entre stores e componentes.
 - **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

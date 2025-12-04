@@ -60,3 +60,7 @@ graph TD
 ## Propósito e Uso
 A principal função deste módulo é fornecer **rastreabilidade**. A abordagem de modelo genérico com um campo de "tipo" foi utilizada para registrar o histórico de decisões em diferentes etapas do workflow sem duplicar estruturas de dados.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

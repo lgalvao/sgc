@@ -109,3 +109,7 @@ A especificação OpenAPI em formato JSON pode ser encontrada em:
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

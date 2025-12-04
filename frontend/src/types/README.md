@@ -12,3 +12,7 @@ Este diretório armazena as definições de tipos, interfaces e enums do TypeScr
 - **Sincronia com Backend:** As interfaces aqui definidas devem refletir fielmente os DTOs retornados pela API Java. Se o backend mudar um campo, a interface aqui deve ser atualizada.
 - **Uso Global:** Evite definir interfaces dentro de componentes (`.vue`). Sempre que um tipo for usado em mais de um lugar, ele deve ser movido para este diretório.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

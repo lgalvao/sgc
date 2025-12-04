@@ -43,3 +43,7 @@ graph TD
 4.  O `PainelService` processa e agrega os dados, retornando uma página de DTOs (`ProcessoResumoDto`, `AlertaDto`).
 5. O `PainelController` retorna os dados como uma resposta JSON para o frontend.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

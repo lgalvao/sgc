@@ -100,3 +100,7 @@ O projeto utiliza [Vitest](https://vitest.dev/) para testes. A estratégia de te
 - `npm run lint`: Executa o linter para análise e correção de código.
 - `npm run typecheck`: Verifica a tipagem do código com TypeScript.
 - `npm run test:unit`: Executa os testes de unidade.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

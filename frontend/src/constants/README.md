@@ -17,3 +17,7 @@ Este diretório centraliza valores constantes utilizados em toda a aplicação f
 ### `index.ts`
 - Ponto de entrada que exporta as constantes para facilitar a importação em outros arquivos.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

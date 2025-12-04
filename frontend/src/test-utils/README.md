@@ -16,3 +16,7 @@ Este diretório contém ferramentas, mocks e helpers para facilitar a escrita de
 ### `mocks/`
 - Contém dados falsos (fixtures) e implementações mockadas de serviços ou objetos complexos para isolar os testes.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

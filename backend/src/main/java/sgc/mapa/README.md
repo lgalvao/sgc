@@ -74,3 +74,7 @@ graph TD
 2. Ele chama o `MapaService.copiarMapaVigente(...)`.
 3. O `MapaService` delega a chamada para o `CopiaMapaService`, que duplica toda a estrutura do mapa.
 
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
