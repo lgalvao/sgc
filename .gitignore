@@ -38,5 +38,6 @@ backend/bin/
 
 # Playwright
 playwright-report/
+test-results/
 e2e/server.log
 /backend/.jqwik-database
