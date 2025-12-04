@@ -58,7 +58,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_PROCESSO,
-            expandir: ['SECRETARIA_1'],
+            expandir: ['SECRETARIA_1', 'COORD_11'],
             iniciar: true
         });
 

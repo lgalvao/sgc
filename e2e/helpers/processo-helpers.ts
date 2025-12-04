@@ -27,26 +27,21 @@ export async function criarProcesso(page: Page, options: {
     await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
     await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(options.diasLimite));
 
-    // Aguardar que as unidades sejam carregadas antes de interagir com a árvore
     await expect(page.getByText('Carregando unidades...')).toBeHidden();
-
     if (options.expandir) {
         for (const sigla of options.expandir) {
             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
         }
     }
 
-    // Usar getByTestId ao invés de getByRole para respeitar disabled
     await page.getByTestId(`chk-arvore-unidade-${options.unidade}`).check();
-
     if (options.iniciar) {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
     } else {
         await page.getByTestId('btn-processo-salvar').click();
     }
-
-    await expect(page).toHaveURL(/\/painel/);
+    await page.waitForURL('/painel');
 }
 
 /**

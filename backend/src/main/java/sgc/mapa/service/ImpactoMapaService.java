@@ -59,7 +59,7 @@ public class ImpactoMapaService {
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
-        log.info("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
+        log.debug("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
 
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));

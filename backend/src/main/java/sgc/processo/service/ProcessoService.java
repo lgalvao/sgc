@@ -245,13 +245,11 @@ public class ProcessoService {
     @Transactional
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         log.info("Iniciando processo de revisão para código {} com unidades {}", codigo, codigosUnidades);
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        Processo processo = processoRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
-
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
         }
@@ -259,15 +257,10 @@ public class ProcessoService {
         List<String> erros = new ArrayList<>();
         getMensagemErroUnidadesSemMapa(codigosUnidades).ifPresent(erros::add);
         getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades).ifPresent(erros::add);
+        if (!erros.isEmpty()) return erros;
 
-        if (!erros.isEmpty()) {
-            return erros;
-        }
-
-        for (Long codigoUnidade : codigosUnidades) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
-
+        for (Long codUnidade : codigosUnidades) {
+            Unidade unidade = unidadeRepo.findById(codUnidade).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
             criarSubprocessoParaRevisao(processo, unidade);
         }
 
@@ -286,10 +279,9 @@ public class ProcessoService {
 
     @Transactional
     public void finalizar(Long codigo) {
-        log.info("Iniciando finalização do processo: código={}", codigo);
+        log.debug("Iniciando finalização do processo: código={}", codigo);
 
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        Processo processo = processoRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);

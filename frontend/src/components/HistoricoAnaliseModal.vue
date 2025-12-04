@@ -35,7 +35,7 @@
             >
               <td>{{ formatarData(analise.dataHora) }}</td>
               <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
-              <td>{{ analise.resultado }}</td>
+              <td>{{ analise.acao || analise.resultado }}</td>
               <td>{{ analise.observacoes || '-' }}</td>
             </tr>
           </tbody>

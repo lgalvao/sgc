@@ -47,26 +47,25 @@ public class ProcessoNotificacaoService {
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
         Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(
-            responsaveis.values().stream().map(ResponsavelDto::getTitularTitulo).distinct().toList()
+                responsaveis.values().stream().map(ResponsavelDto::getTitularTitulo).distinct().toList()
         );
 
         for (Unidade unidade : unidadesParticipantes) {
             try {
                 ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
-                    .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
+                        .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
 
                 UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.getTitularTitulo()))
-                    .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.getTitularTitulo())));
+                        .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.getTitularTitulo())));
 
                 String emailTitular = Optional.ofNullable(titular.getEmail()).filter(e -> !e.isBlank())
-                    .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.getNome())));
+                        .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.getNome())));
 
                 if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
                     enviarEmailUnidadeFinal(processo, unidade, emailTitular);
                 } else if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
                     enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, unidadesParticipantes);
                 }
-
             } catch (Exception ex) {
                 log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", unidade.getSigla(), processo.getCodigo(), ex.getMessage(), ex);
             }
@@ -75,34 +74,31 @@ public class ProcessoNotificacaoService {
 
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
-        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
-            unidade.getSigla(),
-            processo.getDescricao()
-        );
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(unidade.getSigla(), processo.getDescricao());
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
-        log.info("E-mail de finalização (unidade final) enviado para {} ({})", unidade.getSigla(), email);
+        log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
 
     private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidadeIntermediaria, String email, List<Unidade> todasUnidades) {
         List<String> siglasSubordinadas = todasUnidades.stream()
-            .filter(u -> u.getUnidadeSuperior() != null && u.getUnidadeSuperior().getCodigo().equals(unidadeIntermediaria.getCodigo()))
-            .map(Unidade::getSigla)
-            .sorted()
-            .toList();
+                .filter(u -> u.getUnidadeSuperior() != null && u.getUnidadeSuperior().getCodigo().equals(unidadeIntermediaria.getCodigo()))
+                .map(Unidade::getSigla)
+                .sorted()
+                .toList();
 
         if (siglasSubordinadas.isEmpty()) {
-            log.info("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}", unidadeIntermediaria.getSigla());
+            log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}", unidadeIntermediaria.getSigla());
             return;
         }
 
         String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-            unidadeIntermediaria.getSigla(),
-            processo.getDescricao(),
-            siglasSubordinadas
+                unidadeIntermediaria.getSigla(),
+                processo.getDescricao(),
+                siglasSubordinadas
         );
 
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
-        log.info("E-mail de finalização (unidade intermediária) enviado para {} ({})", unidadeIntermediaria.getSigla(), email);
+        log.info("E-mail de finalização enviado para {})", unidadeIntermediaria.getSigla());
     }
 }

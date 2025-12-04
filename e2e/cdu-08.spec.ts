@@ -8,6 +8,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
+    test.beforeAll(async ({ request }) => {
+        const response = await request.post('http://localhost:10000/e2e/reset-database');
+        expect(response.ok()).toBeTruthy();
+    });
+
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;

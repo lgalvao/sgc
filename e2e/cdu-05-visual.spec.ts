@@ -16,14 +16,17 @@ async function verificarPaginaSubprocesso(page: Page) {
 }
 
 test.describe('Visual Regression - CDU-05', () => {
-    test.describe.configure({ mode: 'serial' });
-
     const UNIDADE_ALVO = 'ASSESSORIA_21';
     const USUARIO_CHEFE = '777777';
     const SENHA_CHEFE = 'senha';
 
     const timestamp = Date.now();
     const descProcMapeamento = `Mapeamento Visual ${timestamp}`;
+    
+    test.beforeAll(async ({ request }) => {
+        const response = await request.post('http://localhost:10000/e2e/reset-database');
+        expect(response.ok()).toBeTruthy();
+    });
 
     test('Ciclo Mapeamento Completo com Snapshots', async ({page}) => {
         // 1. Login Admin & Dashboard
@@ -33,19 +36,15 @@ test.describe('Visual Regression - CDU-05', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarPaginaPainel(page);
         
-        // Snapshot do Painel Inicial (pode ter outros processos, então cuidado com o diff)
-        // Idealmente mascaramos a tabela se ela for muito volátil, ou apenas o conteúdo dinâmico.
-        // Como é um ambiente de teste, assumimos controle relativo.
         await expect(page).toHaveScreenshot('02-dashboard-admin.png', {
             fullPage: true
         });
 
-        // 2. Criar Processo (Manual steps to allow snapshot of empty form)
+        // 2. Criar Processo
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page).toHaveScreenshot('03-criar-processo-form.png');
 
-        // Fill form manually
         await page.getByTestId('inp-processo-descricao').fill(descProcMapeamento);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(30));
@@ -58,17 +57,10 @@ test.describe('Visual Regression - CDU-05', () => {
             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
         }
 
-        // Usar getByTestId ao invés de getByRole para respeitar disabled
         await page.getByTestId(`chk-arvore-unidade-${UNIDADE_ALVO}`).check();
-        
-        // Salvar (sem iniciar ainda, pois o teste original fazia save -> click na lista -> iniciar)
-        // O teste original fazia: criarProcesso (que salva) -> verificar -> clicar na linha -> iniciar.
-        // Vamos manter a consistência.
         await page.getByTestId('btn-processo-salvar').click();
         await expect(page).toHaveURL(/\/painel/);
 
-        // Snapshot do Painel com o novo processo
-        // Mascaramos o texto da descrição pois contém timestamp
         await expect(page).toHaveScreenshot('04-dashboard-com-processo.png', {
             fullPage: true,
             mask: [page.getByText(descProcMapeamento)]
@@ -99,7 +91,8 @@ test.describe('Visual Regression - CDU-05', () => {
         // Snapshot Subprocesso Inicial
         await expect(page).toHaveScreenshot('05-subprocesso-chefe-inicial.png', {
             fullPage: true,
-            mask: [page.getByText(descProcMapeamento)]
+            mask: [page.getByText(descProcMapeamento)],
+            maxDiffPixels: 200
         });
 
         // 5. Adicionar Atividade

@@ -1,112 +1,94 @@
 <template>
   <div class="arvore-unidades">
     <template
-      v-for="unidade in unidadesExibidas"
-      :key="unidade.sigla"
+        v-for="unidade in unidadesExibidas"
+        :key="unidade.sigla"
     >
       <div class="form-check">
         <BFormCheckbox
-          :id="`chk-${unidade.sigla}`"
-          :model-value="isChecked(unidade.codigo)"
-          :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-          :disabled="!unidade.isElegivel"
-          :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
-          @update:model-value="(val) => toggle(unidade, val as boolean)"
+            :id="`chk-${unidade.sigla}`"
+            :model-value="isChecked(unidade.codigo)"
+            :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
+            :disabled="!unidade.isElegivel"
+            :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
+            @update:model-value="(val) => toggle(unidade, val as boolean)"
         >
           <label
-            :for="`chk-${unidade.sigla}`"
-            class="form-check-label ms-2"
-            :class="{ 'text-muted': !unidade.isElegivel }"
+              :for="`chk-${unidade.sigla}`"
+              class="form-check-label ms-2"
+              :class="{ 'text-muted': !unidade.isElegivel }"
           >
             <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-            <span
-              v-if="!unidade.isElegivel"
-              class="badge bg-warning text-dark ms-2"
-            >
-              Não elegível
-            </span>
           </label>
         </BFormCheckbox>
       </div>
 
       <!-- Mostrar filhas se a unidade tem filhas -->
       <span
-        v-if="unidade.filhas && unidade.filhas.length > 0"
-        class="me-2 cursor-pointer user-select-none"
-        :data-testid="`btn-arvore-expand-${unidade.sigla}`"
-        @click="toggleExpand(unidade)"
+          v-if="unidade.filhas && unidade.filhas.length > 0"
+          class="me-2 cursor-pointer user-select-none"
+          :data-testid="`btn-arvore-expand-${unidade.sigla}`"
+          @click="toggleExpand(unidade)"
       >
         {{ isExpanded(unidade) ? '[-]' : '[+]' }}
       </span>
       <div
-        v-if="unidade.filhas && unidade.filhas.length"
-        class="ms-4"
+          v-if="unidade.filhas && unidade.filhas.length"
+          class="ms-4"
       >
         <template
-          v-for="filha in unidade.filhas"
-          :key="filha.sigla"
+            v-for="filha in unidade.filhas"
+            :key="filha.sigla"
         >
           <div class="form-check">
             <BFormCheckbox
-              :id="`chk-${filha.sigla}`"
-              :model-value="isChecked(filha.codigo)"
-              :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-              :disabled="!filha.isElegivel"
-              :data-testid="`chk-arvore-unidade-${filha.sigla}`"
-              @update:model-value="(val) => toggle(filha, val as boolean)"
+                :id="`chk-${filha.sigla}`"
+                :model-value="isChecked(filha.codigo)"
+                :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
+                :disabled="!filha.isElegivel"
+                :data-testid="`chk-arvore-unidade-${filha.sigla}`"
+                @update:model-value="(val) => toggle(filha, val as boolean)"
             >
               <label
-                :for="`chk-${filha.sigla}`"
-                class="form-check-label ms-2"
-                :class="{ 'text-muted': !filha.isElegivel }"
+                  :for="`chk-${filha.sigla}`"
+                  class="form-check-label ms-2"
+                  :class="{ 'text-muted': !filha.isElegivel }"
               >
                 <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-                <span
-                  v-if="!filha.isElegivel"
-                  class="badge bg-warning text-dark ms-2"
-                >
-                  Não elegível
-                </span>
               </label>
             </BFormCheckbox>
           </div>
 
           <span
-            v-if="filha.filhas && filha.filhas.length > 0"
-            class="me-2 cursor-pointer user-select-none"
-            :data-testid="`btn-arvore-expand-${filha.sigla}`"
-            @click="toggleExpand(filha)"
+              v-if="filha.filhas && filha.filhas.length > 0"
+              class="me-2 cursor-pointer user-select-none"
+              :data-testid="`btn-arvore-expand-${filha.sigla}`"
+              @click="toggleExpand(filha)"
           >
             {{ isExpanded(filha) ? '[-]' : '[+]' }}
           </span>
           <div
-            v-if="filha.filhas && filha.filhas.length && isExpanded(filha)"
-            class="ms-4"
+              v-if="filha.filhas && filha.filhas.length && isExpanded(filha)"
+              class="ms-4"
           >
             <template
-              v-for="neta in filha.filhas"
-              :key="neta.sigla"
+                v-for="neta in filha.filhas"
+                :key="neta.sigla"
             >
               <div class="form-check">
                 <BFormCheckbox
-                  :id="`chk-${neta.sigla}`"
-                  :model-value="isChecked(neta.codigo)"
-                  :disabled="!neta.isElegivel"
-                  :data-testid="`chk-arvore-unidade-${neta.sigla}`"
-                  @update:model-value="(val) => toggle(neta, val as boolean)"
+                    :id="`chk-${neta.sigla}`"
+                    :model-value="isChecked(neta.codigo)"
+                    :disabled="!neta.isElegivel"
+                    :data-testid="`chk-arvore-unidade-${neta.sigla}`"
+                    @update:model-value="(val) => toggle(neta, val as boolean)"
                 >
                   <label
-                    :for="`chk-${neta.sigla}`"
-                    class="form-check-label ms-2"
-                    :class="{ 'text-muted': !neta.isElegivel }"
+                      :for="`chk-${neta.sigla}`"
+                      class="form-check-label ms-2"
+                      :class="{ 'text-muted': !neta.isElegivel }"
                   >
                     <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                    <span
-                      v-if="!neta.isElegivel"
-                      class="badge bg-warning text-dark ms-2"
-                    >
-                      Não elegível
-                    </span>
                   </label>
                 </BFormCheckbox>
               </div>
@@ -152,13 +134,13 @@ const parentMap = computed(() => {
 const unidadesExibidas = computed(() => {
   const filtradas = props.unidades.filter(props.filtrarPor);
   const lista: Unidade[] = [];
-  
+
   for (const u of filtradas) {
     // Se for SEDOC (pela sigla ou código 1), não mostra ela, mas mostra as filhas
     if (u.sigla === 'SEDOC' || u.codigo === 1) {
-       if (u.filhas) lista.push(...u.filhas);
+      if (u.filhas) lista.push(...u.filhas);
     } else {
-       lista.push(u);
+      lista.push(u);
     }
   }
   return lista;
@@ -223,7 +205,7 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   if (selecionadas === subunidades.length && selfSelected) {
     return true;
   }
-  
+
   // Se for Interoperacional e estiver selecionada, mostra como true (não indeterminate),
   // mesmo que nem todas as filhas estejam selecionadas.
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
@@ -235,10 +217,10 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
 
 function toggle(unidade: Unidade, checked: boolean) {
   const newSelection = new Set(unidadesSelecionadasLocal.value);
-  
+
   // 1. Handle Self and Descendants
   const idsToToggle = [unidade.codigo, ...getTodasSubunidades(unidade)];
-  
+
   if (checked) {
     // Filtrar apenas unidades elegíveis ao adicionar
     idsToToggle.forEach(id => {
@@ -250,7 +232,7 @@ function toggle(unidade: Unidade, checked: boolean) {
   } else {
     idsToToggle.forEach(id => newSelection.delete(id));
   }
-  
+
   // 2. Handle Ancestors (Upwards)
   updateAncestors(unidade, newSelection);
 
@@ -275,7 +257,7 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
       // Se não forem todas as filhas selecionadas, remove o pai
       // EXCETO se o pai for INTEROPERACIONAL (regra 2.3.2.5)
       if (parent.tipo !== 'INTEROPERACIONAL') {
-         selectionSet.delete(parent.codigo);
+        selectionSet.delete(parent.codigo);
       }
       // Se for INTEROPERACIONAL, mantemos o estado atual dele (seja selecionado ou não)
       // a menos que a ação explicita de desmarcar tenha ocorrido nele (tratado no passo 1)

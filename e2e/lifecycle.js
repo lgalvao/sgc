@@ -28,12 +28,9 @@ let backendProcess = null;
 let frontendProcess = null;
 
 const LOG_FILTERS = [
-    // Warnings do Lombok e Java
-    /WARNING:.*sun\.misc\.Unsafe/,
-    /WARNING:.*lombok\.permit\.Permit/,
-    /WARNING:.*will be removed in a future release/,
-    /WARNING:.*Please consider reporting this to the maintainers/,
-    
+    // Warnings do Lombok
+    /WARNING:/,
+
     // Gradle
     /^> Task :/,
     /logStarted/,
@@ -104,9 +101,7 @@ function startBackend() {
 
     const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
-    
-    // No Windows, .bat precisa de shell, mas passamos argumentos separadamente para evitar warning
-    // No Unix, não precisa de shell
+
     const spawnOptions = {
         cwd: BACKEND_DIR,
         shell: isWindows,
@@ -177,9 +172,7 @@ function cleanup() {
             } catch (e2) { /* ignore */ }
         }
     }
-    
-    // NÃO matar portas - isso mataria os Gradle Daemons!
-    // Os processos Spring Boot e Vite já foram finalizados acima
+
 }
 
 // Handle exit signals
@@ -198,9 +191,6 @@ process.on('exit', () => {
 });
 
 // Start services
-// NÃO matar portas aqui - preserva Gradle Daemons para reutilização
-// Se houver conflito de porta, o processo falhará e será tratado
-
 function checkBackendHealth() {
     return new Promise((resolve) => {
         const check = () => {

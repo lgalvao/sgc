@@ -87,6 +87,9 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             const checkboxIntermediaria = page.getByTestId('chk-arvore-unidade-COORD_11');
             await expect(checkboxIntermediaria).toBeDisabled();
 
+            // Expande COORD_11 para acessar SECAO_111
+            await page.getByTestId('btn-arvore-expand-COORD_11').click();
+
             // Seleciona as filhas OPERACIONAIS
             await page.getByTestId('chk-arvore-unidade-SECAO_111').check();
             await page.getByTestId('chk-arvore-unidade-SECAO_112').check();

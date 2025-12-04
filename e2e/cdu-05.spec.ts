@@ -16,8 +16,6 @@ async function verificarPaginaSubprocesso(page: Page) {
 }
 
 test.describe('CDU-05 - Iniciar processo de revisao', () => {
-    test.describe.configure({ mode: 'serial' });
-
     // Unidade ASSESSORIA_21 (12) - Titular 777777 (Janis Joplin)
     const UNIDADE_ALVO = 'ASSESSORIA_21';
     const USUARIO_CHEFE = '777777';
