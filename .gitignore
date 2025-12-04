@@ -35,5 +35,8 @@ backend/bin/
 /backend/target/
 .DS_Store
 
-# Jqwik
-.jqwik-database
+
+# Playwright
+test-results/
+playwright-report/
+e2e/server.log

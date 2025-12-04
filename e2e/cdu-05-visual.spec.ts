@@ -1,6 +1,6 @@
 import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
-import {criarProcesso} from './helpers/processo-helpers';
+import {criarProcesso, calcularDataLimite} from './helpers/processo-helpers';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -40,18 +40,32 @@ test.describe('Visual Regression - CDU-05', () => {
             fullPage: true
         });
 
-        // 2. Criar Processo
+        // 2. Criar Processo (Manual steps to allow snapshot of empty form)
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page).toHaveScreenshot('03-criar-processo-form.png');
 
-        await criarProcesso(page, {
-            descricao: descProcMapeamento,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2']
-        });
+        // Fill form manually
+        await page.getByTestId('inp-processo-descricao').fill(descProcMapeamento);
+        await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
+        await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(30));
+
+        // Aguardar que as unidades sejam carregadas antes de interagir com a árvore
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+
+        const expandir = ['SECRETARIA_2'];
+        for (const sigla of expandir) {
+            await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
+        }
+
+        // Usar getByTestId ao invés de getByRole para respeitar disabled
+        await page.getByTestId(`chk-arvore-unidade-${UNIDADE_ALVO}`).check();
+        
+        // Salvar (sem iniciar ainda, pois o teste original fazia save -> click na lista -> iniciar)
+        // O teste original fazia: criarProcesso (que salva) -> verificar -> clicar na linha -> iniciar.
+        // Vamos manter a consistência.
+        await page.getByTestId('btn-processo-salvar').click();
+        await expect(page).toHaveURL(/\/painel/);
 
         // Snapshot do Painel com o novo processo
         // Mascaramos o texto da descrição pois contém timestamp
@@ -65,6 +79,8 @@ test.describe('Visual Regression - CDU-05', () => {
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await page.getByTestId('btn-processo-iniciar').click();
+        const iniciarModal = page.getByRole('dialog');
+        await expect(iniciarModal).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
 
@@ -91,6 +107,11 @@ test.describe('Visual Regression - CDU-05', () => {
         await page.getByTestId('inp-nova-atividade').fill('Atividade Visual Fixa');
         await page.getByTestId('btn-adicionar-atividade').click();
         
+        // Adicionar conhecimento (necessário para disponibilizar)
+        const cardAtividade = page.locator('.atividade-card').filter({hasText: 'Atividade Visual Fixa'});
+        await cardAtividade.getByTestId('inp-novo-conhecimento').fill('Conhecimento Visual Fixa');
+        await cardAtividade.getByTestId('btn-adicionar-conhecimento').click();
+
         // Snapshot Atividades
         await expect(page).toHaveScreenshot('06-subprocesso-atividades.png', {
              mask: [page.getByText(descProcMapeamento)]
@@ -98,6 +119,7 @@ test.describe('Visual Regression - CDU-05', () => {
 
         // 6. Disponibilizar Cadastro
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await expect(page.getByTestId('btn-disponibilizar-cadastro-confirmar')).toBeVisible();
         await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
 
@@ -168,6 +190,7 @@ test.describe('Visual Regression - CDU-05', () => {
         await page.getByText(descProcMapeamento).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
+        await verificarPaginaPainel(page); // Ensure navigation to panel is complete
 
         // Snapshot Final
         await expect(page).toHaveScreenshot('10-dashboard-finalizado.png', {
