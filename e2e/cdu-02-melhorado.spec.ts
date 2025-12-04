@@ -13,9 +13,9 @@
  */
 
 import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from '../helpers/auth';
-import { criarProcesso, verificarProcessoNaTabela } from '../helpers/processo-helpers';
-import { resetDatabase, useProcessoCleanup } from '../hooks/cleanup-hooks';
+import { login, USUARIOS } from './helpers/auth';
+import { criarProcesso, verificarProcessoNaTabela } from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 test.describe('CDU-02 (MELHORADO) - Visualizar Painel', () => {
     
