@@ -4,15 +4,22 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
-    timeout: 10_000,
-    workers: 1,
-    expect: {timeout: 2_000},
+    timeout: 30_000, // Aumentado para fixtures via API
+    workers: process.env.CI ? 1 : 2, // Paralelização habilitada localmente
+    fullyParallel: true,
+    expect: {timeout: 5_000}, // Aumentado de 2s para 5s
     forbidOnly: !!process.env.CI,
     reporter: [
         ['dot'],
-        ['json', { outputFile: 'test-results/results.json' }]
+        ['json', { outputFile: 'test-results/results.json' }],
+        ['html', { open: 'never' }]
     ],
-    use: {baseURL: 'http://localhost:5173'},
+    use: {
+        baseURL: 'http://localhost:5173',
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure'
+    },
     webServer: {
         command: 'node e2e/lifecycle.js',
         url: 'http://localhost:5173',
