@@ -149,9 +149,15 @@ describe("atividadeService", () => {
 
         const result = await service.atualizarConhecimento(1, request.id, request);
 
+        const expectedPayload = {
+            codigo: request.id,
+            atividadeCodigo: 1,
+            descricao: request.descricao,
+        };
+
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.id}/atualizar`,
-            request,
+            expectedPayload,
         );
         expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto);
         expect(result).toHaveProperty("mapped", true);

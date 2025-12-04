@@ -12,8 +12,8 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.service.SgrhService;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -31,7 +31,7 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoService processoService;
-    private final UnidadeRepo unidadeRepo;
+    private final SgrhService sgrhService;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
@@ -116,7 +116,7 @@ public class E2eController {
         }
 
         // Buscar unidade pela sigla
-        Unidade unidade = unidadeRepo.findBySigla(request.unidadeSigla())
+        UnidadeDto unidade = sgrhService.buscarUnidadePorSigla(request.unidadeSigla())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + request.unidadeSigla() + " não encontrada"));
 
         // Calcular data limite
