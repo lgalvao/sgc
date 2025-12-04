@@ -154,7 +154,7 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
 
         // Adicionar Competência
-        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible({ timeout: 30000 });
+        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Teste ${timestamp}`);
 
@@ -245,8 +245,6 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
     // ========================================================================
 
     test('Fase 1: Ciclo completo de Mapeamento', async ({page}) => {
-        test.setTimeout(120000); // 120s for this phase
-
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         await passo2_ChefeAdicionaAtividadesEConhecimentos(page, descProcMapeamento, timestamp);
         await passo2a_ChefeDisponibilizaCadastro(page);
@@ -257,8 +255,6 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 2: Iniciar processo de Revisão', async ({page}) => {
-        test.setTimeout(120000); // 120s for this phase
-
         // Login as Admin
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);

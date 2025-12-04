@@ -7,10 +7,10 @@ Este documento descreve o fluxo completo do "caminho feliz" para um processo de 
 O processo de mapeamento envolve as seguintes etapas principais:
 1. Criação e inicialização do processo (ADMIN)
 2. Cadastro de atividades e conhecimentos (CHEFE)
-3. Validação do cadastro (GESTOR/ADMIN)
+3. Validação do cadastro (GESTOR)
 4. Criação e disponibilização do mapa de competências (ADMIN)
-5. Validação do mapa de competências (CHEFE/GESTOR/ADMIN)
-6. Finalização do processo (ADMIN)
+5. Validação do mapa de competências (CHEFE/GESTOR)
+6. Finalização do processo de mapeamento (ADMIN)
 
 ## Fluxo Detalhado
 
@@ -29,7 +29,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
 7. O sistema valida os dados e cria o processo na situação "Criado"
 8. O sistema redireciona para o Painel
 
-### 2. Inicialização do Processo (ADMIN)
+### 2. Iniciar Processo (ADMIN)
 
 1. **ADMIN** clica no processo recém-criado na lista de processos
 2. O sistema exibe a tela de Cadastro de Processo com os dados preenchidos
@@ -45,7 +45,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
    - Cria alertas para todas as unidades participantes
 7. O sistema redireciona para o Painel
 
-### 3. Cadastro de Atividades e Conhecimentos (CHEFE)
+### 3. Cadastrar Atividades e Conhecimentos (CHEFE)
 
 1. **CHEFE** realiza login no sistema com suas credenciais
 2. O sistema exibe o Painel com o processo de mapeamento em andamento
@@ -69,7 +69,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
     - Cria alerta para a unidade superior
 14. O sistema redireciona para o Painel
 
-### 4. Validação do Cadastro (GESTOR)
+### 4. Validar Cadastro (GESTOR)
 
 1. **GESTOR** realiza login no sistema com suas credenciais
 2. O sistema exibe o Painel com alertas de cadastros disponibilizados
@@ -89,7 +89,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
     - Cria alerta para a unidade superior
 13. O sistema redireciona para o Painel
 
-### 5. Homologação do Cadastro (ADMIN)
+### 5. Homologar Cadastro (ADMIN)
 
 1. **ADMIN** realiza login no sistema com suas credenciais
 2. O sistema exibe o Painel com alertas de cadastros aceitos
@@ -107,7 +107,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
     - Registra movimentação
 13. O sistema redireciona para a tela Detalhes do Subprocesso
 
-### 6. Criação do Mapa de Competências (ADMIN)
+### 6. Criar Mapa de Competências (ADMIN)
 
 1. **ADMIN** clica no card "Mapa de Competências"
 2. O sistema exibe a tela de Edição de Mapa
@@ -133,7 +133,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
    - Cria alertas para a unidade e unidades superiores
 10. O sistema redireciona para o Painel
 
-### 7. Validação do Mapa de Competências (CHEFE)
+### 7. Validar Mapa de Competências (CHEFE)
 
 1. **CHEFE** realiza login no sistema com suas credenciais
 2. O sistema exibe o Painel com alerta de mapa disponibilizado
@@ -151,7 +151,7 @@ O processo de mapeamento envolve as seguintes etapas principais:
     - Cria alerta para a unidade superior
 11. O sistema redireciona para o Painel
 
-### 8. Homologação do Mapa de Competências (ADMIN)
+### 8. Homologar Mapa de Competências (ADMIN)
 
 1. **ADMIN** realiza login no sistema com suas credenciais
 2. O sistema exibe o Painel com alerta de mapa validado

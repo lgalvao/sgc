@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Profile("!test")
 public class ConfigSeguranca {
+    private final FiltroAutenticacaoSimulado filtroAutenticacaoSimulado;
+
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
      * <p>
@@ -39,9 +42,7 @@ public class ConfigSeguranca {
      */
     @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",
                                 "/api/usuarios/entrar",
@@ -49,21 +50,20 @@ public class ConfigSeguranca {
                         .permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of("http://localhost:5173")); // Permitir o frontend
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedMethods(List.of("GET", "POST"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                .addFilterBefore(new FiltroAutenticacaoSimulado(),
-                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(filtroAutenticacaoSimulado, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

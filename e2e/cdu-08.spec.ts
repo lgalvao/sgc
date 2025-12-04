@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from './helpers/auth';
-import { criarProcesso } from './helpers/processo-helpers';
+import {expect, test} from '@playwright/test';
+import {login, USUARIOS} from './helpers/auth';
+import {criarProcesso} from './helpers/processo-helpers';
 import * as AtividadeHelpers from './helpers/atividade-helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
@@ -8,9 +8,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({ page }) => {
-        test.setTimeout(120000);
-
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
@@ -59,8 +57,8 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('5. Importar Atividades (Mockado)', async () => {
-             // Mock para retornar processos finalizados
-             await page.route('**/api/processos/painel*', async route => {
+            // Mock para retornar processos finalizados
+            await page.route('**/api/processos/painel*', async route => {
                 await route.fulfill({
                     json: [{
                         codigo: 999,
@@ -77,32 +75,30 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Mock detalhes do processo finalizado
             await page.route('**/api/processos/999*', async route => {
-                 await route.fulfill({
+                await route.fulfill({
                     json: {
                         codigo: 999,
                         descricao: 'Processo Finalizado Mock',
-                        unidades: [{ codUnidade: 888, sigla: 'UNIDADE_MOCK', codSubprocesso: 777 }]
+                        unidades: [{codUnidade: 888, sigla: 'UNIDADE_MOCK', codSubprocesso: 777}]
                     }
-                 });
+                });
             });
 
             // Mock atividades do subprocesso de origem (777)
             await page.route('**/api/subprocessos/777/mapa-visualizacao', async route => {
-                 await route.fulfill({
+                await route.fulfill({
                     json: {
                         competencias: [{
-                            atividades: [
-                                { codigo: 101, descricao: 'Atividade Importada 1', conhecimentos: [] }
-                            ]
+                            atividades: [{codigo: 101, descricao: 'Atividade Importada 1', conhecimentos: []}]
                         }],
                         atividadesSemCompetencia: []
                     }
-                 });
+                });
             });
 
             // Mock da ação de importar
             await page.route('**/api/subprocessos/*/importar-atividades', async route => {
-                await route.fulfill({ status: 200, json: { message: 'Ok' } });
+                await route.fulfill({status: 200, json: {message: 'Ok'}});
             });
 
             await AtividadeHelpers.importarAtividades(page, 'Processo Finalizado Mock', 'UNIDADE_MOCK', [101]);
@@ -110,7 +106,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
-             await AtividadeHelpers.verificarBotaoImpacto(page, false);
+            await AtividadeHelpers.verificarBotaoImpacto(page, false);
         });
 
         await test.step('7. Disponibilizar', async () => {
@@ -123,8 +119,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({ page }) => {
-        test.setTimeout(120000);
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
 
