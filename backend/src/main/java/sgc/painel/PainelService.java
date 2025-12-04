@@ -71,7 +71,6 @@ public class PainelService {
                     pageable);
 
         }
-
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
     }
 

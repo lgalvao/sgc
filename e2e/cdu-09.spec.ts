@@ -44,6 +44,11 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         // Iniciar processo
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
+
+        // Wait for data to load to avoid race condition where fields are empty
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
     });
@@ -90,7 +95,7 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         await page.getByRole('button', {name: 'Cancelar'}).click();
     });
 
-    test('Cenario 2: Fluxo Feliz - Disponibilizar Cadastro', async ({page}) => {
+    test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcesso).click();
@@ -167,8 +172,11 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         // Verificar conteúdo do modal
         const modal = page.locator('.modal-content').filter({ hasText: 'Histórico de Análise' });
         await expect(modal).toBeVisible();
-        await expect(modal.getByText(/Devolu[cç][aã]o/i)).toBeVisible();
-        await expect(modal.getByText('Faltou detalhar melhor os conhecimentos técnicos.')).toBeVisible();
+        
+        // Usando data-testid conforme solicitado para maior robustez
+        // Assumindo que é a primeira linha ou única (index 0) pois o teste limpou o banco e criou um processo novo
+        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
+        await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Faltou detalhar melhor os conhecimentos técnicos.');
 
         // Fechar modal
         await page.getByRole('button', {name: 'Fechar'}).click();

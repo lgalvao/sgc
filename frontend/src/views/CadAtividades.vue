@@ -343,13 +343,14 @@
           </thead>
           <tbody>
             <tr
-              v-for="analise in historicoAnalises"
+              v-for="(analise, index) in historicoAnalises"
               :key="analise.codigo"
+              :data-testid="`row-historico-${index}`"
             >
-              <td>{{ formatarData(analise.dataHora) }}</td>
-              <td>{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
-              <td>{{ analise.resultado }}</td>
-              <td>{{ analise.observacoes || '-' }}</td>
+              <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
+              <td :data-testid="`cell-unidade-${index}`">{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
+              <td :data-testid="`cell-resultado-${index}`">{{ formatarAcaoAnalise(analise.acao || analise.resultado) }}</td>
+              <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
             </tr>
           </tbody>
         </table>
@@ -649,6 +650,20 @@ function abrirModalHistorico() {
 
 function fecharModalHistorico() {
   mostrarModalHistorico.value = false;
+}
+
+function formatarAcaoAnalise(acao: string | undefined): string {
+  if (!acao) return '';
+  switch (acao) {
+    case 'DEVOLUCAO_MAPEAMENTO':
+    case 'DEVOLUCAO_REVISAO':
+      return 'Devolução';
+    case 'ACEITE_MAPEAMENTO':
+    case 'ACEITE_REVISAO':
+      return 'Aceite';
+    default:
+      return acao;
+  }
 }
 
 function disponibilizarCadastro() {
