@@ -77,9 +77,6 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByText(descricao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        
-        // Capturar ID do processo (mas não precisamos limpar pois será removido no teste)
-        const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
 
         // Clica em Remover
         await page.getByTestId('btn-processo-remover').click();
@@ -93,6 +90,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
         
-        // Processo já foi removido, não precisa cleanup
+        // Processo já foi removido pela aplicação, não precisa cleanup
     });
 });

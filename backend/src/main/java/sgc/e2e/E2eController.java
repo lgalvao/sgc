@@ -124,9 +124,12 @@ public class E2eController {
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
         // Criar requisição de processo
-        String descricao = request.descricao() != null && !request.descricao().isBlank() 
-            ? request.descricao() 
-            : "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+        String descricao;
+        if (request.descricao() != null && !request.descricao().isBlank()) {
+            descricao = request.descricao();
+        } else {
+            descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+        }
 
         CriarProcessoReq criarReq = CriarProcessoReq.builder()
                 .descricao(descricao)
