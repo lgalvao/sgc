@@ -878,5 +878,5 @@ A infraestrutura está **pronta para paralelização**. Quando necessário:
 
 | Versão | Data | Descrição |
 |--------|------|-----------|
-| 1.0 | 2025-12-04 | Análise inicial de problemas e propostas de melhoria |
-| 2.0 | 2025-12-04 | Atualização com status de implementação das Fases 1 e 2 |
+| 1.0 | 2025-12-04 (manhã) | Análise inicial de problemas e propostas de melhoria |
+| 2.0 | 2025-12-04 (tarde) | Atualização com status de implementação das Fases 1 e 2 |
