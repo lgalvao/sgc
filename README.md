@@ -52,7 +52,23 @@ O SGC permite:
 
 ### Estrutura do Projeto
 
-```text
+`	ext
+sgc/
+├── backend/            # API REST (Spring Boot) - código-fonte em backend/src
+├── frontend/           # Aplicação Vue.js (frontend/src)
+├── e2e/                # Testes end-to-end (Playwright), seed e lifecycle
+├── build/              # Artefatos de build locais
+├── gradle/             # Scripts e wrapper do Gradle
+├── scripts/            # Scripts utilitários do repositório
+├── reqs/               # Documentação de requisitos (CDUs)
+├── regras/             # Regras de negócio / políticas
+├── node_modules/       # Dependências do frontend (não versionar alterações)
+├── test-results/       # Resultados de testes e logs (E2E)
+├── .idea/ .vscode/     # Configs de IDE (opcionais)
+├── build.gradle.kts    # Build raiz (multi-projeto)
+└── AGENTS.md           # Guia para agentes de IA
+`
+text
 sgc/
 ├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
@@ -162,3 +178,4 @@ http://localhost:10000/api-docs
 ## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+
