@@ -1,11 +1,25 @@
 import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_121';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    test.beforeAll(async ({ request }) => {
+        await resetDatabase(request);
+    });
+
+    test.beforeEach(() => {
+        cleanup = useProcessoCleanup();
+    });
+
+    test.afterEach(async ({ request }) => {
+        await cleanup.limpar(request);
+    });
 
     test('Deve exibir detalhes do subprocesso para CHEFE', async ({page}) => {
         const timestamp = Date.now();
@@ -43,6 +57,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         // Verificar URL (deve conter ID e Sigla)
         await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121$/);
+        
+        // Capturar ID do processo para cleanup
+        const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
 
         // 3. Verificar seções da tela
 
