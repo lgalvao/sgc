@@ -2,11 +2,15 @@ package sgc.e2e;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import sgc.processo.service.ProcessoService;
+import sgc.unidade.model.UnidadeRepo;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -23,11 +27,18 @@ class E2eControllerTest { // Alterado aqui
     @Autowired
     private DataSource dataSource;
 
+    @Mock
+    private ProcessoService processoService;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
+
     private E2eController controller; // Já está correto
 
     @BeforeEach
     void setUp() {
-        controller = new E2eController(jdbcTemplate, dataSource);
+        MockitoAnnotations.openMocks(this);
+        controller = new E2eController(jdbcTemplate, dataSource, processoService, unidadeRepo);
     }
 
     @Test
