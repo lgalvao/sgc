@@ -1,6 +1,7 @@
 import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -15,7 +16,7 @@ async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);
 }
 
-test.describe('CDU-05 - Iniciar processo de revisao', () => {
+test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     // Unidade ASSESSORIA_21 (12) - Titular 777777 (Janis Joplin)
     const UNIDADE_ALVO = 'ASSESSORIA_21';
     const USUARIO_CHEFE = '777777';
@@ -24,6 +25,20 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
     const timestamp = Date.now();
     const descProcMapeamento = `Mapeamento Setup ${timestamp}`;
     const descProcRevisao = `Revisão Teste ${timestamp}`;
+    let processoMapeamentoId: number;
+    let processoRevisaoId: number;
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    // Reset completo do banco antes de todos os testes
+    test.beforeAll(async ({ request }) => {
+        await resetDatabase(request);
+        cleanup = useProcessoCleanup();
+    });
+
+    // Limpar processos criados após todos os testes
+    test.afterAll(async ({ request }) => {
+        await cleanup.limpar(request);
+    });
 
     // ========================================================================
     // PASSOS DE PREPARAÇÃO - PROCESSO DE MAPEAMENTO
@@ -244,6 +259,13 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
 
     test('Fase 1: Ciclo completo de Mapeamento', async ({page}) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
+        
+        // Capturar ID do processo para cleanup
+        await page.getByText(descProcMapeamento).click();
+        processoMapeamentoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+        await page.goto('/painel');
+        
         await passo2_ChefeAdicionaAtividadesEConhecimentos(page, descProcMapeamento, timestamp);
         await passo2a_ChefeDisponibilizaCadastro(page);
         await passo2b_AdminHomologaCadastro(page, descProcMapeamento);
@@ -266,9 +288,12 @@ test.describe('CDU-05 - Iniciar processo de revisao', () => {
             expandir: ['SECRETARIA_2']
         });
 
-        // Iniciar processo
+        // Capturar ID do processo para cleanup
         await page.getByText(descProcRevisao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
+        processoRevisaoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
+
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
         await page.getByTestId('btn-processo-iniciar').click();
 

@@ -7,11 +7,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoService;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,6 +30,8 @@ import java.util.List;
 public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
+    private final ProcessoService processoService;
+    private final UnidadeRepo unidadeRepo;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
@@ -74,4 +85,88 @@ public class E2eController {
         jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
     }
+
+    /**
+     * Cria um processo de mapeamento via API para testes E2E.
+     * Mais rápido que criar via UI.
+     */
+    @PostMapping("/fixtures/processo-mapeamento")
+    @Transactional
+    public ProcessoDto criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoFixture(request, TipoProcesso.MAPEAMENTO);
+    }
+
+    /**
+     * Cria um processo de revisão via API para testes E2E.
+     * Mais rápido que criar via UI.
+     */
+    @PostMapping("/fixtures/processo-revisao")
+    @Transactional
+    public ProcessoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoFixture(request, TipoProcesso.REVISAO);
+    }
+
+    /**
+     * Método auxiliar para criar processos fixtures.
+     */
+    private ProcessoDto criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
+        // Validar entrada
+        if (request.unidadeSigla() == null || request.unidadeSigla().isBlank()) {
+            throw new IllegalArgumentException("Unidade é obrigatória");
+        }
+
+        // Buscar unidade pela sigla
+        Unidade unidade = unidadeRepo.findBySigla(request.unidadeSigla())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + request.unidadeSigla() + " não encontrada"));
+
+        // Calcular data limite
+        Integer diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
+
+        // Criar requisição de processo
+        String descricao;
+        if (request.descricao() != null && !request.descricao().isBlank()) {
+            descricao = request.descricao();
+        } else {
+            descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+        }
+
+        CriarProcessoReq criarReq = CriarProcessoReq.builder()
+                .descricao(descricao)
+                .tipo(tipo)
+                .dataLimiteEtapa1(dataLimite)
+                .unidades(List.of(unidade.getCodigo()))
+                .build();
+
+        // Criar processo
+        ProcessoDto processo = processoService.criar(criarReq);
+
+        // Iniciar se solicitado
+        if (request.iniciar() != null && request.iniciar()) {
+            List<Long> unidades = List.of(unidade.getCodigo());
+            Long processoCodigo = processo.getCodigo();
+            
+            if (tipo == TipoProcesso.MAPEAMENTO) {
+                processoService.iniciarProcessoMapeamento(processoCodigo, unidades);
+            } else if (tipo == TipoProcesso.REVISAO) {
+                processoService.iniciarProcessoRevisao(processoCodigo, unidades);
+            }
+            
+            // Recarregar processo após iniciar
+            processo = processoService.obterPorId(processoCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
+        }
+
+        return processo;
+    }
+
+    /**
+     * DTO para requisição de criação de processo fixture.
+     */
+    public record ProcessoFixtureRequest(
+        String descricao,
+        String unidadeSigla,
+        Boolean iniciar,
+        Integer diasLimite
+    ) {}
 }

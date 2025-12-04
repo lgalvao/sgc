@@ -2,6 +2,7 @@ import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso} from './helpers/processo-helpers';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/atividade-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -16,17 +17,23 @@ async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);
 }
 
-test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
+test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
     const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-09 ${timestamp}`;
+    let processoId: number;
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeAll(async ({ request }) => {
-        const response = await request.post('http://localhost:10000/e2e/reset-database');
-        expect(response.ok()).toBeTruthy();
+        await resetDatabase(request);
+        cleanup = useProcessoCleanup();
+    });
+
+    test.afterAll(async ({ request }) => {
+        await cleanup.limpar(request);
     });
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
@@ -48,6 +55,10 @@ test.describe('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', 
         // Wait for data to load to avoid race condition where fields are empty
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        
+        // Capturar ID do processo para cleanup
+        processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

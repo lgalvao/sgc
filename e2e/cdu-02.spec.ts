@@ -1,12 +1,27 @@
 import { expect, test } from '@playwright/test';
 import { login, USUARIOS } from './helpers/auth';
 import { criarProcesso, verificarProcessoNaTabela } from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
+    // Reset completo do banco antes de TODOS os testes
+    test.beforeAll(async ({ request }) => {
+        await resetDatabase(request);
+    });
+
     test.beforeEach(async ({ page }) => await page.goto('/login'));
 
     test.describe('Como ADMIN', () => {
-        test.beforeEach(async ({ page }) => await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha));
+        let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+        test.beforeEach(async ({ page }) => {
+            cleanup = useProcessoCleanup();
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        });
+
+        test.afterEach(async ({ request }) => {
+            await cleanup.limpar(request);
+        });
 
         test('Deve exibir seções de Processos e Alertas', async ({ page }) => {
             await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
@@ -30,6 +45,12 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 unidade: 'ASSESSORIA_11'
             });
 
+            // Capturar ID do processo para cleanup
+            await page.getByText(descricaoProcesso).click();
+            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
+            await page.goto('/painel');
+
             await verificarProcessoNaTabela(page, {
                 descricao: descricaoProcesso,
                 situacao: 'Criado',
@@ -46,6 +67,12 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 diasLimite: 30,
                 unidade: 'ASSESSORIA_11'
             });
+
+            // Capturar ID do processo para cleanup
+            await page.getByText(descricaoProcesso).click();
+            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
+            await page.goto('/painel');
 
             // Verifica que o processo está visível para ADMIN
             await expect(page.getByText(descricaoProcesso)).toBeVisible();
@@ -99,6 +126,12 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await page.getByTestId('btn-processo-salvar').click();
 
             await expect(page).toHaveURL(/\/painel/);
+
+            // Capturar ID do processo para cleanup
+            await page.getByText(descricaoProcesso).click();
+            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            if (processoId > 0) cleanup.registrar(processoId);
+            await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela
             await expect(page.getByText(descricaoProcesso)).toBeVisible();

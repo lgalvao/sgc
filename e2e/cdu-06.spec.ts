@@ -1,9 +1,23 @@
 import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/auth';
 import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    test.beforeAll(async ({ request }) => {
+        await resetDatabase(request);
+    });
+
+    test.beforeEach(() => {
+        cleanup = useProcessoCleanup();
+    });
+
+    test.afterEach(async ({ request }) => {
+        await cleanup.limpar(request);
+    });
 
     test('Deve exibir detalhes do processo para ADMIN', async ({page}) => {
         const timestamp = Date.now();
@@ -26,6 +40,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
         // Navegar para detalhes do processo
         await page.getByRole('row', {name: descricao}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
+        
+        // Capturar ID do processo para cleanup
+        const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
 
         // Verificar detalhes do processo (usando caixa alta conforme observado em reviews)
         await verificarDetalhesProcesso(page, {
@@ -71,6 +89,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await page.getByRole('row', {name: descricao}).click();
 
         await expect(page).toHaveURL(/\/processo\/\d+/);
+        
+        // Capturar ID do processo para cleanup
+        const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
 
         await verificarDetalhesProcesso(page, {
             descricao,

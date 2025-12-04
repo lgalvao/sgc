@@ -1,11 +1,23 @@
 import { expect, test } from '@playwright/test';
 import { login, USUARIOS } from './helpers/auth';
 import { criarProcesso } from './helpers/processo-helpers';
+import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
 
 test.describe('CDU-03 - Manter Processo', () => {
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    test.beforeAll(async ({ request }) => {
+        await resetDatabase(request);
+    });
+
     test.beforeEach(async ({ page }) => {
+        cleanup = useProcessoCleanup();
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+    });
+
+    test.afterEach(async ({ request }) => {
+        await cleanup.limpar(request);
     });
 
     test('Deve validar campos obrigatórios', async ({ page }) => {
@@ -32,9 +44,10 @@ test.describe('CDU-03 - Manter Processo', () => {
             unidade: 'ASSESSORIA_11'
         });
 
-        // Clica na linha do processo criado para editar
+        // Capturar ID do processo para cleanup
         await page.getByText(descricaoOriginal).click();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
 
         // Verifica que os dados foram carregados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
@@ -76,5 +89,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
+        
+        // Processo já foi removido pela aplicação, não precisa cleanup
     });
 });
