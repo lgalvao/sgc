@@ -71,8 +71,16 @@
             </BFormCheckbox>
           </div>
 
+          <span
+            v-if="filha.filhas && filha.filhas.length > 0"
+            class="me-2 cursor-pointer user-select-none"
+            :data-testid="`btn-arvore-expand-${filha.sigla}`"
+            @click="toggleExpand(filha)"
+          >
+            {{ isExpanded(filha) ? '[-]' : '[+]' }}
+          </span>
           <div
-            v-if="filha.filhas && filha.filhas.length"
+            v-if="filha.filhas && filha.filhas.length && isExpanded(filha)"
             class="ms-4"
           >
             <template

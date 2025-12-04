@@ -176,14 +176,17 @@ const processosDisponiveis = computed<ProcessoResumo[]>(() => {
 });
 
 onMounted(() => {
-  processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+  // A busca é feita ao abrir o modal
 });
 
 watch(
     () => props.mostrar,
     (mostrar) => {
+      console.log('WATCH MOSTRAR TRIGGERED', mostrar);
       if (mostrar) {
         resetModal();
+        console.log('CHAMANDO BUSCAR PROCESSOS PAINEL');
+        processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000);
       }
     },
 );
@@ -215,6 +218,7 @@ watch(unidadeSelecionadaId, (newId) => {
 });
 
 function resetModal() {
+  console.log('RESET MODAL');
   processoSelecionado.value = null;
   processoSelecionadoId.value = null;
   unidadesParticipantes.value = [];

@@ -101,6 +101,10 @@ INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo
 INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('292929', 'Flea', 'flea@tre-pe.jus.br', NULL, 18);
 INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('292929', 'SERVIDOR', 18);
 
+-- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
+INSERT INTO sgc.mapa (codigo, data_hora_disponibilizado, data_hora_homologado, unidade_codigo, sugestoes_apresentadas) VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 4, false);
+UPDATE sgc.unidade SET mapa_vigente_codigo = 99, data_vigencia_mapa_atual = CURRENT_TIMESTAMP WHERE codigo = 4;
+
 -- Atualizar titulares das unidades depois da criação dos usuários
 UPDATE sgc.unidade SET titular_titulo = '111111' WHERE codigo = 1;
 UPDATE sgc.unidade SET titular_titulo = '202020' WHERE codigo = 2;

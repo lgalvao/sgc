@@ -55,9 +55,13 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string,
     const linhaConhecimento = card.locator('.group-conhecimento', { hasText: conhecimentoAtual });
 
     await linhaConhecimento.hover();
+    await expect(linhaConhecimento.getByTestId('btn-editar-conhecimento')).toBeVisible();
     await linhaConhecimento.getByTestId('btn-editar-conhecimento').click({ force: true });
-    await linhaConhecimento.getByTestId('inp-editar-conhecimento').fill(novoConhecimento);
-    await linhaConhecimento.getByTestId('btn-salvar-edicao-conhecimento').click();
+    
+    // O texto do conhecimento some ao editar, então não podemos usar linhaConhecimento com hasText
+    // Buscamos o input dentro do card, assumindo que só um está sendo editado
+    await card.getByTestId('inp-editar-conhecimento').fill(novoConhecimento);
+    await card.getByTestId('btn-salvar-edicao-conhecimento').click();
 
     await expect(card.getByText(novoConhecimento)).toBeVisible();
 }
@@ -126,13 +130,7 @@ export async function abrirModalImpacto(page: Page) {
 }
 
 export async function fecharModalImpacto(page: Page) {
-    // Assuming there is a close button or similar.
-    // ImpactoMapaModal.vue has @fechar="fecharModalImpacto"
-    // Usually a modal has a close button in header or footer.
-    // I'll assume clicking outside or pressing Escape works, or look for a button.
-    // ImpactoMapaModal.vue implementation:
-    // It's not fully visible in the read_file output (it was imported).
-    // Let's assume hitting Escape works for now or just checking visibility.
-    await page.keyboard.press('Escape');
+    // Usar o botão de fechar explícito
+    await page.getByTestId('btn-fechar-impacto').click();
     await expect(page.getByRole('dialog')).toBeHidden();
 }
