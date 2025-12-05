@@ -83,7 +83,6 @@ async function carregarDados() {
         0,
         10,
     ); // Paginação inicial
-  } else {
   }
 }
 

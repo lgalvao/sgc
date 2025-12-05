@@ -76,6 +76,7 @@ describe("VisMapa.vue", () => {
                 unidades: [
                   { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
                 ],
+                unidade: { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
                 ...initialState["unidades"],
               },
               processos: {
@@ -153,6 +154,7 @@ describe("VisMapa.vue", () => {
               filhas: [{ sigla: "CHILD", nome: "Child Unit", filhas: [] }],
             },
           ],
+          unidade: { sigla: "CHILD", nome: "Child Unit", filhas: [] },
         },
         processos: {
           processoDetalhe: {

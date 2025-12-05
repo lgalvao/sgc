@@ -162,9 +162,14 @@ class AnaliseServiceTest {
         @Test
         @DisplayName("Deve remover análises por subprocesso")
         void deveRemoverAnalisesPorSubprocesso() {
-            doNothing().when(analiseRepo).deleteBySubprocessoCodigo(1L);
+            Analise analise = new Analise();
+            List<Analise> analises = List.of(analise);
+            when(analiseRepo.findBySubprocessoCodigo(1L)).thenReturn(analises);
+
             service.removerPorSubprocesso(1L);
-            verify(analiseRepo).deleteBySubprocessoCodigo(1L);
+
+            verify(analiseRepo).findBySubprocessoCodigo(1L);
+            verify(analiseRepo).deleteAll(analises);
         }
     }
 }
