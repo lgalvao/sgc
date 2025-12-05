@@ -1,9 +1,7 @@
 // Suprimir o DeprecationWarning DEP0190 - é necessário usar shell: true no Windows para .bat/.cmd
 process.removeAllListeners('warning');
 process.on('warning', (warning) => {
-    if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') {
-        return; // Ignorar este warning específico
-    }
+    if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') return;
     console.warn(warning.name, warning.message);
 });
 
@@ -15,9 +13,10 @@ const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
 const FRONTEND_PORT = 5173;
-const LOG_FILE = path.resolve(__dirname, 'server.log');
 
-// Limpar arquivo de log ao iniciar
+
+// Criar/limpar arquivo de log ao iniciar
+const LOG_FILE = path.resolve(__dirname, 'server.log');
 try {
     fs.writeFileSync(LOG_FILE, '');
 } catch (e) {
@@ -56,7 +55,7 @@ const LOG_FILTERS = [
     /➜  Network:/,
     /use --host to expose/,
     
-    // Logs de serviços mockados (já sabemos que estão ativos)
+    // Logs de serviços mockados
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
     
@@ -95,7 +94,7 @@ function startBackend() {
         try {
             fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
         } catch (e) {
-            // Ignore if fails
+            // Ignorar se falhar
         }
     }
 
@@ -144,7 +143,7 @@ function startFrontend() {
 }
 
 function cleanup() {
-    // Matar apenas os processos que iniciamos, preservando Gradle Daemons
+    // Matar apenas processos iniciados, preservando Gradle Daemons
     if (backendProcess) {
         try {
             if (isWindows) {
@@ -159,6 +158,7 @@ function cleanup() {
             } catch (e2) { /* ignore */ }
         }
     }
+
     if (frontendProcess) {
         try {
              if (isWindows) {
@@ -190,21 +190,13 @@ process.on('exit', () => {
     cleanup();
 });
 
-// Start services
 function checkBackendHealth() {
     return new Promise((resolve) => {
         const check = () => {
             const req = require('http').get(`http://localhost:${BACKEND_PORT}/`, (res) => {
-                // Accept any response (200, 404, etc) - just need server to be responding
-                if (res.statusCode >= 200 && res.statusCode < 500) {
-                    resolve();
-                } else {
-                    setTimeout(check, 1000);
-                }
+                if (res.statusCode >= 200 && res.statusCode < 500) resolve(); else setTimeout(check, 1000);
             });
-            req.on('error', () => {
-                setTimeout(check, 1000);
-            });
+            req.on('error', () => setTimeout(check, 1000));
             req.end();
         };
         check();
@@ -215,16 +207,9 @@ function checkFrontendHealth() {
     return new Promise((resolve) => {
         const check = () => {
             const req = require('http').get(`http://localhost:${FRONTEND_PORT}`, (res) => {
-                // Accept any 2xx or 3xx response
-                if (res.statusCode >= 200 && res.statusCode < 400) {
-                    resolve();
-                } else {
-                    setTimeout(check, 1000);
-                }
+                if (res.statusCode >= 200 && res.statusCode < 400) resolve(); else setTimeout(check, 1000);
             });
-            req.on('error', () => {
-                setTimeout(check, 1000);
-            });
+            req.on('error', () => setTimeout(check, 1000));
             req.end();
         };
         check();
@@ -237,9 +222,7 @@ checkBackendHealth()
         startFrontend();
         return checkFrontendHealth();
     })
-    .then(() => {
-        console.log('[LIFECYCLE] Frontend e Backend no ar!');
-    });
+    .then(() => console.log('>>> Frontend e Backend no ar!'));
 
 // Keep alive
 setInterval(() => { }, 1000);

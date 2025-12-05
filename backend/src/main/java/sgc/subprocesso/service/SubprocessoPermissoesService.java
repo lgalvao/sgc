@@ -42,7 +42,8 @@ public class SubprocessoPermissoesService {
                                                                 (isChefeDaUnidade &&
                                                                                 (situacao == SituacaoSubprocesso.NAO_INICIADO
                                                                                                 || situacao == SituacaoSubprocesso.MAPA_ELABORADO
-                                                                                                || situacao == SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO)))
+                                                                                                || situacao == SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO
+                                                                                                || situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO)))
                                 .podeVisualizarMapa(true)
                                 .podeDisponibilizarCadastro(
                                                 isChefeDaUnidade && situacao == SituacaoSubprocesso.MAPA_ELABORADO)

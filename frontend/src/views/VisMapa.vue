@@ -362,20 +362,7 @@ const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 const observacaoDevolucao = ref("");
 
-const unidade = computed<Unidade | null>(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-    for (const unidade of unidades) {
-      if (unidade.sigla === sigla) return unidade;
-      if (unidade.filhas && unidade.filhas.length) {
-        const encontrada = buscarUnidade(unidade.filhas, sigla);
-        if (encontrada) return encontrada;
-      }
-    }
-    return null;
-  }
-
-  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value);
-});
+const unidade = computed<Unidade | null>(() => unidadesStore.unidade);
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
@@ -388,6 +375,7 @@ const processo = computed(() => processosStore.processoDetalhe);
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 onMounted(async () => {
+  await unidadesStore.buscarUnidade(sigla.value);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
     await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);

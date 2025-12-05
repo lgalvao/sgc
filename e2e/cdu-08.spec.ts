@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
-import {login, USUARIOS} from './helpers/auth';
-import {criarProcesso} from './helpers/processo-helpers';
-import * as AtividadeHelpers from './helpers/atividade-helpers';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso} from './helpers/helpers-processos';
+import * as AtividadeHelpers from './helpers/helpers-atividades';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';

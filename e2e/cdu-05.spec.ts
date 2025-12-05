@@ -1,7 +1,7 @@
 import {expect, Page, test} from '@playwright/test';
-import {login, USUARIOS} from './helpers/auth';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
-import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -128,7 +128,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     async function passo2a_ChefeDisponibilizaCadastro(page: Page): Promise<void> {
         // Disponibilizar cadastro
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validação: Mensagem de sucesso e redirecionamento para o painel
         await expect(page.getByRole('heading', { name: /Cadastro de atividades disponibilizado/i })).toBeVisible();

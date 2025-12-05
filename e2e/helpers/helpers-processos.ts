@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import {expect, type Page} from '@playwright/test';
 
 /**
  * Calcula uma data limite N dias no futuro
@@ -55,12 +55,10 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     await expect(page.getByTestId('tbl-processos')).toBeVisible();
     await expect(page.getByText(options.descricao)).toBeVisible();
 
-    const linhaProcesso = page.locator('tr', { has: page.getByText(options.descricao) });
+    const linhaProcesso = page.locator('tr', {has: page.getByText(options.descricao)});
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
-    await expect(linhaProcesso.getByText(options.tipo, { exact: true })).toBeVisible();
+    await expect(linhaProcesso.getByText(options.tipo, {exact: true})).toBeVisible();
 }
-
-// === NOVOS HELPERS ===
 
 export interface UnidadeParticipante {
     sigla: string;
@@ -75,21 +73,21 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
 }) {
     // Verificar descrição usando o test-id existente
     await expect(page.getByTestId('processo-info')).toHaveText(dados.descricao);
-    
+
     // Verificar tipo e situação usando getByText
     await expect(page.getByText(`Tipo: ${dados.tipo}`)).toBeVisible();
     await expect(page.getByText(`Situação: ${dados.situacao}`)).toBeVisible();
 }
 
 export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {
-    const row = page.getByRole('row', { name: new RegExp(unidade.sigla, 'i') });
+    const row = page.getByRole('row', {name: new RegExp(unidade.sigla, 'i')});
     await expect(row).toBeVisible();
     await expect(row).toContainText(unidade.situacao);
 
     if (unidade.dataLimite instanceof RegExp) {
-         await expect(row).toHaveText(unidade.dataLimite);
+        await expect(row).toHaveText(unidade.dataLimite);
     } else {
-         await expect(row).toContainText(unidade.dataLimite);
+        await expect(row).toContainText(unidade.dataLimite);
     }
 }
 
@@ -99,12 +97,9 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
     prazo: string | RegExp,
     titular?: string
 }) {
-    // Usar test-id correto definido no SubprocessoHeader.vue
     await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText(dados.sigla);
-
     if (dados.titular) {
         await expect(page.getByText(dados.titular).first()).toBeVisible();
     }
-
     await expect(page.getByText(dados.situacao).first()).toBeVisible();
 }

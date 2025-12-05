@@ -27,17 +27,11 @@ backend/bin/
 
 *.gz
 
-# Arquivos compilados
+# Arquivos compilados/binários
 *.class
 /frontend/tsconfig.tsbuildinfo
 /node_modules/
 !backend/build/reports/tests/test/index.html
 /backend/target/
 .DS_Store
-
-
-# Playwright
-playwright-report/
-test-results/
-e2e/server.log
 /backend/.jqwik-database

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from './helpers/auth';
-import { criarProcesso, verificarProcessoNaTabela } from './helpers/processo-helpers';
-import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
+import { login, USUARIOS } from './helpers/helpers-auth';
+import { criarProcesso, verificarProcessoNaTabela } from './helpers/helpers-processos';
+import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     // Reset completo do banco antes de TODOS os testes
@@ -47,7 +47,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 
@@ -70,7 +70,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 

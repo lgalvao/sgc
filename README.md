@@ -1,4 +1,5 @@
 # SGC - Sistema de Gestão de Competências
+
 Última atualização: 2025-12-04 14:18:38Z
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
@@ -52,7 +53,7 @@ O SGC permite:
 
 ### Estrutura do Projeto
 
-`	ext
+```text
 sgc/
 ├── backend/            # API REST (Spring Boot) - código-fonte em backend/src
 ├── frontend/           # Aplicação Vue.js (frontend/src)
@@ -119,7 +120,7 @@ sgc/
 ```bash
 ./gradlew :backend:test
 ```
-- Usa perfil `test` automaticamente
+
 - Banco H2 em memória (limpo a cada teste)
 
 ### Testes Unitários Frontend (Vitest)
@@ -146,17 +147,17 @@ Cada mapa está vinculado a uma unidade e pode ter diferentes situações.
 
 ### 4. Competências, Atividades e Conhecimentos
 
-- **Competência**: Elemento sintetizante (ex: "Desenvolvimento de Software")
+- **Competência**: Elemento sintetizante (ex: "Desenvolvimento de software administrativo")
 - **Atividade**: Ação específica (ex: "Desenvolver APIs REST")
 - **Conhecimento**: Conhecimento técnico necessário (ex: "Spring Boot")
 
 ### 5. Notificações e Alertas
 
-Mecanismo orientado a eventos que reage aos eventos de domínio:
+Serviços orientados a eventos que reage aos eventos de domínio:
 
 - **Alertas**: Visíveis na interface do usuário
 - **Notificações**: E-mails assíncronos
-- **Movimentaçõees**: Registro de mudanças em análise
+- **Movimentaçõees**: Registro de mudanças (auditoria)
 
 ---
 
@@ -169,13 +170,9 @@ Mecanismo orientado a eventos que reage aos eventos de domínio:
 
 ### Especificação OpenAPI e Swagger
 
-```
-http://localhost:10000/swagger-ui.html
-http://localhost:10000/api-docs
-```
-
+- <http://localhost:10000/swagger-ui.html>
+- <http://localhost:10000/api-docs>
 
 ## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
-

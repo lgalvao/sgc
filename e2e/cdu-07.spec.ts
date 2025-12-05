@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
-import {login, USUARIOS} from './helpers/auth';
-import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/processo-helpers';
-import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_121';

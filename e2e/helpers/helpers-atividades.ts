@@ -1,36 +1,27 @@
-import { expect, type Page } from '@playwright/test';
+import {expect, type Page} from '@playwright/test';
 
 export async function navegarParaAtividades(page: Page, options?: { visualizacao?: boolean }) {
     const testId = options?.visualizacao ? 'card-subprocesso-atividades-vis' : 'card-subprocesso-atividades';
     await page.getByTestId(testId).click();
-    // Assuming the title is present as h1 or similar. Vue has <h1 ...>Atividades e conhecimentos</h1>
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);
 
-    // Wait for the request to complete
-    const responsePromise = page.waitForResponse(resp =>
-        resp.url().includes('/atividades') && resp.status() === 201
-    );
-
+    const responsePromise = page.waitForResponse(resp => resp.url().includes('/atividades') && resp.status() === 201);
     await page.getByTestId('btn-adicionar-atividade').click();
     await responsePromise;
 
-    // Verifica se a atividade apareceu na lista pelo texto
-    await expect(page.getByText(descricao, { exact: true })).toBeVisible();
+    await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
 
 export async function adicionarConhecimento(page: Page, atividadeDescricao: string, conhecimentoDescricao: string) {
-    const card = page.locator('.atividade-card', { has: page.getByText(atividadeDescricao) });
+    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
 
     await card.getByTestId('inp-novo-conhecimento').fill(conhecimentoDescricao);
 
-    const responsePromise = page.waitForResponse(resp =>
-        resp.url().includes('/conhecimentos') && resp.status() === 201
-    );
-
+    const responsePromise = page.waitForResponse(resp => resp.url().includes('/conhecimentos') && resp.status() === 201);
     await card.getByTestId('btn-adicionar-conhecimento').click();
     await responsePromise;
 
@@ -38,7 +29,7 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
 }
 
 export async function editarAtividade(page: Page, descricaoAtual: string, novaDescricao: string) {
-    const card = page.locator('.atividade-card', { has: page.getByText(descricaoAtual) });
+    const card = page.locator('.atividade-card', {has: page.getByText(descricaoAtual)});
     const row = card.locator('.atividade-hover-row');
 
     await row.hover();
@@ -51,29 +42,25 @@ export async function editarAtividade(page: Page, descricaoAtual: string, novaDe
 }
 
 export async function removerAtividade(page: Page, descricao: string) {
-    const card = page.locator('.atividade-card', { has: page.getByText(descricao) });
+    const card = page.locator('.atividade-card', {has: page.getByText(descricao)});
     const row = card.locator('.atividade-hover-row');
 
-    page.once('dialog', async dialog => {
-        await dialog.accept();
-    });
+    page.once('dialog', async dialog => await dialog.accept());
 
     await row.hover();
-    await card.getByTestId('btn-remover-atividade').click({ force: true });
+    await card.getByTestId('btn-remover-atividade').click({force: true});
 
     await expect(page.getByText(descricao)).toBeHidden();
 }
 
 export async function editarConhecimento(page: Page, atividadeDescricao: string, conhecimentoAtual: string, novoConhecimento: string) {
-    const card = page.locator('.atividade-card', { has: page.getByText(atividadeDescricao) });
-    const linhaConhecimento = card.locator('.group-conhecimento', { hasText: conhecimentoAtual });
+    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
 
     await linhaConhecimento.hover();
     await expect(linhaConhecimento.getByTestId('btn-editar-conhecimento')).toBeVisible();
-    await linhaConhecimento.getByTestId('btn-editar-conhecimento').click({ force: true });
-    
-    // O texto do conhecimento some ao editar, então não podemos usar linhaConhecimento com hasText
-    // Buscamos o input dentro do card, assumindo que só um está sendo editado
+    await linhaConhecimento.getByTestId('btn-editar-conhecimento').click({force: true});
+
     await card.getByTestId('inp-editar-conhecimento').fill(novoConhecimento);
     await card.getByTestId('btn-salvar-edicao-conhecimento').click();
 
@@ -81,13 +68,13 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string,
 }
 
 export async function removerConhecimento(page: Page, atividadeDescricao: string, conhecimento: string) {
-    const card = page.locator('.atividade-card', { has: page.getByText(atividadeDescricao) });
-    const linhaConhecimento = card.locator('.group-conhecimento', { hasText: conhecimento });
+    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
 
     page.once('dialog', dialog => dialog.accept());
 
     await linhaConhecimento.hover();
-    await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({ force: true });
+    await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({force: true});
 
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
@@ -116,20 +103,15 @@ export async function verificarBotaoImpacto(page: Page, visivel: boolean) {
 
 export async function abrirModalImportar(page: Page) {
     await page.getByTestId('btn-cad-atividades-importar').click();
-    await expect(page.getByRole('dialog', { name: 'Importação de atividades' })).toBeVisible();
+    await expect(page.getByRole('dialog', {name: 'Importação de atividades'})).toBeVisible();
 }
 
 export async function importarAtividades(page: Page, processoDescricao: string, unidadeSigla: string, atividadesCodigos: number[]) {
     await abrirModalImportar(page);
 
-    // Select Processo - We need to find the option that contains the text
-    // The select options might use ID as value, so we select by label/text
-    await page.getByTestId('select-processo').selectOption({ label: processoDescricao });
+    await page.getByTestId('select-processo').selectOption({label: processoDescricao});
+    await page.getByTestId('select-unidade').selectOption({label: unidadeSigla});
 
-    // Select Unidade
-    await page.getByTestId('select-unidade').selectOption({ label: unidadeSigla });
-
-    // Check Activities
     for (const codigo of atividadesCodigos) {
         await page.getByTestId(`checkbox-atividade-${codigo}`).check();
     }
@@ -144,7 +126,6 @@ export async function abrirModalImpacto(page: Page) {
 }
 
 export async function fecharModalImpacto(page: Page) {
-    // Usar o botão de fechar explícito
     await page.getByTestId('btn-fechar-impacto').click();
     await expect(page.getByRole('dialog')).toBeHidden();
 }

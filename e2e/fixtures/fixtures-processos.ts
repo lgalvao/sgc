@@ -31,7 +31,7 @@ export interface ProcessoFixtureOptions {
  * 
  * NOTA: Esta função requer que o endpoint `/e2e/fixtures/processo-mapeamento`
  * esteja implementado no backend. Se o endpoint não existir, use a criação
- * via UI com `criarProcesso()` do processo-helpers.ts.
+ * via UI com `criarProcesso()` do helpers-processos.ts.
  * 
  * @param request - Contexto de requisição do Playwright
  * @param options - Opções de configuração do processo

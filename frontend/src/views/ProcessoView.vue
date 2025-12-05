@@ -209,9 +209,9 @@ function fecharModalFinalizacao() {
   mostrarModalFinalizacao.value = false;
 }
 
-function confirmarFinalizacao() {
+async function confirmarFinalizacao() {
   fecharModalFinalizacao();
-  executarFinalizacao();
+  await executarFinalizacao();
 }
 
 async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {

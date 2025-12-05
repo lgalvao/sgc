@@ -1,8 +1,8 @@
 import {expect, Page, test} from '@playwright/test';
-import {login, USUARIOS} from './helpers/auth';
-import {criarProcesso} from './helpers/processo-helpers';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/atividade-helpers';
-import { resetDatabase, useProcessoCleanup } from './hooks/cleanup-hooks';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso} from './helpers/helpers-processos';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -57,7 +57,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         
         // Capturar ID do processo para cleanup
-        processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -73,7 +73,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByText(descProcesso).click();
 
         // Se cair na tela de processo (lista de unidades), clicar na unidade
-        if (page.url().match(/\/processo\/\d+$/)) {
+        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
 
@@ -90,7 +90,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
         // Verificar que modal de confirmação NÃO abre
-        await expect(page.getByTestId('btn-disponibilizar-cadastro-confirmar')).toBeHidden();
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeHidden();
 
         // Verificar indicador de erro (Toast/Alert)
         await expect(page.getByText('Atividades Incompletas')).toBeVisible();
@@ -100,7 +100,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         // Tentar Disponibilizar novamente - Agora deve abrir o modal
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await expect(page.getByTestId('btn-disponibilizar-cadastro-confirmar')).toBeVisible();
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
 
         // Cancelar para continuar o teste no proximo passo
         await page.getByRole('button', {name: 'Cancelar'}).click();
@@ -110,7 +110,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcesso).click();
-        if (page.url().match(/\/processo\/\d+$/)) {
+        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
         await navegarParaAtividades(page);
@@ -118,7 +118,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Garantir que temos dados validos
         const atividadeDesc = `Atividade Validada ${timestamp}`;
 
-        // Check if exists
+        // Verificar se existe, se nao existir adicionar
         const count = await page.getByText(atividadeDesc).count();
         if (count === 0) {
             await adicionarAtividade(page, atividadeDesc);
@@ -127,7 +127,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         // Disponibilizar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
         await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
@@ -135,7 +135,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         // Verificar status no subprocesso
         await page.getByText(descProcesso).click();
-        if (page.url().match(/\/processo\/\d+$/)) {
+        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Cadastro disponibilizado/i);
@@ -167,11 +167,11 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcesso).click();
-        if (page.url().match(/\/processo\/\d+$/)) {
+        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
 
-        // Verificar status 'Cadastro em andamento'
+        // Verificar situação 'Cadastro em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Cadastro em andamento/i);
 
         await navegarParaAtividades(page);
@@ -184,8 +184,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         const modal = page.locator('.modal-content').filter({ hasText: 'Histórico de Análise' });
         await expect(modal).toBeVisible();
         
-        // Usando data-testid conforme solicitado para maior robustez
-        // Assumindo que é a primeira linha ou única (index 0) pois o teste limpou o banco e criou um processo novo
+        // Assumindo que é a primeira linha ou única
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Faltou detalhar melhor os conhecimentos técnicos.');
 
@@ -194,7 +193,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         // Disponibilizar novamente
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
         await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();

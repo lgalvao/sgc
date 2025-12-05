@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import {BButton, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import TabelaAlertas from "@/components/TabelaAlertas.vue";
 import TabelaProcessos from "@/components/TabelaProcessos.vue";
@@ -69,7 +69,7 @@ const router = useRouter();
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
-onMounted(async () => {
+async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
     console.log("PainelView: buscando processos", perfil.perfilSelecionado, perfil.unidadeSelecionada);
     await processosStore.buscarProcessosPainel(
@@ -88,6 +88,14 @@ onMounted(async () => {
   } else {
     console.log("PainelView: perfil ou unidade não selecionados", perfil.perfilSelecionado, perfil.unidadeSelecionada);
   }
+}
+
+onMounted(async () => {
+  await carregarDados();
+});
+
+onActivated(async () => {
+  await carregarDados();
 });
 
 const processosOrdenados = computed(() => processosPainel.value);
