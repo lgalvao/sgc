@@ -19,14 +19,9 @@ export const useAnalisesStore = defineStore("analises", () => {
         
         try {
             const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
-            const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
-            const analisesFiltradas = analises.filter(
-                (a) => !atuais.some((aa) => aa.codigo === a.codigo),
-            );
-            analisesPorSubprocesso.value.set(codSubrocesso, [
-                ...atuais,
-                ...analisesFiltradas,
-            ]);
+            // Substituir completamente as análises para refletir o estado atual do backend
+            // (importante quando o backend exclui análises, como na disponibilização)
+            analisesPorSubprocesso.value.set(codSubrocesso, analises);
         } catch {
             feedbackStore.show(
                 "Erro",
@@ -41,14 +36,8 @@ export const useAnalisesStore = defineStore("analises", () => {
         try {
             const analises =
                 await analiseService.listarAnalisesValidacao(codSubrocesso);
-            const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
-            const analisesFiltradas = analises.filter(
-                (a) => !atuais.some((aa) => aa.codigo === a.codigo),
-            );
-            analisesPorSubprocesso.value.set(codSubrocesso, [
-                ...atuais,
-                ...analisesFiltradas,
-            ]);
+            // Substituir completamente as análises para refletir o estado atual do backend
+            analisesPorSubprocesso.value.set(codSubrocesso, analises);
         } catch {
             feedbackStore.show(
                 "Erro",

@@ -1,6 +1,7 @@
 package sgc.analise;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.dto.CriarAnaliseRequest;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
     private final SubprocessoRepo codSubprocesso;
@@ -73,11 +75,17 @@ public class AnaliseService {
      * <p>
      * Para cenários de limpeza de dados, como a exclusão de um subprocesso,
      * garantindo que suas análises dependentes também sejam removidas.
+     * <p>
+     * Este método deve ser chamado dentro de uma transação existente.
      *
      * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
      */
-    @Transactional
     public void removerPorSubprocesso(Long codSubprocesso) {
-        analiseRepo.deleteBySubprocessoCodigo(codSubprocesso);
+        List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
+        log.info("removerPorSubprocesso: Encontradas {} análises para subprocesso {}", analises.size(), codSubprocesso);
+        if (!analises.isEmpty()) {
+            analiseRepo.deleteAll(analises);
+            log.info("removerPorSubprocesso: {} análises removidas do subprocesso {}", analises.size(), codSubprocesso);
+        }
     }
 }

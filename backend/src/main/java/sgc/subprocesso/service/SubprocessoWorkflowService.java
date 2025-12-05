@@ -70,7 +70,10 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
 
         Unidade unidadeSuperior = sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
+
+        log.info("disponibilizarRevisao: Removendo histórico de análises do subprocesso {}", codSubprocesso);
         analiseService.removerPorSubprocesso(sp.getCodigo());
+        log.info("disponibilizarRevisao: Histórico removido para subprocesso {}", codSubprocesso);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoDisponibilizada.builder()
                 .codSubprocesso(codSubprocesso)
@@ -374,9 +377,11 @@ public class SubprocessoWorkflowService {
 
     @Transactional
     public void devolverRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
+        log.info("devolverRevisaoCadastro: Iniciando devolução do subprocesso {} com obs: {}", codSubprocesso, observacoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+            log.warn("devolverRevisaoCadastro: Situação inválida {} para subprocesso {}", sp.getSituacao(), codSubprocesso);
             throw new IllegalStateException(
                     "Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
@@ -386,6 +391,7 @@ public class SubprocessoWorkflowService {
             throw new IllegalStateException("Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
+        log.info("devolverRevisaoCadastro: Criando análise de devolução para subprocesso {}", codSubprocesso);
         analiseService.criarAnalise(CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
@@ -394,6 +400,7 @@ public class SubprocessoWorkflowService {
                 .siglaUnidade(unidadeAnalise.getSigla())
                 .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                 .build());
+        log.info("devolverRevisaoCadastro: Análise criada para subprocesso {}", codSubprocesso);
 
         Unidade unidadeDestino = sp.getUnidade();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
