@@ -358,7 +358,7 @@ describe("CadAtividades.vue", () => {
     await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-disponibilizar-cadastro-confirmar"]',
+      '[data-testid="btn-confirmar-disponibilizacao"]',
     );
     await confirmBtn.trigger("click");
     await flushPromises();
@@ -482,7 +482,7 @@ describe("CadAtividades.vue", () => {
     await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="btn-disponibilizar-cadastro-confirmar"]',
+      '[data-testid="btn-confirmar-disponibilizacao"]',
     );
     await confirmBtn.trigger("click");
     await flushPromises();
