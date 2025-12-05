@@ -104,7 +104,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Adicionar Atividade
         await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('inp-nova-atividade').fill(`Atividade Teste ${timestamp}`);
+
+        const promessaAtividade = page.waitForResponse(resp => resp.url().includes('/atividades') && resp.status() === 201);
         await page.getByTestId('btn-adicionar-atividade').click();
+        await promessaAtividade;
 
         // Validação: Atividade foi criada
         const descAtividade = `Atividade Teste ${timestamp}`;
@@ -113,7 +116,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Adicionar conhecimento à atividade
         const cardAtividade = page.locator('.atividade-card').filter({hasText: descAtividade});
         await cardAtividade.getByTestId('inp-novo-conhecimento').fill('Conhecimento Teste');
+
+        const promessaConhecimento = page.waitForResponse(resp => resp.url().includes('/conhecimentos') && resp.status() === 201);
         await cardAtividade.getByTestId('btn-adicionar-conhecimento').click();
+        await promessaConhecimento;
 
         // Validação: Conhecimento foi adicionado
         await expect(cardAtividade.getByText('Conhecimento Teste')).toBeVisible();

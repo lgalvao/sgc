@@ -9,7 +9,15 @@ export async function navegarParaAtividades(page: Page, options?: { visualizacao
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);
+
+    // Wait for the request to complete
+    const responsePromise = page.waitForResponse(resp =>
+        resp.url().includes('/atividades') && resp.status() === 201
+    );
+
     await page.getByTestId('btn-adicionar-atividade').click();
+    await responsePromise;
+
     // Verifica se a atividade apareceu na lista pelo texto
     await expect(page.getByText(descricao, { exact: true })).toBeVisible();
 }
@@ -18,7 +26,13 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
     const card = page.locator('.atividade-card', { has: page.getByText(atividadeDescricao) });
 
     await card.getByTestId('inp-novo-conhecimento').fill(conhecimentoDescricao);
+
+    const responsePromise = page.waitForResponse(resp =>
+        resp.url().includes('/conhecimentos') && resp.status() === 201
+    );
+
     await card.getByTestId('btn-adicionar-conhecimento').click();
+    await responsePromise;
 
     await expect(card.getByText(conhecimentoDescricao)).toBeVisible();
 }
