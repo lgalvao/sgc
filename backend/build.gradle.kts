@@ -116,5 +116,6 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("-Xlint:deprecation")
     }
 }
