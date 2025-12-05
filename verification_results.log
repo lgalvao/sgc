@@ -1,0 +1,250 @@
+[2m[WebServer] [22m  [32m[1mVITE[22m v7.2.6[39m  [2mready in [0m[1m717[22m[2m[0m ms[22m
+[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m[LIFECYCLE] Frontend e Backend no ar!
+
+Running 14 tests using 2 workers
+[2m[WebServer] [22mERROR s.c.erros.RestExceptionHandler.handleGenericException:167 - Erro inesperado na aplicação
+[2m[WebServer] [22morg.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script statement #1 of file [/app/backend/../e2e/setup/seed.sql]: INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL)
+[2m[WebServer] [22m	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:293)
+[2m[WebServer] [22m	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:188)
+[2m[WebServer] [22m	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:150)
+[2m[WebServer] [22m	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:126)
+[2m[WebServer] [22m	at sgc.e2e.E2eController.resetDatabase(E2eController.java:58)
+[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+[2m[WebServer] [22m	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360)
+[2m[WebServer] [22m	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:724)
+[2m[WebServer] [22m	at sgc.e2e.E2eController$$SpringCGLIB$$0.resetDatabase(<generated>)
+[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+[2m[WebServer] [22m	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+[2m[WebServer] [22m	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
+[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)
+[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)
+[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+[2m[WebServer] [22m	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+[2m[WebServer] [22m	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+[2m[WebServer] [22m	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:547)
+[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+[2m[WebServer] [22m	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:614)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:490)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:351)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:83)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:129)
+[2m[WebServer] [22m	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125)
+[2m[WebServer] [22m	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at sgc.comum.config.FiltroAutenticacaoSimulado.doFilterInternal(FiltroAutenticacaoSimulado.java:58)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+[2m[WebServer] [22m	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+[2m[WebServer] [22m	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+[2m[WebServer] [22m	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:334)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+[2m[WebServer] [22m	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+[2m[WebServer] [22m	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+[2m[WebServer] [22m	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+[2m[WebServer] [22m	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240)
+[2m[WebServer] [22m	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+[2m[WebServer] [22m	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+[2m[WebServer] [22m	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+[2m[WebServer] [22m	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:88)
+[2m[WebServer] [22m	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+[2m[WebServer] [22m	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+[2m[WebServer] [22m	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+[2m[WebServer] [22m	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+[2m[WebServer] [22m	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+[2m[WebServer] [22m	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)
+[2m[WebServer] [22m	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+[2m[WebServer] [22m	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+[2m[WebServer] [22m	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1774)
+[2m[WebServer] [22m	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+[2m[WebServer] [22m	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:973)
+[2m[WebServer] [22m	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:491)
+[2m[WebServer] [22m	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+[2m[WebServer] [22m	at java.base/java.lang.Thread.run(Thread.java:1583)
+[2m[WebServer] [22mCaused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PRIMARY KEY ON SGC.UNIDADE(CODIGO) ( /* key:1 */ CAST(1 AS BIGINT), NULL, NULL, NULL, NULL, 'SEDOC', 'ATIVA', 'INTEROPERACIONAL', U&'Se\\00e7\\00e3o de Desenvolvimento e Capacita\\00e7\\00e3o')"; SQL statement:
+[2m[WebServer] [22mINSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL) [23505-232]
+[2m[WebServer] [22m	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+[2m[WebServer] [22m	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+[2m[WebServer] [22m	at org.h2.message.DbException.get(DbException.java:223)
+[2m[WebServer] [22m	at org.h2.message.DbException.get(DbException.java:199)
+[2m[WebServer] [22m	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+[2m[WebServer] [22m	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:517)
+[2m[WebServer] [22m	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+[2m[WebServer] [22m	at org.h2.command.dml.Insert.update(Insert.java:135)
+[2m[WebServer] [22m	at org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:74)
+[2m[WebServer] [22m	at org.h2.command.CommandContainer.update(CommandContainer.java:139)
+[2m[WebServer] [22m	at org.h2.command.Command.executeUpdate(Command.java:304)
+[2m[WebServer] [22m	at org.h2.command.Command.executeUpdate(Command.java:248)
+[2m[WebServer] [22m	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:262)
+[2m[WebServer] [22m	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231)
+[2m[WebServer] [22m	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+[2m[WebServer] [22m	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+[2m[WebServer] [22m	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:261)
+[2m[WebServer] [22m	... 148 common frames omitted
+F°°°[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:124 - Processo 1 criado.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:124 - Processo 2 criado.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_21
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:241 - Processo de mapeamento 1 iniciado para 1 unidades.
+[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:98 - Disponibilizando mapa do subprocesso: codSubprocesso=1, usuario=191919
+[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:118 - Subprocesso 1 atualizado para MAPA_DISPONIBILIZADO e mapa disponibilizado.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:391 - Validação OK: 1 subprocessos homologados.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:395 - Tornando mapas vigentes para o processo 1
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:413 - Mapas de 1 subprocessos foram definidos como vigentes.
+[2m[WebServer] [22mINFO  s.p.s.ProcessoNotificacaoService.enviarNotificacoesDeFinalizacao:40 - Enviando notificações de finalização para o processo 1
+[2m[WebServer] [22mINFO  s.p.s.ProcessoNotificacaoService.enviarEmailUnidadeFinal:79 - E-mail de finalização enviado para ASSESSORIA_21
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:297 - Processo finalizado: código=1
+·[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:124 - Processo 3 criado.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.iniciarProcessoRevisao:247 - Iniciando processo de revisão para código 3 com unidades [12]
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criarSubprocessoParaRevisao:360 - Subprocesso 2 para revisão criado para unidade ASSESSORIA_21
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade ASSESSORIA_21
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.iniciarProcessoRevisao:276 - Processo de revisão 3 iniciado para 1 unidades.
+·[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:124 - Processo 4 criado.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:167 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:241 - Processo de mapeamento 4 iniciado para 1 unidades.
+····T···
+
+  1) [chromium] › e2e/cdu-02-melhorado.spec.ts:44:13 › CDU-02 (MELHORADO) - Visualizar Painel › Como ADMIN › Deve exibir seções de Processos e Alertas
+
+    Error: Falha ao resetar banco de dados: 500
+
+       at hooks/cleanup-hooks.ts:81
+
+      79 |
+      80 |     if (!response.ok()) {
+    > 81 |         throw new Error(`Falha ao resetar banco de dados: ${response.status()} ${response.statusText()}`);
+         |               ^
+      82 |     }
+      83 | }
+      84 |
+        at resetDatabase (/app/e2e/hooks/cleanup-hooks.ts:81:15)
+        at /app/e2e/cdu-02-melhorado.spec.ts:24:9
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cdu-02-melhorado-CDU-02-ME-7b4d7-ções-de-Processos-e-Alertas-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cdu-02-melhorado-CDU-02-ME-7b4d7-ções-de-Processos-e-Alertas-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › e2e/cdu-02-melhorado.spec.ts:134:13 › CDU-02 (MELHORADO) - Visualizar Painel › Como ADMIN › Não deve incluir unidades INTERMEDIARIAS na seleção
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-02-melhorado-CDU-02-ME-60ca7-s-INTERMEDIARIAS-na-seleção-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/cdu-02-melhorado-CDU-02-ME-60ca7-s-INTERMEDIARIAS-na-seleção-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-02-melhorado-CDU-02-ME-60ca7-s-INTERMEDIARIAS-na-seleção-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cdu-02-melhorado-CDU-02-ME-60ca7-s-INTERMEDIARIAS-na-seleção-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cdu-02-melhorado-CDU-02-ME-60ca7-s-INTERMEDIARIAS-na-seleção-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › e2e/cdu-02-melhorado.spec.ts:44:13 › CDU-02 (MELHORADO) - Visualizar Painel › Como ADMIN › Deve exibir seções de Processos e Alertas
+    [chromium] › e2e/cdu-02-melhorado.spec.ts:134:13 › CDU-02 (MELHORADO) - Visualizar Painel › Como ADMIN › Não deve incluir unidades INTERMEDIARIAS na seleção
+  3 did not run
+  9 passed (54.2s)

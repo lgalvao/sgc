@@ -152,6 +152,12 @@ test.describe('CDU-02 (MELHORADO) - Visualizar Painel', () => {
             });
 
             await test.step('Expandir hierarquia (SECRETARIA_1 -> COORD_11)', async () => {
+                // Ensure tree is loaded
+                await expect(page.getByText('Carregando unidades...')).toBeHidden();
+
+                // Wait for SECRETARIA_1 node to be present (it's a root node in the view)
+                await expect(page.getByText('SECRETARIA_1')).toBeVisible();
+
                 const btnSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
                 await btnSecretaria.waitFor({ state: 'visible' });
                 await btnSecretaria.click();
