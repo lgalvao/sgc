@@ -182,10 +182,8 @@ onMounted(() => {
 watch(
     () => props.mostrar,
     (mostrar) => {
-      console.log('WATCH MOSTRAR TRIGGERED', mostrar);
       if (mostrar) {
         resetModal();
-        console.log('CHAMANDO BUSCAR PROCESSOS PAINEL');
         processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000);
       }
     },
@@ -218,7 +216,6 @@ watch(unidadeSelecionadaId, (newId) => {
 });
 
 function resetModal() {
-  console.log('RESET MODAL');
   processoSelecionado.value = null;
   processoSelecionadoId.value = null;
   unidadesParticipantes.value = [];

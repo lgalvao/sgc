@@ -93,7 +93,10 @@ const mapasStore = useMapasStore();
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
 onMounted(async () => {
-  await unidadesStore.buscarArvoreUnidade(codigo.value);
+  await Promise.all([
+    unidadesStore.buscarArvoreUnidade(codigo.value),
+    atribuicaoTemporariaStore.buscarAtribuicoes(),
+  ]);
 });
 
 const unidadeOriginal = computed<Unidade | null>(

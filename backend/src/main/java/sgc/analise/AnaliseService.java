@@ -82,10 +82,8 @@ public class AnaliseService {
      */
     public void removerPorSubprocesso(Long codSubprocesso) {
         List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
-        log.info("removerPorSubprocesso: Encontradas {} análises para subprocesso {}", analises.size(), codSubprocesso);
         if (!analises.isEmpty()) {
             analiseRepo.deleteAll(analises);
-            log.info("removerPorSubprocesso: {} análises removidas do subprocesso {}", analises.size(), codSubprocesso);
         }
     }
 }

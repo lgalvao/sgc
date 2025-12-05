@@ -48,10 +48,6 @@ export const useAtribuicaoTemporariaStore = defineStore(
             }
         }
 
-        function criarAtribuicao(novaAtribuicao: AtribuicaoTemporaria) {
-            atribuicoes.value.push(novaAtribuicao);
-        }
-
         return {
             atribuicoes,
             isLoading,
@@ -59,7 +55,6 @@ export const useAtribuicaoTemporariaStore = defineStore(
             obterAtribuicoesPorServidor,
             obterAtribuicoesPorUnidade,
             buscarAtribuicoes,
-            criarAtribuicao,
         };
     },
 );

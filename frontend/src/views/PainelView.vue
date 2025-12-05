@@ -71,14 +71,12 @@ const asc = ref(true);
 
 async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    console.log("PainelView: buscando processos", perfil.perfilSelecionado, perfil.unidadeSelecionada);
     await processosStore.buscarProcessosPainel(
         perfil.perfilSelecionado,
         Number(perfil.unidadeSelecionada),
         0,
         10,
     ); // Paginação inicial
-    console.log("PainelView: processos encontrados", processosStore.processosPainel.length);
     alertasStore.buscarAlertas(
         Number(perfil.servidorId) || 0,
         Number(perfil.unidadeSelecionada),
@@ -86,7 +84,6 @@ async function carregarDados() {
         10,
     ); // Paginação inicial
   } else {
-    console.log("PainelView: perfil ou unidade não selecionados", perfil.perfilSelecionado, perfil.unidadeSelecionada);
   }
 }
 

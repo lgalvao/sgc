@@ -97,35 +97,6 @@ describe("useAtribuicaoTemporariaStore", () => {
                 "Falha ao carregar atribuições",
             );
         });
-
-        it("criarAtribuicao should add a new atribuicao to the store", () => {
-            const novaAtribuicao: AtribuicaoTemporaria = {
-                codigo: 4,
-                unidade: {codigo: 4, nome: "D", sigla: "D"},
-                servidor: {
-                    codigo: 4,
-                    nome: "Servidor 4",
-                    tituloEleitoral: "123",
-                    unidade: {codigo: 4, nome: "D", sigla: "D"},
-                    email: "",
-                    ramal: "",
-                },
-                dataInicio: "2025-04-01",
-                dataFim: "2025-04-30",
-                dataTermino: "2025-04-30",
-                justificativa: "J4",
-            };
-            const initialLength = atribuicaoTemporariaStore.atribuicoes.length;
-
-            atribuicaoTemporariaStore.criarAtribuicao(novaAtribuicao);
-
-            expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(
-                initialLength + 1,
-            );
-            expect(atribuicaoTemporariaStore.atribuicoes[initialLength]).toEqual(
-                novaAtribuicao,
-            );
-        });
     });
 
     describe("getters", () => {
