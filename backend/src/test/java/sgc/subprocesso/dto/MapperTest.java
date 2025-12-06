@@ -73,7 +73,7 @@ class MapperTest {
         entity.setDataFimEtapa1(LocalDateTime.now());
         entity.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
-        entity.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        entity.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         SubprocessoDto dto = subprocessoMapper.toDTO(entity);
 
@@ -82,7 +82,7 @@ class MapperTest {
         assertEquals(100L, dto.getCodProcesso());
         assertEquals(200L, dto.getCodUnidade());
         assertEquals(300L, dto.getCodMapa());
-        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, dto.getSituacao());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
 
     @Test
@@ -96,7 +96,7 @@ class MapperTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(10),
-                SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
         );
 
         Processo processo = new Processo();
@@ -120,7 +120,7 @@ class MapperTest {
         assertEquals(200L, entity.getUnidade().getCodigo());
         assertNotNull(entity.getMapa());
         assertEquals(300L, entity.getMapa().getCodigo());
-        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, entity.getSituacao());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, entity.getSituacao());
     }
 
     @Test

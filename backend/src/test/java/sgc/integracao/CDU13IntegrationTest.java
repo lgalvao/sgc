@@ -93,7 +93,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
         subprocesso = new Subprocesso();
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoRepo.save(subprocesso);
 
@@ -129,7 +129,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
 
             // 1. Verificar se o subprocesso foi atualizado
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNull();
 
             List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -217,7 +217,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
 
             // 1. Verificar se o subprocesso foi atualizado
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo
@@ -250,7 +250,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             // And then, the unit submits it again and the manager accepts it
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.saveAndFlush(subprocesso);
 
             String obsAceite = "Agora sim, completo.";

@@ -102,7 +102,7 @@ class AtividadeServiceTest {
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
@@ -145,7 +145,7 @@ class AtividadeServiceTest {
 
         atividadeService.criar(dto, usuarioId);
 
-        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(subprocessoRepo).save(subprocesso);
     }
 
@@ -219,7 +219,7 @@ class AtividadeServiceTest {
         atividade.setMapa(mapa);
 
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
@@ -254,7 +254,7 @@ class AtividadeServiceTest {
         atividade.setMapa(mapa);
 
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
@@ -309,7 +309,7 @@ class AtividadeServiceTest {
         atividade.setMapa(mapa);
 
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
@@ -350,7 +350,7 @@ class AtividadeServiceTest {
         conhecimento.setAtividade(atividade);
 
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
@@ -399,7 +399,7 @@ class AtividadeServiceTest {
         conhecimento.setAtividade(atividade);
 
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));

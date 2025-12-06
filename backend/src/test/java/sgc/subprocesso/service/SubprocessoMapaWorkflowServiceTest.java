@@ -55,7 +55,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void salvarMapaSubprocesso() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
@@ -68,7 +68,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
         service.salvarMapaSubprocesso(id, req, "user");
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         verify(repositorioSubprocesso).save(sp);
     }
 
@@ -77,7 +77,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void salvarMapaSubprocessoFalha() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
@@ -90,7 +90,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void delegationMethods() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
@@ -112,7 +112,7 @@ class SubprocessoMapaWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
         sp.setUnidade(new Unidade());
@@ -131,7 +131,7 @@ class SubprocessoMapaWorkflowServiceTest {
         req.setDataLimite(java.time.LocalDate.now().plusDays(1));
         service.disponibilizarMapa(id, req, new Usuario());
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));
     }
 
@@ -141,7 +141,7 @@ class SubprocessoMapaWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 

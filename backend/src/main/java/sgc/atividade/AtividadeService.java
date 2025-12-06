@@ -217,7 +217,7 @@ public class AtividadeService {
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
                 subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

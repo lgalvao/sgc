@@ -58,13 +58,13 @@ class ModeloTest {
         mapa.setCodigo(1L);
         
         Subprocesso subprocesso = new Subprocesso(
-            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
+            processo, unidade, mapa, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
         );
         
         assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
         assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
         assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
-        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
     }
 

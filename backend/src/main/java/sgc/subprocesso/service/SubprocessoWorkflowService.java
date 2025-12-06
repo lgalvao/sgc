@@ -15,6 +15,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -25,8 +26,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPA_AJUSTADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -65,7 +65,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -108,7 +108,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
-        if (situacaoAtual != REVISAO_CADASTRO_HOMOLOGADA && situacaoAtual != MAPA_AJUSTADO) {
+        if (situacaoAtual != REVISAO_CADASTRO_HOMOLOGADA && situacaoAtual != REVISAO_MAPA_AJUSTADO) {
             // TODO usar uma execção de negócio específica
             throw new IllegalStateException(
                     "O mapa de competências só pode ser disponibilizado a partir dos estados 'Revisão de Cadastro Homologada' ou 'Mapa Ajustado'. Estado atual: "
@@ -128,7 +128,12 @@ public class SubprocessoWorkflowService {
             sp.getMapa().setSugestoes(observacoes);
         }
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
+        }
+
         sp.setDataLimiteEtapa2(dataLimiteEtapa2);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
@@ -152,7 +157,13 @@ public class SubprocessoWorkflowService {
         if (sp.getMapa() != null) {
             sp.getMapa().setSugestoes(sugestoes);
         }
-        sp.setSituacao(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
+
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_COM_SUGESTOES);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_COM_SUGESTOES);
+        }
+
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -171,7 +182,12 @@ public class SubprocessoWorkflowService {
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_VALIDADO);
+        }
+
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -199,7 +215,12 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
+        }
+
         sp.setDataFimEtapa2(null);
         repositorioSubprocesso.save(sp);
 
@@ -230,10 +251,18 @@ public class SubprocessoWorkflowService {
         Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
 
         if (proximaUnidade == null) {
-            sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+                sp.setSituacao(MAPEAMENTO_MAPA_HOMOLOGADO);
+            } else {
+                sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
+            }
             repositorioSubprocesso.save(sp);
         } else {
-            sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+            if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+                sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
+            } else {
+                sp.setSituacao(REVISAO_MAPA_VALIDADO);
+            }
             repositorioSubprocesso.save(sp);
 
             publicadorDeEventos.publishEvent(EventoSubprocessoMapaAceito.builder()
@@ -249,7 +278,11 @@ public class SubprocessoWorkflowService {
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_HOMOLOGADO);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
+        }
         repositorioSubprocesso.save(sp);
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
@@ -270,7 +303,12 @@ public class SubprocessoWorkflowService {
 
         subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        } else {
+            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
+        }
+
         sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
@@ -303,7 +341,7 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         repositorioSubprocesso.save(sp);
 
@@ -336,7 +374,7 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         repositorioSubprocesso.save(sp);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoCadastroAceito.builder()
@@ -352,7 +390,7 @@ public class SubprocessoWorkflowService {
     public void homologarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO) {
+        if (sp.getSituacao() != MAPEAMENTO_CADASTRO_DISPONIBILIZADO) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
@@ -360,7 +398,7 @@ public class SubprocessoWorkflowService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoCadastroHomologado.builder()
@@ -376,7 +414,7 @@ public class SubprocessoWorkflowService {
     public void devolverRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException(
                     "Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
@@ -396,7 +434,7 @@ public class SubprocessoWorkflowService {
                 .build());
 
         Unidade unidadeDestino = sp.getUnidade();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
 
         repositorioSubprocesso.save(sp);
@@ -413,7 +451,7 @@ public class SubprocessoWorkflowService {
     public void aceitarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException(
                     "Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
@@ -438,7 +476,7 @@ public class SubprocessoWorkflowService {
             unidadeDestino = unidadeAnalise;
         }
 
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         repositorioSubprocesso.save(sp);
 
         publicadorDeEventos.publishEvent(EventoSubprocessoRevisaoAceita.builder()
@@ -454,7 +492,7 @@ public class SubprocessoWorkflowService {
     public void homologarRevisaoCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+        if (sp.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException(
                     "Ação de homologar só pode ser executada em revisões de cadastro aguardando homologação.");
         }
@@ -462,7 +500,7 @@ public class SubprocessoWorkflowService {
         var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
 
         if (!impactos.isTemImpactos()) {
-            sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
         } else {
             Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
                     .orElseThrow(() -> new IllegalStateException(

@@ -284,7 +284,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa Ajustado'")
         void adminPodeAcessar_EmMapaAjustado() throws Exception {
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))

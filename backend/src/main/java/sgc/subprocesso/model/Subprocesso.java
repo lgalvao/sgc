@@ -76,9 +76,8 @@ public class Subprocesso extends EntidadeBase {
 
     public boolean isEmAndamento() {
         final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.CONCLUIDO,
-            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
-            SituacaoSubprocesso.MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
             SituacaoSubprocesso.NAO_INICIADO
         );
         return !situacoesFinalizadas.contains(this.situacao);
@@ -86,9 +85,8 @@ public class Subprocesso extends EntidadeBase {
 
     public Integer getEtapaAtual() {
         final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.CONCLUIDO,
-            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
-            SituacaoSubprocesso.MAPA_HOMOLOGADO
+            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO
         );
         if (!situacoesFinalizadas.contains(this.situacao)) {
             return 1;

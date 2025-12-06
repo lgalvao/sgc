@@ -93,11 +93,11 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         processoRepo.save(processo);
 
         Mapa mapa1 = mapaRepo.save(new Mapa());
-        Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp1);
 
         Mapa mapa2 = mapaRepo.save(new Mapa());
-        Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp2);
 
         when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
@@ -146,7 +146,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Subprocesso spPendente = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
                 .filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo()))
                 .findFirst().orElseThrow();
-        spPendente.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        spPendente.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(spPendente);
 
         mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())

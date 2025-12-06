@@ -57,7 +57,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         sp.setProcesso(processo);
         sp.setUnidade(unidade);
         sp.setMapa(mapa);
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(sp);
 
         atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
@@ -88,7 +88,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
             .andExpect(jsonPath("$.competencias[1].descricao").value("Nova Competência 2"));
 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
+        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
     }
 
     @Test
@@ -133,7 +133,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 400 se tentar salvar mapa para subprocesso em situação inválida")
     void deveRetornarErroParaSituacaoInvalida() throws Exception {
         // Given
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(subprocesso);
 
         var request = new SalvarMapaRequest("Obs", List.of());
@@ -235,7 +235,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         @WithMockGestor
         @DisplayName("Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida")
         void deveRetornarErroParaSituacaoInvalidaCrud() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
             var request = new sgc.subprocesso.dto.CompetenciaReq("Nova Competência", List.of(atividade1.getCodigo()));

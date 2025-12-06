@@ -97,7 +97,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -119,7 +119,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -133,7 +133,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.CHEFE);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -147,7 +147,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -161,7 +161,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -176,7 +176,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))

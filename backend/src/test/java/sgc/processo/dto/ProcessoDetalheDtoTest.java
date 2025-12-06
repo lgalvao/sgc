@@ -30,7 +30,7 @@ class ProcessoDetalheDtoTest {
             .nome("Test Unit")
             .sigla("TU")
             .codUnidadeSuperior(10L)
-            .situacaoSubprocesso(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO)
+            .situacaoSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
             .dataLimite(limitDate)
             .build();
 
@@ -74,7 +74,7 @@ class ProcessoDetalheDtoTest {
             .nome("Test Unit")
             .sigla("TU")
             .codUnidadeSuperior(10L)
-            .situacaoSubprocesso(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO)
+            .situacaoSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
             .dataLimite(limitDate)
             .filhos(List.of(filho))
             .build();
@@ -83,7 +83,7 @@ class ProcessoDetalheDtoTest {
         assertEquals("Test Unit", dto.getNome());
         assertEquals("TU", dto.getSigla());
         assertEquals(10L, dto.getCodUnidadeSuperior());
-        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, dto.getSituacaoSubprocesso());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, dto.getSituacaoSubprocesso());
         assertEquals(limitDate, dto.getDataLimite());
         assertNotNull(dto.getFilhos());
         assertEquals(1, dto.getFilhos().size());

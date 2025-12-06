@@ -82,7 +82,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                 Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO,
                                 SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
                 subprocesso = subprocessoRepo.save(
-                                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO,
+                                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
                                                 LocalDateTime.now()));
                 subprocessoRepo.flush();
         }
@@ -189,7 +189,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         void testHomologarValidacao_Sucesso() throws Exception {
                 // Cenário: Subprocesso já validado e pronto para homologação
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
                 subprocessoRepo.save(subprocesso);
                 subprocessoRepo.flush();
 
@@ -200,7 +200,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
                 // Verificações
                 Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-                assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
                 List<Movimentacao> movimentacoes = movimentacaoRepo
                                 .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
