@@ -107,6 +107,7 @@ class E2eControllerTest {
         try {
             controller.resetDatabase();
         } catch (RuntimeException e) {
+            // Ignored
         }
         
         assertCount("sgc.unidade WHERE codigo=888", 0);

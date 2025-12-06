@@ -11,6 +11,7 @@ plugins {
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.0.26"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 java {
@@ -81,6 +82,20 @@ dependencies {
 }
 
 // --- Quality Checks Configurations ---
+
+// Spotless
+spotless {
+    // EnforceCheck is disabled by default to avoid breaking CI for existing formatting issues.
+    // Run './gradlew spotlessApply' to fix.
+    isEnforceCheck = false
+    java {
+        googleJavaFormat("1.19.2").aosp().reflowLongStrings()
+        target("src/*/java/**/*.java")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
 
 // JaCoCo
 jacoco {

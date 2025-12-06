@@ -173,6 +173,7 @@ public class AlertaService {
 
                         alertasCriados.add(alertaIntermediaria);
                     }
+                    default -> log.warn("Tipo de unidade desconhecido: {}", tipoUnidade);
                 }
             } catch (Exception e) {
                 log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
