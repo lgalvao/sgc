@@ -19,6 +19,7 @@
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="ControlStatementBraces"/> <!-- Checkstyle handles this -->
+        <exclude name="ShortClassName"/> <!-- Disabled per user request for Sgc class -->
     </rule>
     
     <rule ref="category/java/codestyle.xml/LongVariable">
