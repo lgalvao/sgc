@@ -1,13 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {
-    mapVWUsuariosArray,
-    mapVWUsuarioToServidor,
-} from "@/mappers/servidores";
-import {
-    mapUnidade,
-    mapUnidadeSnapshot,
-    mapUnidadesArray,
-} from "@/mappers/unidades";
+import {mapVWUsuariosArray, mapVWUsuarioToServidor,} from "@/mappers/servidores";
+import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
 import type {Alerta, Mapa, MapaAjuste, MapaVisualizacao} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
@@ -23,12 +16,13 @@ import {
     mapMapaDtoToModel,
     mapMapaVisualizacaoToAtividades,
 } from "../mapas";
+import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
 import {
-    mapProcessoDetalheDtoToFrontend,
-    mapProcessoDtoToFrontend,
-    mapProcessoResumoDtoToFrontend,
-} from "../processos";
-import {mapPerfilUnidadeToFrontend, mapUsuarioToFrontend} from "../sgrh";
+    LoginResponseToFrontend,
+    mapPerfilUnidadeToFrontend,
+    mapUsuarioToFrontend,
+    perfisUnidadesParaDominio
+} from "../sgrh";
 
 describe("mappers/alertas", () => {
     it("mapAlertaDtoToFrontend should map all fields correctly", () => {
@@ -88,12 +82,12 @@ describe("mappers/atividades", () => {
         const request = {descricao: "Nova Atividade"};
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe("Nova Atividade");
-        expect(dto.codSubrocesso).toBe(123);
+        expect(dto.mapaCodigo).toBe(123);
     });
 
     it("mapCriarConhecimentoRequestToDto should map correctly", () => {
         const request = {descricao: "Novo Conhecimento"};
-        const dto = mapCriarConhecimentoRequestToDto(request);
+        const dto = mapCriarConhecimentoRequestToDto(request, 1);
         expect(dto.descricao).toBe("Novo Conhecimento");
     });
 });
@@ -258,6 +252,39 @@ describe("mappers/sgrh", () => {
         expect(model.nome).toBe("Usuário Teste");
         expect(model.unidade.sigla).toBe("UT");
         expect(model.perfis).toContain("CHEFE");
+    });
+
+    it("LoginResponseToFrontend should map correctly", () => {
+        const dto = {
+            tituloEleitoral: 123456,
+            perfil: "GESTOR",
+            unidadeCodigo: 10,
+            token: "abc.def.ghi",
+        };
+        const model = LoginResponseToFrontend(dto);
+        expect(model.tituloEleitoral).toBe(123456);
+        expect(model.perfil).toBe("GESTOR");
+        expect(model.unidadeCodigo).toBe(10);
+        expect(model.token).toBe("abc.def.ghi");
+    });
+
+    it("perfisUnidadesParaDominio should map array correctly", () => {
+        const backendData = [
+            {
+                perfil: "GESTOR",
+                unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
+            },
+            {
+                perfil: "SERVIDOR",
+                unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
+            },
+        ];
+        const result = perfisUnidadesParaDominio(backendData);
+        expect(result).toHaveLength(2);
+        expect(result[0].perfil).toBe("GESTOR");
+        expect(result[0].unidade.sigla).toBe("U1");
+        expect(result[0].siglaUnidade).toBe("U1");
+        expect(result[1].perfil).toBe("SERVIDOR");
     });
 });
 

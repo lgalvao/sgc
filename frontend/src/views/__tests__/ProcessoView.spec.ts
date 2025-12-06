@@ -3,9 +3,9 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 // Mock services
 import * as processoService from "@/services/processoService";
-import {useNotificacoesStore} from "@/stores/notificacoes";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
 import ProcessoView from "@/views/ProcessoView.vue";
 
 const { pushMock } = vi.hoisted(() => {
@@ -32,10 +32,10 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/services/processoService", () => ({
     obterDetalhesProcesso: vi.fn(),
-    fetchSubprocessosElegiveis: vi.fn(),
+    buscarSubprocessosElegiveis: vi.fn(),
     finalizarProcesso: vi.fn(),
     processarAcaoEmBloco: vi.fn(),
-    fetchProcessosFinalizados: vi.fn(),
+    buscarProcessosFinalizados: vi.fn(),
 }));
 
 // Stubs
@@ -103,9 +103,9 @@ const createWrapper = (customState = {}) => {
 
     const processosStore = useProcessosStore();
     const perfilStore = usePerfilStore();
-    const notificacoesStore = useNotificacoesStore();
+    const feedbackStore = useFeedbackStore(); // Get feedback store
 
-    return {wrapper, processosStore, perfilStore, notificacoesStore};
+    return {wrapper, processosStore, perfilStore, feedbackStore};
 };
 
 describe("ProcessoView.vue", () => {
@@ -143,7 +143,7 @@ describe("ProcessoView.vue", () => {
       vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
           mockProcesso as any,
       );
-      vi.mocked(processoService.fetchSubprocessosElegiveis).mockResolvedValue(
+      vi.mocked(processoService.buscarSubprocessosElegiveis).mockResolvedValue(
           mockSubprocessosElegiveis as any,
       );
   });
@@ -158,7 +158,7 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-        expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(1);
+        expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(1);
 
         const detalhes = wrapper.findComponent(ProcessoDetalhesStub);
         expect(detalhes.props("descricao")).toBe("Test Process");
@@ -171,6 +171,29 @@ describe("ProcessoView.vue", () => {
 
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
         expect(acoes.props("mostrarBotoesBloco")).toBe(true);
+    });
+
+    it("deve lidar com dataLimite nula", async () => {
+        const mockProcessoNullDate = { ...mockProcesso };
+        mockProcessoNullDate.unidades = [
+            {
+                codUnidade: 10,
+                sigla: "U1",
+                nome: "Unidade 1",
+                situacaoSubprocesso: "EM_ANDAMENTO",
+                dataLimite: null,
+                filhos: [],
+            },
+        ];
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(mockProcessoNullDate as any);
+
+        const {wrapper: w} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        const data = treeTable.props("data");
+        expect(data[0].dataLimite).toBe("");
     });
 
     it("deve navegar para detalhes da unidade ao clicar na tabela (ADMIN)", async () => {
@@ -208,16 +231,18 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve confirmar finalização", async () => {
-        const {wrapper: w, notificacoesStore} = createWrapper();
+        const {wrapper: w, feedbackStore} = createWrapper();
         wrapper = w;
         await flushPromises();
+
+        vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent(ModalFinalizacaoStub);
         modal.vm.$emit("confirmar");
         await flushPromises();
 
         expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(notificacoesStore.sucesso).toHaveBeenCalled();
+        expect(feedbackStore.show).toHaveBeenCalled();
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
@@ -236,9 +261,11 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve confirmar ação em bloco", async () => {
-        const {wrapper: w} = createWrapper();
+        const {wrapper: w, feedbackStore} = createWrapper();
         wrapper = w;
         await flushPromises();
+
+        vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         modal.vm.$emit("confirmar", [{sigla: "TU", selecionada: true}]);
@@ -251,8 +278,96 @@ describe("ProcessoView.vue", () => {
                 tipoAcao: "aceitar",
             }),
         );
+        expect(feedbackStore.show).toHaveBeenCalled();
 
         // Verificar se a busca foi realizada novamente
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2);
+    });
+
+    it("deve navegar para detalhes da unidade se perfil for CHEFE e unidade corresponder", async () => {
+        const {wrapper: w} = createWrapper({
+            perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 10},
+        });
+        wrapper = w;
+        await flushPromises();
+
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        const item = {id: 10, unidadeAtual: "U1", clickable: true};
+        treeTable.vm.$emit("row-click", item);
+
+        expect(pushMock).toHaveBeenCalledWith({
+            name: "Subprocesso",
+            params: {codProcesso: "1", siglaUnidade: "U1"},
+        });
+    });
+
+    it("não deve navegar para detalhes da unidade se perfil for CHEFE e unidade não corresponder", async () => {
+        const {wrapper: w} = createWrapper({
+            perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 99},
+        });
+        wrapper = w;
+        await flushPromises();
+        // Reset push mock to ensure no previous calls
+        pushMock.mockClear();
+
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        const item = {id: 10, unidadeAtual: "U1", clickable: true};
+        treeTable.vm.$emit("row-click", item);
+
+        expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it("confirmarAcaoBloco deve mostrar erro se nenhuma unidade selecionada", async () => {
+        const {wrapper: w, feedbackStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+        vi.spyOn(feedbackStore, "show");
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        modal.vm.$emit("confirmar", [{sigla: "TU", selecionada: false}]);
+        await flushPromises();
+
+        expect(processoService.processarAcaoEmBloco).not.toHaveBeenCalled();
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Nenhuma unidade selecionada",
+            expect.any(String),
+            "danger"
+        );
+    });
+
+    it("executarFinalizacao deve mostrar erro se falhar", async () => {
+        const {wrapper: w, feedbackStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+        vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        const modal = wrapper.findComponent(ModalFinalizacaoStub);
+        modal.vm.$emit("confirmar");
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Erro ao finalizar processo",
+            expect.any(String),
+            "danger"
+        );
+    });
+
+    it("confirmarAcaoBloco deve mostrar erro se falhar", async () => {
+        const {wrapper: w, feedbackStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+        vi.mocked(processoService.processarAcaoEmBloco).mockRejectedValue(new Error("Fail"));
+        vi.spyOn(feedbackStore, "show");
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        modal.vm.$emit("confirmar", [{sigla: "TU", selecionada: true}]);
+        await flushPromises();
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Erro ao processar em bloco",
+            expect.any(String),
+            "danger"
+        );
     });
 });

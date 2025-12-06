@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -11,28 +12,25 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Set;
-
 @Component
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
-
-    private final UsuarioRepo usuarioRepo;
-
-    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo) {
-        this.usuarioRepo = usuarioRepo;
-    }
+    @Autowired(required = false)
+    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-
         String tituloAdmin = "111111111111";
 
-        Usuario principal;
-        try {
-            principal = usuarioRepo.findById(tituloAdmin).orElse(null);
-        } catch (Exception e) {
-            principal = null;
+        Usuario principal = null;
+        boolean dbAvailable = false;
+        if (usuarioRepo != null) {
+            try {
+                principal = usuarioRepo.findById(tituloAdmin).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
         
         if (principal == null) {
@@ -40,18 +38,26 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
             principal.setTituloEleitoral(tituloAdmin);
             principal.setNome("Admin User");
             principal.setEmail("admin@example.com");
-            principal.setPerfis(Set.of(Perfil.ADMIN));
-            principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+            Unidade u = new Unidade("Unidade Mock", "UM");
+            principal.setUnidadeLotacao(u);
+            principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
+            if (dbAvailable) {
+                try { usuarioRepo.save(principal); } catch (Exception e) { }
+            }
+        } else {
+            if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
+                 Unidade u = new Unidade("Unidade Mock", "UM");
+                 principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
+            }
+            try {
+                usuarioRepo.save(principal);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
-
         context.setAuthentication(auth);
-
         return context;
     }
 }
-
-
-
-

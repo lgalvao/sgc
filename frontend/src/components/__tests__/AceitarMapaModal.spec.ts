@@ -44,18 +44,18 @@ describe("AceitarMapaModal.vue", () => {
     it("deve renderizar o modal com o perfil padrão (não ADMIN)", () => {
         const wrapper = createWrapper({perfil: "CHEFE"});
 
-    const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
+    const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
     expect(corpoModal.exists()).toBe(true);
         expect(corpoModal.text()).toContain("Observações");
         expect(
-            wrapper.find('[data-testid="observacao-aceite-textarea"]').exists(),
+            wrapper.find('[data-testid="inp-aceite-mapa-obs"]').exists(),
         ).toBe(true);
   });
 
     it("deve renderizar o modal com o perfil ADMIN", () => {
         const wrapper = createWrapper({perfil: "ADMIN"});
 
-    const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
+    const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
     expect(corpoModal.exists()).toBe(true);
         expect(corpoModal.text()).toContain(
             "Confirma a homologação do mapa de competências?",
@@ -70,7 +70,7 @@ describe("AceitarMapaModal.vue", () => {
     const wrapper = createWrapper();
 
         await wrapper
-            .find('[data-testid="modal-aceite-cancelar"]')
+            .find('[data-testid="btn-aceite-mapa-cancelar"]')
             .trigger("click");
         expect(wrapper.emitted("fecharModal")).toBeTruthy();
   });
@@ -84,7 +84,7 @@ describe("AceitarMapaModal.vue", () => {
     await nativeTextarea.setValue(observacao);
 
         await wrapper
-            .find('[data-testid="modal-aceite-confirmar"]')
+            .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
@@ -95,7 +95,7 @@ describe("AceitarMapaModal.vue", () => {
     const wrapper = createWrapper();
 
         await wrapper
-            .find('[data-testid="modal-aceite-confirmar"]')
+            .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();

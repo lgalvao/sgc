@@ -1,9 +1,6 @@
 package sgc.processo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
@@ -35,6 +32,7 @@ public class ProcessoDetalheDto {
     private boolean podeHomologarMapa;
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -45,6 +43,8 @@ public class ProcessoDetalheDto {
         private Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
+        private Long mapaCodigo;
+        private Long codSubprocesso;
 
         @Builder.Default
         private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();

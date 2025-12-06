@@ -71,17 +71,21 @@ export interface PerfilUnidade {
 export enum SituacaoSubprocesso {
     NAO_INICIADO = "NAO_INICIADO",
     ATIVIDADES_REVISADAS = "ATIVIDADES_REVISADAS",
-    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = "AGUARDANDO_HOMOLOGACAO_ATIVIDADES",
+    CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
+    CADASTRO_DISPONIBILIZADO = "CADASTRO_DISPONIBILIZADO",
+    CADASTRO_HOMOLOGADO = "CADASTRO_HOMOLOGADO",
     ATIVIDADES_HOMOLOGADAS = "ATIVIDADES_HOMOLOGADAS",
-    MAPEAMENTO_CONCLUIDO = "MAPEAMENTO_CONCLUIDO",
+    MAPA_CRIADO = "MAPA_CRIADO",
+    MAPA_ELABORADO = "MAPA_ELABORADO",
+    MAPA_DISPONIBILIZADO = "MAPA_DISPONIBILIZADO",
+    MAPA_COM_SUGESTOES = "MAPA_COM_SUGESTOES",
     MAPA_VALIDADO = "MAPA_VALIDADO",
-    AGUARDANDO_AJUSTES_MAPA = "AGUARDANDO_AJUSTES_MAPA",
-    MAPA_AJUSTADO = "MAPA_AJUSTADO",
-    AGUARDANDO_HOMOLOGACAO_MAPA = "AGUARDANDO_HOMOLOGACAO_MAPA",
     MAPA_HOMOLOGADO = "MAPA_HOMOLOGADO",
+    MAPA_AJUSTADO = "MAPA_AJUSTADO",
     CONCLUIDO = "CONCLUIDO",
     REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
-    CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
+    REVISAO_CADASTRO_DISPONIBILIZADA = "REVISAO_CADASTRO_DISPONIBILIZADA",
+    REVISAO_CADASTRO_HOMOLOGADA = "REVISAO_CADASTRO_HOMOLOGADA",
 }
 
 export interface Conhecimento {
@@ -255,6 +259,7 @@ export interface UnidadeParticipante {
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
     dataLimite: string;
+    mapaCodigo?: number;
     filhos: UnidadeParticipante[];
 }
 
@@ -308,6 +313,7 @@ export interface MapaVisualizacao {
     codigo: number;
     descricao: string;
     competencias: CompetenciaVisualizacao[];
+    atividadesSemCompetencia?: AtividadeVisualizacao[];
 }
 
 export interface AceitarCadastroRequest {
@@ -315,7 +321,6 @@ export interface AceitarCadastroRequest {
 }
 
 export interface DevolverCadastroRequest {
-    motivo: string;
     observacoes: string;
 }
 

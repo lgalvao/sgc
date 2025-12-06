@@ -41,7 +41,7 @@ describe("CriarCompetenciaModal", () => {
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
         expect(
             wrapper
-                .find('[data-testid="btn-modal-confirmar"]')
+                .find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]')
                 .attributes("disabled"),
         ).toBeDefined();
   });
@@ -80,7 +80,7 @@ describe("CriarCompetenciaModal", () => {
         await wrapper.find('input[type="checkbox"]').trigger("click");
         expect(
             wrapper
-                .find('[data-testid="btn-modal-confirmar"]')
+                .find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]')
                 .attributes("disabled"),
         ).toBeFalsy();
   });
@@ -93,7 +93,7 @@ describe("CriarCompetenciaModal", () => {
       },
     });
 
-        await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger("click");
+        await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
   });
 
@@ -109,7 +109,7 @@ describe("CriarCompetenciaModal", () => {
     await wrapper.findComponent(BFormTextarea).setValue(descricao);
     await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
     await flushPromises();
-        await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger("click");
+        await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]').trigger("click");
 
         expect(wrapper.emitted("salvar")).toBeTruthy();
         expect(wrapper.emitted("salvar")?.[0]).toEqual([

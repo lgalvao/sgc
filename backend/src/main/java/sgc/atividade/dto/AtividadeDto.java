@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizeHtml;
+import sgc.comum.json.SanitizarHtml;
 
 /**
  * DTO para Atividade usado nas APIs (entrada/saída).
@@ -23,6 +23,6 @@ public class AtividadeDto {
 
     /** A descrição da atividade. */
     @NotBlank(message = "Descrição não pode ser vazia")
-    @SanitizeHtml
+    @SanitizarHtml
     private String descricao;
 }

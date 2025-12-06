@@ -3,8 +3,10 @@ package sgc.subprocesso.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ import java.util.List;
  */
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class AtividadeAjusteDto {
     @NotNull private final Long codAtividade;
     @NotBlank private final String nome;

@@ -1,4 +1,5 @@
 # Módulo de Subprocesso
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o ciclo de vida de cada tarefa, desde sua criação até a homologação.
@@ -8,7 +9,7 @@ A principal responsabilidade deste módulo é garantir que as transições de es
 Para melhor organização e desacoplamento, o `SubprocessoController` original foi dividido em múltiplos controladores especializados.
 
 ## Arquitetura de Serviços
-A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService` atua como uma fachada apenas para operações de CRUD, enquanto os controladores de workflow interagem diretamente com os serviços especializados.
+A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService` atua como uma fachada apenas para operações de CRUD básicas, enquanto os controladores de workflow interagem diretamente com serviços especializados para cada domínio de ação.
 
 ```mermaid
 graph TD
@@ -37,7 +38,7 @@ graph TD
 
     ControleCrud -- Utiliza --> Facade
     ControleCadastro -- Utiliza --> Workflow & DtoBuilder
-    ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder
+    ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder & Consulta
     ControleValidacao -- Utiliza --> Workflow & DtoBuilder
 
     Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao & Permissoes -- Acessam --> Repos
@@ -47,28 +48,36 @@ graph TD
 
 ### Controladores REST
 
-- **`SubprocessoCrudController`**: Gerencia as operações básicas de CRUD.
-- **`SubprocessoCadastroController`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver,
-  aceitar, etc.).
-- **`SubprocessoMapaController`**: Expõe endpoints relacionados à gestão do mapa de competências.
-- **`SubprocessoValidacaoController`**: Lida com as ações de workflow da etapa de validação.
+- **`SubprocessoCrudController`**:
+  - `GET /api/subprocessos/{id}`: Detalhes do subprocesso.
+  - `GET /api/subprocessos`: Listagem geral.
 
-### Camada de Fachada
-- **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD.
+- **`SubprocessoCadastroController`**: Lida com o workflow da etapa de cadastro.
+  - `POST /disponibilizar-cadastro`
+  - `POST /devolver-cadastro`
+  - `POST /aceitar-cadastro`
+
+- **`SubprocessoValidacaoController`**: Lida com o workflow da etapa de validação.
+  - `POST /devolver-mapa`
+  - `POST /validar-mapa`
+  - `POST /homologar-mapa`
+
+- **`SubprocessoMapaController`**: Gerencia o mapa de competências dentro do contexto do subprocesso.
+  - `GET /mapa-completo` e `GET /mapa-visualizacao`: Visualização do mapa.
+  - `POST /mapa-completo/atualizar`: Salva o mapa inteiro de uma vez.
+  - `GET /impactos-mapa`: Analisa diferenças entre versões.
+  - **CRUD de Competências (Exceção ao padrão POST):**
+    - `POST .../competencias`: Cria competência.
+    - `PUT .../competencias/{id}`: Atualiza competência.
+    - `DELETE .../competencias/{id}`: Remove competência.
 
 ### Serviços Especializados
-- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado.
-- **`SubprocessoConsultaService`**: Centraliza as consultas complexas e a lógica de busca de subprocessos.
-- **`SubprocessoDtoService`**: Responsável por construir os DTOs de visualização complexos.
-- **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação com o mapa.
-- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow.
-- **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações específicas do subprocesso.
-- **`SubprocessoPermissoesService`**: Centraliza a lógica de verificação de permissões e elegibilidade para ações no subprocesso.
-- **`model/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
-- **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
+- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado (exceto as relacionadas diretamente à edição do mapa).
+- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa e suas validações durante o workflow.
+- **`SubprocessoConsultaService`**: Centraliza as consultas complexas (ex: buscar subprocesso com mapa carregado).
+- **`SubprocessoPermissoesService`**: Centraliza a lógica de segurança e verificação de permissões.
 
-## Diagrama da Máquina de Estados
-O fluxo de trabalho do subprocesso segue o diagrama de estados abaixo. Note que existem fluxos paralelos para "cadastro" e "revisão de cadastro".
+## Diagrama da Máquina de Estados (`SituacaoSubprocesso`)
 
 ```mermaid
 stateDiagram-v2
@@ -76,7 +85,7 @@ stateDiagram-v2
 
     [*] --> PENDENTE_CADASTRO: Processo iniciado
 
-    state "Fluxo de Cadastro Inicial" {
+    state "Fluxo de Cadastro" {
         PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
         CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
         PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
@@ -95,4 +104,9 @@ stateDiagram-v2
 ```
 
 ## Trilha de Auditoria (`Movimentacao`)
-Para cada transição de estado no diagrama acima, uma nova entidade `Movimentacao` é criada e persistida. Isso cria um histórico imutável e detalhado de todas as ações realizadas em um subprocesso, garantindo total rastreabilidade.
+Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem fez o quê e quando.
+
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

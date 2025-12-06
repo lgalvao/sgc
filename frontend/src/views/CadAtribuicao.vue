@@ -66,7 +66,7 @@
           </div>
           <BButton
             variant="primary"
-            data-testid="btn-criar-atribuicao"
+            data-testid="cad-atribuicao__btn-criar-atribuicao"
             type="submit"
           >
             Criar
@@ -87,6 +87,7 @@
           variant="success"
           class="mt-3"
           :model-value="true"
+          :fade="false"
         >
           Atribuição criada!
         </BAlert>
@@ -95,6 +96,7 @@
           variant="danger"
           class="mt-3"
           :model-value="true"
+          :fade="false"
         >
           {{ erroApi }}
         </BAlert>

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -17,17 +17,16 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
+import sgc.processo.eventos.EventoSubprocessoMapaDisponibilizado;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoMapaWorkflowServiceTest {
@@ -46,8 +46,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AtividadeRepo atividadeRepo;
     @Mock private MapaService mapaService;
     @Mock private CompetenciaService competenciaService;
-    @Mock private SubprocessoNotificacaoService subprocessoNotificacaoService;
-    @Mock private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock private ApplicationEventPublisher publicadorDeEventos;
 
     @InjectMocks private SubprocessoMapaWorkflowService service;
 
@@ -56,7 +55,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void salvarMapaSubprocesso() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
@@ -69,7 +68,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
         service.salvarMapaSubprocesso(id, req, "user");
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         verify(repositorioSubprocesso).save(sp);
     }
 
@@ -78,7 +77,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void salvarMapaSubprocessoFalha() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
@@ -91,7 +90,7 @@ class SubprocessoMapaWorkflowServiceTest {
     void delegationMethods() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
@@ -113,7 +112,7 @@ class SubprocessoMapaWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
         sp.setUnidade(new Unidade());
@@ -128,10 +127,12 @@ class SubprocessoMapaWorkflowServiceTest {
         when(repositorioCompetencia.findByMapaCodigo(10L)).thenReturn(List.of(comp));
         when(atividadeRepo.findBySubprocessoCodigo(id)).thenReturn(List.of(ativ));
 
-        service.disponibilizarMapa(id, new DisponibilizarMapaRequest(), new Usuario());
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
+        req.setDataLimite(java.time.LocalDate.now().plusDays(1));
+        service.disponibilizarMapa(id, req, new Usuario());
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
-        verify(subprocessoNotificacaoService).notificarDisponibilizacaoMapa(sp);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));
     }
 
     @Test
@@ -140,7 +141,7 @@ class SubprocessoMapaWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 

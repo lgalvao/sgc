@@ -2,19 +2,19 @@ import apiClient from "@/axios-setup";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
 export const listarAnalisesCadastro = async (
-    subprocessoId: number,
+    codSubprocesso: number,
 ): Promise<AnaliseCadastro[]> => {
     const response = await apiClient.get(
-        `/subprocessos/${subprocessoId}/historico-cadastro`,
+        `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
     return response.data;
 };
 
 export const listarAnalisesValidacao = async (
-    subprocessoId: number,
+    codSubprocesso: number,
 ): Promise<AnaliseValidacao[]> => {
     const response = await apiClient.get(
-        `/subprocessos/${subprocessoId}/historico-validacao`,
+        `/subprocessos/${codSubprocesso}/historico-validacao`,
     );
     return response.data;
 };

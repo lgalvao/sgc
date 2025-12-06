@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.comum.json.SanitizeHtml;
+import sgc.comum.json.SanitizarHtml;
 
 /**
  * Request para devolver validação do mapa (CDU-20 item 7).
@@ -17,6 +17,6 @@ import sgc.comum.json.SanitizeHtml;
 public class DevolverValidacaoReq {
     /** A justificativa para a devolução. */
     @NotBlank
-    @SanitizeHtml
+    @SanitizarHtml
     private String justificativa;
 }

@@ -10,7 +10,8 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 
 /**
- * Mapper (usando MapStruct) para converter a entidade Processo e suas associações para ProcessoDetalheDto.
+ * Mapper (usando MapStruct) para converter a entidade Processo e suas
+ * associações para ProcessoDetalheDto.
  */
 @Mapper(componentModel = "spring")
 @DecoratedWith(ProcessoDetalheMapperCustom.class)
@@ -30,6 +31,8 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataLimite", ignore = true)
     @Mapping(target = "codUnidade", source = "codigo")
     @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
+    @Mapping(target = "mapaCodigo", source = "mapaVigente.codigo")
+    @Mapping(target = "codSubprocesso", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(Unidade unidade);
 
     // Mapeamento de subprocesso para DTO de resumo
@@ -45,13 +48,16 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "unidadesParticipantes", ignore = true)
     ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso);
 
-    // Mapeamento de subprocesso para DTO de participante (usado quando não há UnidadeProcesso correspondente)
+    // Mapeamento de subprocesso para DTO de participante (usado quando não há
+    // UnidadeProcesso correspondente)
     @Mapping(target = "codUnidade", source = "unidade.codigo")
     @Mapping(target = "nome", source = "unidade.nome")
     @Mapping(target = "sigla", source = "unidade.sigla")
     @Mapping(target = "codUnidadeSuperior", source = "unidade.unidadeSuperior.codigo")
     @Mapping(target = "situacaoSubprocesso", source = "situacao")
     @Mapping(target = "dataLimite", source = "dataLimiteEtapa1")
+    @Mapping(target = "mapaCodigo", source = "mapa.codigo")
+    @Mapping(target = "codSubprocesso", source = "codigo")
     @Mapping(target = "filhos", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso);
 }

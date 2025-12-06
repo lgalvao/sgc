@@ -4,18 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
@@ -37,13 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
-class CDU18IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+class CDU18IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -84,7 +79,7 @@ class CDU18IntegrationTest {
             processo,
             unidade,
             mapa,
-            SituacaoSubprocesso.CADASTRO_HOMOLOGADO,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
             LocalDateTime.now().plusMonths(1)
         );
         subprocesso = subprocessoRepo.save(subprocesso);

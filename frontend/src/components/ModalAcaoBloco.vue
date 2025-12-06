@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     :title="tipo === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
     size="lg"
@@ -10,6 +11,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle" />
       Selecione as unidades que terão seus cadastros {{
@@ -36,6 +38,7 @@
               <BFormCheckbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
+                :data-testid="'chk-unidade-' + unidade.sigla"
               />
             </td>
             <td><strong>{{ unidade.sigla }}</strong></td>
@@ -49,12 +52,14 @@
     <template #footer>
       <BButton
         variant="secondary"
+        data-testid="modal-acao-bloco__btn-modal-cancelar"
         @click="emit('fechar')"
       >
         <i class="bi bi-x-circle" /> Cancelar
       </BButton>
       <BButton
         :variant="tipo === 'aceitar' ? 'primary' : 'success'"
+        data-testid="modal-acao-bloco__btn-confirmar-acao-bloco"
         @click="emit('confirmar', unidades)"
       >
         <i :class="tipo === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

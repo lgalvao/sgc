@@ -1,9 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
-import {useNotificacoesStore} from "@/stores/notificacoes";
-// Import axios-setup AFTER mocking
-import "../axios-setup";
+import {useFeedbackStore} from "@/stores/feedback";
 
 // Hoist mock instance so it's shared between module and test
 const { mockInstance } = vi.hoisted(() => {
@@ -44,9 +42,11 @@ describe("axios-setup", () => {
     let requestInterceptor: (config: any) => any;
     let responseErrorInterceptor: (error: any) => any;
 
-    beforeAll(() => {
+    beforeAll(async () => {
+        // Import axios-setup AFTER mocking its dependencies
+        await import("../axios-setup"); // Use dynamic import
+
         // Access interceptors from the hoisted mock instance
-        // These calls happened when '../axios-setup' was imported
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
         const responseUseCalls = mockInstance.interceptors.response.use.mock.calls;
 
@@ -81,47 +81,49 @@ describe("axios-setup", () => {
     });
 
     it("response error interceptor should redirect to login on 401", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
 
         const error = {response: {status: 401}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith(
+        expect(feedbackStore.show).toHaveBeenCalledWith(
             "Não Autorizado",
             expect.stringContaining("Sua sessão expirou"),
+            "danger"
         );
         expect(router.push).toHaveBeenCalledWith("/login");
     });
 
     it("response error interceptor should not show global error for 400, 404, 409, 422", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
 
         const error = {response: {status: 400}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).not.toHaveBeenCalled();
+        expect(feedbackStore.show).not.toHaveBeenCalled();
     });
 
     it("response error interceptor should show unexpected error for 500", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
 
         const error = {
             response: {status: 500, data: {message: "Server Error"}},
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith("Erro Inesperado", "Server Error");
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
     });
 
     it("response error interceptor should show network error", async () => {
-        const store = useNotificacoesStore();
-        vi.spyOn(store, "erro");
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
 
         const error = {request: {}}; // No response, but request exists -> Network error usually
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(store.erro).toHaveBeenCalledWith(
+        expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro de Rede",
             expect.stringContaining("Não foi possível conectar"),
+            "danger"
         );
     });
 });

@@ -15,7 +15,6 @@ export interface Unidade {
   codigo: number;
   nome: string;
   sigla: string;
-  // Outros campos da Unidade podem ser adicionados conforme necessário
 }
 
 export interface Usuario {
@@ -67,4 +66,27 @@ export interface LoginResponse {
   perfil: Perfil; // Usando o tipo Perfil já definido
   unidadeCodigo: number;
   token: string;
+}
+
+export function LoginResponseToFrontend(response: any): LoginResponse {
+  return {
+    tituloEleitoral: response.tituloEleitoral,
+    perfil: response.perfil,
+    unidadeCodigo: response.unidadeCodigo,
+    token: response.token,
+  };
+}
+
+export function perfisUnidadesParaDominio(
+  perfisUnidadesBackend: any[]
+): PerfilUnidade[] {
+  return perfisUnidadesBackend.map((item) => ({
+    perfil: item.perfil,
+    unidade: {
+      codigo: item.unidade.codigo,
+      nome: item.unidade.nome,
+      sigla: item.unidade.sigla,
+    },
+    siglaUnidade: item.unidade.sigla,
+  }));
 }

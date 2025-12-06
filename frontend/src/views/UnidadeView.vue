@@ -5,7 +5,7 @@
         <BButton
           v-if="perfilStore.perfilSelecionado === 'ADMIN'"
           variant="outline-primary"
-          data-testid="btn-criar-atribuicao"
+          data-testid="unidade-view__btn-criar-atribuicao"
           @click="irParaCriarAtribuicao"
         >
           Criar atribuição
@@ -42,6 +42,7 @@
         <BButton
           v-if="mapaVigente"
           variant="outline-success"
+          data-testid="btn-mapa-vigente"
           @click="visualizarMapa"
         >
           <i
@@ -78,12 +79,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useUsuariosStore} from "@/stores/usuarios";
-import type {
-  MapaCompleto,
-  Responsavel,
-  Unidade,
-  Usuario,
-} from "@/types/tipos";
+import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 
 const props = defineProps<{ codUnidade: number }>();
@@ -97,18 +93,21 @@ const mapasStore = useMapasStore();
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
 onMounted(async () => {
-  await unidadesStore.fetchUnidadesParaProcesso("");
+  await Promise.all([
+    unidadesStore.buscarArvoreUnidade(codigo.value),
+    atribuicaoTemporariaStore.buscarAtribuicoes(),
+  ]);
 });
 
 const unidadeOriginal = computed<Unidade | null>(
-    () => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null,
+    () => unidadesStore.unidade,
 );
 
 const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   const unidade = unidadeOriginal.value;
   if (!unidade) return null;
 
-  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorUnidade(
+  const atribuicoes = atribuicaoTemporariaStore.obterAtribuicoesPorUnidade(
       unidade.sigla,
   );
   const hoje = new Date();
@@ -148,7 +147,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
     return (
-        usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) ||
+        usuariosStore.obterUsuarioPorId(unidadeOriginal.value.idServidorTitular) ||
         null
     );
   }
@@ -164,7 +163,7 @@ const responsavelDetalhes = computed<Usuario | null>(() => {
     return null;
   }
   return (
-      usuariosStore.getUsuarioById(
+      usuariosStore.obterUsuarioPorId(
           unidadeComResponsavelDinamico.value.responsavel.codigo,
       ) || null
   );

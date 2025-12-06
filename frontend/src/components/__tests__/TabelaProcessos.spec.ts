@@ -1,11 +1,7 @@
-import { mount, type VueWrapper } from "@vue/test-utils";
-import { BTable } from "bootstrap-vue-next";
-import { describe, expect, it } from "vitest";
-import {
-  type ProcessoResumo,
-  SituacaoProcesso,
-  TipoProcesso,
-} from "@/types/tipos";
+import {mount, type VueWrapper} from "@vue/test-utils";
+import {BTable} from "bootstrap-vue-next";
+import {describe, expect, it} from "vitest";
+import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
 
 // Mock de dados de processo
@@ -16,6 +12,7 @@ const mockProcessos: ProcessoResumo[] = [
     tipo: TipoProcesso.MAPEAMENTO,
     unidadeCodigo: 1,
     unidadeNome: "UNID1, UNID2",
+    unidadesParticipantes: "UNID1, UNID2",
     situacao: SituacaoProcesso.EM_ANDAMENTO,
     dataLimite: new Date().toISOString(),
     dataCriacao: new Date().toISOString(),
@@ -27,6 +24,7 @@ const mockProcessos: ProcessoResumo[] = [
     tipo: TipoProcesso.REVISAO,
     unidadeCodigo: 3,
     unidadeNome: "UNID3",
+    unidadesParticipantes: "UNID3",
     situacao: SituacaoProcesso.FINALIZADO,
     dataLimite: new Date().toISOString(),
     dataCriacao: new Date().toISOString(),
@@ -53,7 +51,8 @@ describe("TabelaProcessos.vue", () => {
     const headers = table.findAll("th");
     expect(headers[0].text()).toContain("Descrição");
     expect(headers[1].text()).toContain("Tipo");
-    expect(headers[2].text()).toContain("Situação");
+    expect(headers[2].text()).toContain("Unidades Participantes");
+    expect(headers[3].text()).toContain("Situação");
   });
 
   it("deve exibir os processos passados via prop", async () => {
@@ -72,13 +71,15 @@ describe("TabelaProcessos.vue", () => {
 
     const cells = rows[0].findAll("td");
     expect(cells[0].text()).toBe("Processo Alpha");
-    expect(cells[1].text()).toBe("MAPEAMENTO");
-    expect(cells[2].text()).toBe("EM_ANDAMENTO");
+    expect(cells[1].text()).toBe("Mapeamento");
+    expect(cells[2].text()).toBe("UNID1, UNID2");
+    expect(cells[3].text()).toBe("Em Andamento");
 
     const cells2 = rows[1].findAll("td");
     expect(cells2[0].text()).toBe("Processo Beta");
-    expect(cells2[1].text()).toBe("REVISAO");
-    expect(cells2[2].text()).toBe("FINALIZADO");
+    expect(cells2[1].text()).toBe("Revisão");
+    expect(cells2[2].text()).toBe("UNID3");
+    expect(cells2[3].text()).toBe("Finalizado");
   });
 
   it("deve emitir o evento ordenar ao receber o evento sort-changed", async () => {

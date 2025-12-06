@@ -7,44 +7,78 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Set;
-
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
-
-    @Autowired
+    @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
-    @Autowired
+
+    @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
-        Unidade unidade = unidadeRepo.findById(10L).orElseThrow();
+        Unidade unidade = null;
+        boolean dbAvailable = false;
+        if (unidadeRepo != null) {
+            try {
+                unidade = unidadeRepo.findById(10L).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        if (unidade == null) {
+            unidade = new Unidade("Unidade Mock", "SESEL");
+            unidade.setCodigo(10L);
+        }
 
-        // Busca o usuário ou cria um novo para evitar instâncias duplicadas
-        Usuario usuario = usuarioRepo.findById(annotation.value())
-            .orElseGet(() -> {
-                Usuario novoUsuario = new Usuario(
+        Usuario usuario = null;
+        if (usuarioRepo != null) {
+            try {
+                usuario = usuarioRepo.findById(annotation.value()).orElse(null);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        if (usuario == null) {
+            usuario = new Usuario(
                     annotation.value(),
                     "Chefe Teste",
                     "chefe@teste.com",
                     "123",
-                    unidade,
-                    Set.of(Perfil.CHEFE)
-                );
-                return usuarioRepo.save(novoUsuario);
-            });
+                    unidade
+            );
 
-        // Garante que a unidade está correta no usuário do contexto, pois o usuário
-        // pode existir no banco de dados com uma unidade diferente.
-        usuario.setUnidade(unidade);
-        usuarioRepo.save(usuario);
+            usuario.getAtribuicoes().add(UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+            if (dbAvailable && usuarioRepo != null) {
+                try {
+                    usuarioRepo.save(usuario);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+
+        // Garante que a unidade está correta no usuário do contexto
+        usuario.setUnidadeLotacao(unidade);
+        if (usuario.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+            usuario.getAtribuicoes().add(UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+        }
+        if (dbAvailable && usuarioRepo != null) {
+            try {
+                usuarioRepo.save(usuario);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            usuario, null, usuario.getAuthorities());
+                usuario, null, usuario.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         return context;

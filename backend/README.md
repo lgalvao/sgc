@@ -1,4 +1,5 @@
 # Backend do Sistema de Gestão de Competências (SGC)
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos. Parte da comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio.
@@ -93,18 +94,6 @@ Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da
 ./gradlew :backend:build
 ```
 
-Para executar a aplicação em modo de desenvolvimento e para testes e2e (utilizando o banco de dados em memória H2), ative o perfil `e2e`:
-
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
-```
-
-Para executar o processo em segundo plano e liberar o terminal, adicione `&` ao final do comando:
-
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e' &
-```
-
 A API estará disponível em `http://localhost:10000`.
 
 ## Documentação da API (Swagger UI)
@@ -114,9 +103,36 @@ A documentação da API é gerada automaticamente com SpringDoc e está acessív
 A especificação OpenAPI em formato JSON pode ser encontrada em:
 [http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
+## 🛡️ Verificações de Qualidade
+
+O backend utiliza um conjunto de ferramentas de análise estática para garantir a qualidade do código. As verificações são não-bloqueantes (warnings only).
+
+### Ferramentas Configuradas
+- **Checkstyle**: Verifica a aderência ao padrão de código (Google Checks).
+- **PMD**: Analisa o código em busca de más práticas e código morto.
+- **SpotBugs**: Detecta bugs potenciais através de análise de bytecode.
+- **JaCoCo**: Mede a cobertura de testes unitários.
+
+### Como Executar
+Na raiz do projeto:
+```bash
+./gradlew :backend:qualityCheck
+```
+
+### Relatórios
+Os relatórios HTML são gerados em `backend/build/reports/`:
+- `checkstyle/main.html`
+- `pmd/main.html`
+- `spotbugs/main.html`
+- `jacoco/test/html/index.html`
+
 ## Padrões de Design e Boas Práticas
 - **Lombok:** Utilizado para reduzir código repetitivo.
 - **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

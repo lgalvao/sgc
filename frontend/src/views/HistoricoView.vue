@@ -17,6 +17,7 @@
       variant="info"
       class="mt-4"
       :model-value="true"
+      :fade="false"
     >
       Nenhum processo finalizado.
     </BAlert>
@@ -45,7 +46,7 @@ const criterio = ref<SortCriteria>("descricao");
 const asc = ref(true);
 
 onMounted(async () => {
-  await processosStore.fetchProcessosFinalizados();
+  await processosStore.buscarProcessosFinalizados();
 });
 
 const processosFinalizadosOrdenados = computed(() => {

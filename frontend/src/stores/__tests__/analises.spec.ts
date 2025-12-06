@@ -9,11 +9,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesValidacao: vi.fn(),
 }));
 
-vi.mock("@/stores/notificacoes", () => ({
-    useNotificacoesStore: vi.fn(() => ({
-        erro: vi.fn(),
-    })),
-}));
+
 
 describe("useAnalisesStore", () => {
     let store: ReturnType<typeof useAnalisesStore>;
@@ -30,12 +26,12 @@ describe("useAnalisesStore", () => {
     });
 
     describe("getters", () => {
-        it("getAnalisesPorSubprocesso should return an empty array if no analyses are present for the subprocess", () => {
-            const result = store.getAnalisesPorSubprocesso(123);
+        it("obterAnalisesPorSubprocesso should return an empty array if no analyses are present for the subprocess", () => {
+            const result = store.obterAnalisesPorSubprocesso(123);
             expect(result).toEqual([]);
         });
 
-        it("getAnalisesPorSubprocesso should return the correct analyses for a given subprocess", () => {
+        it("obterAnalisesPorSubprocesso should return the correct analyses for a given subprocess", () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
                 {
                     codigo: 1,
@@ -61,7 +57,7 @@ describe("useAnalisesStore", () => {
             const codSubrocesso = 123;
             store.analisesPorSubprocesso.set(codSubrocesso, mockAnalises);
 
-            const result = store.getAnalisesPorSubprocesso(codSubrocesso);
+            const result = store.obterAnalisesPorSubprocesso(codSubrocesso);
             expect(result).toEqual(mockAnalises);
         });
     });
@@ -93,32 +89,32 @@ describe("useAnalisesStore", () => {
             },
         ];
 
-        it("fetchAnalisesCadastro should call the service and update the state", async () => {
+        it("buscarAnalisesCadastro should call the service and update the state", async () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(
                 mockAnalisesCadastro,
             );
 
-            await store.fetchAnalisesCadastro(codSubrocesso);
+            await store.buscarAnalisesCadastro(codSubrocesso);
 
             expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesCadastro,
             );
         });
 
-        it("fetchAnalisesValidacao should call the service and update the state", async () => {
+        it("buscarAnalisesValidacao should call the service and update the state", async () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(
                 mockAnalisesValidacao,
             );
 
-            await store.fetchAnalisesValidacao(codSubrocesso);
+            await store.buscarAnalisesValidacao(codSubrocesso);
 
             expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesValidacao,
             );
         });
@@ -132,19 +128,36 @@ describe("useAnalisesStore", () => {
             );
 
             // Fetch cadastro first
-            await store.fetchAnalisesCadastro(codSubrocesso);
-            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            await store.buscarAnalisesCadastro(codSubrocesso);
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesCadastro,
             );
 
             // Then fetch validacao
-            await store.fetchAnalisesValidacao(codSubrocesso);
+            await store.buscarAnalisesValidacao(codSubrocesso);
 
             const expected = [...mockAnalisesCadastro, ...mockAnalisesValidacao];
-            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 expect.arrayContaining(expected),
             );
-            expect(store.getAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
+        });
+
+        it("should handle error in buscarAnalisesCadastro", async () => {
+            vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
+                new Error("Fail"),
+            );
+            await store.buscarAnalisesCadastro(codSubrocesso);
+            // It just catches and logs toast, state remains or empty
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+        });
+
+        it("should handle error in buscarAnalisesValidacao", async () => {
+            vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
+                new Error("Fail"),
+            );
+            await store.buscarAnalisesValidacao(codSubrocesso);
+            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
     });
 });

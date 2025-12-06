@@ -81,7 +81,8 @@ class AlertaMapperTest {
         Usuario user = new Usuario();
         Unidade uUser = new Unidade();
         uUser.setCodigo(10L);
-        user.setUnidade(uUser);
+        user.setUnidadeLotacao(uUser);
+        user.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(user).unidade(uUser).perfil(sgc.sgrh.model.Perfil.SERVIDOR).build()); // Add a profile to avoid empty attributions logic if tested
 
         Authentication auth = mock(Authentication.class);
         SecurityContext sc = mock(SecurityContext.class);

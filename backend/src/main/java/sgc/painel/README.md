@@ -1,4 +1,5 @@
 # Módulo Painel
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 O módulo `painel` é responsável por fornecer os dados agregados para o dashboard (painel de controle) da aplicação. Ele centraliza a lógica de negócio que coleta informações de diferentes módulos, como `processo` e `alerta`, para apresentar uma visão consolidada ao usuário.

@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
     size="lg"
@@ -25,8 +26,7 @@
         <BCard
           v-for="atividade in atividades"
           :key="atividade.codigo"
-          :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-          class="atividade-card-item"
+          :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
           no-body
         >
           <BCardBody class="d-flex align-items-center py-2">
@@ -35,6 +35,7 @@
               v-model="atividadesSelecionadas"
               :value="atividade.codigo"
               class="form-check-input me-2"
+              :data-testid="`chk-atividade-${atividade.codigo}`"
             >
               {{ atividade.descricao }}
               <span
@@ -57,7 +58,7 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="criar-competencia-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
@@ -65,7 +66,7 @@
       <BButton
         :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
         variant="primary"
-        data-testid="btn-modal-confirmar"
+        data-testid="criar-competencia-modal__btn-modal-confirmar"
         @click="salvar"
       >
         <i class="bi bi-save" /> Salvar
@@ -103,7 +104,7 @@ watch(
         if (props.competenciaParaEditar) {
           novaCompetencia.value.descricao = props.competenciaParaEditar.descricao;
           atividadesSelecionadas.value = [
-            ...props.competenciaParaEditar.atividadesAssociadas,
+            ...((props.competenciaParaEditar.atividadesAssociadas) || []),
           ];
           competenciaSendoEditada.value = props.competenciaParaEditar;
         } else {

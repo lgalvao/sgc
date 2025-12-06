@@ -38,38 +38,23 @@
       @fechar="fecharModalFinalizacao"
       @confirmar="confirmarFinalizacao"
     />
-
-    <!-- Alerta de sucesso -->
-    <BAlert
-      v-if="mostrarAlertaSucesso"
-      variant="success"
-      class="position-fixed"
-      style="top: 20px; right: 20px; z-index: 9999;"
-      dismissible
-      :model-value="true"
-      @dismissed="mostrarAlertaSucesso = false"
-    >
-      <i class="bi bi-check-circle" />
-      Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco!
-    </BAlert>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BContainer} from "bootstrap-vue-next";
+import {BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ModalAcaoBloco, {
-  type UnidadeSelecao,
-} from "@/components/ModalAcaoBloco.vue";
+import ModalAcaoBloco, {type UnidadeSelecao,} from "@/components/ModalAcaoBloco.vue";
 import ModalFinalizacao from "@/components/ModalFinalizacao.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import ProcessoDetalhes from "@/components/ProcessoDetalhes.vue";
 import TreeTable from "@/components/TreeTableView.vue";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
 
 interface TreeTableItem {
@@ -90,12 +75,12 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const {processoDetalhe, subprocessosElegiveis} = storeToRefs(processosStore);
 const perfilStore = usePerfilStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
+
 
 const mostrarModalBloco = ref(false);
 const tipoAcaoBloco = ref<"aceitar" | "homologar">("aceitar");
 const unidadesSelecionadasBloco = ref<UnidadeSelecao[]>([]);
-const mostrarAlertaSucesso = ref(false);
 const mostrarModalFinalizacao = ref(false);
 
 const codProcesso = computed(() =>
@@ -106,8 +91,8 @@ const codProcesso = computed(() =>
 
 onMounted(async () => {
   if (codProcesso.value) {
-    await processosStore.fetchProcessoDetalhe(codProcesso.value);
-    await processosStore.fetchSubprocessosElegiveis(codProcesso.value);
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
+    await processosStore.buscarSubprocessosElegiveis(codProcesso.value);
   }
 });
 
@@ -190,15 +175,17 @@ async function executarFinalizacao() {
   if (!processo.value) return;
   try {
     await processosStore.finalizarProcesso(processo.value.codigo);
-    notificacoesStore.sucesso(
+    feedbackStore.show(
         "Processo finalizado",
         "O processo foi finalizado. Todos os mapas de competências estão agora vigentes.",
+        "success"
     );
     await router.push("/painel");
   } catch {
-    notificacoesStore.erro(
+    feedbackStore.show(
         "Erro ao finalizar processo",
         "Ocorreu um erro durante a finalização. Tente novamente.",
+        "danger"
     );
   }
 }
@@ -222,9 +209,9 @@ function fecharModalFinalizacao() {
   mostrarModalFinalizacao.value = false;
 }
 
-function confirmarFinalizacao() {
+async function confirmarFinalizacao() {
   fecharModalFinalizacao();
-  executarFinalizacao();
+  await executarFinalizacao();
 }
 
 async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
@@ -232,9 +219,10 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       .filter((u) => u.selecionada)
       .map((u) => u.sigla);
   if (unidadesSelecionadas.length === 0) {
-    notificacoesStore.erro(
+    feedbackStore.show(
         "Nenhuma unidade selecionada",
         "Selecione ao menos uma unidade para processar.",
+        "danger"
     );
     return;
   }
@@ -245,16 +233,18 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       tipoAcao: tipoAcaoBloco.value,
       unidadeUsuario: String(perfilStore.unidadeSelecionada) || "",
     });
-    mostrarAlertaSucesso.value = true;
+    feedbackStore.show(
+        `Cadastros ${tipoAcaoBloco.value === 'aceitar' ? 'aceitos' : 'homologados'} em bloco!`,
+        `Operação de ${tipoAcaoBloco.value} em bloco concluída com sucesso!`,
+        "success"
+    );
     fecharModalBloco();
-    setTimeout(() => {
-      mostrarAlertaSucesso.value = false;
-      router.push("/painel");
-    }, 2000);
+    await router.push("/painel");
   } catch {
-    notificacoesStore.erro(
+    feedbackStore.show(
         "Erro ao processar em bloco",
         "Ocorreu um erro ao processar os cadastros em bloco.",
+        "danger"
     );
   }
 }

@@ -1,5 +1,7 @@
 spring:
   main.banner-mode: off
+  jackson:
+    use-jackson2-defaults: true
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
@@ -44,6 +46,8 @@ springdoc:
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
 
 logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
   level:
     org.hibernate: ERROR
     org.hibernate.SQL: ERROR

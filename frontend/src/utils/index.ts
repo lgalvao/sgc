@@ -3,7 +3,7 @@
  */
 
 import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from "@/constants/situacoes";
-import type {TipoNotificacao} from "@/stores/notificacoes";
+// import type {TipoNotificacao} from "@/stores/notificacoes"; // Removed
 
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
@@ -16,11 +16,26 @@ export function badgeClass(situacao: string): string {
 // ===== LABELS DE SITUAÇÃO =====
 export function situacaoLabel(situacao?: string | null): string {
     if (!situacao) return "Não disponibilizado";
-  return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
+
+    const backendLabels: Record<string, string> = {
+        MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+        MAPA_VALIDADO: "Mapa validado",
+        MAPA_HOMOLOGADO: "Mapa homologado",
+        CADASTRO_HOMOLOGADO: "Cadastro homologado",
+        CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
+        CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
+    };
+
+    if (backendLabels[situacao]) return backendLabels[situacao];
+
+    return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
 }
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====
-export const iconeTipo = (tipo: TipoNotificacao): string => {
+// Define local type for iconeTipo since TipoNotificacao was removed
+export type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
+
+export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
   switch (tipo) {
       case "success":
           return "bi bi-check-circle-fill text-success";
@@ -30,8 +45,6 @@ export const iconeTipo = (tipo: TipoNotificacao): string => {
           return "bi bi-exclamation-triangle-fill text-warning";
       case "info":
           return "bi bi-info-circle-fill text-info";
-      case "email":
-          return "bi bi-envelope-fill text-primary";
       default:
           return "bi bi-bell-fill";
   }

@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Histórico de Análises"
     size="lg"
@@ -12,6 +13,7 @@
         v-if="analises.length === 0"
         variant="info"
         :model-value="true"
+        :fade="false"
       >
         Nenhuma análise registrada para este subprocesso.
       </BAlert>
@@ -29,11 +31,12 @@
             <tr
               v-for="(analise, index) in analises"
               :key="index"
+              :data-testid="`row-historico-${index}`"
             >
-              <td>{{ formatarData(analise.dataHora) }}</td>
-              <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
-              <td>{{ analise.resultado }}</td>
-              <td>{{ analise.observacoes || '-' }}</td>
+              <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
+              <td :data-testid="`cell-unidade-${index}`">{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
+              <td :data-testid="`cell-resultado-${index}`">{{ analise.acao || analise.resultado }}</td>
+              <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
             </tr>
           </tbody>
         </table>
@@ -75,7 +78,7 @@ watch(
   () => props.mostrar,
     (newVal) => {
     if (newVal && props.codSubrocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(
+      analises.value = analisesStore.obterAnalisesPorSubprocesso(
           props.codSubrocesso,
       );
     }

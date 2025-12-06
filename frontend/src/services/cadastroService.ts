@@ -1,51 +1,51 @@
 import apiClient from "../axios-setup";
 
-export async function disponibilizarCadastro(id: number): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/disponibilizar`);
+export async function disponibilizarCadastro(codSubprocesso: number): Promise<void> {
+  await apiClient.post(`/subprocessos/${codSubprocesso}/cadastro/disponibilizar`);
 }
 
-export async function disponibilizarRevisaoCadastro(id: number): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/disponibilizar-revisao`);
+export async function disponibilizarRevisaoCadastro(codSubprocesso: number): Promise<void> {
+  await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-revisao`);
 }
 
 export async function devolverCadastro(
-    id: number,
-    dados: { motivo: string; observacoes: string },
+    codSubprocesso: number,
+    dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/devolver-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-cadastro`, dados);
 }
 
 export async function aceitarCadastro(
-    id: number,
+    codSubprocesso: number,
     dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/aceitar-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-cadastro`, dados);
 }
 
 export async function homologarCadastro(
-    id: number,
+    codSubprocesso: number,
     dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/homologar-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-cadastro`, dados);
 }
 
 export async function devolverRevisaoCadastro(
-    id: number,
-    dados: { motivo: string; observacoes: string },
+    codSubprocesso: number,
+    dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/devolver-revisao-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-revisao-cadastro`, dados);
 }
 
 export async function aceitarRevisaoCadastro(
-    id: number,
+    codSubprocesso: number,
     dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/aceitar-revisao-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-revisao-cadastro`, dados);
 }
 
 export async function homologarRevisaoCadastro(
-    id: number,
+    codSubprocesso: number,
     dados: { observacoes: string },
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${id}/homologar-revisao-cadastro`, dados);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-revisao-cadastro`, dados);
 }

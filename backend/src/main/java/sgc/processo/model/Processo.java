@@ -18,7 +18,18 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@AttributeOverrides({
+    @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
+})
 public class Processo extends EntidadeBase {
+    public Processo(Long codigo, String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDateTime dataCriacao) {
+        super(codigo);
+        this.descricao = descricao;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.dataCriacao = dataCriacao;
+    }
+
     public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDateTime dataLimite) {
         super();
         this.descricao = descricao;

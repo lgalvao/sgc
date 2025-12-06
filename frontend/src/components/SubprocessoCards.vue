@@ -8,7 +8,7 @@
         <BCard
           v-if="permissoes.podeEditarMapa"
           class="h-100 card-actionable"
-          data-testid="atividades-card"
+          data-testid="card-subprocesso-atividades"
           @click="navegarPara('SubprocessoCadastro')"
         >
           <BCardTitle>
@@ -25,7 +25,7 @@
         <BCard
           v-else-if="permissoes.podeVisualizarMapa"
           class="h-100 card-actionable"
-          data-testid="atividades-card-vis"
+          data-testid="card-subprocesso-atividades-vis"
           @click="navegarPara('SubprocessoVisCadastro')"
         >
           <BCardTitle>
@@ -46,10 +46,10 @@
         class="mb-3"
       >
         <BCard
-          v-if="permissoes.podeVisualizarMapa"
+          v-if="permissoes.podeEditarMapa"
           :class="{ 'disabled-card': !mapa }"
           class="h-100 card-actionable"
-          data-testid="mapa-card"
+          data-testid="card-subprocesso-mapa"
           @click="navegarPara('SubprocessoMapa')"
         >
           <BCardTitle>
@@ -57,6 +57,24 @@
           </BCardTitle>
           <BCardText class="text-muted">
             Mapa de competências técnicas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(mapa?.situacao)"
+            class="badge"
+          >{{ situacaoLabel(mapa?.situacao) }}</span>
+        </BCard>
+        <BCard
+          v-else-if="permissoes.podeVisualizarMapa"
+          :class="{ 'disabled-card': !mapa }"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-mapa-vis"
+          @click="navegarPara('SubprocessoVisMapa')"
+        >
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização do mapa de competências técnicas
           </BCardText>
           <span
             :class="badgeClass(mapa?.situacao)"
@@ -74,7 +92,7 @@
         <BCard
           v-if="permissoes.podeVisualizarDiagnostico"
           class="h-100 card-actionable"
-          data-testid="diagnostico-card"
+          data-testid="card-subprocesso-diagnostico"
           @click="navegarPara('DiagnosticoEquipe')"
         >
           <BCardTitle>
@@ -96,7 +114,7 @@
       >
         <BCard
           class="h-100 card-actionable"
-          data-testid="ocupacoes-card"
+          data-testid="card-subprocesso-ocupacoes"
           @click="navegarPara('OcupacoesCriticas')"
         >
           <BCardTitle>
@@ -116,33 +134,38 @@
 </template>
 
 <script lang="ts" setup>
-import { BCard, BCardText, BCardTitle, BCol, BRow } from "bootstrap-vue-next";
-import { useRouter } from "vue-router";
-import {
-  type Mapa,
-  type MapaCompleto,
-  SubprocessoPermissoes,
-  TipoProcesso,
-} from "@/types/tipos";
-import { badgeClass, situacaoLabel } from "@/utils";
+import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
+import {type Mapa, type MapaCompleto, SubprocessoPermissoes, TipoProcesso,} from "@/types/tipos";
+import {badgeClass, situacaoLabel} from "@/utils";
 
 const TipoProcessoEnum = TipoProcesso;
 
-defineProps<{
+const props = defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;
   permissoes: SubprocessoPermissoes;
+  codSubprocesso?: number | null;
+  codProcesso?: number;
+  siglaUnidade?: string;
 }>();
 
 const router = useRouter();
 const route = router.currentRoute;
 
 const navegarPara = (routeName: string) => {
-  if (!route.value.params.codSubprocesso) return;
+  const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
+  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
+
+  if (!codigoProcesso || !sigla) return;
+
   router.push({
     name: routeName,
-    params: { codSubprocesso: route.value.params.codSubprocesso },
+    params: {
+      codProcesso: codigoProcesso,
+      siglaUnidade: sigla
+    },
   });
 };
 </script>

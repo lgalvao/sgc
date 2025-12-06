@@ -5,7 +5,8 @@
       :fields="fields"
       hover
       responsive
-      data-testid="tabela-processos"
+      data-testid="tbl-processos"
+      :tbody-tr-attr="rowAttr"
       :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
       :sort-desc="[!direcaoOrdenacaoAsc]"
       @row-clicked="handleSelecionarProcesso"
@@ -15,6 +16,14 @@
         <div class="text-center text-muted">
           Nenhum processo encontrado.
         </div>
+      </template>
+
+      <template #cell(situacao)="data">
+        {{ formatarSituacao(data.value as string) }}
+      </template>
+
+      <template #cell(tipo)="data">
+        {{ formatarTipo(data.value as string) }}
       </template>
     </BTable>
   </div>
@@ -63,5 +72,30 @@ const handleSortChange = (ctx: any) => {
 
 const handleSelecionarProcesso = (processo: ProcessoResumo) => {
   emit("selecionarProcesso", processo);
+};
+
+function formatarSituacao(situacao: string): string {
+  const mapa: Record<string, string> = {
+    EM_ANDAMENTO: "Em Andamento",
+    FINALIZADO: "Finalizado",
+    CRIADO: "Criado",
+  };
+  return mapa[situacao] || situacao;
+}
+
+function formatarTipo(tipo: string): string {
+  const mapa: Record<string, string> = {
+    MAPEAMENTO: "Mapeamento",
+    REVISAO: "Revisão",
+    DIAGNOSTICO: "Diagnóstico",
+  };
+  return mapa[tipo] || tipo;
+}
+
+const rowAttr = (item: ProcessoResumo | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-processo-${item.codigo}` };
+  }
+  return {};
 };
 </script>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "./router";
-import {useNotificacoesStore} from "./stores/notificacoes";
+import {useFeedbackStore} from "@/stores/feedback";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
@@ -10,44 +10,47 @@ const apiClient = axios.create({
 });
 
 const handleResponseError = (error: any) => {
+  const feedbackStore = useFeedbackStore();
   try {
-    const notificacoesStore = useNotificacoesStore();
       if (error && typeof error === "object" && "response" in error) {
       const { status, data } = (error as any).response;
       // Do not show global popups for these statuses, they will be handled locally
       const isHandledInline = [400, 404, 409, 422].includes(status);
 
       if (isHandledInline) {
-        // Just forward the error to the local handler
-        return Promise.reject(error);
-      }
+        // Just forward the error to the local handler without showing a global toast
+                        return Promise.reject(error); // Correctly return the rejected promise
+                        // Removed `return;` as it's redundant after `return Promise.reject`
+              }
 
       if (status === 401) {
-          notificacoesStore.erro(
+          feedbackStore.show(
               "Não Autorizado",
               "Sua sessão expirou ou você não está autenticado. Faça login novamente.",
+              "danger"
           );
           router.push("/login");
       } else if (data && data.message) {
         // For other errors (like 500), show a generic popup
-          notificacoesStore.erro("Erro Inesperado", data.message);
+          feedbackStore.show("Erro Inesperado", data.message, "danger");
       } else {
-          notificacoesStore.erro(
+          feedbackStore.show(
               "Erro Inesperado",
               "Ocorreu um erro. Tente novamente mais tarde.",
+              "danger"
           );
       }
       } else if (error && typeof error === "object" && "request" in error) {
-          notificacoesStore.erro(
+          feedbackStore.show(
               "Erro de Rede",
               "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
+              "danger"
           );
       } else if (error && typeof error === "object" && "message" in error) {
-          notificacoesStore.erro("Erro", (error as any).message);
+          feedbackStore.show("Erro", (error as any).message, "danger");
     }
   } catch (storeError) {
-    // Pinia store may not be available in test environments
-      console.error("Erro ao acessar store de notificações:", storeError);
+      console.error("Erro ao exibir notificação:", storeError);
   }
   return Promise.reject(error);
 };

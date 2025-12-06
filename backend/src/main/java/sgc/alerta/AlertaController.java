@@ -56,6 +56,7 @@ public class AlertaController {
      */
     @PostMapping("/{codigo}/marcar-como-lido")
     @Operation(summary = "Marca um alerta como lido")
+    // TODO esta operação me parece com grão muito pequeno. Na realidade, o mais comum é marcar todos os alertas visiveis como lidos
     public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         alertaService.marcarComoLido(String.valueOf(usuario.getTituloEleitoral()), codigo);
         return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));

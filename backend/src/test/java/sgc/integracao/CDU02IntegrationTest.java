@@ -5,14 +5,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -23,9 +21,6 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,18 +28,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
 @Import(TestSecurityConfig.class)
-public class CDU02IntegrationTest {
+public class CDU02IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
 
-    @Autowired
-    private MockMvc mockMvc;
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
@@ -70,9 +62,15 @@ public class CDU02IntegrationTest {
                             "Usuario de Teste",
                             "teste@sgc.com",
                             "123",
-                            unidade,
-                            Arrays.stream(perfis).map(Perfil::valueOf).collect(Collectors.toList())
+                            unidade
                     );
+                    for (String perfilStr : perfis) {
+                         newUser.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
+                                 .usuario(newUser)
+                                 .unidade(unidade)
+                                 .perfil(Perfil.valueOf(perfilStr))
+                                 .build());
+                    }
                     return usuarioRepo.save(newUser);
                 });
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

@@ -1,13 +1,13 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createMemoryHistory, createRouter } from "vue-router";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createMemoryHistory, createRouter} from "vue-router";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { SituacaoSubprocesso } from "@/types/tipos";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import VisMapa from "../VisMapa.vue";
 
 const router = createRouter({
@@ -43,7 +43,7 @@ describe("VisMapa.vue", () => {
     // If testing nested units, we might need to push a different route or just rely on the fact that component reads param.
     // Since router is global in this test file setup, we should push before mount if sigla changes.
 
-    return mount(VisMapa, {
+    const wrapper = mount(VisMapa, {
       global: {
         plugins: [
           createTestingPinia({
@@ -76,6 +76,7 @@ describe("VisMapa.vue", () => {
                 unidades: [
                   { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
                 ],
+                unidade: { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
                 ...initialState["unidades"],
               },
               processos: {
@@ -84,8 +85,9 @@ describe("VisMapa.vue", () => {
                     {
                       sigla: siglaUnidade,
                       codUnidade: 10,
+                      codSubprocesso: 10,
                       situacaoSubprocesso:
-                        SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+                        SituacaoSubprocesso.MAPA_DISPONIBILIZADO,
                     },
                   ],
                 },
@@ -120,26 +122,29 @@ describe("VisMapa.vue", () => {
         },
       },
     });
+
+    const feedbackStore = useFeedbackStore();
+    return { wrapper, feedbackStore };
   };
 
   it("renders correctly with data from store", async () => {
-    const wrapper = mountComponent();
+    const { wrapper } = mountComponent();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe(
+    expect(wrapper.find('[data-testid="vis-mapa__txt-competencia-descricao"]').text()).toBe(
       "Competencia 1",
     );
     expect(wrapper.find(".atividade-associada-descricao").text()).toBe(
       "Atividade 1",
     );
-    expect(wrapper.find('[data-testid="conhecimento-item"]').text()).toBe(
+    expect(wrapper.find('[data-testid="txt-conhecimento-item"]').text()).toBe(
       "Conhecimento 1",
     );
   });
 
   it("resolves nested unit from store", async () => {
     await router.push("/processo/1/CHILD/vis-mapa");
-    const wrapper = mountComponent(
+    const { wrapper } = mountComponent(
       {
         unidades: {
           unidades: [
@@ -149,6 +154,7 @@ describe("VisMapa.vue", () => {
               filhas: [{ sigla: "CHILD", nome: "Child Unit", filhas: [] }],
             },
           ],
+          unidade: { sigla: "CHILD", nome: "Child Unit", filhas: [] },
         },
         processos: {
           processoDetalhe: {
@@ -156,7 +162,7 @@ describe("VisMapa.vue", () => {
               {
                 sigla: "CHILD",
                 codUnidade: 11,
-                situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+                situacaoSubprocesso: SituacaoSubprocesso.CONCLUIDO,
               },
             ],
           },
@@ -166,13 +172,13 @@ describe("VisMapa.vue", () => {
     );
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="unidade-info"]').text()).toContain(
+    expect(wrapper.find('[data-testid="txt-header-unidade"]').text()).toContain(
       "CHILD - Child Unit",
     );
   });
 
   it("shows buttons for CHEFE when MAPEAMENTO_CONCLUIDO", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "CHEFE" },
       processos: {
         processoDetalhe: {
@@ -180,7 +186,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
-              situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO,
+              situacaoSubprocesso: SituacaoSubprocesso.MAPA_DISPONIBILIZADO,
             },
           ],
         },
@@ -189,13 +195,13 @@ describe("VisMapa.vue", () => {
     await wrapper.vm.$nextTick();
 
     expect(
-      wrapper.find('[data-testid="apresentar-sugestoes-btn"]').exists(),
+      wrapper.find('[data-testid="btn-mapa-sugestoes"]').exists(),
     ).toBe(true);
-    expect(wrapper.find('[data-testid="validar-btn"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="btn-mapa-validar"]').exists()).toBe(true);
   });
 
   it("shows buttons for GESTOR when MAPA_VALIDADO", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -203,6 +209,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -211,55 +218,57 @@ describe("VisMapa.vue", () => {
     });
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('[data-testid="devolver-ajustes-btn"]').exists()).toBe(
+    expect(wrapper.find('[data-testid="btn-mapa-devolver"]').exists()).toBe(
       true,
     );
     expect(
-      wrapper.find('[data-testid="btn-registrar-aceite-homologar"]').exists(),
+      wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').exists(),
     ).toBe(true);
   });
 
   it("opens validar modal and confirms", async () => {
-    const wrapper = mountComponent();
+    const { wrapper, feedbackStore } = mountComponent();
     const store = useProcessosStore();
-    const notificacoes = useNotificacoesStore();
+    vi.spyOn(feedbackStore, "show");
 
-    await wrapper.find('[data-testid="validar-btn"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
     await wrapper.vm.$nextTick();
 
-    const confirmBtn = wrapper.find('[data-testid="modal-validar-confirmar"]');
+    const confirmBtn = wrapper.find('[data-testid="btn-validar-mapa-confirmar"]');
     expect(confirmBtn.exists()).toBe(true);
 
     await confirmBtn.trigger("click");
 
     expect(store.validarMapa).toHaveBeenCalledWith(10);
-    expect(notificacoes.sucesso).toHaveBeenCalled();
+    expect(feedbackStore.show).toHaveBeenCalled();
   });
 
   it("opens sugestoes modal and confirms", async () => {
-    const wrapper = mountComponent();
+    const { wrapper, feedbackStore } = mountComponent();
     const store = useProcessosStore();
+    vi.spyOn(feedbackStore, "show");
 
     await wrapper
-      .find('[data-testid="apresentar-sugestoes-btn"]')
+      .find('[data-testid="btn-mapa-sugestoes"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
-    const textarea = wrapper.find('[data-testid="sugestoes-textarea"]');
+    const textarea = wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]');
     await textarea.setValue("Minhas sugestões");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="modal-apresentar-sugestoes-confirmar"]',
+      '[data-testid="btn-sugestoes-mapa-confirmar"]',
     );
     await confirmBtn.trigger("click");
 
     expect(store.apresentarSugestoes).toHaveBeenCalledWith(10, {
       sugestoes: "Minhas sugestões",
     });
+    expect(feedbackStore.show).toHaveBeenCalled();
   });
 
   it("opens devolucao modal and confirms (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper, feedbackStore } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -267,6 +276,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -274,28 +284,29 @@ describe("VisMapa.vue", () => {
       },
     });
     const store = useSubprocessosStore();
+    vi.spyOn(feedbackStore, "show");
 
-    await wrapper.find('[data-testid="devolver-ajustes-btn"]').trigger("click");
+    await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
     await wrapper.vm.$nextTick();
 
     const textarea = wrapper.find(
-      '[data-testid="observacao-devolucao-textarea"]',
+      '[data-testid="inp-devolucao-mapa-obs"]',
     );
     await textarea.setValue("Ajustar X");
 
     const confirmBtn = wrapper.find(
-      '[data-testid="modal-devolucao-confirmar"]',
+      '[data-testid="btn-devolucao-mapa-confirmar"]',
     );
     await confirmBtn.trigger("click");
 
     expect(store.devolverRevisaoCadastro).toHaveBeenCalledWith(10, {
-      motivo: "",
       observacoes: "Ajustar X",
     });
+    expect(feedbackStore.show).not.toHaveBeenCalled(); // Should not show error on success (and success toast is not called in this path in component, only navigation)
   });
 
   it("opens aceitar modal and confirms (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -303,6 +314,7 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -312,7 +324,7 @@ describe("VisMapa.vue", () => {
     const store = useSubprocessosStore();
 
     await wrapper
-      .find('[data-testid="btn-registrar-aceite-homologar"]')
+      .find('[data-testid="btn-mapa-homologar-aceite"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -327,14 +339,16 @@ describe("VisMapa.vue", () => {
   });
 
   it("confirms homologacao (ADMIN)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "ADMIN" },
       processos: {
         processoDetalhe: {
+          tipo: TipoProcesso.REVISAO,
           unidades: [
             {
               sigla: "TEST",
               codUnidade: 10,
+              codSubprocesso: 10,
               situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO,
             },
           ],
@@ -344,7 +358,7 @@ describe("VisMapa.vue", () => {
     const store = useSubprocessosStore();
 
     await wrapper
-      .find('[data-testid="btn-registrar-aceite-homologar"]')
+      .find('[data-testid="btn-mapa-homologar-aceite"]')
       .trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -367,7 +381,7 @@ describe("VisMapa.vue", () => {
       },
     ];
 
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       analises: {
         analisesPorSubprocesso: new Map([[10, analisesData]]),
       },
@@ -376,7 +390,7 @@ describe("VisMapa.vue", () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
 
-    const btn = wrapper.find('[data-testid="historico-analise-btn"]');
+    const btn = wrapper.find('[data-testid="btn-mapa-historico"]');
     expect(btn.exists()).toBe(true);
 
     await btn.trigger("click");
@@ -387,7 +401,7 @@ describe("VisMapa.vue", () => {
   });
 
   it("view suggestions (GESTOR)", async () => {
-    const wrapper = mountComponent({
+    const { wrapper } = mountComponent({
       perfil: { perfilSelecionado: "GESTOR" },
       processos: {
         processoDetalhe: {
@@ -395,7 +409,8 @@ describe("VisMapa.vue", () => {
             {
               sigla: "TEST",
               codUnidade: 10,
-              situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA,
+              codSubprocesso: 10,
+              situacaoSubprocesso: SituacaoSubprocesso.MAPA_COM_SUGESTOES,
             },
           ],
         },
@@ -403,7 +418,7 @@ describe("VisMapa.vue", () => {
     });
     await wrapper.vm.$nextTick();
 
-    const btn = wrapper.find('[data-testid="ver-sugestoes-btn"]');
+    const btn = wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]');
     expect(btn.exists()).toBe(true);
 
     await btn.trigger("click");

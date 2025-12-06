@@ -19,11 +19,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
@@ -40,7 +36,10 @@ import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
@@ -78,7 +77,7 @@ class ProcessoServiceTest {
         unidade.setCodigo(1L);
 
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-        when(processoRepo.save(any())).thenAnswer(i -> {
+        when(processoRepo.saveAndFlush(any())).thenAnswer(i -> {
             Processo p = i.getArgument(0);
             p.setCodigo(100L);
             return p;
@@ -87,7 +86,7 @@ class ProcessoServiceTest {
 
         processoService.criar(req);
 
-        verify(processoRepo).save(any());
+        verify(processoRepo).saveAndFlush(any());
         verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
     }
 
@@ -141,7 +140,7 @@ class ProcessoServiceTest {
         processoService.atualizar(id, req);
 
         assertThat(processo.getDescricao()).isEqualTo("Nova Desc");
-        verify(processoRepo).save(processo);
+        verify(processoRepo).saveAndFlush(processo);
     }
 
     @Test
@@ -159,7 +158,7 @@ class ProcessoServiceTest {
             .build();
 
         assertThatThrownBy(() -> processoService.atualizar(id, req))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -214,7 +213,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.apagar(id))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -287,9 +286,8 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(outroProcesso));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(id, List.of(1L)))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("já participam de outro processo");
+        List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
+        assertThat(erros).contains("As seguintes unidades já participam de outro processo ativo: ");
     }
 
     @Test
@@ -335,9 +333,8 @@ class ProcessoServiceTest {
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoRevisao(id, List.of(1L)))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("não possuem mapa vigente");
+        List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
+        assertThat(erros).contains("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: U1");
     }
 
     @Test
@@ -361,7 +358,7 @@ class ProcessoServiceTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
@@ -397,7 +394,7 @@ class ProcessoServiceTest {
         Mapa m = new Mapa();
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         sp.setUnidade(u);
         sp.setMapa(m);
 
@@ -420,7 +417,7 @@ class ProcessoServiceTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         sp.setUnidade(null);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
@@ -529,7 +526,7 @@ class ProcessoServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         Unidade u = new Unidade();
         u.setNome("U1");
         u.setSigla("S1");
@@ -565,7 +562,7 @@ class ProcessoServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setUnidade(u);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));

@@ -1,12 +1,12 @@
 package sgc.atividade;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -16,20 +16,22 @@ import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.RestExceptionHandler;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AtividadeController.class)
-@WithMockUser
-@AutoConfigureMockMvc
+@Import(RestExceptionHandler.class)
 class AtividadeControllerTest {
     private static final String ATIVIDADE_TESTE = "Atividade Teste";
     private static final String API_ATIVIDADES = "/api/atividades";
@@ -38,26 +40,25 @@ class AtividadeControllerTest {
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
     private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private AtividadeService atividadeService;
+    @MockitoBean private AtividadeService atividadeService;
+    @MockitoBean private AtividadeMapper atividadeMapper;
+    @MockitoBean private ConhecimentoMapper conhecimentoMapper;
 
-    @MockitoBean
-    private AtividadeMapper atividadeMapper;
-
-    @MockitoBean
-    private ConhecimentoMapper conhecimentoMapper;
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+    }
 
     @Nested
     @DisplayName("Testes para CRUD de Atividades")
     class ListarAtividades {
         @Test
         @DisplayName("Deve retornar lista de atividades com status 200 OK")
+        @WithMockUser
         void deveRetornarListaDeAtividades() throws Exception {
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
@@ -72,6 +73,7 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve retornar lista vazia com status 200 OK")
+        @WithMockUser
         void deveRetornarListaVazia() throws Exception {
             when(atividadeService.listar()).thenReturn(Collections.emptyList());
 
@@ -88,6 +90,7 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve retornar uma atividade com status 200 OK")
+        @WithMockUser
         void deveRetornarAtividadePorId() throws Exception {
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
@@ -100,6 +103,7 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve retornar 404 Not Found para código inexistente")
+        @WithMockUser
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             when(atividadeService.obterPorCodigo(99L)).thenThrow(new ErroEntidadeNaoEncontrada(""));
 
@@ -118,12 +122,15 @@ class AtividadeControllerTest {
             var atividadeDto = new AtividadeDto(null, 10L, NOVA_ATIVIDADE);
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);
 
-            when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
+            when(atividadeService.criar(any(AtividadeDto.class), any())).thenReturn(atividadeSalvaDto);
 
-            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("user")))
+            mockMvc.perform(post(API_ATIVIDADES)
+                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(
+                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", "password", java.util.Collections.emptyList())
+                    ))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -133,13 +140,14 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para DTO inválido")
+        @WithMockUser
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
 
-            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("user")))
+            mockMvc.perform(post(API_ATIVIDADES)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -149,29 +157,34 @@ class AtividadeControllerTest {
     class AtualizarAtividade {
         @Test
         @DisplayName("Deve atualizar uma atividade e retornar 200 OK")
+        @WithMockUser
         void deveAtualizarAtividade() throws Exception {
             var atividadeDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
             var atividadeAtualizadaDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
 
             when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
-            mockMvc.perform(post("/api/atividades/1/atualizar").with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+            mockMvc.perform(post("/api/atividades/1/atualizar")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.descricao").value(DESCRICAO_ATUALIZADA));
         }
 
         @Test
         @DisplayName("Deve retornar 404 Not Found para código inexistente")
+        @WithMockUser
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             var atividadeDto = new AtividadeDto(99L, null, "Tanto faz");
 
-            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class))).thenThrow(new ErroEntidadeNaoEncontrada(""));
+            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class)))
+                    .thenThrow(new ErroEntidadeNaoEncontrada(""));
 
-            mockMvc.perform(post("/api/atividades/99/atualizar").with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+            mockMvc.perform(post("/api/atividades/99/atualizar")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
         }
     }
@@ -182,10 +195,12 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve excluir uma atividade e retornar 204 No Content")
+        @WithMockUser
         void deveExcluirAtividade() throws Exception {
             doNothing().when(atividadeService).excluir(1L);
 
-            mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
+            mockMvc.perform(post("/api/atividades/1/excluir")
+                    .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluir(1L);
@@ -193,10 +208,12 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve retornar 404 Not Found para código inexistente")
+        @WithMockUser
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             doThrow(new ErroEntidadeNaoEncontrada("")).when(atividadeService).excluir(99L);
 
-            mockMvc.perform(post("/api/atividades/99/excluir").with(csrf()))
+            mockMvc.perform(post("/api/atividades/99/excluir")
+                    .with(csrf()))
                     .andExpect(status().isNotFound());
         }
     }
@@ -212,6 +229,7 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve listar conhecimentos de uma atividade")
+        @WithMockUser
         void deveListarConhecimentos() throws Exception {
             var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Conhecimento Teste");
 
@@ -224,15 +242,18 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve criar um conhecimento para uma atividade")
+        @WithMockUser
         void deveCriarConhecimento() throws Exception {
             var conhecimentoDto = new ConhecimentoDto(null, 1L, NOVO_CONHECIMENTO);
             var conhecimentoSalvoDto = new ConhecimentoDto(1L, 1L, NOVO_CONHECIMENTO);
 
-            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoSalvoDto);
+            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class)))
+                    .thenReturn(conhecimentoSalvoDto);
 
-            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+            mockMvc.perform(post(API_CONHECIMENTOS)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_CONHECIMENTOS_1))
                     .andExpect(jsonPath("$.codigo").value(1L));
@@ -240,24 +261,29 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve atualizar um conhecimento")
+        @WithMockUser
         void deveAtualizarConhecimento() throws Exception {
             var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Atualizado");
 
-            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
+            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class)))
+                    .thenReturn(conhecimentoDto);
 
-            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.descricao").value("Atualizado"));
         }
 
         @Test
         @DisplayName("Deve excluir um conhecimento")
+        @WithMockUser
         void deveExcluirConhecimento() throws Exception {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
-            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
+            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR)
+                    .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);

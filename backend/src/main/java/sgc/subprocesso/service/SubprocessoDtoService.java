@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.atividade.model.Atividade;
@@ -27,13 +26,10 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.util.HtmlUtils;
+import sgc.unidade.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -47,7 +43,6 @@ public class SubprocessoDtoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final AnaliseService analiseService;
-    private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
@@ -56,49 +51,85 @@ public class SubprocessoDtoService {
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
-        System.out.println("Obtendo detalhes para o subprocesso " + codigo);
+        log.debug("Obtendo detalhes para o subprocesso {}", codigo);
         if (perfil == null) {
-            System.out.println("Perfil inválido para acesso aos detalhes do subprocesso.");
+            log.warn("Perfil inválido para acesso aos detalhes do subprocesso.");
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
 
         Subprocesso sp = repositorioSubprocesso.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
-        System.out.println("Subprocesso encontrado: " + sp);
-
-        if (perfil == Perfil.GESTOR || perfil == Perfil.CHEFE) {
-            if (sp.getUnidade() == null || codUnidadeUsuario == null || !codUnidadeUsuario.equals(sp.getUnidade().getCodigo())) {
-                System.out.println("Usuário sem permissão para visualizar este subprocesso.");
-                throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
-            }
-        } else if (perfil != Perfil.ADMIN) {
-            System.out.println("Perfil sem permissão.");
-            throw new ErroAccessoNegado("Perfil sem permissão.");
-        }
+        log.debug("Subprocesso encontrado: {}", sp.getCodigo());
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("Usuário autenticado: " + username);
+        log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
-        System.out.println("Usuário encontrado: " + usuario);
+        log.debug("Usuário encontrado: {}", usuario);
+        log.debug("Atribuições do usuário (de SGRH): {}", usuario.getTodasAtribuicoes().stream()
+                .map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla()).toList());
+        log.debug("Perfil solicitado (de request): {}", perfil);
+
+        verificarPermissaoVisualizacao(sp, perfil, usuario);
 
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
-        System.out.println("Responsável encontrado: " + responsavel);
+        log.debug("Responsável encontrado: {}", responsavel);
 
-        List<Movimentacao> movimentacoes = repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        final List<Atividade> atividades = (sp.getMapa() != null && sp.getMapa().getCodigo() != null)
-                ? atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo())
-                : emptyList();
-
-        final Set<Long> idsAtividades = atividades.stream().map(Atividade::getCodigo).filter(Objects::nonNull).collect(Collectors.toSet());
-        List<Conhecimento> conhecimentos = repositorioConhecimento.findAll().stream()
-                .filter(c -> c.getAtividade() != null && idsAtividades.contains(c.getAtividade().getCodigo()))
-                .toList();
+        List<Movimentacao> movimentacoes = repositorioMovimentacao
+                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
         SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
-        System.out.println("Permissões calculadas: " + permissoes);
+        log.debug("Permissões calculadas: {}", permissoes);
 
-        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, atividades.stream().map(atividadeMapper::toDto).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDto).collect(Collectors.toList()), movimentacaoMapper, permissoes);
+        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
+    }
+
+    private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
+        boolean hasPerfil = usuario.getTodasAtribuicoes().stream()
+                .anyMatch(a -> a.getPerfil() == perfil);
+
+        if (!hasPerfil) {
+            log.warn("Usuário não possui o perfil solicitado.");
+            throw new ErroAccessoNegado("Perfil inválido para o usuário.");
+        }
+
+        if (perfil == Perfil.ADMIN) {
+            return;
+        }
+
+        Unidade unidadeAlvo = sp.getUnidade();
+
+        if (unidadeAlvo == null) {
+            throw new ErroAccessoNegado("Unidade não identificada.");
+        }
+
+        boolean hasPermission = usuario.getTodasAtribuicoes().stream()
+                .filter(a -> a.getPerfil() == perfil)
+                .anyMatch(a -> {
+                    Unidade unidadeUsuario = a.getUnidade();
+                    if (perfil == Perfil.GESTOR) {
+                        return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
+                    } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
+                        return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
+                    }
+                    return false;
+                });
+
+        if (!hasPermission) {
+            log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
+            throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
+        }
+    }
+
+    private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
+        sgc.unidade.model.Unidade atual = alvo;
+        while (atual != null) {
+            if (atual.getCodigo().equals(superior.getCodigo())) {
+                return true;
+            }
+            atual = atual.getUnidadeSuperior();
+        }
+        return false;
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +140,8 @@ public class SubprocessoDtoService {
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
             List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
-            if (atividades == null) atividades = emptyList();
+            if (atividades == null)
+                atividades = emptyList();
 
             for (Atividade a : atividades) {
                 List<Conhecimento> ks = repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
@@ -127,7 +159,7 @@ public class SubprocessoDtoService {
 
         return SubprocessoCadastroDto.builder()
                 .subprocessoId(sp.getCodigo())
-                .unidadeSigla(HtmlUtils.escapeHtml(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null))
+                .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
                 .atividades(atividadesComConhecimentos)
                 .build();
     }
@@ -135,7 +167,8 @@ public class SubprocessoDtoService {
     @Transactional(readOnly = true)
     public SugestoesDto obterSugestoes(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         return SugestoesDto.of(sp);
     }
@@ -151,13 +184,13 @@ public class SubprocessoDtoService {
 
         Long codMapa = sp.getMapa().getCodigo();
 
-        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
+        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream()
+                .findFirst()
                 .orElse(null);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
-
 
         return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
     }
@@ -173,7 +206,9 @@ public class SubprocessoDtoService {
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Subprocesso sp = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d"
+                                .formatted(codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
 }

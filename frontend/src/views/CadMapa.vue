@@ -2,6 +2,7 @@
   <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
+      <span class="ms-3" data-testid="txt-badge-situacao">{{ situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao) }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -12,7 +13,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
-          data-testid="impactos-mapa-button"
+          data-testid="cad-mapa__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -20,7 +21,7 @@
         <BButton
           :disabled="competencias.length === 0"
           variant="outline-success"
-          data-testid="btn-disponibilizar-page"
+          data-testid="btn-cad-mapa-disponibilizar"
           @click="abrirModalDisponibilizar"
         >
           Disponibilizar
@@ -34,7 +35,7 @@
           variant="outline-primary"
           class="mb-3"
           data-testid="btn-abrir-criar-competencia"
-          @click="() => abrirModalCriarNovaCompetencia()"
+          @click="abrirModalCriarLimpo"
         >
           <i class="bi bi-plus-lg" /> Criar competência
         </BButton>
@@ -43,7 +44,7 @@
           v-for="comp in competencias"
           :key="comp.codigo"
           class="mb-2 competencia-card"
-          data-testid="competencia-item"
+          data-testid="cad-mapa__card-competencia"
           no-body
         >
           <BCardBody>
@@ -52,7 +53,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="competencia-descricao"
+                data-testid="cad-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <BButton
@@ -90,10 +91,10 @@
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
-                      v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
+                      v-if="(getAtividadeCompleta(atvId)?.conhecimentos.length ?? 0) > 0"
                       v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
                       class="badge bg-secondary ms-2"
-                      data-testid="badge-conhecimentos"
+                      data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
@@ -103,6 +104,7 @@
                     variant="outline-secondary"
                     size="sm"
                     class="botao-acao-inline"
+                    data-testid="btn-remover-atividade-associada"
                     title="Remover Atividade"
                     @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
@@ -122,10 +124,11 @@
     <!-- Modal de Criar Nova Competência -->
     <BModal
       v-model="mostrarModalCriarNovaCompetencia"
+      :fade="false"
       :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       size="lg"
       centered
-      data-testid="criar-competencia-modal"
+      data-testid="mdl-criar-competencia"
       @hidden="fecharModalCriarNovaCompetencia"
     >
       <!-- Conteúdo do card movido para cá -->
@@ -134,7 +137,7 @@
         <div class="mb-2">
           <BFormTextarea
             v-model="novaCompetencia.descricao"
-            data-testid="input-nova-competencia"
+            data-testid="inp-criar-competencia-descricao"
             placeholder="Descreva a competência"
             rows="3"
           />
@@ -147,8 +150,7 @@
           <BCard
             v-for="atividade in atividades"
             :key="atividade.codigo"
-            :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-            class="atividade-card-item"
+            :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
             :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
             no-body
           >
@@ -157,14 +159,14 @@
                 :id="`atv-${atividade.codigo}`"
                 v-model="atividadesSelecionadas"
                 :value="atividade.codigo"
-                data-testid="atividade-checkbox"
+                data-testid="chk-criar-competencia-atividade"
               >
                 {{ atividade.descricao }}
                 <span
                   v-if="atividade.conhecimentos.length > 0"
                   v-b-tooltip.html.right="getConhecimentosModal(atividade)"
                   class="badge bg-secondary ms-2"
-                  data-testid="badge-conhecimentos"
+                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
                 >
                   {{ atividade.conhecimentos.length }}
                 </span>
@@ -184,7 +186,7 @@
           v-b-tooltip.hover
           variant="primary"
           :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-criar-competencia"
+          data-testid="btn-criar-competencia-salvar"
           title="Criar Competência"
           @click="adicionarCompetenciaEFecharModal"
         >
@@ -196,8 +198,9 @@
     <!-- Modal de Disponibilizar -->
     <BModal
       v-model="mostrarModalDisponibilizar"
+      :fade="false"
       title="Disponibilização do mapa de competências"
-      data-testid="disponibilizar-modal"
+      data-testid="mdl-disponibilizar-mapa"
       centered
       @hidden="fecharModalDisponibilizar"
     >
@@ -209,7 +212,7 @@
         <BFormInput
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          data-testid="input-data-limite"
+          data-testid="inp-disponibilizar-mapa-data"
           type="date"
         />
       </div>
@@ -221,7 +224,7 @@
         <BFormTextarea
           id="observacoes"
           v-model="observacoesDisponibilizacao"
-          data-testid="input-observacoes-disponibilizacao"
+          data-testid="inp-disponibilizar-mapa-obs"
           rows="3"
           placeholder="Digite observações sobre a disponibilização..."
         />
@@ -231,14 +234,15 @@
         variant="info"
         class="mt-3"
         :model-value="true"
-        data-testid="notificacao-disponibilizacao"
+        :fade="false"
+        data-testid="alert-disponibilizar-mapa"
       >
         {{ notificacaoDisponibilizacao }}
       </BAlert>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="btn-modal-cancelar"
+          data-testid="btn-disponibilizar-mapa-cancelar"
           @click="fecharModalDisponibilizar"
         >
           Cancelar
@@ -246,7 +250,7 @@
         <BButton
           variant="success"
           :disabled="!dataLimiteValidacao"
-          data-testid="btn-disponibilizar"
+          data-testid="btn-disponibilizar-mapa-confirmar"
           @click="disponibilizarMapa"
         >
           Disponibilizar
@@ -257,8 +261,9 @@
     <!-- Modal de Exclusão de Competência -->
     <BModal
       v-model="mostrarModalExcluirCompetencia"
+      :fade="false"
       title="Exclusão de competência"
-      data-testid="excluir-competencia-modal"
+      data-testid="mdl-excluir-competencia"
       ok-title="Confirmar"
       cancel-title="Cancelar"
       ok-variant="danger"
@@ -295,6 +300,7 @@ import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {situacaoLabel} from "@/utils";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -334,10 +340,10 @@ const codSubrocesso = ref<number | null>(null);
 
 onMounted(async () => {
   // Carrega unidade diretamente
-  await unidadesStore.fetchUnidade(siglaUnidade.value);
+  await unidadesStore.buscarUnidade(siglaUnidade.value);
 
   // Busca ID do subprocesso
-  const id = await subprocessosStore.fetchSubprocessoPorProcessoEUnidade(
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       codProcesso.value,
       siglaUnidade.value,
   );
@@ -345,9 +351,9 @@ onMounted(async () => {
   if (id) {
     codSubrocesso.value = id;
     await Promise.all([
-      mapasStore.fetchMapaCompleto(id),
-      subprocessosStore.fetchSubprocessoDetalhe(id),
-      atividadesStore.fetchAtividadesParaSubprocesso(id),
+      mapasStore.buscarMapaCompleto(id),
+      subprocessosStore.buscarSubprocessoDetalhe(id),
+      atividadesStore.buscarAtividadesParaSubprocesso(id),
     ]);
   }
 });
@@ -356,7 +362,7 @@ const atividades = computed<Atividade[]>(() => {
   if (typeof codSubrocesso.value !== "number") {
     return [];
   }
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
 });
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
@@ -382,7 +388,7 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   if (competenciaParaEditar) {
     novaCompetencia.value.descricao = competenciaParaEditar.descricao;
     atividadesSelecionadas.value = [
-      ...competenciaParaEditar.atividadesAssociadas,
+      ...(competenciaParaEditar.atividadesAssociadas || []),
     ];
     competenciaSendoEditada.value = competenciaParaEditar;
   } else {
@@ -390,6 +396,11 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
   }
+}
+
+function abrirModalCriarLimpo() {
+  competenciaSendoEditada.value = null;
+  abrirModalCriarNovaCompetencia();
 }
 
 function fecharModalCriarNovaCompetencia() {
@@ -435,7 +446,7 @@ function getConhecimentosModal(atividade: Atividade): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
-function adicionarCompetenciaEFecharModal() {
+async function adicionarCompetenciaEFecharModal() {
   if (
       !novaCompetencia.value.descricao ||
       atividadesSelecionadas.value.length === 0
@@ -443,23 +454,29 @@ function adicionarCompetenciaEFecharModal() {
     return;
 
   const competencia: Competencia = {
-    codigo: competenciaSendoEditada.value?.codigo || 0,
+    // deixe undefined para novas competências e permita backend atribuir o id
+    codigo: competenciaSendoEditada.value?.codigo ?? undefined,
     descricao: novaCompetencia.value.descricao,
     atividadesAssociadas: atividadesSelecionadas.value,
-  };
+  } as any;
 
-  if (competenciaSendoEditada.value) {
-    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
-  } else {
-    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+  try {
+    if (competenciaSendoEditada.value) {
+      await mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
+    } else {
+      await mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+    }
+
+    // Recarregar mapa completo para garantir que novas competências tenham seus códigos
+    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
+  } finally {
+    // Limpar formulário e fechar modal independente do resultado (o feedbackStore já notifica erros)
+    novaCompetencia.value.descricao = "";
+    atividadesSelecionadas.value = [];
+    competenciaSendoEditada.value = null;
+
+    fecharModalCriarNovaCompetencia();
   }
-
-  // Limpar formulário
-  novaCompetencia.value.descricao = "";
-  atividadesSelecionadas.value = [];
-  competenciaSendoEditada.value = null;
-
-  fecharModalCriarNovaCompetencia();
 }
 
 function excluirCompetencia(codigo: number) {
@@ -511,6 +528,9 @@ async function disponibilizarMapa() {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
     });
+    // Recarregar mapa para atualizar a situacao exibida
+    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
     fecharModalDisponibilizar();
     // TODO: Adicionar redirecionamento para o painel
   } catch {

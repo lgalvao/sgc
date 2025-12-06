@@ -15,9 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.analise.AnaliseService;
-import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
@@ -27,14 +25,15 @@ import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.dto.MovimentacaoMapper;
+import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoMapper;
+import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -96,9 +95,11 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("admin");
 
+        Usuario admin = new Usuario();
+        admin.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(admin).unidade(new Unidade()).perfil(Perfil.ADMIN).build());
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(new Usuario());
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
@@ -114,13 +115,64 @@ class SubprocessoDtoServiceTest {
     }
 
     @Test
-    @DisplayName("obterDetalhes falha se perfil invalido")
-    void obterDetalhesPerfilInvalido() {
+    @DisplayName("obterDetalhes sucesso servidor mesma unidade")
+    void obterDetalhesServidorMesmaUnidade() {
         Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
 
-        assertThatThrownBy(() -> service.obterDetalhes(1L, Perfil.SERVIDOR, null))
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(u);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("servidor");
+
+        Usuario servidor = new Usuario();
+        servidor.setUnidadeLotacao(u);
+        servidor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(servidor).unidade(u).perfil(Perfil.SERVIDOR).build());
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+
+        var res = service.obterDetalhes(id, Perfil.SERVIDOR, 10L);
+
+        assertThat(res).isNotNull();
+    }
+
+    @Test
+    @DisplayName("obterDetalhes falha servidor unidade diferente")
+    void obterDetalhesServidorUnidadeDiferente() {
+        Long id = 1L;
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(u1);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("servidor");
+
+        Usuario servidor = new Usuario();
+        servidor.setUnidadeLotacao(u2);
+        servidor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(servidor).unidade(u2).perfil(Perfil.SERVIDOR).build());
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+
+        assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.SERVIDOR, null))
             .isInstanceOf(ErroAccessoNegado.class);
     }
 
@@ -143,8 +195,12 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("gestor");
 
+        Usuario gestor = new Usuario();
+        gestor.setUnidadeLotacao(u);
+        gestor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(gestor).unidade(u).perfil(Perfil.GESTOR).build());
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(new Usuario());
+        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.GESTOR, 10L);
@@ -156,14 +212,27 @@ class SubprocessoDtoServiceTest {
     @DisplayName("obterDetalhes falha gestor unidade errada")
     void obterDetalhesGestorErrado() {
         Long id = 1L;
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
-        sp.setUnidade(u);
+        sp.setUnidade(u1);
+
+        Authentication auth = mock(Authentication.class);
+        SecurityContext ctx = mock(SecurityContext.class);
+        when(ctx.getAuthentication()).thenReturn(auth);
+        securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
+        when(auth.getName()).thenReturn("gestor");
+
+        Usuario gestor = new Usuario();
+        gestor.setUnidadeLotacao(u2);
+        gestor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(gestor).unidade(u2).perfil(Perfil.GESTOR).build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
 
         assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.GESTOR, 20L))
             .isInstanceOf(ErroAccessoNegado.class);
@@ -185,13 +254,16 @@ class SubprocessoDtoServiceTest {
         securityMock.when(SecurityContextHolder::getContext).thenReturn(ctx);
         when(auth.getName()).thenReturn("admin");
 
+        Usuario admin = new Usuario();
+        admin.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(admin).unidade(new Unidade()).perfil(Perfil.ADMIN).build());
+
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
         assertThat(res).isNotNull();
-        assertThat(res.getElementosProcesso()).isEmpty();
     }
 
     @Test

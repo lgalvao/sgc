@@ -2,6 +2,17 @@
   <BContainer class="mt-4">
     <h2>Cadastro de processo</h2>
 
+    <BAlert
+      v-model="alertState.show"
+      :variant="alertState.variant"
+      dismissible
+      :fade="false"
+      class="mt-3"
+    >
+      <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
+      <p class="mb-0">{{ alertState.body }}</p>
+    </BAlert>
+
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <BFormGroup
         label="Descrição"
@@ -13,7 +24,7 @@
           v-model="descricao"
           placeholder="Descreva o processo"
           type="text"
-          data-testid="input-descricao"
+          data-testid="inp-processo-descricao"
         />
       </BFormGroup>
 
@@ -25,7 +36,7 @@
         <BFormSelect
           id="tipo"
           v-model="tipo"
-          data-testid="select-tipo"
+          data-testid="sel-processo-tipo"
           :options="Object.values(TipoProcessoEnum)"
         />
       </BFormGroup>
@@ -59,12 +70,14 @@
           id="dataLimite"
           v-model="dataLimite"
           type="date"
-          data-testid="input-dataLimite"
+          data-testid="inp-processo-data-limite"
         />
       </BFormGroup>
 
       <BButton
         variant="primary"
+        type="button"
+        data-testid="btn-processo-salvar"
         @click="salvarProcesso"
       >
         Salvar
@@ -72,7 +85,7 @@
       <BButton
         variant="success"
         class="ms-2"
-        data-testid="btn-iniciar-processo"
+        data-testid="btn-processo-iniciar"
         @click="abrirModalConfirmacao"
       >
         Iniciar processo
@@ -81,6 +94,7 @@
         v-if="processoEditando"
         variant="danger"
         class="ms-2"
+        data-testid="btn-processo-remover"
         @click="abrirModalRemocao"
       >
         Remover
@@ -97,6 +111,7 @@
     <!-- Modal de confirmação CDU-05 -->
     <BModal
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Iniciar processo"
       centered
       hide-footer
@@ -114,12 +129,14 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="btn-iniciar-processo-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
+          data-testid="btn-iniciar-processo-confirmar"
           @click="confirmarIniciarProcesso"
         >
           Confirmar
@@ -130,6 +147,7 @@
     <!-- Modal de confirmação de remoção -->
     <BModal
       v-model="mostrarModalRemocao"
+      :fade="false"
       title="Remover processo"
       centered
       hide-footer
@@ -156,28 +174,21 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BContainer,
-  BForm,
-  BFormGroup,
-  BFormInput,
-  BFormSelect,
-  BModal,
-} from "bootstrap-vue-next";
-import { nextTick, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal} from "bootstrap-vue-next";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import { TEXTOS } from "@/constants";
+// import {TEXTOS} from "@/constants"; // Removed
 import * as processoService from "@/services/processoService";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useUnidadesStore } from "@/stores/unidades";
+
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
 import {
   AtualizarProcessoRequest,
   CriarProcessoRequest,
   Processo as ProcessoModel,
   TipoProcesso,
+  Unidade
 } from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
@@ -190,38 +201,67 @@ const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
-const notificacoesStore = useNotificacoesStore();
+
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
+
+interface AlertState {
+  show: boolean;
+  variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+  title: string;
+  body: string;
+}
+
+const alertState = ref<AlertState>({
+  show: false,
+  variant: 'info',
+  title: '',
+  body: ''
+});
+
+function mostrarAlerta(variant: AlertState['variant'], title: string, body: string) {
+  alertState.value = {
+    show: true,
+    variant,
+    title,
+    body
+  };
+  window.scrollTo(0, 0);
+}
 
 onMounted(async () => {
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
-      await processosStore.fetchProcessoDetalhe(Number(codProcesso));
+      await processosStore.buscarProcessoDetalhe(Number(codProcesso));
       const processo = processosStore.processoDetalhe;
       if (processo) {
+        // Redirect if process is not in CRIADO state (cannot be edited)
+        if (processo.situacao !== 'CRIADO') {
+          // Como vamos redirecionar, não adianta mostrar alerta local.
+          // Idealmente usaríamos um store global, mas aqui apenas logamos/redirecionamos
+          await router.push(`/processo/${processo.codigo}`);
+          return;
+        }
+
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
-        await unidadesStore.fetchUnidadesParaProcesso(
+        await unidadesStore.buscarUnidadesParaProcesso(
           processo.tipo,
           processo.codigo,
         );
         await nextTick();
       }
     } catch (error) {
-      notificacoesStore.erro(
-        "Erro ao carregar processo",
-        "Não foi possível carregar os detalhes do processo.",
-      );
+      mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
       console.error("Erro ao carregar processo:", error);
     }
   } else {
-    await unidadesStore.fetchUnidadesParaProcesso(tipo.value);
+    await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
   }
 });
 
@@ -229,7 +269,7 @@ watch(tipo, async (novoTipo) => {
   const codProcesso = processoEditando.value
     ? processoEditando.value.codigo
     : undefined;
-  await unidadesStore.fetchUnidadesParaProcesso(novoTipo, codProcesso);
+  await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
 });
 
 function limparCampos() {
@@ -239,21 +279,38 @@ function limparCampos() {
   unidadesSelecionadas.value = [];
 }
 
+
+// Helper para buscar unidade na árvore
+function findUnidadeById(codigo: number, nodes: Unidade[]): Unidade | null {
+  for (const node of nodes) {
+    if (node.codigo === codigo) return node;
+    if (node.filhas) {
+      const found = findUnidadeById(codigo, node.filhas);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 async function salvarProcesso() {
   if (!descricao.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
-    console.log("Validation error in salvarProcesso: Preencha a descrição.");
+    mostrarAlerta('danger', "Dados incompletos", "Preencha a descrição.");
     return;
   }
-  if (unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-      "Dados incompletos",
-      "Pelo menos uma unidade participante deve ser incluída.",
-    );
+
+  // Filtrar apenas unidades elegíveis
+  const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
+    const unidade = findUnidadeById(id, unidadesStore.unidades);
+    return unidade && unidade.isElegivel;
+  });
+
+  if (unidadesFiltradas.length === 0) {
+    mostrarAlerta('danger', "Dados incompletos", "Pelo menos uma unidade participante elegível deve ser incluída.");
     return;
   }
+
   if (!dataLimite.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
+    mostrarAlerta('danger', "Dados incompletos", "Preencha a data limite.");
     return;
   }
 
@@ -264,52 +321,42 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value,
+        unidades: unidadesFiltradas,
       };
       await processosStore.atualizarProcesso(
         processoEditando.value.codigo,
         request,
       );
-      notificacoesStore.sucesso(
-        "Processo alterado",
-        "O processo foi alterado!",
-      );
+      // Sucesso! Redirecionar. O alerta não aparecerá na outra tela, mas resolve o bloqueio.
       await router.push("/painel");
     } else {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesSelecionadas.value,
+        unidades: unidadesFiltradas,
       };
       await processosStore.criarProcesso(request);
-      notificacoesStore.sucesso("Processo criado", "O processo foi criado!");
       await router.push("/painel");
     }
     limparCampos();
   } catch (error) {
-    notificacoesStore.erro(
-      "Erro ao salvar processo",
-      "Não foi possível salvar o processo. Verifique os dados e tente novamente.",
-    );
+    mostrarAlerta('danger', "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
     console.error("Erro ao salvar processo:", error);
   }
 }
 
 async function abrirModalConfirmacao() {
   if (!descricao.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a descrição.");
+    mostrarAlerta('danger', "Dados incompletos", "Preencha a descrição.");
     return;
   }
   if (unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-      "Dados incompletos",
-      "Pelo menos uma unidade participante deve ser incluída.",
-    );
+    mostrarAlerta('danger', "Dados incompletos", "Pelo menos uma unidade participante deve ser incluída.");
     return;
   }
   if (!dataLimite.value) {
-    notificacoesStore.erro("Dados incompletos", "Preencha a data limite.");
+    mostrarAlerta('danger', "Dados incompletos", "Preencha a data limite.");
     return;
   }
 
@@ -322,34 +369,42 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (!processoEditando.value) {
-    notificacoesStore.erro(
-      "Salve o processo",
-      "Você precisa salvar o processo antes de poder iniciá-lo.",
-    );
-    return;
+
+  let codigoProcesso = processoEditando.value?.codigo;
+
+  if (!codigoProcesso) {
+    // Se não houver processo salvo, cria antes de iniciar
+    const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
+      const unidade = findUnidadeById(id, unidadesStore.unidades);
+      return unidade && unidade.isElegivel;
+    });
+
+    try {
+      const request: CriarProcessoRequest = {
+        descricao: descricao.value,
+        tipo: tipo.value as TipoProcesso,
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesFiltradas,
+      };
+      const novoProcesso = await processosStore.criarProcesso(request);
+      codigoProcesso = novoProcesso.codigo;
+    } catch (error) {
+      mostrarAlerta('danger', "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+      console.error("Erro ao criar processo:", error);
+      return;
+    }
   }
 
   try {
     await processosStore.iniciarProcesso(
-      processoEditando.value.codigo,
+      codigoProcesso,
       tipo.value as TipoProcesso,
       unidadesSelecionadas.value,
     );
-    notificacoesStore.sucesso(
-      "Processo iniciado",
-      "O processo foi iniciado! Notificações enviadas às unidades.",
-    );
     await router.push("/painel");
-    if (!processoEditando.value) {
-      // Only clear fields if it was a new process
-      limparCampos();
-    }
+    limparCampos();
   } catch (error) {
-    notificacoesStore.erro(
-      "Erro ao iniciar processo",
-      "Não foi possível iniciar o processo. Tente novamente.",
-    );
+    mostrarAlerta('danger', "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
     console.error("Erro ao iniciar processo:", error);
   }
 }
@@ -366,22 +421,13 @@ async function confirmarRemocao() {
   if (processoEditando.value) {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
-      notificacoesStore.adicionarNotificacao({
-        tipo: "success",
-        titulo: "Processo removido",
-        mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
-        testId: "notificacao-remocao",
-      });
       await router.push("/painel");
       if (!processoEditando.value) {
         // Only clear fields if it was a new process
         limparCampos();
       }
     } catch (error) {
-      notificacoesStore.erro(
-        "Erro ao remover processo",
-        "Não foi possível remover o processo. Tente novamente.",
-      );
+      mostrarAlerta('danger', "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
       console.error("Erro ao remover processo:", error);
     }
   }

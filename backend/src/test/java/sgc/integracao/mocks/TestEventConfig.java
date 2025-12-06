@@ -14,11 +14,10 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 @TestConfiguration
 @Profile("test")
 public class TestEventConfig {
-    
     @Bean
     @Primary
     public EventoProcessoListener eventoProcessoListener() {
-        return new EventoProcessoListener(null, null, null, null, null, null, null) {
+        return new EventoProcessoListener(null, null, null, null, null, null) {
             @Override
             public void aoIniciarProcesso(EventoProcessoIniciado evento) {
                 // No-op para testes

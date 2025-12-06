@@ -4,25 +4,22 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
@@ -38,42 +35,40 @@ import sgc.unidade.model.UnidadeRepo;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-21: Finalizar Processo")
-class CDU21IntegrationTest {
+class CDU21IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private EntityManager entityManager;
 
     @Autowired private ProcessoRepo processoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
     @Autowired private MapaRepo mapaRepo;
     @Autowired private UsuarioRepo usuarioRepo;
+    @MockitoBean
+    private ProcessoNotificacaoService processoNotificacaoService;
 
     @MockitoBean
     private SgrhService sgrhService;
-
-    @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -84,7 +79,6 @@ class CDU21IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         Usuario titularIntermediaria = usuarioRepo.findById("1").orElseThrow();
         Usuario titularOp1 = usuarioRepo.findById("2").orElseThrow();
@@ -99,11 +93,11 @@ class CDU21IntegrationTest {
         processoRepo.save(processo);
 
         Mapa mapa1 = mapaRepo.save(new Mapa());
-        Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp1);
 
         Mapa mapa2 = mapaRepo.save(new Mapa());
-        Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp2);
 
         when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
@@ -122,10 +116,6 @@ class CDU21IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve finalizar processo, atualizar status, tornar mapas vigentes e notificar todas as unidades corretamente")
     void finalizarProcesso_ComSucesso_DeveAtualizarStatusENotificarUnidades() throws Exception {
-        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
-
         mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())
                 .with(csrf()))
             .andExpect(status().isOk());
@@ -140,29 +130,13 @@ class CDU21IntegrationTest {
         Unidade un1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
         Subprocesso sp1 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo())).findFirst().orElseThrow();
         assertThat(un1.getMapaVigente().getCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(un1.getDataVigenciaMapaAtual()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(un1.getDataVigenciaMapa()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
 
         Unidade un2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();
         assertThat(un2.getMapaVigente().getCodigo()).isEqualTo(sp2.getMapa().getCodigo());
 
-        verify(notificacaoEmailService, times(3)).enviarEmailHtml(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
-
-        List<String> allEmails = emailCaptor.getAllValues();
-        List<String> allSubjects = subjectCaptor.getAllValues();
-        List<String> allBodies = bodyCaptor.getAllValues();
-
-        int indexOp1 = allEmails.indexOf("titular.op1@test.com");
-        assertThat(indexOp1).isGreaterThanOrEqualTo(0);
-        assertThat(allSubjects.get(indexOp1)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp1)).contains("<p>Prezado(a) responsável pela <span>SEMARE</span>,</p>");
-        assertThat(allBodies.get(indexOp1)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para a sua unidade.</p>");
-        assertThat(allBodies.get(indexOp1)).doesNotContain("para as unidades:");
-
-        int indexIntermediaria = allEmails.indexOf("titular.intermediaria@test.com");
-        assertThat(indexIntermediaria).isGreaterThanOrEqualTo(0);
-        assertThat(allSubjects.get(indexIntermediaria)).contains("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Prezado(a) responsável pela <span>COAD</span>,</p>");
+        verify(processoNotificacaoService, times(1)).enviarNotificacoesDeFinalizacao(eq(processo), anyList());
     }
 
     @Test
@@ -172,7 +146,7 @@ class CDU21IntegrationTest {
         Subprocesso spPendente = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
                 .filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo()))
                 .findFirst().orElseThrow();
-        spPendente.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        spPendente.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(spPendente);
 
         mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())
@@ -190,6 +164,5 @@ class CDU21IntegrationTest {
         assertThat(u1.getMapaVigente()).isNull();
         assertThat(u2.getMapaVigente()).isNull();
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 }

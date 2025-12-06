@@ -2,13 +2,7 @@ package sgc.unidade;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -29,22 +23,24 @@ public class UnidadeController {
 
     /**
      * Cria uma nova atribuição temporária para um servidor em uma unidade.
-     * @param idUnidade O ID da unidade.
-     * @param request Os dados da atribuição.
+     *
+     * @param codUnidade O Código da unidade.
+     * @param request    Os dados da atribuição.
      * @return Resposta vazia com status 201 (Created).
      */
-    @PostMapping("/{idUnidade}/atribuicoes-temporarias")
+    @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
-        @PathVariable Long idUnidade,
-        @RequestBody CriarAtribuicaoTemporariaRequest request
-    ) {
-        unidadeService.criarAtribuicaoTemporaria(idUnidade, request);
+            @PathVariable Long codUnidade,
+            @RequestBody CriarAtribuicaoTemporariaRequest request) {
+        unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
+        // TODO nao pode passar nulo aqui
         return ResponseEntity.created(null).build();
     }
 
     /**
      * Busca todas as unidades em estrutura hierárquica
-     * Endpoint usado pela tela de cadastro de processo para selecionar unidades participantes
+     * Endpoint usado pela tela de cadastro de processo para selecionar unidades
+     * participantes
      */
     @GetMapping
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
@@ -53,20 +49,22 @@ public class UnidadeController {
     }
 
     /**
-     * Busca a árvore de unidades indicando a elegibilidade de cada uma para participar de um processo.
+     * Busca a árvore de unidades indicando a elegibilidade de cada uma para
+     * participar de um processo.
+     *
      * @param tipoProcesso O tipo de processo a ser criado.
-     * @param codProcesso O código do processo (opcional, para edição).
+     * @param codProcesso  O código do processo (opcional, para edição).
      * @return A lista de unidades raiz com a árvore de filhas e a elegibilidade.
      */
     @GetMapping("/arvore-com-elegibilidade")
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
-        @RequestParam("tipoProcesso") String tipoProcesso,
-        @RequestParam(value = "codProcesso", required = false) Long codProcesso
-    ) {
-        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.valueOf(tipoProcesso), codProcesso);
+            @RequestParam("tipoProcesso") String tipoProcesso,
+            @RequestParam(value = "codProcesso", required = false) Long codProcesso) {
+        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.valueOf(tipoProcesso),
+                codProcesso);
         return ResponseEntity.ok(arvore);
     }
-    
+
     /**
      * Verifica se a unidade possui mapa de competências vigente
      * Usado pelo frontend para determinar se deve exibir opções de revisão
@@ -79,10 +77,11 @@ public class UnidadeController {
         boolean temMapaVigente = unidadeService.verificarMapaVigente(codigoUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
-    
+
     /**
      * Busca servidores (usuários) de uma unidade específica
-     * Usado pelo frontend para validar se unidade tem servidores em processos de diagnóstico
+     * Usado pelo frontend para validar se unidade tem servidores em processos de
+     * diagnóstico
      * 
      * @param codigoUnidade O código da unidade
      * @return Lista de servidores da unidade
@@ -108,6 +107,7 @@ public class UnidadeController {
 
     /**
      * Busca uma unidade específica pela sua sigla.
+     *
      * @param sigla A sigla da unidade.
      * @return Os dados da unidade.
      */
@@ -118,13 +118,57 @@ public class UnidadeController {
     }
 
     /**
-     * Busca uma unidade específica pelo seu ID.
-     * @param id O ID da unidade.
+     * Busca uma unidade específica pelo seu código.
+     *
+     * @param codigo O código da unidade.
      * @return Os dados da unidade.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<UnidadeDto> buscarUnidadePorId(@PathVariable Long id) {
-        UnidadeDto unidade = unidadeService.buscarPorId(id);
+    @GetMapping("/{codigo}")
+    public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
+        UnidadeDto unidade = unidadeService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(unidade);
+    }
+
+    /**
+     * Busca a árvore de uma unidade específica (incluindo subunidades).
+     *
+     * @param codigo O código da unidade.
+     * @return A unidade com sua árvore de subunidades.
+     */
+    @GetMapping("/{codigo}/arvore")
+    public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
+        UnidadeDto unidade = unidadeService.buscarArvore(codigo);
+        if (unidade == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(unidade);
+    }
+
+    /**
+     * Busca as siglas de todas as unidades subordinadas (diretas e indiretas) e a
+     * própria unidade.
+     *
+     * @param sigla A sigla da unidade raiz.
+     * @return Lista de siglas.
+     */
+    @GetMapping("/sigla/{sigla}/subordinadas")
+    public ResponseEntity<List<String>> buscarSiglasSubordinadas(@PathVariable String sigla) {
+        List<String> siglas = unidadeService.buscarSiglasSubordinadas(sigla);
+        return ResponseEntity.ok(siglas);
+    }
+
+    /**
+     * Busca a sigla da unidade superior imediata.
+     *
+     * @param sigla A sigla da unidade.
+     * @return A sigla da unidade superior ou 204 se não houver.
+     */
+    @GetMapping("/sigla/{sigla}/superior")
+    public ResponseEntity<String> buscarSiglaSuperior(@PathVariable String sigla) {
+        String siglaSuperior = unidadeService.buscarSiglaSuperior(sigla);
+        if (siglaSuperior == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(siglaSuperior);
     }
 }

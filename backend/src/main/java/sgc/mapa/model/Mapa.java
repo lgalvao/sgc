@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mapa extends EntidadeBase {
+    public Mapa(Long codigo) {
+        super(codigo);
+    }
+
     @Column(name = "data_hora_disponibilizado")
     private LocalDateTime dataHoraDisponibilizado;
 

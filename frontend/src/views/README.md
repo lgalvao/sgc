@@ -1,4 +1,5 @@
 # Views (Páginas da Aplicação)
+Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém os componentes de **página** (Views) do Vue.js. As views são os componentes de nível superior que são carregados diretamente pelo Vue Router.
 
@@ -11,13 +12,33 @@ Diferente dos componentes "burros" (`src/components`), as views são "inteligent
 
 ## Views Principais
 
+### Autenticação e Painel
 - **`LoginView.vue`**: Tela de login.
-- **`PainelView.vue`**: Dashboard principal do usuário.
-- **`ProcessoView.vue`**: Listagem e gestão de processos.
-- **`SubprocessoView.vue`**: Tela de detalhes de uma unidade dentro de um processo (o "coração" operacional do sistema).
-- **`CadMapa.vue` / `VisMapa.vue`**: Telas para edição e visualização do mapa de competências.
-- **`CadAtividades.vue`**: Tela para cadastro de atividades e conhecimentos.
-- **`DiagnosticoEquipe.vue` / `OcupacoesCriticas.vue`**: Telas específicas para o processo de Diagnóstico.
-- **`HistoricoView.vue`**: Visualização de históricos passados.
+- **`PainelView.vue`**: Dashboard principal do usuário, exibindo alertas e movimentações recentes.
+
+### Processos e Subprocessos
+- **`ProcessoView.vue`**: Listagem de processos.
+- **`CadProcesso.vue`**: Formulário para criação de novos processos.
+- **`SubprocessoView.vue`**: Tela de detalhes de um subprocesso específico. É o hub central para as ações de uma unidade (ver mapa, diagnósticos, etc.).
+
+### Gestão de Mapas e Atividades
+- **`CadMapa.vue`**: Tela para edição do mapa de competências.
+- **`VisMapa.vue`**: Tela para visualização (leitura) do mapa de competências.
+- **`CadAtividades.vue`**: Tela para cadastro e edição de atividades e conhecimentos.
+- **`VisAtividades.vue`**: Visualização de atividades e conhecimentos.
+
+### Diagnóstico
+- **`DiagnosticoEquipe.vue`**: Tela para realizar o diagnóstico da equipe.
+- **`OcupacoesCriticas.vue`**: Tela para identificação de ocupações críticas.
+
+### Outros
+- **`CadAtribuicao.vue`**: Tela para cadastro de atribuições temporárias.
+- **`UnidadeView.vue`**: Visualização de detalhes de uma unidade organizacional.
+- **`HistoricoView.vue`**: Visualização de históricos.
 - **`RelatoriosView.vue`**: Geração e visualização de relatórios gerenciais.
-- **`ConfiguracoesView.vue`**: Configurações do sistema (apenas ADMIN).
+- **`ConfiguracoesView.vue`**: Configurações do sistema (acesso restrito a administradores).
+
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

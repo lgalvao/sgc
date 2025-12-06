@@ -1,0 +1,1 @@
+Todos os views nesse diretorio devem ter os nomes sem o sufixo 'View'

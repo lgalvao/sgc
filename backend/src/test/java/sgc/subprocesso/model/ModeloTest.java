@@ -3,13 +3,13 @@ package sgc.subprocesso.model;
 import org.junit.jupiter.api.Test;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
+import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import sgc.sgrh.model.Usuario;
 
 class ModeloTest {
     @Test
@@ -58,13 +58,13 @@ class ModeloTest {
         mapa.setCodigo(1L);
         
         Subprocesso subprocesso = new Subprocesso(
-            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
+            processo, unidade, mapa, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
         );
         
         assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
         assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
         assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
-        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
     }
 

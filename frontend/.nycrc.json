@@ -10,7 +10,6 @@
     "node_modules/**",
     "tests/**",
     "spec/**",
-    "playwright.config.ts",
     "vite.config.js",
     "vitest.setup.js",
     "vitest.setup.ts",

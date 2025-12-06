@@ -4,22 +4,22 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
-    fullyParallel: false,
+    timeout: 20_000,
     workers: 1,
-    timeout: 10000,
-    reporter: "dot",
-    expect: {timeout: 5000},
-    globalSetup: require.resolve('./e2e/setup/setup-databases'),
-    globalTeardown: require.resolve('./e2e/setup/global-teardown'),
-    projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
-
-    webServer: {
-        command: 'npm --prefix ./frontend run dev',
-        url: 'http://localhost:5173',
-        reuseExistingServer: !process.env.CI,
-    },
+    expect: {timeout: 3_000},
+    reporter: 'dot',
     use: {
         baseURL: 'http://localhost:5173',
-        trace: 'retain-on-failure'
-    }
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure'
+    },
+    webServer: {
+        command: 'node e2e/lifecycle.js',
+        url: 'http://localhost:5173',
+        reuseExistingServer: true,
+        timeout: 300 * 1000,
+        stdout: 'pipe',
+        stderr: 'pipe',
+    },
+    projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium-headless-shell'}}],
 });

@@ -10,15 +10,18 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
-import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.ConhecimentoRepo;
 import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -29,7 +32,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceTest {
@@ -98,6 +102,7 @@ class AtividadeServiceTest {
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
@@ -109,6 +114,39 @@ class AtividadeServiceTest {
 
         assertThat(result).isNotNull();
         verify(atividadeRepo).save(any());
+    }
+
+    @Test
+    @DisplayName("criar deve atualizar situacao se nao iniciado")
+    void criarAtualizaSituacao() {
+        Long mapaId = 10L;
+        String usuarioId = "user1";
+        AtividadeDto dto = new AtividadeDto();
+        dto.setMapaCodigo(mapaId);
+
+        Unidade unidade = new Unidade();
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(usuarioId);
+        unidade.setTitular(usuario);
+
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        subprocesso.setProcesso(processo);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+        when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
+        when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+        when(atividadeRepo.save(any())).thenReturn(new Atividade());
+        when(atividadeMapper.toDto(any())).thenReturn(dto);
+
+        atividadeService.criar(dto, usuarioId);
+
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        verify(subprocessoRepo).save(subprocesso);
     }
 
     @Test
@@ -169,12 +207,21 @@ class AtividadeServiceTest {
     @DisplayName("atualizar deve atualizar e retornar dto")
     void atualizar() {
         Long id = 1L;
+        Long mapaId = 100L;
         AtividadeDto dto = new AtividadeDto();
         dto.setDescricao("Nova desc");
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Atividade atividade = new Atividade();
         atividade.setDescricao("Velha desc");
+        atividade.setMapa(mapa);
 
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
         when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade(null, "Nova desc"));
         when(atividadeRepo.save(any())).thenReturn(atividade);
@@ -197,9 +244,19 @@ class AtividadeServiceTest {
     @DisplayName("excluir deve remover atividade e conhecimentos")
     void excluir() {
         Long id = 1L;
+        Long mapaId = 100L;
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Atividade atividade = new Atividade();
         atividade.setCodigo(id);
+        atividade.setMapa(mapa);
 
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
         when(conhecimentoRepo.findByAtividadeCodigo(id)).thenReturn(List.of());
 
@@ -242,9 +299,19 @@ class AtividadeServiceTest {
     @DisplayName("criarConhecimento deve salvar")
     void criarConhecimento() {
         Long id = 1L;
+        Long mapaId = 100L;
         ConhecimentoDto dto = new ConhecimentoDto();
-        Atividade atividade = new Atividade();
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
+        Atividade atividade = new Atividade();
+        atividade.setMapa(mapa);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
         when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
         when(conhecimentoRepo.save(any())).thenReturn(new Conhecimento());
@@ -268,15 +335,24 @@ class AtividadeServiceTest {
     void atualizarConhecimento() {
         Long ativId = 1L;
         Long conId = 2L;
+        Long mapaId = 100L;
         ConhecimentoDto dto = new ConhecimentoDto();
         dto.setDescricao("Novo");
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Atividade atividade = new Atividade();
         atividade.setCodigo(ativId);
+        atividade.setMapa(mapa);
 
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setAtividade(atividade);
 
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
         when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento("Novo", atividade));
         when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
@@ -310,13 +386,22 @@ class AtividadeServiceTest {
     void excluirConhecimento() {
         Long ativId = 1L;
         Long conId = 2L;
+        Long mapaId = 100L;
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
 
         Atividade atividade = new Atividade();
         atividade.setCodigo(ativId);
+        atividade.setMapa(mapa);
 
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setAtividade(atividade);
 
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
         atividadeService.excluirConhecimento(ativId, conId);

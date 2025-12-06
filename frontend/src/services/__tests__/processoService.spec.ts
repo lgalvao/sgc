@@ -1,20 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
-import {
-    afterEach,
-    beforeAll,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type Mock,
-    vi,
-} from "vitest";
+import {afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi,} from "vitest";
 import apiClient from "@/axios-setup";
-import {
-    type AtualizarProcessoRequest,
-    type CriarProcessoRequest,
-    TipoProcesso,
-} from "@/types/tipos";
+import {type AtualizarProcessoRequest, type CriarProcessoRequest, TipoProcesso,} from "@/types/tipos";
 import * as service from "../processoService";
 
 vi.mock("@/axios-setup", () => {
@@ -58,8 +45,11 @@ describe("processoService", () => {
         mockApi.post.mockResolvedValue({});
         await service.iniciarProcesso(1, TipoProcesso.REVISAO, [10, 20]);
         expect(mockApi.post).toHaveBeenCalledWith(
-            "/processos/1/iniciar?tipo=REVISAO",
-            [10, 20],
+            "/processos/1/iniciar",
+            {
+                tipo: TipoProcesso.REVISAO,
+                unidades: [10, 20],
+            },
         );
     });
 
@@ -75,15 +65,15 @@ describe("processoService", () => {
         expect(mockApi.post).toHaveBeenCalledWith("/processos/1/excluir");
     });
 
-    it("fetchProcessosFinalizados should get from the correct endpoint", async () => {
+    it("buscarProcessosFinalizados should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: []});
-        await service.fetchProcessosFinalizados();
+        await service.buscarProcessosFinalizados();
         expect(mockApi.get).toHaveBeenCalledWith("/processos/finalizados");
     });
 
-    it("obterProcessoPorId should get from the correct endpoint", async () => {
+    it("obterProcessoPorCodigo should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: {}});
-        await service.obterProcessoPorId(1);
+        await service.obterProcessoPorCodigo(1);
         expect(mockApi.get).toHaveBeenCalledWith("/processos/1");
     });
 
@@ -124,9 +114,9 @@ describe("processoService", () => {
         );
     });
 
-    it("fetchSubprocessosElegiveis should get from the correct endpoint", async () => {
+    it("buscarSubprocessosElegiveis should get from the correct endpoint", async () => {
         mockApi.get.mockResolvedValue({data: []});
-        await service.fetchSubprocessosElegiveis(1);
+        await service.buscarSubprocessosElegiveis(1);
         expect(mockApi.get).toHaveBeenCalledWith(
             "/processos/1/subprocessos-elegiveis",
         );
@@ -147,17 +137,15 @@ describe("processoService", () => {
         mockApi.post.mockResolvedValue({});
         await service.apresentarSugestoes(1, payload);
         expect(mockApi.post).toHaveBeenCalledWith(
-            "/processos/apresentar-sugestoes",
-            {id: 1, ...payload},
+            "/subprocessos/1/apresentar-sugestoes",
+            payload,
         );
     });
 
     it("validarMapa should post to the correct endpoint", async () => {
         mockApi.post.mockResolvedValue({});
         await service.validarMapa(1);
-        expect(mockApi.post).toHaveBeenCalledWith("/processos/validar-mapa", {
-            id: 1,
-        });
+        expect(mockApi.post).toHaveBeenCalledWith("/subprocessos/1/validar-mapa");
     });
 
     it("buscarSubprocessos should get from the correct endpoint", async () => {

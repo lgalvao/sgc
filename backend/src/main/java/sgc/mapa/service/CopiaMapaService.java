@@ -7,9 +7,9 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.unidade.model.Unidade;
@@ -25,7 +25,6 @@ public class CopiaMapaService {
     private final ConhecimentoRepo conhecimentoRepo;
     private final UnidadeRepo repositorioUnidade;
     private final CompetenciaRepo competenciaRepo;
-    private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Long codUnidadeDestino) {
@@ -43,7 +42,10 @@ public class CopiaMapaService {
                 .setUnidade(unidadeDestino);
 
         Mapa mapaSalvo = repositorioMapa.save(novoMapa);
-        subprocessoRepo.findByUnidadeCodigo(codUnidadeDestino).forEach(s -> s.setMapa(mapaSalvo));
+        // Removido: subprocessoRepo.findByUnidadeCodigo(codUnidadeDestino).forEach(s ->
+        // s.setMapa(mapaSalvo));
+        // O subprocesso já é criado com o mapa correto em
+        // ProcessoService.criarSubprocessoParaRevisao
         Map<Long, Atividade> mapaDeAtividades = new HashMap<>();
 
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigo(fonte.getCodigo());

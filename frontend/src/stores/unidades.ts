@@ -1,139 +1,114 @@
 import {defineStore} from "pinia";
+import {ref} from "vue";
 import {mapUnidadesArray} from "@/mappers/unidades";
 import {
     buscarArvoreComElegibilidade,
-    buscarUnidadePorCodigo,
+    buscarArvoreUnidade as serviceBuscarArvoreUnidade,
+    buscarSubordinadas as serviceBuscarSubordinadas,
+    buscarSuperior as serviceBuscarSuperior,
+    buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
 
-export const useUnidadesStore = defineStore("unidades", {
-    state: () => ({
-        unidades: [] as Unidade[],
-        unidade: null as Unidade | null,
-        isLoading: false,
-        error: null as string | null,
-    }),
-    actions: {
-        async fetchUnidadesParaProcesso(
-            tipoProcesso: string,
-            codProcesso?: number,
-        ) {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const response = await buscarArvoreComElegibilidade(
-                    tipoProcesso,
-                    codProcesso,
-                );
-                this.unidades = mapUnidadesArray(response as any) as Unidade[];
-            } catch (err: any) {
-                this.error = "Falha ao carregar unidades: " + err.message;
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async fetchUnidade(sigla: string) {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const response = await buscarUnidadePorSigla(sigla);
-                this.unidade = response as unknown as Unidade; // O service retorna data ou objeto direto? Ver service.
-            } catch (err: any) {
-                this.error = "Falha ao carregar unidade: " + err.message;
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async fetchUnidadePorCodigo(codigo: number) {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const response = await buscarUnidadePorCodigo(codigo);
-                this.unidade = response as unknown as Unidade;
-            } catch (err: any) {
-                this.error = "Falha ao carregar unidade: " + err.message;
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        pesquisarUnidadePorCodigo(
-            this: ReturnType<typeof useUnidadesStore>,
-            codigo: number,
-            units: Unidade[] = this.unidades,
-        ): Unidade | null {
-            for (const unit of units) {
-                if (unit.codigo === codigo) return unit;
-                if (unit.filhas) {
-                    const found = this.pesquisarUnidadePorCodigo(codigo, unit.filhas);
-                    if (found) return found;
-                }
-            }
+export const useUnidadesStore = defineStore("unidades", () => {
+    const unidades = ref<Unidade[]>([]);
+    const unidade = ref<Unidade | null>(null);
+    const isLoading = ref(false);
+    const error = ref<string | null>(null);
+
+    async function buscarUnidadesParaProcesso(
+        tipoProcesso: string,
+        codProcesso?: number,
+    ) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await buscarArvoreComElegibilidade(
+                tipoProcesso,
+                codProcesso,
+            );
+            unidades.value = mapUnidadesArray(response as any) as Unidade[];
+        } catch (err: any) {
+            error.value = "Falha ao carregar unidades: " + err.message;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    async function buscarUnidade(sigla: string) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await buscarUnidadePorSigla(sigla);
+            unidade.value = response as unknown as Unidade;
+        } catch (err: any) {
+            error.value = "Falha ao carregar unidade: " + err.message;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    async function buscarUnidadePorCodigo(codigo: number) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await serviceBuscarUnidadePorCodigo(codigo);
+            unidade.value = response as unknown as Unidade;
+        } catch (err: any) {
+            error.value = "Falha ao carregar unidade: " + err.message;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    async function buscarArvoreUnidade(codigo: number) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const response = await serviceBuscarArvoreUnidade(codigo);
+            unidade.value = response as unknown as Unidade;
+        } catch (err: any) {
+            error.value = "Falha ao carregar unidade: " + err.message;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    async function obterUnidadesSubordinadas(siglaUnidade: string): Promise<string[]> {
+        isLoading.value = true;
+        try {
+            return await serviceBuscarSubordinadas(siglaUnidade);
+        } catch (err: any) {
+            error.value = "Falha ao buscar subordinadas: " + err.message;
+            return [];
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    async function obterUnidadeSuperior(siglaUnidade: string): Promise<string | null> {
+        isLoading.value = true;
+        try {
+            return await serviceBuscarSuperior(siglaUnidade);
+        } catch (err: any) {
+            error.value = "Falha ao buscar superior: " + err.message;
             return null;
-        },
+        } finally {
+            isLoading.value = false;
+        }
+    }
 
-        pesquisarUnidadePorSigla(
-            this: ReturnType<typeof useUnidadesStore>,
-            sigla: string,
-            units: Unidade[] = this.unidades,
-        ): Unidade | null {
-            for (const unit of units) {
-                if (unit.sigla === sigla) return unit;
-                if (unit.filhas) {
-                    const found = this.pesquisarUnidadePorSigla(sigla, unit.filhas);
-                    if (found) return found;
-                }
-            }
-            return null;
-        },
-
-        getUnidadesSubordinadas(siglaUnidade: string): string[] {
-            const unidadesEncontradas: string[] = [];
-            const stack: Unidade[] = [];
-
-            const unidadeRaiz = this.pesquisarUnidadePorSigla(siglaUnidade);
-            if (unidadeRaiz) {
-                stack.push(unidadeRaiz);
-                while (stack.length > 0) {
-                    const currentUnidade = stack.pop()!;
-                    unidadesEncontradas.push(currentUnidade.sigla);
-                    if (currentUnidade.filhas) {
-                        for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                            stack.push(currentUnidade.filhas[i]);
-                        }
-                    }
-                }
-            }
-            return unidadesEncontradas;
-        },
-        getUnidadeSuperior(siglaUnidade: string): string | null {
-            const stack: { unit: Unidade; parentSigla: string | null }[] = [];
-
-            for (const unidade of this.unidades) {
-                stack.push({unit: unidade, parentSigla: null});
-            }
-
-            while (stack.length > 0) {
-                const {unit: currentUnidade, parentSigla: currentParentSigla} =
-                    stack.pop()!;
-
-                if (currentUnidade.sigla === siglaUnidade) {
-                    return currentParentSigla;
-                }
-
-                if (currentUnidade.filhas) {
-                    for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                        stack.push({
-                            unit: currentUnidade.filhas[i],
-                            parentSigla: currentUnidade.sigla,
-                        });
-                    }
-                }
-            }
-            return null;
-        },
-        getUnidadeImediataSuperior(siglaUnidade: string): string | null {
-            return this.getUnidadeSuperior(siglaUnidade);
-        },
-    },
+    return {
+        unidades,
+        unidade,
+        isLoading,
+        error,
+        buscarUnidadesParaProcesso,
+        buscarUnidade,
+        buscarUnidadePorCodigo,
+        buscarArvoreUnidade,
+        obterUnidadesSubordinadas,
+        obterUnidadeSuperior,
+    };
 });

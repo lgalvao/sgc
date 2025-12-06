@@ -31,13 +31,26 @@ public class CompetenciaService {
                 () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         competencia.setDescricao(descricao);
+
+        // Remove from existing activities
+        for (Atividade atividade : competencia.getAtividades()) {
+            atividade.getCompetencias().remove(competencia);
+        }
         competencia.getAtividades().clear();
+
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        competenciaRepo.deleteById(codCompetencia);
+        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow(
+                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+
+        for (Atividade atividade : competencia.getAtividades()) {
+            atividade.getCompetencias().remove(competencia);
+        }
+
+        competenciaRepo.delete(competencia);
     }
 
     private void prepararCompetenciasAtividades(List<Long> codAtividades, Competencia competencia) {
@@ -45,5 +58,8 @@ public class CompetenciaService {
 
         List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
         competencia.setAtividades(new HashSet<>(atividades));
+        for (Atividade atividade : atividades) {
+            atividade.getCompetencias().add(competencia);
+        }
     }
 }

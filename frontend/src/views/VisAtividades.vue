@@ -13,19 +13,21 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
+          data-testid="vis-atividades__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </BButton>
         <BButton
           variant="outline-info"
+          data-testid="btn-vis-atividades-historico"
           @click="abrirModalHistoricoAnalise"
         >
           Histórico de análise
         </BButton>
         <BButton
           variant="secondary"
-          data-testid="btn-devolver"
+          data-testid="btn-acao-devolver"
           title="Devolver para ajustes"
           @click="devolverCadastro"
         >
@@ -33,7 +35,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-acao-principal-analise"
+          data-testid="btn-acao-analisar-principal"
           title="Validar"
           @click="validarCadastro"
         >
@@ -55,7 +57,7 @@
         >
           <strong
             class="atividade-descricao"
-            data-testid="atividade-descricao"
+            data-testid="txt-atividade-descricao"
           >{{ atividade.descricao }}</strong>
         </div>
 
@@ -66,7 +68,7 @@
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
-            <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
+            <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
         </div>
       </BCardBody>
@@ -90,6 +92,7 @@
     <!-- Modal de Validação -->
     <BModal
       v-model="mostrarModalValidar"
+      :fade="false"
       :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
       centered
       hide-footer
@@ -106,7 +109,7 @@
         <BFormTextarea
           id="observacaoValidacao"
           v-model="observacaoValidacao"
-          data-testid="input-observacao-aceite"
+          data-testid="inp-aceite-cadastro-obs"
           rows="3"
         />
       </div>
@@ -119,7 +122,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-modal-confirmar-aceite"
+          data-testid="btn-aceite-cadastro-confirmar"
           @click="confirmarValidacao"
         >
           Confirmar
@@ -130,6 +133,7 @@
     <!-- Modal de Devolução -->
     <BModal
       v-model="mostrarModalDevolver"
+      :fade="false"
       :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
       centered
       hide-footer
@@ -143,7 +147,7 @@
         <BFormTextarea
           id="observacaoDevolucao"
           v-model="observacaoDevolucao"
-          data-testid="input-observacao-devolucao"
+          data-testid="inp-devolucao-cadastro-obs"
           rows="3"
         />
       </div>
@@ -156,7 +160,7 @@
         </BButton>
         <BButton
           variant="danger"
-          data-testid="btn-modal-confirmar-devolucao"
+          data-testid="btn-devolucao-cadastro-confirmar"
           @click="confirmarDevolucao"
         >
           Confirmar
@@ -167,14 +171,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormTextarea,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
@@ -252,9 +249,8 @@ const isHomologacao = computed(() => {
   const {situacaoSubprocesso} = subprocesso.value;
   return (
       perfilSelecionado.value === Perfil.ADMIN &&
-      (situacaoSubprocesso ===
-          SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES ||
-          situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA)
+      (situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
+          situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO)
   );
 });
 
@@ -264,15 +260,15 @@ const podeVerImpacto = computed(() => {
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
   const situacaoCorreta =
       subprocesso.value.situacaoSubprocesso ===
-      SituacaoSubprocesso.ATIVIDADES_REVISADAS;
+      SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO;
   return podeVer && situacaoCorreta;
 });
 
-const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const atividades = computed<Atividade[]>(() => {
   if (codSubrocesso.value === undefined) return [];
-  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -281,9 +277,9 @@ const isRevisao = computed(
 );
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
   }
 });
 
@@ -328,7 +324,6 @@ async function confirmarValidacao() {
 async function confirmarDevolucao() {
   if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
-    motivo: "", // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 

@@ -1,17 +1,17 @@
-import { createTestingPinia } from "@pinia/testing";
-import { flushPromises, mount } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { computed, defineComponent } from "vue";
+import {createTestingPinia} from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {computed, defineComponent} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 // Import services to mock
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadesService from "@/services/unidadesService";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useMapasStore } from "@/stores/mapas";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useUnidadesStore } from "@/stores/unidades";
-import { Perfil } from "@/types/tipos";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {Perfil} from "@/types/tipos";
 import CadMapa from "@/views/CadMapa.vue";
 
 const { pushMock } = vi.hoisted(() => {
@@ -50,7 +50,7 @@ vi.mock("@/services/mapaService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
   buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-  fetchSubprocessoDetalhe: vi.fn(),
+  buscarSubprocessoDetalhe: vi.fn(),
   adicionarCompetencia: vi.fn(),
   atualizarCompetencia: vi.fn(),
   removerCompetencia: vi.fn(),
@@ -146,7 +146,6 @@ describe("CadMapa.vue", () => {
       perfilSelecionado: { value: Perfil.CHEFE },
       servidorLogado: { value: null },
       unidadeSelecionada: { value: null },
-      getPerfisDoServidor: vi.fn(),
     } as any);
 
     const wrapper = mount(CadMapa, {
@@ -238,7 +237,7 @@ describe("CadMapa.vue", () => {
     vi.mocked(
       subprocessoService.buscarSubprocessoPorProcessoEUnidade,
     ).mockResolvedValue({ codigo: 123 } as any);
-    vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue({
+    vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
       permissoes: { podeVisualizarImpacto: true },
     } as any);
     vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(
@@ -278,10 +277,10 @@ describe("CadMapa.vue", () => {
       .find('[data-testid="btn-abrir-criar-competencia"]')
       .trigger("click");
     expect(
-      wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
+      wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-nova-competencia"]');
+    const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
     await textarea.setValue("Nova Competencia Teste");
 
     // Checkbox interaction
@@ -300,7 +299,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-criar-competencia"]')
+      .find('[data-testid="btn-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
@@ -321,10 +320,10 @@ describe("CadMapa.vue", () => {
       .find('[data-testid="btn-editar-competencia"]')
       .trigger("click");
     expect(
-      wrapper.find('[data-testid="criar-competencia-modal"]').exists(),
+      wrapper.find('[data-testid="mdl-criar-competencia"]').exists(),
     ).toBe(true);
 
-    const textarea = wrapper.find('[data-testid="input-nova-competencia"]');
+    const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
     await textarea.setValue("Competencia A Editada");
 
     vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue({
@@ -332,7 +331,7 @@ describe("CadMapa.vue", () => {
     } as any);
 
     await wrapper
-      .find('[data-testid="btn-criar-competencia"]')
+      .find('[data-testid="btn-criar-competencia-salvar"]')
       .trigger("click");
 
     expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
@@ -355,7 +354,7 @@ describe("CadMapa.vue", () => {
 
     // Find the modal by data-testid
     const deleteModal = wrapper.findComponent(
-      '[data-testid="excluir-competencia-modal"]',
+      '[data-testid="mdl-excluir-competencia"]',
     );
 
     expect(deleteModal.exists()).toBe(true);
@@ -398,22 +397,22 @@ describe("CadMapa.vue", () => {
     await flushPromises();
 
     await wrapper
-      .find('[data-testid="btn-disponibilizar-page"]')
+      .find('[data-testid="btn-cad-mapa-disponibilizar"]')
       .trigger("click");
 
-    const modal = wrapper.find('[data-testid="disponibilizar-modal"]');
+    const modal = wrapper.find('[data-testid="mdl-disponibilizar-mapa"]');
     expect(modal.exists()).toBe(true);
 
     await wrapper
-      .find('[data-testid="input-data-limite"]')
+      .find('[data-testid="inp-disponibilizar-mapa-data"]')
       .setValue("2023-12-31");
     await wrapper
-      .find('[data-testid="input-observacoes-disponibilizacao"]')
+      .find('[data-testid="inp-disponibilizar-mapa-obs"]')
       .setValue("Obs");
 
     vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
 
-    await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+    await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
     expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
       dataLimite: "2023-12-31",
@@ -426,9 +425,47 @@ describe("CadMapa.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    await wrapper.find('[data-testid="impactos-mapa-button"]').trigger("click");
+    await wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').trigger("click");
 
     const impactoModal = wrapper.findComponent({ name: "ImpactoMapaModal" });
     expect(impactoModal.props("mostrar")).toBe(true);
+  });
+
+  it('deve mostrar o botão "Impacto no mapa" se tiver permissão', async () => {
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').exists()).toBe(true);
+  });
+
+  it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {
+    vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
+      permissoes: { podeVisualizarImpacto: false },
+    } as any);
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);
+  });
+
+  it("getConhecimentosTooltip deve retornar 'Nenhum conhecimento cadastrado' se vazia", () => {
+      const { wrapper: w } = createWrapper();
+      expect((w.vm as any).getConhecimentosTooltip(101)).toBe("Nenhum conhecimento cadastrado");
+  });
+
+  it("getConhecimentosModal deve retornar 'Nenhum conhecimento' se vazia", () => {
+      const { wrapper: w } = createWrapper();
+      expect((w.vm as any).getConhecimentosModal({ conhecimentos: [] })).toBe("Nenhum conhecimento");
+  });
+
+  it("não deve buscar dados se subprocesso não encontrado", async () => {
+    vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(null);
+    createWrapper();
+    await flushPromises();
+
+    expect(mapaService.obterMapaCompleto).not.toHaveBeenCalled();
   });
 });

@@ -1,59 +1,47 @@
-# Configuração para testes E2E (End-to-End) com Playwright
-# Usa H2 em memória com dados mínimos de teste (sem processos pré-criados)
-server:
-  port: 10000
-  error:
-    include-exception: true
-    include-stacktrace: always
-    whitelabel.enabled: true
-
 spring:
+  jackson:
+    use-jackson2-defaults: true
   datasource:
-    e2e:
-      url: jdbc:h2:mem:sgcdb_default;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
-      driverClassName: org.h2.Driver
-      username: sa
-      password:
+    url: jdbc:h2:mem:sgc-e2e;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: none
     properties:
-      hibernate.default_schema: SGC
-    show-sql: false
+      hibernate:
+        default_schema: sgc
+    defer-datasource-initialization: true
   sql:
     init:
-      mode: always # Explicitly enable default SQL initialization for E2E profile
-      platform: h2
-
-  devtools:
-    restart:
-      enabled: false
-    livereload:
-      enabled: false
+      mode: always
+      schema-locations: file:../e2e/setup/schema.sql
+      data-locations: file:../e2e/setup/seed.sql
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
-      cors:
-        allowed-origins: "*"
+        include: health
   endpoint:
-    shutdown:
+    health:
       enabled: true
-  health:
-    mail:
-      enabled: false
 
+# Configuração de logging otimizada para e2e
 logging:
+  pattern:
+    # Sem timestamp para economizar tokens e melhorar cache
+    console: "%-5level %logger{30}.%M:%L - %msg%n"
   level:
     sgc: INFO
-    org.springframework: INFO
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.orm.jpa: ERROR
     org.springframework.jdbc: ERROR
-    org.springframework.boot.autoconfigure: ERROR
-    org.hibernate.SQL: WARN
-    org.springframework.mail: ERROR
-    org.springframework.boot.actuate.mail: ERROR
-  file:
-    name: sgc_e2e.log
+    com.zaxxer.hikari: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR

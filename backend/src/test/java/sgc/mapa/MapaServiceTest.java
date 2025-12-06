@@ -22,8 +22,6 @@ import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVinculoService;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

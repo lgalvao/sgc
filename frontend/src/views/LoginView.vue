@@ -7,13 +7,13 @@
       >
         <h2
           class="mb-2 text-center"
-          data-testid="titulo-sgc"
+          data-testid="txt-login-titulo"
         >
           SGC
         </h2>
         <h5
           class="mb-4 text-center text-muted"
-          data-testid="subtitulo-sistema"
+          data-testid="txt-login-subtitulo"
         >
           Sistema de Gestão de Competências
         </h5>
@@ -26,7 +26,7 @@
             <label
               class="form-label"
               for="titulo"
-              data-testid="label-titulo"
+              data-testid="lbl-login-usuario"
             >
               <i class="bi bi-person-circle me-2" />
               Título eleitoral</label>
@@ -37,14 +37,14 @@
               autocomplete="username"
               placeholder="Digite seu título"
               type="text"
-              data-testid="input-titulo"
+              data-testid="inp-login-usuario"
             />
           </div>
           <div class="mb-3">
             <label
               class="form-label"
               for="senha"
-              data-testid="label-senha"
+              data-testid="lbl-login-senha"
             >
               <i class="bi bi-key me-2" />
               Senha</label>
@@ -55,19 +55,19 @@
               autocomplete="current-password"
               placeholder="Digite sua senha"
               type="password"
-              data-testid="input-senha"
+              data-testid="inp-login-senha"
             />
           </div>
 
           <div
             v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
             class="mb-3"
-            data-testid="secao-perfil-unidade"
+            data-testid="sec-login-perfil"
           >
             <label
               class="form-label"
               for="par"
-              data-testid="label-perfil-unidade"
+              data-testid="lbl-login-perfil"
             >Selecione o Perfil e a Unidade</label>
             <BFormSelect
               id="par"
@@ -75,7 +75,7 @@
               :options="perfisUnidadesOptions"
               value-field="value"
               text-field="text"
-              data-testid="select-perfil-unidade"
+              data-testid="sel-login-perfil"
             >
               <template #first>
                 <BFormSelectOption
@@ -92,7 +92,7 @@
             variant="primary"
             class="w-100 login-btn"
             type="submit"
-            data-testid="botao-entrar"
+            data-testid="btn-login-entrar"
             aria-label="Entrar"
           >
             <i class="bi bi-box-arrow-in-right me-2" />
@@ -109,12 +109,13 @@ import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption,} from
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {PerfilUnidade} from "@/mappers/sgrh";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+
 import {usePerfilStore} from "@/stores/perfil";
+import {useFeedbackStore} from "@/stores/feedback";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
 
 const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");
@@ -139,42 +140,44 @@ watch(perfisUnidadesDisponiveis, (newVal) => {
 const handleLogin = async () => {
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
-      notificacoesStore.erro(
-          "Dados incompletos",
-          "Por favor, preencha título e senha.",
-      );
+      feedbackStore.show("Dados incompletos", "Por favor, preencha título e senha.", "danger");
       return;
     }
 
-    const sucessoAutenticacao = await perfilStore.loginCompleto(
-        titulo.value,
-        senha.value,
-    );
+    try {
+      const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
-    if (sucessoAutenticacao) {
-      if (perfilStore.perfisUnidades.length > 1) {
-        loginStep.value = 2;
-      } else if (perfilStore.perfisUnidades.length === 1) {
-        await router.push("/painel");
+      if (sucessoAutenticacao) {
+        if (perfilStore.perfisUnidades.length > 1) {
+          loginStep.value = 2;
+          return;
+        } else if (perfilStore.perfisUnidades.length === 1) {
+          await router.push("/painel");
+        } else {
+          feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
+        }
       } else {
-        notificacoesStore.erro(
-            "Perfis indisponíveis",
-            "Nenhum perfil/unidade disponível para este usuário.",
-        );
+        feedbackStore.show("Falha na autenticação", "Título ou senha inválidos.", "danger");
       }
-    } else {
-      notificacoesStore.erro(
-          "Falha na autenticação",
-          "Título ou senha inválidos.",
-      );
+    } catch (error) {
+      console.error("Erro no login:", error);
+      feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
     }
-  } else {
+  } else if (loginStep.value === 2) {
+    // Step 2: Profile Selection
     if (parSelecionado.value) {
-      await perfilStore.selecionarPerfilUnidade(
+      try {
+        await perfilStore.selecionarPerfilUnidade(
           Number(titulo.value),
           parSelecionado.value,
-      );
-      await router.push("/painel");
+        );
+        await router.push("/painel");
+      } catch (error) {
+        console.error("Erro ao selecionar perfil:", error);
+        feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
+      }
+    } else {
+      feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
     }
   }
 };

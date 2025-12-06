@@ -26,3 +26,18 @@ export async function buscarArvoreComElegibilidade(
     const response = await apiClient.get(url);
     return response.data;
 }
+
+export async function buscarArvoreUnidade(codigo: number) {
+    const response = await apiClient.get(`/unidades/${codigo}/arvore`);
+    return response.data;
+}
+
+export async function buscarSubordinadas(sigla: string) {
+    const response = await apiClient.get(`/unidades/sigla/${sigla}/subordinadas`);
+    return response.data;
+}
+
+export async function buscarSuperior(sigla: string) {
+    const response = await apiClient.get(`/unidades/sigla/${sigla}/superior`);
+    return response.data || null;
+}

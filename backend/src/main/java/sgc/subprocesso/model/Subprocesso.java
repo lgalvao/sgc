@@ -21,6 +21,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Subprocesso extends EntidadeBase {
+    public Subprocesso(Long codigo, sgc.processo.model.Processo processo, sgc.unidade.model.Unidade unidade, sgc.mapa.model.Mapa mapa, SituacaoSubprocesso situacao, java.time.LocalDateTime dataLimiteEtapa1) {
+        super(codigo);
+        this.processo = processo;
+        this.unidade = unidade;
+        this.mapa = mapa;
+        this.situacao = situacao;
+        this.dataLimiteEtapa1 = dataLimiteEtapa1;
+    }
+
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
@@ -67,9 +76,8 @@ public class Subprocesso extends EntidadeBase {
 
     public boolean isEmAndamento() {
         final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.CONCLUIDO,
-            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
-            SituacaoSubprocesso.MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
             SituacaoSubprocesso.NAO_INICIADO
         );
         return !situacoesFinalizadas.contains(this.situacao);
@@ -77,9 +85,8 @@ public class Subprocesso extends EntidadeBase {
 
     public Integer getEtapaAtual() {
         final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.CONCLUIDO,
-            SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
-            SituacaoSubprocesso.MAPA_HOMOLOGADO
+            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO
         );
         if (!situacoesFinalizadas.contains(this.situacao)) {
             return 1;

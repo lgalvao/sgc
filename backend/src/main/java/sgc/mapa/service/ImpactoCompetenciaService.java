@@ -1,18 +1,13 @@
 package sgc.mapa.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.TipoImpactoCompetencia;
 
@@ -34,6 +29,7 @@ public class ImpactoCompetenciaService {
         List<Competencia> competenciasDoMapa = repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
+            if (atividadeDto.getCodigo() == null) continue;
             Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
@@ -51,6 +47,7 @@ public class ImpactoCompetenciaService {
         }
 
         for (AtividadeImpactadaDto atividadeDto : alteradas) {
+            if (atividadeDto.getCodigo() == null) continue;
             Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
@@ -82,6 +79,7 @@ public class ImpactoCompetenciaService {
     }
 
     public List<String> obterCompetenciasDaAtividade(Long codAtividade, Mapa mapaVigente) {
+        if (codAtividade == null) return Collections.emptyList();
         Atividade atividade = atividadeRepo.findById(codAtividade).orElse(null);
         if (atividade == null) return Collections.emptyList();
 

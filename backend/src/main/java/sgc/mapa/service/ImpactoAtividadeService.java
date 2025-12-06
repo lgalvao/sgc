@@ -46,13 +46,13 @@ public class ImpactoAtividadeService {
 
         for (Atividade atual : atuais) {
             if (!descricoesVigentes.contains(atual.getDescricao())) {
-                inseridas.add(new AtividadeImpactadaDto(
-                        atual.getCodigo(),
-                        atual.getDescricao(),
-                        TipoImpactoAtividade.INSERIDA,
-                        null,
-                        List.of()
-                ));
+                inseridas.add(AtividadeImpactadaDto.builder()
+                        .codigo(atual.getCodigo())
+                        .descricao(atual.getDescricao())
+                        .tipoImpacto(TipoImpactoAtividade.INSERIDA)
+                        .descricaoAnterior(null)
+                        .competenciasVinculadas(List.of())
+                        .build());
             }
         }
         return inseridas;
@@ -68,13 +68,13 @@ public class ImpactoAtividadeService {
 
         for (Atividade vigente : vigentes) {
             if (!atuaisMap.containsKey(vigente.getDescricao())) {
-                AtividadeImpactadaDto atividadeImpactadaDto = new AtividadeImpactadaDto(
-                        vigente.getCodigo(),
-                        vigente.getDescricao(),
-                        TipoImpactoAtividade.REMOVIDA,
-                        null,
-                        impactoCompetenciaService.obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente)
-                );
+                AtividadeImpactadaDto atividadeImpactadaDto = AtividadeImpactadaDto.builder()
+                        .codigo(vigente.getCodigo())
+                        .descricao(vigente.getDescricao())
+                        .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
+                        .descricaoAnterior(null)
+                        .competenciasVinculadas(impactoCompetenciaService.obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente))
+                        .build();
 
                 removidas.add(atividadeImpactadaDto);
             }
@@ -93,13 +93,13 @@ public class ImpactoAtividadeService {
                 List<Conhecimento> conhecimentosVigentes = conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
 
                 if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
-                    alteradas.add(new AtividadeImpactadaDto(
-                            atual.getCodigo(),
-                            atual.getDescricao(),
-                            TipoImpactoAtividade.ALTERADA,
-                            "Descrição ou conhecimentos associados alterados.",
-                            impactoCompetenciaService.obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente)
-                    ));
+                    alteradas.add(AtividadeImpactadaDto.builder()
+                            .codigo(atual.getCodigo())
+                            .descricao(atual.getDescricao())
+                            .tipoImpacto(TipoImpactoAtividade.ALTERADA)
+                            .descricaoAnterior("Descrição ou conhecimentos associados alterados.")
+                            .competenciasVinculadas(impactoCompetenciaService.obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente))
+                            .build());
                 }
             }
         }

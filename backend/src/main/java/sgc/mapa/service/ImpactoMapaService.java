@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
-import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
@@ -60,7 +59,7 @@ public class ImpactoMapaService {
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
-        log.info("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
+        log.debug("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
 
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
@@ -107,7 +106,7 @@ public class ImpactoMapaService {
         } else if (hasRole(usuario, "GESTOR")) {
             validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA), MSG_ERRO_GESTOR);
         } else if (hasRole(usuario, "ADMIN")) {
-            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, MAPA_AJUSTADO), MSG_ERRO_ADMIN);
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO), MSG_ERRO_ADMIN);
         }
     }
 

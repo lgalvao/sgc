@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrarModal"
     title="Alterar data limite"
     centered
@@ -24,7 +25,7 @@
     <template #footer>
       <BButton
         variant="secondary"
-        data-testid="btn-modal-cancelar"
+        data-testid="subprocesso-modal__btn-modal-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
@@ -46,12 +47,7 @@
 <script lang="ts" setup>
 import {BButton, BFormGroup, BFormInput, BModal} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
-import {
-  formatDateBR,
-  formatDateForInput,
-  isDateValidAndFuture,
-  parseDate,
-} from "@/utils";
+import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate,} from "@/utils";
 
 interface Props {
   mostrarModal: boolean;

@@ -17,5 +17,5 @@ import lombok.NoArgsConstructor;
 public class ImportarAtividadesReq {
     /** O código do subprocesso do qual as atividades serão importadas. */
     @NotNull
-    private Long subprocessoOrigemId;
+    private Long codSubprocessoOrigem;
 }

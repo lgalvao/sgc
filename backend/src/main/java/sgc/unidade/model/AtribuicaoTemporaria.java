@@ -29,6 +29,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     @JoinColumn(name = "usuario_titulo")
     private Usuario usuario;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "perfil")
+    private sgc.sgrh.model.Perfil perfil;
+
     @Column(name = "data_inicio")
     private LocalDateTime dataInicio;
 

@@ -1,13 +1,16 @@
+import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("jacoco")
     java
+    jacoco
+    checkstyle
+    pmd
+    id("com.github.spotbugs") version "6.0.26"
 }
 
 java {
@@ -23,7 +26,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -31,6 +34,8 @@ dependencies {
     implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // BD
@@ -58,6 +63,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
+    testImplementation("net.jqwik:jqwik:1.9.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
@@ -69,6 +75,144 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.19.0")
     implementation("ch.qos.logback:logback-classic:1.5.20")
     implementation("ch.qos.logback:logback-core:1.5.20")
+
+    // Quality Check Dependencies (SpotBugs)
+    spotbugs("com.github.spotbugs:spotbugs:4.8.6")
+}
+
+// --- Quality Checks Configurations ---
+
+// JaCoCo
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
+    }
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            exclude(
+                "**/config/**",
+                "**/dto/**",
+                "**/entity/**",
+                "**/mapper/**",
+                "**/*Application.class",
+                "**/Sgc.class"
+            )
+        }
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90.toBigDecimal()
+            }
+        }
+    }
+    classDirectories.setFrom(tasks.jacocoTestReport.get().classDirectories)
+}
+
+// SpotBugs
+spotbugs {
+    toolVersion.set("4.9.8")
+    excludeFilter.set(file("config/spotbugs/exclude.xml"))
+    ignoreFailures.set(true) // Don't fail build
+    effort.set(com.github.spotbugs.snom.Effort.MAX)
+    reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
+}
+
+tasks.withType<SpotBugsTask> {
+    reports {
+        create("html") {
+            required.set(true)
+        }
+    }
+}
+
+// Checkstyle
+checkstyle {
+    toolVersion = "12.2.0"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
+    isIgnoreFailures = true // Don't fail build, we check manually via quality task
+}
+
+// PMD
+pmd {
+    toolVersion = "7.16.0"
+    // ruleSets = listOf(file("config/pmd/ruleset.xml").toURI().toString())
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    isIgnoreFailures = true // Don't fail build
+}
+
+// --- Custom Quality Tasks ---
+
+tasks.register("qualityCheck") {
+    group = "quality"
+    description = "Runs all quality checks (tests, coverage, SpotBugs, Checkstyle, PMD)"
+
+    dependsOn(tasks.test)
+    dependsOn(tasks.jacocoTestReport)
+    dependsOn(tasks.jacocoTestCoverageVerification)
+    dependsOn(tasks.checkstyleMain)
+    dependsOn(tasks.checkstyleTest)
+    dependsOn(tasks.pmdMain)
+    dependsOn(tasks.pmdTest)
+    dependsOn(tasks.spotbugsMain)
+    dependsOn(tasks.spotbugsTest)
+
+    val buildDir = layout.buildDirectory.get().asFile.absolutePath
+
+    doLast {
+        println("\n=== Quality Check Summary ===")
+        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
+        println("Checkstyle Main: file://$buildDir/reports/checkstyle/main.html")
+        println("Checkstyle Test: file://$buildDir/reports/checkstyle/test.html")
+        println("PMD Main: file://$buildDir/reports/pmd/main.html")
+        println("PMD Test: file://$buildDir/reports/pmd/test.html")
+        println("SpotBugs Main: file://$buildDir/reports/spotbugs/main.html")
+        println("SpotBugs Test: file://$buildDir/reports/spotbugs/test.html")
+    }
+}
+
+tasks.register("qualityCheckFast") {
+    group = "quality"
+    description = "Runs only tests and coverage"
+
+    dependsOn(tasks.test)
+    dependsOn(tasks.jacocoTestReport)
+    dependsOn(tasks.jacocoTestCoverageVerification)
+
+    val buildDir = layout.buildDirectory.get().asFile.absolutePath
+
+    doLast {
+        println("\n=== Quality Check Fast Summary ===")
+        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
+    }
+}
+
+// Ensure quality checks don't run on normal 'check'
+tasks.named("check") {
+    setDependsOn(dependsOn.filter {
+        it != tasks.checkstyleMain &&
+        it != tasks.checkstyleTest &&
+        it != tasks.pmdMain &&
+        it != tasks.pmdTest &&
+        it != tasks.spotbugsMain &&
+        it != tasks.spotbugsTest
+    })
 }
 
 tasks.withType<BootJar> {
@@ -117,34 +261,6 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("-Xlint:deprecation")
     }
-}
-
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-    reports {
-        xml.required.set(true)
-        csv.required.set(true)
-        html.required.set(true)
-    }
-    classDirectories.setFrom(
-        sourceSets["main"].output.asFileTree.matching {
-            exclude("**/sgc/e2e/**")
-            exclude("**/sgc/comum/config/**")
-            exclude("**/*MapperImpl*")
-            exclude("**/*Impl_*")
-        }
-    )
-}
-
-tasks.register<BootRun>("bootRunE2E") {
-    group = "Application"
-    description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
-    jvmArgs = listOf("-Dspring.profiles.active=e2e")
-    mainClass.set("sgc.Sgc")
-    classpath = sourceSets["main"].runtimeClasspath
 }

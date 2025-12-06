@@ -1,7 +1,23 @@
 <template>
   <BContainer class="mt-4">
-    <div class="fs-5 w-100 mb-3">
-      {{ siglaUnidade }} - {{ nomeUnidade }}
+    <div class="d-flex align-items-center mb-3">
+      <BButton
+        variant="link"
+        class="p-0 me-3 text-decoration-none"
+        data-testid="btn-cad-atividades-voltar"
+        @click="router.back()"
+      >
+        <i class="bi bi-arrow-left fs-4" />
+      </BButton>
+      <div class="fs-5 d-flex align-items-center gap-2">
+        <span>{{ siglaUnidade }} - {{ nomeUnidade }}</span>
+        <span
+          v-if="subprocesso"
+          :class="badgeClass(subprocesso.situacaoSubprocesso)"
+          class="badge fs-6"
+          data-testid="cad-atividades__txt-badge-situacao"
+        >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
+      </div>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -13,6 +29,7 @@
         <BButton
           v-if="podeVerImpacto"
           variant="outline-secondary"
+          data-testid="cad-atividades__btn-impactos-mapa"
           @click="abrirModalImpacto"
         >
           <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
@@ -20,6 +37,7 @@
         <BButton
           v-if="isChefe && historicoAnalises.length > 0"
           variant="outline-info"
+          data-testid="btn-cad-atividades-historico"
           @click="abrirModalHistorico"
         >
           Histórico de análise
@@ -27,6 +45,7 @@
         <BButton
           v-if="isChefe"
           variant="outline-primary"
+          data-testid="btn-cad-atividades-importar"
           title="Importar"
           @click="mostrarModalImportar = true"
         >
@@ -35,7 +54,7 @@
         <BButton
           v-if="isChefe"
           variant="outline-success"
-          data-testid="btn-disponibilizar"
+          data-testid="btn-cad-atividades-disponibilizar"
           title="Disponibilizar"
           @click="disponibilizarCadastro"
         >
@@ -52,7 +71,7 @@
       <BCol>
         <BFormInput
           v-model="novaAtividade"
-          data-testid="input-nova-atividade"
+          data-testid="inp-nova-atividade"
           placeholder="Nova atividade"
           type="text"
           aria-label="Nova atividade"
@@ -87,7 +106,7 @@
             <BFormInput
               v-model="atividadeEditada"
               class="me-2 atividade-edicao-input"
-              data-testid="input-editar-atividade"
+              data-testid="inp-editar-atividade"
               aria-label="Editar atividade"
             />
             <BButton
@@ -115,8 +134,8 @@
           <template v-else>
             <strong
               class="atividade-descricao"
-              data-testid="atividade-descricao"
-            >{{ atividade.descricao }}</strong>
+              data-testid="cad-atividades__txt-atividade-descricao"
+            >{{ atividade?.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <BButton
                 variant="outline-primary"
@@ -152,29 +171,60 @@
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
-            <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
-            <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-              <BButton
-                variant="outline-primary"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-editar-conhecimento"
-                title="Editar"
-                @click="abrirModalEdicaoConhecimento(conhecimento)"
-              >
-                <i class="bi bi-pencil" />
-              </BButton>
-              <BButton
-                variant="outline-danger"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-remover-conhecimento"
-                title="Remover"
-                @click="removerConhecimento(idx, cidx)"
-              >
-                <i class="bi bi-trash" />
-              </BButton>
-            </div>
+            <template v-if="conhecimentoEmEdicao && conhecimentoEmEdicao.conhecimentoId === conhecimento.id">
+                <BFormInput
+                  v-model="conhecimentoEmEdicao.descricao"
+                  class="me-2"
+                  size="sm"
+                  data-testid="inp-editar-conhecimento"
+                  aria-label="Editar conhecimento"
+                />
+                <BButton
+                  variant="outline-success"
+                  size="sm"
+                  class="me-1 botao-acao"
+                  data-testid="btn-salvar-edicao-conhecimento"
+                  title="Salvar"
+                  @click="salvarEdicaoConhecimento"
+                >
+                  <i class="bi bi-save" />
+                </BButton>
+                <BButton
+                  variant="outline-secondary"
+                  size="sm"
+                  class="botao-acao"
+                  data-testid="btn-cancelar-edicao-conhecimento"
+                  title="Cancelar"
+                  @click="cancelarEdicaoConhecimento"
+                >
+                  <i class="bi bi-x" />
+                </BButton>
+            </template>
+            <template v-else>
+                <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
+                <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
+                  <BButton
+                    variant="outline-primary"
+                    size="sm"
+                    class="botao-acao"
+                    data-testid="btn-editar-conhecimento"
+                    title="Editar"
+                    @click="iniciarEdicaoConhecimento(atividade.codigo, conhecimento)"
+                  >
+                    <i class="bi bi-pencil" />
+                  </BButton>
+                  <BButton
+                    variant="outline-danger"
+                    size="sm"
+                    class="botao-acao"
+                    data-testid="btn-remover-conhecimento"
+                    title="Remover"
+                    @click="removerConhecimento(idx, cidx)"
+                  >
+                    <i class="bi bi-trash" />
+                  </BButton>
+                </div>
+            </template>
           </div>
           <BForm
             class="row g-2 align-items-center"
@@ -185,7 +235,7 @@
               <BFormInput
                 v-model="atividade.novoConhecimento"
                 size="sm"
-                data-testid="input-novo-conhecimento"
+                data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 type="text"
                 aria-label="Novo conhecimento"
@@ -225,6 +275,7 @@
 
     <BModal
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
       centered
       hide-footer
@@ -239,6 +290,7 @@
           v-if="atividadesSemConhecimento.length > 0"
           variant="warning"
           :model-value="true"
+          :fade="false"
         >
           <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
           <ul>
@@ -270,6 +322,7 @@
 
     <BModal
       v-model="mostrarModalHistorico"
+      :fade="false"
       title="Histórico de Análise"
       centered
       size="lg"
@@ -278,7 +331,7 @@
       <div class="table-responsive">
         <table
           class="table table-striped"
-          data-testid="historico-analise-tabela"
+          data-testid="cad-atividades__tbl-historico-analise"
         >
           <thead>
             <tr>
@@ -290,13 +343,14 @@
           </thead>
           <tbody>
             <tr
-              v-for="analise in historicoAnalises"
+              v-for="(analise, index) in historicoAnalises"
               :key="analise.codigo"
+              :data-testid="`row-historico-${index}`"
             >
-              <td>{{ formatarData(analise.dataHora) }}</td>
-              <td>{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
-              <td>{{ analise.resultado }}</td>
-              <td>{{ analise.observacoes || '-' }}</td>
+              <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
+              <td :data-testid="`cell-unidade-${index}`">{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
+              <td :data-testid="`cell-resultado-${index}`">{{ formatarAcaoAnalise(analise.acao || analise.resultado) }}</td>
+              <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
             </tr>
           </tbody>
         </table>
@@ -310,41 +364,25 @@
         </BButton>
       </template>
     </BModal>
-
-    <EditarConhecimentoModal
-      :mostrar="mostrarModalEdicaoConhecimento"
-      :conhecimento="conhecimentoSendoEditado as Conhecimento"
-      @fechar="fecharModalEdicaoConhecimento"
-      @salvar="salvarEdicaoConhecimento"
-    />
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  BCard,
-  BCardBody,
-  BCol,
-  BContainer,
-  BForm,
-  BFormInput,
-  BModal,
-} from "bootstrap-vue-next";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import EditarConhecimentoModal from "@/components/EditarConhecimentoModal.vue";
+import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {badgeClass, situacaoLabel} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
-import { usePerfil } from "@/composables/usePerfil";
-import { useAnalisesStore } from "@/stores/analises";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useMapasStore } from "@/stores/mapas";
-import { useNotificacoesStore } from "@/stores/notificacoes";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useUnidadesStore } from "@/stores/unidades";
+import {usePerfil} from "@/composables/usePerfil";
+import {useAnalisesStore} from "@/stores/analises";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useMapasStore} from "@/stores/mapas";
+import {useFeedbackStore} from "@/stores/feedback";
+
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useUnidadesStore} from "@/stores/unidades";
 import {
   type Atividade,
   type Conhecimento,
@@ -357,6 +395,12 @@ import {
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
+}
+
+interface ConhecimentoEdicao {
+  atividadeId: number;
+  conhecimentoId: number;
+  descricao: string;
 }
 
 const props = defineProps<{
@@ -372,8 +416,10 @@ const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
+
 const router = useRouter();
+
 useMapasStore();
 
 const unidade = computed(() => unidadesStore.unidade);
@@ -387,15 +433,23 @@ const codSubrocesso = computed(
   () =>
     processosStore.processoDetalhe?.unidades.find(
       (u) => u.sigla === unidadeId.value,
-    )?.codUnidade,
+    )?.codSubprocesso,
+);
+
+const codMapa = computed(
+  () =>
+    processosStore.processoDetalhe?.unidades.find(
+      (u) => u.sigla === unidadeId.value,
+    )?.mapaCodigo,
 );
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
     if (codSubrocesso.value === undefined) return [];
-    return atividadesStore
-      .getAtividadesPorSubprocesso(codSubrocesso.value)
+    const result = atividadesStore
+      .obterAtividadesPorSubprocesso(codSubrocesso.value)
       .map((a) => ({ ...a, novoConhecimento: "" }));
+    return result;
   },
   set: () => {},
 });
@@ -406,12 +460,18 @@ const isRevisao = computed(
 );
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && codSubrocesso.value) {
+  if (novaAtividade.value?.trim() && codMapa.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(codSubrocesso.value, request);
+    await atividadesStore.adicionarAtividade(codMapa.value, request);
     novaAtividade.value = "";
+    // Refresh activities using subprocess ID
+    if (codSubrocesso.value) {
+        await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+        // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
+        await processosStore.buscarProcessoDetalhe(codProcesso.value);
+    }
   }
 }
 
@@ -427,6 +487,7 @@ async function removerAtividade(idx: number) {
       codSubrocesso.value,
       atividadeRemovida.codigo,
     );
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
   }
 }
 
@@ -443,6 +504,7 @@ async function adicionarConhecimento(idx: number) {
       request,
     );
     atividade.novoConhecimento = "";
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
   }
 }
 
@@ -459,45 +521,36 @@ async function removerConhecimento(idx: number, cidx: number) {
   }
 }
 
-const mostrarModalEdicaoConhecimento = ref(false);
-const conhecimentoSendoEditado = ref<Conhecimento | null>(null);
+const conhecimentoEmEdicao = ref<ConhecimentoEdicao | null>(null);
 
-function abrirModalEdicaoConhecimento(conhecimento: Conhecimento) {
-  conhecimentoSendoEditado.value = { ...conhecimento };
-  mostrarModalEdicaoConhecimento.value = true;
+function iniciarEdicaoConhecimento(atividadeId: number, conhecimento: Conhecimento) {
+  conhecimentoEmEdicao.value = {
+    atividadeId,
+    conhecimentoId: conhecimento.id,
+    descricao: conhecimento.descricao,
+  };
 }
 
-function fecharModalEdicaoConhecimento() {
-  mostrarModalEdicaoConhecimento.value = false;
-  conhecimentoSendoEditado.value = null;
+function cancelarEdicaoConhecimento() {
+  conhecimentoEmEdicao.value = null;
 }
 
-async function salvarEdicaoConhecimento(
-  conhecimentoId: number,
-  novaDescricao: string,
-) {
-  if (!codSubrocesso.value) return;
-  const atividade = atividades.value.find((a) =>
-    a.conhecimentos.some((c) => c.id === conhecimentoId),
-  );
-  if (atividade) {
-    const conhecimento = atividade.conhecimentos.find(
-      (c) => c.id === conhecimentoId,
-    );
-    if (conhecimento) {
+async function salvarEdicaoConhecimento() {
+  if (!codSubrocesso.value || !conhecimentoEmEdicao.value) return;
+
+  if (conhecimentoEmEdicao.value.descricao.trim()) {
       const conhecimentoAtualizado: Conhecimento = {
-        ...conhecimento,
-        descricao: novaDescricao,
+        id: conhecimentoEmEdicao.value.conhecimentoId,
+        descricao: conhecimentoEmEdicao.value.descricao.trim(),
       };
       await atividadesStore.atualizarConhecimento(
         codSubrocesso.value,
-        atividade.codigo,
-        conhecimentoId,
+        conhecimentoEmEdicao.value.atividadeId,
+        conhecimentoEmEdicao.value.conhecimentoId,
         conhecimentoAtualizado,
       );
-    }
   }
-  fecharModalEdicaoConhecimento();
+  cancelarEdicaoConhecimento();
 }
 
 const editandoAtividade = ref<number | null>(null);
@@ -533,9 +586,10 @@ function cancelarEdicaoAtividade() {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  notificacoesStore.sucesso(
+  feedbackStore.show(
     "Importação Concluída",
     "As atividades foram importadas para o seu mapa.",
+    "success"
   );
 }
 
@@ -567,11 +621,11 @@ const atividadesSemConhecimento = ref<Atividade[]>([]);
 
 
 onMounted(async () => {
-  await unidadesStore.fetchUnidade(props.sigla);
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(props.sigla);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
-    await analisesStore.fetchAnalisesCadastro(codSubrocesso.value);
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+    await analisesStore.buscarAnalisesCadastro(codSubrocesso.value);
   }
 });
 
@@ -583,7 +637,7 @@ function validarAtividades(): Atividade[] {
 
 const historicoAnalises = computed(() => {
   if (!codSubrocesso.value) return [];
-  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value);
+  return analisesStore.obterAnalisesPorSubprocesso(codSubrocesso.value);
 });
 
 function formatarData(data: string): string {
@@ -598,6 +652,20 @@ function fecharModalHistorico() {
   mostrarModalHistorico.value = false;
 }
 
+function formatarAcaoAnalise(acao: string | undefined): string {
+  if (!acao) return '';
+  switch (acao) {
+    case 'DEVOLUCAO_MAPEAMENTO':
+    case 'DEVOLUCAO_REVISAO':
+      return 'Devolução';
+    case 'ACEITE_MAPEAMENTO':
+    case 'ACEITE_REVISAO':
+      return 'Aceite';
+    default:
+      return acao;
+  }
+}
+
 function disponibilizarCadastro() {
   const sub = subprocesso.value;
   const situacaoEsperada = isRevisao.value
@@ -605,9 +673,10 @@ function disponibilizarCadastro() {
     : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
-    notificacoesStore.erro(
+    feedbackStore.show(
       "Ação não permitida",
       `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+      "danger"
     );
     return;
   }
@@ -617,10 +686,12 @@ function disponibilizarCadastro() {
     const atividadesDescricoes = atividadesSemConhecimento.value
       .map((a) => `- ${a.descricao}`)
       .join("\n");
-    notificacoesStore.aviso(
+    feedbackStore.show(
       "Atividades Incompletas",
       `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
+      "warning"
     );
+    return;
   }
 
   mostrarModalConfirmacao.value = true;
@@ -729,8 +800,5 @@ function fecharModalImpacto() {
   border-top-right-radius: 0.375rem;
 }
 
-.atividade-titulo-card .atividade-descricao {
-  font-size: 1.1rem;
-}
 
 </style>

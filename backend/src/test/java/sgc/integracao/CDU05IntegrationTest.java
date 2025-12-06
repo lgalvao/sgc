@@ -1,16 +1,13 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -32,6 +29,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,17 +41,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockAdmin
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
-public class CDU05IntegrationTest {
+public class CDU05IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -172,20 +167,11 @@ public class CDU05IntegrationTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())
+        // A validação agora ocorre na criação do processo
+        mockMvc.perform(post("/api/processos").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
-
-        // 2. Tentar iniciar o processo de revisão (deve falhar)
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isConflict()); // Espera-se um erro de negócio
+                .andExpect(status().isConflict()); // ErroProcesso mapeado para 409 Conflict
     }
 
     @Test
@@ -227,6 +213,6 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
     }
 }

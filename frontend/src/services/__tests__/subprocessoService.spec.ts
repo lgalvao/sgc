@@ -22,7 +22,7 @@ describe("subprocessoService", () => {
             await subprocessoService.importarAtividades(1, 2);
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/importar-atividades",
-                {subprocessoOrigemId: 2},
+                {codSubprocessoOrigem: 2},
             );
         });
 
@@ -34,10 +34,10 @@ describe("subprocessoService", () => {
         });
     });
 
-    describe("fetchSubprocessoDetalhe", () => {
+    describe("buscarSubprocessoDetalhe", () => {
         it("deve chamar o endpoint correto com os parâmetros corretos", async () => {
             mockedApiClient.get.mockResolvedValue({data: {}});
-            await subprocessoService.fetchSubprocessoDetalhe(1, "perfil", 123);
+            await subprocessoService.buscarSubprocessoDetalhe(1, "perfil", 123);
             expect(mockedApiClient.get).toHaveBeenCalledWith("/subprocessos/1", {
                 params: {perfil: "perfil", unidadeUsuario: 123},
             });
@@ -66,7 +66,10 @@ describe("subprocessoService", () => {
             );
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/competencias",
-                mockCompetencia,
+                {
+                    descricao: mockCompetencia.descricao,
+                    atividadesIds: mockCompetencia.atividadesAssociadas,
+                },
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);
@@ -80,7 +83,10 @@ describe("subprocessoService", () => {
             );
             expect(mockedApiClient.post).toHaveBeenCalledWith(
                 "/subprocessos/1/competencias/1/atualizar",
-                mockCompetencia,
+                {
+                    descricao: mockCompetencia.descricao,
+                    atividadesIds: mockCompetencia.atividadesAssociadas,
+                },
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);

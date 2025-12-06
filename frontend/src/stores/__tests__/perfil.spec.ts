@@ -36,8 +36,6 @@ describe("usePerfilStore", () => {
 
         initPinia();
         perfilStore = usePerfilStore();
-        // Reset the store state to its initial values based on mocked localStorage
-        perfilStore.$reset();
     });
 
     afterEach(() => {
@@ -50,119 +48,131 @@ describe("usePerfilStore", () => {
         expect(perfilStore.unidadeSelecionada).toBeNull();
     });
 
-    it("should initialize with values from localStorage if available", () => {
-        mockLocalStorage.setItem("idServidor", "10");
-        mockLocalStorage.setItem("perfilSelecionado", "USER");
-        mockLocalStorage.setItem("unidadeSelecionada", "123");
+            it("should initialize with values from localStorage if available", () => {
+                mockLocalStorage.setItem("idServidor", "10");
+                mockLocalStorage.setItem("perfilSelecionado", "USER");
+                mockLocalStorage.setItem("unidadeSelecionada", "123");
+                mockLocalStorage.setItem("unidadeSelecionadaSigla", "U10"); // Add this
 
-        // Create a new Pinia instance and store to pick up new localStorage mocks
-        setActivePinia(createPinia()); // Re-activate Pinia with a fresh instance
-        const newPerfilStore = usePerfilStore(); // Get a fresh store instance
+                // Create a new Pinia instance and store to pick up new localStorage mocks
+                setActivePinia(createPinia()); // Re-activate Pinia with a fresh instance
+                const newPerfilStore = usePerfilStore(); // Get a fresh store instance
 
-        expect(newPerfilStore.servidorId).toBe(10);
-        expect(newPerfilStore.perfilSelecionado).toBe("USER");
-        expect(newPerfilStore.unidadeSelecionada).toBe(123);
-    });
-
-    describe("actions", () => {
-        const mockUsuarioService = vi.mocked(usuarioService);
-
-        it("setServidorId should update idServidor and store it in localStorage", () => {
-            perfilStore.setServidorId(15);
-            expect(perfilStore.servidorId).toBe(15);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("idServidor", "15");
-        });
-
-        it("setPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
-            perfilStore.setPerfilUnidade(Perfil.ADMIN, 123);
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
-            expect(perfilStore.unidadeSelecionada).toBe(123);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-                "perfilSelecionado",
-                Perfil.ADMIN,
-            );
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-                "unidadeSelecionada",
-                "123",
-            );
-        });
-
-        it("loginCompleto should authenticate, fetch profiles, and auto-select if one profile", async () => {
-            const perfilUnidade = {
-                perfil: Perfil.CHEFE,
-                unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
-                siglaUnidade: "UT",
-            };
-            const mockLoginResponse = {
-                perfil: Perfil.CHEFE,
-                unidadeCodigo: 1,
-                tituloEleitoral: 123,
-                token: "fake-token",
-            };
-
-            mockUsuarioService.autenticar.mockResolvedValue(true);
-            mockUsuarioService.autorizar.mockResolvedValue([perfilUnidade]);
-            mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
-
-            const result = await perfilStore.loginCompleto("123", "pass");
-
-            expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({
-                tituloEleitoral: 123,
-                senha: "pass",
+                expect(newPerfilStore.servidorId).toBe(10);
+                expect(newPerfilStore.perfilSelecionado).toBe("USER");
+                expect(newPerfilStore.unidadeSelecionada).toBe(123);
+                expect(newPerfilStore.unidadeSelecionadaSigla).toBe("U10"); // Add this
             });
-            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith(123);
-            expect(mockUsuarioService.entrar).toHaveBeenCalled();
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.CHEFE);
-            expect(perfilStore.unidadeSelecionada).toBe(1);
-            expect(result).toBe(true);
-        });
 
-        it("loginCompleto should not auto-select if multiple profiles", async () => {
-            const perfis = [
-                {
-                    perfil: Perfil.CHEFE,
-                    unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
-                    siglaUnidade: "U1",
-                },
-                {
-                    perfil: Perfil.GESTOR,
-                    unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
-                    siglaUnidade: "U2",
-                },
-            ];
-            mockUsuarioService.autenticar.mockResolvedValue(true);
-            mockUsuarioService.autorizar.mockResolvedValue(perfis);
+            describe("actions", () => {
+                const mockUsuarioService = vi.mocked(usuarioService);
 
-            await perfilStore.loginCompleto("123", "pass");
+                it("definirServidorId should update idServidor and store it in localStorage", () => {
+                    perfilStore.definirServidorId(15);
+                    expect(perfilStore.servidorId).toBe(15);
+                    expect(mockLocalStorage.setItem).toHaveBeenCalledWith("idServidor", "15");
+                });
 
-            expect(mockUsuarioService.entrar).not.toHaveBeenCalled();
-            expect(perfilStore.perfisUnidades).toEqual(perfis);
-        });
+                it("definirPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
+                    perfilStore.definirPerfilUnidade(Perfil.ADMIN, 123, "TEST_SIGLA"); // Fix this line
+                    expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
+                    expect(perfilStore.unidadeSelecionada).toBe(123);
+                    expect(perfilStore.unidadeSelecionadaSigla).toBe("TEST_SIGLA"); // Add this
+                    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+                        "perfilSelecionado",
+                        Perfil.ADMIN,
+                    );
+                    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+                        "unidadeSelecionada",
+                        "123",
+                    );
+                    expect(mockLocalStorage.setItem).toHaveBeenCalledWith( // Add this
+                        "unidadeSelecionadaSigla",
+                        "TEST_SIGLA",
+                    );
+                });
 
-        it("selecionarPerfilUnidade should call entrar and set profile", async () => {
-            const perfilUnidade = {
-                perfil: Perfil.GESTOR,
-                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
-                siglaUnidade: "XYZ",
-            };
-            const mockLoginResponse = {
-                perfil: Perfil.GESTOR,
-                unidadeCodigo: 2,
-                tituloEleitoral: 456,
-                token: "fake-token",
-            };
-            mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
+                it("loginCompleto should authenticate, fetch profiles, and auto-select if one profile", async () => {
+                    const perfilUnidade = {
+                        perfil: Perfil.CHEFE,
+                        unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
+                        siglaUnidade: "UT",
+                    };
+                    const mockLoginResponse = {
+                        perfil: Perfil.CHEFE,
+                        unidadeCodigo: 1,
+                        tituloEleitoral: 123,
+                        token: "fake-token",
+                    };
 
-            await perfilStore.selecionarPerfilUnidade(456, perfilUnidade);
+                    mockUsuarioService.autenticar.mockResolvedValue(true);
+                    mockUsuarioService.autorizar.mockResolvedValue([perfilUnidade]);
+                    mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
-            expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
-                tituloEleitoral: 456,
-                perfil: Perfil.GESTOR,
-                unidadeCodigo: 2,
+                    const result = await perfilStore.loginCompleto("123", "pass");
+
+                    expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({
+                        tituloEleitoral: 123,
+                        senha: "pass",
+                    });
+                    expect(mockUsuarioService.autorizar).toHaveBeenCalledWith(123);
+                    expect(mockUsuarioService.entrar).toHaveBeenCalled();
+                    expect(perfilStore.perfilSelecionado).toBe(Perfil.CHEFE);
+                    expect(perfilStore.unidadeSelecionada).toBe(1);
+                    expect(perfilStore.unidadeSelecionadaSigla).toBe("UT"); // Add this
+                    expect(result).toBe(true);
+                });
+
+                it("loginCompleto should not auto-select if multiple profiles", async () => {
+                    const perfis = [
+                        {
+                            perfil: Perfil.CHEFE,
+                            unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
+                            siglaUnidade: "U1",
+                        },
+                        {
+                            perfil: Perfil.GESTOR,
+                            unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
+                            siglaUnidade: "U2",
+                        },
+                    ];
+                    mockUsuarioService.autenticar.mockResolvedValue(true);
+                    mockUsuarioService.autorizar.mockResolvedValue(perfis);
+
+                    await perfilStore.loginCompleto("123", "pass");
+
+                    expect(mockUsuarioService.entrar).not.toHaveBeenCalled();
+                    expect(perfilStore.perfisUnidades).toEqual(perfis);
+                    expect(perfilStore.perfilSelecionado).toBeNull(); // Add this
+                    expect(perfilStore.unidadeSelecionada).toBeNull(); // Add this
+                    expect(perfilStore.unidadeSelecionadaSigla).toBeNull(); // Add this
+                });
+
+                it("selecionarPerfilUnidade should call entrar and set profile", async () => {
+                    const perfilUnidade = {
+                        perfil: Perfil.GESTOR,
+                        unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
+                        siglaUnidade: "XYZ",
+                    };
+                    const mockLoginResponse = {
+                        perfil: Perfil.GESTOR,
+                        unidadeCodigo: 2,
+                        tituloEleitoral: 456,
+                        token: "fake-token",
+                    };
+                    mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
+
+                    await perfilStore.selecionarPerfilUnidade(456, perfilUnidade);
+
+                    expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
+                        tituloEleitoral: 456,
+                        perfil: Perfil.GESTOR,
+                        unidadeCodigo: 2,
+                    });
+                    expect(perfilStore.perfilSelecionado).toBe(Perfil.GESTOR);
+                    expect(perfilStore.unidadeSelecionada).toBe(2);
+                    expect(perfilStore.unidadeSelecionadaSigla).toBe("XYZ"); // Add this
+                    expect(perfilStore.servidorId).toBe(456);
+                });
             });
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.GESTOR);
-            expect(perfilStore.unidadeSelecionada).toBe(2);
-            expect(perfilStore.servidorId).toBe(456);
         });
-    });
-});

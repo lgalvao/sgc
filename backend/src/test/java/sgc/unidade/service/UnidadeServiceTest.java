@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.MapaRepo;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -23,7 +23,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UnidadeServiceTest {
@@ -111,9 +112,9 @@ class UnidadeServiceTest {
         usuario.setTituloEleitoral("123");
         usuario.setNome("Teste");
         usuario.setEmail("teste@email.com");
-        usuario.setUnidade(unidade);
+        usuario.setUnidadeLotacao(unidade);
 
-        when(usuarioRepo.findByUnidadeCodigo(unidadeId)).thenReturn(List.of(usuario));
+        when(usuarioRepo.findByUnidadeLotacaoCodigo(unidadeId)).thenReturn(List.of(usuario));
 
         var resultado = unidadeService.buscarServidoresPorUnidade(unidadeId);
 
@@ -137,8 +138,8 @@ class UnidadeServiceTest {
     }
 
     @Test
-    @DisplayName("buscarPorId deve retornar unidade se existir")
-    void buscarPorId() {
+    @DisplayName("buscarPorCodigo deve retornar unidade se existir")
+    void buscarPorCodigo() {
         Long id = 1L;
         Unidade unidade = new Unidade("Nome", "SIGLA");
         unidade.setCodigo(id);
@@ -146,18 +147,18 @@ class UnidadeServiceTest {
 
         when(unidadeRepo.findById(id)).thenReturn(Optional.of(unidade));
 
-        UnidadeDto dto = unidadeService.buscarPorId(id);
+        UnidadeDto dto = unidadeService.buscarPorCodigo(id);
 
         assertThat(dto.getCodigo()).isEqualTo(id);
     }
 
     @Test
-    @DisplayName("buscarPorId deve lançar exceção se não encontrar")
-    void buscarPorIdException() {
+    @DisplayName("buscarPorCodigo deve lançar exceção se não encontrar")
+    void buscarPorCodigoException() {
         Long id = 99L;
         when(unidadeRepo.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> unidadeService.buscarPorId(id))
+        assertThatThrownBy(() -> unidadeService.buscarPorCodigo(id))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

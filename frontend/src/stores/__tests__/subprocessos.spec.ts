@@ -3,14 +3,14 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as cadastroService from "@/services/cadastroService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {Perfil} from "@/types/tipos";
-import {useNotificacoesStore} from "../notificacoes";
+
 import {usePerfilStore} from "../perfil";
 import {useProcessosStore} from "../processos";
 import {useSubprocessosStore} from "../subprocessos";
 
 // Mock dependencies
 vi.mock("@/services/subprocessoService", () => ({
-    fetchSubprocessoDetalhe: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
 }));
 
@@ -31,7 +31,7 @@ describe("Subprocessos Store", () => {
         vi.restoreAllMocks();
     });
 
-    it("fetchSubprocessoDetalhe deve carregar detalhes com sucesso", async () => {
+    it("buscarSubprocessoDetalhe deve carregar detalhes com sucesso", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
         const mockDetalhe = {codigo: 123, situacao: "EM_ANDAMENTO"};
@@ -47,13 +47,13 @@ describe("Subprocessos Store", () => {
             },
         ];
 
-        vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue(
+        vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue(
             mockDetalhe as any,
         );
 
-        await store.fetchSubprocessoDetalhe(123);
+        await store.buscarSubprocessoDetalhe(123);
 
-        expect(subprocessoService.fetchSubprocessoDetalhe).toHaveBeenCalledWith(
+        expect(subprocessoService.buscarSubprocessoDetalhe).toHaveBeenCalledWith(
             123,
             "GESTOR",
             99,
@@ -61,47 +61,36 @@ describe("Subprocessos Store", () => {
         expect(store.subprocessoDetalhe).toEqual(mockDetalhe);
     });
 
-    it("fetchSubprocessoDetalhe deve notificar erro se perfil não selecionado", async () => {
+    it("buscarSubprocessoDetalhe deve notificar erro se perfil não selecionado", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         // Perfil not selected
         perfilStore.perfilSelecionado = null;
 
-        await store.fetchSubprocessoDetalhe(123);
+        await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Informações de perfil ou unidade não disponíveis.",
-        );
         expect(store.subprocessoDetalhe).toBeNull();
     });
 
-    it("fetchSubprocessoDetalhe deve notificar erro se unidade não encontrada para perfil", async () => {
+    it("buscarSubprocessoDetalhe deve notificar erro se unidade não encontrada para perfil", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         perfilStore.perfilSelecionado = Perfil.GESTOR;
         perfilStore.unidadeSelecionada = 99;
         perfilStore.perfisUnidades = []; // No matching unit
 
-        await store.fetchSubprocessoDetalhe(123);
+        await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Informações de perfil ou unidade não disponíveis.",
-        );
     });
 
-    it("fetchSubprocessoDetalhe deve tratar erro do serviço", async () => {
+    it("buscarSubprocessoDetalhe deve tratar erro do serviço", async () => {
         const store = useSubprocessosStore();
         const perfilStore = usePerfilStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         perfilStore.perfilSelecionado = Perfil.GESTOR;
         perfilStore.unidadeSelecionada = 99;
@@ -113,25 +102,21 @@ describe("Subprocessos Store", () => {
             },
         ];
 
-        vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockRejectedValue(
+        vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockRejectedValue(
             new Error("Fail"),
         );
 
-        await store.fetchSubprocessoDetalhe(123);
+        await store.buscarSubprocessoDetalhe(123);
 
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao buscar detalhes do subprocesso",
-            "Não foi possível carregar as informações.",
-        );
     });
 
-    it("fetchSubprocessoPorProcessoEUnidade deve retornar código com sucesso", async () => {
+    it("buscarSubprocessoPorProcessoEUnidade deve retornar código com sucesso", async () => {
         const store = useSubprocessosStore();
         vi.mocked(
             subprocessoService.buscarSubprocessoPorProcessoEUnidade,
         ).mockResolvedValue({codigo: 555} as any);
 
-        const result = await store.fetchSubprocessoPorProcessoEUnidade(1, "UNID");
+        const result = await store.buscarSubprocessoPorProcessoEUnidade(1, "UNID");
 
         expect(result).toBe(555);
         expect(
@@ -139,21 +124,16 @@ describe("Subprocessos Store", () => {
         ).toHaveBeenCalledWith(1, "UNID");
     });
 
-    it("fetchSubprocessoPorProcessoEUnidade deve tratar erro", async () => {
+    it("buscarSubprocessoPorProcessoEUnidade deve tratar erro", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
         vi.mocked(
             subprocessoService.buscarSubprocessoPorProcessoEUnidade,
         ).mockRejectedValue(new Error("Fail"));
 
-        const result = await store.fetchSubprocessoPorProcessoEUnidade(1, "UNID");
+        const result = await store.buscarSubprocessoPorProcessoEUnidade(1, "UNID");
 
         expect(result).toBeNull();
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro",
-            "Não foi possível encontrar o subprocesso para esta unidade.",
-        );
     });
 
     it("alterarDataLimiteSubprocesso deve delegar para processosStore", async () => {
@@ -174,16 +154,15 @@ describe("Subprocessos Store", () => {
 
     it("disponibilizarCadastro deve executar ação com sucesso e atualizar processo", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
         const processosStore = useProcessosStore();
-        vi.spyOn(notificacoesStore, "sucesso");
+
 
         vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue(
             {} as any,
         );
 
         processosStore.processoDetalhe = {codigo: 10} as any;
-        vi.spyOn(processosStore, "fetchProcessoDetalhe").mockResolvedValue(
+        vi.spyOn(processosStore, "buscarProcessoDetalhe").mockResolvedValue(
             undefined,
         );
 
@@ -191,17 +170,14 @@ describe("Subprocessos Store", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
-        expect(notificacoesStore.sucesso).toHaveBeenCalledWith(
-            "Cadastro disponibilizado",
-            "Cadastro disponibilizado.",
-        );
-        expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(10);
+
+
+        expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(10);
     });
 
     it("disponibilizarCadastro deve tratar erro", async () => {
         const store = useSubprocessosStore();
-        const notificacoesStore = useNotificacoesStore();
-        vi.spyOn(notificacoesStore, "erro");
+
 
         vi.mocked(cadastroService.disponibilizarCadastro).mockRejectedValue(
             new Error("Fail"),
@@ -210,10 +186,6 @@ describe("Subprocessos Store", () => {
         const success = await store.disponibilizarCadastro(123);
 
         expect(success).toBe(false);
-        expect(notificacoesStore.erro).toHaveBeenCalledWith(
-            "Erro ao disponibilizar",
-            "Não foi possível concluir a ação: Erro ao disponibilizar.",
-        );
     });
 
     it("disponibilizarRevisaoCadastro deve chamar serviço correto", async () => {

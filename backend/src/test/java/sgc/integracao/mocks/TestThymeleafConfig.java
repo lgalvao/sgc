@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 @TestConfiguration
 public class TestThymeleafConfig {
-
     @Bean
     public TemplateEngine templateEngine() {
         TemplateEngine mockTemplateEngine = mock(TemplateEngine.class);

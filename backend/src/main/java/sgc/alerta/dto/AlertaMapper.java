@@ -3,12 +3,11 @@ package sgc.alerta.dto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import sgc.alerta.model.Alerta;
-import sgc.sgrh.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.alerta.model.Alerta;
+import sgc.sgrh.model.Usuario;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,14 +41,16 @@ public abstract class AlertaMapper {
         }
 
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long codUnidade = usuario.getUnidade().getCodigo();
 
-        Optional<Subprocesso> subprocessoOpt = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
-            alerta.getProcesso().getCodigo(),
-            codUnidade
-        );
-
-        return subprocessoOpt
+        // Try to find a subprocess for any of the user's units
+        return usuario.getTodasAtribuicoes().stream()
+            .map(attr -> subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
+                alerta.getProcesso().getCodigo(),
+                attr.getUnidade().getCodigo()
+            ))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst()
             .map(sp -> String.format("/subprocessos/%d", sp.getCodigo()))
             .orElse(null);
     }

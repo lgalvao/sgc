@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Disponibilizar Mapa"
     header-bg-variant="primary"
@@ -30,7 +31,7 @@
       <button
         class="btn btn-secondary"
         type="button"
-        data-testid="btn-modal-cancelar"
+        data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar

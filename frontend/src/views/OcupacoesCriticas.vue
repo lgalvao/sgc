@@ -10,6 +10,7 @@
       <div class="d-flex gap-2">
         <BButton
           variant="outline-success"
+          data-testid="btn-finalizar-identificacao"
           @click="finalizarIdentificacao"
         >
           <i class="bi bi-check-circle me-2" />Finalizar Identificação
@@ -20,6 +21,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle me-2" />
       Identifique as ocupações críticas da unidade baseadas nas competências avaliadas no diagnóstico.
@@ -66,6 +68,7 @@
           <BButton
             variant="outline-danger"
             size="sm"
+            data-testid="btn-remover-ocupacao"
             @click="removerOcupacao(index)"
           >
             <i class="bi bi-trash" />
@@ -89,6 +92,7 @@
               v-model="novaOcupacao.nome"
               type="text"
               required
+              data-testid="inp-ocupacao-nome"
             />
           </div>
           <div class="col-md-6">
@@ -103,6 +107,7 @@
                 { value: 4, text: '4 - Alto' },
                 { value: 5, text: '5 - Muito Alto' },
               ]"
+              data-testid="sel-ocupacao-criticidade"
             />
           </div>
           <div class="col-12">
@@ -111,6 +116,7 @@
               v-model="novaOcupacao.descricao"
               rows="3"
               required
+              data-testid="txt-ocupacao-descricao"
             />
           </div>
           <div class="col-12">
@@ -125,6 +131,7 @@
                   :id="'comp-' + competencia.codigo"
                   v-model="novaOcupacao.competenciasCriticas"
                   :value="competencia.descricao"
+                  :data-testid="`chk-ocupacao-competencia-${competencia.codigo}`"
                 >
                   {{ competencia.descricao }}
                 </BFormCheckbox>
@@ -135,6 +142,7 @@
             <BButton
               type="submit"
               variant="primary"
+              data-testid="btn-adicionar-ocupacao"
             >
               <i class="bi bi-plus-circle me-2" />Adicionar Ocupação
             </BButton>
@@ -146,6 +154,7 @@
     <!-- Modal de confirmação -->
     <BModal
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Finalizar Identificação"
       centered
       hide-footer
@@ -154,12 +163,14 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="ocupacoes-criticas__btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
+          data-testid="ocupacoes-criticas__btn-modal-confirmar"
           @click="confirmarFinalizacao"
         >
           Confirmar
@@ -185,7 +196,8 @@ import {
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useFeedbackStore} from "@/stores/feedback";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Competencia, MapaCompleto} from "@/types/tipos";
@@ -195,22 +207,24 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
+
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => route.params.siglaUnidade as string);
 
 const unidade = computed(() =>
-    unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value),
+    unidadesStore.unidade,
 );
 const nomeUnidade = computed(() => unidade.value?.nome || "");
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(siglaUnidade.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   // Correção temporária: usando codProcesso como codSubrocesso
-  await mapasStore.fetchMapaCompleto(codProcesso.value);
+  await mapasStore.buscarMapaCompleto(codProcesso.value);
 });
 
 const mapa = computed<MapaCompleto | null>(() => {
@@ -243,10 +257,7 @@ const mostrarModalConfirmacao = ref(false);
 
 function adicionarOcupacao() {
   if (!novaOcupacao.value.nome.trim() || !novaOcupacao.value.descricao.trim()) {
-    notificacoesStore.erro(
-        "Dados incompletos",
-        "Preencha nome e descrição da ocupação.",
-    );
+    feedbackStore.show("Dados incompletos", "Preencha nome e descrição da ocupação.", "danger");
     return;
   }
 
@@ -265,15 +276,12 @@ function adicionarOcupacao() {
     competenciasCriticas: [],
   };
 
-  notificacoesStore.sucesso(
-      "Ocupação adicionada",
-      "Ocupação crítica adicionada!",
-  );
+  feedbackStore.show("Ocupação adicionada", "Ocupação crítica adicionada!", "success");
 }
 
 function removerOcupacao(index: number) {
   ocupacoesCriticas.value.splice(index, 1);
-  notificacoesStore.sucesso("Ocupação removida", "Ocupação crítica removida!");
+  feedbackStore.show("Ocupação removida", "Ocupação crítica removida!", "success");
 }
 
 function finalizarIdentificacao() {
@@ -290,26 +298,9 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar identificação
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  notificacoesStore.sucesso(
-      "Identificação finalizada",
-      "A identificação de ocupações críticas foi concluída!",
-  );
+  feedbackStore.show("Identificação finalizada", "A identificação de ocupações críticas foi concluída!", "success");
 
   fecharModalConfirmacao();
   router.push("/painel");
 }
 </script>
-
-<style scoped>
-.card {
-  transition: box-shadow 0.2s;
-}
-
-.card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.border {
-  border-color: var(--bs-border-color) !important;
-}
-</style>

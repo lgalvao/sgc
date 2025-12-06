@@ -1,4 +1,4 @@
-import {createBootstrap} from "bootstrap-vue-next"; // Importar createBootstrap
+import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar createBootstrap e vBTooltip
 import {createPinia} from "pinia";
 import {createApp} from "vue";
 import App from "./App.vue";
@@ -28,7 +28,9 @@ app.use(router);
 // Registrar o plugin do BootstrapVueNext
 app.use(createBootstrap());
 
+// Registrar a diretiva de tooltip globalmente
+app.directive('b-tooltip', vBTooltip);
+
 app.mount("#app");
 
-// Expose Pinia instance globally for Playwright testing (optional, for dev/test environments)
 window.__pinia__ = pinia;

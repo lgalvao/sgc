@@ -12,7 +12,9 @@ import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroSituacaoInvalida;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
@@ -75,9 +77,14 @@ public class AtividadeService {
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
         // Apesar da segurança estar configurada, mantemos esta verificação como proteção extra.
+        if (subprocesso.getUnidade() == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+        }
         if (!usuario.equals(subprocesso.getUnidade().getTitular())) {
             throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
         }
+
+        atualizarSituacaoSubprocessoSeNecessario(atividadeDto.getMapaCodigo());
 
         var entidade = atividadeMapper.toEntity(atividadeDto);
         var salvo = atividadeRepo.save(entidade);
@@ -96,9 +103,9 @@ public class AtividadeService {
     public AtividadeDto atualizar(Long codigo, AtividadeDto atividadeDto) {
         return atividadeRepo.findById(codigo)
                 .map(existente -> {
+                    atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
                     var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
                     existente.setDescricao(entidadeParaAtualizar.getDescricao());
-                    existente.setMapa(entidadeParaAtualizar.getMapa());
 
                     var atualizado = atividadeRepo.save(existente);
                     return atividadeMapper.toDto(atualizado);
@@ -114,6 +121,7 @@ public class AtividadeService {
      */
     public void excluir(Long codAtividade) {
         atividadeRepo.findById(codAtividade).ifPresentOrElse(atividade -> {
+            atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
             var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
             conhecimentoRepo.deleteAll(conhecimentos);
             atividadeRepo.delete(atividade);
@@ -150,6 +158,7 @@ public class AtividadeService {
     public ConhecimentoDto criarConhecimento(Long codAtividade, ConhecimentoDto conhecimentoDto) {
         return atividadeRepo.findById(codAtividade)
                 .map(atividade -> {
+                    atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
                     var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
@@ -171,6 +180,7 @@ public class AtividadeService {
         return conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .map(existente -> {
+                    atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());
                     var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
                     existente.setDescricao(paraAtualizar.getDescricao());
                     var atualizado = conhecimentoRepo.save(existente);
@@ -189,8 +199,30 @@ public class AtividadeService {
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
         conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .ifPresentOrElse(conhecimentoRepo::delete, () -> {
+                .ifPresentOrElse(conhecimento -> {
+                    atualizarSituacaoSubprocessoSeNecessario(conhecimento.getAtividade().getMapa().getCodigo());
+                    conhecimentoRepo.delete(conhecimento);
+                }, () -> {
                     throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
                 });
+    }
+
+    private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
+        var subprocesso = subprocessoRepo.findByMapaCodigo(mapaCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+
+        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            if (subprocesso.getProcesso() == null) {
+                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+            }
+            var tipoProcesso = subprocesso.getProcesso().getTipo();
+            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                subprocessoRepo.save(subprocesso);
+            } else if (tipoProcesso == TipoProcesso.REVISAO) {
+                subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                subprocessoRepo.save(subprocesso);
+            }
+        }
     }
 }

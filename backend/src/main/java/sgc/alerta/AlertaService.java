@@ -123,7 +123,7 @@ public class AlertaService {
             List<Long> codigosUnidades,
             List<Subprocesso> subprocessos) {
 
-        log.info("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
+        log.debug("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long codUnidade : codigosUnidades) {
@@ -134,6 +134,7 @@ public class AlertaService {
                     log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
                     continue;
                 }
+
                 TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().getTipo());
                 String nomeProcesso = processo.getDescricao();
 
@@ -179,7 +180,7 @@ public class AlertaService {
             }
         }
 
-        log.info("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
+        log.debug("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
         return alertasCriados;
     }
 
@@ -240,13 +241,23 @@ public class AlertaService {
                         log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH.", titulo);
                         return sgrhService.buscarUsuarioPorTitulo(tituloStr)
                                 .map(usuarioDto -> {
-                                    Usuario novoUsuario = new Usuario()
-                                            .setTituloEleitoral(usuarioDto.getTitulo())
-                                            .setNome(usuarioDto.getNome())
-                                            .setEmail(usuarioDto.getEmail())
-                                            .setPerfis(java.util.Set.of(Perfil.CHEFE));
+                                    Unidade unidade = unidadeRepo.findById(codUnidade)
+                                            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
 
-                                    unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);
+                                    Usuario novoUsuario = new Usuario();
+                                    novoUsuario.setTituloEleitoral(usuarioDto.getTitulo());
+                                    novoUsuario.setNome(usuarioDto.getNome());
+                                    novoUsuario.setEmail(usuarioDto.getEmail());
+                                    novoUsuario.setUnidadeLotacao(unidade);
+
+                                    sgc.sgrh.model.UsuarioPerfil perfilChefe = sgc.sgrh.model.UsuarioPerfil.builder()
+                                            .usuario(novoUsuario)
+                                            .unidade(unidade)
+                                            .perfil(Perfil.CHEFE)
+                                            .build();
+
+                                    novoUsuario.getAtribuicoes().add(perfilChefe);
+
                                     return novoUsuario;
                                 })
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));

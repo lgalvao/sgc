@@ -5,14 +5,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
+import sgc.analise.model.TipoAcaoAnalise;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
@@ -27,7 +27,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
@@ -43,15 +42,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe("333333333333")
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({ TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class,
+        sgc.integracao.mocks.TestThymeleafConfig.class })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
-class CDU10IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+class CDU10IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -68,11 +65,11 @@ class CDU10IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -85,13 +82,14 @@ class CDU10IntegrationTest {
     void setUp() {
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
         unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
-        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO,
+                SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
-        subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapa, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
+        subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapa,
+                SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
     }
 
@@ -101,7 +99,8 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var competencia = competenciaRepo
+                    .save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
             var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
@@ -114,10 +113,12 @@ class CDU10IntegrationTest {
                     .andExpect(jsonPath("$.message", is("Revisão do cadastro de atividades disponibilizada")));
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNotNull();
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização da revisão do cadastro de atividades");
@@ -127,13 +128,13 @@ class CDU10IntegrationTest {
             var alertas = alertaRepo.findByProcessoCodigo(subprocessoRevisao.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade SESEL submetida para análise");
+            assertThat(alerta.getDescricao())
+                    .isEqualTo("Cadastro de atividades e conhecimentos da unidade SESEL disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
+            verify(subprocessoNotificacaoService).notificarDisponibilizacaoRevisaoCadastro(
                     org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                    org.mockito.ArgumentMatchers.any(Unidade.class)
-            );
+                    org.mockito.ArgumentMatchers.any(Unidade.class));
         }
 
         @Test
@@ -143,10 +144,11 @@ class CDU10IntegrationTest {
             atividadeRepo.save(atividade);
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isUnprocessableContent());
 
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();
-            assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            assertThat(subprocessoNaoAlterado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         }
     }
 
@@ -159,6 +161,75 @@ class CDU10IntegrationTest {
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());
+        }
+    }
+
+    @Nested
+    @DisplayName("Cenário 4: Histórico de análise deve ser excluído após nova disponibilização")
+    class HistoricoAnaliseExcluido {
+
+        @Test
+        @DisplayName("Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente - Fluxo completo")
+        void deveExcluirHistoricoAposNovaDisponibilizacao() throws Exception {
+            // Preparar: criar atividade com conhecimento para permitir disponibilização
+            var competencia = competenciaRepo
+                    .save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
+            competencia.getAtividades().add(atividade);
+            competenciaRepo.save(competencia);
+            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
+
+            Long subprocessoId = subprocessoRevisao.getCodigo();
+
+            // 1. Primeira disponibilização (como CHEFE)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
+                    .andExpect(status().isOk());
+
+            // Verificar situação
+            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            // Verificar que não há análises ainda
+            List<Analise> analisesAposDisp1 = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+            assertThat(analisesAposDisp1).isEmpty();
+
+            // 2. Criar análise de "Aceite" manualmente (simulando GESTOR/ADMIN aceitou)
+            Analise analiseAceite = new Analise();
+            analiseAceite.setSubprocesso(sp);
+            analiseAceite.setUnidadeSigla(unidadeSuperior.getSigla());
+            analiseAceite.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
+            analiseAceite.setDataHora(LocalDateTime.now());
+            analiseRepo.saveAndFlush(analiseAceite);
+
+            // 3. Criar análise de "Devolução" manualmente (simulando segunda devolução)
+            Analise analiseDevolucao = new Analise();
+            analiseDevolucao.setSubprocesso(sp);
+            analiseDevolucao.setUnidadeSigla(unidadeSuperior.getSigla());
+            analiseDevolucao.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
+            analiseDevolucao.setObservacoes("Segunda devolução");
+            analiseDevolucao.setDataHora(LocalDateTime.now());
+            analiseRepo.saveAndFlush(analiseDevolucao);
+
+            // Verificar que temos 2 análises
+            List<Analise> analisesAntes = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+            assertThat(analisesAntes).hasSize(2);
+
+            // 4. Simular devolução: mudar situação para em andamento (como faria o endpoint de devolução)
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setDataFimEtapa1(null);
+            subprocessoRepo.saveAndFlush(sp);
+
+            // 5. Nova disponibilização (como CHEFE) - deve excluir histórico anterior (CDU-10 passo 15)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
+                    .andExpect(status().isOk());
+
+            // 6. Verificar que histórico foi excluído
+            List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+            assertThat(analisesDepois)
+                    .as("Histórico de análises deve estar vazio após nova disponibilização (CDU-10 passo 15)")
+                    .isEmpty();
         }
     }
 }

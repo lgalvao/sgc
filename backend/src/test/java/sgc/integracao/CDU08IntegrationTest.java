@@ -1,17 +1,14 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
@@ -22,7 +19,10 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ImportarAtividadesReq;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -30,6 +30,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,20 +43,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+
+
 @Transactional
+
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+
+@Import({ TestSecurityConfig.class, TestThymeleafConfig.class })
+
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
-class CDU08IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+
+class CDU08IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UsuarioRepo usuarioRepo;
 
     @Autowired
     private UnidadeRepo unidadeRepo;
@@ -75,6 +76,9 @@ class CDU08IntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
+    @Autowired
+    private ProcessoRepo processoRepo;
+
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
 
@@ -82,6 +86,10 @@ class CDU08IntegrationTest {
     void setUp() {
         Unidade unidadeOrigem = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
         Unidade unidadeDestino = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+
+        Processo processo = new Processo("Processo Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO,
+                LocalDateTime.now().plusDays(30));
+        processoRepo.save(processo);
 
         Mapa mapaOrigem = new Mapa();
         mapaRepo.save(mapaOrigem);
@@ -95,11 +103,13 @@ class CDU08IntegrationTest {
         conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
         conhecimentoRepo.save(new Conhecimento("Conhecimento 2.2", atividade2));
 
-        subprocessoOrigem = new Subprocesso();
-        subprocessoOrigem.setUnidade(unidadeOrigem);
-        subprocessoOrigem.setMapa(mapaOrigem);
-        subprocessoOrigem.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-        subprocessoOrigem.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoOrigem = new Subprocesso()
+                .setUnidade(unidadeOrigem)
+                .setMapa(mapaOrigem)
+                .setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .setProcesso(processo);
+
         subprocessoRepo.save(subprocessoOrigem);
 
         Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
@@ -108,8 +118,9 @@ class CDU08IntegrationTest {
         subprocessoDestino = new Subprocesso();
         subprocessoDestino.setUnidade(unidadeDestino);
         subprocessoDestino.setMapa(mapa); // Usa o 'mapa' para os testes de CRUD
-        subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoDestino.setProcesso(processo);
         subprocessoRepo.save(subprocessoDestino);
     }
 
@@ -122,44 +133,70 @@ class CDU08IntegrationTest {
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Atividades importadas.")));
 
-            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            List<Atividade> atividadesDestino = atividadeRepo
+                    .findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).hasSize(2);
 
-            Atividade atividade1Importada = atividadesDestino.stream().filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElse(null);
+            Atividade atividade1Importada = atividadesDestino.stream()
+                    .filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElse(null);
             assertThat(atividade1Importada).isNotNull();
             List<Conhecimento> conhecimentos1 = conhecimentoRepo.findByAtividadeCodigo(atividade1Importada.getCodigo());
             assertThat(conhecimentos1).hasSize(1);
             assertThat(conhecimentos1.getFirst().getDescricao()).isEqualTo("Conhecimento 1.1");
 
-            Atividade atividade2Importada = atividadesDestino.stream().filter(a -> a.getDescricao().equals("Atividade 2")).findFirst().orElse(null);
+            Atividade atividade2Importada = atividadesDestino.stream()
+                    .filter(a -> a.getDescricao().equals("Atividade 2")).findFirst().orElse(null);
             assertThat(atividade2Importada).isNotNull();
             List<Conhecimento> conhecimentos2 = conhecimentoRepo.findByAtividadeCodigo(atividade2Importada.getCodigo());
             assertThat(conhecimentos2).hasSize(2);
-            assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList()).containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
+            assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList())
+                    .containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
 
-            List<sgc.subprocesso.model.Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
+            List<sgc.subprocesso.model.Movimentacao> movimentacoes = movimentacaoRepo
+                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
+            assertThat(movimentacoes.getFirst().getDescricao())
+                    .contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
+        }
+
+        @Test
+        @DisplayName("Deve importar e atualizar status se NAO_INICIADO")
+        void deveImportarEAtualizarStatus() throws Exception {
+            subprocessoDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            subprocessoRepo.save(subprocessoDestino);
+
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
+
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            Subprocesso atualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
+            assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 
         @Test
         @DisplayName("Deve falhar ao importar para subprocesso em estado inválido")
         void deveFalharAoImportarParaSubprocessoEmEstadoInvalido() throws Exception {
-            subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isUnprocessableContent());
         }
 
         @Test
@@ -167,7 +204,8 @@ class CDU08IntegrationTest {
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
             ImportarAtividadesReq request = new ImportarAtividadesReq(9999L);
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isNotFound());
@@ -183,12 +221,14 @@ class CDU08IntegrationTest {
 
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            List<Atividade> atividadesDestino = atividadeRepo
+                    .findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).isEmpty();
         }
 
@@ -200,14 +240,17 @@ class CDU08IntegrationTest {
 
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+            mockMvc.perform(
+                    post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            List<Atividade> atividadesDestino = atividadeRepo
+                    .findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).hasSize(2);
-            assertThat(atividadesDestino.stream().map(Atividade::getDescricao).toList()).containsExactlyInAnyOrder("Atividade 1", "Atividade 2");
+            assertThat(atividadesDestino.stream().map(Atividade::getDescricao).toList())
+                    .containsExactlyInAnyOrder("Atividade 1", "Atividade 2");
         }
     }
 }

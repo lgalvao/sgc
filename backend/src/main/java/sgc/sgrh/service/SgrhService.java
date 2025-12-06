@@ -3,172 +3,218 @@ package sgc.sgrh.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
-    final UnidadeRepo unidadeRepo;
-
-    // Mapa estático para controle de mocks em testes E2E
-    public static final Map<String, List<PerfilDto>> perfisMock = new ConcurrentHashMap<>();
+    private final UnidadeRepo unidadeRepo;
+    private final UsuarioRepo usuarioRepo;
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        log.warn("MOCK SGRH: Buscando usuário por título.");
-
-        return Optional.of(new UsuarioDto(titulo,
-                "Usuário Mock %s".formatted(titulo),
-                "%s@tre-pe.jus.br".formatted(titulo),
-                "MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))),
-                "Analista Judiciário"));
+        return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
     }
 
     public Usuario buscarUsuarioPorLogin(String login) {
-        log.warn("MOCK SGRH: Buscando usuário por login.");
-        var unidade = unidadeRepo.findById(10L).orElse(null); // Usa uma unidade padrão para o mock
-        return new Usuario(login, "Usuário Mock", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
+        return usuarioRepo.findById(login)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {
-        log.warn("MOCK SGRH: Buscando responsável vigente para a sigla {}.", sigla);
-        var unidade = unidadeRepo.findBySigla(sigla).orElse(null);
-        return new Usuario("responsavel", "Responsável Vigente", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
+        log.debug("Buscando responsável vigente para a sigla {}.", sigla);
+        Unidade unidade = unidadeRepo.findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+
+        return usuarioRepo.findChefeByUnidadeCodigo(unidade.getCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        if (!perfisMock.isEmpty() && perfisMock.containsKey(titulo)) {
-            log.info("Retornando perfis mockados para o usuário {}", titulo);
-            return perfisMock.get(titulo);
-        }
-        log.warn("MOCK SGRH: Buscando perfis do usuário (padrão).");
-        return List.of(
-                new PerfilDto(titulo, 1L, "SEDOC", "ADMIN"),
-                new PerfilDto(titulo, 2L, "SGP", "GESTOR")
-        );
+        return usuarioRepo.findById(titulo)
+                .map(usuario -> usuario.getTodasAtribuicoes().stream()
+                        .map(this::toPerfilDto)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
-        String titulo = email.split("@")[0];
-        return Optional.of(new UsuarioDto(titulo, "Usuário %s".formatted(titulo), email, "MAT%d".formatted(titulo.hashCode()), "Analista Judiciário"));
+        return usuarioRepo.findByEmail(email).map(this::toUsuarioDto);
     }
 
     public List<UsuarioDto> buscarUsuariosAtivos() {
-        log.warn("MOCK SGRH: Listando usuários ativos");
-        return List.of(
-                new UsuarioDto("123456789012", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001", "Analista Judiciário"),
-                new UsuarioDto("987654321098", "Maria Santos", "maria.santos@tre-pe.jus.br", "MAT002", "Técnico Judiciário"),
-                new UsuarioDto("111222333444", "Pedro Oliveira", "pedro.oliveira@tre-pe.jus.br", "MAT003", "Analista Judiciário"));
+        return usuarioRepo.findAll().stream()
+                .map(this::toUsuarioDto)
+                .collect(Collectors.toList());
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        log.warn("MOCK SGRH: Buscando unidade por código.");
-        Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
-        return Optional.ofNullable(unidadesMock.get(codigo));
+        return unidadeRepo.findById(codigo).map(this::toUnidadeDto);
+    }
+
+    public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
+        return unidadeRepo.findBySigla(sigla).map(this::toUnidadeDto);
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        log.warn("MOCK SGRH: Listando unidades ativas");
-        return new ArrayList<>(criarUnidadesMock().values());
+        return unidadeRepo.findAll().stream()
+                .map(this::toUnidadeDto)
+                .collect(Collectors.toList());
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        log.warn("MOCK SGRH: Buscando subunidades.");
-        return criarUnidadesMock().values().stream()
-                .filter(u -> codigoPai.equals(u.getCodigoPai()))
+        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
+                .map(this::toUnidadeDto)
                 .collect(Collectors.toList());
     }
 
     public List<UnidadeDto> construirArvoreHierarquica() {
-        log.warn("MOCK SGRH: Construindo árvore hierárquica de unidades");
-        Map<Long, UnidadeDto> todasUnidades = criarUnidadesMock();
+        List<Unidade> todas = unidadeRepo.findAll();
         Map<Long, List<UnidadeDto>> subunidadesPorPai = new HashMap<>();
-        for (UnidadeDto unidade : todasUnidades.values()) {
-            if (unidade.getCodigoPai() != null) {
-                subunidadesPorPai.computeIfAbsent(unidade.getCodigoPai(), x -> new ArrayList<>()).add(unidade);
+        Map<Long, UnidadeDto> dtoMap = new HashMap<>();
+
+        // Primeiro cria todos os DTOs
+        for (Unidade u : todas) {
+            dtoMap.put(u.getCodigo(), toUnidadeDto(u));
+        }
+
+        // Organiza a hierarquia
+        for (Unidade u : todas) {
+            if (u.getUnidadeSuperior() != null) {
+                subunidadesPorPai.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>())
+                        .add(dtoMap.get(u.getCodigo()));
             }
         }
-        return todasUnidades.values().stream()
-                .filter(u -> u.getCodigoPai() == null)
-                .map(u -> construirArvore(u, subunidadesPorPai))
+
+        // Monta a árvore recursivamente (ou apenas associa os filhos já que temos o
+        // mapa)
+        for (UnidadeDto dto : dtoMap.values()) {
+            List<UnidadeDto> filhos = subunidadesPorPai.get(dto.getCodigo());
+            if (filhos != null) {
+                dto.setSubunidades(filhos);
+            }
+        }
+
+        // Retorna apenas as raízes
+        return todas.stream()
+                .filter(u -> u.getUnidadeSuperior() == null)
+                .map(u -> dtoMap.get(u.getCodigo()))
                 .collect(Collectors.toList());
     }
 
-    private UnidadeDto construirArvore(UnidadeDto unidade, Map<Long, List<UnidadeDto>> subunidadesPorPai) {
-        List<UnidadeDto> filhos = subunidadesPorPai.getOrDefault(unidade.getCodigo(), Collections.emptyList())
-                .stream()
-                .map(filho -> construirArvore(filho, subunidadesPorPai))
-                .toList();
-        return new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), unidade.getCodigoPai(), unidade.getTipo(), filhos.isEmpty() ? null : filhos, false);
-    }
-
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Buscando responsável da unidade.");
-        return Optional.of(new ResponsavelDto(unidadeCodigo, "123456789012", "João Silva (Titular)", "987654321098", "Maria Santos (Substituto)"));
+        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
+        if (chefes.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
     }
 
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
-        log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
-        return unidadesCodigos.stream().collect(Collectors.toMap(codigo -> codigo, codigo -> new ResponsavelDto(codigo, String.format("%012d", codigo), "Titular da Unidade " + codigo, String.format("%012d", codigo + 1000), "Substituto da Unidade " + codigo)));
+        List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
+
+        Map<Long, List<Usuario>> chefesPorUnidade = todosChefes.stream()
+                .flatMap(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE
+                                && unidadesCodigos.contains(a.getUnidade().getCodigo()))
+                        .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidade().getCodigo(), u)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        Map<Long, ResponsavelDto> resultado = new HashMap<>();
+        for (Long codigo : unidadesCodigos) {
+            List<Usuario> chefes = chefesPorUnidade.getOrDefault(codigo, Collections.emptyList());
+            if (!chefes.isEmpty()) {
+                resultado.put(codigo, montarResponsavelDto(codigo, chefes));
+            }
+        }
+        return resultado;
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
-        log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
-        return titulos.stream().collect(Collectors.toMap(titulo -> titulo, titulo -> new UsuarioDto(
-                titulo,
-                "Usuário Mock %s".formatted(titulo),
-                "%s@tre-pe.jus.br".formatted(titulo),
-                "MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))),
-                "Analista Judiciário"), (u1, u2) -> u1)
-        );
+        return usuarioRepo.findAllById(titulos).stream()
+                .collect(Collectors.toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
     }
 
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        log.warn("MOCK SGRH: Buscando unidades onde o usuário é responsável.");
-        return List.of(1L, 2L, 10L);
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE)
+                        .map(a -> a.getUnidade().getCodigo())
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Verificando se o usuário tem perfil na unidade.");
-        return "ADMIN".equals(perfil) && unidadeCodigo == 1L;
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .anyMatch(a -> a.getPerfil().name().equals(perfil)
+                                && a.getUnidade().getCodigo().equals(unidadeCodigo)))
+                .orElse(false);
     }
 
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        log.warn("MOCK SGRH: Buscando unidades onde o usuário tem perfil.");
-        return switch (perfil) {
-            case "ADMIN" -> List.of(1L);
-            case "GESTOR" -> List.of(2L, 3L);
-            case "CHEFE" -> List.of(10L, 11L);
-            default -> List.of(1L, 2L, 10L);
-        };
+        return usuarioRepo.findById(titulo)
+                .map(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil().name().equals(perfil))
+                        .map(a -> a.getUnidade().getCodigo())
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
-    private Map<Long, UnidadeDto> criarUnidadesMock() {
-        Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
-        unidadesDto.put(2L, new UnidadeDto(2L, "Secretaria de Informática e Comunicações", "STIC", null, "INTEROPERACIONAL", false));
-        unidadesDto.put(3L, new UnidadeDto(3L, "Secretaria de Gestao de Pessoas", "SGP", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(6L, new UnidadeDto(6L, "Coordenadoria de Sistemas", "COSIS", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(7L, new UnidadeDto(7L, "Coordenadoria de Suporte e Infraestrutura", "COSINF", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(14L, new UnidadeDto(14L, "Coordenadoria Jurídica", "COJUR", 2L, "INTERMEDIARIA", false));
-        unidadesDto.put(4L, new UnidadeDto(4L, "Coordenadoria de Educação Especial", "COEDE", 3L, "INTERMEDIARIA", false));
-        unidadesDto.put(8L, new UnidadeDto(8L, "Seção de Desenvolvimento de Sistemas", "SEDESENV", 6L, "OPERACIONAL", false));
-        unidadesDto.put(9L, new UnidadeDto(9L, "Seção de Dados e Inteligência Artificial", "SEDIA", 6L, "OPERACIONAL", false));
-        unidadesDto.put(10L, new UnidadeDto(10L, "Seção de Sistemas Eleitorais", "SESEL", 6L, "OPERACIONAL", false));
-        unidadesDto.put(11L, new UnidadeDto(11L, "Seção de Infraestrutura", "SENIC", 7L, "OPERACIONAL", false));
-        unidadesDto.put(12L, new UnidadeDto(12L, "Seção Jurídica", "SEJUR", 14L, "OPERACIONAL", false));
-        unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL", false));
-        unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL", false));
-        unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL", false));
-        return unidadesDto;
+    private UsuarioDto toUsuarioDto(Usuario usuario) {
+        return UsuarioDto.builder()
+                .titulo(usuario.getTituloEleitoral())
+                .nome(usuario.getNome())
+                .email(usuario.getEmail())
+                .matricula("MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no título
+                .cargo("Analista Judiciário") // Valor padrão, já que não temos cargo no modelo ainda
+                .build();
+    }
+
+    private UnidadeDto toUnidadeDto(Unidade unidade) {
+        return UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                .tipo(unidade.getTipo().name())
+                .isElegivel(false) // Default
+                .build();
+    }
+
+    private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
+        return PerfilDto.builder()
+                .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
+                .unidadeNome(atribuicao.getUnidade().getNome())
+                .perfil(atribuicao.getPerfil().name())
+                .build();
+    }
+
+    private ResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
+        Usuario titular = chefes.get(0);
+        Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
+
+        return ResponsavelDto.builder()
+                .unidadeCodigo(unidadeCodigo)
+                .titularTitulo(titular.getTituloEleitoral())
+                .titularNome(titular.getNome())
+                .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
+                .substitutoNome(substituto != null ? substituto.getNome() : null)
+                .build();
     }
 }

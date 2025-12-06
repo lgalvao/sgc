@@ -9,7 +9,6 @@ vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
 vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
 vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
-vi.mock("../notificacoes", () => ({useNotificacoesStore: vi.fn(() => ({}))}));
 
 describe("useProcessosStore", () => {
     let store: ReturnType<typeof useProcessosStore>;
@@ -38,7 +37,6 @@ describe("useProcessosStore", () => {
             typeof import("@/services/processoService")
         >;
         vi.restoreAllMocks();
-        store.$reset();
     });
 
     it("deve inicializar com o estado padrão", () => {
@@ -47,18 +45,33 @@ describe("useProcessosStore", () => {
     });
 
     describe("Actions", () => {
-        describe("fetchProcessosPainel", () => {
+        describe("buscarProcessosPainel", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockPage = {content: [{id: 1}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
-                await store.fetchProcessosPainel("perfil", 1, 0, 10);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10);
+                const calls = painelService.listarProcessos.mock.calls[0];
+                expect(calls[0]).toBe("perfil");
+                expect(calls[1]).toBe(1);
+                expect(calls[2]).toBe(0);
+                expect(calls[3]).toBe(10);
+                // sort and order may be undefined by default
+                expect(calls[4]).toBeUndefined();
+                expect(calls[5]).toBeUndefined();
+                expect(store.processosPainel).toEqual(mockPage.content);
+            });
+
+            it("deve respeitar ordenacao personalizada", async () => {
+                const mockPage = {content: [{id: 2}], totalPages: 1};
+                painelService.listarProcessos.mockResolvedValue(mockPage as any);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
                 expect(painelService.listarProcessos).toHaveBeenCalledWith(
                     "perfil",
                     1,
                     0,
                     10,
-                    undefined,
-                    undefined,
+                    "descricao",
+                    "asc",
                 );
                 expect(store.processosPainel).toEqual(mockPage.content);
             });
@@ -66,24 +79,24 @@ describe("useProcessosStore", () => {
             it("não deve atualizar o estado em caso de falha", async () => {
                 painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
                 await expect(
-                    store.fetchProcessosPainel("perfil", 1, 0, 10),
+                    store.buscarProcessosPainel("perfil", 1, 0, 10),
                 ).rejects.toThrow(MOCK_ERROR);
             });
         });
 
-        describe("fetchProcessoDetalhe", () => {
+        describe("buscarProcessoDetalhe", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                await store.fetchProcessoDetalhe(1);
+                await store.buscarProcessoDetalhe(1);
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
                 expect(store.processoDetalhe).toEqual(MOCK_PROCESSO_DETALHE);
             });
 
             it("não deve atualizar o estado em caso de falha", async () => {
                 processoService.obterDetalhesProcesso.mockRejectedValue(MOCK_ERROR);
-                await expect(store.fetchProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
+                await expect(store.buscarProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
             });
         });
 
@@ -149,15 +162,14 @@ describe("useProcessosStore", () => {
                 processoService.iniciarProcesso.mockResolvedValue();
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
-                ); // Adicionar mock
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
+                );
                 await store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]);
                 expect(processoService.iniciarProcesso).toHaveBeenCalledWith(
                     1,
                     TipoProcesso.MAPEAMENTO,
                     [10],
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
             it("deve lançar um erro em caso de falha", async () => {
@@ -168,26 +180,26 @@ describe("useProcessosStore", () => {
             });
         });
 
-        describe("fetchProcessosFinalizados", () => {
+        describe("buscarProcessosFinalizados", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockProcessos = [{id: 1}];
-                processoService.fetchProcessosFinalizados.mockResolvedValue(
+                processoService.buscarProcessosFinalizados.mockResolvedValue(
                     mockProcessos as any,
                 );
-                await store.fetchProcessosFinalizados();
-                expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
+                await store.buscarProcessosFinalizados();
+                expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
                 expect(store.processosFinalizados).toEqual(mockProcessos);
             });
         });
 
-        describe("fetchSubprocessosElegiveis", () => {
+        describe("buscarSubprocessosElegiveis", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
                 const mockSubprocessos = [{id: 1}];
-                processoService.fetchSubprocessosElegiveis.mockResolvedValue(
+                processoService.buscarSubprocessosElegiveis.mockResolvedValue(
                     mockSubprocessos as any,
                 );
-                await store.fetchSubprocessosElegiveis(1);
-                expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(
+                await store.buscarSubprocessosElegiveis(1);
+                expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(
                     1,
                 );
                 expect(store.subprocessosElegiveis).toEqual(mockSubprocessos);
@@ -200,10 +212,9 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.finalizarProcesso(1);
                 expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -219,12 +230,11 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.processarCadastroBloco(payload);
                 expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(
                     payload,
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -236,12 +246,11 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.alterarDataLimiteSubprocesso(1, payload);
                 expect(
                     processoService.alterarDataLimiteSubprocesso,
                 ).toHaveBeenCalledWith(1, payload);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -253,13 +262,12 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.apresentarSugestoes(1, payload);
                 expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(
                     1,
                     payload,
                 );
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
 
@@ -270,10 +278,9 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                const fetchDetalheSpy = vi.spyOn(store, "fetchProcessoDetalhe");
                 await store.validarMapa(1);
                 expect(processoService.validarMapa).toHaveBeenCalledWith(1);
-                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
     });

@@ -9,7 +9,7 @@
           v-if="podeValidar"
           variant="outline-warning"
           title="Apresentar sugestões"
-          data-testid="apresentar-sugestoes-btn"
+          data-testid="btn-mapa-sugestoes"
           @click="abrirModalSugestoes"
         >
           Apresentar sugestões
@@ -18,7 +18,7 @@
           v-if="podeValidar"
           variant="outline-success"
           title="Validar mapa"
-          data-testid="validar-btn"
+          data-testid="btn-mapa-validar"
           @click="abrirModalValidar"
         >
           Validar
@@ -28,7 +28,7 @@
           v-if="podeValidar && temHistoricoAnalise"
           variant="outline-secondary"
           title="Histórico de análise"
-          data-testid="historico-analise-btn"
+          data-testid="btn-mapa-historico"
           @click="verHistorico"
         >
           Histórico de análise
@@ -39,7 +39,7 @@
           v-show="podeVerSugestoes"
           variant="outline-info"
           title="Ver sugestões"
-          data-testid="ver-sugestoes-btn"
+          data-testid="btn-mapa-ver-sugestoes"
           @click="verSugestoes"
         >
           Ver sugestões
@@ -48,7 +48,7 @@
           v-if="podeAnalisar"
           variant="outline-secondary"
           title="Histórico de análise"
-          data-testid="historico-analise-btn-gestor"
+          data-testid="btn-mapa-historico-gestor"
           @click="verHistorico"
         >
           Histórico de análise
@@ -57,7 +57,7 @@
           v-if="podeAnalisar"
           variant="outline-danger"
           title="Devolver para ajustes"
-          data-testid="devolver-ajustes-btn"
+          data-testid="btn-mapa-devolver"
           @click="abrirModalDevolucao"
         >
           Devolver para ajustes
@@ -65,7 +65,7 @@
         <BButton
           v-if="podeAnalisar"
           variant="outline-success"
-          data-testid="btn-registrar-aceite-homologar"
+          data-testid="btn-mapa-homologar-aceite"
           title="Aceitar"
           @click="abrirModalAceitar"
         >
@@ -78,7 +78,7 @@
       <div class="mb-5 d-flex align-items-center">
         <div
           class="fs-5"
-          data-testid="unidade-info"
+          data-testid="txt-header-unidade"
         >
           {{ unidade.sigla }} - {{ unidade.nome }}
         </div>
@@ -92,7 +92,7 @@
           v-for="comp in mapa?.competencias"
           :key="comp.codigo"
           class="mb-3 competencia-card"
-          data-testid="competencia-block"
+          data-testid="vis-mapa__card-competencia"
           no-body
         >
           <BCardBody class="py-2">
@@ -101,7 +101,7 @@
             >
               <strong
                 class="competencia-descricao"
-                data-testid="competencia-descricao"
+                data-testid="vis-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
@@ -111,7 +111,7 @@
               >
                 <BCard
                   class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
-                  data-testid="atividade-item"
+                  data-testid="card-atividade-associada"
                   no-body
                 >
                   <BCardBody class="d-flex align-items-center py-1 px-2">
@@ -122,7 +122,7 @@
                       v-for="conhecimento in atv.conhecimentos"
                       :key="conhecimento.descricao"
                       class="me-3 mb-1"
-                      data-testid="conhecimento-item"
+                      data-testid="txt-conhecimento-item"
                     >
                       {{ conhecimento.descricao }}
                     </span>
@@ -147,6 +147,7 @@
 
     <BModal
       v-model="mostrarModalSugestoes"
+      :fade="false"
       title="Apresentar Sugestões"
       centered
       hide-footer
@@ -161,20 +162,20 @@
           v-model="sugestoes"
           rows="5"
           placeholder="Digite suas sugestões para o mapa de competências..."
-          data-testid="sugestoes-textarea"
+          data-testid="inp-sugestoes-mapa-texto"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-apresentar-sugestoes-cancelar"
+          data-testid="btn-sugestoes-mapa-cancelar"
           @click="fecharModalSugestoes"
         >
           Cancelar
         </BButton>
         <BButton
           variant="primary"
-          data-testid="modal-apresentar-sugestoes-confirmar"
+          data-testid="btn-sugestoes-mapa-confirmar"
           @click="confirmarSugestoes"
         >
           Confirmar
@@ -184,6 +185,7 @@
 
     <BModal
       v-model="mostrarModalVerSugestoes"
+      :fade="false"
       title="Sugestões"
       centered
       hide-footer
@@ -194,13 +196,13 @@
           v-model="sugestoesVisualizacao"
           rows="5"
           readonly
-          data-testid="sugestoes-visualizacao-textarea"
+          data-testid="txt-ver-sugestoes-mapa"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-sugestoes-fechar"
+          data-testid="btn-ver-sugestoes-mapa-fechar"
           @click="fecharModalVerSugestoes"
         >
           Fechar
@@ -210,6 +212,7 @@
 
     <BModal
       v-model="mostrarModalValidar"
+      :fade="false"
       title="Validar Mapa de Competências"
       centered
       hide-footer
@@ -218,14 +221,14 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-validar-cancelar"
+          data-testid="btn-validar-mapa-cancelar"
           @click="fecharModalValidar"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
-          data-testid="modal-validar-confirmar"
+          data-testid="btn-validar-mapa-confirmar"
           @click="confirmarValidacao"
         >
           Validar
@@ -235,6 +238,7 @@
 
     <BModal
       v-model="mostrarModalDevolucao"
+      :fade="false"
       title="Devolução"
       centered
       hide-footer
@@ -250,20 +254,20 @@
           v-model="observacaoDevolucao"
           rows="3"
           placeholder="Digite observações sobre a devolução..."
-          data-testid="observacao-devolucao-textarea"
+          data-testid="inp-devolucao-mapa-obs"
         />
       </div>
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-devolucao-cancelar"
+          data-testid="btn-devolucao-mapa-cancelar"
           @click="fecharModalDevolucao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="danger"
-          data-testid="modal-devolucao-confirmar"
+          data-testid="btn-devolucao-mapa-confirmar"
           @click="confirmarDevolucao"
         >
           Confirmar
@@ -273,6 +277,7 @@
 
     <BModal
       v-model="mostrarModalHistorico"
+      :fade="false"
       title="Histórico de Análise"
       centered
       size="lg"
@@ -280,7 +285,7 @@
     >
       <table
         class="table table-striped"
-        data-testid="tabela-historico"
+        data-testid="tbl-historico-analise"
       >
         <thead>
           <tr>
@@ -294,7 +299,7 @@
           <tr
             v-for="item in historicoAnalise"
             :key="item.codigo"
-            data-testid="historico-item"
+            data-testid="row-historico"
           >
             <td>{{ item.data }}</td>
             <td>{{ item.unidade }}</td>
@@ -306,7 +311,7 @@
       <template #footer>
         <BButton
           variant="secondary"
-          data-testid="modal-historico-fechar"
+          data-testid="btn-historico-analise-fechar"
           @click="fecharModalHistorico"
         >
           Fechar
@@ -317,14 +322,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormTextarea,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -332,11 +330,12 @@ import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useFeedbackStore} from "@/stores/feedback";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {SituacaoSubprocesso, type Unidade} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso, type Unidade} from "@/types/tipos";
 
 const route = useRoute();
 const router = useRouter();
@@ -345,7 +344,8 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 const unidadesStore = useUnidadesStore();
 const mapaStore = useMapasStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
+
 const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
 const {perfilSelecionado} = usePerfil();
@@ -362,20 +362,7 @@ const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 const observacaoDevolucao = ref("");
 
-const unidade = computed<Unidade | null>(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-    for (const unidade of unidades) {
-      if (unidade.sigla === sigla) return unidade;
-      if (unidade.filhas && unidade.filhas.length) {
-        const encontrada = buscarUnidade(unidade.filhas, sigla);
-        if (encontrada) return encontrada;
-      }
-    }
-    return null;
-  }
-
-  return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value);
-});
+const unidade = computed<Unidade | null>(() => unidadesStore.unidade);
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
@@ -384,12 +371,14 @@ const subprocesso = computed(() => {
   );
 });
 
-const codSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const processo = computed(() => processosStore.processoDetalhe);
+const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(sigla.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
-    await mapaStore.fetchMapaVisualizacao(codSubprocesso.value);
+    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
   }
 });
 
@@ -397,7 +386,7 @@ const podeValidar = computed(() => {
   return (
       perfilSelecionado.value === "CHEFE" &&
       subprocesso.value?.situacaoSubprocesso ===
-      SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
+      SituacaoSubprocesso.MAPA_DISPONIBILIZADO
   );
 });
 
@@ -408,14 +397,14 @@ const podeAnalisar = computed(() => {
       (subprocesso.value?.situacaoSubprocesso ===
           SituacaoSubprocesso.MAPA_VALIDADO ||
           subprocesso.value?.situacaoSubprocesso ===
-          SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
+          SituacaoSubprocesso.MAPA_COM_SUGESTOES)
   );
 });
 
 const podeVerSugestoes = computed(() => {
   return (
       subprocesso.value?.situacaoSubprocesso ===
-      SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
+      SituacaoSubprocesso.MAPA_COM_SUGESTOES
   );
 });
 
@@ -427,7 +416,7 @@ const historicoAnalise = computed(() => {
   if (!codSubprocesso.value) return [];
 
   return analisesStore
-      .getAnalisesPorSubprocesso(codSubprocesso.value)
+      .obterAnalisesPorSubprocesso(codSubprocesso.value)
       .map((analise) => ({
         codigo: analise.codigo,
         data: new Date(analise.dataHora).toLocaleString("pt-BR"),
@@ -506,9 +495,10 @@ async function confirmarSugestoes() {
 
     fecharModalSugestoes();
 
-    notificacoesStore.sucesso(
-        "Sugestões apresentadas",
-        "Sugestões submetidas para análise da unidade superior",
+    feedbackStore.show(
+      "Sugestões apresentadas",
+      "Sugestões submetidas para análise da unidade superior",
+      "success"
     );
 
     await router.push({
@@ -516,9 +506,10 @@ async function confirmarSugestoes() {
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    notificacoesStore.erro(
-        "Erro ao apresentar sugestões",
-        "Ocorreu um erro. Tente novamente.",
+    feedbackStore.show(
+      "Erro ao apresentar sugestões",
+      "Ocorreu um erro. Tente novamente.",
+      "danger"
     );
   }
 }
@@ -530,9 +521,10 @@ async function confirmarValidacao() {
 
     fecharModalValidar();
 
-    notificacoesStore.sucesso(
-        "Mapa validado",
-        "Mapa validado e submetido para análise da unidade superior",
+    feedbackStore.show(
+      "Mapa validado",
+      "Mapa validado e submetido para análise da unidade superior",
+      "success"
     );
 
     await router.push({
@@ -540,9 +532,10 @@ async function confirmarValidacao() {
       params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
     });
   } catch {
-    notificacoesStore.erro(
-        "Erro ao validar mapa",
-        "Ocorreu um erro. Tente novamente.",
+    feedbackStore.show(
+      "Erro ao validar mapa",
+      "Ocorreu um erro. Tente novamente.",
+      "danger"
     );
   }
 }
@@ -552,11 +545,16 @@ async function confirmarAceitacao(observacoes?: string) {
 
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === "ADMIN";
+  const tipoProcesso = processo.value?.tipo;
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
-      observacoes: observacoes || "",
-    });
+    if (tipoProcesso === TipoProcesso.REVISAO) {
+      await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
+        observacoes: observacoes || "",
+      });
+    } else {
+      await processosStore.homologarValidacao(codSubprocesso.value);
+    }
   } else {
     await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {
       observacoes: observacoes || "",
@@ -564,14 +562,16 @@ async function confirmarAceitacao(observacoes?: string) {
   }
 
   fecharModalAceitar();
-  await router.push({name: "Painel"});
+  await router.push({
+    name: "Subprocesso",
+    params: { codProcesso: codProcesso.value, siglaUnidade: sigla.value },
+  });
 }
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
 
   await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-    motivo: "",
     observacoes: observacaoDevolucao.value,
   });
 
@@ -580,43 +580,3 @@ async function confirmarDevolucao() {
 }
 </script>
 
-<style scoped>
-.competencia-card {
-  transition: box-shadow 0.2s;
-}
-
-.competencia-titulo-card {
-  background: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
-  width: calc(100% + 1.5rem);
-}
-
-.competencia-titulo-card .competencia-descricao {
-  font-size: 1.1rem;
-}
-
-.atividade-associada-card-item {
-  background-color: transparent;
-}
-
-.atividade-associada-descricao {
-  color: var(--bs-body-color);
-  font-weight: bold;
-}
-
-.conhecimentos-atividade {
-  margin-top: 0.25rem;
-  font-size: 0.9rem;
-}
-
-.conhecimentos-atividade {
-  border-radius: 0.25rem;
-  font-weight: normal;
-}
-</style>

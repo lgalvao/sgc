@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -23,9 +24,9 @@ import java.util.regex.Pattern;
 
 @Service
 @Primary
-@org.springframework.context.annotation.Profile("!e2e,!test")
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test & !e2e")
 public class NotificacaoEmailService {
     private final JavaMailSender enviadorDeEmail;
     private final NotificacaoRepo repositorioNotificacao;
@@ -88,7 +89,8 @@ public class NotificacaoEmailService {
                         if (Boolean.TRUE.equals(sucesso)) {
                             log.info("E-mail para {} enviado.", emailDto.getDestinatario());
                         } else {
-                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.getDestinatario(), MAX_TENTATIVAS);
+                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.getDestinatario(),
+                                    MAX_TENTATIVAS);
                         }
                     })
                     .exceptionally(ex -> {
@@ -110,16 +112,17 @@ public class NotificacaoEmailService {
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
-     * email for enviado, ou {@code false} caso contrário.
+     *         email for enviado, ou {@code false} caso contrário.
      */
     @Async
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
-                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, emailDto.getDestinatario());
+                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS,
+                        emailDto.getDestinatario());
                 enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado na tentativa {} para: {}", tentativa, emailDto.getDestinatario());
+                log.info("E-mail enviado para: {}", emailDto.getDestinatario());
                 return CompletableFuture.completedFuture(true);
             } catch (Exception e) {
                 excecaoFinal = e;
@@ -136,7 +139,8 @@ public class NotificacaoEmailService {
                 }
             }
         }
-        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS, emailDto.getDestinatario(), excecaoFinal);
+        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS,
+                emailDto.getDestinatario(), excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
@@ -157,7 +161,8 @@ public class NotificacaoEmailService {
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.getDestinatario(), emailDto.getAssunto(), emailDto.getCorpo());
+        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.getDestinatario(),
+                emailDto.getAssunto(), emailDto.getCorpo());
         if (conteudo.length() > 500) {
             conteudo = "%s...".formatted(conteudo.substring(0, 497));
         }

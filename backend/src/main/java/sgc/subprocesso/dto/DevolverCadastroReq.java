@@ -1,6 +1,5 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DevolverCadastroReq {
-    /** O motivo da devolução. */
-    @NotBlank(message = "Motivo da devolução é obrigatório")
-    private String motivo;
-
     /** Observações adicionais. */
     private String observacoes;
 }

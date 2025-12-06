@@ -1,16 +1,13 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.model.Atividade;
@@ -35,6 +32,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,15 +43,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
-public class CDU16IntegrationTest {
+public class CDU16IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSO_MAPA_AJUSTE = "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -96,7 +91,7 @@ public class CDU16IntegrationTest {
                 processo,
                 unidade,
                 mapa,
-                SituacaoSubprocesso.MAPA_AJUSTADO,
+                SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
                 processo.getDataLimite()
         );
         subprocessoRepo.save(subprocesso);
@@ -128,7 +123,7 @@ public class CDU16IntegrationTest {
                 .andExpect(status().isOk());
 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
     }
 
     @Nested
@@ -161,7 +156,7 @@ public class CDU16IntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_AJUSTADO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
             Atividade atividadeAtualizada = atividadeRepo.findById(atividade1.getCodigo()).orElseThrow();
             assertThat(atividadeAtualizada.getDescricao()).isEqualTo("Atividade 1 Ajustada");
@@ -171,7 +166,7 @@ public class CDU16IntegrationTest {
         @Test
         @DisplayName("Deve retornar 409 se tentar ajustar mapa em situação inválida")
         void deveRetornarErroParaSituacaoInvalida() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
             var request = new SalvarAjustesReq(List.of());
@@ -180,7 +175,7 @@ public class CDU16IntegrationTest {
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isUnprocessableContent());
         }
     }
 }

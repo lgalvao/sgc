@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -11,47 +12,59 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Set;
-
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
-
-    private final UsuarioRepo usuarioRepo;
-
-    public WithMockGestorSecurityContextFactory(UsuarioRepo usuarioRepo) {
-        this.usuarioRepo = usuarioRepo;
-    }
+    @Autowired(required = false)
+    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-
         String tituloGestor = customUser.value();
-
-        Usuario principal;
-        try {
-            principal = usuarioRepo.findById(tituloGestor).orElse(null);
-        } catch (Exception e) {
-            principal = null;
+        Usuario principal = null;
+        boolean dbAvailable = false;
+        if (usuarioRepo != null) {
+            try {
+                principal = usuarioRepo.findById(tituloGestor).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
-        
+
         if (principal == null) {
             principal = new Usuario();
             principal.setTituloEleitoral(tituloGestor);
             principal.setNome("Gestor User");
             principal.setEmail("gestor@example.com");
-            principal.setPerfis(Set.of(Perfil.GESTOR));
-            principal.setUnidade(new Unidade("Unidade Mock", "UO_SUP"));
+            Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+            principal.setUnidadeLotacao(u);
+            principal.getAtribuicoes().add(
+                    sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.GESTOR).build());
+
+            if (dbAvailable) {
+                try {
+                    usuarioRepo.save(principal);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        } else {
+            if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
+                Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+                principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u)
+                        .perfil(Perfil.GESTOR).build());
+            }
+            try {
+                usuarioRepo.save(principal);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
-
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password",
+                principal.getAuthorities());
         context.setAuthentication(auth);
-
         return context;
     }
 }
-
-
-
-

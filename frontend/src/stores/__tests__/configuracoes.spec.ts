@@ -40,7 +40,7 @@ describe("useConfiguracoesStore", () => {
                 JSON.stringify(storedConfig),
             );
             const store = useConfiguracoesStore();
-            store.loadConfiguracoes();
+            store.carregarConfiguracoes();
             expect(store.diasInativacaoProcesso).toBe(45);
             expect(store.diasAlertaNovo).toBe(15);
         });
@@ -49,9 +49,9 @@ describe("useConfiguracoesStore", () => {
     describe("Interação com LocalStorage", () => {
         it("deve salvar as configurações no localStorage", () => {
             const store = useConfiguracoesStore();
-            store.setDiasInativacaoProcesso(60);
-            store.setDiasAlertaNovo(20);
-            store.saveConfiguracoes();
+            store.definirDiasInativacaoProcesso(60);
+            store.definirDiasAlertaNovo(20);
+            store.salvarConfiguracoes();
             const savedConfig = JSON.parse(
                 localStorageMock.getItem("appConfiguracoes") || "{}",
             );
@@ -64,7 +64,7 @@ describe("useConfiguracoesStore", () => {
                 throw new Error("Erro de leitura");
             });
             const store = useConfiguracoesStore();
-            store.loadConfiguracoes();
+            store.carregarConfiguracoes();
             expect(store.diasInativacaoProcesso).toBe(10); // Mantém o padrão
             expect(console.error).toHaveBeenCalled();
         });
@@ -74,7 +74,7 @@ describe("useConfiguracoesStore", () => {
                 throw new Error("Erro de escrita");
             });
             const store = useConfiguracoesStore();
-            const result = store.saveConfiguracoes();
+            const result = store.salvarConfiguracoes();
             expect(result).toBe(false);
             expect(console.error).toHaveBeenCalled();
         });
@@ -83,29 +83,29 @@ describe("useConfiguracoesStore", () => {
     describe("Lógica dos Setters", () => {
         it("não deve permitir valores menores que 1 para diasInativacaoProcesso", () => {
             const store = useConfiguracoesStore();
-            store.setDiasInativacaoProcesso(0);
+            store.definirDiasInativacaoProcesso(0);
             expect(store.diasInativacaoProcesso).toBe(10);
-            store.setDiasInativacaoProcesso(-5);
+            store.definirDiasInativacaoProcesso(-5);
             expect(store.diasInativacaoProcesso).toBe(10);
         });
 
         it("não deve permitir valores menores que 1 para diasAlertaNovo", () => {
             const store = useConfiguracoesStore();
-            store.setDiasAlertaNovo(0);
+            store.definirDiasAlertaNovo(0);
             expect(store.diasAlertaNovo).toBe(7);
-            store.setDiasAlertaNovo(-5);
+            store.definirDiasAlertaNovo(-5);
             expect(store.diasAlertaNovo).toBe(7);
         });
 
         it("deve definir o valor para diasInativacaoProcesso se for >= 1", () => {
             const store = useConfiguracoesStore();
-            store.setDiasInativacaoProcesso(30);
+            store.definirDiasInativacaoProcesso(30);
             expect(store.diasInativacaoProcesso).toBe(30);
         });
 
         it("deve definir o valor para diasAlertaNovo se for >= 1", () => {
             const store = useConfiguracoesStore();
-            store.setDiasAlertaNovo(20);
+            store.definirDiasAlertaNovo(20);
             expect(store.diasAlertaNovo).toBe(20);
         });
     });

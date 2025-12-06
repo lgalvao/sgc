@@ -1,28 +1,15 @@
 {
-  "name": "sgc",
-  "version": "1.0.0",
-  "description": "SGC",
-  "homepage": "https://github.com/lgalvao/sgc#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lgalvao/sgc.git"
-  },
-  "author": "Leonardo Galvao",
-  "scripts": {
-    "dev:e2e": "concurrently \"./gradlew bootRunE2E\" \"cd frontend && npm run dev\"",
-    "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit",
-    "validate": "npm run typecheck && npm run check:ts-unused"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.56.1",
-    "@types/node": "^24.10.1",
-    "axios": "^1.13.2",
-    "concurrently": "^9.2.1",
-    "consola": "^3.4.2",
-    "playwright": "^1.56.1",
-    "ts-unused-exports": "^11.0.1",
-    "typescript": "^5.9.3",
-    "uuid": "^13.0.0"
-  }
+    "name": "sgc-e2e",
+    "version": "1.0.0",
+    "scripts": {
+        "test:e2e": "playwright test",
+        "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.57.0",
+        "@types/node": "^24.10.1",
+        "typescript": "^5.9.3"
+    },
+    "description": "E2E tests for SGC",
+    "license": "ISC"
 }

@@ -1,5 +1,6 @@
 <template>
   <BModal
+    :fade="false"
     :model-value="mostrar"
     title="Importação de atividades"
     size="lg"
@@ -12,6 +13,7 @@
       variant="danger"
       dismissible
       :model-value="true"
+      :fade="false"
       @dismissed="limparErroImportacao"
     >
       {{ erroImportacao }}
@@ -105,7 +107,7 @@
       <BButton
         variant="outline-secondary"
         type="button"
-        data-testid="btn-modal-cancelar"
+        data-testid="importar-atividades-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
@@ -174,7 +176,7 @@ const processosDisponiveis = computed<ProcessoResumo[]>(() => {
 });
 
 onMounted(() => {
-  processosStore.fetchProcessosPainel("ADMIN", 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+  // A busca é feita ao abrir o modal
 });
 
 watch(
@@ -182,6 +184,7 @@ watch(
     (mostrar) => {
       if (mostrar) {
         resetModal();
+        processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000);
       }
     },
 );
@@ -225,7 +228,7 @@ function resetModal() {
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   if (processo) {
-    await processosStore.fetchProcessoDetalhe(processo.codigo);
+    await processosStore.buscarProcessoDetalhe(processo.codigo);
     unidadesParticipantes.value =
         processosStore.processoDetalhe?.unidades || [];
   } else {
@@ -238,9 +241,9 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade);
+    await atividadesStore.buscarAtividadesParaSubprocesso(unidadePu.codSubprocesso);
     const atividadesDaOutraUnidade =
-        atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
+        atividadesStore.obterAtividadesPorSubprocesso(unidadePu.codSubprocesso);
     atividadesParaImportar.value = atividadesDaOutraUnidade
         ? [...atividadesDaOutraUnidade]
         : [];

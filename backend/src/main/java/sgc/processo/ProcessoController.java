@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
+import sgc.subprocesso.dto.SubprocessoDto;
 
 import java.net.URI;
 import java.util.List;
@@ -136,24 +137,27 @@ public class ProcessoController {
      * 'MAPEAMENTO' ou 'REVISAO'.
      *
      * @param codigo       O código do processo a ser iniciado.
-     * @param tipo     O tipo de processo ('MAPEAMENTO' ou 'REVISAO').
-     * @param unidades Uma lista opcional de IDs de unidades para restringir o início
-     *                 do processo a um subconjunto dos participantes.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
-    public ResponseEntity<ProcessoDto> iniciar(
+    public ResponseEntity<?> iniciar(
             @PathVariable Long codigo,
             @RequestBody IniciarProcessoReq req) {
 
+        List<String> erros;
         if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
-            processoService.iniciarProcessoRevisao(codigo, req.unidades());
+            erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
         } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
-            processoService.iniciarProcessoMapeamento(codigo, req.unidades());
+            erros = processoService.iniciarProcessoMapeamento(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();
         }
+
+        if (!erros.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("erros", erros));
+        }
+
         ProcessoDto processoAtualizado = processoService.obterPorId(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
         return ResponseEntity.ok(processoAtualizado);
@@ -212,8 +216,8 @@ public class ProcessoController {
      */
     @GetMapping("/{codigo}/subprocessos")
     @Operation(summary = "Lista todos os subprocessos de um processo")
-    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessos(@PathVariable Long codigo) {
-        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
-        return ResponseEntity.ok(elegiveis);
+    public ResponseEntity<List<SubprocessoDto>> listarSubprocessos(@PathVariable Long codigo) {
+        List<SubprocessoDto> subprocessos = processoService.listarTodosSubprocessos(codigo);
+        return ResponseEntity.ok(subprocessos);
     }
 }

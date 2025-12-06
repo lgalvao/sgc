@@ -10,6 +10,7 @@
       <div class="d-flex gap-2">
         <BButton
           variant="outline-success"
+          data-testid="btn-finalizar-diagnostico"
           @click="finalizarDiagnostico"
         >
           <i class="bi bi-check-circle me-2" />Finalizar Diagnóstico
@@ -20,6 +21,7 @@
     <BAlert
       variant="info"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-info-circle me-2" />
       Nesta etapa, os servidores da unidade devem avaliar a importância e o domínio das competências da unidade.
@@ -45,6 +47,7 @@
             <label class="form-label fw-bold">Importância da competência:</label>
             <BFormSelect
               v-model="avaliacoes[competencia.codigo].importancia"
+              :data-testid="`sel-importancia-${competencia.codigo}`"
               :options="[
                 { value: 1, text: '1 - Muito baixa' },
                 { value: 2, text: '2 - Baixa' },
@@ -59,6 +62,7 @@
             <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
             <BFormSelect
               v-model="avaliacoes[competencia.codigo].dominio"
+              :data-testid="`sel-dominio-${competencia.codigo}`"
               :options="[
                 { value: 1, text: '1 - Muito baixo' },
                 { value: 2, text: '2 - Baixo' },
@@ -75,6 +79,7 @@
               v-model="avaliacoes[competencia.codigo].observacoes"
               rows="2"
               placeholder="Comentários sobre esta competência..."
+              :data-testid="`txt-obs-${competencia.codigo}`"
             />
           </div>
         </BCard>
@@ -85,6 +90,7 @@
       v-else
       variant="warning"
       :model-value="true"
+      :fade="false"
     >
       <i class="bi bi-exclamation-triangle me-2" />
       Nenhum mapa de competências disponível para diagnóstico.
@@ -93,6 +99,7 @@
     <!-- Modal de confirmação -->
     <BModal
       v-model="mostrarModalConfirmacao"
+      :fade="false"
       title="Finalizar Diagnóstico"
       centered
       hide-footer
@@ -102,6 +109,7 @@
         v-if="avaliacoesPendentes.length > 0"
         variant="warning"
         :model-value="true"
+        :fade="false"
       >
         <strong>Atenção:</strong> As seguintes competências ainda não foram avaliadas:
         <ul class="mb-0 mt-2">
@@ -116,12 +124,14 @@
       <template #footer>
         <BButton
           variant="secondary"
+          data-testid="diagnostico-equipe__btn-modal-cancelar"
           @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
           variant="success"
+          data-testid="diagnostico-equipe__btn-modal-confirmar"
           @click="confirmarFinalizacao"
         >
           Confirmar
@@ -136,7 +146,8 @@ import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BModal,}
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useMapasStore} from "@/stores/mapas";
-import {useNotificacoesStore} from "@/stores/notificacoes";
+import {useFeedbackStore} from "@/stores/feedback";
+
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Competencia, MapaCompleto} from "@/types/tipos";
@@ -146,22 +157,24 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const notificacoesStore = useNotificacoesStore();
+const feedbackStore = useFeedbackStore();
+
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => route.params.siglaUnidade as string);
 
 const unidade = computed(() =>
-    unidadesStore.pesquisarUnidadePorSigla(siglaUnidade.value),
+    unidadesStore.unidade,
 );
 const nomeUnidade = computed(() => unidade.value?.nome || "");
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  await unidadesStore.buscarUnidade(siglaUnidade.value);
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
   // Correção temporária: usando codProcesso como codSubrocesso
-  await mapasStore.fetchMapaCompleto(codProcesso.value);
+  await mapasStore.buscarMapaCompleto(codProcesso.value);
   competencias.value.forEach((comp) => {
     if (!avaliacoes.value[comp.codigo]) {
       avaliacoes.value[comp.codigo] = {
@@ -230,10 +243,7 @@ function confirmarFinalizacao() {
   // TODO: Implementar chamada real ao backend para finalizar diagnóstico
   // Registrar movimentação e alertas é responsabilidade do backend
 
-  notificacoesStore.sucesso(
-      "Diagnóstico finalizado",
-      "O diagnóstico da equipe foi concluído!",
-  );
+  feedbackStore.show("Diagnóstico finalizado", "O diagnóstico da equipe foi concluído!", "success");
 
   fecharModalConfirmacao();
   router.push("/painel");

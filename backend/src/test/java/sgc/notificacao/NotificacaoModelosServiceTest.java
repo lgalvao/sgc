@@ -52,7 +52,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("processo-iniciado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Processo Iniciado - " + tipoProcesso, context.getVariable("titulo"));
+        assertEquals("Processo iniciado - " + tipoProcesso, context.getVariable("titulo"));
         assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(tipoProcesso, context.getVariable("tipoProcesso"));
@@ -70,7 +70,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Cadastro Disponibilizado para Análise", context.getVariable("titulo"));
+        assertEquals("Cadastro disponibilizado para análise", context.getVariable("titulo"));
         assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(quantidadeAtividades, context.getVariable("quantidadeAtividades"));
@@ -88,7 +88,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Cadastro Devolvido para Ajustes", context.getVariable("titulo"));
+        assertEquals("Cadastro devolvido para ajustes", context.getVariable("titulo"));
         assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(motivo, context.getVariable("motivo"));
@@ -106,7 +106,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Mapa de Competências Disponibilizado", context.getVariable("titulo"));
+        assertEquals("Mapa de Competências disponibilizado", context.getVariable("titulo"));
         assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(dataLimite.format(FORMATADOR), context.getVariable("dataLimiteValidacao"));
@@ -122,7 +122,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("mapa-validado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Mapa de Competências Validado", context.getVariable("titulo"));
+        assertEquals("Mapa de Competências validado", context.getVariable("titulo"));
         assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
     }
@@ -138,7 +138,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("processo-finalizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("Processo Finalizado - Mapas Vigentes", context.getVariable("titulo"));
+        assertEquals("Processo finalizado - Mapas Vigentes", context.getVariable("titulo"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(dataFinalizacao.format(FORMATADOR), context.getVariable("dataFinalizacao"));
         assertEquals(quantidadeMapas, context.getVariable("quantidadeMapas"));

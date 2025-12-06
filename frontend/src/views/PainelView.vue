@@ -5,7 +5,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
           class="display-6 mb-0"
-          data-testid="titulo-processos"
+          data-testid="txt-painel-titulo-processos"
         >
           Processos
         </div>
@@ -13,7 +13,7 @@
           v-if="perfil.isAdmin"
           :to="{ name: 'CadProcesso' }"
           variant="outline-primary"
-          data-testid="btn-criar-processo"
+          data-testid="btn-painel-criar-processo"
         >
           <i class="bi bi-plus-lg" /> Criar processo
         </BButton>
@@ -31,7 +31,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
           class="mb-0 display-6"
-          data-testid="titulo-alertas"
+          data-testid="txt-painel-titulo-alertas"
         >
           Alertas
         </div>
@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import {BButton, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import TabelaAlertas from "@/components/TabelaAlertas.vue";
 import TabelaProcessos from "@/components/TabelaProcessos.vue";
@@ -69,21 +69,29 @@ const router = useRouter();
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
-onMounted(async () => {
+async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    processosStore.fetchProcessosPainel(
+    await processosStore.buscarProcessosPainel(
         perfil.perfilSelecionado,
         Number(perfil.unidadeSelecionada),
         0,
         10,
     ); // Paginação inicial
-    alertasStore.fetchAlertas(
+    alertasStore.buscarAlertas(
         Number(perfil.servidorId) || 0,
         Number(perfil.unidadeSelecionada),
         0,
         10,
     ); // Paginação inicial
   }
+}
+
+onMounted(async () => {
+  await carregarDados();
+});
+
+onActivated(async () => {
+  await carregarDados();
 });
 
 const processosOrdenados = computed(() => processosPainel.value);
@@ -95,7 +103,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  processosStore.fetchProcessosPainel(
+  processosStore.buscarProcessosPainel(
     perfil.perfilSelecionado!,
     Number(perfil.unidadeSelecionada),
     0,
@@ -129,9 +137,9 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaAsc.value = !alertaAsc.value;
   } else {
     alertaCriterio.value = campo;
-    alertaAsc.value = campo === "data" ? false : true;
+    alertaAsc.value = campo !== "data";
   }
-  alertasStore.fetchAlertas(
+  alertasStore.buscarAlertas(
     Number(perfil.servidorId) || 0,
     Number(perfil.unidadeSelecionada),
     0,

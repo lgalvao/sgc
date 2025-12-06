@@ -79,80 +79,51 @@ describe("useAtribuicaoTemporariaStore", () => {
     });
 
     describe("actions", () => {
-        it("fetchAtribuicoes should fetch and set atribuicoes", async () => {
+        it("buscarAtribuicoes should fetch and set atribuicoes", async () => {
             atribuicaoTemporariaStore.atribuicoes = [];
-            await atribuicaoTemporariaStore.fetchAtribuicoes();
+            await atribuicaoTemporariaStore.buscarAtribuicoes();
             expect(
                 atribuicaoTemporariaService.buscarTodasAtribuicoes,
             ).toHaveBeenCalledTimes(1);
             expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
         });
 
-        it("fetchAtribuicoes should handle errors", async () => {
+        it("buscarAtribuicoes should handle errors", async () => {
             (
                 atribuicaoTemporariaService.buscarTodasAtribuicoes as any
             ).mockRejectedValue(new Error("Failed"));
-            await atribuicaoTemporariaStore.fetchAtribuicoes();
+            await atribuicaoTemporariaStore.buscarAtribuicoes();
             expect(atribuicaoTemporariaStore.error).toContain(
                 "Falha ao carregar atribuições",
-            );
-        });
-
-        it("criarAtribuicao should add a new atribuicao to the store", () => {
-            const novaAtribuicao: AtribuicaoTemporaria = {
-                codigo: 4,
-                unidade: {codigo: 4, nome: "D", sigla: "D"},
-                servidor: {
-                    codigo: 4,
-                    nome: "Servidor 4",
-                    tituloEleitoral: "123",
-                    unidade: {codigo: 4, nome: "D", sigla: "D"},
-                    email: "",
-                    ramal: "",
-                },
-                dataInicio: "2025-04-01",
-                dataFim: "2025-04-30",
-                dataTermino: "2025-04-30",
-                justificativa: "J4",
-            };
-            const initialLength = atribuicaoTemporariaStore.atribuicoes.length;
-
-            atribuicaoTemporariaStore.criarAtribuicao(novaAtribuicao);
-
-            expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(
-                initialLength + 1,
-            );
-            expect(atribuicaoTemporariaStore.atribuicoes[initialLength]).toEqual(
-                novaAtribuicao,
             );
         });
     });
 
     describe("getters", () => {
-        it("getAtribuicoesPorServidor should return the correct atribuicoes by servidor ID", () => {
+        it("obterAtribuicoesPorServidor should return the correct atribuicoes by servidor ID", () => {
             const servidorAtribuicoes =
-                atribuicaoTemporariaStore.getAtribuicoesPorServidor(1);
+                atribuicaoTemporariaStore.obterAtribuicoesPorServidor(1);
             expect(servidorAtribuicoes.length).toBe(2);
             expect(servidorAtribuicoes[0].codigo).toBe(1);
             expect(servidorAtribuicoes[1].codigo).toBe(3);
         });
 
-        it("getAtribuicoesPorServidor should return an empty array if no matching servidor is found", () => {
+        it("obterAtribuicoesPorServidor should return an empty array if no matching servidor is found", () => {
             const servidorAtribuicoes =
-                atribuicaoTemporariaStore.getAtribuicoesPorServidor(999);
+                atribuicaoTemporariaStore.obterAtribuicoesPorServidor(999);
             expect(servidorAtribuicoes.length).toBe(0);
         });
 
-        it("getAtribuicoesPorUnidade should return the correct atribuicoes by unidade sigla", () => {
+        it("obterAtribuicoesPorUnidade should return the correct atribuicoes by unidade sigla", () => {
             const unidadeAtribuicoes =
-                atribuicaoTemporariaStore.getAtribuicoesPorUnidade("A");
+                atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("A");
             expect(unidadeAtribuicoes.length).toBe(1);
             expect(unidadeAtribuicoes[0].codigo).toBe(1);
         });
 
-        it("getAtribuicoesPorUnidade should return an empty array if no matching unidade is found", () => {
+        it("obterAtribuicoesPorUnidade should return an empty array if no matching unidade is found", () => {
             const unidadeAtribuicoes =
-                atribuicaoTemporariaStore.getAtribuicoesPorUnidade("NONEXISTENT");
+                atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("NONEXISTENT");
             expect(unidadeAtribuicoes.length).toBe(0);
         });
     });

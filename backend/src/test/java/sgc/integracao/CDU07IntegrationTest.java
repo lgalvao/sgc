@@ -5,17 +5,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockCustomUser;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -29,7 +29,6 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,17 +36,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("CDU-07: Detalhar Subprocesso")
-public class CDU07IntegrationTest {
+public class CDU07IntegrationTest extends BaseIntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL";
     private static final String OUTRO_CHEFE_TITULO = "333333333333";
 
-    @Autowired
-    private MockMvc mockMvc;
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired
@@ -77,11 +74,17 @@ public class CDU07IntegrationTest {
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
         processoRepo.save(processo);
 
-        subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
-        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade, Set.of(Perfil.SERVIDOR));
+        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade);
+        usuario.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.SERVIDOR).build());
         usuarioRepo.save(usuario);
+
+        // Create a CHEFE for the unit to avoid 404 in buscarResponsavelVigente
+        Usuario chefe = new Usuario("888888888888", "Chefe SESEL", "chefe@test.com", "124", unidade);
+        chefe.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(chefe).unidade(unidade).perfil(Perfil.CHEFE).build());
+        usuarioRepo.save(chefe);
 
         Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);
         movimentacaoRepo.save(movimentacao);
@@ -97,14 +100,18 @@ public class CDU07IntegrationTest {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())
                         .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.nome").value("Se&ccedil;&atilde;o de Sistemas Eleitorais"))
-                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
+                .andExpect(jsonPath("$.unidade.nome").value("Seção de Sistemas Eleitorais"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()))
                 .andExpect(jsonPath("$.localizacaoAtual").value(UNIDADE_SIGLA))
+                .andExpect(jsonPath("$.processoDescricao").value("Processo de Teste"))
+                .andExpect(jsonPath("$.tipoProcesso").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.responsavel.tipoResponsabilidade").value("Substituição"))
+                .andExpect(jsonPath("$.titular").exists())
                 .andExpect(jsonPath("$.movimentacoes[0].descricao").value("Subprocesso iniciado"));
         }
 
         @Test
-        @WithMockChefe
+        @WithMockChefe("888888888888")
         @DisplayName("CHEFE pode visualizar o subprocesso da sua unidade")
         void chefePodeVisualizarSuaUnidade() throws Exception {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())
@@ -115,7 +122,7 @@ public class CDU07IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(OUTRO_CHEFE_TITULO)
+        @WithMockCustomUser(tituloEleitoral = OUTRO_CHEFE_TITULO, perfis = {"CHEFE"}, unidadeId = 11L)
         @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
         void chefeNaoPodeVisualizarOutraUnidade() throws Exception {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())

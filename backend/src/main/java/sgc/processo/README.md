@@ -1,12 +1,13 @@
 # Módulo de Processo
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
-O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências".
+O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências" ou "Revisão de Mapas".
 
-Este módulo inicia e finaliza os fluxos de trabalho, coordena a criação de `Subprocessos` e `Mapas` e, crucialmente, **publica eventos de domínio** para comunicar-se de forma desacoplada com outros módulos, como `alerta` e `notificacao`.
+Este módulo inicia e finaliza os fluxos de trabalho, coordena a criação de `Subprocessos` para cada unidade participante e **publica eventos de domínio** para comunicar-se de forma desacoplada com outros módulos, como `alerta` e `notificacao`.
 
 ## Arquitetura de Serviços (Padrão Fachada)
-O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as operações. O `ProcessoController` e outros serviços externos interagem exclusivamente com esta fachada, que orquestra os serviços especializados e a lógica de negócio.
+O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as operações principais.
 
 ```mermaid
 graph TD
@@ -38,28 +39,37 @@ graph TD
 
 ## Componentes Principais
 
-### Camada de Fachada
-- **`ProcessoService`**: Atua como a fachada única para o módulo. Suas responsabilidades incluem:
-  - Gerenciar operações de CRUD.
-  - Conter toda a lógica para iniciar e finalizar um novo processo.
-  - Invocar o `CopiaMapaService` para clonar o mapa vigente (em caso de "Revisão").
-  - Publicar eventos de domínio como `EventoProcessoIniciado`.
+### Controladores e Serviços
+- **`ProcessoService`**: Atua como a fachada única para o módulo. Responsabilidades:
+  - CRUD de Processos.
+  - Iniciar processos (criando subprocessos e mapas).
+  - Finalizar processos (homologando mapas vigentes).
+  - Publicar eventos de domínio (`EventoProcessoIniciado`, `EventoProcessoFinalizado`).
+- **`ProcessoController`**: Expõe a API REST.
+  - `GET /api/processos/ativos`: Lista processos em andamento.
+  - `GET /api/processos/{id}/detalhes`: Visão completa do processo e seus subprocessos.
+  - `POST /api/processos/{id}/iniciar`: Dispara o início do processo (CDU-03).
+  - `POST /api/processos/{id}/finalizar`: Encerra o processo (CDU-21).
+- **`ProcessoNotificacaoService`**: Centraliza a lógica para enviar notificações específicas do processo, mantendo a fachada mais limpa.
 
-### Serviços Especializados
-- **`ProcessoNotificacaoService`**: Centraliza a lógica para enviar notificações específicas do processo.
+### Modelo de Dados (`model`)
+- **`Processo`**: Entidade principal. Contém título, datas, tipo (`MAPEAMENTO`, `REVISAO`, `DIAGNOSTICO`) e situação.
+- **`TipoProcesso` / `SituacaoProcesso`**: Enums de domínio.
 
-### Outros Componentes
-
-- **`ProcessoController`**: Expõe a API REST e delega todas as chamadas para o `ProcessoService`.
-- **`eventos/`**: Define os eventos de domínio (`EventoProcessoIniciado`, etc.) que são publicados para desacoplar a comunicação com outros módulos.
-- **`model/`**: Contém as entidades JPA, como `Processo` e `UnidadeProcesso`.
+### Eventos de Domínio (`eventos`)
+- **`EventoProcessoIniciado`**: Publicado quando um processo começa.
+- **`EventoProcessoFinalizado`**: Publicado quando um processo termina.
+- **`EventoRevisaoSubprocessoDisponibilizada`**: Publicado quando uma revisão é liberada.
 
 ## Fluxo de Iniciação de um Processo
 
-1. O `ProcessoController` recebe a requisição para iniciar um processo.
-2.  Ele chama o `ProcessoService.iniciarProcesso(...)`.
-3.  O `ProcessoService`, dentro de uma transação, executa toda a lógica de criação de subprocessos e mapas.
-4.  Ao final, ele publica um `EventoProcessoIniciado` usando o `ApplicationEventPublisher`.
-5.  Os módulos `alerta` e `notificacao` recebem o evento e executam suas ações de forma independente.
+1. O `ProcessoController` recebe a requisição `POST /iniciar`.
+2. O `ProcessoService` inicia uma transação.
+3. Para cada unidade participante, o serviço cria um `Subprocesso`.
+4. Se for um processo de **REVISAO**, o `CopiaMapaService` (do módulo `mapa`) é invocado para duplicar o mapa vigente da unidade.
+5. Ao final, um `EventoProcessoIniciado` é publicado, disparando alertas e e-mails através dos listeners no pacote `notificacao`.
 
-A arquitetura orientada a eventos e o uso de uma fachada coesa garantem que este módulo, apesar de sua importância central, permaneça testável e desacoplado.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

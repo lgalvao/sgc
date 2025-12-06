@@ -14,6 +14,7 @@
         <BFormSelect
           id="filtroTipo"
           v-model="filtroTipo"
+          data-testid="sel-filtro-tipo"
           :options="[
             { value: '', text: 'Todos' },
             { value: 'Mapeamento', text: 'Mapeamento' },
@@ -31,6 +32,7 @@
           id="filtroDataInicio"
           v-model="filtroDataInicio"
           type="date"
+          data-testid="inp-filtro-data-inicio"
         />
       </div>
       <div class="col-md-4">
@@ -42,6 +44,7 @@
           id="filtroDataFim"
           v-model="filtroDataFim"
           type="date"
+          data-testid="inp-filtro-data-fim"
         />
       </div>
     </div>
@@ -51,6 +54,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-mapas"
           @click="abrirModalMapasVigentes"
         >
           <h5 class="card-title">
@@ -66,6 +70,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-gaps"
           @click="abrirModalDiagnosticosGaps"
         >
           <h5 class="card-title">
@@ -81,6 +86,7 @@
         <BCard
           class="h-100"
           style="cursor: pointer;"
+          data-testid="card-relatorio-andamento"
           @click="abrirModalAndamentoGeral"
         >
           <h5 class="card-title">
@@ -97,6 +103,7 @@
     <!-- Modal Mapas Vigentes -->
     <BModal
       v-model="mostrarModalMapasVigentes"
+      :fade="false"
       title="Mapas Vigentes"
       size="xl"
       hide-footer
@@ -135,6 +142,7 @@
     <!-- Modal Diagnósticos de Gaps -->
     <BModal
       v-model="mostrarModalDiagnosticosGaps"
+      :fade="false"
       title="Diagnósticos de Gaps"
       size="xl"
       hide-footer
@@ -193,6 +201,7 @@
     <!-- Modal Andamento Geral -->
     <BModal
       v-model="mostrarModalAndamentoGeral"
+      :fade="false"
       title="Andamento Geral dos Processos"
       size="xl"
       hide-footer
@@ -239,14 +248,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BButton,
-  BCard,
-  BContainer,
-  BFormInput,
-  BFormSelect,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BContainer, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useProcessosStore} from "@/stores/processos";
