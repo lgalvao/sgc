@@ -94,6 +94,28 @@ O projeto utiliza [Vitest](https://vitest.dev/) para testes. A estratégia de te
     npm run lint
     ```
 
+## 🛡️ Verificações de Qualidade
+
+O frontend possui scripts dedicados para garantir a qualidade do código e cobertura de testes.
+
+### Ferramentas
+- **ESLint**: Análise estática e formatação.
+- **vue-tsc**: Verificação de tipos TypeScript.
+- **Vitest Coverage**: Relatório de cobertura de testes.
+
+### Como Executar
+Para rodar todas as verificações (sem falhar o build em caso de avisos):
+```bash
+npm run quality:check
+```
+
+Para gerar e abrir os relatórios de cobertura:
+```bash
+npm run quality:report
+```
+
+Os relatórios de cobertura ficam em `coverage/`.
+
 ## Scripts Disponíveis
 
 - `npm run dev`: Inicia o servidor de desenvolvimento.

@@ -1,6 +1,6 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -197,7 +197,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                     post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isUnprocessableContent());
         }
 
         @Test

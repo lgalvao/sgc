@@ -1,6 +1,6 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -214,6 +214,6 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
     }
 }

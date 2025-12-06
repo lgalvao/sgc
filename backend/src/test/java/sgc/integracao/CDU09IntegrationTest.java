@@ -145,7 +145,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo())
                     .with(csrf()))
-                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message", is("Existem atividades sem conhecimentos associados.")))
                     .andExpect(jsonPath("$.details.atividadesSemConhecimento[0].descricao", is("Atividade Vazia")));
 

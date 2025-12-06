@@ -73,7 +73,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroValidacao.class)
     protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage()));
+        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_CONTENT, sanitizar(ex.getMessage()));
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
             log.warn("Detalhes da validação: {}", ex.getDetails());
             erroApi.setDetails(ex.getDetails());
@@ -154,7 +154,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErroMapaNaoAssociado.class
     })
     protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
-        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_ENTITY, "warn");
+        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_CONTENT, "warn");
     }
 
     @ExceptionHandler(ErroAlerta.class)

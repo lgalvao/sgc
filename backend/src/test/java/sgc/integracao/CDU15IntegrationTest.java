@@ -143,7 +143,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnprocessableEntity());
+            .andExpect(status().isUnprocessableContent());
     }
 
     @Test
@@ -244,7 +244,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
         }
     }
 }

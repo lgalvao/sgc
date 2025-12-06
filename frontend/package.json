@@ -10,7 +10,11 @@
     "lint": "eslint . --ext .vue,.js,.mjs,.ts --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
     "test:unit": "vitest --run --reporter=dot",
-    "coverage:unit": "vitest --run --coverage --reporter=dot"
+    "coverage:unit": "vitest --run --coverage --reporter=dot",
+    "quality:test": "vitest --run --coverage --reporter=dot",
+    "quality:lint": "eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist || true",
+    "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict || true",
+    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -33,7 +37,7 @@
     "@vitest/ui": "^4.0.15",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
-    "@vue/typescript-plugin": "^3.1.5",
+    "@vue/typescript-plugin": "^3.1.6",
     "consola": "^3.4.2",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -46,6 +50,6 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.15",
     "vue-eslint-parser": "^10.2.0",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.6"
   }
 }

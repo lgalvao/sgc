@@ -1,6 +1,6 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -202,7 +202,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(status().isUnprocessableContent())
                     .andReturn().getResponse().getContentAsString();
 
             ErroApi erroApi = objectMapper.readValue(responseBody, ErroApi.class);
@@ -225,7 +225,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.details.competenciasNaoAssociadas").exists());
         }
     }

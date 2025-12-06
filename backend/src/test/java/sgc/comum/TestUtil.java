@@ -1,8 +1,8 @@
 package sgc.comum;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -14,9 +14,9 @@ public class TestUtil {
             MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.registerModule(new JavaTimeModule());
+        ObjectMapper mapper = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .build();
 
         return mapper.writeValueAsBytes(object);
     }

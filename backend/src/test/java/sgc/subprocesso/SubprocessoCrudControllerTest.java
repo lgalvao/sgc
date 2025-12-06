@@ -1,15 +1,14 @@
 package sgc.subprocesso;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.sgrh.dto.UnidadeDto;
@@ -23,31 +22,29 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(SubprocessoCrudController.class)
+@Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
 
-    @Mock private SubprocessoService subprocessoService;
-    @Mock private SubprocessoDtoService subprocessoDtoService;
-    @Mock private UnidadeService unidadeService;
+    @MockitoBean private SubprocessoService subprocessoService;
+    @MockitoBean private SubprocessoDtoService subprocessoDtoService;
+    @MockitoBean private UnidadeService unidadeService;
 
-    @InjectMocks private SubprocessoCrudController controller;
-
-    private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new RestExceptionHandler())
-                .build();
-    }
+    @Autowired private MockMvc mockMvc;
 
     @Test
     @DisplayName("listar deve retornar lista de subprocessos")
+    @WithMockUser
     void listar() throws Exception {
         when(subprocessoDtoService.listar()).thenReturn(List.of(new SubprocessoDto()));
 
@@ -59,6 +56,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("obterPorCodigo deve retornar detalhe")
+    @WithMockUser
     void obterPorCodigo() throws Exception {
         when(subprocessoDtoService.obterDetalhes(eq(1L), any(), any())).thenReturn(SubprocessoDetalheDto.builder().build());
 
@@ -68,6 +66,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("buscarPorProcessoEUnidade deve retornar DTO")
+    @WithMockUser
     void buscarPorProcessoEUnidade() throws Exception {
         UnidadeDto uDto = new UnidadeDto();
         uDto.setCodigo(10L);
@@ -83,6 +82,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("criar deve retornar Created")
+    @WithMockUser
     void criar() throws Exception {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
@@ -90,6 +90,7 @@ class SubprocessoCrudControllerTest {
         when(subprocessoService.criar(any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/subprocessos")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"codProcesso\": 1}"))
                 .andExpect(status().isCreated())
@@ -98,6 +99,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("atualizar deve retornar Ok")
+    @WithMockUser
     void atualizar() throws Exception {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
@@ -105,6 +107,7 @@ class SubprocessoCrudControllerTest {
         when(subprocessoService.atualizar(eq(1L), any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/subprocessos/1/atualizar")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"codProcesso\": 1}"))
                 .andExpect(status().isOk());
@@ -112,19 +115,23 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("excluir deve retornar NoContent")
+    @WithMockUser
     void excluir() throws Exception {
         doNothing().when(subprocessoService).excluir(1L);
 
-        mockMvc.perform(post("/api/subprocessos/1/excluir"))
+        mockMvc.perform(post("/api/subprocessos/1/excluir")
+                .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("excluir retorna NotFound se erro")
+    @WithMockUser
     void excluirNotFound() throws Exception {
         doThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L)).when(subprocessoService).excluir(1L);
 
-        mockMvc.perform(post("/api/subprocessos/1/excluir"))
+        mockMvc.perform(post("/api/subprocessos/1/excluir")
+                .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

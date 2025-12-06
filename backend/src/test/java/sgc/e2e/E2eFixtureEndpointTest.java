@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import sgc.processo.model.SituacaoProcesso;
 
@@ -22,7 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Testes de integração para os endpoints de fixtures do E2eController.
  */
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+
 @SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("e2e")
 class E2eFixtureEndpointTest {
 

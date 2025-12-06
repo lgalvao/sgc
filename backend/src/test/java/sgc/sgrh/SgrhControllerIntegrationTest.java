@@ -25,7 +25,10 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+
 @SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
 @Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })

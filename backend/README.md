@@ -103,6 +103,29 @@ A documentação da API é gerada automaticamente com SpringDoc e está acessív
 A especificação OpenAPI em formato JSON pode ser encontrada em:
 [http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
+## 🛡️ Verificações de Qualidade
+
+O backend utiliza um conjunto de ferramentas de análise estática para garantir a qualidade do código. As verificações são não-bloqueantes (warnings only).
+
+### Ferramentas Configuradas
+- **Checkstyle**: Verifica a aderência ao padrão de código (Google Checks).
+- **PMD**: Analisa o código em busca de más práticas e código morto.
+- **SpotBugs**: Detecta bugs potenciais através de análise de bytecode.
+- **JaCoCo**: Mede a cobertura de testes unitários.
+
+### Como Executar
+Na raiz do projeto:
+```bash
+./gradlew :backend:qualityCheck
+```
+
+### Relatórios
+Os relatórios HTML são gerados em `backend/build/reports/`:
+- `checkstyle/main.html`
+- `pmd/main.html`
+- `spotbugs/main.html`
+- `jacoco/test/html/index.html`
+
 ## Padrões de Design e Boas Práticas
 - **Lombok:** Utilizado para reduzir código repetitivo.
 - **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.

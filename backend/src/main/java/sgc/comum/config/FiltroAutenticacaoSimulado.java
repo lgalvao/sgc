@@ -38,8 +38,8 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
                 JsonNode node = objectMapper.readTree(json);
 
                 if (node.has("tituloEleitoral")) {
-                    String titulo = node.get("tituloEleitoral").asText();
-                    String perfil = node.has("perfil") ? node.get("perfil").asText() : "USER";
+                    String titulo = node.get("tituloEleitoral").asString();
+                    String perfil = node.has("perfil") ? node.get("perfil").asString() : "USER";
 
                     // Cria autenticação simples
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

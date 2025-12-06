@@ -145,7 +145,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividade);
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isUnprocessableContent());
 
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();
             assertThat(subprocessoNaoAlterado.getSituacao())
