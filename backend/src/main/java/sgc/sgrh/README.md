@@ -1,5 +1,5 @@
 # Pacote SGRH e Usuário
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 ## Visão Geral
 Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
@@ -68,6 +68,6 @@ graph TD
 - **Para obter dados de RH (unidades, responsáveis, etc.)**, outros serviços devem injetar e utilizar o `SgrhService`.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

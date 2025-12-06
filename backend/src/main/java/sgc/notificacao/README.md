@@ -1,5 +1,5 @@
 # Módulo de Notificação e Orquestração de Eventos
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 ## Visão Geral
 Este pacote tem uma dupla responsabilidade:
@@ -73,6 +73,6 @@ graph TD
 - **Centralização da Lógica Reativa:** O `EventoProcessoListener` centraliza a resposta aos eventos de domínio, tornando o fluxo de trabalho reativo claro e fácil de entender.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

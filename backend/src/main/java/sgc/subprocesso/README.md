@@ -1,5 +1,5 @@
 # Módulo de Subprocesso
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 ## Visão Geral
 Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o ciclo de vida de cada tarefa, desde sua criação até a homologação.
@@ -107,6 +107,6 @@ stateDiagram-v2
 Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem fez o quê e quando.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

@@ -1,5 +1,5 @@
 # Backend do Sistema de Gestão de Competências (SGC)
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 ## Visão Geral
 Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos. Parte da comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio.
@@ -133,6 +133,6 @@ Os relatórios HTML são gerados em `backend/build/reports/`:
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

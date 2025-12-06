@@ -1,5 +1,5 @@
 # Composables (Vue Composition API)
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 Este diretório contém **Composables** do Vue.js. Composables são funções que encapsulam lógica de estado com a Composition API para ser reutilizada entre componentes.
 
@@ -19,6 +19,6 @@ Por convenção, o nome dessas funções começa com `use` (ex: `usePerfil`).
     - **Integração com Stores:** Orquestra dados das stores `useUsuariosStore`, `useUnidadesStore` e `useAtribuicaoTemporariaStore`.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

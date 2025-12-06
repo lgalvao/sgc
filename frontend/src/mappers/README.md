@@ -1,5 +1,5 @@
 # Mappers (Mapeadores de Dados)
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 Este diretório contém funções puras responsáveis por transformar dados entre o formato da API (DTOs do Backend) e o formato utilizado internamente pelo Frontend (Interfaces TypeScript e Stores).
 
@@ -19,6 +19,6 @@ Este diretório contém funções puras responsáveis por transformar dados entr
 - **`sgrh.ts`**: Mapeia dados vindos da integração com o SGRH (unidades, perfis).
 - **`unidades.ts`**: Transforma dados da estrutura organizacional.
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

@@ -1,5 +1,5 @@
 # Types (Definições TypeScript)
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 Este diretório armazena as definições de tipos, interfaces e enums do TypeScript. Ele serve como o contrato de dados entre o frontend e o backend.
 
@@ -13,6 +13,6 @@ Este diretório armazena as definições de tipos, interfaces e enums do TypeScr
 - **Uso Global:** Evite definir interfaces dentro de componentes (`.vue`). Sempre que um tipo for usado em mais de um lugar, ele deve ser movido para este diretório.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

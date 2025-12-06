@@ -1,5 +1,5 @@
 # Constantes
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 Este diretório centraliza valores constantes utilizados em toda a aplicação frontend. O objetivo é evitar "números mágicos" e strings repetidas, facilitando a manutenção e a consistência.
 
@@ -18,6 +18,6 @@ Este diretório centraliza valores constantes utilizados em toda a aplicação f
 - Ponto de entrada que exporta as constantes para facilitar a importação em outros arquivos.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

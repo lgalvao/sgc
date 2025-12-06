@@ -1,5 +1,5 @@
 # Módulo de Atividade
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-06T22:32:53Z
 
 ## Visão Geral
 Este pacote gerencia a entidade `Atividade`, que representa uma tarefa ou atribuição dentro de um `Mapa` de competências.
@@ -73,6 +73,6 @@ graph TD
 A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter endpoints soltos para conhecimentos, o acesso hierárquico `/api/atividades/{atividadeId}/conhecimentos` garante que todo conhecimento esteja sempre corretamente vinculado à sua atividade pai.
 
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-06T22:32:53Z)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
