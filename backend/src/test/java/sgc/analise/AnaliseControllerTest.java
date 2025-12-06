@@ -1,34 +1,37 @@
 package sgc.analise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.RestExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Testes do AnaliseController")
 class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";
@@ -48,24 +51,14 @@ class AnaliseControllerTest {
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
     private static final String ANALISE_DE_VALIDACAO = "Análise de validação";
 
+    @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @Mock
+    @MockitoBean
     private AnaliseService analiseService;
-
-    @InjectMocks
-    private AnaliseController analiseController;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(analiseController)
-                .setControllerAdvice(new RestExceptionHandler())
-                .build();
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-    }
 
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
