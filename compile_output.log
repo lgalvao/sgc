@@ -1,0 +1,24 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:compileJava
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file '/app/backend/build.gradle.kts' line: 105
+
+* What went wrong:
+Could not resolve all files for configuration ':backend:testRuntimeClasspath'.
+> Could not find org.springframework.boot:spring-boot-test-autoconfigure-web:.
+  Required by:
+      project ':backend'
+> Could not find org.springframework.boot:spring-boot-test-autoconfigure-jpa:.
+  Required by:
+      project ':backend'
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1s
+Configuration cache entry stored.

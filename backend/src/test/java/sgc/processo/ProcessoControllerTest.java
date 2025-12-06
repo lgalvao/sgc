@@ -3,11 +3,12 @@ package sgc.processo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ProcessoController.class)
+@ExtendWith(MockitoExtension.class)
 public class ProcessoControllerTest {
         private static final String NOVO_PROCESSO = "Novo Processo";
         private static final String API_PROCESSOS = "/api/processos";
@@ -40,7 +41,7 @@ public class ProcessoControllerTest {
         private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
         private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
 
-        @MockitoBean
+        @Mock
         private ProcessoService processoService;
 
         @Captor
@@ -57,8 +58,7 @@ public class ProcessoControllerTest {
         void setUp() {
                 ProcessoController controle = new ProcessoController(processoService);
                 mockMvc = MockMvcBuilders.standaloneSetup(controle)
-                                .setControllerAdvice(new RestExceptionHandler()) // Register the global exception
-                                                                                 // handler
+                                .setControllerAdvice(new RestExceptionHandler())
                                 .build();
                 objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());

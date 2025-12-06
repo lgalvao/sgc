@@ -1,34 +1,38 @@
 package sgc.atividade;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.core.MethodParameter;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.RestExceptionHandler;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AtividadeController.class)
-@WithMockUser
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class AtividadeControllerTest {
     private static final String ATIVIDADE_TESTE = "Atividade Teste";
     private static final String API_ATIVIDADES = "/api/atividades";
@@ -37,20 +41,41 @@ class AtividadeControllerTest {
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
     private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private AtividadeService atividadeService;
 
-    @MockitoBean
+    @Mock
     private AtividadeMapper atividadeMapper;
 
-    @MockitoBean
+    @Mock
     private ConhecimentoMapper conhecimentoMapper;
+
+    @InjectMocks
+    private AtividadeController atividadeController;
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(atividadeController)
+                .setControllerAdvice(new RestExceptionHandler())
+                .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
+                    @Override
+                    public boolean supportsParameter(MethodParameter parameter) {
+                        return parameter.getParameterType().equals(String.class);
+                    }
+
+                    @Override
+                    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                        return "user";
+                    }
+                })
+                .build();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     @Nested
     @DisplayName("Testes para CRUD de Atividades")
@@ -119,14 +144,9 @@ class AtividadeControllerTest {
 
             when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user",
-                    "N/A", java.util.Collections.emptyList());
-
-            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(atividadeDto))
-                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                            .authentication(auth)))
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -139,14 +159,9 @@ class AtividadeControllerTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
 
-            var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user",
-                    "N/A", java.util.Collections.emptyList());
-
-            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(atividadeDto))
-                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                            .authentication(auth)))
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -162,7 +177,7 @@ class AtividadeControllerTest {
 
             when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
-            mockMvc.perform(post("/api/atividades/1/atualizar").with(csrf())
+            mockMvc.perform(post("/api/atividades/1/atualizar")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
@@ -177,7 +192,7 @@ class AtividadeControllerTest {
             when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class)))
                     .thenThrow(new ErroEntidadeNaoEncontrada(""));
 
-            mockMvc.perform(post("/api/atividades/99/atualizar").with(csrf())
+            mockMvc.perform(post("/api/atividades/99/atualizar")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
@@ -193,7 +208,7 @@ class AtividadeControllerTest {
         void deveExcluirAtividade() throws Exception {
             doNothing().when(atividadeService).excluir(1L);
 
-            mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
+            mockMvc.perform(post("/api/atividades/1/excluir"))
                     .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluir(1L);
@@ -204,7 +219,7 @@ class AtividadeControllerTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             doThrow(new ErroEntidadeNaoEncontrada("")).when(atividadeService).excluir(99L);
 
-            mockMvc.perform(post("/api/atividades/99/excluir").with(csrf()))
+            mockMvc.perform(post("/api/atividades/99/excluir"))
                     .andExpect(status().isNotFound());
         }
     }
@@ -239,7 +254,7 @@ class AtividadeControllerTest {
             when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoSalvoDto);
 
-            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
+            mockMvc.perform(post(API_CONHECIMENTOS)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
@@ -255,7 +270,7 @@ class AtividadeControllerTest {
             when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoDto);
 
-            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
+            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
@@ -267,7 +282,7 @@ class AtividadeControllerTest {
         void deveExcluirConhecimento() throws Exception {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
-            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
+            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR))
                     .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);

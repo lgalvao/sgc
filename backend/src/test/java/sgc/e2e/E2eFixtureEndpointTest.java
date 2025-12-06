@@ -1,29 +1,48 @@
 package sgc.e2e;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import sgc.processo.dto.ProcessoDto;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import sgc.processo.model.SituacaoProcesso;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Testes de integração para os endpoints de fixtures do E2eController.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @ActiveProfiles("e2e")
 class E2eFixtureEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private WebApplicationContext context;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
-    void devePermitirCriarProcessoMapeamentoViaFixture() {
+    void devePermitirCriarProcessoMapeamentoViaFixture() throws Exception {
         // Preparar requisição
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "Processo Fixture Teste Mapeamento",
@@ -32,23 +51,18 @@ class E2eFixtureEndpointTest {
                 30
         );
 
-        // Executar
-        ResponseEntity<ProcessoDto> response = restTemplate.postForEntity(
-                "/e2e/fixtures/processo-mapeamento",
-                request,
-                ProcessoDto.class
-        );
-
-        // Validar
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Processo Fixture Teste Mapeamento", response.getBody().getDescricao());
-        assertEquals("MAPEAMENTO", response.getBody().getTipo());
-        assertEquals(SituacaoProcesso.CRIADO, response.getBody().getSituacao());
+        // Executar e Validar
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo Fixture Teste Mapeamento"))
+                .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.CRIADO.name()));
     }
 
     @Test
-    void devePermitirCriarEIniciarProcessoMapeamentoViaFixture() {
+    void devePermitirCriarEIniciarProcessoMapeamentoViaFixture() throws Exception {
         // Preparar requisição
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "Processo Fixture Teste Mapeamento Iniciado",
@@ -57,23 +71,18 @@ class E2eFixtureEndpointTest {
                 30
         );
 
-        // Executar
-        ResponseEntity<ProcessoDto> response = restTemplate.postForEntity(
-                "/e2e/fixtures/processo-mapeamento",
-                request,
-                ProcessoDto.class
-        );
-
-        // Validar
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Processo Fixture Teste Mapeamento Iniciado", response.getBody().getDescricao());
-        assertEquals("MAPEAMENTO", response.getBody().getTipo());
-        assertEquals(SituacaoProcesso.EM_ANDAMENTO, response.getBody().getSituacao());
+        // Executar e Validar
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo Fixture Teste Mapeamento Iniciado"))
+                .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
     }
 
     @Test
-    void deveRetornarErroQuandoUnidadeNaoExiste() {
+    void deveRetornarErroQuandoUnidadeNaoExiste() throws Exception {
         // Preparar requisição com unidade inexistente
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "Processo Fixture Teste",
@@ -82,19 +91,15 @@ class E2eFixtureEndpointTest {
                 30
         );
 
-        // Executar
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "/e2e/fixtures/processo-mapeamento",
-                request,
-                String.class
-        );
-
-        // Validar - deve retornar erro
-        assertTrue(response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError());
+        // Executar e Validar
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    void deveGerarDescricaoAutomaticaQuandoNaoFornecida() {
+    void deveGerarDescricaoAutomaticaQuandoNaoFornecida() throws Exception {
         // Preparar requisição sem descrição
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 null, // sem descrição
@@ -103,18 +108,12 @@ class E2eFixtureEndpointTest {
                 30
         );
 
-        // Executar
-        ResponseEntity<ProcessoDto> response = restTemplate.postForEntity(
-                "/e2e/fixtures/processo-mapeamento",
-                request,
-                ProcessoDto.class
-        );
-
-        // Validar
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertNotNull(response.getBody().getDescricao());
-        assertTrue(response.getBody().getDescricao().contains("Processo Fixture E2E"));
-        assertTrue(response.getBody().getDescricao().contains("MAPEAMENTO"));
+        // Executar e Validar
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao", containsString("Processo Fixture E2E")))
+                .andExpect(jsonPath("$.descricao", containsString("MAPEAMENTO")));
     }
 }
