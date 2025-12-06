@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -44,16 +43,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe("333333333333")
 @Import({ TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class,
         sgc.integracao.mocks.TestThymeleafConfig.class })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
-class CDU10IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+class CDU10IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessoRepo processoRepo;

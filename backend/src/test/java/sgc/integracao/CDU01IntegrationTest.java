@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -26,16 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-01: Realizar Login")
-public class CDU01IntegrationTest {
+public class CDU01IntegrationTest extends BaseIntegrationTest {
     private static final String BASE_URL = "/api/usuarios";
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private TestUtil testUtil;

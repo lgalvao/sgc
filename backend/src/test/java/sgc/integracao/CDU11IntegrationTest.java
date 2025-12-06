@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -40,17 +39,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import(sgc.integracao.mocks.TestSecurityConfig.class)
-class CDU11IntegrationTest {
+class CDU11IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{codigo}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
 
-    @Autowired
-    private MockMvc mockMvc;
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired

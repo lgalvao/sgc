@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ public class ErroApi {
         this.timestamp = LocalDateTime.now();
     }
 
-    public ErroApi(HttpStatus status, String message) {
+    public ErroApi(HttpStatusCode status, String message) {
         this();
         this.status = status.value();
         this.message = message;
     }
 
-    public ErroApi(HttpStatus status, String message, List<ErroSubApi> subErrors) {
+    public ErroApi(HttpStatusCode status, String message, List<ErroSubApi> subErrors) {
         this(status, message);
         this.subErrors = subErrors != null ? new ArrayList<>(subErrors) : null;
     }

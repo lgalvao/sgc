@@ -1,19 +1,22 @@
 package sgc.analise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.RestExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -21,14 +24,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AnaliseController.class)
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do AnaliseController")
-@WithMockUser
 class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";
     private static final String OBSERVACAO_2 = "Observação 2";
@@ -47,14 +48,24 @@ class AnaliseControllerTest {
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
     private static final String ANALISE_DE_VALIDACAO = "Análise de validação";
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private AnaliseService analiseService;
+
+    @InjectMocks
+    private AnaliseController analiseController;
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(analiseController)
+                .setControllerAdvice(new RestExceptionHandler())
+                .build();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
@@ -142,7 +153,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated())
@@ -167,7 +178,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
@@ -183,7 +194,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{}"))
                     .andExpect(status().isCreated());
@@ -200,7 +211,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isNotFound());
@@ -217,7 +228,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isBadRequest())
@@ -235,7 +246,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())
@@ -332,7 +343,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated())
@@ -355,7 +366,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
@@ -372,7 +383,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isNotFound());
@@ -389,7 +400,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isBadRequest())
@@ -407,7 +418,7 @@ class AnaliseControllerTest {
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
-            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
+            mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,15 +44,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
-public class CDU16IntegrationTest {
+public class CDU16IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSO_MAPA_AJUSTE = "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;

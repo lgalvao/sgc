@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,18 +29,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
 @Import(TestSecurityConfig.class)
-public class CDU02IntegrationTest {
+public class CDU02IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
 
-    @Autowired
-    private MockMvc mockMvc;
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired

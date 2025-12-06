@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,16 +42,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
-public class CDU06IntegrationTest {
+public class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private ProcessoRepo processoRepo;

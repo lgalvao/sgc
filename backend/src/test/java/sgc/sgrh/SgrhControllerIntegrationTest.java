@@ -4,13 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
@@ -20,19 +21,21 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
 @Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
 @DisplayName("Testes de Integração do SgrhController")
 class SgrhControllerIntegrationTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private UnidadeRepo unidadeRepo;
@@ -42,6 +45,9 @@ class SgrhControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
         unidade = unidadeRepo.findById(100L).orElseThrow();
     }
 
