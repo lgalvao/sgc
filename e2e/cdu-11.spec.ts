@@ -1,8 +1,8 @@
-import {expect, Page, test} from '@playwright/test';
-import {login, USUARIOS} from './helpers/helpers-auth';
-import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { expect, Page, test } from '@playwright/test';
+import { login, USUARIOS } from './helpers/helpers-auth';
+import { criarProcesso } from './helpers/helpers-processos';
+import { adicionarAtividade, adicionarConhecimento, navegarParaAtividades } from './helpers/helpers-atividades';
+import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -270,6 +270,21 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // DEBUG: verificar URL antes do clique
         console.log('URL antes do clique na linha:', page.url());
 
+        // DEBUG: Interceptar TODAS as chamadas de rede para /subprocessos/
+        page.on('response', async response => {
+            if (response.url().includes('subprocessos')) {
+                console.log('=== Chamada API detectada ===');
+                console.log('URL:', response.url());
+                console.log('Status:', response.status());
+                try {
+                    const body = await response.text();
+                    console.log('Resposta:', body.substring(0, 500));
+                } catch (e) {
+                    console.log('Erro ao ler resposta:', e);
+                }
+            }
+        });
+
         // Clicar na linha
         await linhaUnidade.click();
 
@@ -278,6 +293,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // DEBUG: verificar a URL atual (deve ter mudado)
         console.log('URL após clicar na unidade:', page.url());
+
+        // Esperar a página carregar completamente
+        await page.waitForTimeout(2000);
 
         // Esperar navegação para o subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
