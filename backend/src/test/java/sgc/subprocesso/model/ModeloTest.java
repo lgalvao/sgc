@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ModeloTest {
     @Test
-    void Subprocesso_GettersAndSetters() {
+    void subprocessoGettersAndSetters() {
         Subprocesso subprocesso = new Subprocesso();
         
         Processo processo = new Processo();
@@ -47,7 +47,7 @@ class ModeloTest {
     }
 
     @Test
-    void Subprocesso_ConstructorWithParameters() {
+    void subprocessoConstructorWithParameters() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         
@@ -69,7 +69,7 @@ class ModeloTest {
     }
 
     @Test
-    void Movimentacao_GettersAndSetters() {
+    void movimentacaoGettersAndSetters() {
         Movimentacao movimentacao = new Movimentacao();
         
         Subprocesso subprocesso = new Subprocesso();
@@ -97,7 +97,7 @@ class ModeloTest {
     }
 
     @Test
-    void Movimentacao_ConstructorWithParameters() {
+    void movimentacaoConstructorWithParameters() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         
@@ -122,7 +122,7 @@ class ModeloTest {
     }
 
     @Test
-    void ErroSubprocesso_ConstructorAndGetMessage() {
+    void erroSubprocessoConstructorAndGetMessage() {
         ErroSubprocesso erro = new ErroSubprocesso("Mensagem de erro");
         assertEquals("Mensagem de erro", erro.getMessage());
     }
