@@ -1,7 +1,7 @@
 package sgc.comum.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
 import net.jqwik.api.*;
 import org.mockito.Mockito;
 
@@ -15,7 +15,7 @@ class HtmlSanitizingDeserializerPropertyTest {
     private final HtmlSanitizingDeserializer deserializer = new HtmlSanitizingDeserializer();
 
     @Property
-    void deveSanitizarQualquerString(@ForAll String input) throws IOException {
+    void deveSanitizarQualquerString(@ForAll String input) {
         // Setup
         JsonParser jsonParser = Mockito.mock(JsonParser.class);
         DeserializationContext context = Mockito.mock(DeserializationContext.class);
@@ -35,7 +35,7 @@ class HtmlSanitizingDeserializerPropertyTest {
     }
 
     @Property
-    void deveRemoverTagsEspecificas(@ForAll("htmlTags") String tag, @ForAll("textoSimples") String content) throws IOException {
+    void deveRemoverTagsEspecificas(@ForAll("htmlTags") String tag, @ForAll("textoSimples") String content) {
         JsonParser jsonParser = Mockito.mock(JsonParser.class);
         DeserializationContext context = Mockito.mock(DeserializationContext.class);
 
@@ -63,7 +63,7 @@ class HtmlSanitizingDeserializerPropertyTest {
     }
 
     @Property
-    void naoDeveAlterarTextoSemHtml(@ForAll("textoSimples") String input) throws IOException {
+    void naoDeveAlterarTextoSemHtml(@ForAll("textoSimples") String input) {
         JsonParser jsonParser = Mockito.mock(JsonParser.class);
         DeserializationContext context = Mockito.mock(DeserializationContext.class);
 

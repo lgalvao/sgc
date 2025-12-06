@@ -1,6 +1,6 @@
 package sgc.comum.json;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
