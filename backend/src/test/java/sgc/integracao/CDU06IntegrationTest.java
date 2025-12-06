@@ -181,7 +181,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value("MAPA_HOMOLOGADO"))
+                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value("MAPEAMENTO_MAPA_HOMOLOGADO"))
                 .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
     }
 }

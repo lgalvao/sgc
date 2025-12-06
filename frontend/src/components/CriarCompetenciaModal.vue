@@ -26,8 +26,7 @@
         <BCard
           v-for="atividade in atividades"
           :key="atividade.codigo"
-          :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-          class="atividade-card-item"
+          :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
           no-body
         >
           <BCardBody class="d-flex align-items-center py-2">

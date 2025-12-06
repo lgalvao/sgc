@@ -301,7 +301,7 @@ INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_destino_codigo, descric
 VALUES (70003, 50000, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
-VALUES (60000, 50000, 8, 1001, 'CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
+VALUES (60000, 50000, 8, 1001, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
 INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_codigo, descricao, data_hora)
 VALUES (80000, 60000, 50001, 'INICIADO', CURRENT_TIMESTAMP());
 

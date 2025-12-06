@@ -69,11 +69,13 @@ create table if not exists sgc.subprocesso
     processo_codigo    bigint,
     unidade_codigo     bigint,
     situacao_id        varchar(50) check (situacao_id in
-                                          ('NAO_INICIADO', 'CADASTRO_EM_ANDAMENTO', 'CADASTRO_DISPONIBILIZADO',
-                                           'CADASTRO_HOMOLOGADO', 'MAPA_CRIADO', 'MAPA_DISPONIBILIZADO',
-                                           'MAPA_COM_SUGESTOES', 'MAPA_VALIDADO', 'MAPA_HOMOLOGADO',
-                                           'REVISAO_CADASTRO_EM_ANDAMENTO', 'REVISAO_CADASTRO_DISPONIBILIZADA',
-                                           'REVISAO_CADASTRO_HOMOLOGADA', 'MAPA_AJUSTADO')),
+                                          ('NAO_INICIADO',
+                                           'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', 'MAPEAMENTO_CADASTRO_DISPONIBILIZADO', 'MAPEAMENTO_CADASTRO_HOMOLOGADO',
+                                           'MAPEAMENTO_MAPA_CRIADO', 'MAPEAMENTO_MAPA_DISPONIBILIZADO', 'MAPEAMENTO_MAPA_COM_SUGESTOES',
+                                           'MAPEAMENTO_MAPA_VALIDADO', 'MAPEAMENTO_MAPA_HOMOLOGADO',
+                                           'REVISAO_CADASTRO_EM_ANDAMENTO', 'REVISAO_CADASTRO_DISPONIBILIZADA', 'REVISAO_CADASTRO_HOMOLOGADA',
+                                           'REVISAO_MAPA_AJUSTADO', 'REVISAO_MAPA_DISPONIBILIZADO', 'REVISAO_MAPA_COM_SUGESTOES',
+                                           'REVISAO_MAPA_VALIDADO', 'REVISAO_MAPA_HOMOLOGADO')),
     primary key (codigo)
 );
 
