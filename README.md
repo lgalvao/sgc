@@ -29,7 +29,7 @@ O SGC permite:
 
 **Backend:**
 
-- Java 25
+- Java 21
 - Spring Boot 3.5.x
 - JPA/Hibernate
 - Lombok e MapStruct
@@ -68,8 +68,9 @@ sgc/
 ├── .idea/ .vscode/     # Configs de IDE (opcionais)
 ├── build.gradle.kts    # Build raiz (multi-projeto)
 └── AGENTS.md           # Guia para agentes de IA
-`
-text
+```
+
+```text
 sgc/
 ├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
@@ -200,7 +201,7 @@ Serviços orientados a eventos que reage aos eventos de domínio:
 
 - **Alertas**: Visíveis na interface do usuário
 - **Notificações**: E-mails assíncronos
-- **Movimentaçõees**: Registro de mudanças (auditoria)
+- **Movimentações**: Registro de mudanças (auditoria)
 
 ---
 
@@ -208,7 +209,7 @@ Serviços orientados a eventos que reage aos eventos de domínio:
 
 - **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
-- **[frontend/README.md](backend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
+- **[frontend/README.md](frontend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
 
 ### Especificação OpenAPI e Swagger
