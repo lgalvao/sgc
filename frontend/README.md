@@ -106,12 +106,12 @@ O frontend possui scripts dedicados para garantir a qualidade do código e cober
 ### Como Executar
 Para rodar todas as verificações (sem falhar o build em caso de avisos):
 ```bash
-npm run quality:check
+npm run quality:all
 ```
 
-Para gerar e abrir os relatórios de cobertura:
+Para gerar os relatórios de cobertura de testes:
 ```bash
-npm run quality:report
+npm run coverage:unit
 ```
 
 Os relatórios de cobertura ficam em `coverage/`.
