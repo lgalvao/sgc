@@ -106,12 +106,12 @@ O frontend possui scripts dedicados para garantir a qualidade do código e cober
 ### Como Executar
 Para rodar todas as verificações (sem falhar o build em caso de avisos):
 ```bash
-npm run quality:check
+npm run quality:all
 ```
 
-Para gerar e abrir os relatórios de cobertura:
+Para gerar os relatórios de cobertura (já incluído em `quality:all`):
 ```bash
-npm run quality:report
+npm run coverage:unit
 ```
 
 Os relatórios de cobertura ficam em `coverage/`.
@@ -122,6 +122,7 @@ Os relatórios de cobertura ficam em `coverage/`.
 - `npm run lint`: Executa o linter para análise e correção de código.
 - `npm run typecheck`: Verifica a tipagem do código com TypeScript.
 - `npm run test:unit`: Executa os testes de unidade.
+- `npm run quality:all`: Executa verificações de qualidade (testes, lint, typecheck).
 
 ## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
 
