@@ -3,6 +3,7 @@ package sgc.subprocesso.service;
 import net.jqwik.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroValidacao;
@@ -17,7 +18,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -20,11 +20,7 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service

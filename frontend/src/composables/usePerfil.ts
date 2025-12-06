@@ -1,8 +1,8 @@
-import { computed } from "vue";
-import { usePerfilStore } from "@/stores/perfil";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useUsuariosStore } from "@/stores/usuarios";
-import { type Unidade } from "@/types/tipos";
+import {computed} from "vue";
+import {usePerfilStore} from "@/stores/perfil";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useUsuariosStore} from "@/stores/usuarios";
+import {type Unidade} from "@/types/tipos";
 
 // Função auxiliar para achatar a hierarquia de unidades
 function flattenUnidades(unidades: Unidade[]): Unidade[] {

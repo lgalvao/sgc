@@ -1,7 +1,7 @@
 import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();

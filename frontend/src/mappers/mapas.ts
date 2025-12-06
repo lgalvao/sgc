@@ -1,13 +1,13 @@
-import type { AtividadeImpactada, CompetenciaImpactada, ImpactoMapa, } from "@/types/impacto";
+import type {AtividadeImpactada, CompetenciaImpactada, ImpactoMapa,} from "@/types/impacto";
 import type {
-  Atividade,
-  AtividadeVisualizacao,
-  Conhecimento,
-  ConhecimentoVisualizacao,
-  Mapa,
-  MapaAjuste,
-  MapaCompleto,
-  MapaVisualizacao,
+    Atividade,
+    AtividadeVisualizacao,
+    Conhecimento,
+    ConhecimentoVisualizacao,
+    Mapa,
+    MapaAjuste,
+    MapaCompleto,
+    MapaVisualizacao,
 } from "@/types/tipos";
 
 function mapConhecimentoVisualizacaoToModel(

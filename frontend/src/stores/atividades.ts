@@ -4,7 +4,7 @@ import {mapMapaVisualizacaoToAtividades} from "@/mappers/mapas";
 import * as atividadeService from "@/services/atividadeService";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import { useFeedbackStore } from "@/stores/feedback";
+import {useFeedbackStore} from "@/stores/feedback";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 
 

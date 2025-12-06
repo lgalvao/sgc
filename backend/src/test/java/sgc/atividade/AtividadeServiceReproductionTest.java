@@ -9,13 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import java.util.Optional;
 

@@ -2,6 +2,7 @@ package sgc.processo.service;
 
 import jakarta.validation.ConstraintViolationException;
 import net.jqwik.api.*;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.CriarProcessoReq;
@@ -18,8 +19,6 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;

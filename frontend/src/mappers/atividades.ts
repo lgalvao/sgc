@@ -1,4 +1,4 @@
-import type { Atividade, Conhecimento, CriarConhecimentoRequest, } from "@/types/tipos";
+import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
 
 export function mapAtividadeDtoToModel(dto: any): Atividade {
   if (!dto) return null as any;

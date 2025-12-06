@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import type { PerfilUnidade } from "@/mappers/sgrh";
-import type { Perfil } from "@/types/tipos";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import type {PerfilUnidade} from "@/mappers/sgrh";
+import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 
 export const usePerfilStore = defineStore("perfil", () => {

@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from './helpers/helpers-auth';
-import { criarProcesso, verificarProcessoNaTabela } from './helpers/helpers-processos';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {expect, test} from '@playwright/test';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     // Reset completo do banco antes de TODOS os testes

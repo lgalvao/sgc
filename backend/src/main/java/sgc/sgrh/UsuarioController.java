@@ -1,6 +1,5 @@
 package sgc.sgrh;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.service.UsuarioService;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Base64;
 import java.util.HashMap;

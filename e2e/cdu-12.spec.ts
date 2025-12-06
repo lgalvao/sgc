@@ -2,16 +2,16 @@ import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
+    abrirModalImpacto,
     adicionarAtividade,
     adicionarConhecimento,
     editarAtividade,
-    removerAtividade,
-    navegarParaAtividades,
-    abrirModalImpacto,
     fecharModalImpacto,
+    navegarParaAtividades,
+    removerAtividade,
     verificarBotaoImpacto
 } from './helpers/helpers-atividades';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);

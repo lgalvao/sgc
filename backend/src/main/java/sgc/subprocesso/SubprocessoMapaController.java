@@ -16,6 +16,7 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
@@ -25,8 +26,6 @@ import sgc.subprocesso.service.SubprocessoConsultaService;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
-
-import sgc.sgrh.service.SgrhService;
 
 @RestController
 @RequestMapping("/api/subprocessos")

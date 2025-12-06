@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/helpers-processos';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';

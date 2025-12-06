@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import { useFeedbackStore } from "@/stores/feedback";
+import {useFeedbackStore} from "@/stores/feedback";
 
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 

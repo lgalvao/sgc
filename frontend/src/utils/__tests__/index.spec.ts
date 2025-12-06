@@ -8,8 +8,8 @@ import {
     formatDateTimeBR,
     iconeTipo,
     isDateValidAndFuture,
+    type LocalTipoNotificacao,
     parseDate,
-    type LocalTipoNotificacao, // Import LocalTipoNotificacao
 } from "@/utils";
 
 describe("utilitários", () => {

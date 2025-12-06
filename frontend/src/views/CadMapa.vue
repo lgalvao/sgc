@@ -301,7 +301,7 @@ import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
-import { situacaoLabel } from "@/utils";
+import {situacaoLabel} from "@/utils";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -475,7 +475,8 @@ async function adicionarCompetenciaEFecharModal() {
     novaCompetencia.value.descricao = "";
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
-    fecharModalCriarNovaCompetencia();
+
+    fecharModalCriarNovaCompetencia();
   }
 }
 

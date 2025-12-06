@@ -183,7 +183,13 @@ import * as processoService from "@/services/processoService";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso, Unidade} from "@/types/tipos";
+import {
+  AtualizarProcessoRequest,
+  CriarProcessoRequest,
+  Processo as ProcessoModel,
+  TipoProcesso,
+  Unidade
+} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 

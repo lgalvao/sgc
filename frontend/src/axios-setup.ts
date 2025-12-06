@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "./router";
-import { useFeedbackStore } from "@/stores/feedback";
+import {useFeedbackStore} from "@/stores/feedback";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",

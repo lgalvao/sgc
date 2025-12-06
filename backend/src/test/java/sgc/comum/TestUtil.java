@@ -1,9 +1,9 @@
 package sgc.comum;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
-import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

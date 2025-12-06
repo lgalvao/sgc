@@ -11,12 +11,12 @@ import {
     homologarRevisaoCadastro,
 } from "@/services/cadastroService";
 import {
-    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
+    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
 import {useProcessosStore} from "@/stores/processos";
-import { useFeedbackStore } from "@/stores/feedback";
+import {useFeedbackStore} from "@/stores/feedback";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,

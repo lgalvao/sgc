@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { autenticar, login, loginComPerfil, USUARIOS } from './helpers/helpers-auth';
+import {expect, test} from '@playwright/test';
+import {autenticar, login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     test.beforeEach(async ({ page }) => {

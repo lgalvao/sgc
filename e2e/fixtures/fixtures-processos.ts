@@ -1,4 +1,4 @@
-import type { APIRequestContext } from '@playwright/test';
+import type {APIRequestContext} from '@playwright/test';
 
 /**
  * Representa um processo criado via fixture

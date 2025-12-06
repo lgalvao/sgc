@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from './helpers/helpers-auth';
-import { criarProcesso } from './helpers/helpers-processos';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {expect, test} from '@playwright/test';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso} from './helpers/helpers-processos';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-03 - Manter Processo', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
