@@ -1,5 +1,5 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,9 +14,9 @@ import {
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
-import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
+import { usePerfilStore } from "@/stores/perfil"; // Adicionar esta linha
+import { useProcessosStore } from "@/stores/processos";
+import { useFeedbackStore } from "@/stores/feedback";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -68,7 +68,11 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             }
         }
 
-        if (!perfil || codUnidade === null) {
+        // Perfis ADMIN e GESTOR são globais e podem acessar qualquer subprocesso
+        // sem necessidade de codUnidade específico
+        const perfilGlobal = perfil === 'ADMIN' || perfil === 'GESTOR';
+
+        if (!perfil || (!perfilGlobal && codUnidade === null)) {
             feedbackStore.show(
                 "Erro ao buscar detalhes do subprocesso",
                 "Informações de perfil ou unidade não disponíveis.",

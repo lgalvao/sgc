@@ -250,52 +250,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Verificar que a tabela de unidades está visível
         await expect(page.getByRole('heading', { name: /Unidades participantes/i })).toBeVisible();
 
-        // DEBUG: verificar quantas linhas existem na tabela  
-        const rows = await page.locator('tr').count();
-        console.log('Número de linhas na tabela:', rows);
-
-        // Verificar que a linha existe antes de clicar
+        // Clicar na linha da unidade
         const linhaUnidade = page.getByRole('row', { name: 'Seção 221' });
-        const linhaVisivel = await linhaUnidade.isVisible();
-        console.log('Linha visível:', linhaVisivel);
-
-        if (!linhaVisivel) {
-            // DEBUG: mostrar conteúdo da tabela
-            const tableContent = await page.locator('table').first().textContent();
-            console.log('Conteúdo da tabela:', tableContent);
-        }
-
         await expect(linhaUnidade).toBeVisible({ timeout: 5000 });
-
-        // DEBUG: verificar URL antes do clique
-        console.log('URL antes do clique na linha:', page.url());
-
-        // DEBUG: Interceptar TODAS as chamadas de rede para /subprocessos/
-        page.on('response', async response => {
-            if (response.url().includes('subprocessos')) {
-                console.log('=== Chamada API detectada ===');
-                console.log('URL:', response.url());
-                console.log('Status:', response.status());
-                try {
-                    const body = await response.text();
-                    console.log('Resposta:', body.substring(0, 500));
-                } catch (e) {
-                    console.log('Erro ao ler resposta:', e);
-                }
-            }
-        });
-
-        // Clicar na linha
         await linhaUnidade.click();
-
-        // Pequena espera para navegação
-        await page.waitForTimeout(500);
-
-        // DEBUG: verificar a URL atual (deve ter mudado)
-        console.log('URL após clicar na unidade:', page.url());
-
-        // Esperar a página carregar completamente
-        await page.waitForTimeout(2000);
 
         // Esperar navegação para o subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
