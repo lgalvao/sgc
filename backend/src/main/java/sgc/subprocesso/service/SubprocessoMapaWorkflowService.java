@@ -46,8 +46,8 @@ public class SubprocessoMapaWorkflowService {
 
         MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
 
-        if (eraVazio && temNovasCompetencias && subprocesso.getSituacao() == SituacaoSubprocesso.CADASTRO_HOMOLOGADO) {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
+        if (eraVazio && temNovasCompetencias && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             repositorioSubprocesso.save(subprocesso);
             log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", codSubprocesso);
         }
@@ -81,8 +81,8 @@ public class SubprocessoMapaWorkflowService {
                         "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO
-                && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
+        if (situacao != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                && situacao != SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
             throw new ErroMapaEmSituacaoInvalida(
                     "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s"
                             .formatted(situacao));
@@ -104,7 +104,7 @@ public class SubprocessoMapaWorkflowService {
         if (request.getDataLimite() == null) {
             throw new ErroValidacao("A data limite para validação é obrigatória.");
         }
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
         repositorioSubprocesso.save(subprocesso);
 
@@ -115,7 +115,7 @@ public class SubprocessoMapaWorkflowService {
                 .unidadeDestino(subprocesso.getUnidade())
                 .build());
 
-        log.info("Subprocesso {} atualizado para MAPA_DISPONIBILIZADO e mapa disponibilizado.", codSubprocesso);
+        log.info("Subprocesso {} atualizado para MAPEAMENTO_MAPA_DISPONIBILIZADO e mapa disponibilizado.", codSubprocesso);
     }
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {

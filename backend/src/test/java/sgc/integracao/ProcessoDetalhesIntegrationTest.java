@@ -69,7 +69,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
 
                 var mapaEmAndamento = mapaRepo.save(new Mapa());
                 var subprocessoEmAndamento = new Subprocesso(processoEmAndamento, unidade, mapaEmAndamento,
-                                SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processoEmAndamento.getDataLimite());
+                                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processoEmAndamento.getDataLimite());
                 subprocessoRepo.save(subprocessoEmAndamento);
 
                 // Processo finalizado
@@ -81,7 +81,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
 
                 var mapaFinalizado = mapaRepo.save(new Mapa());
                 var subprocessoFinalizado = new Subprocesso(processoFinalizado, unidade, mapaFinalizado,
-                                SituacaoSubprocesso.MAPA_HOMOLOGADO, processoFinalizado.getDataLimite());
+                                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processoFinalizado.getDataLimite());
                 subprocessoRepo.save(subprocessoFinalizado);
         }
 

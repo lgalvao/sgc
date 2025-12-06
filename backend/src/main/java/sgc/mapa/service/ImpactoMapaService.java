@@ -106,7 +106,7 @@ public class ImpactoMapaService {
         } else if (hasRole(usuario, "GESTOR")) {
             validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA), MSG_ERRO_GESTOR);
         } else if (hasRole(usuario, "ADMIN")) {
-            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, MAPA_AJUSTADO), MSG_ERRO_ADMIN);
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO), MSG_ERRO_ADMIN);
         }
     }
 

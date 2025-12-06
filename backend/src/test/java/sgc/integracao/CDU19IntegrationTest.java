@@ -78,7 +78,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         Mapa mapa = new Mapa();
         mapaRepo.save(mapa);
 
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
     }
 
@@ -98,7 +98,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
 
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -123,7 +123,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);

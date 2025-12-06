@@ -74,7 +74,7 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
         processoRepo.save(processo);
 
-        subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
         Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade);
@@ -101,7 +101,7 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
                         .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.unidade.nome").value("Seção de Sistemas Eleitorais"))
-                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
+                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()))
                 .andExpect(jsonPath("$.localizacaoAtual").value(UNIDADE_SIGLA))
                 .andExpect(jsonPath("$.processoDescricao").value("Processo de Teste"))
                 .andExpect(jsonPath("$.tipoProcesso").value("MAPEAMENTO"))

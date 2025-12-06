@@ -358,7 +358,7 @@ class ProcessoServiceTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
@@ -394,7 +394,7 @@ class ProcessoServiceTest {
         Mapa m = new Mapa();
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         sp.setUnidade(u);
         sp.setMapa(m);
 
@@ -417,7 +417,7 @@ class ProcessoServiceTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         sp.setUnidade(null);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
@@ -526,7 +526,7 @@ class ProcessoServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         Unidade u = new Unidade();
         u.setNome("U1");
         u.setSigla("S1");
@@ -562,7 +562,7 @@ class ProcessoServiceTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setUnidade(u);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));

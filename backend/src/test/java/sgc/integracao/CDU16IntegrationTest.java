@@ -91,7 +91,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
                 processo,
                 unidade,
                 mapa,
-                SituacaoSubprocesso.MAPA_AJUSTADO,
+                SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
                 processo.getDataLimite()
         );
         subprocessoRepo.save(subprocesso);
@@ -123,7 +123,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
     }
 
     @Nested
@@ -156,7 +156,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_AJUSTADO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
             Atividade atividadeAtualizada = atividadeRepo.findById(atividade1.getCodigo()).orElseThrow();
             assertThat(atividadeAtualizada.getDescricao()).isEqualTo("Atividade 1 Ajustada");
@@ -166,7 +166,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve retornar 409 se tentar ajustar mapa em situação inválida")
         void deveRetornarErroParaSituacaoInvalida() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
             var request = new SalvarAjustesReq(List.of());

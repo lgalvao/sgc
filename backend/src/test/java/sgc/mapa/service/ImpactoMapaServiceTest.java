@@ -142,9 +142,9 @@ class ImpactoMapaServiceTest {
         }
 
         @Test
-        @DisplayName("ADMIN pode acessar quando situação for MAPA_AJUSTADO")
+        @DisplayName("ADMIN pode acessar quando situação for REVISAO_MAPA_AJUSTADO")
         void adminPodeAcessarAjustado() {
-            subprocesso.setSituacao(MAPA_AJUSTADO);
+            subprocesso.setSituacao(REVISAO_MAPA_AJUSTADO);
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 

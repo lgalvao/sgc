@@ -79,7 +79,7 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
             processo,
             unidade,
             mapa,
-            SituacaoSubprocesso.CADASTRO_HOMOLOGADO,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
             LocalDateTime.now().plusMonths(1)
         );
         subprocesso = subprocessoRepo.save(subprocesso);

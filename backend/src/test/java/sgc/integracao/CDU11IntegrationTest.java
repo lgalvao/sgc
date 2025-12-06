@@ -76,7 +76,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
         // Mapa e Subprocesso
         var mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
+        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                 processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
@@ -163,7 +163,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
             Subprocesso subprocessoSemAtividades = new Subprocesso(processo, unidade, new Mapa(),
-                    SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
+                    SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             mapaRepo.save(subprocessoSemAtividades.getMapa());
             subprocessoRepo.save(subprocessoSemAtividades);
 
@@ -179,7 +179,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
             Mapa mapaNovo = mapaRepo.save(new Mapa());
             Subprocesso subprocessoAtividadeSemConhecimento = new Subprocesso(processo, unidade, mapaNovo,
-                    SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
+                    SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
             Atividade atividadeSemConhecimento = new Atividade(mapaNovo, "Atividade sem conhecimento");
             atividadeRepo.save(atividadeSemConhecimento);

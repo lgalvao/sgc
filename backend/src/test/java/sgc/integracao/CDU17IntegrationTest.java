@@ -127,7 +127,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite.atStartOfDay());
 
             Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo())
@@ -175,7 +175,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se subprocesso não está no estado correto")
         @WithMockAdmin
         void disponibilizarMapa_comEstadoInvalido_retornaConflict() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);

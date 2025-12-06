@@ -7,27 +7,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SituacaoSubprocesso {
     NAO_INICIADO("Não Iniciado"),
-    EM_ANDAMENTO("Em Andamento"),
-    ENVIADO("Enviado"),
-    CONCLUIDO("Concluído"),
-    EM_REVISAO("Em Revisão"),
-    DEVOLVIDO_CADASTRO("Devolvido para Cadastro"),
-    DEVOLVIDO_REVISAO_CADASTRO("Devolvido para Revisão de Cadastro"),
-    REVISAO_CADASTRO_HOMOLOGADA("Revisão de Cadastro Homologada"),
-    MAPA_AJUSTADO("Mapa Ajustado"),
-    MAPA_DISPONIBILIZADO("Mapa Disponibilizado"),
-    EM_HOMOLOGACAO("Em Homologação"),
-    HOMOLOGADO("Homologado"),
-    MAPA_HOMOLOGADO("Mapa Homologado"),
-    CADASTRO_DISPONIBILIZADO("Cadastro Disponibilizado"),
-    ATIVIDADES_HOMOLOGADAS("Atividades Homologadas"),
-    CADASTRO_EM_ANDAMENTO("Cadastro em Andamento"),
-    CADASTRO_HOMOLOGADO("Cadastro Homologado"),
-    MAPA_COM_SUGESTOES("Mapa com Sugestões"),
-    MAPA_CRIADO("Mapa Criado"),
-    MAPA_VALIDADO("Mapa Validado"),
+
+    // Mapeamento
+    MAPEAMENTO_CADASTRO_EM_ANDAMENTO("Cadastro em Andamento"),
+    MAPEAMENTO_CADASTRO_DISPONIBILIZADO("Cadastro Disponibilizado"),
+    MAPEAMENTO_CADASTRO_HOMOLOGADO("Cadastro Homologado"),
+    MAPEAMENTO_MAPA_CRIADO("Mapa Criado"),
+    MAPEAMENTO_MAPA_DISPONIBILIZADO("Mapa Disponibilizado"),
+    MAPEAMENTO_MAPA_COM_SUGESTOES("Mapa com Sugestões"),
+    MAPEAMENTO_MAPA_VALIDADO("Mapa Validado"),
+    MAPEAMENTO_MAPA_HOMOLOGADO("Mapa Homologado"),
+
+    // Revisão
+    REVISAO_CADASTRO_EM_ANDAMENTO("Revisão de Cadastro em Andamento"),
     REVISAO_CADASTRO_DISPONIBILIZADA("Revisão de Cadastro Disponibilizada"),
-    REVISAO_CADASTRO_EM_ANDAMENTO("Revisão de Cadastro em Andamento");
+    REVISAO_CADASTRO_HOMOLOGADA("Revisão de Cadastro Homologada"),
+    REVISAO_MAPA_AJUSTADO("Mapa Ajustado"),
+    REVISAO_MAPA_DISPONIBILIZADO("Mapa Disponibilizado"),
+    REVISAO_MAPA_COM_SUGESTOES("Mapa com Sugestões"),
+    REVISAO_MAPA_VALIDADO("Mapa Validado"),
+    REVISAO_MAPA_HOMOLOGADO("Mapa Homologado");
 
     private final String descricao;
 }

@@ -87,7 +87,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
         subprocessoMapeamento = new Subprocesso(processoMapeamento, unidadeChefe, mapa,
-                SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processoMapeamento.getDataLimite());
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processoMapeamento.getDataLimite());
         subprocessoRepo.save(subprocessoMapeamento);
     }
 
@@ -113,7 +113,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocessoMapeamento.getCodigo())
                     .orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNotNull();
 
             List<Movimentacao> movimentacoes = movimentacaoRepo
@@ -150,7 +150,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoMapeamento.getCodigo())
                     .orElseThrow();
-            assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThat(subprocessoNaoAlterado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
     }
 

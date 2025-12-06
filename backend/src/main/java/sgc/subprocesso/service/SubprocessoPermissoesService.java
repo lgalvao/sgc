@@ -23,21 +23,20 @@ public class SubprocessoPermissoesService {
 
         if (acao.equals("ENVIAR_REVISAO")) {
 
-            if (!SituacaoSubprocesso.EM_ANDAMENTO.equals(subprocesso.getSituacao())
-                    && !SituacaoSubprocesso.DEVOLVIDO_CADASTRO.equals(subprocesso.getSituacao())) {
+            if (!SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO.equals(subprocesso.getSituacao())) {
                 throw new ErroAccessoNegado("Situação inválida.");
             }
 
         } else if (acao.equals("AJUSTAR_MAPA")) {
 
             if (!SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.equals(subprocesso.getSituacao())
-                    && !SituacaoSubprocesso.MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
+                    && !SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
                 throw new ErroAccessoNegado("Situação inválida para ajuste.");
             }
 
             if (subprocesso.getMapa() != null
                     && atividadeRepo.countByMapaCodigo(subprocesso.getMapa().getCodigo()) == 0
-                    && subprocesso.getSituacao().equals(SituacaoSubprocesso.MAPA_AJUSTADO)) {
+                    && subprocesso.getSituacao().equals(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)) {
                 throw new ErroAccessoNegado("Mapa vazio.");
             }
         }
@@ -82,7 +81,7 @@ public class SubprocessoPermissoesService {
 
         // The failing test "naoDevePermitirVisualizarImpactoParaAdminEmSituacaoIncorreta" expects FALSE but got TRUE.
         // This means we need to check the situation for Impact visualization as well.
-        boolean situacaoImpactoValida = sp.getSituacao() == SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS;
+        boolean situacaoImpactoValida = sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
         boolean podeVisualizarImpacto = (isAdmin || isGestorUnidade) && situacaoImpactoValida;
 
         // But test "naoDevePermitirVisualizarImpactoParaNaoAdmin" failed with NPE, but implied it expects FALSE.

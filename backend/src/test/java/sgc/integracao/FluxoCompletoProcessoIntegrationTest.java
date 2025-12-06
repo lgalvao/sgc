@@ -108,7 +108,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                                 .orElseThrow(() -> new RuntimeException("Subprocesso não encontrado"));
 
                 // Alterar situação para MAPA_HOMOLOGADO (pré-requisito para finalizar)
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
                 subprocessoRepo.saveAndFlush(subprocesso);
                 System.out.println("Subprocesso atualizado para situação: " + subprocesso.getSituacao());
 
@@ -116,7 +116,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                 var subprocessoAntesFinalizar = subprocessoDtoService.obterPorProcessoEUnidade(
                                 codProcesso, unidadeSENIC.getCodigo());
                 System.out.println("Situação antes de finalizar: " + subprocessoAntesFinalizar.getSituacao());
-                assertThat(subprocessoAntesFinalizar.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                assertThat(subprocessoAntesFinalizar.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
                 // ============================================================
                 // PASSO 8: Finalizar processo (Admin)

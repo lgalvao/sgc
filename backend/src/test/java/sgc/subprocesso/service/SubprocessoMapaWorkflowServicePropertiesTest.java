@@ -224,7 +224,7 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
     private Subprocesso criarSubprocesso() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.MAPA_CRIADO); // ou CADASTRO_HOMOLOGADO, ambos válidos para edição, mas para
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO); // ou CADASTRO_HOMOLOGADO, ambos válidos para edição, mas para
                                                          // disponibilizar deve estar válido?
         // O método getSubprocessoParaEdicao checa se é CADASTRO_HOMOLOGADO ou
         // MAPA_CRIADO.

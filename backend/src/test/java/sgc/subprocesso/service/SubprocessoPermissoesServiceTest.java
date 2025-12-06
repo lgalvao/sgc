@@ -36,7 +36,7 @@ class SubprocessoPermissoesServiceTest {
         when(admin.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);
-        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS);
+        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
@@ -52,7 +52,7 @@ class SubprocessoPermissoesServiceTest {
         when(admin.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);
-        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPA_CRIADO);
+        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
@@ -68,7 +68,7 @@ class SubprocessoPermissoesServiceTest {
         when(gestor.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);
-        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS);
+        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);

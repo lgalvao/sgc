@@ -106,7 +106,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         subprocessoOrigem = new Subprocesso()
                 .setUnidade(unidadeOrigem)
                 .setMapa(mapaOrigem)
-                .setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO)
+                .setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .setDataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .setProcesso(processo);
 
@@ -118,7 +118,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         subprocessoDestino = new Subprocesso();
         subprocessoDestino.setUnidade(unidadeDestino);
         subprocessoDestino.setMapa(mapa); // Usa o 'mapa' para os testes de CRUD
-        subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoDestino.setProcesso(processo);
         subprocessoRepo.save(subprocessoDestino);
@@ -181,13 +181,13 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso atualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
-            assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
 
         @Test
         @DisplayName("Deve falhar ao importar para subprocesso em estado inválido")
         void deveFalharAoImportarParaSubprocessoEmEstadoInvalido() throws Exception {
-            subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());

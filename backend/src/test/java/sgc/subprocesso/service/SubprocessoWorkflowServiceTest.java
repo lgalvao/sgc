@@ -17,6 +17,8 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -71,7 +73,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.disponibilizarCadastro(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroDisponibilizado.class));
     }
 
@@ -153,6 +155,10 @@ class SubprocessoWorkflowServiceTest {
         Unidade u = new Unidade();
         sp.setUnidade(u);
 
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
 
@@ -161,7 +167,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.disponibilizarMapa(id, "obs", LocalDateTime.now(), user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));
     }
 
@@ -202,13 +208,18 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(new Unidade());
         sp.getUnidade().setUnidadeSuperior(new Unidade());
         sp.setMapa(new Mapa());
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.apresentarSugestoes(id, "sug", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         assertThat(sp.getMapa().getSugestoes()).isEqualTo("sug");
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaComSugestoes.class));
     }
@@ -221,13 +232,18 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(new Unidade());
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.validarMapa(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaValidado.class));
     }
 
@@ -245,13 +261,17 @@ class SubprocessoWorkflowServiceTest {
         u.setUnidadeSuperior(sup);
         sp.setUnidade(u);
 
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.devolverValidacao(id, "justificativa", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         verify(analiseService).criarAnalise(any());
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDevolvido.class));
     }
@@ -268,13 +288,18 @@ class SubprocessoWorkflowServiceTest {
         sup.setSigla("SUP");
         u.setUnidadeSuperior(sup); // Sup nao tem superior
         sp.setUnidade(u);
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.aceitarValidacao(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         // Should verify no event is published if that's the logic, or verify specific logic
     }
 
@@ -290,13 +315,18 @@ class SubprocessoWorkflowServiceTest {
         sup.setUnidadeSuperior(sup2);
         u.setUnidadeSuperior(sup);
         sp.setUnidade(u);
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         service.aceitarValidacao(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaAceito.class));
     }
 
@@ -307,6 +337,11 @@ class SubprocessoWorkflowServiceTest {
     void homologarValidacao() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
 
@@ -315,7 +350,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.homologarValidacao(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaHomologado.class));
     }
 
@@ -329,6 +364,11 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(new Unidade());
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
+
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+
         Usuario user = new Usuario();
         SubmeterMapaAjustadoReq req = new SubmeterMapaAjustadoReq();
         req.setDataLimiteEtapa2(LocalDateTime.now());
@@ -337,7 +377,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.submeterMapaAjustado(id, req, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaAjustadoSubmetido.class));
     }
 
@@ -360,7 +400,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.devolverCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(analiseService).criarAnalise(any());
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroDevolvido.class));
     }
@@ -383,7 +423,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroAceito.class));
     }
 
@@ -410,7 +450,7 @@ class SubprocessoWorkflowServiceTest {
     void homologarCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
 
@@ -419,7 +459,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.homologarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroHomologado.class));
     }
 
@@ -531,7 +571,7 @@ class SubprocessoWorkflowServiceTest {
 
         service.homologarRevisaoCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
         // Verify no event or verify a potential homolocated event?
     }
 

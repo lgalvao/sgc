@@ -113,7 +113,7 @@ public class SubprocessoServiceActionsTest {
         @Transactional
         void deveAceitarCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
-            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
@@ -140,13 +140,13 @@ public class SubprocessoServiceActionsTest {
         @Transactional
         void deveHomologarCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
-            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação."));
-            assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
+            assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
         }
     }
 
@@ -186,7 +186,7 @@ public class SubprocessoServiceActionsTest {
         @Transactional
         void deveLancarExcecaoSeSituacaoIncorreta() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
-            Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThrows(IllegalStateException.class,
                     () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
         }
@@ -218,7 +218,7 @@ public class SubprocessoServiceActionsTest {
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
-            assertEquals(SituacaoSubprocesso.MAPA_HOMOLOGADO, spAtualizado.getSituacao());
+            assertEquals(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, spAtualizado.getSituacao());
         }
 
         @Test
@@ -231,7 +231,7 @@ public class SubprocessoServiceActionsTest {
         @Transactional
         void deveLancarExcecaoSeSituacaoIncorreta_homologar() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
-            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService
                     .homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
         }
@@ -244,14 +244,14 @@ public class SubprocessoServiceActionsTest {
         @Transactional
         void deveDevolverCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
-            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             subprocessoWorkflowService.devolverCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após devolução."));
 
-            assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
+            assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
             assertNull(spAtualizado.getDataFimEtapa1());
         }
     }

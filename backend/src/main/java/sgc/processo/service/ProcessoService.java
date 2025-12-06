@@ -40,8 +40,7 @@ import java.util.*;
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPA_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
@@ -384,7 +383,7 @@ public class ProcessoService {
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
         List<String> pendentes = subprocessos.stream()
-                .filter(sp -> sp.getSituacao() != MAPA_HOMOLOGADO)
+                .filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
                 .map(sp -> {
                     String identificador = sp.getUnidade() != null
                             ? sp.getUnidade().getSigla()
@@ -446,7 +445,7 @@ public class ProcessoService {
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
         if (isAdmin) {
             return subprocessos.stream()
-                    .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_AJUSTADO)
+                    .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
                     .map(this::toSubprocessoElegivelDto)
                     .toList();
         }
@@ -462,7 +461,8 @@ public class ProcessoService {
 
         return subprocessos.stream()
                 .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
-                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO)
+                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .map(this::toSubprocessoElegivelDto)
                 .toList();
     }

@@ -43,7 +43,7 @@ public class SubprocessoMapaService {
         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
     if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-        && sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
+        && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
       throw new ErroMapaEmSituacaoInvalida("Ajustes no mapa só podem ser feitos em estados específicos. "
           + "Situação atual: %s".formatted(sp.getSituacao()));
     }
@@ -68,7 +68,7 @@ public class SubprocessoMapaService {
       competenciaRepo.save(competencia);
     }
 
-    sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+    sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
     subprocessoRepo.save(sp);
   }
 
@@ -78,7 +78,7 @@ public class SubprocessoMapaService {
         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d"
         .formatted(codSubprocessoDestino)));
 
-    if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO
+    if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
         && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
         && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
       throw new ErroAtividadesEmSituacaoInvalida("Atividades só podem ser importadas para um subprocesso "
@@ -128,7 +128,7 @@ public class SubprocessoMapaService {
     if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
       var tipoProcesso = spDestino.getProcesso().getTipo();
       if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-        spDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
       } else if (tipoProcesso == TipoProcesso.REVISAO) {
         spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
       }

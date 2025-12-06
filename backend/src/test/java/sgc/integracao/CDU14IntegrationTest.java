@@ -201,7 +201,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(status().isOk());
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+                        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
                 }
 
                 @Test

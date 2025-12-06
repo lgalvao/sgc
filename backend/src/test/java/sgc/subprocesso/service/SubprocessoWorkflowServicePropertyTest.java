@@ -38,7 +38,7 @@ class SubprocessoWorkflowServicePropertyTest {
     @Property
     void disponibilizarMapaDeveFalharSeEstadoInvalido(@ForAll SituacaoSubprocesso situacao, @ForAll String obs) {
         Assume.that(situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                 && situacao != SituacaoSubprocesso.MAPA_AJUSTADO);
+                 && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
         Long codSubprocesso = 1L;
         Subprocesso sp = new Subprocesso();
