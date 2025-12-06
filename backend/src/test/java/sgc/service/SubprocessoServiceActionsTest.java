@@ -218,7 +218,7 @@ public class SubprocessoServiceActionsTest {
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
                     .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
-            assertEquals(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, spAtualizado.getSituacao());
+            assertEquals(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO, spAtualizado.getSituacao());
         }
 
         @Test

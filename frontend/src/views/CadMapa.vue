@@ -91,7 +91,7 @@
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
-                      v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
+                      v-if="(getAtividadeCompleta(atvId)?.conhecimentos.length ?? 0) > 0"
                       v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
                       class="badge bg-secondary ms-2"
                       data-testid="cad-mapa__txt-badge-conhecimentos-1"
@@ -150,8 +150,7 @@
           <BCard
             v-for="atividade in atividades"
             :key="atividade.codigo"
-            :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-            class="atividade-card-item"
+            :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
             :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
             no-body
           >
