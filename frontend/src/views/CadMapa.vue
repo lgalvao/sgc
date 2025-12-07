@@ -447,12 +447,7 @@ function getConhecimentosModal(atividade: Atividade): string {
 }
 
 async function adicionarCompetenciaEFecharModal() {
-  if (
-      !novaCompetencia.value.descricao ||
-      atividadesSelecionadas.value.length === 0
-  )
-    return;
-
+  // Validações agora são feitas no backend via Bean Validation
   const competencia: Competencia = {
     // deixe undefined para novas competências e permita backend atribuir o id
     codigo: competenciaSendoEditada.value?.codigo ?? undefined,

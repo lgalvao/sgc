@@ -177,7 +177,7 @@ class SubprocessoMapaControllerTest {
     void adicionarCompetencia() throws Exception {
         CompetenciaReq req = new CompetenciaReq();
         req.setDescricao("Comp");
-        req.setAtividadesIds(List.of());
+        req.setAtividadesIds(List.of(1L, 2L)); // Corrigido: lista não pode ser vazia
 
         when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any(), any()))
                 .thenReturn(new MapaCompletoDto());
@@ -191,12 +191,61 @@ class SubprocessoMapaControllerTest {
     }
 
     @Test
+    @DisplayName("adicionarCompetencia - deve retornar 400 quando descrição está vazia")
+    @WithMockUser
+    void adicionarCompetencia_DeveRetornar400QuandoDescricaoVazia() throws Exception {
+        CompetenciaReq req = new CompetenciaReq();
+        req.setDescricao(""); // Descrição vazia - deve falhar
+        req.setAtividadesIds(List.of(1L));
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/competencias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia")
+    @WithMockUser
+    void adicionarCompetencia_DeveRetornar400QuandoAtividadesVazio() throws Exception {
+        CompetenciaReq req = new CompetenciaReq();
+        req.setDescricao("Competência válida");
+        req.setAtividadesIds(List.of()); // Lista vazia - deve falhar
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/competencias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades é null")
+    @WithMockUser
+    void adicionarCompetencia_DeveRetornar400QuandoAtividadesNull() throws Exception {
+        CompetenciaReq req = new CompetenciaReq();
+        req.setDescricao("Competência válida");
+        req.setAtividadesIds(null); // Null - deve falhar
+
+        mockMvc.perform(
+                        post("/api/subprocessos/1/competencias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     @DisplayName("atualizarCompetencia")
     @WithMockUser
     void atualizarCompetencia() throws Exception {
         CompetenciaReq req = new CompetenciaReq();
         req.setDescricao("Comp");
-        req.setAtividadesIds(List.of());
+        req.setAtividadesIds(List.of(1L)); // Corrigido: lista não pode ser vazia
 
         when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any(), any()))
                 .thenReturn(new MapaCompletoDto());
