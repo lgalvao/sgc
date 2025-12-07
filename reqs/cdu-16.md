@@ -28,4 +28,4 @@ Fluxo principal:
 
    9.1. ADMIN deve associar a uma competência todas as atividades ainda não associadas.
 
-10. Quando concluir os ajustes, ADMIN clica em Disponibilizar e o sistema segue o fluxo descrito no caso de uso Disponibilizar mapa de competências.
+10. Quando concluir os ajustes, ADMIN clica em `Disponibilizar` e o sistema segue o fluxo descrito no caso de uso _Disponibilizar mapa de competências_.

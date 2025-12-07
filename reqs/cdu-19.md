@@ -41,6 +41,7 @@ Fluxo principal:
    ```
 
    4.5. O sistema cria internamente um alerta com:
+   
    - Descrição: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
    - Processo: [DESCRICAO_PROCESSO]
    - Data/hora: Data/hora atual

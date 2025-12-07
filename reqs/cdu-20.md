@@ -127,7 +127,7 @@ Fluxo principal:
 
     10.1. Usuário escolhe `Homologar`.
 
-    10.2. O sistema abre um diálogo de confirmação (título Homologação) com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Cancelar`.
+    10.2. O sistema abre um diálogo de confirmação (título 'Homologação') com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Cancelar`.
 
     10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na mesma tela.
 

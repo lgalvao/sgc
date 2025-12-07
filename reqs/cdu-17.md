@@ -37,9 +37,9 @@ Fluxo principal:
     10.1. Título: 'Disponibilização do mapa de competências'
 
     10.2. Campo de data, de preenchimento obrigatório, para armazenar a Data limite para a validação do mapa
-    
+
     10.3. Campo de texto formatado, de preenchimento opcional, para registro de Observações
-    
+
     10.4. Botões Disponibilizar e Cancelar.
 
 11. Caso ADMIN escolha Cancelar, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela

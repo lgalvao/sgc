@@ -6,15 +6,14 @@ Pré-condições:
 
 - Usuário logado com qualquer perfil
 - Processo de mapeamento ou de revisão iniciado ou finalizado, que tenha a unidade como participante
-- Subprocesso da unidade com cadastro de atividades e conhecimentos (processo de mapeamento) ou revisão do cadastro (
-  processo de revisão) já disponibilizados.
+- Subprocesso da unidade com cadastro de atividades e conhecimentos (processo de mapeamento) ou revisão do cadastro (processo de revisão) já disponibilizados.
 
 Fluxo principal:
 
 1. No Painel, o usuário clica no processo de mapeamento ou revisão na situação `Em andamento` ou `Finalizado`.
 
 2. Se usuário estiver logado com perfil ADMIN ou GESTOR:
-   
+
    2.1. O sistema mostra a tela `Detalhes do processo`
 
    2.2. Usuário clica em uma unidade subordinada, que seja operacional ou interoperacional

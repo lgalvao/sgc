@@ -19,8 +19,7 @@ Fluxo principal:
 
 4. O sistema verifica título/senha através da API do Sistema Acesso do TRE-PE
 
-5. Caso o usuário não seja autenticado com as credenciais fornecidas, sistema mostra a mensagem `Título ou
-   senha inválidos.`
+5. Caso o usuário não seja autenticado com as credenciais fornecidas, sistema mostra a mensagem `Título ou senha inválidos.`
 
 6. Caso o usuário seja autenticado, o sistema consulta perfis e unidades do usuário nas views conectadas ao ba. Importante: Um usuário pode estar
    em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um perfil.
@@ -52,9 +51,7 @@ Fluxo principal:
     9.1.1. Itens principais de navegação:
     - Ícone/logotipo do sistema (abre a tela `Painel`)
     - Link `Painel`, para tela `Painel`
-    - **Se ADMIN**: Link `Unidades`, para tela `Unidades`, que apresenta a hierarquia de unidades do TRE-PE
-    - **Se GESTOR CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados da
-      unidade do usuário logado
+    - Se ADMIN: Link `Unidades`, para tela `Unidades`, que apresenta a hierarquia de unidades do TRE-PE; se GESTOR CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados da unidade do usuário logado
     - Link `Relatórios`, para tela `Relatórios`
     - Link `Histórico`, para tela `Histórico de processos`
 

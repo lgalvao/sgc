@@ -8,8 +8,7 @@ Pré-condições:
 
 ## Fluxo principal
 
-1. No Painel ADMIN escolhe um processo na tela Detalhes do processo clica em uma unidade operacional ou interoperacional
-   com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
+1. No Painel ADMIN escolhe um processo na tela Detalhes do processo clica em uma unidade operacional ou interoperacional com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
 
 2. O sistema mostra a tela Detalhes do subprocesso.
 
