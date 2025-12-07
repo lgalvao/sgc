@@ -45,12 +45,14 @@ Fluxo principal:
 
 12. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
+    ```text
     Assunto: SGC: Cadastro de atividades e conhecimentos disponibilizado: [SIGLA_UNIDADE_SUBPROCESSO]
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
     A unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizou o cadastro de atividades e conhecimentos do processo [DESCRICAO_PROCESSO].
 
     A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
 
 13. O sistema cria internamente um alerta:
 

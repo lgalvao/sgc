@@ -12,22 +12,14 @@
     - Campo `Descrição`
     - Campo `Tipo`, com opções: 'Mapeamento', 'Revisão' e 'Diagnóstico'
     - Quadro de Unidades participantes, contendo uma árvore de unidades com checkboxes para cada uma.
-        - A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de
-          um processo ativo do tipo
-          selecionado
+        - A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de um processo ativo do tipo selecionado
         - O comportamento de seleção das unidades participantes deve seguir estas regras:
-            - Ao clicar em uma unidade intermediária na árvore, todas as unidades abaixo dela devem ser automaticamente
-              selecionadas;
-            - Se todas as unidades de uma subárvore estiverem selecionadas, o nó raiz desta subárvore deve ser
-              automaticamente selecionado;
-            - Se um nó de uma subárvore tiver a seleção removida, o nó raiz da subárvore deve ficar num estado
-              intermediário, indicando que há nós selecionados da subárvore, mas não todos;
-            - Se todas as unidades de uma subárvore tiverem a seleção removida, o nó raiz desta subárvore deve ter
-              automaticamente a seleção removida.
-            - Se a raiz de uma subárvore for uma unidade interoperacional, ela poderá ser selecionada ainda que as
-              unidades subordinadas não o sejam.
-    - Campo `Data limite etapa 1`, para informação do prazo que as unidades terão para concluir a etapa inicial do
-      processo.
+            - Ao clicar em uma unidade intermediária na árvore, todas as unidades abaixo dela devem ser automaticamente selecionadas;
+            - Se todas as unidades de uma subárvore estiverem selecionadas, o nó raiz desta subárvore deve ser automaticamente selecionado;
+            - Se um nó de uma subárvore tiver a seleção removida, o nó raiz da subárvore deve ficar num estado intermediário, indicando que há nós selecionados da subárvore, mas não todos;
+            - Se todas as unidades de uma subárvore tiverem a seleção removida, o nó raiz desta subárvore deve ter automaticamente a seleção removida.
+            - Se a raiz de uma subárvore for uma unidade interoperacional, ela poderá ser selecionada ainda que as unidades subordinadas não o sejam.
+    - Campo `Data limite etapa 1`, para informação do prazo que as unidades terão para concluir a etapa inicial do processo.
     - Botões `Cancelar`, `Salvar` e `Iniciar processo`
 
 3. O usuário fornece os dados solicitados, escolhe o tipo do processo e seleciona as unidades participantes.
@@ -51,9 +43,7 @@
 
 ### Edição de processo:
 
-1. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do Painel (apenas processos
-   na situação 'Criado' podem ser editados). Além dos botões Cancelar, Salvar e Iniciar processo, também será exibido o
-   botão Remover.
+1. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do Painel (apenas processos na situação 'Criado' podem ser editados). Além dos botões Cancelar, Salvar e Iniciar processo, também será exibido o botão Remover.
 
 2. O sistema abre a tela Cadastro de processo preenchida com os dados atuais do processo.
 
@@ -87,6 +77,4 @@
 
 ## Fluxo alternativo
 
-Caso o usuário escolha o botão Iniciar processo em vez do botão Salvar, o sistema realiza as validações dos dados
-informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo de do caso de uso
-`Iniciar processo de mapeamento`, ou `Iniciar processo de revisão` etc., dependendo do tipo do processo.
+Caso o usuário escolha o botão Iniciar processo em vez do botão Salvar, o sistema realiza as validações dos dados informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo de do caso de uso `Iniciar processo de mapeamento`, ou `Iniciar processo de revisão` etc., dependendo do tipo do processo.
