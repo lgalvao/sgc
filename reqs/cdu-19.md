@@ -40,17 +40,12 @@ Fluxo principal:
    A análise dessas sugestões já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
    ```
 
-   4.5. O sistema cria internamente um alerta:
-
-   4.5.1. Descrição: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
-
-   4.5.2. Processo: [DESCRICAO_PROCESSO]
-
-   4.5.3. Data/hora: Data/hora atual
-
-   4.5.4. Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
-
-   4.5.5. Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+   4.5. O sistema cria internamente um alerta com:
+   - Descrição: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
+   - Processo: [DESCRICAO_PROCESSO]
+   - Data/hora: Data/hora atual
+   - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
+   - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
    4.6. O sistema mostra a mensagem "Mapa submetido com sugestões para análise da unidade superior".
 
@@ -76,29 +71,22 @@ Fluxo principal:
    A análise dessa validação já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
    ```
 
-   5.5. O sistema cria internamente um alerta:
+   5.5. O sistema cria internamente um alerta com:
 
-   5.5.1. Descrição: "Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
-
-   5.5.2. Processo: [DESCRICAO_PROCESSO]
-
-   5.5.3. Data/hora: Data/hora atual
-
-   5.5.4. Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
-
-   5.5.5. Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+   - Descrição: "Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
+   - Processo: [DESCRICAO_PROCESSO]
+   - Data/hora: Data/hora atual
+   - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
+   - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
    5.6. O sistema mostra a mensagem "Mapa validado e submetido para análise à unidade superior".
 
-6. O sistema registra movimentação para o subprocesso:
+6. O sistema registra movimentação para o subprocesso com:
 
-   6.1. Data/hora: Data/hora atual
-
-   6.2. Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
-
-   6.3. Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
-
-   6.4. Descrição: "Apresentação de sugestões para o mapa de competências" ou "Validação do mapa de competências", conforme o caso.
+   - Data/hora: Data/hora atual
+   - Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
+   - Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
+   - Descrição: "Apresentação de sugestões para o mapa de competências" ou "Validação do mapa de competências", conforme o caso.
 
 7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual, e exclui o histórico de análise de validação do mapa do subprocesso da unidade.
 
