@@ -117,7 +117,7 @@ public class ImpactoCompetenciaService {
         @Builder.Default
         private Set<String> atividadesAfetadas = new LinkedHashSet<>();
 
-        void adicionarImpacto(String descricaoImpacto) {
+        /* default */ void adicionarImpacto(String descricaoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);
         }
     }

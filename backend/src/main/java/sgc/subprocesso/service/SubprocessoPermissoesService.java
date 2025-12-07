@@ -21,13 +21,13 @@ public class SubprocessoPermissoesService {
             throw new ErroAccessoNegado("Unidade sem acesso a este subprocesso.");
         }
 
-        if (acao.equals("ENVIAR_REVISAO")) {
+        if ("ENVIAR_REVISAO".equals(acao)) {
 
             if (!SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO.equals(subprocesso.getSituacao())) {
                 throw new ErroAccessoNegado("Situação inválida.");
             }
 
-        } else if (acao.equals("AJUSTAR_MAPA")) {
+        } else if ("AJUSTAR_MAPA".equals(acao)) {
 
             if (!SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.equals(subprocesso.getSituacao())
                     && !SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
@@ -36,7 +36,7 @@ public class SubprocessoPermissoesService {
 
             if (subprocesso.getMapa() != null
                     && atividadeRepo.countByMapaCodigo(subprocesso.getMapa().getCodigo()) == 0
-                    && subprocesso.getSituacao().equals(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)) {
+                    && SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
                 throw new ErroAccessoNegado("Mapa vazio.");
             }
         }

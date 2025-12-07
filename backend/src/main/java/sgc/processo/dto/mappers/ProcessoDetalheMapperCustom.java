@@ -65,7 +65,7 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             return false;
         }
         return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
     }
 
     protected void montarHierarquiaUnidades(ProcessoDetalheDto dto,

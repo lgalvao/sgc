@@ -32,10 +32,10 @@ public class UsuarioPerfil implements Serializable {
     private Perfil perfil;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UsuarioPerfil that = (UsuarioPerfil) o;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UsuarioPerfil that = (UsuarioPerfil) obj;
         return id != null && Objects.equals(id, that.id);
     }
 

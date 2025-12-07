@@ -59,12 +59,12 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        Usuario usuario = (Usuario) o;
+        Usuario usuario = (Usuario) obj;
         return Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
     }
 

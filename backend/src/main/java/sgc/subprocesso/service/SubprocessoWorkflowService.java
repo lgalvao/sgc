@@ -471,10 +471,7 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
-        if (unidadeDestino == null) {
-            unidadeDestino = unidadeAnalise;
-        }
+        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior() != null ? unidadeAnalise.getUnidadeSuperior() : unidadeAnalise;
 
         sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         repositorioSubprocesso.save(sp);

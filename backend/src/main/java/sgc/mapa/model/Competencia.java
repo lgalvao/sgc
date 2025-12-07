@@ -41,6 +41,7 @@ public class Competencia extends EntidadeBase {
      * @param mapa      O mapa ao qual a competência pertence.
      */
     public Competencia(String descricao, Mapa mapa) {
+        super();
         this.descricao = descricao;
         this.mapa = mapa;
     }

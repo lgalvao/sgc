@@ -18,8 +18,8 @@ public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
     }
 
     @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) {
-        String value = p.getValueAsString();
+    public String deserialize(JsonParser parser, DeserializationContext ctxt) {
+        String value = parser.getValueAsString();
         if (value == null || value.isBlank()) {
             return value;
         }

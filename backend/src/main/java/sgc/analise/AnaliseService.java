@@ -56,7 +56,7 @@ public class AnaliseService {
         Subprocesso sp = codSubprocesso.findById(req.getCodSubprocesso())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", req.getCodSubprocesso()));
 
-        Analise a = Analise.builder()
+        Analise analise = Analise.builder()
                 .subprocesso(sp)
                 .dataHora(LocalDateTime.now())
                 .observacoes(req.getObservacoes())
@@ -67,7 +67,7 @@ public class AnaliseService {
                 .motivo(req.getMotivo())
                 .build();
 
-        return analiseRepo.save(a);
+        return analiseRepo.save(analise);
     }
 
     /**

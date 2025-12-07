@@ -20,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
@@ -97,7 +98,7 @@ public class UsuarioController {
             response.setToken(encodedClaims);
         } catch (Exception e) {
             // Logar o erro ou lançar uma exceção apropriada
-            System.err.println("Erro ao gerar token simulado: " + e.getMessage());
+            log.error("Erro ao gerar token simulado: {}", e.getMessage());
             response.setToken("erro_geracao_token"); // Token de fallback em caso de erro
         }
 

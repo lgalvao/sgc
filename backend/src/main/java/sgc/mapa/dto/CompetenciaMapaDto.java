@@ -31,7 +31,7 @@ public class CompetenciaMapaDto {
     public CompetenciaMapaDto(Long codigo, String descricao, List<Long> atividadesCodigos) {
         this.codigo = codigo;
         this.descricao = descricao;
-        this.setAtividadesCodigos(atividadesCodigos);
+        this.atividadesCodigos = (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
     }
 
     public void setAtividadesCodigos(List<Long> atividadesCodigos) {
