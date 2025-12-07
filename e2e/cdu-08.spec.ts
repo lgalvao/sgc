@@ -35,6 +35,14 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
             await page.waitForLoadState('networkidle');
             await page.getByText(descricaoProcesso).click();
+            
+            // If on process detail page (with table of units), click on the unit row
+            // If already on subprocess page (direct navigation for CHEFE), skip this step
+            const isOnProcessDetailPage = await page.getByRole('row', {name: /ASSESSORIA_11/}).isVisible().catch(() => false);
+            if (isOnProcessDetailPage) {
+                await page.getByRole('row', {name: /ASSESSORIA_11/}).click();
+            }
+            
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 

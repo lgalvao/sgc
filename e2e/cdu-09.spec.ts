@@ -93,7 +93,9 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeHidden();
 
         // Verificar indicador de erro (Toast/Alert)
-        await expect(page.getByText('Atividades Incompletas')).toBeVisible();
+        const alert = page.getByTestId('global-alert');
+        await expect(alert).toBeVisible();
+        await expect(alert).toContainText('Atividades Incompletas');
 
         // Adicionar conhecimento para corrigir
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
