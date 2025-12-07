@@ -312,7 +312,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-confirmar-disponibilizacao"
+          data-testid="btn-disponibilizar-cadastro-confirmar"
           @click="confirmarDisponibilizacao"
         >
           Confirmar
@@ -582,6 +582,9 @@ function cancelarEdicaoAtividade() {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
+  if (codSubrocesso.value) {
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+  }
   feedbackStore.show(
     "Importação Concluída",
     "As atividades foram importadas para o seu mapa.",

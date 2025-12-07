@@ -123,3 +123,14 @@ UPDATE sgc.unidade SET titular_titulo = '101010' WHERE codigo = 15;
 UPDATE sgc.unidade SET titular_titulo = '181818' WHERE codigo = 16;
 UPDATE sgc.unidade SET titular_titulo = '131313' WHERE codigo = 17;
 UPDATE sgc.unidade SET titular_titulo = '141414' WHERE codigo = 18;
+
+-- Dados para teste de Importação (CDU-08)
+-- Mapa para SECRETARIA_1 (Unidade 2)
+INSERT INTO sgc.mapa (codigo, data_hora_disponibilizado, data_hora_homologado, unidade_codigo, sugestoes_apresentadas) VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 2, false);
+UPDATE sgc.unidade SET mapa_vigente_codigo = 200, data_vigencia_mapa_atual = CURRENT_TIMESTAMP WHERE codigo = 2;
+
+-- Atividade para SECRETARIA_1
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (2001, 'Atividade 1', 200);
+
+-- Conhecimento para Atividade 1
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (200101, 'Conhecimento 1', 2001);

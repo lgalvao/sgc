@@ -30,9 +30,14 @@ export async function atualizarAtividade(
     codAtividade: number,
     request: Atividade,
 ): Promise<Atividade> {
+    const payload = {
+        codigo: request.codigo,
+        descricao: request.descricao,
+        mapaCodigo: request.mapaCodigo,
+    };
     const response = await apiClient.post<any>(
         `/atividades/${codAtividade}/atualizar`,
-        request,
+        payload,
     );
     return mapAtividadeDtoToModel(response.data);
 }

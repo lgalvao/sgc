@@ -116,6 +116,7 @@ export interface Atividade {
     codigo: number;
     descricao: string;
     conhecimentos: { id: number; descricao: string }[];
+    mapaCodigo?: number;
 }
 
 export interface Competencia {

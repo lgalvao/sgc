@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
@@ -19,6 +20,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 /** Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos. */
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor

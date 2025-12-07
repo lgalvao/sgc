@@ -38,9 +38,20 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             
             // If on process detail page (with table of units), click on the unit row
             // If already on subprocess page (direct navigation for CHEFE), skip this step
-            const isOnProcessDetailPage = await page.getByRole('row', {name: /ASSESSORIA_11/}).isVisible().catch(() => false);
-            if (isOnProcessDetailPage) {
-                await page.getByRole('row', {name: /ASSESSORIA_11/}).click();
+            // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
+            const unitRow = page.getByRole('row', {name: /ASSESSORIA_11/});
+            const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
+
+            // Wait until one of them is visible
+            await expect(async () => {
+                const rowVisible = await unitRow.isVisible();
+                const cardVisible = await subprocessCard.isVisible();
+                expect(rowVisible || cardVisible).toBeTruthy();
+            }).toPass();
+
+            // If unit row is visible, we are on Process Detail page, so click it
+            if (await unitRow.isVisible()) {
+                await unitRow.click();
             }
             
             await AtividadeHelpers.navegarParaAtividades(page);

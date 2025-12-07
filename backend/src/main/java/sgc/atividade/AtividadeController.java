@@ -69,15 +69,14 @@ public class AtividadeController {
     /**
      * Atualiza os dados de uma atividade existente.
      *
-     * @param codAtividade O código da atividade a ser atualizada.
      * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
      * @return Um {@link ResponseEntity} com status 200 OK e a {@link AtividadeDto} atualizada.
      */
-    @PostMapping("/{codAtividade}/atualizar")
+    @PostMapping("/{codigo}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
-    public ResponseEntity<AtividadeDto> atualizar(
-            @PathVariable Long codAtividade, @Valid @RequestBody AtividadeDto atividadeDto) {
-        return ResponseEntity.ok(atividadeService.atualizar(codAtividade, atividadeDto));
+    public AtividadeDto atualizar(
+            @PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
+        return atividadeService.atualizar(codigo, atividadeDto);
     }
 
     /**
