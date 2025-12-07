@@ -33,6 +33,18 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                         .podeFinalizar(isCurrentUserAdmin())
                         .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
                         .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
+                        // Campos formatados
+                        .dataCriacaoFormatada(
+                                sgc.comum.util.FormatadorData.formatarData(
+                                        processo.getDataCriacao()))
+                        .dataFinalizacaoFormatada(
+                                sgc.comum.util.FormatadorData.formatarData(
+                                        processo.getDataFinalizacao()))
+                        .dataLimiteFormatada(
+                                sgc.comum.util.FormatadorData.formatarData(
+                                        processo.getDataLimite()))
+                        .situacaoLabel(processo.getSituacao().getLabel())
+                        .tipoLabel(processo.getTipo().getLabel())
                         .build();
 
         List<Subprocesso> subprocessos =
@@ -92,6 +104,10 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 if (sp.getMapa() != null) {
                     unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
                 }
+                // Campos formatados
+                unidadeDto.setDataLimiteFormatada(
+                        sgc.comum.util.FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
+                unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
         }
 

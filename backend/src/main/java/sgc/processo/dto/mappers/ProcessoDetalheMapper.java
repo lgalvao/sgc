@@ -21,7 +21,11 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "podeFinalizar", ignore = true)
     @Mapping(target = "podeHomologarCadastro", ignore = true)
     @Mapping(target = "podeHomologarMapa", ignore = true)
-
+    @Mapping(target = "dataLimiteFormatada", ignore = true)
+    @Mapping(target = "dataCriacaoFormatada", ignore = true)
+    @Mapping(target = "dataFinalizacaoFormatada", ignore = true)
+    @Mapping(target = "situacaoLabel", ignore = true)
+    @Mapping(target = "tipoLabel", ignore = true)
     // Mapeamento customizado
     ProcessoDetalheDto toDetailDTO(Processo processo);
 
@@ -33,6 +37,8 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
     @Mapping(target = "mapaCodigo", source = "mapaVigente.codigo")
     @Mapping(target = "codSubprocesso", ignore = true)
+    @Mapping(target = "dataLimiteFormatada", ignore = true)
+    @Mapping(target = "situacaoLabel", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(Unidade unidade);
 
     // Mapeamento de subprocesso para DTO de resumo
@@ -59,6 +65,8 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "mapaCodigo", source = "mapa.codigo")
     @Mapping(target = "codSubprocesso", source = "codigo")
     @Mapping(target = "filhos", ignore = true)
+    @Mapping(target = "dataLimiteFormatada", ignore = true)
+    @Mapping(target = "situacaoLabel", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(
             Subprocesso subprocesso);
 }

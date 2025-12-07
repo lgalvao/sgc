@@ -28,6 +28,13 @@ public class ProcessoDetalheDto {
     private boolean podeHomologarCadastro;
     private boolean podeHomologarMapa;
 
+    // Campos formatados para apresentação
+    private String dataLimiteFormatada;
+    private String dataCriacaoFormatada;
+    private String dataFinalizacaoFormatada;
+    private String situacaoLabel;
+    private String tipoLabel;
+
     @Getter
     @Setter
     @Builder
@@ -44,5 +51,10 @@ public class ProcessoDetalheDto {
         private Long codSubprocesso;
 
         @Builder.Default private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();
+
+        // Campos formatados para apresentação
+        private String dataLimiteFormatada;
+        private String situacaoLabel;
     }
 }
+
