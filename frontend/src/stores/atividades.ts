@@ -36,22 +36,23 @@ export const useAtividadesStore = defineStore("atividades", () => {
     }
 
     async function adicionarAtividade(
-        codSubrocesso: number,
+        codSubprocesso: number,
+        codMapa: number,
         request: CriarAtividadeRequest,
     ) {
         try {
             const novaAtividade = await atividadeService.criarAtividade(
                 request,
-                codSubrocesso,
+                codMapa,
             );
             if (novaAtividade) {
                 const atividades =
-                    atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+                    atividadesPorSubprocesso.value.get(codSubprocesso) || [];
                 atividades.push(novaAtividade);
-                atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+                atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
             }
-            // After adding, re-fetch to ensure data consistency, especially if backend logic changes
-            await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Re-fetch to ensure consistency with backend
+            await buscarAtividadesParaSubprocesso(codSubprocesso);
         } catch (error) {
             feedbackStore.show("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.", "danger");
             throw error;

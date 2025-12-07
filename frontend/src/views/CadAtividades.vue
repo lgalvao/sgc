@@ -460,18 +460,14 @@ const isRevisao = computed(
 );
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && codMapa.value) {
+  if (novaAtividade.value?.trim() && codMapa.value && codSubrocesso.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(codMapa.value, request);
+    await atividadesStore.adicionarAtividade(codSubrocesso.value, codMapa.value, request);
     novaAtividade.value = "";
-    // Refresh activities using subprocess ID
-    if (codSubrocesso.value) {
-        await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
-        // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
-        await processosStore.buscarProcessoDetalhe(codProcesso.value);
-    }
+    // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
+    await processosStore.buscarProcessoDetalhe(codProcesso.value);
   }
 }
 
@@ -670,7 +666,7 @@ function disponibilizarCadastro() {
   const sub = subprocesso.value;
   const situacaoEsperada = isRevisao.value
     ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-    : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
+    : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
     feedbackStore.show(

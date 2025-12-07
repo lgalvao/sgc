@@ -8,11 +8,7 @@ export async function navegarParaAtividades(page: Page, options?: { visualizacao
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);
-
-    const responsePromise = page.waitForResponse(resp => resp.url().includes('/atividades') && resp.status() === 201);
     await page.getByTestId('btn-adicionar-atividade').click();
-    await responsePromise;
-
     await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
 

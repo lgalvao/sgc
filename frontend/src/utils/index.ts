@@ -18,6 +18,9 @@ export function situacaoLabel(situacao?: string | null): string {
     if (!situacao) return "Não disponibilizado";
 
     const backendLabels: Record<string, string> = {
+        // Initial status
+        NAO_INICIADO: "Não iniciado",
+        
         // Mapeamento statuses
         MAPEAMENTO_CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
         MAPEAMENTO_CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",

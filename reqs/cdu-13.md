@@ -6,8 +6,7 @@ Pré-condições:
 
 - Usuário logado com perfil GESTOR ou ADMIN
 - Processo de mapeamento iniciado que tenha a unidade como participante
-- Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
-  usuário.
+- Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do usuário.
 
 Fluxo principal:
 
@@ -21,16 +20,12 @@ Fluxo principal:
 
 5. Usuário clica no card Atividades e conhecimentos.
 
-6. O sistema apresenta as atividades e conhecimentos da unidade na tela Atividades e conhecimentos, com os botões:
-
+6. O sistema apresenta as atividades e conhecimentos da unidade na tela `Atividades e conhecimentos`, com os botões:
     - Histórico de análise
     - Devolver para ajustes
     - Registrar aceite, caso o perfil seja GESTOR ou Homologar, caso o perfil seja ADMIN.
 
-7. Se o usuário clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises prévias
-   registradas para o cadastro de atividades desde a última disponibilização. As análises deverão ser apresentadas em
-   uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas
-   informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
+7. Se o usuário clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises prévias registradas para o cadastro de atividades desde a última disponibilização. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
 
 8. O usuário analisa as informações e opta por aceitar/homologar ou devolver o cadastro para ajustes.
 
@@ -69,12 +64,16 @@ Fluxo principal:
 
    9.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
-   Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
+   ```text
+      Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
-   O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO_PROCESSO] foi
-   devolvido para ajustes.
-   Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
+      Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+
+      O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO_PROCESSO] foi
+      devolvido para ajustes.
+
+      Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
+   ```
 
    9.10. O sistema cria internamente um alerta:
 
@@ -121,25 +120,23 @@ campo para preenchimento de uma observação opcional e os botões Confirmar ou 
 
 10.7. O sistema envia notificação por e-mail para a unidade superior:
 
-Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+   ```text
+   Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
 
-Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetido
-para análise por essa unidade.
-A análise já pode ser realizada no sistema de Gestão de Competências ([URL_SISTEMA]).
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+   O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetido
+   para análise por essa unidade.
+
+   A análise já pode ser realizada no sistema de Gestão de Competências ([URL_SISTEMA]).
 
 10.8. O sistema cria internamente um alerta:
 
-10.8.1. Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para
-análise"
-
-10.8.2. Processo: [DESCRICA_PROCESSO]
-
-10.8.3. Data/hora: Data/hora atual
-
-10.8.4. Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-
-10.8.5. Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+- Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+- Processo: [DESCRICA_PROCESSO]
+- Data/hora: Data/hora atual
+- Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+- Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
 10.9. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
 
@@ -147,13 +144,13 @@ análise"
 
 11.1. Usuário escolhe Homologar.
 
-11.2. O sistema abre um diálogo de confirmação (título Homologação do cadastro de atividades e conhecimentos) com a
-pergunta "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões Confirmar ou Cancelar.
+11.2. O sistema abre um modal de confirmação (título Homologação do cadastro de atividades e conhecimentos) com a
+pergunta "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` ou `Cancelar`.
 
-11.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de homologação do cadastro, permanecendo
+11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendo
 na mesma tela.
 
-11.4. Usuário escolhe Confirmar.
+11.4. Usuário escolhe `Confirmar`.
 
 11.5. O sistema registra uma movimentação para o subprocesso:
 

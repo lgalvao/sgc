@@ -19,9 +19,9 @@ export async function obterAtividadePorCodigo(codAtividade: number): Promise<Ati
 
 export async function criarAtividade(
     request: any,
-    codSubrocesso: number,
+    codMapa: number,
 ): Promise<Atividade> {
-    const requestDto = mapCriarAtividadeRequestToDto(request, codSubrocesso);
+    const requestDto = mapCriarAtividadeRequestToDto(request, codMapa);
     const response = await apiClient.post<any>("/atividades", requestDto);
     return mapAtividadeDtoToModel(response.data);
 }

@@ -151,7 +151,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByText(descProcesso).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
-        // Entrar na visualizacao de atividades
+        // Navigate to visualization of activities
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Clicar em Analisar (Devolver)

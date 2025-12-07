@@ -21,11 +21,11 @@ export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
 
 export function mapCriarAtividadeRequestToDto(
   request: any,
-  codSubrocesso: number,
+  codMapa: number,
 ): any {
   return {
     ...request,
-    mapaCodigo: codSubrocesso,
+    mapaCodigo: codMapa,
   };
 }
 

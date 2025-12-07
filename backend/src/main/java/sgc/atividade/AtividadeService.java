@@ -106,19 +106,30 @@ public class AtividadeService {
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public AtividadeDto atualizar(Long codigo, AtividadeDto atividadeDto) {
-        return atividadeRepo
-                .findById(codigo)
-                .map(
-                        existente -> {
-                            atualizarSituacaoSubprocessoSeNecessario(
-                                    existente.getMapa().getCodigo());
-                            var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
-                            existente.setDescricao(entidadeParaAtualizar.getDescricao());
+        log.info("Atualizando atividade com código: {}", codigo);
+        try {
+            return atividadeRepo
+                    .findById(codigo)
+                    .map(
+                            existente -> {
+                                log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(), 
+                                    existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
+                                if (existente.getMapa() != null) {
+                                    atualizarSituacaoSubprocessoSeNecessario(
+                                            existente.getMapa().getCodigo());
+                                }
+                                var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
+                                existente.setDescricao(entidadeParaAtualizar.getDescricao());
 
-                            var atualizado = atividadeRepo.save(existente);
-                            return atividadeMapper.toDto(atualizado);
-                        })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
+                                var atualizado = atividadeRepo.save(existente);
+                                log.info("Atividade {} atualizada com sucesso", codigo);
+                                return atividadeMapper.toDto(atualizado);
+                            })
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
+        } catch (Exception e) {
+            log.error("Erro ao atualizar atividade {}: {}", codigo, e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**

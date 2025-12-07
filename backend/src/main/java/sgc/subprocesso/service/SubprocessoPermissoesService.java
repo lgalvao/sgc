@@ -117,12 +117,20 @@ public class SubprocessoPermissoesService {
         } else {
             podeVisualizarImpacto = false;
         }
+        // Editing is only allowed for role-based access AND when status allows editing
+        // Once cadastro is disponibilizado, no one can edit - only view, devolver, or aceitar
+        boolean situacaoPermiteEdicao = 
+            sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO
+                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+        
+        boolean podeEditarMapa = acessoEdicao && situacaoPermiteEdicao;
 
         return SubprocessoPermissoesDto.builder()
-                .podeEditarMapa(acessoEdicao)
+                .podeEditarMapa(podeEditarMapa)
                 .podeVisualizarMapa(true)
                 .podeVerPagina(true)
-                .podeDisponibilizarCadastro(acessoEdicao)
+                .podeDisponibilizarCadastro(podeEditarMapa)
                 .podeDevolverCadastro(isAdmin || isGestorUnidade)
                 .podeAceitarCadastro(isAdmin || isGestorUnidade)
                 .podeVisualizarDiagnostico(true)
