@@ -158,7 +158,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
                 .with(user(titular))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
         
         // THEN: Status should have transitioned
         Subprocesso updatedSubprocesso = subprocessoRepo.findById(subprocesso.getCodigo())

@@ -66,6 +66,10 @@ public class AtividadeService {
      * @throws ErroSituacaoInvalida se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
+        if (atividadeDto.getMapaCodigo() == null) {
+            throw new ErroEntidadeNaoEncontrada("Mapa", "não informado");
+        }
+
         var subprocesso =
                 subprocessoRepo
                         .findByMapaCodigo(atividadeDto.getMapaCodigo())
@@ -93,7 +97,13 @@ public class AtividadeService {
 
         atualizarSituacaoSubprocessoSeNecessario(atividadeDto.getMapaCodigo());
 
+        if (subprocesso.getMapa() == null) {
+            throw new ErroEntidadeNaoEncontrada(
+                    "Mapa não associado ao subprocesso %d".formatted(subprocesso.getCodigo()));
+        }
+
         var entidade = atividadeMapper.toEntity(atividadeDto);
+        entidade.setMapa(subprocesso.getMapa());
         var salvo = atividadeRepo.save(entidade);
 
         return atividadeMapper.toDto(salvo);

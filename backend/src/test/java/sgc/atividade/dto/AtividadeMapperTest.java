@@ -1,34 +1,15 @@
 package sgc.atividade.dto;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
 
-@ExtendWith(MockitoExtension.class)
 class AtividadeMapperTest {
     private static final String TEST_DESCRIPTION = "Test Description";
 
     private final AtividadeMapper mapper = Mappers.getMapper(AtividadeMapper.class);
-
-    @Mock private MapaRepo mapaRepo;
-
-    @BeforeEach
-    void setUp() throws NoSuchFieldException, IllegalAccessException {
-        // Injeta o mock do mapaRepo no mapper
-        java.lang.reflect.Field field = AtividadeMapper.class.getDeclaredField("mapaRepo");
-        field.setAccessible(true);
-        field.set(mapper, mapaRepo);
-    }
 
     @Test
     void testToDto() {
@@ -48,33 +29,13 @@ class AtividadeMapperTest {
     }
 
     @Test
-    void testToEntity() {
+    void testToEntityIgnoraMapa() {
         AtividadeDto dto = new AtividadeDto(1L, 100L, TEST_DESCRIPTION);
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(100L);
-        when(mapaRepo.findById(100L)).thenReturn(Optional.of(mapa));
 
         Atividade atividade = mapper.toEntity(dto);
 
         assertNotNull(atividade);
         assertEquals(TEST_DESCRIPTION, atividade.getDescricao());
-        assertNotNull(atividade.getMapa());
-        assertEquals(100L, atividade.getMapa().getCodigo());
-    }
-
-    @Test
-    void testMapWithNullValue() {
-        Mapa result = mapper.map(null);
-        assertNull(result);
-    }
-
-    @Test
-    void testMapWithValidValue() {
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(100L);
-        when(mapaRepo.findById(100L)).thenReturn(Optional.of(mapa));
-        Mapa result = mapper.map(100L);
-        assertNotNull(result);
-        assertEquals(100L, result.getCodigo());
+        assertNull(atividade.getMapa());
     }
 }

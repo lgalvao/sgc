@@ -1,5 +1,7 @@
 package sgc.subprocesso.service;
 
+import java.util.EnumSet;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.AtividadeRepo;
@@ -119,11 +121,21 @@ public class SubprocessoPermissoesService {
         }
         // Editing is only allowed for role-based access AND when status allows editing
         // Once cadastro is disponibilizado, no one can edit - only view, devolver, or aceitar
-        boolean situacaoPermiteEdicao = 
-            sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO
-                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
-                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+        EnumSet<SituacaoSubprocesso> situacoesPermitemEdicao = EnumSet.of(
+                SituacaoSubprocesso.NAO_INICIADO,
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
+                SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
+                SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO,
+                SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+
+        boolean situacaoPermiteEdicao = situacoesPermitemEdicao.contains(sp.getSituacao());
         
         boolean podeEditarMapa = acessoEdicao && situacaoPermiteEdicao;
 

@@ -92,9 +92,13 @@ class AtividadeServiceTest {
         usuario.setTituloEleitoral(usuarioId);
         unidade.setTitular(usuario);
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setMapa(mapa);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
@@ -121,6 +125,9 @@ class AtividadeServiceTest {
         usuario.setTituloEleitoral(usuarioId);
         unidade.setTitular(usuario);
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -128,6 +135,7 @@ class AtividadeServiceTest {
         subprocesso.setUnidade(unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         subprocesso.setProcesso(processo);
+        subprocesso.setMapa(mapa);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
@@ -162,6 +170,9 @@ class AtividadeServiceTest {
         AtividadeDto dto = new AtividadeDto();
         dto.setMapaCodigo(mapaId);
         Subprocesso sp = new Subprocesso();
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+        sp.setMapa(mapa);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(sp));
         when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
@@ -183,8 +194,12 @@ class AtividadeServiceTest {
         titular.setTituloEleitoral("outro");
         unidade.setTitular(titular);
 
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(mapaId);
+
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);
+        subprocesso.setMapa(mapa);
 
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);

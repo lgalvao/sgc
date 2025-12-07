@@ -7,10 +7,12 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.ConhecimentoDto;
+import sgc.comum.erros.ErroAccessoNegado;
 
 /** Controlador REST para gerenciar Atividades e seus Conhecimentos associados. */
 @RestController
@@ -58,9 +60,12 @@ public class AtividadeController {
      */
     @PostMapping
     @Operation(summary = "Cria uma atividade")
-    public ResponseEntity<AtividadeDto> criar(
-            @Valid @RequestBody AtividadeDto atividadeDto,
-            @AuthenticationPrincipal String tituloUsuario) {
+    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String tituloUsuario = authentication != null ? authentication.getName() : null;
+        if (tituloUsuario == null || tituloUsuario.isBlank()) {
+            throw new ErroAccessoNegado("Usuário não autenticado.");
+        }
         var salvo = atividadeService.criar(atividadeDto, tituloUsuario);
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
@@ -161,4 +166,5 @@ public class AtividadeController {
         atividadeService.excluirConhecimento(codAtividade, codConhecimento);
         return ResponseEntity.noContent().build();
     }
+
 }
