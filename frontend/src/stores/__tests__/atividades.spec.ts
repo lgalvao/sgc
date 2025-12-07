@@ -62,11 +62,11 @@ describe("useAtividadesStore", () => {
                 competencias: [{atividades: [novaAtividade]}],
             } as any);
 
-            await store.adicionarAtividade(1, {descricao: "Nova Atividade"});
+            await store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"});
 
             expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
                 {descricao: "Nova Atividade"},
-                1,
+                999,
             );
             expect(store.atividadesPorSubprocesso.get(1)).toEqual([novaAtividade]);
         });
@@ -75,7 +75,7 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "criarAtividade").mockRejectedValue(
                 new Error("Erro"),
             );
-            await expect(store.adicionarAtividade(1, {descricao: "Nova Atividade"})).rejects.toThrow("Erro");
+            await expect(store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"})).rejects.toThrow("Erro");
         });
     });
 

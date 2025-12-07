@@ -116,6 +116,7 @@ class AtividadeControllerTest {
 
         @Test
         @DisplayName("Deve criar uma atividade e retornar 201 Created")
+        @WithMockUser
         void deveCriarAtividade() throws Exception {
             var atividadeDto = new AtividadeDto(null, 10L, NOVA_ATIVIDADE);
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);
@@ -125,17 +126,6 @@ class AtividadeControllerTest {
 
             mockMvc.perform(
                             post(API_ATIVIDADES)
-                                    .with(
-                                            org.springframework.security.test.web.servlet.request
-                                                    .SecurityMockMvcRequestPostProcessors
-                                                    .authentication(
-                                                            new org.springframework.security
-                                                                    .authentication
-                                                                    .UsernamePasswordAuthenticationToken(
-                                                                    "user",
-                                                                    "password",
-                                                                    java.util.Collections
-                                                                            .emptyList())))
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
