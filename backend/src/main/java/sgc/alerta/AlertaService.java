@@ -134,7 +134,7 @@ public class AlertaService {
      * @return Uma lista contendo todos os alertas que foram criados.
      */
     @Transactional
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    @SuppressWarnings({"PMD.ExhaustiveSwitchHasDefault", "PMD.AvoidCatchingGenericException"})
     public List<Alerta> criarAlertasProcessoIniciado(
             Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
 
@@ -220,6 +220,8 @@ public class AlertaService {
 
                         alertasCriados.add(alertaIntermediaria);
                     }
+                    default -> {
+                    }
                 }
             } catch (RuntimeException e) {
                 log.error(
@@ -281,9 +283,9 @@ public class AlertaService {
     @Transactional
     public void criarAlertaCadastroDevolvido(
             Processo processo, Long codUnidadeDestino, String motivo) {
-        String desc = ("""
+        String desc = """
                 Cadastro devolvido no processo '%s'. Motivo: %s.
-                Realize os ajustes necessários e disponibilize novamente.""")
+                Realize os ajustes necessários e disponibilize novamente."""
                 .formatted(processo.getDescricao(), motivo);
 
         criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc, null);

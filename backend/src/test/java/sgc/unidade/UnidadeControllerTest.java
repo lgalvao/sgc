@@ -46,7 +46,13 @@ class UnidadeControllerTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
-                                        "{\"tituloEleitoralServidor\":\"123\",\"dataTermino\":\"2025-12-31\",\"justificativa\":\"teste\"}"))
+                                        """
+                                        {
+                                            "tituloEleitoralServidor":"123",
+                                            "dataTermino":"2025-12-31",
+                                            "justificativa":"teste"
+                                        }
+                                        """))
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
