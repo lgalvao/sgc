@@ -28,7 +28,7 @@ public class NotificacaoModelosService {
 
     private final SpringTemplateEngine templateEngine;
 
-    NotificacaoModelosService(SpringTemplateEngine templateEngine) {
+    public NotificacaoModelosService(SpringTemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 

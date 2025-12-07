@@ -68,39 +68,43 @@ public class EventoProcessoListener {
         log.debug("Processando evento de processo iniciado: codProcesso={}, tipo={}",
                 evento.getCodProcesso(), evento.getTipo());
         try {
-            Processo processo = processoRepo.findById(evento.getCodProcesso())
-                    .orElseThrow(
-                            () -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.getCodProcesso()));
-
-            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.getCodProcesso());
-
-            if (subprocessos.isEmpty()) {
-                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());
-                return;
-            }
-
-            log.debug("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.getCodProcesso());
-
-            // 1. Criar alertas diferenciados por tipo de unidade
-            List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
-                    processo,
-                    evento.getCodUnidades(),
-                    subprocessos);
-            log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
-
-            // 2. Enviar e-mails para cada subprocesso
-            for (Subprocesso subprocesso : subprocessos) {
-                try {
-                    enviarEmailDeProcessoIniciado(processo, subprocesso);
-                } catch (Exception e) {
-                    log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(),
-                            e.getClass().getSimpleName(), e);
-                }
-            }
-            log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
+            processarInicioProcesso(evento);
         } catch (Exception e) {
             log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }
+    }
+
+    private void processarInicioProcesso(EventoProcessoIniciado evento) {
+        Processo processo = processoRepo.findById(evento.getCodProcesso())
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.getCodProcesso()));
+
+        List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.getCodProcesso());
+
+        if (subprocessos.isEmpty()) {
+            log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());
+            return;
+        }
+
+        log.debug("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.getCodProcesso());
+
+        // 1. Criar alertas diferenciados por tipo de unidade
+        List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
+                processo,
+                evento.getCodUnidades(),
+                subprocessos);
+        log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
+
+        // 2. Enviar e-mails para cada subprocesso
+        for (Subprocesso subprocesso : subprocessos) {
+            try {
+                enviarEmailDeProcessoIniciado(processo, subprocesso);
+            } catch (Exception e) {
+                log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(),
+                        e.getClass().getSimpleName(), e);
+            }
+        }
+        log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
     }
 
     private void enviarEmailDeProcessoIniciado(Processo processo, Subprocesso subprocesso) {

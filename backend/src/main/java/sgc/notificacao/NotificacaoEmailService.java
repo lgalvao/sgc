@@ -163,14 +163,15 @@ public class NotificacaoEmailService {
         notificacao.setDataHora(LocalDateTime.now());
         String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.getDestinatario(),
                 emailDto.getAssunto(), emailDto.getCorpo());
-        if (conteudo.length() > 500) {
-            conteudo = "%s...".formatted(conteudo.substring(0, 497));
+        final int limite = 500;
+        if (conteudo.length() > limite) {
+            conteudo = "%s...".formatted(conteudo.substring(0, limite - 3));
         }
         notificacao.setConteudo(conteudo);
         return notificacao;
     }
 
     private boolean isEmailValido(String email) {
-        return email != null && !email.trim().isEmpty() && PADRAO_EMAIL.matcher(email.trim()).matches();
+        return email != null && !email.isBlank() && PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 }

@@ -1,0 +1,18 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+> Task :backend:test
+
+E2eControllerTest > shouldClearProcessData_RealDelete() SKIPPED
+
+E2eControllerTest > shouldResetDatabase_TruncateTables() SKIPPED
+
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 1m 44s
+6 actionable tasks: 2 executed, 4 up-to-date
+Configuration cache entry stored.

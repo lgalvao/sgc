@@ -41,7 +41,7 @@ public class ConfigSeguranca {
      * @throws Exception se ocorrer um erro durante a configuração.
      */
     @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // NOPMD - Spring Security requires this signature
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",

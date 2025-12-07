@@ -48,6 +48,7 @@ public class Atividade extends EntidadeBase {
      * @param descricao A descrição da atividade.
      */
     public Atividade(Mapa mapa, String descricao) {
+        super();
         this.mapa = mapa;
         this.descricao = descricao;
     }

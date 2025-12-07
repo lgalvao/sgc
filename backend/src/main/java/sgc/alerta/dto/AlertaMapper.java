@@ -21,7 +21,7 @@ public abstract class AlertaMapper {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
@@ -60,7 +60,7 @@ public abstract class AlertaMapper {
         if (dataHora == null) {
             return "";
         }
-        return dataHora.format(formatter);
+        return dataHora.format(FORMATTER);
     }
 
     @Named("extractProcessoName")

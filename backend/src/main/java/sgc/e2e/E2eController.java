@@ -34,7 +34,7 @@ public class E2eController {
     private final SgrhService sgrhService;
 
     @PostMapping("/reset-database")
-    public void resetDatabase() throws SQLException {
+    public void resetDatabase() throws SQLException { // NOPMD - E2E utility
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
         try {

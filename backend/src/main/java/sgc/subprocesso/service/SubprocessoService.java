@@ -99,25 +99,25 @@ public class SubprocessoService {
         return repositorioSubprocesso.findById(codigo)
                 .map(subprocesso -> {
                     if (subprocessoDto.getCodProcesso() != null) {
-                        Processo p = new Processo();
-                        p.setCodigo(subprocessoDto.getCodProcesso());
-                        subprocesso.setProcesso(p);
+                        Processo processo = new Processo();
+                        processo.setCodigo(subprocessoDto.getCodProcesso());
+                        subprocesso.setProcesso(processo);
                     } else {
                         subprocesso.setProcesso(null);
                     }
 
                     if (subprocessoDto.getCodUnidade() != null) {
-                        Unidade u = new Unidade();
-                        u.setCodigo(subprocessoDto.getCodUnidade());
-                        subprocesso.setUnidade(u);
+                        Unidade unidade = new Unidade();
+                        unidade.setCodigo(subprocessoDto.getCodUnidade());
+                        subprocesso.setUnidade(unidade);
                     } else {
                         subprocesso.setUnidade(null);
                     }
 
                     if (subprocessoDto.getCodMapa() != null) {
-                        Mapa m = new Mapa();
-                        m.setCodigo(subprocessoDto.getCodMapa());
-                        subprocesso.setMapa(m);
+                        Mapa mapa = new Mapa();
+                        mapa.setCodigo(subprocessoDto.getCodMapa());
+                        subprocesso.setMapa(mapa);
                     } else {
                         subprocesso.setMapa(null);
                     }

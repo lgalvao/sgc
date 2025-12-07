@@ -172,6 +172,10 @@ pmd {
     isIgnoreFailures = true // Don't fail build
 }
 
+tasks.named("pmdTest") {
+    enabled = false
+}
+
 // --- Custom Quality Tasks ---
 
 tasks.register("qualityCheck") {

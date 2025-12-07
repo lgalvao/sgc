@@ -66,10 +66,11 @@ public class ProcessoService {
 
         String username = authentication.getName();
         boolean isGestorOuChefe = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR") || a.getAuthority().equals("ROLE_CHEFE"));
+                .anyMatch(a -> "ROLE_GESTOR".equals(a.getAuthority()) || "ROLE_CHEFE".equals(a.getAuthority()));
 
-        if (!isGestorOuChefe)
+        if (!isGestorOuChefe) {
             return false;
+        }
 
         List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()

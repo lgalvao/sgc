@@ -50,12 +50,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage())));
     }
 
+    @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
         @Nullable HttpMessageNotReadableException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }
 
+    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         @Nullable MethodArgumentNotValidException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
         log.warn("Erro de validação de argumento de método: {}", ex != null ? ex.getMessage() : null);
@@ -97,17 +99,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
     protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroEntidadeNaoEncontrada ex) {
-        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn");
+        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler(ErroUnidadeNaoEncontrada.class)
     protected ResponseEntity<Object> handleErroUnidadeNaoEncontrada(ErroUnidadeNaoEncontrada ex) {
-        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn");
+        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler(ErroAccessoNegado.class)
     protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroAccessoNegado ex) {
-        return handleBusinessException(ex, HttpStatus.FORBIDDEN, "warn");
+        return handleBusinessException(ex, HttpStatus.FORBIDDEN, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -138,12 +140,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ErroRequisicaoSemCorpo.class)
     protected ResponseEntity<Object> handleErroRequisicaoSemCorpo(ErroRequisicaoSemCorpo ex) {
-        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn");
+        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler(ErroParametroPainelInvalido.class)
     protected ResponseEntity<Object> handleErroParametroPainelInvalido(ErroParametroPainelInvalido ex) {
-        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn");
+        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler({
@@ -154,7 +156,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErroMapaNaoAssociado.class
     })
     protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
-        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_CONTENT, "warn");
+        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_CONTENT, "warn"); // NOPMD - using literal for internal config
     }
 
     @ExceptionHandler(ErroAlerta.class)

@@ -35,6 +35,7 @@ public class Conhecimento extends EntidadeBase {
      * @param atividade A atividade à qual o conhecimento está associado.
      */
     public Conhecimento(String descricao, Atividade atividade) {
+        super();
         this.descricao = descricao;
         this.atividade = atividade;
     }
