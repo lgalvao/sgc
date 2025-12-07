@@ -30,8 +30,8 @@ O SGC permite:
 **Backend:**
 
 - Java 25
-- Spring Boot 3.5.x
-- JPA/Hibernate
+- Spring Boot 4
+- Hibernate 7
 - Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
 - Arquitetura: Em camadas, estruturada por domínio
@@ -62,12 +62,9 @@ sgc/
 ├── gradle/             # Scripts e wrapper do Gradle
 ├── scripts/            # Scripts utilitários do repositório
 ├── reqs/               # Documentação de requisitos (CDUs)
-├── regras/             # Regras de negócio / políticas
-├── node_modules/       # Dependências do frontend (não versionar alterações)
 ├── test-results/       # Resultados de testes e logs (E2E)
-├── .idea/ .vscode/     # Configs de IDE (opcionais)
 ├── build.gradle.kts    # Build raiz (multi-projeto)
-└── AGENTS.md           # Guia para agentes de IA
+
 `
 text
 sgc/
@@ -149,16 +146,19 @@ Utilize o script wrapper na raiz do projeto:
 Você também pode executar tarefas específicas via Gradle:
 
 - **Tudo (Backend + Frontend)**:
+
   ```bash
   ./gradlew qualityCheckAll
   ```
 
 - **Apenas Backend** (Checkstyle, PMD, SpotBugs, JaCoCo, Testes):
+
   ```bash
   ./gradlew qualityCheck
   ```
 
 - **Apenas Frontend** (ESLint, Type Check, Vitest):
+
   ```bash
   ./gradlew frontendQualityCheck
   ```
