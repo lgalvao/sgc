@@ -1,5 +1,7 @@
 package sgc.integracao.mocks;
 
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -12,10 +14,10 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Arrays;
-
+@Slf4j
 @Component
-public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
+public class WithMockCustomUserSecurityContextFactory
+        implements WithSecurityContextFactory<WithMockCustomUser> {
     @Autowired(required = false)
     private UnidadeRepo unidadeRepo;
 
@@ -32,33 +34,47 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 unidade = unidadeRepo.findById(customUser.unidadeId()).orElse(null);
                 dbAvailable = true;
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                log.error("Erro ao buscar unidade", e);
             }
         }
 
         if (unidade == null) {
-             unidade = new Unidade("Unidade Mock", "MOCK");
-             unidade.setCodigo(customUser.unidadeId());
+            unidade = new Unidade("Unidade Mock", "MOCK");
+            unidade.setCodigo(customUser.unidadeId());
         }
 
-        Usuario principal = new Usuario(
-                customUser.tituloEleitoral(),
-                customUser.nome(),
-                customUser.email(),
-                "321",
-                unidade
-        );
+        Usuario principal =
+                new Usuario(
+                        customUser.tituloEleitoral(),
+                        customUser.nome(),
+                        customUser.email(),
+                        "321",
+                        unidade);
         final Unidade finalUnidade = unidade;
-        Arrays.stream(customUser.perfis()).forEach(p -> {
-             principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(finalUnidade).perfil(Perfil.valueOf(p)).build());
-        });
+        Arrays.stream(customUser.perfis())
+                .forEach(
+                        p -> {
+                            principal
+                                    .getAtribuicoes()
+                                    .add(
+                                            sgc.sgrh.model.UsuarioPerfil.builder()
+                                                    .usuario(principal)
+                                                    .unidade(finalUnidade)
+                                                    .perfil(Perfil.valueOf(p))
+                                                    .build());
+                        });
 
         if (dbAvailable && usuarioRepo != null) {
-            try { usuarioRepo.save(principal); } catch (Exception ignored) { }
+            try {
+                usuarioRepo.save(principal);
+            } catch (Exception e) {
+                log.error("Erro ao salvar usuario", e);
+            }
         }
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                principal, null, principal.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principal, null, principal.getAuthorities());
         context.setAuthentication(authentication);
 
         return context;

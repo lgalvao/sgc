@@ -1,5 +1,10 @@
 package sgc.subprocesso.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,24 +19,14 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class MovimentacaoListenerTest {
 
-    @Mock
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private SubprocessoNotificacaoService notificacaoService;
+    @Mock private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private SubprocessoNotificacaoService notificacaoService;
 
-    @InjectMocks
-    private MovimentacaoListener listener;
+    @InjectMocks private MovimentacaoListener listener;
 
     private Subprocesso mockSubprocesso(Long id) {
         Subprocesso sp = new Subprocesso();
@@ -52,11 +47,12 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoCadastroDisponibilizado evento = EventoSubprocessoCadastroDisponibilizado.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoCadastroDisponibilizado evento =
+                EventoSubprocessoCadastroDisponibilizado.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -74,12 +70,13 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoCadastroDevolvido evento = EventoSubprocessoCadastroDevolvido.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .motivo("motivo")
-                .build();
+        EventoSubprocessoCadastroDevolvido evento =
+                EventoSubprocessoCadastroDevolvido.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .motivo("motivo")
+                        .build();
 
         listener.handle(evento);
 
@@ -97,11 +94,12 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoCadastroAceito evento = EventoSubprocessoCadastroAceito.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoCadastroAceito evento =
+                EventoSubprocessoCadastroAceito.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -118,10 +116,11 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoCadastroHomologado evento = EventoSubprocessoCadastroHomologado.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoCadastroHomologado evento =
+                EventoSubprocessoCadastroHomologado.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .build();
 
         listener.handle(evento);
 
@@ -139,11 +138,12 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoRevisaoDisponibilizada evento = EventoSubprocessoRevisaoDisponibilizada.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoRevisaoDisponibilizada evento =
+                EventoSubprocessoRevisaoDisponibilizada.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -162,12 +162,13 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoRevisaoDevolvida evento = EventoSubprocessoRevisaoDevolvida.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoRevisaoDevolvida evento =
+                EventoSubprocessoRevisaoDevolvida.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeOrigem(origem)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -185,11 +186,12 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoRevisaoAceita evento = EventoSubprocessoRevisaoAceita.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoRevisaoAceita evento =
+                EventoSubprocessoRevisaoAceita.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -206,10 +208,11 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoRevisaoHomologada evento = EventoSubprocessoRevisaoHomologada.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoRevisaoHomologada evento =
+                EventoSubprocessoRevisaoHomologada.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .build();
 
         listener.handle(evento);
 
@@ -225,10 +228,11 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaDisponibilizado evento = EventoSubprocessoMapaDisponibilizado.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaDisponibilizado evento =
+                EventoSubprocessoMapaDisponibilizado.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .build();
 
         listener.handle(evento);
 
@@ -245,10 +249,11 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaComSugestoes evento = EventoSubprocessoMapaComSugestoes.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaComSugestoes evento =
+                EventoSubprocessoMapaComSugestoes.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .build();
 
         listener.handle(evento);
 
@@ -265,10 +270,8 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaValidado evento = EventoSubprocessoMapaValidado.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaValidado evento =
+                EventoSubprocessoMapaValidado.builder().codSubprocesso(id).usuario(user).build();
 
         listener.handle(evento);
 
@@ -285,10 +288,8 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaAceito evento = EventoSubprocessoMapaAceito.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaAceito evento =
+                EventoSubprocessoMapaAceito.builder().codSubprocesso(id).usuario(user).build();
 
         listener.handle(evento);
 
@@ -306,11 +307,12 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaDevolvido evento = EventoSubprocessoMapaDevolvido.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .unidadeDestino(destino)
-                .build();
+        EventoSubprocessoMapaDevolvido evento =
+                EventoSubprocessoMapaDevolvido.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .unidadeDestino(destino)
+                        .build();
 
         listener.handle(evento);
 
@@ -327,10 +329,8 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaHomologado evento = EventoSubprocessoMapaHomologado.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaHomologado evento =
+                EventoSubprocessoMapaHomologado.builder().codSubprocesso(id).usuario(user).build();
 
         listener.handle(evento);
 
@@ -347,10 +347,11 @@ class MovimentacaoListenerTest {
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
 
-        EventoSubprocessoMapaAjustadoSubmetido evento = EventoSubprocessoMapaAjustadoSubmetido.builder()
-                .codSubprocesso(id)
-                .usuario(user)
-                .build();
+        EventoSubprocessoMapaAjustadoSubmetido evento =
+                EventoSubprocessoMapaAjustadoSubmetido.builder()
+                        .codSubprocesso(id)
+                        .usuario(user)
+                        .build();
 
         listener.handle(evento);
 

@@ -1,5 +1,7 @@
 package sgc.mapa.service;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.*;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
@@ -10,9 +12,6 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.TipoImpactoCompetencia;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,8 @@ public class ImpactoCompetenciaService {
             List<AtividadeImpactadaDto> alteradas) {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
-        List<Competencia> competenciasDoMapa = repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
+        List<Competencia> competenciasDoMapa =
+                repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
             if (atividadeDto.getCodigo() == null) continue;
@@ -34,14 +34,19 @@ public class ImpactoCompetenciaService {
             if (atividade == null) continue;
 
             for (Competencia comp : competenciasDoMapa) {
-                if (comp.getAtividades().stream().anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
-                    CompetenciaImpactoAcumulador acumulador = mapaImpactos
-                            .computeIfAbsent(comp.getCodigo(), x -> CompetenciaImpactoAcumulador.builder()
-                                    .codigo(comp.getCodigo())
-                                    .descricao(comp.getDescricao())
-                                    .build());
+                if (comp.getAtividades().stream()
+                        .anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
+                    CompetenciaImpactoAcumulador acumulador =
+                            mapaImpactos.computeIfAbsent(
+                                    comp.getCodigo(),
+                                    x ->
+                                            CompetenciaImpactoAcumulador.builder()
+                                                    .codigo(comp.getCodigo())
+                                                    .descricao(comp.getDescricao())
+                                                    .build());
 
-                    acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.getDescricao()));
+                    acumulador.adicionarImpacto(
+                            "Atividade removida: %s".formatted(atividadeDto.getDescricao()));
                 }
             }
         }
@@ -53,28 +58,34 @@ public class ImpactoCompetenciaService {
 
             for (Competencia comp : atividade.getCompetencias()) {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
-                    CompetenciaImpactoAcumulador acumulador = mapaImpactos
-                            .computeIfAbsent(comp.getCodigo(),
-                                    x -> CompetenciaImpactoAcumulador.builder()
-                                            .codigo(comp.getCodigo())
-                                            .descricao(comp.getDescricao())
-                                            .build());
+                    CompetenciaImpactoAcumulador acumulador =
+                            mapaImpactos.computeIfAbsent(
+                                    comp.getCodigo(),
+                                    x ->
+                                            CompetenciaImpactoAcumulador.builder()
+                                                    .codigo(comp.getCodigo())
+                                                    .descricao(comp.getDescricao())
+                                                    .build());
 
-                    String detalhe = String.format(
-                            "Atividade alterada: '%s' → '%s'",
-                            atividadeDto.getDescricaoAnterior(),
-                            atividadeDto.getDescricao());
+                    String detalhe =
+                            String.format(
+                                    "Atividade alterada: '%s' → '%s'",
+                                    atividadeDto.getDescricaoAnterior(),
+                                    atividadeDto.getDescricao());
                     acumulador.adicionarImpacto(detalhe);
                 }
             }
         }
 
         return mapaImpactos.values().stream()
-                .map(acc -> new CompetenciaImpactadaDto(
-                        acc.codigo,
-                        acc.descricao,
-                        new ArrayList<>(acc.atividadesAfetadas),
-                        TipoImpactoCompetencia.valueOf(determinarTipoImpacto(acc.atividadesAfetadas))))
+                .map(
+                        acc ->
+                                new CompetenciaImpactadaDto(
+                                        acc.codigo,
+                                        acc.descricao,
+                                        new ArrayList<>(acc.atividadesAfetadas),
+                                        TipoImpactoCompetencia.valueOf(
+                                                determinarTipoImpacto(acc.atividadesAfetadas))))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -90,11 +101,11 @@ public class ImpactoCompetenciaService {
     }
 
     private String determinarTipoImpacto(Set<String> atividadesAfetadas) {
-        boolean temRemovida = atividadesAfetadas.stream()
-                .anyMatch(desc -> desc.contains("removida"));
+        boolean temRemovida =
+                atividadesAfetadas.stream().anyMatch(desc -> desc.contains("removida"));
 
-        boolean temAlterada = atividadesAfetadas.stream()
-                .anyMatch(desc -> desc.contains("alterada"));
+        boolean temAlterada =
+                atividadesAfetadas.stream().anyMatch(desc -> desc.contains("alterada"));
 
         if (temRemovida && temAlterada) {
             return "IMPACTO_GENERICO";
@@ -114,8 +125,7 @@ public class ImpactoCompetenciaService {
     private static class CompetenciaImpactoAcumulador {
         private Long codigo;
         private String descricao;
-        @Builder.Default
-        private Set<String> atividadesAfetadas = new LinkedHashSet<>();
+        @Builder.Default private Set<String> atividadesAfetadas = new LinkedHashSet<>();
 
         /* default */ void adicionarImpacto(String descricaoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);

@@ -1,12 +1,12 @@
 package sgc.comum.json;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import net.jqwik.api.*;
 import org.mockito.Mockito;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 class HtmlSanitizingDeserializerPropertyTest {
 
@@ -33,7 +33,8 @@ class HtmlSanitizingDeserializerPropertyTest {
     }
 
     @Property
-    void deveRemoverTagsEspecificas(@ForAll("htmlTags") String tag, @ForAll("textoSimples") String content) {
+    void deveRemoverTagsEspecificas(
+            @ForAll("htmlTags") String tag, @ForAll("textoSimples") String content) {
         JsonParser jsonParser = Mockito.mock(JsonParser.class);
         DeserializationContext context = Mockito.mock(DeserializationContext.class);
 

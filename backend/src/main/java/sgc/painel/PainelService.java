@@ -1,5 +1,8 @@
 package sgc.painel;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +22,6 @@ import sgc.sgrh.model.Perfil;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,19 +33,19 @@ public class PainelService {
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.
-     * <p>
-     * - Se o perfil for 'ADMIN', todos os processos são retornados.
-     * - Para outros perfis, os processos são filtrados pela unidade do usuário e
-     * suas subordinadas. Processos no estado 'CRIADO' são omitidos.
      *
-     * @param perfil        O perfil do usuário (obrigatório).
-     * @param codigoUnidade O código da unidade do usuário (necessário para perfis
-     *                      não-ADMIN).
-     * @param pageable      As informações de paginação.
+     * <p>- Se o perfil for 'ADMIN', todos os processos são retornados. - Para outros perfis, os
+     * processos são filtrados pela unidade do usuário e suas subordinadas. Processos no estado
+     * 'CRIADO' são omitidos.
+     *
+     * @param perfil O perfil do usuário (obrigatório).
+     * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
+     * @param pageable As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
-    public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+    public Page<ProcessoResumoDto> listarProcessos(
+            Perfil perfil, Long codigoUnidade, Pageable pageable) {
         if (perfil == null) {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
@@ -55,34 +54,31 @@ public class PainelService {
         if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll(pageable);
         } else {
-            if (codigoUnidade == null)
-                return Page.empty(pageable);
+            if (codigoUnidade == null) return Page.empty(pageable);
 
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-            processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
-                    unidadeIds,
-                    SituacaoProcesso.CRIADO,
-                    pageable);
-
+            processos =
+                    processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+                            unidadeIds, SituacaoProcesso.CRIADO, pageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
     }
 
     /**
      * Lista alertas com base no usuário ou na unidade.
-     * <p>
-     * A busca prioriza o título do usuário. Se não for fornecido, busca pela
-     * unidade e suas subordinadas. Se nenhum dos dois for fornecido, retorna
-     * todos os alertas.
+     *
+     * <p>A busca prioriza o título do usuário. Se não for fornecido, busca pela unidade e suas
+     * subordinadas. Se nenhum dos dois for fornecido, retorna todos os alertas.
      *
      * @param usuarioTitulo Título de eleitor do usuário.
      * @param codigoUnidade Código da unidade.
-     * @param pageable      As informações de paginação.
+     * @param pageable As informações de paginação.
      * @return Uma página {@link Page} de {@link AlertaDto}.
      */
-    public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
+    public Page<AlertaDto> listarAlertas(
+            String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         Page<Alerta> alertasPage;
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
             alertasPage = alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable);
@@ -94,15 +90,20 @@ public class PainelService {
             alertasPage = alertaRepo.findAll(pageable);
         }
 
-        return alertasPage.map(alerta -> {
-            LocalDateTime dataHoraLeitura = null;
-            if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-                dataHoraLeitura = alertaUsuarioRepo.findById(new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo))
-                        .map(AlertaUsuario::getDataHoraLeitura)
-                        .orElse(null);
-            }
-            return paraAlertaDto(alerta, dataHoraLeitura);
-        });
+        return alertasPage.map(
+                alerta -> {
+                    LocalDateTime dataHoraLeitura = null;
+                    if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
+                        dataHoraLeitura =
+                                alertaUsuarioRepo
+                                        .findById(
+                                                new AlertaUsuario.Chave(
+                                                        alerta.getCodigo(), usuarioTitulo))
+                                        .map(AlertaUsuario::getDataHoraLeitura)
+                                        .orElse(null);
+                    }
+                    return paraAlertaDto(alerta, dataHoraLeitura);
+                });
     }
 
     private List<Long> obterIdsUnidadesSubordinadas(Long codUnidade) {
@@ -115,10 +116,12 @@ public class PainelService {
         return ids;
     }
 
-    private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
-        Unidade participante = processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()
-                ? processo.getParticipantes().iterator().next()
-                : null;
+    private ProcessoResumoDto paraProcessoResumoDto(
+            Processo processo, Perfil perfil, Long codigoUnidade) {
+        Unidade participante =
+                processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()
+                        ? processo.getParticipantes().iterator().next()
+                        : null;
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
 
         String unidadesParticipantes = formatarUnidadesParticipantes(processo.getParticipantes());
@@ -141,8 +144,9 @@ public class PainelService {
         if (participantes == null || participantes.isEmpty()) {
             return "";
         }
-        Map<Long, Unidade> participantesPorCodigo = participantes.stream()
-                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
+        Map<Long, Unidade> participantesPorCodigo =
+                participantes.stream()
+                        .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
         Set<Long> participantesIds = participantesPorCodigo.keySet();
 
         Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds);
@@ -192,7 +196,8 @@ public class PainelService {
         return true;
     }
 
-    private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
+    private String calcularLinkDestinoProcesso(
+            Processo processo, Perfil perfil, Long codigoUnidade) {
         if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
             return "/processo/cadastro?codProcesso=" + processo.getCodigo();
         }
@@ -201,7 +206,8 @@ public class PainelService {
         }
         // Para CHEFE ou SERVIDOR, precisamos da sigla da unidade
         if (codigoUnidade != null) {
-            return unidadeRepo.findById(codigoUnidade)
+            return unidadeRepo
+                    .findById(codigoUnidade)
                     .map(unidade -> "/processo/" + processo.getCodigo() + "/" + unidade.getSigla())
                     .orElse(null);
         }
@@ -215,8 +221,14 @@ public class PainelService {
                 .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
                 .descricao(alerta.getDescricao())
                 .dataHora(alerta.getDataHora())
-                .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
-                .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
+                .unidadeOrigem(
+                        alerta.getUnidadeOrigem() != null
+                                ? alerta.getUnidadeOrigem().getSigla()
+                                : null)
+                .unidadeDestino(
+                        alerta.getUnidadeDestino() != null
+                                ? alerta.getUnidadeDestino().getSigla()
+                                : null)
                 .dataHoraLeitura(dataHoraLeitura)
                 .linkDestino(linkDestino)
                 .build();
@@ -224,7 +236,10 @@ public class PainelService {
 
     private String calcularLinkDestinoAlerta(Alerta alerta) {
         if (alerta.getProcesso() != null && alerta.getUnidadeDestino() != null) {
-            return "/processo/" + alerta.getProcesso().getCodigo() + "/" + alerta.getUnidadeDestino().getSigla();
+            return "/processo/"
+                    + alerta.getProcesso().getCodigo()
+                    + "/"
+                    + alerta.getUnidadeDestino().getSigla();
         }
         return null;
     }

@@ -1,5 +1,16 @@
 package sgc.processo;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +30,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @WebMvcTest(ProcessoController.class)
 @Import(RestExceptionHandler.class)
 public class ProcessoControllerTest {
@@ -43,19 +42,15 @@ public class ProcessoControllerTest {
     private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
     private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
 
-    @MockitoBean
-    private ProcessoService processoService;
+    @MockitoBean private ProcessoService processoService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 
-    @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<CriarProcessoReq> criarCaptor;
+    @org.mockito.Captor private org.mockito.ArgumentCaptor<CriarProcessoReq> criarCaptor;
 
-    @org.mockito.Captor
-    private org.mockito.ArgumentCaptor<AtualizarProcessoReq> atualizarCaptor;
+    @org.mockito.Captor private org.mockito.ArgumentCaptor<AtualizarProcessoReq> atualizarCaptor;
 
     @BeforeEach
     void setUp() {
@@ -66,22 +61,28 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        var req = new CriarProcessoReq(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30),
-                List.of(1L));
-        var dto = ProcessoDto.builder()
-                .codigo(1L)
-                .dataCriacao(LocalDateTime.now())
-                .descricao(NOVO_PROCESSO)
-                .situacao(SituacaoProcesso.CRIADO)
-                .tipo(TipoProcesso.MAPEAMENTO.name())
-                .build();
+        var req =
+                new CriarProcessoReq(
+                        NOVO_PROCESSO,
+                        TipoProcesso.MAPEAMENTO,
+                        LocalDateTime.now().plusDays(30),
+                        List.of(1L));
+        var dto =
+                ProcessoDto.builder()
+                        .codigo(1L)
+                        .dataCriacao(LocalDateTime.now())
+                        .descricao(NOVO_PROCESSO)
+                        .situacao(SituacaoProcesso.CRIADO)
+                        .tipo(TipoProcesso.MAPEAMENTO.name())
+                        .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(post(API_PROCESSOS)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", API_PROCESSOS_1))
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
@@ -95,26 +96,29 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        var req = new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30),
-                List.of(1L));
+        var req =
+                new CriarProcessoReq(
+                        "", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
-        mockMvc.perform(post(API_PROCESSOS)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-                .codigo(1L)
-                .dataCriacao(LocalDateTime.now())
-                .descricao("Processo Teste")
-                .situacao(SituacaoProcesso.CRIADO)
-                .tipo(TipoProcesso.MAPEAMENTO.name())
-                .build();
+        var dto =
+                ProcessoDto.builder()
+                        .codigo(1L)
+                        .dataCriacao(LocalDateTime.now())
+                        .descricao("Processo Teste")
+                        .situacao(SituacaoProcesso.CRIADO)
+                        .tipo(TipoProcesso.MAPEAMENTO.name())
+                        .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -131,8 +135,7 @@ public class ProcessoControllerTest {
     void obterPorId_ProcessoNaoExiste_RetornaNotFound() throws Exception {
         when(processoService.obterPorId(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(API_PROCESSOS_999))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get(API_PROCESSOS_999)).andExpect(status().isNotFound());
 
         verify(processoService).obterPorId(999L);
     }
@@ -140,22 +143,29 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, TipoProcesso.REVISAO,
-                LocalDateTime.now().plusDays(45), List.of(1L));
-        var dto = ProcessoDto.builder()
-                .codigo(1L)
-                .dataCriacao(LocalDateTime.now())
-                .descricao(PROCESSO_ATUALIZADO)
-                .situacao(SituacaoProcesso.CRIADO)
-                .tipo(TipoProcesso.REVISAO.name())
-                .build();
+        var req =
+                new AtualizarProcessoReq(
+                        1L,
+                        PROCESSO_ATUALIZADO,
+                        TipoProcesso.REVISAO,
+                        LocalDateTime.now().plusDays(45),
+                        List.of(1L));
+        var dto =
+                ProcessoDto.builder()
+                        .codigo(1L)
+                        .dataCriacao(LocalDateTime.now())
+                        .descricao(PROCESSO_ATUALIZADO)
+                        .situacao(SituacaoProcesso.CRIADO)
+                        .tipo(TipoProcesso.REVISAO.name())
+                        .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS + "/1/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                 .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(PROCESSO_ATUALIZADO));
@@ -168,15 +178,18 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        var req = new AtualizarProcessoReq(999L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
+        var req =
+                new AtualizarProcessoReq(999L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
-        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService)
+        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
+                .when(processoService)
                 .atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(post(API_PROCESSOS + "/999/atualizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS + "/999/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound());
     }
 
@@ -185,21 +198,22 @@ public class ProcessoControllerTest {
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
         var req = new AtualizarProcessoReq(1L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
-        doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L),
-                any(AtualizarProcessoReq.class));
+        doThrow(new IllegalStateException())
+                .when(processoService)
+                .atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS + "/1/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict());
     }
 
     @Test
     @WithMockUser
     void excluir_ProcessoExiste_RetornaNoContent() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS + "/1/excluir")
-                .with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(processoService).apagar(1L);
@@ -208,10 +222,11 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
+        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
+                .when(processoService)
+                .apagar(999L);
 
-        mockMvc.perform(post(API_PROCESSOS + "/999/excluir")
-                .with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS + "/999/excluir").with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
@@ -220,21 +235,21 @@ public class ProcessoControllerTest {
     void excluir_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
         doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
 
-        mockMvc.perform(post(API_PROCESSOS + "/1/excluir")
-                .with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir").with(csrf()))
                 .andExpect(status().isConflict());
     }
 
     @Test
     @WithMockUser
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = ProcessoDetalheDto.builder()
-                .codigo(1L)
-                .descricao("Processo Detalhado")
-                .tipo(TipoProcesso.MAPEAMENTO.name())
-                .situacao(SituacaoProcesso.CRIADO)
-                .dataCriacao(LocalDateTime.now())
-                .build();
+        var dto =
+                ProcessoDetalheDto.builder()
+                        .codigo(1L)
+                        .descricao("Processo Detalhado")
+                        .tipo(TipoProcesso.MAPEAMENTO.name())
+                        .situacao(SituacaoProcesso.CRIADO)
+                        .dataCriacao(LocalDateTime.now())
+                        .build();
 
         when(processoService.obterDetalhes(eq(1L))).thenReturn(dto);
 
@@ -249,11 +264,11 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService)
+        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
+                .when(processoService)
                 .obterDetalhes(eq(999L));
 
-        mockMvc.perform(get("/api/processos/999/detalhes"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/processos/999/detalhes")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -261,8 +276,7 @@ public class ProcessoControllerTest {
     void obterDetalhes_AcessoNegado_RetornaForbidden() throws Exception {
         doThrow(new ErroAccessoNegado("Acesso negado")).when(processoService).obterDetalhes(eq(1L));
 
-        mockMvc.perform(get("/api/processos/1/detalhes"))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
     }
 
     @Test
@@ -274,10 +288,11 @@ public class ProcessoControllerTest {
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
         when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
 
-        mockMvc.perform(post("/api/processos/1/iniciar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/processos/1/iniciar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L))
                 .andExpect(jsonPath("$.descricao").value("Processo Teste"));
@@ -294,10 +309,11 @@ public class ProcessoControllerTest {
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(processo));
         when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(List.of());
 
-        mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post(API_PROCESSOS_1 + "/iniciar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L))
                 .andExpect(jsonPath("$.descricao").value("Processo Teste"));
@@ -310,10 +326,11 @@ public class ProcessoControllerTest {
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
         var req = new IniciarProcessoReq(null, List.of(1L));
 
-        mockMvc.perform(post("/api/processos/999/iniciar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/processos/999/iniciar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -322,9 +339,7 @@ public class ProcessoControllerTest {
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
         doNothing().when(processoService).finalizar(1L);
 
-        mockMvc.perform(post("/api/processos/1/finalizar")
-                .with(csrf()))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/processos/1/finalizar").with(csrf())).andExpect(status().isOk());
 
         verify(processoService).finalizar(1L);
     }
@@ -332,32 +347,38 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).finalizar(999L);
+        doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
+                .when(processoService)
+                .finalizar(999L);
 
-        mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar")
-                .with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar").with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser
     void finalizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        doThrow(new IllegalStateException("Processo em estado inválido")).when(processoService).finalizar(1L);
+        doThrow(new IllegalStateException("Processo em estado inválido"))
+                .when(processoService)
+                .finalizar(1L);
 
-        mockMvc.perform(post("/api/processos/1/finalizar")
-                .with(csrf()))
+        mockMvc.perform(post("/api/processos/1/finalizar").with(csrf()))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(
-                        "A operação não pode ser executada no estado atual do recurso."));
+                .andExpect(
+                        jsonPath("$.message")
+                                .value(
+                                        "A operação não pode ser executada no estado atual do"
+                                                + " recurso."));
     }
 
     @Test
     @WithMockUser
     void finalizar_ValidacaoFalhou_RetornaConflict() throws Exception {
-        doThrow(new ErroProcesso("Subprocessos não homologados")).when(processoService).finalizar(1L);
+        doThrow(new ErroProcesso("Subprocessos não homologados"))
+                .when(processoService)
+                .finalizar(1L);
 
-        mockMvc.perform(post("/api/processos/1/finalizar")
-                .with(csrf()))
+        mockMvc.perform(post("/api/processos/1/finalizar").with(csrf()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
     }
@@ -365,7 +386,8 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void listarFinalizados_RetornaLista() throws Exception {
-        when(processoService.listarFinalizados()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+        when(processoService.listarFinalizados())
+                .thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
 
         mockMvc.perform(get("/api/processos/finalizados"))
                 .andExpect(status().isOk())
@@ -376,7 +398,8 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void listarAtivos_RetornaLista() throws Exception {
-        when(processoService.listarAtivos()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+        when(processoService.listarAtivos())
+                .thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
 
         mockMvc.perform(get("/api/processos/ativos"))
                 .andExpect(status().isOk())
@@ -387,7 +410,8 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void obterStatusUnidades_RetornaMap() throws Exception {
-        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
+                .thenReturn(List.of(100L));
 
         mockMvc.perform(get("/api/processos/status-unidades").param("tipo", "MAPEAMENTO"))
                 .andExpect(status().isOk())
@@ -398,7 +422,8 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void listarUnidadesBloqueadas_RetornaLista() throws Exception {
-        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(100L));
+        when(processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO"))
+                .thenReturn(List.of(100L));
 
         mockMvc.perform(get("/api/processos/unidades-bloqueadas").param("tipo", "MAPEAMENTO"))
                 .andExpect(status().isOk())
@@ -409,8 +434,12 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void listarSubprocessosElegiveis_RetornaLista() throws Exception {
-        when(processoService.listarSubprocessosElegiveis(1L)).thenReturn(
-                List.of(sgc.processo.dto.SubprocessoElegivelDto.builder().codSubprocesso(10L).build()));
+        when(processoService.listarSubprocessosElegiveis(1L))
+                .thenReturn(
+                        List.of(
+                                sgc.processo.dto.SubprocessoElegivelDto.builder()
+                                        .codSubprocesso(10L)
+                                        .build()));
 
         mockMvc.perform(get("/api/processos/1/subprocessos-elegiveis"))
                 .andExpect(status().isOk())
@@ -422,7 +451,8 @@ public class ProcessoControllerTest {
     @WithMockUser
     void listarSubprocessos_RetornaLista() throws Exception {
         when(processoService.listarTodosSubprocessos(1L))
-                .thenReturn(List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
+                .thenReturn(
+                        List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
 
         mockMvc.perform(get("/api/processos/1/subprocessos"))
                 .andExpect(status().isOk())

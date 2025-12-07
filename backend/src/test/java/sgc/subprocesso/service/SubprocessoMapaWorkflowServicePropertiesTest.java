@@ -1,5 +1,13 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.jqwik.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,15 +27,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class SubprocessoMapaWorkflowServicePropertiesTest {
 
@@ -38,8 +37,7 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
             AtividadeRepo atividadeRepo,
             MapaService mapaService,
             CompetenciaService competenciaService,
-            ApplicationEventPublisher publisher) {
-    }
+            ApplicationEventPublisher publisher) {}
 
     private ServiceAndMocks createService() {
         SubprocessoRepo subprocessoRepo = mock(SubprocessoRepo.class);
@@ -49,13 +47,14 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         CompetenciaService competenciaService = mock(CompetenciaService.class);
         ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
 
-        SubprocessoMapaWorkflowService service = new SubprocessoMapaWorkflowService(
-                subprocessoRepo,
-                competenciaRepo,
-                atividadeRepo,
-                mapaService,
-                competenciaService,
-                publisher);
+        SubprocessoMapaWorkflowService service =
+                new SubprocessoMapaWorkflowService(
+                        subprocessoRepo,
+                        competenciaRepo,
+                        atividadeRepo,
+                        mapaService,
+                        competenciaService,
+                        publisher);
         return new ServiceAndMocks(
                 service,
                 subprocessoRepo,
@@ -66,10 +65,12 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                 publisher);
     }
 
-    record MapaCenario(Subprocesso subprocesso, List<Atividade> atividades, List<Competencia> competencias) {
+    record MapaCenario(
+            Subprocesso subprocesso, List<Atividade> atividades, List<Competencia> competencias) {
         @Override
         public String toString() {
-            return String.format("Atividades: %d, Competencias: %d", atividades.size(), competencias.size());
+            return String.format(
+                    "Atividades: %d, Competencias: %d", atividades.size(), competencias.size());
         }
     }
 
@@ -84,18 +85,23 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.atividadeRepo.findBySubprocessoCodigo(cenario.subprocesso.getCodigo()))
                 .thenReturn(cenario.atividades);
 
-        assertThatCode(() -> mocks.service.disponibilizarMapa(
-                cenario.subprocesso.getCodigo(),
-                new DisponibilizarMapaRequest() {
-                    {
-                        setDataLimite(java.time.LocalDate.now().plusDays(1));
-                    }
-                },
-                new Usuario())).doesNotThrowAnyException();
+        assertThatCode(
+                        () ->
+                                mocks.service.disponibilizarMapa(
+                                        cenario.subprocesso.getCodigo(),
+                                        new DisponibilizarMapaRequest() {
+                                            {
+                                                setDataLimite(
+                                                        java.time.LocalDate.now().plusDays(1));
+                                            }
+                                        },
+                                        new Usuario()))
+                .doesNotThrowAnyException();
     }
 
     @Property
-    void deveRejeitarMapaComAtividadeFaltando(@ForAll("cenarioComAtividadeFaltando") MapaCenario cenario) {
+    void deveRejeitarMapaComAtividadeFaltando(
+            @ForAll("cenarioComAtividadeFaltando") MapaCenario cenario) {
         var mocks = createService();
 
         when(mocks.subprocessoRepo.findById(cenario.subprocesso.getCodigo()))
@@ -105,20 +111,24 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.atividadeRepo.findBySubprocessoCodigo(cenario.subprocesso.getCodigo()))
                 .thenReturn(cenario.atividades);
 
-        assertThatThrownBy(() -> mocks.service.disponibilizarMapa(
-                cenario.subprocesso.getCodigo(),
-                new DisponibilizarMapaRequest() {
-                    {
-                        setDataLimite(java.time.LocalDate.now().plusDays(1));
-                    }
-                },
-                new Usuario()))
+        assertThatThrownBy(
+                        () ->
+                                mocks.service.disponibilizarMapa(
+                                        cenario.subprocesso.getCodigo(),
+                                        new DisponibilizarMapaRequest() {
+                                            {
+                                                setDataLimite(
+                                                        java.time.LocalDate.now().plusDays(1));
+                                            }
+                                        },
+                                        new Usuario()))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Todas as atividades devem estar associadas");
     }
 
     @Property
-    void deveRejeitarMapaComCompetenciaVazia(@ForAll("cenarioComCompetenciaVazia") MapaCenario cenario) {
+    void deveRejeitarMapaComCompetenciaVazia(
+            @ForAll("cenarioComCompetenciaVazia") MapaCenario cenario) {
         var mocks = createService();
 
         when(mocks.subprocessoRepo.findById(cenario.subprocesso.getCodigo()))
@@ -126,10 +136,12 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         when(mocks.competenciaRepo.findByMapaCodigo(cenario.subprocesso.getMapa().getCodigo()))
                 .thenReturn(cenario.competencias);
 
-        assertThatThrownBy(() -> mocks.service.disponibilizarMapa(
-                cenario.subprocesso.getCodigo(),
-                new DisponibilizarMapaRequest(),
-                new Usuario()))
+        assertThatThrownBy(
+                        () ->
+                                mocks.service.disponibilizarMapa(
+                                        cenario.subprocesso.getCodigo(),
+                                        new DisponibilizarMapaRequest(),
+                                        new Usuario()))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Todas as competências devem estar associadas");
     }
@@ -138,46 +150,74 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
 
     @Provide
     Arbitrary<MapaCenario> cenarioValido() {
-        return atividadesArb().flatMap(atividades -> competenciasValidasArb(atividades).map(competencias -> {
-            Subprocesso sp = criarSubprocesso();
-            return new MapaCenario(sp, atividades, competencias);
-        }));
+        return atividadesArb()
+                .flatMap(
+                        atividades ->
+                                competenciasValidasArb(atividades)
+                                        .map(
+                                                competencias -> {
+                                                    Subprocesso sp = criarSubprocesso();
+                                                    return new MapaCenario(
+                                                            sp, atividades, competencias);
+                                                }));
     }
 
     @Provide
     Arbitrary<MapaCenario> cenarioComAtividadeFaltando() {
-        return atividadesArb().filter(l -> l.size() >= 2).flatMap(atividades -> {
-            // Usa sublista para gerar competências que cobrem apenas uma parte
-            List<Atividade> subLista = atividades.subList(0, atividades.size() - 1);
-            return competenciasValidasArb(subLista).map(competencias -> {
-                Subprocesso sp = criarSubprocesso();
-                return new MapaCenario(sp, atividades, competencias);
-            });
-        });
+        return atividadesArb()
+                .filter(l -> l.size() >= 2)
+                .flatMap(
+                        atividades -> {
+                            // Usa sublista para gerar competências que cobrem apenas uma parte
+                            List<Atividade> subLista = atividades.subList(0, atividades.size() - 1);
+                            return competenciasValidasArb(subLista)
+                                    .map(
+                                            competencias -> {
+                                                Subprocesso sp = criarSubprocesso();
+                                                return new MapaCenario(
+                                                        sp, atividades, competencias);
+                                            });
+                        });
     }
 
     @Provide
     Arbitrary<MapaCenario> cenarioComCompetenciaVazia() {
-        return atividadesArb().flatMap(atividades -> competenciasValidasArb(atividades).map(competencias -> {
-            Subprocesso sp = criarSubprocesso();
-            // Adiciona uma competência vazia
-            Competencia vazia = new Competencia();
-            vazia.setCodigo(999L);
-            vazia.setDescricao("Vazia");
-            vazia.setAtividades(new HashSet<>());
-            competencias.add(vazia);
-            return new MapaCenario(sp, atividades, competencias);
-        }));
+        return atividadesArb()
+                .flatMap(
+                        atividades ->
+                                competenciasValidasArb(atividades)
+                                        .map(
+                                                competencias -> {
+                                                    Subprocesso sp = criarSubprocesso();
+                                                    // Adiciona uma competência vazia
+                                                    Competencia vazia = new Competencia();
+                                                    vazia.setCodigo(999L);
+                                                    vazia.setDescricao("Vazia");
+                                                    vazia.setAtividades(new HashSet<>());
+                                                    competencias.add(vazia);
+                                                    return new MapaCenario(
+                                                            sp, atividades, competencias);
+                                                }));
     }
 
     private Arbitrary<List<Atividade>> atividadesArb() {
-        return Arbitraries.longs().between(1, 1000).list().ofMinSize(1).ofMaxSize(10).uniqueElements()
-                .map(ids -> ids.stream().map(id -> {
-                    Atividade a = new Atividade();
-                    a.setCodigo(id);
-                    a.setDescricao("Atividade " + id);
-                    return a;
-                }).collect(Collectors.toList()));
+        return Arbitraries.longs()
+                .between(1, 1000)
+                .list()
+                .ofMinSize(1)
+                .ofMaxSize(10)
+                .uniqueElements()
+                .map(
+                        ids ->
+                                ids.stream()
+                                        .map(
+                                                id -> {
+                                                    Atividade a = new Atividade();
+                                                    a.setCodigo(id);
+                                                    a.setDescricao("Atividade " + id);
+                                                    return a;
+                                                })
+                                        .collect(Collectors.toList()));
     }
 
     private Arbitrary<List<Competencia>> competenciasValidasArb(List<Atividade> atividades) {
@@ -187,45 +227,68 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
             return Arbitraries.just(Collections.emptyList());
         }
 
-        return Arbitraries.integers().between(1, 5).flatMap(numCompetencias -> {
-            // Gera atribuições de atividades para competências
-            // Lista de Sets, onde cada Set contem os índices das competencias para aquela
-            // atividade
-            return Arbitraries.integers().between(0, numCompetencias - 1).set().ofMinSize(1)
-                    .list().ofSize(atividades.size())
-                    .filter(assignments -> {
-                        // Garante que toda competência receba pelo menos uma atividade (para não ser
-                        // vazia)
-                        Set<Integer> indicesUsados = assignments.stream()
-                                .flatMap(Set::stream)
-                                .collect(Collectors.toSet());
-                        return indicesUsados.size() == numCompetencias;
-                    })
-                    .map(assignments -> {
-                        List<Competencia> comps = IntStream.range(0, numCompetencias).mapToObj(i -> {
-                            Competencia c = new Competencia();
-                            c.setCodigo((long) i);
-                            c.setDescricao("Competencia " + i);
-                            c.setAtividades(new HashSet<>());
-                            return c;
-                        }).collect(Collectors.toList());
+        return Arbitraries.integers()
+                .between(1, 5)
+                .flatMap(
+                        numCompetencias -> {
+                            // Gera atribuições de atividades para competências
+                            // Lista de Sets, onde cada Set contem os índices das competencias para
+                            // aquela
+                            // atividade
+                            return Arbitraries.integers()
+                                    .between(0, numCompetencias - 1)
+                                    .set()
+                                    .ofMinSize(1)
+                                    .list()
+                                    .ofSize(atividades.size())
+                                    .filter(
+                                            assignments -> {
+                                                // Garante que toda competência receba pelo menos
+                                                // uma atividade (para não ser
+                                                // vazia)
+                                                Set<Integer> indicesUsados =
+                                                        assignments.stream()
+                                                                .flatMap(Set::stream)
+                                                                .collect(Collectors.toSet());
+                                                return indicesUsados.size() == numCompetencias;
+                                            })
+                                    .map(
+                                            assignments -> {
+                                                List<Competencia> comps =
+                                                        IntStream.range(0, numCompetencias)
+                                                                .mapToObj(
+                                                                        i -> {
+                                                                            Competencia c =
+                                                                                    new Competencia();
+                                                                            c.setCodigo((long) i);
+                                                                            c.setDescricao(
+                                                                                    "Competencia "
+                                                                                            + i);
+                                                                            c.setAtividades(
+                                                                                    new HashSet<>());
+                                                                            return c;
+                                                                        })
+                                                                .collect(Collectors.toList());
 
-                        for (int i = 0; i < atividades.size(); i++) {
-                            Atividade a = atividades.get(i);
-                            for (Integer compIndex : assignments.get(i)) {
-                                comps.get(compIndex).getAtividades().add(a);
-                            }
-                        }
-                        return comps;
-                    });
-        });
+                                                for (int i = 0; i < atividades.size(); i++) {
+                                                    Atividade a = atividades.get(i);
+                                                    for (Integer compIndex : assignments.get(i)) {
+                                                        comps.get(compIndex).getAtividades().add(a);
+                                                    }
+                                                }
+                                                return comps;
+                                            });
+                        });
     }
 
     private Subprocesso criarSubprocesso() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO); // ou CADASTRO_HOMOLOGADO, ambos válidos para edição, mas para
-                                                         // disponibilizar deve estar válido?
+        sp.setSituacao(
+                SituacaoSubprocesso
+                        .MAPEAMENTO_MAPA_CRIADO); // ou CADASTRO_HOMOLOGADO, ambos válidos para
+        // edição, mas para
+        // disponibilizar deve estar válido?
         // O método getSubprocessoParaEdicao checa se é CADASTRO_HOMOLOGADO ou
         // MAPA_CRIADO.
         sp.setMapa(new Mapa());

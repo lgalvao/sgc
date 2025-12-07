@@ -9,5 +9,4 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class EventoSubprocessoMapaHomologado extends EventoSubprocessoBase {
-}
+public class EventoSubprocessoMapaHomologado extends EventoSubprocessoBase {}

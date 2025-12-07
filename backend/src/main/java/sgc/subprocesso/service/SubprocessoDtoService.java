@@ -1,5 +1,9 @@
 package sgc.subprocesso.service;
 
+import static java.util.Collections.emptyList;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,11 +32,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.Collections.emptyList;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,8 +56,14 @@ public class SubprocessoDtoService {
             throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
 
-        Subprocesso sp = repositorioSubprocesso.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codigo)));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codigo)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado: %d"
+                                                        .formatted(codigo)));
         log.debug("Subprocesso encontrado: {}", sp.getCodigo());
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,8 +71,11 @@ public class SubprocessoDtoService {
         log.debug("Usuário autenticado: {}", username);
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
         log.debug("Usuário encontrado: {}", usuario);
-        log.debug("Atribuições do usuário (de SGRH): {}", usuario.getTodasAtribuicoes().stream()
-                .map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla()).toList());
+        log.debug(
+                "Atribuições do usuário (de SGRH): {}",
+                usuario.getTodasAtribuicoes().stream()
+                        .map(a -> a.getPerfil() + "-" + a.getUnidade().getSigla())
+                        .toList());
         log.debug("Perfil solicitado (de request): {}", perfil);
 
         verificarPermissaoVisualizacao(sp, perfil, usuario);
@@ -75,18 +83,20 @@ public class SubprocessoDtoService {
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
         log.debug("Responsável encontrado: {}", responsavel);
 
-        List<Movimentacao> movimentacoes = repositorioMovimentacao
-                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movimentacoes =
+                repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
-        SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+        SubprocessoPermissoesDto permissoes =
+                subprocessoPermissoesService.calcularPermissoes(sp, usuario);
         log.debug("Permissões calculadas: {}", permissoes);
 
-        return SubprocessoDetalheDto.of(sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
+        return SubprocessoDetalheDto.of(
+                sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
-        boolean hasPerfil = usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> a.getPerfil() == perfil);
+        boolean hasPerfil =
+                usuario.getTodasAtribuicoes().stream().anyMatch(a -> a.getPerfil() == perfil);
 
         if (!hasPerfil) {
             log.warn("Usuário não possui o perfil solicitado.");
@@ -103,17 +113,23 @@ public class SubprocessoDtoService {
             throw new ErroAccessoNegado("Unidade não identificada.");
         }
 
-        boolean hasPermission = usuario.getTodasAtribuicoes().stream()
-                .filter(a -> a.getPerfil() == perfil)
-                .anyMatch(a -> {
-                    Unidade unidadeUsuario = a.getUnidade();
-                    if (perfil == Perfil.GESTOR) {
-                        return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
-                    } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
-                        return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
-                    }
-                    return false;
-                });
+        boolean hasPermission =
+                usuario.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == perfil)
+                        .anyMatch(
+                                a -> {
+                                    Unidade unidadeUsuario = a.getUnidade();
+                                    if (perfil == Perfil.GESTOR) {
+                                        return isMesmaUnidadeOuSubordinada(
+                                                unidadeAlvo, unidadeUsuario);
+                                    } else if (perfil == Perfil.CHEFE
+                                            || perfil == Perfil.SERVIDOR) {
+                                        return unidadeAlvo
+                                                .getCodigo()
+                                                .equals(unidadeUsuario.getCodigo());
+                                    }
+                                    return false;
+                                });
 
         if (!hasPermission) {
             log.warn("Acesso negado para perfil {} na unidade {}", perfil, unidadeAlvo.getSigla());
@@ -134,26 +150,32 @@ public class SubprocessoDtoService {
 
     @Transactional(readOnly = true)
     public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
-        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos =
+                new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
             List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
-            if (atividades == null)
-                atividades = emptyList();
+            if (atividades == null) atividades = emptyList();
 
             for (Atividade a : atividades) {
-                List<Conhecimento> ks = repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
-                List<ConhecimentoDto> ksDto = ks == null
-                        ? emptyList()
-                        : ks.stream().map(conhecimentoMapper::toDto).toList();
+                List<Conhecimento> ks =
+                        repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
+                List<ConhecimentoDto> ksDto =
+                        ks == null
+                                ? emptyList()
+                                : ks.stream().map(conhecimentoMapper::toDto).toList();
 
-                atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
-                        .codigo(a.getCodigo())
-                        .descricao(a.getDescricao())
-                        .conhecimentos(ksDto)
-                        .build());
+                atividadesComConhecimentos.add(
+                        SubprocessoCadastroDto.AtividadeCadastroDto.builder()
+                                .codigo(a.getCodigo())
+                                .descricao(a.getDescricao())
+                                .conhecimentos(ksDto)
+                                .build());
             }
         }
 
@@ -166,17 +188,27 @@ public class SubprocessoDtoService {
 
     @Transactional(readOnly = true)
     public SugestoesDto obterSugestoes(Long codSubprocesso) {
-        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado: %d"
+                                                        .formatted(codSubprocesso)));
 
         return SugestoesDto.of(sp);
     }
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
-        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codSubprocesso));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado", codSubprocesso));
 
         if (sp.getMapa() == null) {
             throw new IllegalStateException("Subprocesso sem mapa associado.");
@@ -184,9 +216,10 @@ public class SubprocessoDtoService {
 
         Long codMapa = sp.getMapa().getCodigo();
 
-        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream()
-                .findFirst()
-                .orElse(null);
+        Analise analise =
+                analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream()
+                        .findFirst()
+                        .orElse(null);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
@@ -197,18 +230,19 @@ public class SubprocessoDtoService {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return repositorioSubprocesso.findAll()
-                .stream()
-                .map(subprocessoMapper::toDTO)
-                .toList();
+        return repositorioSubprocesso.findAll().stream().map(subprocessoMapper::toDTO).toList();
     }
 
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        Subprocesso sp = repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(
-                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d"
-                                .formatted(codProcesso, codUnidade)));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado para o processo %d e unidade %d"
+                                                        .formatted(codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
 }

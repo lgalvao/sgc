@@ -21,18 +21,20 @@ public class SubprocessoConsultaService {
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     public Subprocesso getSubprocesso(Long codigo) {
-        return subprocessoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+        return subprocessoRepo
+                .findById(codigo)
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     /**
-     * Busca e retorna um subprocesso pelo seu código, garantindo que ele possua um
-     * mapa de competências associado.
+     * Busca e retorna um subprocesso pelo seu código, garantindo que ele possua um mapa de
+     * competências associado.
      *
      * @param codigo O código do subprocesso.
      * @return A entidade {@link Subprocesso} correspondente.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado ou
-     *                                  se não possuir um mapa associado.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado ou se não possuir um
+     *     mapa associado.
      */
     public Subprocesso getSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = getSubprocesso(codigo);

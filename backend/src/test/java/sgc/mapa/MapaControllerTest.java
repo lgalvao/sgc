@@ -1,5 +1,14 @@
 package sgc.mapa;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +25,6 @@ import sgc.mapa.dto.MapaMapper;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaService;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MapaController.class)
 @Import(RestExceptionHandler.class)
@@ -83,8 +82,7 @@ class MapaControllerTest {
     void obterPorId_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         when(mapaService.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada(""));
 
-        mockMvc.perform(get(API_MAPAS_1))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get(API_MAPAS_1)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -98,10 +96,11 @@ class MapaControllerTest {
         when(mapaService.criar(any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
-        mockMvc.perform(post(API_MAPAS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mapaDto)))
+        mockMvc.perform(
+                        post(API_MAPAS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", API_MAPAS_1));
     }
@@ -117,10 +116,11 @@ class MapaControllerTest {
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
-        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mapaDto)))
+        mockMvc.perform(
+                        post(API_MAPAS_1_ATUALIZAR)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
     }
@@ -130,13 +130,15 @@ class MapaControllerTest {
     void atualizar_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenThrow(new ErroEntidadeNaoEncontrada(""));
+        when(mapaService.atualizar(eq(1L), any(Mapa.class)))
+                .thenThrow(new ErroEntidadeNaoEncontrada(""));
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(new Mapa());
 
-        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mapaDto)))
+        mockMvc.perform(
+                        post(API_MAPAS_1_ATUALIZAR)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isNotFound());
     }
 
@@ -145,9 +147,7 @@ class MapaControllerTest {
     void excluir_QuandoMapaExiste_DeveRetornarNoContent() throws Exception {
         doNothing().when(mapaService).excluir(1L);
 
-        mockMvc.perform(post(API_MAPAS_1_EXCLUIR)
-                .with(csrf()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNoContent());
 
         verify(mapaService).excluir(1L);
     }
@@ -157,8 +157,6 @@ class MapaControllerTest {
     void excluir_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         doThrow(new ErroEntidadeNaoEncontrada("")).when(mapaService).excluir(1L);
 
-        mockMvc.perform(post(API_MAPAS_1_EXCLUIR)
-                .with(csrf()))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNotFound());
     }
 }

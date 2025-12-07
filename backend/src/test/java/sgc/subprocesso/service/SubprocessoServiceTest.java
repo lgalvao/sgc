@@ -1,5 +1,15 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,17 +28,6 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
@@ -54,7 +53,8 @@ class SubprocessoServiceTest {
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(atividadeRepo.findByMapaCodigo(10L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(100L)).thenReturn(List.of(new Conhecimento()));
+        when(repositorioConhecimento.findByAtividadeCodigo(100L))
+                .thenReturn(List.of(new Conhecimento()));
 
         var res = service.obterAtividadesSemConhecimento(id);
 
@@ -74,7 +74,8 @@ class SubprocessoServiceTest {
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(atividadeRepo.findByMapaCodigo(10L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(100L)).thenReturn(Collections.emptyList());
+        when(repositorioConhecimento.findByAtividadeCodigo(100L))
+                .thenReturn(Collections.emptyList());
 
         var res = service.obterAtividadesSemConhecimento(id);
 
@@ -106,7 +107,7 @@ class SubprocessoServiceTest {
         when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of(comp));
 
         assertThatThrownBy(() -> service.validarAssociacoesMapa(id))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -122,7 +123,7 @@ class SubprocessoServiceTest {
         when(atividadeRepo.findByMapaCodigo(id)).thenReturn(List.of(ativ));
 
         assertThatThrownBy(() -> service.validarAssociacoesMapa(id))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -142,11 +143,8 @@ class SubprocessoServiceTest {
     @DisplayName("atualizar modifica e salva")
     void atualizar() {
         Long id = 1L;
-        SubprocessoDto dto = SubprocessoDto.builder()
-            .codProcesso(10L)
-            .codUnidade(20L)
-            .codMapa(30L)
-            .build();
+        SubprocessoDto dto =
+                SubprocessoDto.builder().codProcesso(10L).codUnidade(20L).codMapa(30L).build();
 
         Subprocesso sp = new Subprocesso();
 

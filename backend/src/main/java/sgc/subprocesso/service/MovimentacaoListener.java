@@ -39,7 +39,10 @@ public class MovimentacaoListener {
     @Transactional(propagation = Propagation.MANDATORY)
     public void handle(EventoSubprocessoCadastroDevolvido evento) {
         Subprocesso sp = buscarSubprocesso(evento.getCodSubprocesso());
-        salvarMovimentacao(sp, evento, "Devolução do cadastro de atividades para ajustes: " + evento.getMotivo());
+        salvarMovimentacao(
+                sp,
+                evento,
+                "Devolução do cadastro de atividades para ajustes: " + evento.getMotivo());
 
         Unidade destino = resolveDestino(evento);
         if (destino != null) {
@@ -84,10 +87,12 @@ public class MovimentacaoListener {
     @Transactional(propagation = Propagation.MANDATORY)
     public void handle(EventoSubprocessoRevisaoDevolvida evento) {
         Subprocesso sp = buscarSubprocesso(evento.getCodSubprocesso());
-        salvarMovimentacao(sp, evento, "Devolução do cadastro de atividades e conhecimentos para ajustes");
+        salvarMovimentacao(
+                sp, evento, "Devolução do cadastro de atividades e conhecimentos para ajustes");
 
         if (evento.getUnidadeOrigem() != null && evento.getUnidadeDestino() != null) {
-            notificacaoService.notificarDevolucaoRevisaoCadastro(sp, evento.getUnidadeOrigem(), evento.getUnidadeDestino());
+            notificacaoService.notificarDevolucaoRevisaoCadastro(
+                    sp, evento.getUnidadeOrigem(), evento.getUnidadeDestino());
         }
     }
 
@@ -148,7 +153,8 @@ public class MovimentacaoListener {
     @Transactional(propagation = Propagation.MANDATORY)
     public void handle(EventoSubprocessoMapaDevolvido evento) {
         Subprocesso sp = buscarSubprocesso(evento.getCodSubprocesso());
-        salvarMovimentacao(sp, evento, "Devolução da validação do mapa de competências para ajustes");
+        salvarMovimentacao(
+                sp, evento, "Devolução da validação do mapa de competências para ajustes");
 
         Unidade destino = resolveDestino(evento);
         if (destino != null) {
@@ -173,15 +179,21 @@ public class MovimentacaoListener {
     }
 
     private Subprocesso buscarSubprocesso(Long id) {
-        return subprocessoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + id));
+        return subprocessoRepo
+                .findById(id)
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + id));
     }
 
-    private void salvarMovimentacao(Subprocesso sp, EventoSubprocessoBase evento, String descricao) {
-        Unidade origem = evento.getUnidadeOrigem() != null ? evento.getUnidadeOrigem() : sp.getUnidade();
-        Unidade destino = evento.getUnidadeDestino() != null ? evento.getUnidadeDestino() : sp.getUnidade();
+    private void salvarMovimentacao(
+            Subprocesso sp, EventoSubprocessoBase evento, String descricao) {
+        Unidade origem =
+                evento.getUnidadeOrigem() != null ? evento.getUnidadeOrigem() : sp.getUnidade();
+        Unidade destino =
+                evento.getUnidadeDestino() != null ? evento.getUnidadeDestino() : sp.getUnidade();
 
-        movimentacaoRepo.save(new Movimentacao(sp, origem, destino, descricao, evento.getUsuario()));
+        movimentacaoRepo.save(
+                new Movimentacao(sp, origem, destino, descricao, evento.getUsuario()));
     }
 
     private Unidade resolveDestino(EventoSubprocessoBase evento) {

@@ -1,6 +1,16 @@
 package sgc.processo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import jakarta.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.jqwik.api.*;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.model.MapaRepo;
@@ -20,17 +30,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class ProcessoServicePropertyTest {
 
     // Mocks
@@ -44,41 +43,57 @@ class ProcessoServicePropertyTest {
     private MapaRepo mapaRepo = mock(MapaRepo.class);
     private SubprocessoMovimentacaoRepo movimentacaoRepo = mock(SubprocessoMovimentacaoRepo.class);
     private CopiaMapaService copiaMapaService = mock(CopiaMapaService.class);
-    private ProcessoNotificacaoService processoNotificacaoService = mock(ProcessoNotificacaoService.class);
+    private ProcessoNotificacaoService processoNotificacaoService =
+            mock(ProcessoNotificacaoService.class);
     private SgrhService sgrhService = mock(SgrhService.class);
 
-    private ProcessoService service = new ProcessoService(
-            processoRepo, unidadeRepo, subprocessoRepo, publicadorEventos,
-            processoMapper, processoDetalheMapper, subprocessoMapper,
-            mapaRepo, movimentacaoRepo, copiaMapaService, processoNotificacaoService, sgrhService
-    );
+    private ProcessoService service =
+            new ProcessoService(
+                    processoRepo,
+                    unidadeRepo,
+                    subprocessoRepo,
+                    publicadorEventos,
+                    processoMapper,
+                    processoDetalheMapper,
+                    subprocessoMapper,
+                    mapaRepo,
+                    movimentacaoRepo,
+                    copiaMapaService,
+                    processoNotificacaoService,
+                    sgrhService);
 
     @Property
-    void criarDeveLancarErroSeDescricaoForVazia(@ForAll("descricaoInvalida") String descricaoInvalida, @ForAll TipoProcesso tipo) {
+    void criarDeveLancarErroSeDescricaoForVazia(
+            @ForAll("descricaoInvalida") String descricaoInvalida, @ForAll TipoProcesso tipo) {
         CriarProcessoReq req = new CriarProcessoReq();
         req.setDescricao(descricaoInvalida);
         req.setTipo(tipo);
         req.setUnidades(List.of(1L));
 
         Throwable thrown = catchThrowable(() -> service.criar(req));
-        assertThat(thrown).isInstanceOf(ConstraintViolationException.class)
+        assertThat(thrown)
+                .isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("A descrição do processo é obrigatória");
     }
 
     @Property
-    void criarDeveLancarErroSeUnidadesVazias(@ForAll("descricaoValida") String descricao, @ForAll TipoProcesso tipo) {
+    void criarDeveLancarErroSeUnidadesVazias(
+            @ForAll("descricaoValida") String descricao, @ForAll TipoProcesso tipo) {
         CriarProcessoReq req = new CriarProcessoReq();
         req.setDescricao(descricao);
         req.setTipo(tipo);
         req.setUnidades(new ArrayList<>()); // Empty list
 
         Throwable thrown = catchThrowable(() -> service.criar(req));
-        assertThat(thrown).isInstanceOf(ConstraintViolationException.class)
+        assertThat(thrown)
+                .isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("Pelo menos uma unidade participante deve ser selecionada");
     }
 
     @Property
-    void criarMapeamentoDeveSucesso(@ForAll("descricaoValida") String descricao, @ForAll("listaUnidades") List<Long> unidadesIds) {
+    void criarMapeamentoDeveSucesso(
+            @ForAll("descricaoValida") String descricao,
+            @ForAll("listaUnidades") List<Long> unidadesIds) {
         // Setup
         CriarProcessoReq req = new CriarProcessoReq();
         req.setDescricao(descricao);
@@ -86,20 +101,20 @@ class ProcessoServicePropertyTest {
         req.setUnidades(unidadesIds);
 
         // Mock UnidadeRepo
-        List<Unidade> unidades = new ArrayList<>();
         for (Long id : unidadesIds) {
             Unidade u = new Unidade();
             u.setCodigo(id);
-            unidades.add(u);
             when(unidadeRepo.findById(id)).thenReturn(Optional.of(u));
         }
 
         // Mock ProcessoRepo save
-        when(processoRepo.saveAndFlush(any(Processo.class))).thenAnswer(i -> {
-            Processo p = i.getArgument(0);
-            p.setCodigo(100L); // simulate DB id
-            return p;
-        });
+        when(processoRepo.saveAndFlush(any(Processo.class)))
+                .thenAnswer(
+                        i -> {
+                            Processo p = i.getArgument(0);
+                            p.setCodigo(100L); // simulate DB id
+                            return p;
+                        });
 
         when(processoMapper.toDto(any(Processo.class))).thenReturn(ProcessoDto.builder().build());
 
@@ -108,7 +123,9 @@ class ProcessoServicePropertyTest {
     }
 
     @Property
-    void criarRevisaoDeveFalharSeUnidadeSemMapa(@ForAll("descricaoValida") String descricao, @ForAll("listaUnidades") List<Long> unidadesIds) {
+    void criarRevisaoDeveFalharSeUnidadeSemMapa(
+            @ForAll("descricaoValida") String descricao,
+            @ForAll("listaUnidades") List<Long> unidadesIds) {
         CriarProcessoReq req = new CriarProcessoReq();
         req.setDescricao(descricao);
         req.setTipo(TipoProcesso.REVISAO);
@@ -126,11 +143,13 @@ class ProcessoServicePropertyTest {
         }
         // Needed for the bulk check inside service
         when(unidadeRepo.findAllById(anyList())).thenReturn(unidades);
-        when(unidadeRepo.findSiglasByCodigos(anyList())).thenReturn(unidadesIds.stream().map(id -> "U"+id).toList());
+        when(unidadeRepo.findSiglasByCodigos(anyList()))
+                .thenReturn(unidadesIds.stream().map(id -> "U" + id).toList());
 
         Throwable thrown = catchThrowable(() -> service.criar(req));
-        assertThat(thrown).isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("não possuem mapa vigente");
+        assertThat(thrown)
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("não possuem mapa vigente");
     }
 
     @Provide

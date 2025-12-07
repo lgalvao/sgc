@@ -1,5 +1,12 @@
 package sgc.mapa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,24 +25,13 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.TipoImpactoAtividade;
 import sgc.mapa.service.ImpactoCompetenciaService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ImpactoCompetenciaServiceTest {
-    @InjectMocks
-    private ImpactoCompetenciaService service;
+    @InjectMocks private ImpactoCompetenciaService service;
 
-    @Mock
-    private CompetenciaRepo competenciaRepo;
+    @Mock private CompetenciaRepo competenciaRepo;
 
-    @Mock
-    private AtividadeRepo atividadeRepo;
+    @Mock private AtividadeRepo atividadeRepo;
 
     private Mapa mapa;
     private Competencia competencia;
@@ -57,24 +53,37 @@ class ImpactoCompetenciaServiceTest {
         @Test
         @DisplayName("Deve retornar lista vazia se não houver atividades removidas ou alteradas")
         void identificarCompetenciasImpactadas_SemAtividades_RetornaVazio() {
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.emptyList(), Collections.emptyList());
+            List<CompetenciaImpactadaDto> result =
+                    service.identificarCompetenciasImpactadas(
+                            mapa, Collections.emptyList(), Collections.emptyList());
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("Deve identificar competências impactadas por atividades removidas")
         void identificarCompetenciasImpactadas_AtividadesRemovidas_RetornaImpactos() {
-            AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
+            AtividadeImpactadaDto atividadeRemovidaDto =
+                    new AtividadeImpactadaDto(
+                            1L,
+                            "Atividade Removida",
+                            TipoImpactoAtividade.REMOVIDA,
+                            null,
+                            Collections.emptyList());
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
 
             competencia.setAtividades(Set.of(atividade));
             atividade.setCompetencias(Set.of(competencia));
 
-            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
+            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo()))
+                    .thenReturn(Collections.singletonList(competencia));
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
 
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovidaDto), Collections.emptyList());
+            List<CompetenciaImpactadaDto> result =
+                    service.identificarCompetenciasImpactadas(
+                            mapa,
+                            Collections.singletonList(atividadeRemovidaDto),
+                            Collections.emptyList());
 
             assertThat(result).isNotEmpty();
             assertThat(result.getFirst().getDescricao()).isEqualTo("Comp 1");
@@ -84,17 +93,26 @@ class ImpactoCompetenciaServiceTest {
         @Test
         @DisplayName("Deve identificar competências impactadas por atividades alteradas")
         void identificarCompetenciasImpactadas_AtividadesAlteradas() {
-            AtividadeImpactadaDto atividadeDto = new AtividadeImpactadaDto(1L, "Atividade Nova", TipoImpactoAtividade.ALTERADA, "Atividade Antiga", Collections.emptyList());
+            AtividadeImpactadaDto atividadeDto =
+                    new AtividadeImpactadaDto(
+                            1L,
+                            "Atividade Nova",
+                            TipoImpactoAtividade.ALTERADA,
+                            "Atividade Antiga",
+                            Collections.emptyList());
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
 
             competencia.setAtividades(Set.of(atividade));
             atividade.setCompetencias(Set.of(competencia));
 
-            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
+            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo()))
+                    .thenReturn(Collections.singletonList(competencia));
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
 
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.emptyList(), Collections.singletonList(atividadeDto));
+            List<CompetenciaImpactadaDto> result =
+                    service.identificarCompetenciasImpactadas(
+                            mapa, Collections.emptyList(), Collections.singletonList(atividadeDto));
 
             assertThat(result).isNotEmpty();
             assertThat(result.getFirst().getTipoImpacto().name()).isEqualTo("ATIVIDADE_ALTERADA");
@@ -103,8 +121,20 @@ class ImpactoCompetenciaServiceTest {
         @Test
         @DisplayName("Deve identificar impacto genérico quando houver remoção e alteração")
         void identificarCompetenciasImpactadas_Misto() {
-            AtividadeImpactadaDto remDto = new AtividadeImpactadaDto(1L, "Ativ Rem", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
-            AtividadeImpactadaDto altDto = new AtividadeImpactadaDto(2L, "Ativ Alt", TipoImpactoAtividade.ALTERADA, "Old", Collections.emptyList());
+            AtividadeImpactadaDto remDto =
+                    new AtividadeImpactadaDto(
+                            1L,
+                            "Ativ Rem",
+                            TipoImpactoAtividade.REMOVIDA,
+                            null,
+                            Collections.emptyList());
+            AtividadeImpactadaDto altDto =
+                    new AtividadeImpactadaDto(
+                            2L,
+                            "Ativ Alt",
+                            TipoImpactoAtividade.ALTERADA,
+                            "Old",
+                            Collections.emptyList());
 
             Atividade ativ1 = new Atividade();
             ativ1.setCodigo(1L);
@@ -115,15 +145,16 @@ class ImpactoCompetenciaServiceTest {
             ativ1.setCompetencias(Set.of(competencia));
             ativ2.setCompetencias(Set.of(competencia));
 
-            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
+            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo()))
+                    .thenReturn(Collections.singletonList(competencia));
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(ativ1));
             when(atividadeRepo.findById(2L)).thenReturn(Optional.of(ativ2));
 
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(
-                mapa,
-                Collections.singletonList(remDto),
-                Collections.singletonList(altDto)
-            );
+            List<CompetenciaImpactadaDto> result =
+                    service.identificarCompetenciasImpactadas(
+                            mapa,
+                            Collections.singletonList(remDto),
+                            Collections.singletonList(altDto));
 
             assertThat(result).isNotEmpty();
             assertThat(result.getFirst().getTipoImpacto().name()).isEqualTo("IMPACTO_GENERICO");

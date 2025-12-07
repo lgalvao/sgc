@@ -1,6 +1,11 @@
 package sgc.sgrh.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,12 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.Unidade;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "USUARIO", schema = "sgc")
@@ -38,7 +37,11 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidadeLotacao;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER)
     private Set<UsuarioPerfil> atribuicoes = new java.util.HashSet<>();
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
@@ -49,8 +52,9 @@ public class Usuario implements UserDetails {
         LocalDateTime now = LocalDateTime.now();
         if (atribuicoesTemporarias != null) {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now)) &&
-                        (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
+                if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now))
+                        && (temp.getDataTermino() == null
+                                || !temp.getDataTermino().isBefore(now))) {
                     todas.add(new UsuarioPerfil(null, this, temp.getUnidade(), temp.getPerfil()));
                 }
             }
@@ -60,10 +64,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Usuario usuario = (Usuario) obj;
         return Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
     }
@@ -91,7 +93,12 @@ public class Usuario implements UserDetails {
         return tituloEleitoral;
     }
 
-    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidadeLotacao) {
+    public Usuario(
+            String tituloEleitoral,
+            String nome,
+            String email,
+            String ramal,
+            Unidade unidadeLotacao) {
         this.tituloEleitoral = tituloEleitoral;
         this.nome = nome;
         this.email = email;
@@ -101,7 +108,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String toString() {
-        return "Usuario{titulo='%s', nome='%s', unidade=%s}".formatted(tituloEleitoral, nome,
-                unidadeLotacao.getSigla());
+        return "Usuario{titulo='%s', nome='%s', unidade=%s}"
+                .formatted(tituloEleitoral, nome, unidadeLotacao.getSigla());
     }
 }

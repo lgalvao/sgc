@@ -1,17 +1,16 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.*;
 import sgc.sgrh.model.Usuario;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * Tabela de associação que conecta um {@link Alerta} a um {@link Usuario} específico.
- * <p>
- * Esta entidade rastreia quais usuários receberam um alerta e quando o leram.
- * Utiliza uma chave primária composta ({@link Chave}) para identificar a relação.
+ *
+ * <p>Esta entidade rastreia quais usuários receberam um alerta e quando o leram. Utiliza uma chave
+ * primária composta ({@link Chave}) para identificar a relação.
  */
 @Entity
 @Table(name = "ALERTA_USUARIO", schema = "sgc")
@@ -20,9 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlertaUsuario implements Serializable {
-    /**
-     * Chave primária composta para a entidade {@link AlertaUsuario}.
-     */
+    /** Chave primária composta para a entidade {@link AlertaUsuario}. */
     @Embeddable
     @Getter
     @Setter
@@ -34,8 +31,7 @@ public class AlertaUsuario implements Serializable {
         private String usuarioTituloEleitoral;
     }
 
-    @EmbeddedId
-    private Chave id;
+    @EmbeddedId private Chave id;
 
     @MapsId("alertaCodigo")
     @ManyToOne
@@ -44,7 +40,11 @@ public class AlertaUsuario implements Serializable {
 
     @MapsId("usuarioTituloEleitoral")
     @ManyToOne
-    @JoinColumn(name = "usuario_titulo_eleitoral", referencedColumnName = "titulo_eleitoral", insertable = false, updatable = false)
+    @JoinColumn(
+            name = "usuario_titulo_eleitoral",
+            referencedColumnName = "titulo_eleitoral",
+            insertable = false,
+            updatable = false)
     private Usuario usuario;
 
     @Column(name = "data_hora_leitura")

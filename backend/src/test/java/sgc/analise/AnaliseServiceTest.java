@@ -1,5 +1,10 @@
 package sgc.analise;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,25 +21,16 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para AnaliseService")
 class AnaliseServiceTest {
     private static final String OBS = "Observação";
 
-    @Mock
-    private AnaliseRepo analiseRepo;
+    @Mock private AnaliseRepo analiseRepo;
 
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
 
-    @InjectMocks
-    private AnaliseService service;
+    @InjectMocks private AnaliseService service;
 
     private Subprocesso subprocesso;
 
@@ -54,7 +50,8 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.CADASTRO);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise));
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+                    .thenReturn(List.of(analise));
 
             List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
 
@@ -70,7 +67,8 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.VALIDACAO);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise));
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
+                    .thenReturn(List.of(analise));
 
             List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
 
@@ -85,7 +83,9 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
+            assertThrows(
+                    ErroEntidadeNaoEncontrada.class,
+                    () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
         }
     }
 
@@ -99,15 +99,17 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(CriarAnaliseRequest.builder()
-                    .codSubprocesso(1L)
-                    .observacoes(OBS)
-                    .tipo(TipoAnalise.CADASTRO)
-                    .acao(null)
-                    .siglaUnidade(null)
-                    .tituloUsuario(null)
-                    .motivo(null)
-                    .build());
+            Analise resultado =
+                    service.criarAnalise(
+                            CriarAnaliseRequest.builder()
+                                    .codSubprocesso(1L)
+                                    .observacoes(OBS)
+                                    .tipo(TipoAnalise.CADASTRO)
+                                    .acao(null)
+                                    .siglaUnidade(null)
+                                    .tituloUsuario(null)
+                                    .motivo(null)
+                                    .build());
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
@@ -122,15 +124,17 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(CriarAnaliseRequest.builder()
-                    .codSubprocesso(1L)
-                    .observacoes(OBS)
-                    .tipo(TipoAnalise.VALIDACAO)
-                    .acao(null)
-                    .siglaUnidade(null)
-                    .tituloUsuario(null)
-                    .motivo(null)
-                    .build());
+            Analise resultado =
+                    service.criarAnalise(
+                            CriarAnaliseRequest.builder()
+                                    .codSubprocesso(1L)
+                                    .observacoes(OBS)
+                                    .tipo(TipoAnalise.VALIDACAO)
+                                    .acao(null)
+                                    .siglaUnidade(null)
+                                    .tituloUsuario(null)
+                                    .motivo(null)
+                                    .build());
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
@@ -144,15 +148,19 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.criarAnalise(CriarAnaliseRequest.builder()
-                    .codSubprocesso(99L)
-                    .observacoes("Obs")
-                    .tipo(TipoAnalise.CADASTRO)
-                    .acao(null)
-                    .siglaUnidade(null)
-                    .tituloUsuario(null)
-                    .motivo(null)
-                    .build()));
+            assertThrows(
+                    ErroEntidadeNaoEncontrada.class,
+                    () ->
+                            service.criarAnalise(
+                                    CriarAnaliseRequest.builder()
+                                            .codSubprocesso(99L)
+                                            .observacoes("Obs")
+                                            .tipo(TipoAnalise.CADASTRO)
+                                            .acao(null)
+                                            .siglaUnidade(null)
+                                            .tituloUsuario(null)
+                                            .motivo(null)
+                                            .build()));
         }
     }
 

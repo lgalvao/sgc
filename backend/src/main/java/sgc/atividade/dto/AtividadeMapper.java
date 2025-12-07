@@ -9,18 +9,13 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 
-/**
- * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
- */
+/** Mapper (usando MapStruct) entre a entidade Atividade e seu DTO. */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class AtividadeMapper {
-    /**
-     * Repositório de mapas, injetado para buscar a entidade Mapa durante o mapeamento.
-     */
-    @Autowired
-    protected MapaRepo mapaRepo;
+    /** Repositório de mapas, injetado para buscar a entidade Mapa durante o mapeamento. */
+    @Autowired protected MapaRepo mapaRepo;
 
     /**
      * Converte uma entidade {@link Atividade} em um DTO {@link AtividadeDto}.
@@ -51,6 +46,7 @@ public abstract class AtividadeMapper {
      */
     public Mapa map(Long codMapa) {
         if (codMapa == null) return null;
-        return mapaRepo.findById(codMapa).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapa));
+        return mapaRepo.findById(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapa));
     }
 }

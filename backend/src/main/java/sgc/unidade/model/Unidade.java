@@ -1,15 +1,14 @@
 package sgc.unidade.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
@@ -18,9 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({
-        @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
-})
+@AttributeOverrides({@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))})
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();

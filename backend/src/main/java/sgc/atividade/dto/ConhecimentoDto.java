@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import sgc.comum.json.SanitizarHtml;
 
 /**
- * DTO para Conhecimento usado nas APIs (entrada/saída).
- * Contém apenas campos primários e referência por codigo para evitar expor entidades JPA.
+ * DTO para Conhecimento usado nas APIs (entrada/saída). Contém apenas campos primários e referência
+ * por codigo para evitar expor entidades JPA.
  */
 @Data
 @Builder

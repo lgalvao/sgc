@@ -1,6 +1,7 @@
 package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -26,12 +27,12 @@ import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 
-import java.util.stream.Collectors;
-
 @Slf4j
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
+    private static final String LOG_LEVEL_ERROR = "error";
+    private static final String LOG_LEVEL_WARN = "warn";
 
     private String sanitizar(String texto) {
         return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
@@ -41,8 +42,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(erroApi, HttpStatus.valueOf(erroApi.getStatus()));
     }
 
-    private ResponseEntity<Object> handleBusinessException(Exception ex, HttpStatus status, String logLevel) {
-        if ("error".equals(logLevel)) {
+    private ResponseEntity<Object> handleBusinessException(
+            Exception ex, HttpStatus status, String logLevel) {
+        if (LOG_LEVEL_ERROR.equals(logLevel)) {
             log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         } else {
             log.warn("{}: {}", ex.getClass().getSimpleName(), ex.getMessage());
@@ -52,23 +54,36 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-        @Nullable HttpMessageNotReadableException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
+            @Nullable HttpMessageNotReadableException ex,
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
+            @Nullable WebRequest request) {
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-        @Nullable MethodArgumentNotValidException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
-        log.warn("Erro de validação de argumento de método: {}", ex != null ? ex.getMessage() : null);
+            @Nullable MethodArgumentNotValidException ex,
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
+            @Nullable WebRequest request) {
+        log.warn(
+                "Erro de validação de argumento de método: {}",
+                ex != null ? ex.getMessage() : null);
         String message = "A requisição contém dados de entrada inválidos.";
-        var subErrors = ex != null ? ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new ErroSubApi(
-                        error.getObjectName(),
-                        error.getField(),
-                        error.getRejectedValue(),
-                        sanitizar(error.getDefaultMessage())))
-                .collect(Collectors.toList()) : null;
+        var subErrors =
+                ex != null
+                        ? ex.getBindingResult().getFieldErrors().stream()
+                                .map(
+                                        error ->
+                                                new ErroSubApi(
+                                                        error.getObjectName(),
+                                                        error.getField(),
+                                                        error.getRejectedValue(),
+                                                        sanitizar(error.getDefaultMessage())))
+                                .collect(Collectors.toList())
+                        : null;
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
@@ -84,32 +99,39 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+    protected ResponseEntity<Object> handleConstraintViolationException(
+            ConstraintViolationException ex) {
         log.error("Erro de constraint de banco de dados: {}", ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
-        var subErrors = ex.getConstraintViolations().stream()
-            .map(violation -> new ErroSubApi(
-                violation.getRootBeanClass().getSimpleName(),
-                violation.getPropertyPath().toString(),
-                violation.getInvalidValue(),
-                sanitizar(violation.getMessage())))
-            .collect(Collectors.toList());
+        var subErrors =
+                ex.getConstraintViolations().stream()
+                        .map(
+                                violation ->
+                                        new ErroSubApi(
+                                                violation.getRootBeanClass().getSimpleName(),
+                                                violation.getPropertyPath().toString(),
+                                                violation.getInvalidValue(),
+                                                sanitizar(violation.getMessage())))
+                        .collect(Collectors.toList());
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
     @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
     protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroEntidadeNaoEncontrada ex) {
-        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn"); // NOPMD - using literal for internal config
+        return handleBusinessException(
+                ex, HttpStatus.NOT_FOUND, LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler(ErroUnidadeNaoEncontrada.class)
     protected ResponseEntity<Object> handleErroUnidadeNaoEncontrada(ErroUnidadeNaoEncontrada ex) {
-        return handleBusinessException(ex, HttpStatus.NOT_FOUND, "warn"); // NOPMD - using literal for internal config
+        return handleBusinessException(
+                ex, HttpStatus.NOT_FOUND, LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler(ErroAccessoNegado.class)
     protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroAccessoNegado ex) {
-        return handleBusinessException(ex, HttpStatus.FORBIDDEN, "warn"); // NOPMD - using literal for internal config
+        return handleBusinessException(
+                ex, HttpStatus.FORBIDDEN, LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -135,17 +157,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ErroProcesso.class)
     protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
-        return handleBusinessException(ex, HttpStatus.CONFLICT, "error");
+        return handleBusinessException(ex, HttpStatus.CONFLICT, LOG_LEVEL_ERROR);
     }
 
     @ExceptionHandler(ErroRequisicaoSemCorpo.class)
     protected ResponseEntity<Object> handleErroRequisicaoSemCorpo(ErroRequisicaoSemCorpo ex) {
-        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn"); // NOPMD - using literal for internal config
+        return handleBusinessException(
+                ex, HttpStatus.BAD_REQUEST, LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler(ErroParametroPainelInvalido.class)
-    protected ResponseEntity<Object> handleErroParametroPainelInvalido(ErroParametroPainelInvalido ex) {
-        return handleBusinessException(ex, HttpStatus.BAD_REQUEST, "warn"); // NOPMD - using literal for internal config
+    protected ResponseEntity<Object> handleErroParametroPainelInvalido(
+            ErroParametroPainelInvalido ex) {
+        return handleBusinessException(
+                ex, HttpStatus.BAD_REQUEST, LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler({
@@ -156,17 +181,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErroMapaNaoAssociado.class
     })
     protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
-        return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_CONTENT, "warn"); // NOPMD - using literal for internal config
+        return handleBusinessException(
+                ex,
+                HttpStatus.UNPROCESSABLE_CONTENT,
+                LOG_LEVEL_WARN);
     }
 
     @ExceptionHandler(ErroAlerta.class)
     protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(ErroAlerta ex) {
-        return handleBusinessException(ex, HttpStatus.CONFLICT, "error");
+        return handleBusinessException(ex, HttpStatus.CONFLICT, LOG_LEVEL_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
         log.error("Erro inesperado na aplicação", ex);
-        return buildResponseEntity(new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado"));
+        return buildResponseEntity(
+                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado"));
     }
 }

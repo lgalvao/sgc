@@ -1,5 +1,13 @@
 package sgc.alerta;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,15 +27,6 @@ import sgc.sgrh.service.SgrhService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AlertaServiceTest {
@@ -63,7 +62,8 @@ class AlertaServiceTest {
         when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
         when(usuarioRepo.findById("456")).thenReturn(Optional.of(new Usuario()));
 
-        service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
+        service.criarAlerta(
+                p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
 
         verify(alertaUsuarioRepo, times(2)).save(any());
     }
@@ -93,7 +93,8 @@ class AlertaServiceTest {
 
         when(sgrhService.buscarUsuarioPorTitulo("123")).thenReturn(Optional.of(userDto));
 
-        service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
+        service.criarAlerta(
+                p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
 
         verify(alertaUsuarioRepo).save(any());
     }
@@ -106,7 +107,8 @@ class AlertaServiceTest {
         Unidade u = new Unidade();
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
         when(alertaRepo.save(any())).thenReturn(new Alerta());
-        when(sgrhService.buscarResponsavelUnidade(unidadeId)).thenThrow(new RuntimeException("Erro"));
+        when(sgrhService.buscarResponsavelUnidade(unidadeId))
+                .thenThrow(new RuntimeException("Erro"));
 
         service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", null);
 
@@ -148,7 +150,8 @@ class AlertaServiceTest {
 
         service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
-        verify(alertaRepo).save(argThat(a -> a.getDescricao().contains("Aguarde a disponibilização")));
+        verify(alertaRepo)
+                .save(argThat(a -> a.getDescricao().contains("Aguarde a disponibilização")));
     }
 
     @Test
@@ -177,10 +180,14 @@ class AlertaServiceTest {
         Processo p = new Processo();
         Long unidadeId = 1L;
 
-        when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenThrow(new RuntimeException("Erro SGRH"));
+        when(sgrhService.buscarUnidadePorCodigo(unidadeId))
+                .thenThrow(new RuntimeException("Erro SGRH"));
 
-        assertThatThrownBy(() -> service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of()))
-            .isInstanceOf(ErroAlerta.class);
+        assertThatThrownBy(
+                        () ->
+                                service.criarAlertasProcessoIniciado(
+                                        p, List.of(unidadeId), List.of()))
+                .isInstanceOf(ErroAlerta.class);
     }
 
     @Test

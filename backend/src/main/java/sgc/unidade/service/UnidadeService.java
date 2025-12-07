@@ -1,5 +1,10 @@
 package sgc.unidade.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -15,12 +20,6 @@ import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 public class UnidadeService {
@@ -34,37 +33,43 @@ public class UnidadeService {
         return montarHierarquia(todasUnidades);
     }
 
-    public List<UnidadeDto> buscarArvoreComElegibilidade(TipoProcesso tipoProcesso, Long codProcesso) {
+    public List<UnidadeDto> buscarArvoreComElegibilidade(
+            TipoProcesso tipoProcesso, Long codProcesso) {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
 
         // For MAPEAMENTO, all units are elegível
         // For REVISAO and DIAGNOSTICO, only units with vigente maps are elegível
-        boolean requerMapaVigente = tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO;
+        boolean requerMapaVigente =
+                tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO;
 
         return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente);
     }
 
-    private List<UnidadeDto> montarHierarquiaComElegibilidade(List<Unidade> unidades, boolean requerMapaVigente) {
+    private List<UnidadeDto> montarHierarquiaComElegibilidade(
+            List<Unidade> unidades, boolean requerMapaVigente) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            Long codigoPai = u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
+            Long codigoPai =
+                    u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
 
             // Determine elegibility based on whether unit has vigente map AND is not
             // INTERMEDIARIA
-            boolean isElegivel = (!requerMapaVigente || u.getMapaVigente() != null)
-                    && u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
+            boolean isElegivel =
+                    (!requerMapaVigente || u.getMapaVigente() != null)
+                            && u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 
-            UnidadeDto dto = new UnidadeDto(
-                    u.getCodigo(),
-                    u.getNome(),
-                    u.getSigla(),
-                    codigoPai,
-                    u.getTipo().name(),
-                    new ArrayList<>(),
-                    isElegivel);
+            UnidadeDto dto =
+                    new UnidadeDto(
+                            u.getCodigo(),
+                            u.getNome(),
+                            u.getSigla(),
+                            codigoPai,
+                            u.getTipo().name(),
+                            new ArrayList<>(),
+                            isElegivel);
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
         }
@@ -88,14 +93,27 @@ public class UnidadeService {
         return resultado;
     }
 
-    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
-        Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(
-                        () -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codUnidade + " não encontrada"));
+    public void criarAtribuicaoTemporaria(
+            Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+        Unidade unidade =
+                unidadeRepo
+                        .findById(codUnidade)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Unidade com codigo "
+                                                        + codUnidade
+                                                        + " não encontrada"));
 
-        Usuario usuario = usuarioRepo.findById(request.tituloEleitoralServidor())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Usuário com título eleitoral " + request.tituloEleitoralServidor() + " não encontrado"));
+        Usuario usuario =
+                usuarioRepo
+                        .findById(request.tituloEleitoralServidor())
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Usuário com título eleitoral "
+                                                        + request.tituloEleitoralServidor()
+                                                        + " não encontrado"));
 
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
         atribuicao.setUnidade(unidade);
@@ -115,12 +133,14 @@ public class UnidadeService {
         List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
 
         return usuarios.stream()
-                .map(u -> new ServidorDto(
-                        u.getTituloEleitoral(),
-                        u.getNome(),
-                        u.getTituloEleitoral(),
-                        u.getEmail(),
-                        u.getUnidadeLotacao().getCodigo()))
+                .map(
+                        u ->
+                                new ServidorDto(
+                                        u.getTituloEleitoral(),
+                                        u.getNome(),
+                                        u.getTituloEleitoral(),
+                                        u.getEmail(),
+                                        u.getUnidadeLotacao().getCodigo()))
                 .toList();
     }
 
@@ -130,17 +150,19 @@ public class UnidadeService {
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            Long codigoPai = u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
+            Long codigoPai =
+                    u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
 
-            UnidadeDto dto = new UnidadeDto(
-                    u.getCodigo(),
-                    u.getNome(),
-                    u.getSigla(),
-                    codigoPai,
-                    u.getTipo().name(),
-                    new ArrayList<>(),
-                    true // isElegivel: Set to true by default for now
-            );
+            UnidadeDto dto =
+                    new UnidadeDto(
+                            u.getCodigo(),
+                            u.getNome(),
+                            u.getSigla(),
+                            codigoPai,
+                            u.getTipo().name(),
+                            new ArrayList<>(),
+                            true // isElegivel: Set to true by default for now
+                            );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
         }
@@ -164,7 +186,8 @@ public class UnidadeService {
         return resultado;
     }
 
-    private UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
+    private UnidadeDto montarComSubunidades(
+            UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
         List<UnidadeDto> filhas = mapaFilhas.get(dto.getCodigo());
         if (filhas == null || filhas.isEmpty()) {
             return dto;
@@ -180,10 +203,18 @@ public class UnidadeService {
     }
 
     public UnidadeDto buscarPorSigla(String sigla) {
-        Unidade unidade = unidadeRepo.findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+        Unidade unidade =
+                unidadeRepo
+                        .findBySigla(sigla)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Unidade com sigla " + sigla + " não encontrada"));
 
-        Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
+        Long codigoPai =
+                unidade.getUnidadeSuperior() != null
+                        ? unidade.getUnidadeSuperior().getCodigo()
+                        : null;
 
         return new UnidadeDto(
                 unidade.getCodigo(),
@@ -196,10 +227,20 @@ public class UnidadeService {
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
-        Unidade unidade = unidadeRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com codigo " + codigo + " não encontrada"));
+        Unidade unidade =
+                unidadeRepo
+                        .findById(codigo)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Unidade com codigo "
+                                                        + codigo
+                                                        + " não encontrada"));
 
-        Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
+        Long codigoPai =
+                unidade.getUnidadeSuperior() != null
+                        ? unidade.getUnidadeSuperior().getCodigo()
+                        : null;
 
         return new UnidadeDto(
                 unidade.getCodigo(),
@@ -221,7 +262,8 @@ public class UnidadeService {
         UnidadeDto raiz = buscarNaHierarquiaPorSigla(todas, sigla);
 
         if (raiz == null) {
-            throw new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada na hierarquia");
+            throw new ErroEntidadeNaoEncontrada(
+                    "Unidade com sigla " + sigla + " não encontrada na hierarquia");
         }
 
         List<String> resultado = new ArrayList<>();
@@ -230,8 +272,13 @@ public class UnidadeService {
     }
 
     public String buscarSiglaSuperior(String sigla) {
-        Unidade unidade = unidadeRepo.findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+        Unidade unidade =
+                unidadeRepo
+                        .findBySigla(sigla)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Unidade com sigla " + sigla + " não encontrada"));
 
         if (unidade.getUnidadeSuperior() != null) {
             return unidade.getUnidadeSuperior().getSigla();
@@ -241,12 +288,10 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquia(List<UnidadeDto> lista, Long codigo) {
         for (UnidadeDto u : lista) {
-            if (u.getCodigo().equals(codigo))
-                return u;
+            if (u.getCodigo().equals(codigo)) return u;
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquia(u.getSubunidades(), codigo);
-                if (found != null)
-                    return found;
+                if (found != null) return found;
             }
         }
         return null;
@@ -254,12 +299,10 @@ public class UnidadeService {
 
     private UnidadeDto buscarNaHierarquiaPorSigla(List<UnidadeDto> lista, String sigla) {
         for (UnidadeDto u : lista) {
-            if (u.getSigla().equals(sigla))
-                return u;
+            if (u.getSigla().equals(sigla)) return u;
             if (u.getSubunidades() != null) {
                 UnidadeDto found = buscarNaHierarquiaPorSigla(u.getSubunidades(), sigla);
-                if (found != null)
-                    return found;
+                if (found != null) return found;
             }
         }
         return null;

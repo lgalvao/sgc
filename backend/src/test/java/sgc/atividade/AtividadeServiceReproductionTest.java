@@ -1,5 +1,9 @@
 package sgc.atividade;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,25 +21,15 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceReproductionTest {
 
-    @InjectMocks
-    private AtividadeService atividadeService;
+    @InjectMocks private AtividadeService atividadeService;
 
-    @Mock
-    private AtividadeRepo atividadeRepo;
-    @Mock
-    private AtividadeMapper atividadeMapper;
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private UsuarioRepo usuarioRepo;
+    @Mock private AtividadeRepo atividadeRepo;
+    @Mock private AtividadeMapper atividadeMapper;
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private UsuarioRepo usuarioRepo;
 
     @Test
     @DisplayName("REPRODUÇÃO: criar falha com NPE se unidade do subprocesso for nula")
@@ -60,7 +54,9 @@ class AtividadeServiceReproductionTest {
     }
 
     @Test
-    @DisplayName("REPRODUÇÃO: criar falha com NPE se processo do subprocesso for nulo durante atualização de situação")
+    @DisplayName(
+            "REPRODUÇÃO: criar falha com NPE se processo do subprocesso for nulo durante"
+                    + " atualização de situação")
     void criarComProcessoNulo() {
         Long mapaId = 10L;
         String usuarioId = "user1";

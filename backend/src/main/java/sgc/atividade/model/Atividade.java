@@ -1,6 +1,10 @@
 package sgc.atividade.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +13,9 @@ import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
- * Representa uma atividade desempenhada em um determinado contexto,
- * associada a um mapa de competências.
+ * Representa uma atividade desempenhada em um determinado contexto, associada a um mapa de
+ * competências.
  */
 @Entity
 @Table(name = "ATIVIDADE", schema = "sgc")
@@ -44,7 +43,7 @@ public class Atividade extends EntidadeBase {
     /**
      * Construtor para criar uma nova atividade.
      *
-     * @param mapa      O mapa ao qual a atividade pertence.
+     * @param mapa O mapa ao qual a atividade pertence.
      * @param descricao A descrição da atividade.
      */
     public Atividade(Mapa mapa, String descricao) {
@@ -55,10 +54,9 @@ public class Atividade extends EntidadeBase {
 
     @ManyToMany
     @JoinTable(
-        name = "competencia_atividade",
-        schema = "sgc",
-        joinColumns = @JoinColumn(name = "atividade_codigo"),
-        inverseJoinColumns = @JoinColumn(name = "competencia_codigo")
-    )
+            name = "competencia_atividade",
+            schema = "sgc",
+            joinColumns = @JoinColumn(name = "atividade_codigo"),
+            inverseJoinColumns = @JoinColumn(name = "competencia_codigo"))
     private Set<Competencia> competencias = new HashSet<>();
 }

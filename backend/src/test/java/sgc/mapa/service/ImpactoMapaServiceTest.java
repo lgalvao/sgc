@@ -1,5 +1,12 @@
 package sgc.mapa.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,34 +25,20 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-
 @DisplayName("Testes para ImpactoMapaService")
 class ImpactoMapaServiceTest {
-    @Autowired
-    private ImpactoMapaService impactoMapaService;
+    @Autowired private ImpactoMapaService impactoMapaService;
 
-    @MockitoBean
-    private SubprocessoRepo subprocessoRepo;
+    @MockitoBean private SubprocessoRepo subprocessoRepo;
 
-    @MockitoBean
-    private MapaRepo mapaRepo;
+    @MockitoBean private MapaRepo mapaRepo;
 
-    @MockitoBean
-    private ImpactoAtividadeService impactoAtividadeService;
+    @MockitoBean private ImpactoAtividadeService impactoAtividadeService;
 
-    @MockitoBean
-    private ImpactoCompetenciaService impactoCompetenciaService;
+    @MockitoBean private ImpactoCompetenciaService impactoCompetenciaService;
 
     private Usuario chefe;
     private Usuario gestor;
@@ -72,11 +65,15 @@ class ImpactoMapaServiceTest {
     }
 
     private void addAtribuicao(Usuario u, Perfil p) {
-        u.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder()
-                .usuario(u)
-                .unidade(new Unidade()) // Mock unit, logic should handle checking if unit matches if strictly required
-                .perfil(p)
-                .build());
+        u.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(u)
+                                .unidade(
+                                        new Unidade()) // Mock unit, logic should handle checking if
+                                // unit matches if strictly required
+                                .perfil(p)
+                                .build());
     }
 
     @Nested
@@ -94,12 +91,15 @@ class ImpactoMapaServiceTest {
         }
 
         @Test
-        @DisplayName("CHEFE não pode acessar quando situação for diferente de REVISAO_CADASTRO_EM_ANDAMENTO")
+        @DisplayName(
+                "CHEFE não pode acessar quando situação for diferente de"
+                        + " REVISAO_CADASTRO_EM_ANDAMENTO")
         void chefeNaoPodeAcessar() {
             subprocesso.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
 
-            assertThrows(ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, chefe));
+            assertThrows(
+                    ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, chefe));
         }
 
         @Test
@@ -113,12 +113,16 @@ class ImpactoMapaServiceTest {
         }
 
         @Test
-        @DisplayName("GESTOR não pode acessar quando situação for diferente de REVISAO_CADASTRO_DISPONIBILIZADA")
+        @DisplayName(
+                "GESTOR não pode acessar quando situação for diferente de"
+                        + " REVISAO_CADASTRO_DISPONIBILIZADA")
         void gestorNaoPodeAcessar() {
             subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
 
-            assertThrows(ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, gestor));
+            assertThrows(
+                    ErroAccessoNegado.class,
+                    () -> impactoMapaService.verificarImpactos(1L, gestor));
         }
 
         @Test
@@ -157,7 +161,8 @@ class ImpactoMapaServiceTest {
             subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
 
-            assertThrows(ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, admin));
+            assertThrows(
+                    ErroAccessoNegado.class, () -> impactoMapaService.verificarImpactos(1L, admin));
         }
     }
 
@@ -192,9 +197,12 @@ class ImpactoMapaServiceTest {
 
             verify(impactoAtividadeService, times(2)).obterAtividadesDoMapa(any());
             verify(impactoAtividadeService).detectarAtividadesInseridas(any(), any());
-            verify(impactoAtividadeService).detectarAtividadesRemovidas(any(), any(), eq(mapaVigente));
-            verify(impactoAtividadeService).detectarAtividadesAlteradas(any(), any(), eq(mapaVigente));
-            verify(impactoCompetenciaService).identificarCompetenciasImpactadas(eq(mapaVigente), any(), any());
+            verify(impactoAtividadeService)
+                    .detectarAtividadesRemovidas(any(), any(), eq(mapaVigente));
+            verify(impactoAtividadeService)
+                    .detectarAtividadesAlteradas(any(), any(), eq(mapaVigente));
+            verify(impactoCompetenciaService)
+                    .identificarCompetenciasImpactadas(eq(mapaVigente), any(), any());
         }
     }
 }

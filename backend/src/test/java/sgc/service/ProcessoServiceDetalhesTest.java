@@ -1,5 +1,13 @@
 package sgc.service;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -19,28 +27,16 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceDetalhesTest {
     private static final String DIRETORIA_X = "Diretoria X";
 
-    @Mock
-    private ProcessoRepo processoRepo;
+    @Mock private ProcessoRepo processoRepo;
 
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
 
-    @Mock
-    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    @Mock private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     @Test
     public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {
@@ -69,38 +65,41 @@ public class ProcessoServiceDetalhesTest {
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
 
-        ProcessoDetalheDto.UnidadeParticipanteDto unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
-                .codUnidade(10L)
-                .nome(DIRETORIA_X)
-                .sigla("DX")
-                .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
-                .dataLimite(LocalDateTime.now().plusDays(7))
-                .build();
+        ProcessoDetalheDto.UnidadeParticipanteDto unidadeParticipanteDTO =
+                ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+                        .codUnidade(10L)
+                        .nome(DIRETORIA_X)
+                        .sigla("DX")
+                        .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
+                        .dataLimite(LocalDateTime.now().plusDays(7))
+                        .build();
 
-        ProcessoResumoDto processoResumoDTO = ProcessoResumoDto.builder()
-                .codigo(100L)
-                .situacao(SituacaoProcesso.CRIADO)
-                .dataLimite(LocalDateTime.now().plusDays(5))
-                .unidadeCodigo(10L)
-                .unidadeNome(DIRETORIA_X)
-                .build();
+        ProcessoResumoDto processoResumoDTO =
+                ProcessoResumoDto.builder()
+                        .codigo(100L)
+                        .situacao(SituacaoProcesso.CRIADO)
+                        .dataLimite(LocalDateTime.now().plusDays(5))
+                        .unidadeCodigo(10L)
+                        .unidadeNome(DIRETORIA_X)
+                        .build();
 
-        ProcessoDetalheDto processoDetalheDTO = ProcessoDetalheDto.builder()
-                .codigo(1L)
-                .descricao("Proc Teste")
-                .tipo("MAPEAMENTO")
-                .situacao(SituacaoProcesso.EM_ANDAMENTO)
-                .dataLimite(dataLimite)
-                .dataCriacao(dataCriacao)
-                .unidades(List.of(unidadeParticipanteDTO))
-                .resumoSubprocessos(List.of(processoResumoDTO))
-                .build();
+        ProcessoDetalheDto processoDetalheDTO =
+                ProcessoDetalheDto.builder()
+                        .codigo(1L)
+                        .descricao("Proc Teste")
+                        .tipo("MAPEAMENTO")
+                        .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                        .dataLimite(dataLimite)
+                        .dataCriacao(dataCriacao)
+                        .unidades(List.of(unidadeParticipanteDTO))
+                        .resumoSubprocessos(List.of(processoResumoDTO))
+                        .build();
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
-        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p)))
+        Mockito.lenient()
+                .when(processoDetalheMapperCustom.toDetailDTO(eq(p)))
                 .thenReturn(processoDetalheDTO);
-
     }
 }

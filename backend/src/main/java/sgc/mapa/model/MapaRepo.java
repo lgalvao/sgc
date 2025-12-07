@@ -1,15 +1,12 @@
 package sgc.mapa.model;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
-/**
- * Repositório JPA para a entidade Mapa.
- */
+/** Repositório JPA para a entidade Mapa. */
 @Repository
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     /**
@@ -20,7 +17,7 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
      */
     @Query("SELECT u.mapaVigente FROM Unidade u WHERE u.codigo = :unidadeCodigo")
     Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
-    
+
     /**
      * Busca o mapa de um subprocesso.
      *

@@ -1,5 +1,12 @@
 package sgc.notificacao;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,14 +28,6 @@ import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventoProcessoListenerTest {
@@ -85,34 +84,48 @@ class EventoProcessoListenerTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                 .thenReturn(List.of(subprocessoOperacional));
 
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
 
-        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, String.valueOf(S456), SUBSTITUTO_TESTE);
+        ResponsavelDto responsavelDto =
+                new ResponsavelDto(
+                        100L,
+                        String.valueOf(T123),
+                        TITULAR_TESTE,
+                        String.valueOf(S456),
+                        SUBSTITUTO_TESTE);
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
 
-        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
-        UsuarioDto substituto = new UsuarioDto(String.valueOf(S456), SUBSTITUTO_TESTE, SUBSTITUTO_EMAIL, RAMAL_SUBSTITUTO, TECNICO);
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456))).thenReturn(Optional.of(substituto));
+        UsuarioDto titular =
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+        UsuarioDto substituto =
+                new UsuarioDto(
+                        String.valueOf(S456),
+                        SUBSTITUTO_TESTE,
+                        SUBSTITUTO_EMAIL,
+                        RAMAL_SUBSTITUTO,
+                        TECNICO);
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+                .thenReturn(Optional.of(titular));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456)))
+                .thenReturn(Optional.of(substituto));
 
         when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Operacional</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(alertaService, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional.getUnidade().getCodigo()), List.of(subprocessoOperacional));
+        verify(alertaService, times(1))
+                .criarAlertasProcessoIniciado(
+                        processo,
+                        List.of(subprocessoOperacional.getUnidade().getCodigo()),
+                        List.of(subprocessoOperacional));
 
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(
-                eq(TITULAR_EMAIL),
-                anyString(),
-                anyString()
-        );
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(
-                eq(SUBSTITUTO_EMAIL),
-                anyString(),
-                anyString()
-        );
+        verify(notificacaoEmailService, times(1))
+                .enviarEmailHtml(eq(TITULAR_EMAIL), anyString(), anyString());
+        verify(notificacaoEmailService, times(1))
+                .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
     }
 
     @Test
@@ -130,7 +143,8 @@ class EventoProcessoListenerTest {
     @DisplayName("Não deve enviar e-mails se não houver subprocessos")
     void aoIniciarProcesso_naoDeveEnviarEmails_quandoNaoHouverSubprocessos() {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(Collections.emptyList());
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
@@ -141,15 +155,22 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve enviar e-mail correto para unidade INTERMEDIARIA")
     void aoIniciarProcesso_deveEnviarEmailCorreto_quandoUnidadeIntermediaria() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Intermediaria", "UNID-INT", null, "INTERMEDIARIA", false);
-        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null); // Sem substituto
-        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(
+                        100L, "Unidade Intermediaria", "UNID-INT", null, "INTERMEDIARIA", false);
+        ResponsavelDto responsavelDto =
+                new ResponsavelDto(
+                        100L, String.valueOf(T123), TITULAR_TESTE, null, null); // Sem substituto
+        UsuarioDto titular =
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+                .thenReturn(Optional.of(titular));
         when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Intermediaria</body></html>");
 
@@ -158,44 +179,59 @@ class EventoProcessoListenerTest {
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList(), anyList());
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(
-                eq(TITULAR_EMAIL),
-                assuntoCaptor.capture(),
-                corpoCaptor.capture()
-        );
+        verify(notificacaoEmailService, times(1))
+                .enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), corpoCaptor.capture());
 
-        assertEquals("Processo Iniciado em Unidades Subordinadas - Teste de Processo", assuntoCaptor.getValue());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
+        assertEquals(
+                "Processo Iniciado em Unidades Subordinadas - Teste de Processo",
+                assuntoCaptor.getValue());
+        verify(notificacaoEmailService, never())
+                .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
     }
 
     @Test
     @DisplayName("Deve enviar e-mail correto para unidade INTEROPERACIONAL")
     void aoIniciarProcesso_deveEnviarEmailCorreto_quandoUnidadeInteroperacional() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Interoperacional", "UNID-IO", null, "INTEROPERACIONAL", false);
-        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
-        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(
+                        100L,
+                        "Unidade Interoperacional",
+                        "UNID-IO",
+                        null,
+                        "INTEROPERACIONAL",
+                        false);
+        ResponsavelDto responsavelDto =
+                new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
+        UsuarioDto titular =
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+                .thenReturn(Optional.of(titular));
         when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Interoperacional</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoEmailService).enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), anyString());
+        verify(notificacaoEmailService)
+                .enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), anyString());
         assertEquals("Processo Iniciado - Teste de Processo", assuntoCaptor.getValue());
     }
 
     @Test
     @DisplayName("Não deve enviar e-mail para tipo de unidade desconhecido")
     void aoIniciarProcesso_naoDeveEnviarEmail_quandoTipoUnidadeDesconhecido() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Desconhecida", "UNID-DESC", null, "DESCONHECIDO", false);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(
+                        100L, "Unidade Desconhecida", "UNID-DESC", null, "DESCONHECIDO", false);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -208,7 +244,8 @@ class EventoProcessoListenerTest {
     void aoIniciarProcesso_naoDeveEnviarEmail_quandoSubprocessoSemUnidade() {
         subprocessoOperacional.setUnidade(null);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
@@ -219,9 +256,11 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Não deve enviar e-mail se responsável da unidade não for encontrado")
     void aoIniciarProcesso_naoDeveEnviarEmail_quandoResponsavelNaoEncontrado() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", "UNID-OP", null, "OPERACIONAL", false);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(100L, "Unidade Operacional", "UNID-OP", null, "OPERACIONAL", false);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.empty());
 
@@ -233,15 +272,25 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Não deve enviar e-mail se titular não tiver e-mail")
     void aoIniciarProcesso_naoDeveEnviarEmail_quandoTitularSemEmail() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
-        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
-        UsuarioDto titularSemEmail = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, " ", RAMAL, ANALISTA); // Email em branco
+        UnidadeDto unidadeDto =
+                new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
+        ResponsavelDto responsavelDto =
+                new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
+        UsuarioDto titularSemEmail =
+                new UsuarioDto(
+                        String.valueOf(T123),
+                        TITULAR_TESTE,
+                        " ",
+                        RAMAL,
+                        ANALISTA); // Email em branco
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titularSemEmail));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+                .thenReturn(Optional.of(titularSemEmail));
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
@@ -259,21 +308,33 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Erro ao enviar email substituto")
     void erroEmailSubstituto() {
-        UnidadeDto unidadeDto = new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
-        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, String.valueOf(S456), SUBSTITUTO_TESTE);
-        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+        UnidadeDto unidadeDto =
+                new UnidadeDto(100L, "Unidade Operacional", UNID_OP, null, "OPERACIONAL", false);
+        ResponsavelDto responsavelDto =
+                new ResponsavelDto(
+                        100L,
+                        String.valueOf(T123),
+                        TITULAR_TESTE,
+                        String.valueOf(S456),
+                        SUBSTITUTO_TESTE);
+        UsuarioDto titular =
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoOperacional));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+                .thenReturn(List.of(subprocessoOperacional));
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+                .thenReturn(Optional.of(titular));
 
-        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456))).thenThrow(new RuntimeException("Erro SGRH"));
+        when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456)))
+                .thenThrow(new RuntimeException("Erro SGRH"));
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq(TITULAR_EMAIL), any(), any());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), any(), any());
+        verify(notificacaoEmailService, never())
+                .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), any(), any());
     }
 }

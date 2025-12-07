@@ -1,5 +1,13 @@
 package sgc.atividade;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,33 +34,17 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceTest {
 
-    @InjectMocks
-    private AtividadeService atividadeService;
+    @InjectMocks private AtividadeService atividadeService;
 
-    @Mock
-    private AtividadeRepo atividadeRepo;
-    @Mock
-    private AtividadeMapper atividadeMapper;
-    @Mock
-    private ConhecimentoRepo conhecimentoRepo;
-    @Mock
-    private ConhecimentoMapper conhecimentoMapper;
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private UsuarioRepo usuarioRepo;
+    @Mock private AtividadeRepo atividadeRepo;
+    @Mock private AtividadeMapper atividadeMapper;
+    @Mock private ConhecimentoRepo conhecimentoRepo;
+    @Mock private ConhecimentoMapper conhecimentoMapper;
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private UsuarioRepo usuarioRepo;
 
     @Test
     @DisplayName("listar deve retornar todas atividades")
@@ -84,7 +76,7 @@ class AtividadeServiceTest {
         when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> atividadeService.obterPorCodigo(id))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -145,7 +137,8 @@ class AtividadeServiceTest {
 
         atividadeService.criar(dto, usuarioId);
 
-        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(subprocesso.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(subprocessoRepo).save(subprocesso);
     }
 
@@ -159,7 +152,7 @@ class AtividadeServiceTest {
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -174,7 +167,7 @@ class AtividadeServiceTest {
         when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -237,7 +230,7 @@ class AtividadeServiceTest {
     void atualizarNaoEncontrado() {
         when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> atividadeService.atualizar(1L, new AtividadeDto()))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -271,7 +264,7 @@ class AtividadeServiceTest {
     void excluirNaoEncontrado() {
         when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> atividadeService.excluir(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -292,7 +285,7 @@ class AtividadeServiceTest {
     void listarConhecimentosNaoEncontrada() {
         when(atividadeRepo.existsById(1L)).thenReturn(false);
         assertThatThrownBy(() -> atividadeService.listarConhecimentos(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -327,7 +320,7 @@ class AtividadeServiceTest {
     void criarConhecimentoAtividadeNaoEncontrada() {
         when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> atividadeService.criarConhecimento(1L, new ConhecimentoDto()))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -377,8 +370,11 @@ class AtividadeServiceTest {
 
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
-        assertThatThrownBy(() -> atividadeService.atualizarConhecimento(ativId, conId, new ConhecimentoDto()))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        assertThatThrownBy(
+                        () ->
+                                atividadeService.atualizarConhecimento(
+                                        ativId, conId, new ConhecimentoDto()))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -424,6 +420,6 @@ class AtividadeServiceTest {
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
         assertThatThrownBy(() -> atividadeService.excluirConhecimento(ativId, conId))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

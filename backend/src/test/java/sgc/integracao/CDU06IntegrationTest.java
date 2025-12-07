@@ -1,5 +1,15 @@
 package sgc.integracao;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,17 +39,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
@@ -48,18 +47,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
 
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @MockitoBean
-    private SgrhService sgrhService;
+    @MockitoBean private SgrhService sgrhService;
 
     private Processo processo;
 
@@ -75,19 +69,32 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     }
 
     private void setupSecurityContext(Unidade unidade, Perfil perfil) {
-        Usuario principal = new Usuario(
-                TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123",
-                unidade
-        );
-        principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(unidade).perfil(perfil).build());
-        
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        Usuario principal =
+                new Usuario(TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123", unidade);
+        principal
+                .getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(principal)
+                                .unidade(unidade)
+                                .perfil(perfil)
+                                .build());
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        principal, null, principal.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
         when(sgrhService.buscarPerfisUsuario(anyString()))
-                .thenReturn(List.of(new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
+                .thenReturn(
+                        List.of(
+                                new PerfilDto(
+                                        TEST_USER_ID,
+                                        unidade.getCodigo(),
+                                        unidade.getNome(),
+                                        perfil.name())));
     }
 
     @Test
@@ -97,7 +104,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                        processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -119,7 +132,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -133,7 +152,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.CHEFE);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -141,13 +166,21 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
+    @DisplayName(
+            "Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro"
+                    + " disponibilizado")
     void testPodeHomologarCadastro_true() throws Exception {
         Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -161,7 +194,13 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, processo.getDataLimite()));
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -176,12 +215,20 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
+        Subprocesso subprocesso =
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value("MAPEAMENTO_MAPA_HOMOLOGADO"))
+                .andExpect(
+                        jsonPath("$.unidades[0].situacaoSubprocesso")
+                                .value("MAPEAMENTO_MAPA_HOMOLOGADO"))
                 .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
     }
 }

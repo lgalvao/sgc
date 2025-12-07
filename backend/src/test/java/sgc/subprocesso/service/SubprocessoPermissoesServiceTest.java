@@ -1,5 +1,11 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,25 +20,18 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoPermissoesServiceTest {
 
-    @InjectMocks
-    private SubprocessoPermissoesService service;
+    @InjectMocks private SubprocessoPermissoesService service;
 
     @Test
     void devePermitirVisualizarImpactoParaAdminEmSituacaoCorreta() {
         Usuario admin = mock(Usuario.class);
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        atribuicoes.add(UsuarioPerfil.builder().perfil(Perfil.ADMIN).unidade(new Unidade()).build());
+        atribuicoes.add(
+                UsuarioPerfil.builder().perfil(Perfil.ADMIN).unidade(new Unidade()).build());
         when(admin.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);
@@ -48,7 +47,8 @@ class SubprocessoPermissoesServiceTest {
     void naoDevePermitirVisualizarImpactoParaAdminEmSituacaoIncorreta() {
         Usuario admin = mock(Usuario.class);
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        atribuicoes.add(UsuarioPerfil.builder().perfil(Perfil.ADMIN).unidade(new Unidade()).build());
+        atribuicoes.add(
+                UsuarioPerfil.builder().perfil(Perfil.ADMIN).unidade(new Unidade()).build());
         when(admin.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);
@@ -64,7 +64,8 @@ class SubprocessoPermissoesServiceTest {
     void naoDevePermitirVisualizarImpactoParaNaoAdmin() {
         Usuario gestor = mock(Usuario.class);
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        atribuicoes.add(UsuarioPerfil.builder().perfil(Perfil.GESTOR).unidade(new Unidade()).build());
+        atribuicoes.add(
+                UsuarioPerfil.builder().perfil(Perfil.GESTOR).unidade(new Unidade()).build());
         when(gestor.getTodasAtribuicoes()).thenReturn(atribuicoes);
 
         Subprocesso sub = mock(Subprocesso.class);

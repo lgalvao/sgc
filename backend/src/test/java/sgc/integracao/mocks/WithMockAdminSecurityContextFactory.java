@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,8 +13,10 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
+@Slf4j
 @Component
-public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
+public class WithMockAdminSecurityContextFactory
+        implements WithSecurityContextFactory<WithMockAdmin> {
     @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
 
@@ -29,10 +32,10 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
                 principal = usuarioRepo.findById(tituloAdmin).orElse(null);
                 dbAvailable = true;
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                log.error("Erro ao buscar usuario admin", e);
             }
         }
-        
+
         if (principal == null) {
             principal = new Usuario();
             principal.setTituloEleitoral(tituloAdmin);
@@ -40,23 +43,43 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
             principal.setEmail("admin@example.com");
             Unidade u = new Unidade("Unidade Mock", "UM");
             principal.setUnidadeLotacao(u);
-            principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
+            principal
+                    .getAtribuicoes()
+                    .add(
+                            sgc.sgrh.model.UsuarioPerfil.builder()
+                                    .usuario(principal)
+                                    .unidade(u)
+                                    .perfil(Perfil.ADMIN)
+                                    .build());
             if (dbAvailable) {
-                try { usuarioRepo.save(principal); } catch (Exception e) { }
+                try {
+                    usuarioRepo.save(principal);
+                } catch (Exception e) {
+                    log.error("Erro ao salvar usuario admin", e);
+                }
             }
         } else {
             if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
-                 Unidade u = new Unidade("Unidade Mock", "UM");
-                 principal.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(principal).unidade(u).perfil(Perfil.ADMIN).build());
+                Unidade u = new Unidade("Unidade Mock", "UM");
+                principal
+                        .getAtribuicoes()
+                        .add(
+                                sgc.sgrh.model.UsuarioPerfil.builder()
+                                        .usuario(principal)
+                                        .unidade(u)
+                                        .perfil(Perfil.ADMIN)
+                                        .build());
             }
             try {
                 usuarioRepo.save(principal);
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                log.error("Erro ao atualizar usuario admin", e);
             }
         }
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(
+                        principal, "password", principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
     }

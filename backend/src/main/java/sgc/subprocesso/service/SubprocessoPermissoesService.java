@@ -13,6 +13,8 @@ import sgc.subprocesso.model.Subprocesso;
 @Service
 @RequiredArgsConstructor
 public class SubprocessoPermissoesService {
+    private static final String ACAO_ENVIAR_REVISAO = "ENVIAR_REVISAO";
+    private static final String ACAO_AJUSTAR_MAPA = "AJUSTAR_MAPA";
 
     private final AtividadeRepo atividadeRepo;
 
@@ -21,22 +23,22 @@ public class SubprocessoPermissoesService {
             throw new ErroAccessoNegado("Unidade sem acesso a este subprocesso.");
         }
 
-        if ("ENVIAR_REVISAO".equals(acao)) {
+        if (ACAO_ENVIAR_REVISAO.equals(acao)) {
 
-            if (!SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO.equals(subprocesso.getSituacao())) {
+            if (SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO != subprocesso.getSituacao()) {
                 throw new ErroAccessoNegado("Situação inválida.");
             }
 
-        } else if ("AJUSTAR_MAPA".equals(acao)) {
+        } else if (ACAO_AJUSTAR_MAPA.equals(acao)) {
 
-            if (!SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.equals(subprocesso.getSituacao())
-                    && !SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
+            if (SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA != subprocesso.getSituacao()
+                    && SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO != subprocesso.getSituacao()) {
                 throw new ErroAccessoNegado("Situação inválida para ajuste.");
             }
 
             if (subprocesso.getMapa() != null
                     && atividadeRepo.countByMapaCodigo(subprocesso.getMapa().getCodigo()) == 0
-                    && SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO.equals(subprocesso.getSituacao())) {
+                    && SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO == subprocesso.getSituacao()) {
                 throw new ErroAccessoNegado("Mapa vazio.");
             }
         }
@@ -52,61 +54,85 @@ public class SubprocessoPermissoesService {
 
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso sp, Usuario usuario) {
         // Implementação básica de permissões baseada no perfil e unidade do usuário
-        boolean isAdmin = usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> a.getPerfil() == Perfil.ADMIN);
+        boolean isAdmin =
+                usuario.getTodasAtribuicoes().stream().anyMatch(a -> a.getPerfil() == Perfil.ADMIN);
 
         // Null checks added for unit code to prevent NPE in tests where units are mocked empty
         Long spUnidadeCodigo = sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null;
 
-        boolean isGestorUnidade = spUnidadeCodigo != null && usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> a.getPerfil() == Perfil.GESTOR
-                        && a.getUnidade() != null && a.getUnidade().getCodigo() != null
-                        && (a.getUnidade().getCodigo().equals(spUnidadeCodigo)
-                                || isSubordinada(sp.getUnidade(), a.getUnidade())));
+        boolean isGestorUnidade =
+                spUnidadeCodigo != null
+                        && usuario.getTodasAtribuicoes().stream()
+                                .anyMatch(
+                                        a ->
+                                                a.getPerfil() == Perfil.GESTOR
+                                                        && a.getUnidade() != null
+                                                        && a.getUnidade().getCodigo() != null
+                                                        && (a.getUnidade()
+                                                                        .getCodigo()
+                                                                        .equals(spUnidadeCodigo)
+                                                                || isSubordinada(
+                                                                        sp.getUnidade(),
+                                                                        a.getUnidade())));
 
-        boolean isChefeOuServidorUnidade = spUnidadeCodigo != null && usuario.getTodasAtribuicoes().stream()
-                .anyMatch(a -> (a.getPerfil() == Perfil.CHEFE || a.getPerfil() == Perfil.SERVIDOR)
-                        && a.getUnidade() != null && a.getUnidade().getCodigo() != null
-                        && a.getUnidade().getCodigo().equals(spUnidadeCodigo));
+        boolean isChefeOuServidorUnidade =
+                spUnidadeCodigo != null
+                        && usuario.getTodasAtribuicoes().stream()
+                                .anyMatch(
+                                        a ->
+                                                (a.getPerfil() == Perfil.CHEFE
+                                                                || a.getPerfil() == Perfil.SERVIDOR)
+                                                        && a.getUnidade() != null
+                                                        && a.getUnidade().getCodigo() != null
+                                                        && a.getUnidade()
+                                                                .getCodigo()
+                                                                .equals(spUnidadeCodigo));
 
         boolean acessoEdicao = isAdmin || isGestorUnidade || isChefeOuServidorUnidade;
 
         // Logic for visualization impact based on test expectation:
         // Test expects isPodeVisualizarImpacto() to be true for ADMIN only if situation is correct.
         // Test expects it to be false for incorrect situation.
-        // Test expects it to be false for GESTOR even if situation is correct (Wait, test name is "naoDevePermitirVisualizarImpactoParaNaoAdmin", so Gestor shouldn't see it?)
+        // Test expects it to be false for GESTOR even if situation is correct (Wait, test name is
+        // "naoDevePermitirVisualizarImpactoParaNaoAdmin", so Gestor shouldn't see it?)
 
         // However, existing logic said:
         // .podeVisualizarImpacto(isAdmin || isGestorUnidade)
 
-        // The failing test "naoDevePermitirVisualizarImpactoParaAdminEmSituacaoIncorreta" expects FALSE but got TRUE.
+        // The failing test "naoDevePermitirVisualizarImpactoParaAdminEmSituacaoIncorreta" expects
+        // FALSE but got TRUE.
         // This means we need to check the situation for Impact visualization as well.
-        boolean situacaoImpactoValida = sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
-        boolean podeVisualizarImpacto = (isAdmin || isGestorUnidade) && situacaoImpactoValida;
+        boolean situacaoImpactoValida =
+                sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
 
-        // But test "naoDevePermitirVisualizarImpactoParaNaoAdmin" failed with NPE, but implied it expects FALSE.
-        // If I fix NPE, I need to know if Gestor SHOULD see it. The test name suggests "NaoAdmin" shouldn't see it.
-        // But my previous code allowed Gestor. I will restrict to Admin to satisfy the test name "NaoAdmin".
+        // But test "naoDevePermitirVisualizarImpactoParaNaoAdmin" failed with NPE, but implied it
+        // expects FALSE.
+        // If I fix NPE, I need to know if Gestor SHOULD see it. The test name suggests "NaoAdmin"
+        // shouldn't see it.
+        // But my previous code allowed Gestor. I will restrict to Admin to satisfy the test name
+        // "NaoAdmin".
+        boolean podeVisualizarImpacto;
         if (isAdmin) {
-             podeVisualizarImpacto = situacaoImpactoValida;
+            podeVisualizarImpacto = situacaoImpactoValida;
         } else {
-             podeVisualizarImpacto = false;
+            podeVisualizarImpacto = false;
         }
 
         return SubprocessoPermissoesDto.builder()
-            .podeEditarMapa(acessoEdicao)
-            .podeVisualizarMapa(true)
-            .podeVerPagina(true)
-            .podeDisponibilizarCadastro(acessoEdicao)
-            .podeDevolverCadastro(isAdmin || isGestorUnidade)
-            .podeAceitarCadastro(isAdmin || isGestorUnidade)
-            .podeVisualizarDiagnostico(true)
-            .podeAlterarDataLimite(isAdmin)
-            .podeVisualizarImpacto(podeVisualizarImpacto)
-            .build();
+                .podeEditarMapa(acessoEdicao)
+                .podeVisualizarMapa(true)
+                .podeVerPagina(true)
+                .podeDisponibilizarCadastro(acessoEdicao)
+                .podeDevolverCadastro(isAdmin || isGestorUnidade)
+                .podeAceitarCadastro(isAdmin || isGestorUnidade)
+                .podeVisualizarDiagnostico(true)
+                .podeAlterarDataLimite(isAdmin)
+                .podeVisualizarImpacto(podeVisualizarImpacto)
+                .build();
     }
 
-    private boolean isSubordinada(sgc.unidade.model.Unidade alvo, sgc.unidade.model.Unidade superior) {
+    private boolean isSubordinada(
+            sgc.unidade.model.Unidade alvo, sgc.unidade.model.Unidade superior) {
         if (alvo == null || superior == null || alvo.getUnidadeSuperior() == null) return false;
 
         sgc.unidade.model.Unidade atual = alvo;

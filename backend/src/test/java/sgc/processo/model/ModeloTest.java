@@ -1,12 +1,11 @@
 package sgc.processo.model;
 
-import org.junit.jupiter.api.Test;
-import sgc.processo.erros.ErroProcesso;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import sgc.processo.erros.ErroProcesso;
 
 class ModeloTest {
     @Test
@@ -31,7 +30,9 @@ class ModeloTest {
         assertEquals(SituacaoProcesso.CRIADO, processo.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
 
-        Processo processo2 = new Processo("Descricao", TipoProcesso.MAPEAMENTO, SituacaoProcesso.CRIADO, dataLimite);
+        Processo processo2 =
+                new Processo(
+                        "Descricao", TipoProcesso.MAPEAMENTO, SituacaoProcesso.CRIADO, dataLimite);
         assertNotNull(processo2);
     }
 

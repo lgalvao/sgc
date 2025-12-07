@@ -1,5 +1,11 @@
 package sgc.alerta.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,18 +22,10 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class AlertaMapperTest {
 
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
 
     // Subclass to test protected methods and inject mocks
     static class AlertaMapperImpl extends AlertaMapper {
@@ -37,8 +35,7 @@ class AlertaMapperTest {
         }
     }
 
-    @InjectMocks
-    private AlertaMapperImpl mapper;
+    @InjectMocks private AlertaMapperImpl mapper;
 
     @Test
     @DisplayName("formatDataHora returns formatted string")
@@ -82,7 +79,14 @@ class AlertaMapperTest {
         Unidade uUser = new Unidade();
         uUser.setCodigo(10L);
         user.setUnidadeLotacao(uUser);
-        user.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(user).unidade(uUser).perfil(sgc.sgrh.model.Perfil.SERVIDOR).build()); // Add a profile to avoid empty attributions logic if tested
+        user.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(user)
+                                .unidade(uUser)
+                                .perfil(sgc.sgrh.model.Perfil.SERVIDOR)
+                                .build()); // Add a profile to avoid empty attributions logic if
+        // tested
 
         Authentication auth = mock(Authentication.class);
         SecurityContext sc = mock(SecurityContext.class);
@@ -92,7 +96,8 @@ class AlertaMapperTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(50L);
-        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 10L))
+                .thenReturn(Optional.of(sp));
 
         String link = mapper.buildLinkDestino(alerta);
         assertThat(link).isEqualTo("/subprocessos/50");

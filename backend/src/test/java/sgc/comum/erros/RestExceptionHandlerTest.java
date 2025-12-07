@@ -1,5 +1,7 @@
 package sgc.comum.erros;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,13 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 class RestExceptionHandlerTest {
 
-    @InjectMocks
-    private RestExceptionHandler handler;
+    @InjectMocks private RestExceptionHandler handler;
 
     @Test
     @DisplayName("Deve tratar ErroEntidadeNaoEncontrada com status 404")

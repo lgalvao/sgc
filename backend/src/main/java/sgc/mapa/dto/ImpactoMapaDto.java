@@ -1,14 +1,13 @@
 package sgc.mapa.dto;
 
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
 /**
- * DTO que representa o resultado completo da análise de impactos
- * no mapa de competências devido a alterações no cadastro de atividades.
- * <p>
- * CDU-12 - Verificar impactos no mapa de competências
+ * DTO que representa o resultado completo da análise de impactos no mapa de competências devido a
+ * alterações no cadastro de atividades.
+ *
+ * <p>CDU-12 - Verificar impactos no mapa de competências
  */
 @Getter
 @Setter
@@ -40,9 +39,12 @@ public class ImpactoMapaDto {
             List<AtividadeImpactadaDto> atividadesInseridas,
             List<AtividadeImpactadaDto> atividadesRemovidas,
             List<AtividadeImpactadaDto> atividadesAlteradas,
-            List<CompetenciaImpactadaDto> competenciasImpactadas
-    ) {
-        boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
+            List<CompetenciaImpactadaDto> competenciasImpactadas) {
+        boolean temImpactos =
+                !atividadesInseridas.isEmpty()
+                        || !atividadesRemovidas.isEmpty()
+                        || !atividadesAlteradas.isEmpty()
+                        || !competenciasImpactadas.isEmpty();
         // TODO Usar sempre o builder, nao usar esses construtores enormes
         return new ImpactoMapaDto(
                 temImpactos,
@@ -53,7 +55,6 @@ public class ImpactoMapaDto {
                 List.copyOf(atividadesInseridas),
                 List.copyOf(atividadesRemovidas),
                 List.copyOf(atividadesAlteradas),
-                List.copyOf(competenciasImpactadas)
-        );
+                List.copyOf(competenciasImpactadas));
     }
 }

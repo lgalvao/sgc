@@ -1,5 +1,6 @@
 package sgc.atividade;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +18,7 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.util.List;
-
-/**
- * Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos.
- */
+/** Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos. */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,10 +36,7 @@ public class AtividadeService {
      * @return Uma {@link List} de {@link AtividadeDto}.
      */
     public List<AtividadeDto> listar() {
-        return atividadeRepo.findAll()
-                .stream()
-                .map(atividadeMapper::toDto)
-                .toList();
+        return atividadeRepo.findAll().stream().map(atividadeMapper::toDto).toList();
     }
 
     /**
@@ -53,7 +47,8 @@ public class AtividadeService {
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public AtividadeDto obterPorCodigo(Long codAtividade) {
-        return atividadeRepo.findById(codAtividade)
+        return atividadeRepo
+                .findById(codAtividade)
                 .map(atividadeMapper::toDto)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
@@ -61,27 +56,37 @@ public class AtividadeService {
     /**
      * Cria uma nova atividade, realizando validações de segurança e de estado do subprocesso.
      *
-     * @param atividadeDto  O DTO com os dados da nova atividade.
+     * @param atividadeDto O DTO com os dados da nova atividade.
      * @param tituloUsuario O título de eleitor do usuário que está criando a atividade.
      * @return O {@link AtividadeDto} da atividade criada.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou o usuário não forem encontrados.
-     * @throws ErroAccessoNegado         se o usuário não for o titular da unidade do subprocesso.
-     * @throws ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
+     * @throws ErroAccessoNegado se o usuário não for o titular da unidade do subprocesso.
+     * @throws ErroSituacaoInvalida se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
-        var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.getMapaCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo())));
+        var subprocesso =
+                subprocessoRepo
+                        .findByMapaCodigo(atividadeDto.getMapaCodigo())
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado para o mapa com código %d"
+                                                        .formatted(atividadeDto.getMapaCodigo())));
 
-        var usuario = usuarioRepo.findById(tituloUsuario)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
+        var usuario =
+                usuarioRepo
+                        .findById(tituloUsuario)
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
         // Apesar da segurança estar configurada, mantemos esta verificação como proteção extra.
         if (subprocesso.getUnidade() == null) {
-            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+            throw new ErroEntidadeNaoEncontrada(
+                    "Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
         }
         if (!usuario.equals(subprocesso.getUnidade().getTitular())) {
-            throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
+            throw new ErroAccessoNegado(
+                    "Usuário não autorizado a criar atividades para este subprocesso.");
         }
 
         atualizarSituacaoSubprocessoSeNecessario(atividadeDto.getMapaCodigo());
@@ -95,21 +100,24 @@ public class AtividadeService {
     /**
      * Atualiza uma atividade existente.
      *
-     * @param codigo       O código da atividade a ser atualizada.
+     * @param codigo O código da atividade a ser atualizada.
      * @param atividadeDto O DTO com os novos dados da atividade.
      * @return O {@link AtividadeDto} da atividade atualizada.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public AtividadeDto atualizar(Long codigo, AtividadeDto atividadeDto) {
-        return atividadeRepo.findById(codigo)
-                .map(existente -> {
-                    atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
-                    var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
-                    existente.setDescricao(entidadeParaAtualizar.getDescricao());
+        return atividadeRepo
+                .findById(codigo)
+                .map(
+                        existente -> {
+                            atualizarSituacaoSubprocessoSeNecessario(
+                                    existente.getMapa().getCodigo());
+                            var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
+                            existente.setDescricao(entidadeParaAtualizar.getDescricao());
 
-                    var atualizado = atividadeRepo.save(existente);
-                    return atividadeMapper.toDto(atualizado);
-                })
+                            var atualizado = atividadeRepo.save(existente);
+                            return atividadeMapper.toDto(atualizado);
+                        })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
     }
 
@@ -120,14 +128,20 @@ public class AtividadeService {
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public void excluir(Long codAtividade) {
-        atividadeRepo.findById(codAtividade).ifPresentOrElse(atividade -> {
-            atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
-            var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
-            conhecimentoRepo.deleteAll(conhecimentos);
-            atividadeRepo.delete(atividade);
-        }, () -> {
-            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
-        });
+        atividadeRepo
+                .findById(codAtividade)
+                .ifPresentOrElse(
+                        atividade -> {
+                            atualizarSituacaoSubprocessoSeNecessario(
+                                    atividade.getMapa().getCodigo());
+                            var conhecimentos =
+                                    conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+                            conhecimentoRepo.deleteAll(conhecimentos);
+                            atividadeRepo.delete(atividade);
+                        },
+                        () -> {
+                            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
+                        });
     }
 
     /**
@@ -141,8 +155,7 @@ public class AtividadeService {
         if (!atividadeRepo.existsById(codAtividade)) {
             throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
         }
-        return conhecimentoRepo.findByAtividadeCodigo(codAtividade)
-                .stream()
+        return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
                 .map(conhecimentoMapper::toDto)
                 .toList();
     }
@@ -150,70 +163,91 @@ public class AtividadeService {
     /**
      * Cria um novo conhecimento e o associa a uma atividade existente.
      *
-     * @param codAtividade    O código da atividade à qual o conhecimento será associado.
+     * @param codAtividade O código da atividade à qual o conhecimento será associado.
      * @param conhecimentoDto O DTO com os dados do novo conhecimento.
      * @return O {@link ConhecimentoDto} do conhecimento criado.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public ConhecimentoDto criarConhecimento(Long codAtividade, ConhecimentoDto conhecimentoDto) {
-        return atividadeRepo.findById(codAtividade)
-                .map(atividade -> {
-                    atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
-                    var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
-                    conhecimento.setAtividade(atividade);
-                    var salvo = conhecimentoRepo.save(conhecimento);
-                    return conhecimentoMapper.toDto(salvo);
-                })
+        return atividadeRepo
+                .findById(codAtividade)
+                .map(
+                        atividade -> {
+                            atualizarSituacaoSubprocessoSeNecessario(
+                                    atividade.getMapa().getCodigo());
+                            var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
+                            conhecimento.setAtividade(atividade);
+                            var salvo = conhecimentoRepo.save(conhecimento);
+                            return conhecimentoMapper.toDto(salvo);
+                        })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
 
     /**
      * Atualiza um conhecimento existente, verificando se ele pertence à atividade especificada.
      *
-     * @param codAtividade    O código da atividade pai.
+     * @param codAtividade O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
      * @return O {@link ConhecimentoDto} do conhecimento atualizado.
-     * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à atividade.
+     * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
+     *     atividade.
      */
-    public ConhecimentoDto atualizarConhecimento(Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
-        return conhecimentoRepo.findById(codConhecimento)
+    public ConhecimentoDto atualizarConhecimento(
+            Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
+        return conhecimentoRepo
+                .findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .map(existente -> {
-                    atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());
-                    var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
-                    existente.setDescricao(paraAtualizar.getDescricao());
-                    var atualizado = conhecimentoRepo.save(existente);
-                    return conhecimentoMapper.toDto(atualizado);
-                })
+                .map(
+                        existente -> {
+                            atualizarSituacaoSubprocessoSeNecessario(
+                                    existente.getAtividade().getMapa().getCodigo());
+                            var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
+                            existente.setDescricao(paraAtualizar.getDescricao());
+                            var atualizado = conhecimentoRepo.save(existente);
+                            return conhecimentoMapper.toDto(atualizado);
+                        })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
     }
 
     /**
      * Exclui um conhecimento, verificando se ele pertence à atividade especificada.
      *
-     * @param codAtividade    O código da atividade pai.
+     * @param codAtividade O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
-     * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à atividade.
+     * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
+     *     atividade.
      */
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        conhecimentoRepo.findById(codConhecimento)
+        conhecimentoRepo
+                .findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .ifPresentOrElse(conhecimento -> {
-                    atualizarSituacaoSubprocessoSeNecessario(conhecimento.getAtividade().getMapa().getCodigo());
-                    conhecimentoRepo.delete(conhecimento);
-                }, () -> {
-                    throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
-                });
+                .ifPresentOrElse(
+                        conhecimento -> {
+                            atualizarSituacaoSubprocessoSeNecessario(
+                                    conhecimento.getAtividade().getMapa().getCodigo());
+                            conhecimentoRepo.delete(conhecimento);
+                        },
+                        () -> {
+                            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
+                        });
     }
 
     private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo.findByMapaCodigo(mapaCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+        var subprocesso =
+                subprocessoRepo
+                        .findByMapaCodigo(mapaCodigo)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado para o mapa com código %d"
+                                                        .formatted(mapaCodigo)));
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+                throw new ErroEntidadeNaoEncontrada(
+                        "Processo não associado ao Subprocesso %d"
+                                .formatted(subprocesso.getCodigo()));
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {

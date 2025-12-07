@@ -1,5 +1,12 @@
 package sgc.integracao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,14 +31,6 @@ import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
@@ -39,23 +38,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired private MovimentacaoRepo movimentacaoRepo;
 
-    @Autowired
-    private AlertaRepo alertaRepo;
+    @Autowired private AlertaRepo alertaRepo;
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private MapaRepo mapaRepo;
+    @Autowired private MapaRepo mapaRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -78,7 +71,13 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         Mapa mapa = new Mapa();
         mapaRepo.save(mapa);
 
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, processo.getDataLimite());
+        subprocesso =
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        mapa,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
+                        processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
     }
 
@@ -86,27 +85,39 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Testes para o fluxo de 'Apresentar Sugestões'")
     class ApresentarSugestoesTest {
         @Test
-        @DisplayName("Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
+        @DisplayName(
+                "Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
         @WithMockChefe
         void testApresentarSugestoes_Sucesso() throws Exception {
             String sugestoes = "Minha sugestão de teste";
 
-            mockMvc.perform(post("/api/subprocessos/{id}/apresentar-sugestoes", subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType("application/json")
-                            .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
+            mockMvc.perform(
+                            post(
+                                            "/api/subprocessos/{id}/apresentar-sugestoes",
+                                            subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType("application/json")
+                                    .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
                     .andExpect(status().isOk());
 
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+            Subprocesso subprocessoAtualizado =
+                    subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes =
+                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                            subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Sugestões apresentadas para o mapa de competências");
-            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+            assertThat(movimentacoes.getFirst().getDescricao())
+                    .isEqualTo("Sugestões apresentadas para o mapa de competências");
+            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())
+                    .isEqualTo(unidade.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
+            List<Alerta> alertas =
+                    alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
         }
     }
@@ -118,23 +129,34 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")
         @WithMockChefe
         void testValidarMapa_Sucesso() throws Exception {
-            mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
-                            .with(csrf()))
+            mockMvc.perform(
+                            post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                                    .with(csrf()))
                     .andExpect(status().isOk());
 
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            Subprocesso subprocessoAtualizado =
+                    subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes =
+                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                            subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Validação do mapa de competências");
-            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(movimentacoes.getFirst().getDescricao())
+                    .isEqualTo("Validação do mapa de competências");
+            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())
+                    .isEqualTo(unidade.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
 
-            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+            List<Alerta> alertas =
+                    alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
-            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da SEDIA aguardando análise");
-            assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(alertas.getFirst().getDescricao())
+                    .contains("Validação do mapa de competências da SEDIA aguardando análise");
+            assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
         }
     }
 }

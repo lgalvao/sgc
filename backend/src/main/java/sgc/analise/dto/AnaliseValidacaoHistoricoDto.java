@@ -1,13 +1,12 @@
 package sgc.analise.dto;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
-
-import java.time.LocalDateTime;
 
 @Value
 @Builder

@@ -1,5 +1,13 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,15 +46,6 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -96,11 +95,18 @@ class SubprocessoDtoServiceTest {
         when(auth.getName()).thenReturn("admin");
 
         Usuario admin = new Usuario();
-        admin.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(admin).unidade(new Unidade()).perfil(Perfil.ADMIN).build());
+        admin.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(admin)
+                                .unidade(new Unidade())
+                                .perfil(Perfil.ADMIN)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
+                .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
@@ -111,7 +117,7 @@ class SubprocessoDtoServiceTest {
     @DisplayName("obterDetalhes falha se perfil null")
     void obterDetalhesPerfilNull() {
         assertThatThrownBy(() -> service.obterDetalhes(1L, null, null))
-            .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -135,11 +141,18 @@ class SubprocessoDtoServiceTest {
 
         Usuario servidor = new Usuario();
         servidor.setUnidadeLotacao(u);
-        servidor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(servidor).unidade(u).perfil(Perfil.SERVIDOR).build());
+        servidor.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(servidor)
+                                .unidade(u)
+                                .perfil(Perfil.SERVIDOR)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
+                .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.SERVIDOR, 10L);
 
@@ -167,13 +180,19 @@ class SubprocessoDtoServiceTest {
 
         Usuario servidor = new Usuario();
         servidor.setUnidadeLotacao(u2);
-        servidor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(servidor).unidade(u2).perfil(Perfil.SERVIDOR).build());
+        servidor.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(servidor)
+                                .unidade(u2)
+                                .perfil(Perfil.SERVIDOR)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
 
         assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.SERVIDOR, null))
-            .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -197,11 +216,18 @@ class SubprocessoDtoServiceTest {
 
         Usuario gestor = new Usuario();
         gestor.setUnidadeLotacao(u);
-        gestor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(gestor).unidade(u).perfil(Perfil.GESTOR).build());
+        gestor.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(gestor)
+                                .unidade(u)
+                                .perfil(Perfil.GESTOR)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
+                .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.GESTOR, 10L);
 
@@ -229,13 +255,19 @@ class SubprocessoDtoServiceTest {
 
         Usuario gestor = new Usuario();
         gestor.setUnidadeLotacao(u2);
-        gestor.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(gestor).unidade(u2).perfil(Perfil.GESTOR).build());
+        gestor.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(gestor)
+                                .unidade(u2)
+                                .perfil(Perfil.GESTOR)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
 
         assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.GESTOR, 20L))
-            .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -255,11 +287,18 @@ class SubprocessoDtoServiceTest {
         when(auth.getName()).thenReturn("admin");
 
         Usuario admin = new Usuario();
-        admin.getAtribuicoes().add(sgc.sgrh.model.UsuarioPerfil.builder().usuario(admin).unidade(new Unidade()).perfil(Perfil.ADMIN).build());
+        admin.getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(admin)
+                                .unidade(new Unidade())
+                                .perfil(Perfil.ADMIN)
+                                .build());
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
-        when(subprocessoPermissoesService.calcularPermissoes(any(), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
+                .thenReturn(SubprocessoPermissoesDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
@@ -280,7 +319,8 @@ class SubprocessoDtoServiceTest {
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(atividadeRepo.findByMapaCodigo(100L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(10L)).thenReturn(List.of(new Conhecimento()));
+        when(repositorioConhecimento.findByAtividadeCodigo(10L))
+                .thenReturn(List.of(new Conhecimento()));
         when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
 
         var res = service.obterCadastro(id);
@@ -323,7 +363,7 @@ class SubprocessoDtoServiceTest {
     void obterSugestoesNaoEncontrado() {
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.obterSugestoes(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -335,7 +375,8 @@ class SubprocessoDtoServiceTest {
         sp.getMapa().setCodigo(100L);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO)).thenReturn(Collections.emptyList());
+        when(analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO))
+                .thenReturn(Collections.emptyList());
 
         var res = service.obterMapaParaAjuste(id);
 
@@ -352,7 +393,7 @@ class SubprocessoDtoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.obterMapaParaAjuste(id))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -363,15 +404,17 @@ class SubprocessoDtoServiceTest {
 
         assertThat(service.listar()).hasSize(1);
 
-        when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L)).thenReturn(Optional.of(new Subprocesso()));
+        when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L))
+                .thenReturn(Optional.of(new Subprocesso()));
         assertThat(service.obterPorProcessoEUnidade(1L, 1L)).isNotNull();
     }
 
     @Test
     @DisplayName("obterPorProcessoEUnidade falha se nao encontrado")
     void obterPorProcessoEUnidadeNaoEncontrado() {
-        when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L)).thenReturn(Optional.empty());
+        when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L))
+                .thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.obterPorProcessoEUnidade(1L, 1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

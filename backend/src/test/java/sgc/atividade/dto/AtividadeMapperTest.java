@@ -1,5 +1,9 @@
 package sgc.atividade.dto;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,19 +14,13 @@ import sgc.atividade.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class AtividadeMapperTest {
     private static final String TEST_DESCRIPTION = "Test Description";
 
     private final AtividadeMapper mapper = Mappers.getMapper(AtividadeMapper.class);
 
-    @Mock
-    private MapaRepo mapaRepo;
+    @Mock private MapaRepo mapaRepo;
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {

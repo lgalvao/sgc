@@ -16,7 +16,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Movimentacao extends EntidadeBase {
-    public Movimentacao(Long codigo, Subprocesso subprocesso, Usuario usuario, String descricao, LocalDateTime dataHora) {
+    public Movimentacao(
+            Long codigo,
+            Subprocesso subprocesso,
+            Usuario usuario,
+            String descricao,
+            LocalDateTime dataHora) {
         super(codigo);
         this.subprocesso = subprocesso;
         this.usuario = usuario;
@@ -47,10 +52,15 @@ public class Movimentacao extends EntidadeBase {
     private Usuario usuario;
 
     /**
-     * Construtor de conveniência para registrar uma nova movimentação.
-     * A data e hora são preenchidas automaticamente.
+     * Construtor de conveniência para registrar uma nova movimentação. A data e hora são
+     * preenchidas automaticamente.
      */
-    public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao, Usuario usuario) {
+    public Movimentacao(
+            Subprocesso subprocesso,
+            Unidade unidadeOrigem,
+            Unidade unidadeDestino,
+            String descricao,
+            Usuario usuario) {
         super();
         this.subprocesso = subprocesso;
         this.unidadeOrigem = unidadeOrigem;
@@ -58,17 +68,5 @@ public class Movimentacao extends EntidadeBase {
         this.descricao = descricao;
         this.usuario = usuario;
         this.dataHora = LocalDateTime.now();
-    }
-
-    @Override
-    public String toString() {
-        return """
-                Movimentacao{descricao='%s',
-                             unidadeDestino=%s,
-                             unidadeOrigem=%s,
-                             dataHora=%s,
-                             subprocesso=%s,
-                             usuario=%s}
-                """.formatted(descricao, unidadeDestino, unidadeOrigem, dataHora, subprocesso, usuario);
     }
 }

@@ -1,12 +1,11 @@
 package sgc.processo.eventos;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 class EventosTest {
     @Test
@@ -27,9 +26,8 @@ class EventosTest {
 
     @Test
     void processoIniciadoEvento_Getters() {
-        EventoProcessoIniciado evento = new EventoProcessoIniciado(
-                1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L)
-        );
+        EventoProcessoIniciado evento =
+                new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L));
 
         assertEquals(1L, evento.getCodProcesso());
         assertEquals("MAPEAMENTO", evento.getTipo());

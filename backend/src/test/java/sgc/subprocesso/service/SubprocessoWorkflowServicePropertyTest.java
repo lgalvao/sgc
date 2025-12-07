@@ -1,5 +1,11 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 import net.jqwik.api.Assume;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
@@ -14,13 +20,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class SubprocessoWorkflowServicePropertyTest {
 
     private SubprocessoRepo repositorioSubprocesso = mock(SubprocessoRepo.class);
@@ -30,15 +29,21 @@ class SubprocessoWorkflowServicePropertyTest {
     private SubprocessoService subprocessoService = mock(SubprocessoService.class);
     private ImpactoMapaService impactoMapaService = mock(ImpactoMapaService.class);
 
-    private SubprocessoWorkflowService service = new SubprocessoWorkflowService(
-        repositorioSubprocesso, publicadorDeEventos, unidadeRepo, analiseService,
-        subprocessoService, impactoMapaService
-    );
+    private SubprocessoWorkflowService service =
+            new SubprocessoWorkflowService(
+                    repositorioSubprocesso,
+                    publicadorDeEventos,
+                    unidadeRepo,
+                    analiseService,
+                    subprocessoService,
+                    impactoMapaService);
 
     @Property
-    void disponibilizarMapaDeveFalharSeEstadoInvalido(@ForAll SituacaoSubprocesso situacao, @ForAll String obs) {
-        Assume.that(situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                 && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+    void disponibilizarMapaDeveFalharSeEstadoInvalido(
+            @ForAll SituacaoSubprocesso situacao, @ForAll String obs) {
+        Assume.that(
+                situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                        && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
         Long codSubprocesso = 1L;
         Subprocesso sp = new Subprocesso();
@@ -49,16 +54,18 @@ class SubprocessoWorkflowServicePropertyTest {
 
         Usuario usuario = new Usuario();
 
-        Throwable thrown = catchThrowable(() ->
-            service.disponibilizarMapa(codSubprocesso, obs, null, usuario)
-        );
+        Throwable thrown =
+                catchThrowable(
+                        () -> service.disponibilizarMapa(codSubprocesso, obs, null, usuario));
 
-        assertThat(thrown).isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("Estado atual: " + situacao);
+        assertThat(thrown)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Estado atual: " + situacao);
     }
 
     @Property
-    void disponibilizarCadastroDeveFalharSeUsuarioNaoForTitular(@ForAll String usuarioId, @ForAll String titularId) {
+    void disponibilizarCadastroDeveFalharSeUsuarioNaoForTitular(
+            @ForAll String usuarioId, @ForAll String titularId) {
         Assume.that(usuarioId != null && !usuarioId.equals(titularId));
 
         Long codSubprocesso = 1L;
@@ -77,9 +84,8 @@ class SubprocessoWorkflowServicePropertyTest {
 
         when(repositorioSubprocesso.findById(codSubprocesso)).thenReturn(Optional.of(sp));
 
-        Throwable thrown = catchThrowable(() ->
-            service.disponibilizarCadastro(codSubprocesso, usuario)
-        );
+        Throwable thrown =
+                catchThrowable(() -> service.disponibilizarCadastro(codSubprocesso, usuario));
 
         assertThat(thrown).isInstanceOf(ErroAccessoNegado.class);
     }

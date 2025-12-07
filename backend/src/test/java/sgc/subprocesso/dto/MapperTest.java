@@ -1,5 +1,11 @@
 package sgc.subprocesso.dto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,39 +22,33 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
 
-    @Mock
-    private ProcessoRepo processoRepo;
+    @Mock private ProcessoRepo processoRepo;
 
-    @Mock
-    private UnidadeRepo unidadeRepo;
+    @Mock private UnidadeRepo unidadeRepo;
 
-    @Mock
-    private MapaRepo mapaRepo;
+    @Mock private MapaRepo mapaRepo;
 
-    private final MovimentacaoMapper movimentacaoMapper = Mappers.getMapper(MovimentacaoMapper.class);
+    private final MovimentacaoMapper movimentacaoMapper =
+            Mappers.getMapper(MovimentacaoMapper.class);
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
-        java.lang.reflect.Field processoRepoField = SubprocessoMapper.class.getDeclaredField("processoRepo");
+        java.lang.reflect.Field processoRepoField =
+                SubprocessoMapper.class.getDeclaredField("processoRepo");
         processoRepoField.setAccessible(true);
         processoRepoField.set(subprocessoMapper, processoRepo);
 
-        java.lang.reflect.Field unidadeRepoField = SubprocessoMapper.class.getDeclaredField("unidadeRepo");
+        java.lang.reflect.Field unidadeRepoField =
+                SubprocessoMapper.class.getDeclaredField("unidadeRepo");
         unidadeRepoField.setAccessible(true);
         unidadeRepoField.set(subprocessoMapper, unidadeRepo);
 
-        java.lang.reflect.Field mapaRepoField = SubprocessoMapper.class.getDeclaredField("mapaRepo");
+        java.lang.reflect.Field mapaRepoField =
+                SubprocessoMapper.class.getDeclaredField("mapaRepo");
         mapaRepoField.setAccessible(true);
         mapaRepoField.set(subprocessoMapper, mapaRepo);
     }
@@ -87,17 +87,17 @@ class MapperTest {
 
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
-        SubprocessoDto dto = new SubprocessoDto(
-                1L,
-                100L,
-                200L,
-                300L,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(10),
-                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
-        );
+        SubprocessoDto dto =
+                new SubprocessoDto(
+                        1L,
+                        100L,
+                        200L,
+                        300L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusDays(10),
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Processo processo = new Processo();
         processo.setCodigo(100L);

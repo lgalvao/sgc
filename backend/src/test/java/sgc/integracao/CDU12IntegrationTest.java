@@ -1,5 +1,11 @@
 package sgc.integracao;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,40 +33,32 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Transactional
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, WithMockAdminSecurityContextFactory.class, WithMockGestorSecurityContextFactory.class})
+@Import({
+    TestSecurityConfig.class,
+    WithMockChefeSecurityContextFactory.class,
+    WithMockAdminSecurityContextFactory.class,
+    WithMockGestorSecurityContextFactory.class
+})
 @DisplayName("CDU-12: Verificar impactos no mapa de competências")
 class CDU12IntegrationTest extends BaseIntegrationTest {
 
-    private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA = "/api/subprocessos/{codigo}/impactos-mapa";
+    private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA =
+            "/api/subprocessos/{codigo}/impactos-mapa";
     private static final String CHEFE_TITULO = "121212121212";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
     private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.totalAtividadesInseridas";
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
 
-
     // Repositories
-    @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
+    @Autowired private ProcessoRepo processoRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired private MapaRepo mapaRepo;
+    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired private CompetenciaRepo competenciaRepo;
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
@@ -69,17 +67,16 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private Mapa mapaSubprocesso;
     private Unidade unidade;
 
-
     @BeforeEach
     void setUp() {
         unidade = unidadeRepo.findById(12L).orElseThrow();
 
-        Processo processoRevisao = new Processo(
-                "Processo de Revisão 2024",
-                TipoProcesso.REVISAO,
-                SituacaoProcesso.EM_ANDAMENTO,
-                LocalDateTime.now().plusMonths(3)
-        );
+        Processo processoRevisao =
+                new Processo(
+                        "Processo de Revisão 2024",
+                        TipoProcesso.REVISAO,
+                        SituacaoProcesso.EM_ANDAMENTO,
+                        LocalDateTime.now().plusMonths(3));
         processoRepo.save(processoRevisao);
 
         Mapa mapaVigente = new Mapa();
@@ -88,22 +85,25 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         unidade.setMapaVigente(mapaVigente);
         unidadeRepo.save(unidade);
 
-        atividadeVigente1 = atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
-        atividadeVigente2 = atividadeRepo.save(new Atividade(mapaVigente, "Elaborar relatórios gerenciais."));
+        atividadeVigente1 =
+                atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
+        atividadeVigente2 =
+                atividadeRepo.save(new Atividade(mapaVigente, "Elaborar relatórios gerenciais."));
 
-        competenciaVigente1 = competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
+        competenciaVigente1 =
+                competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
 
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);
 
         mapaSubprocesso = mapaRepo.save(new Mapa());
-        subprocessoRevisao = new Subprocesso(
-                processoRevisao,
-                unidade,
-                mapaSubprocesso,
-                SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-                processoRevisao.getDataLimite()
-        );
+        subprocessoRevisao =
+                new Subprocesso(
+                        processoRevisao,
+                        unidade,
+                        mapaSubprocesso,
+                        SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                        processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
     }
 
@@ -120,7 +120,9 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
-        @DisplayName("Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente")
+        @DisplayName(
+                "Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa"
+                        + " vigente")
         void semImpactos_QuandoCadastroIdentico() throws Exception {
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente2.getDescricao()));
@@ -151,7 +153,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
                     .andExpect(jsonPath("$.atividadesInseridas", hasSize(1)))
-                    .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Realizar auditorias internas.")))
+                    .andExpect(
+                            jsonPath(
+                                    "$.atividadesInseridas[0].descricao",
+                                    is("Realizar auditorias internas.")))
                     .andExpect(jsonPath("$.atividadesInseridas[0].tipoImpacto", is("INSERIDA")));
         }
 
@@ -166,16 +171,24 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
                     .andExpect(jsonPath("$.atividadesRemovidas", hasSize(1)))
-                    .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())))
+                    .andExpect(
+                            jsonPath(
+                                    "$.atividadesRemovidas[0].descricao",
+                                    is(atividadeVigente2.getDescricao())))
                     .andExpect(jsonPath("$.atividadesRemovidas[0].tipoImpacto", is("REMOVIDA")))
-                    .andExpect(jsonPath("$.atividadesRemovidas[0].competenciasVinculadas", contains(competenciaVigente1.getDescricao())));
+                    .andExpect(
+                            jsonPath(
+                                    "$.atividadesRemovidas[0].competenciasVinculadas",
+                                    contains(competenciaVigente1.getDescricao())));
         }
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades alteradas como uma remoção e uma inserção")
         void deveDetectarAtividadesAlteradas() throws Exception {
-            Atividade atividadeAlterada = new Atividade(mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
+            Atividade atividadeAlterada =
+                    new Atividade(
+                            mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
             atividadeRepo.save(atividadeAlterada);
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
 
@@ -185,15 +198,23 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
                     .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
-                    .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Elaborar relatórios gerenciais e estratégicos.")))
-                    .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())));
+                    .andExpect(
+                            jsonPath(
+                                    "$.atividadesInseridas[0].descricao",
+                                    is("Elaborar relatórios gerenciais e estratégicos.")))
+                    .andExpect(
+                            jsonPath(
+                                    "$.atividadesRemovidas[0].descricao",
+                                    is(atividadeVigente2.getDescricao())));
         }
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve identificar competências impactadas por remoções e alterações")
         void deveIdentificarCompetenciasImpactadas() throws Exception {
-            Atividade atividadeNova = new Atividade(mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
+            Atividade atividadeNova =
+                    new Atividade(
+                            mapaSubprocesso, "Elaborar relatórios gerenciais e estratégicos.");
             atividadeRepo.save(atividadeNova);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
@@ -203,14 +224,20 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
                     .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(1)))
                     .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
-                    .andExpect(jsonPath("$.competenciasImpactadas[0].descricao", is(competenciaVigente1.getDescricao())))
-                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(2)))
-                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
-                            containsInAnyOrder(
-                                    "Atividade removida: " + atividadeVigente1.getDescricao(),
-                                    "Atividade removida: " + atividadeVigente2.getDescricao()
-                            )
-                    ));
+                    .andExpect(
+                            jsonPath(
+                                    "$.competenciasImpactadas[0].descricao",
+                                    is(competenciaVigente1.getDescricao())))
+                    .andExpect(
+                            jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(2)))
+                    .andExpect(
+                            jsonPath(
+                                    "$.competenciasImpactadas[0].atividadesAfetadas",
+                                    containsInAnyOrder(
+                                            "Atividade removida: "
+                                                    + atividadeVigente1.getDescricao(),
+                                            "Atividade removida: "
+                                                    + atividadeVigente2.getDescricao())));
         }
     }
 
@@ -260,7 +287,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockGestor
-        @DisplayName("GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada'")
+        @DisplayName(
+                "GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada'")
         void gestorPodeAcessar_EmRevisaoDisponibilizada() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
@@ -293,7 +321,9 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
-        @DisplayName("CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento'")
+        @DisplayName(
+                "CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do"
+                        + " cadastro em andamento'")
         void chefeNaoPodeAcessar_EmSituacaoIncorreta() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);

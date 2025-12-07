@@ -1,5 +1,11 @@
 package sgc.notificacao;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,32 +18,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class NotificacaoModelosServiceTest {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Mock
-    private SpringTemplateEngine templateEngine;
+    @Mock private SpringTemplateEngine templateEngine;
 
-    @InjectMocks
-    private NotificacaoModelosService notificacaoModelosService;
+    @InjectMocks private NotificacaoModelosService notificacaoModelosService;
 
-    @Captor
-    private ArgumentCaptor<Context> contextCaptor;
+    @Captor private ArgumentCaptor<Context> contextCaptor;
 
-    @Captor
-    private ArgumentCaptor<String> templateNameCaptor;
+    @Captor private ArgumentCaptor<String> templateNameCaptor;
 
     @BeforeEach
     void setUp() {
-        when(templateEngine.process(templateNameCaptor.capture(), contextCaptor.capture())).thenReturn("<html></html>");
+        when(templateEngine.process(templateNameCaptor.capture(), contextCaptor.capture()))
+                .thenReturn("<html></html>");
     }
 
     @Test
@@ -48,7 +44,8 @@ class NotificacaoModelosServiceTest {
         String tipoProcesso = "REVISAO";
         LocalDateTime dataLimite = LocalDateTime.now();
 
-        notificacaoModelosService.criarEmailDeProcessoIniciado(nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
+        notificacaoModelosService.criarEmailDeProcessoIniciado(
+                nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
 
         assertEquals("processo-iniciado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -66,7 +63,8 @@ class NotificacaoModelosServiceTest {
         String nomeProcesso = "Processo Teste";
         int quantidadeAtividades = 10;
 
-        notificacaoModelosService.criarEmailCadastroDisponibilizado(nomeUnidade, nomeProcesso, quantidadeAtividades);
+        notificacaoModelosService.criarEmailCadastroDisponibilizado(
+                nomeUnidade, nomeProcesso, quantidadeAtividades);
 
         assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -84,7 +82,8 @@ class NotificacaoModelosServiceTest {
         String motivo = "Motivo Teste";
         String observacoes = "Observações Teste";
 
-        notificacaoModelosService.criarEmailCadastroDevolvido(nomeUnidade, nomeProcesso, motivo, observacoes);
+        notificacaoModelosService.criarEmailCadastroDevolvido(
+                nomeUnidade, nomeProcesso, motivo, observacoes);
 
         assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -102,7 +101,8 @@ class NotificacaoModelosServiceTest {
         String nomeProcesso = "Processo Teste";
         LocalDateTime dataLimite = LocalDateTime.now();
 
-        notificacaoModelosService.criarEmailMapaDisponibilizado(nomeUnidade, nomeProcesso, dataLimite);
+        notificacaoModelosService.criarEmailMapaDisponibilizado(
+                nomeUnidade, nomeProcesso, dataLimite);
 
         assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -134,7 +134,8 @@ class NotificacaoModelosServiceTest {
         LocalDateTime dataFinalizacao = LocalDateTime.now();
         int quantidadeMapas = 5;
 
-        notificacaoModelosService.criarEmailProcessoFinalizado(nomeProcesso, dataFinalizacao, quantidadeMapas);
+        notificacaoModelosService.criarEmailProcessoFinalizado(
+                nomeProcesso, dataFinalizacao, quantidadeMapas);
 
         assertEquals("processo-finalizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -150,7 +151,8 @@ class NotificacaoModelosServiceTest {
         String siglaUnidade = "UT";
         String nomeProcesso = "Processo Teste";
 
-        notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(siglaUnidade, nomeProcesso);
+        notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                siglaUnidade, nomeProcesso);
 
         assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -160,17 +162,22 @@ class NotificacaoModelosServiceTest {
     }
 
     @Test
-    @DisplayName("Deve criar email de processo finalizado para unidades subordinadas com os dados corretos")
+    @DisplayName(
+            "Deve criar email de processo finalizado para unidades subordinadas com os dados"
+                    + " corretos")
     void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
         String siglaUnidade = "UT";
         String nomeProcesso = "Processo Teste";
         List<String> siglas = List.of("SUB1", "SUB2");
 
-        notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(siglaUnidade, nomeProcesso, siglas);
+        notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                siglaUnidade, nomeProcesso, siglas);
 
         assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("SGC: Conclusão do processo " + nomeProcesso + " em unidades subordinadas", context.getVariable("titulo"));
+        assertEquals(
+                "SGC: Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
+                context.getVariable("titulo"));
         assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         assertEquals(siglas, context.getVariable("siglasUnidadesSubordinadas"));

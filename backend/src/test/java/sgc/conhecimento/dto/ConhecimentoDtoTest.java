@@ -1,9 +1,9 @@
 package sgc.conhecimento.dto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import sgc.atividade.dto.ConhecimentoDto;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ConhecimentoDtoTest {
     @Test

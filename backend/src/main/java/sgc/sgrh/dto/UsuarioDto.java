@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para dados de usuário do SGRH.
- */
+/** DTO para dados de usuário do SGRH. */
 @Data
 @Builder
 @NoArgsConstructor

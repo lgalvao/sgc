@@ -1,6 +1,7 @@
 package sgc.notificacao.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,6 @@ import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "NOTIFICACAO", schema = "sgc")

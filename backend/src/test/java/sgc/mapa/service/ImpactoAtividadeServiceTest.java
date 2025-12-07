@@ -16,9 +16,7 @@ import sgc.atividade.model.AtividadeRepo;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para ImpactoAtividadeService")
 class ImpactoAtividadeServiceTest {
-    @InjectMocks
-    private ImpactoAtividadeService impactoAtividadeService;
+    @InjectMocks private ImpactoAtividadeService impactoAtividadeService;
 
-    @Mock
-    private AtividadeRepo atividadeRepo;
+    @Mock private AtividadeRepo atividadeRepo;
 }

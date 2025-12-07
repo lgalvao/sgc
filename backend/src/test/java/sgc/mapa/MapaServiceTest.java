@@ -1,5 +1,14 @@
 package sgc.mapa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,33 +31,18 @@ import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVinculoService;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MapaServiceTest {
-    @Mock
-    private MapaRepo mapaRepo;
+    @Mock private MapaRepo mapaRepo;
 
-    @Mock
-    private CompetenciaRepo competenciaRepo;
+    @Mock private CompetenciaRepo competenciaRepo;
 
-    @Mock
-    private MapaVinculoService mapaVinculoService;
+    @Mock private MapaVinculoService mapaVinculoService;
 
-    @Mock
-    private MapaIntegridadeService mapaIntegridadeService;
+    @Mock private MapaIntegridadeService mapaIntegridadeService;
 
-    @InjectMocks
-    private MapaService mapaService;
+    @InjectMocks private MapaService mapaService;
 
     private Mapa mapa;
     private Competencia competencia;
@@ -89,7 +83,7 @@ class MapaServiceTest {
     void obterPorCodigo_NaoEncontrado() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapaService.obterPorCodigo(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -109,7 +103,7 @@ class MapaServiceTest {
     void atualizar_NaoEncontrado() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> mapaService.atualizar(1L, mapa))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -123,7 +117,7 @@ class MapaServiceTest {
     void excluir_NaoEncontrado() {
         when(mapaRepo.existsById(1L)).thenReturn(false);
         assertThatThrownBy(() -> mapaService.excluir(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -138,7 +132,8 @@ class MapaServiceTest {
         assertThat(mapaCompleto.getSubprocessoCodigo()).isEqualTo(100L);
         assertThat(mapaCompleto.getObservacoes()).isEqualTo("Observações do Mapa");
         assertThat(mapaCompleto.getCompetencias()).hasSize(1);
-        assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao()).isEqualTo("Competência 1");
+        assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao())
+                .isEqualTo("Competência 1");
     }
 
     @Test
@@ -167,11 +162,13 @@ class MapaServiceTest {
         when(mapaRepo.save(any())).thenReturn(mapa);
         when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia, c3));
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
-        when(competenciaRepo.save(any())).thenAnswer(i -> {
-            Competencia c = i.getArgument(0);
-            if (c.getCodigo() == null) c.setCodigo(2L);
-            return c;
-        });
+        when(competenciaRepo.save(any()))
+                .thenAnswer(
+                        i -> {
+                            Competencia c = i.getArgument(0);
+                            if (c.getCodigo() == null) c.setCodigo(2L);
+                            return c;
+                        });
 
         mapaService.salvarMapaCompleto(1L, req, "123");
 
@@ -196,7 +193,7 @@ class MapaServiceTest {
         when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
         SalvarMapaRequest req = new SalvarMapaRequest();
         assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -210,6 +207,6 @@ class MapaServiceTest {
         when(competenciaRepo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

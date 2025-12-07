@@ -1,6 +1,13 @@
 package sgc.processo;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import jakarta.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
+import java.util.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,14 +51,6 @@ import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ProcessoServiceTest {
@@ -72,16 +71,20 @@ class ProcessoServiceTest {
     @Test
     @DisplayName("Criar processo deve persistir e publicar evento")
     void criar() {
-        CriarProcessoReq req = new CriarProcessoReq("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+        CriarProcessoReq req =
+                new CriarProcessoReq(
+                        "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
 
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-        when(processoRepo.saveAndFlush(any())).thenAnswer(i -> {
-            Processo p = i.getArgument(0);
-            p.setCodigo(100L);
-            return p;
-        });
+        when(processoRepo.saveAndFlush(any()))
+                .thenAnswer(
+                        i -> {
+                            Processo p = i.getArgument(0);
+                            p.setCodigo(100L);
+                            return p;
+                        });
         when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
         processoService.criar(req);
@@ -93,27 +96,32 @@ class ProcessoServiceTest {
     @Test
     @DisplayName("Criar deve lançar exceção se descrição vazia")
     void criarDescricaoVazia() {
-        CriarProcessoReq req = new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+        CriarProcessoReq req =
+                new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
         assertThatThrownBy(() -> processoService.criar(req))
-            .isInstanceOf(ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
     @DisplayName("Criar deve lançar exceção se lista de unidades vazia")
     void criarSemUnidades() {
-        CriarProcessoReq req = new CriarProcessoReq("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of());
+        CriarProcessoReq req =
+                new CriarProcessoReq(
+                        "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of());
         assertThatThrownBy(() -> processoService.criar(req))
-            .isInstanceOf(ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
     @DisplayName("Criar deve lançar exceção se unidade não encontrada")
     void criarUnidadeNaoEncontrada() {
-        CriarProcessoReq req = new CriarProcessoReq("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
+        CriarProcessoReq req =
+                new CriarProcessoReq(
+                        "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
         when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> processoService.criar(req))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -123,14 +131,15 @@ class ProcessoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(id);
         processo.setSituacao(SituacaoProcesso.CRIADO);
-        
-        AtualizarProcessoReq req = AtualizarProcessoReq.builder()
-            .codigo(id)
-            .descricao("Nova Desc")
-            .tipo(TipoProcesso.MAPEAMENTO)
-            .dataLimiteEtapa1(LocalDateTime.now())
-            .unidades(List.of(1L))
-            .build();
+
+        AtualizarProcessoReq req =
+                AtualizarProcessoReq.builder()
+                        .codigo(id)
+                        .descricao("Nova Desc")
+                        .tipo(TipoProcesso.MAPEAMENTO)
+                        .dataLimiteEtapa1(LocalDateTime.now())
+                        .unidades(List.of(1L))
+                        .build();
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
@@ -151,14 +160,15 @@ class ProcessoServiceTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
-        AtualizarProcessoReq req = AtualizarProcessoReq.builder()
-            .descricao("Desc")
-            .tipo(TipoProcesso.MAPEAMENTO)
-            .unidades(List.of())
-            .build();
+        AtualizarProcessoReq req =
+                AtualizarProcessoReq.builder()
+                        .descricao("Desc")
+                        .tipo(TipoProcesso.MAPEAMENTO)
+                        .unidades(List.of())
+                        .build();
 
         assertThatThrownBy(() -> processoService.atualizar(id, req))
-            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -169,18 +179,19 @@ class ProcessoServiceTest {
         processo.setCodigo(id);
         processo.setSituacao(SituacaoProcesso.CRIADO);
 
-        AtualizarProcessoReq req = AtualizarProcessoReq.builder()
-            .codigo(id)
-            .descricao("Desc")
-            .tipo(TipoProcesso.MAPEAMENTO)
-            .unidades(List.of(99L))
-            .build();
+        AtualizarProcessoReq req =
+                AtualizarProcessoReq.builder()
+                        .codigo(id)
+                        .descricao("Desc")
+                        .tipo(TipoProcesso.MAPEAMENTO)
+                        .unidades(List.of(99L))
+                        .build();
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> processoService.atualizar(id, req))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -201,7 +212,7 @@ class ProcessoServiceTest {
     void apagarNaoEncontrado() {
         when(processoRepo.findById(99L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> processoService.apagar(99L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
@@ -213,7 +224,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.apagar(id))
-            .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
     @Test
@@ -265,7 +276,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(id, List.of()))
-            .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+                .isInstanceOf(ErroUnidadesNaoDefinidas.class);
     }
 
     @Test
@@ -284,7 +295,8 @@ class ProcessoServiceTest {
         outroProcesso.setParticipantes(Set.of(u1));
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(outroProcesso));
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
+                .thenReturn(List.of(outroProcesso));
 
         List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
         assertThat(erros).contains("As seguintes unidades já participam de outro processo ativo: ");
@@ -334,7 +346,10 @@ class ProcessoServiceTest {
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
         List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
-        assertThat(erros).contains("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: U1");
+        assertThat(erros)
+                .contains(
+                        "As seguintes unidades não possuem mapa vigente e não podem participar de"
+                                + " um processo de revisão: U1");
     }
 
     @Test
@@ -346,7 +361,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.iniciarProcessoRevisao(id, List.of()))
-            .isInstanceOf(ErroUnidadesNaoDefinidas.class);
+                .isInstanceOf(ErroUnidadesNaoDefinidas.class);
     }
 
     @Test
@@ -363,8 +378,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
 
-        assertThatThrownBy(() -> processoService.finalizar(id))
-            .isInstanceOf(ErroProcesso.class);
+        assertThatThrownBy(() -> processoService.finalizar(id)).isInstanceOf(ErroProcesso.class);
     }
 
     @Test
@@ -376,8 +390,8 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.finalizar(id))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("Apenas processos 'EM ANDAMENTO'");
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("Apenas processos 'EM ANDAMENTO'");
     }
 
     @Test
@@ -424,8 +438,8 @@ class ProcessoServiceTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
 
         assertThatThrownBy(() -> processoService.finalizar(id))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("sem unidade associada");
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessageContaining("sem unidade associada");
     }
 
     @Test

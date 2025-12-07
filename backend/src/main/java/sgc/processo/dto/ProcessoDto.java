@@ -1,9 +1,8 @@
 package sgc.processo.dto;
 
+import java.time.LocalDateTime;
 import lombok.*;
 import sgc.processo.model.SituacaoProcesso;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

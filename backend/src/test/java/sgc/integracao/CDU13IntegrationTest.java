@@ -1,6 +1,14 @@
 package sgc.integracao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,46 +41,28 @@ import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({ TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class })
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest extends BaseIntegrationTest {
 
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private UsuarioRepo usuarioRepo;
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
+    @Autowired private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
-    @Autowired
-    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Autowired private AnaliseRepo analiseRepo;
 
-    @Autowired
-    private AnaliseRepo analiseRepo;
-
-    @Autowired
-    private EntityManager entityManager;
+    @Autowired private EntityManager entityManager;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -98,8 +88,13 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado
-        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior,
-                "Disponibilização inicial", adminUser);
+        Movimentacao movimentacaoInicial =
+                new Movimentacao(
+                        subprocesso,
+                        unidade,
+                        unidadeSuperior,
+                        "Disponibilização inicial",
+                        adminUser);
         movimentacaoRepo.save(movimentacaoInicial);
     }
 
@@ -117,10 +112,13 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             DevolverCadastroReq requestBody = new DevolverCadastroReq(observacoes);
 
             // When
-            mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestBody)))
+            mockMvc.perform(
+                            post(
+                                            "/api/subprocessos/{id}/devolver-cadastro",
+                                            subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(requestBody)))
                     .andExpect(status().isOk());
 
             // Then
@@ -128,11 +126,14 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             entityManager.clear();
 
             // 1. Verificar se o subprocesso foi atualizado
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso subprocessoAtualizado =
+                    subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNull();
 
-            List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Analise> analises =
+                    analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
@@ -140,12 +141,15 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // 3. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo
-                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes =
+                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                            subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de devolução
             Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
-            assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-            assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
+            assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
+            assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla())
+                    .isEqualTo(unidade.getSigla());
         }
     }
 
@@ -162,10 +166,11 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             AceitarCadastroReq requestBody = new AceitarCadastroReq(observacoes);
 
             // When
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestBody)))
+            mockMvc.perform(
+                            post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(requestBody)))
                     .andExpect(status().isOk());
 
             // Then
@@ -173,22 +178,28 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             entityManager.clear();
 
             // 1. Verificar se a análise foi registrada corretamente
-            List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Analise> analises =
+                    analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("666666666666"); // From
-                                                                                                // @WithMockGestor("666666666666")
+            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo())
+                    .isEqualTo("666666666666"); // From
+            // @WithMockGestor("666666666666")
 
             // 2. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo
-                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes =
+                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                            subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de aceite
             Movimentacao movimentacaoAceite = movimentacoes.getFirst();
-            assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(movimentacaoAceite.getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-            assertThat(movimentacaoAceite.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos aceito");
+            assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla())
+                    .isEqualTo(unidade.getSigla());
+            assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
+            assertThat(movimentacaoAceite.getDescricao())
+                    .isEqualTo("Cadastro de atividades e conhecimentos aceito");
         }
     }
 
@@ -205,10 +216,13 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             HomologarCadastroReq requestBody = new HomologarCadastroReq("Homologado via teste.");
 
             // When
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestBody)))
+            mockMvc.perform(
+                            post(
+                                            "/api/subprocessos/{id}/homologar-cadastro",
+                                            subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(requestBody)))
                     .andExpect(status().isOk());
 
             // Then
@@ -216,12 +230,15 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             entityManager.clear();
 
             // 1. Verificar se o subprocesso foi atualizado
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Subprocesso subprocessoAtualizado =
+                    subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
             // 2. Verificar a movimentação
-            List<Movimentacao> movimentacoes = movimentacaoRepo
-                    .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes =
+                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                            subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de homologação
             Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
             assertThat(movimentacaoHomologacao.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
@@ -243,10 +260,13 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             String obsDevolucao = "Falta atividade Z";
             DevolverCadastroReq devolverReq = new DevolverCadastroReq(obsDevolucao);
 
-            mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(devolverReq)))
+            mockMvc.perform(
+                            post(
+                                            "/api/subprocessos/{id}/devolver-cadastro",
+                                            subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(devolverReq)))
                     .andExpect(status().isOk());
 
             // And then, the unit submits it again and the manager accepts it
@@ -255,23 +275,28 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
 
             String obsAceite = "Agora sim, completo.";
             AceitarCadastroReq aceitarReq = new AceitarCadastroReq(obsAceite);
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(aceitarReq)))
+            mockMvc.perform(
+                            post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(aceitarReq)))
                     .andExpect(status().isOk());
 
             // When
-            String jsonResponse = mockMvc
-                    .perform(get("/api/subprocessos/{id}/historico-cadastro", subprocesso.getCodigo())
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+            String jsonResponse =
+                    mockMvc.perform(
+                                    get(
+                                                    "/api/subprocessos/{id}/historico-cadastro",
+                                                    subprocesso.getCodigo())
+                                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isOk())
+                            .andReturn()
+                            .getResponse()
+                            .getContentAsString();
 
             // Then
-            List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse,
-                    new TypeReference<>() {
-                    });
+            List<sgc.analise.dto.AnaliseHistoricoDto> historico =
+                    objectMapper.readValue(jsonResponse, new TypeReference<>() {});
 
             assertThat(historico).hasSize(2);
 

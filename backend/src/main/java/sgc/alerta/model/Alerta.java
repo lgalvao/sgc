@@ -1,19 +1,18 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
-
 /**
  * Representa um alerta ou notificação dentro do sistema.
- * <p>
- * Alertas são gerados em resposta a eventos importantes no sistema,
- * como o início de um processo, e são direcionados a unidades ou usuários específicos.
+ *
+ * <p>Alertas são gerados em resposta a eventos importantes no sistema, como o início de um
+ * processo, e são direcionados a unidades ou usuários específicos.
  */
 @Entity
 @Table(name = "ALERTA", schema = "sgc")
@@ -23,7 +22,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alerta extends EntidadeBase {
-    public Alerta(Long codigo, sgc.processo.model.Processo processo, sgc.sgrh.model.Usuario usuarioDestino, String descricao, java.time.LocalDateTime dataHora) {
+    public Alerta(
+            Long codigo,
+            sgc.processo.model.Processo processo,
+            sgc.sgrh.model.Usuario usuarioDestino,
+            String descricao,
+            java.time.LocalDateTime dataHora) {
         super(codigo);
         this.processo = processo;
         this.usuarioDestino = usuarioDestino;

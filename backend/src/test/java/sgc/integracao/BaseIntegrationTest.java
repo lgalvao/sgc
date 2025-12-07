@@ -1,5 +1,7 @@
 package sgc.integracao;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +19,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-
 @SpringBootTest
 @Transactional
 @Import(TestConfig.class)
@@ -26,31 +26,22 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext context;
+    @Autowired private WebApplicationContext context;
 
     @BeforeEach
     void setupMockMvc() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     }
 
-    @Autowired
-    protected ObjectMapper objectMapper;
+    @Autowired protected ObjectMapper objectMapper;
 
-    @Autowired
-    protected ProcessoRepo processoRepo;
+    @Autowired protected ProcessoRepo processoRepo;
 
-    @Autowired
-    protected SubprocessoRepo subprocessoRepo;
+    @Autowired protected SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    protected UnidadeRepo unidadeRepo;
+    @Autowired protected UnidadeRepo unidadeRepo;
 
-    @Autowired
-    protected AtividadeRepo atividadeRepo;
+    @Autowired protected AtividadeRepo atividadeRepo;
 
-    @Autowired
-    protected MapaRepo mapaRepo;
+    @Autowired protected MapaRepo mapaRepo;
 }

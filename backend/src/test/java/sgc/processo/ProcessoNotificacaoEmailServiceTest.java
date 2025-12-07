@@ -1,5 +1,10 @@
 package sgc.processo;
 
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,25 +23,15 @@ import sgc.sgrh.service.SgrhService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class ProcessoNotificacaoEmailServiceTest {
-    @InjectMocks
-    private ProcessoNotificacaoService service;
+    @InjectMocks private ProcessoNotificacaoService service;
 
-    @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    @Mock private NotificacaoEmailService notificacaoEmailService;
 
-    @Mock
-    private NotificacaoModelosService notificacaoModelosService;
+    @Mock private NotificacaoModelosService notificacaoModelosService;
 
-    @Mock
-    private SgrhService sgrhService;
+    @Mock private SgrhService sgrhService;
 
     private Processo processo;
     private Unidade unidade;
@@ -56,9 +51,19 @@ class ProcessoNotificacaoEmailServiceTest {
             unidade.setTipo(TipoUnidade.OPERACIONAL);
             unidade.setCodigo(1L);
 
-            when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
-            when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));
-            when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
+            when(sgrhService.buscarResponsaveisUnidades(any()))
+                    .thenReturn(
+                            Map.of(
+                                    1L,
+                                    new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
+            when(sgrhService.buscarUsuariosPorTitulos(any()))
+                    .thenReturn(
+                            Map.of(
+                                    "123",
+                                    new UsuarioDto(
+                                            "123", "Nome", "email@test.com", "mat", "cargo")));
+            when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any()))
+                    .thenReturn("html");
 
             service.enviarNotificacoesDeFinalizacao(processo, Collections.singletonList(unidade));
 
@@ -73,9 +78,20 @@ class ProcessoNotificacaoEmailServiceTest {
             Unidade subordinada = new Unidade();
             subordinada.setUnidadeSuperior(unidade);
 
-            when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
-            when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));
-            when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("html");
+            when(sgrhService.buscarResponsaveisUnidades(any()))
+                    .thenReturn(
+                            Map.of(
+                                    1L,
+                                    new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
+            when(sgrhService.buscarUsuariosPorTitulos(any()))
+                    .thenReturn(
+                            Map.of(
+                                    "123",
+                                    new UsuarioDto(
+                                            "123", "Nome", "email@test.com", "mat", "cargo")));
+            when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                            any(), any(), any()))
+                    .thenReturn("html");
 
             service.enviarNotificacoesDeFinalizacao(processo, List.of(unidade, subordinada));
 
@@ -86,7 +102,8 @@ class ProcessoNotificacaoEmailServiceTest {
         @DisplayName("Não deve enviar e-mail se não houver unidades participantes")
         void enviarNotificacoesDeFinalizacao_SemUnidades_NaoEnviaEmail() {
             service.enviarNotificacoesDeFinalizacao(processo, Collections.emptyList());
-            verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+            verify(notificacaoEmailService, never())
+                    .enviarEmailHtml(anyString(), anyString(), anyString());
         }
     }
 }

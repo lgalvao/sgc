@@ -10,8 +10,8 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 
 /**
- * Mapper (usando MapStruct) para converter a entidade Processo e suas
- * associações para ProcessoDetalheDto.
+ * Mapper (usando MapStruct) para converter a entidade Processo e suas associações para
+ * ProcessoDetalheDto.
  */
 @Mapper(componentModel = "spring")
 @DecoratedWith(ProcessoDetalheMapperCustom.class)
@@ -59,5 +59,6 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "mapaCodigo", source = "mapa.codigo")
     @Mapping(target = "codSubprocesso", source = "codigo")
     @Mapping(target = "filhos", ignore = true)
-    ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso);
+    ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(
+            Subprocesso subprocesso);
 }

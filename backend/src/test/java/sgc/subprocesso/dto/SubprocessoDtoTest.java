@@ -1,13 +1,12 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.Test;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 class SubprocessoDtoTest {
     private static final String OBSERVACOES = "Observações";
@@ -51,8 +50,19 @@ class SubprocessoDtoTest {
 
     @Test
     void atividadeAjusteDtoRecordConstructorAndGetters() {
-        List<ConhecimentoAjusteDto> conhecimentos = List.of(ConhecimentoAjusteDto.builder().conhecimentoId(1L).nome(COMPETENCIA).incluido(true).build());
-        AtividadeAjusteDto dto = AtividadeAjusteDto.builder().codAtividade(1L).nome(ATIVIDADE).conhecimentos(conhecimentos).build();
+        List<ConhecimentoAjusteDto> conhecimentos =
+                List.of(
+                        ConhecimentoAjusteDto.builder()
+                                .conhecimentoId(1L)
+                                .nome(COMPETENCIA)
+                                .incluido(true)
+                                .build());
+        AtividadeAjusteDto dto =
+                AtividadeAjusteDto.builder()
+                        .codAtividade(1L)
+                        .nome(ATIVIDADE)
+                        .conhecimentos(conhecimentos)
+                        .build();
 
         assertEquals(1L, dto.getCodAtividade());
         assertEquals(ATIVIDADE, dto.getNome());
@@ -61,17 +71,20 @@ class SubprocessoDtoTest {
 
     @Test
     void competenciaAjusteDtoRecordConstructorAndGetters() {
-        List<AtividadeAjusteDto> atividades = List.of(AtividadeAjusteDto.builder()
-                .codAtividade(1L)
-                .nome(ATIVIDADE)
-                .conhecimentos(List.of())
-                .build());
+        List<AtividadeAjusteDto> atividades =
+                List.of(
+                        AtividadeAjusteDto.builder()
+                                .codAtividade(1L)
+                                .nome(ATIVIDADE)
+                                .conhecimentos(List.of())
+                                .build());
 
-        CompetenciaAjusteDto dto = CompetenciaAjusteDto.builder()
-                .codCompetencia(1L)
-                .nome(COMPETENCIA)
-                .atividades(atividades)
-                .build();
+        CompetenciaAjusteDto dto =
+                CompetenciaAjusteDto.builder()
+                        .codCompetencia(1L)
+                        .nome(COMPETENCIA)
+                        .atividades(atividades)
+                        .build();
 
         assertEquals(1L, dto.getCodCompetencia());
         assertEquals(COMPETENCIA, dto.getNome());
@@ -80,11 +93,12 @@ class SubprocessoDtoTest {
 
     @Test
     void conhecimentoAjusteDtoRecordConstructorAndGetters() {
-        ConhecimentoAjusteDto dto = ConhecimentoAjusteDto.builder()
-                .conhecimentoId(1L)
-                .nome(COMPETENCIA)
-                .incluido(true)
-                .build();
+        ConhecimentoAjusteDto dto =
+                ConhecimentoAjusteDto.builder()
+                        .conhecimentoId(1L)
+                        .nome(COMPETENCIA)
+                        .incluido(true)
+                        .build();
 
         assertEquals(1L, dto.getConhecimentoId());
         assertEquals(COMPETENCIA, dto.getNome());
@@ -135,19 +149,21 @@ class SubprocessoDtoTest {
 
     @Test
     void mapaAjusteDtoRecordConstructorAndGetters() {
-        List<CompetenciaAjusteDto> competencias = List.of(CompetenciaAjusteDto.builder()
-                .codCompetencia(1L)
-                .nome("Competência")
-                .atividades(List.of())
-                .build()
-        );
+        List<CompetenciaAjusteDto> competencias =
+                List.of(
+                        CompetenciaAjusteDto.builder()
+                                .codCompetencia(1L)
+                                .nome("Competência")
+                                .atividades(List.of())
+                                .build());
 
-        MapaAjusteDto dto = MapaAjusteDto.builder()
-                .codMapa(1L)
-                .unidadeNome(UNIDADE)
-                .competencias(competencias)
-                .justificativaDevolucao("Justificativa")
-                .build();
+        MapaAjusteDto dto =
+                MapaAjusteDto.builder()
+                        .codMapa(1L)
+                        .unidadeNome(UNIDADE)
+                        .competencias(competencias)
+                        .justificativaDevolucao("Justificativa")
+                        .build();
 
         assertEquals(1L, dto.getCodMapa());
         assertEquals(UNIDADE, dto.getUnidadeNome());
@@ -158,17 +174,17 @@ class SubprocessoDtoTest {
     @Test
     void movimentacaoDtoAutowiredConstructor() {
         LocalDateTime now = LocalDateTime.now();
-        MovimentacaoDto dto = new MovimentacaoDto(
-                1L,
-                now,
-                1L,
-                "SIGLA_ORIGEM",
-                "Unidade Origem",
-                2L,
-                "SIGLA_DESTINO",
-                UNIDADE,
-                "Descrição"
-        );
+        MovimentacaoDto dto =
+                new MovimentacaoDto(
+                        1L,
+                        now,
+                        1L,
+                        "SIGLA_ORIGEM",
+                        "Unidade Origem",
+                        2L,
+                        "SIGLA_DESTINO",
+                        UNIDADE,
+                        "Descrição");
 
         assertEquals(1L, dto.getCodigo());
         assertEquals(now, dto.getDataHora());
@@ -183,7 +199,8 @@ class SubprocessoDtoTest {
 
     @Test
     void salvarAjustesReqRecordConstructorAndGetters() {
-        List<CompetenciaAjusteDto> competencias = List.of(new CompetenciaAjusteDto(1L, "Competência", List.of()));
+        List<CompetenciaAjusteDto> competencias =
+                List.of(new CompetenciaAjusteDto(1L, "Competência", List.of()));
         SalvarAjustesReq req = new SalvarAjustesReq(competencias);
 
         assertEquals(competencias, req.getCompetencias());
@@ -191,10 +208,19 @@ class SubprocessoDtoTest {
 
     @Test
     void subprocessoCadastroDtoRecordConstructorAndAccessors() {
-        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividades = List.of(
-                SubprocessoCadastroDto.AtividadeCadastroDto.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
-        );
-        SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder().subprocessoId(1L).unidadeSigla(SIGLA).atividades(atividades).build();
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividades =
+                List.of(
+                        SubprocessoCadastroDto.AtividadeCadastroDto.builder()
+                                .codigo(1L)
+                                .descricao("Atividade")
+                                .conhecimentos(List.of())
+                                .build());
+        SubprocessoCadastroDto dto =
+                SubprocessoCadastroDto.builder()
+                        .subprocessoId(1L)
+                        .unidadeSigla(SIGLA)
+                        .atividades(atividades)
+                        .build();
 
         assertEquals(1L, dto.getSubprocessoId());
         assertEquals(SIGLA, dto.getUnidadeSigla());
@@ -203,21 +229,34 @@ class SubprocessoDtoTest {
 
     @Test
     void subprocessoDetalheDtoRecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDto unidade = SubprocessoDetalheDto.UnidadeDto.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
-        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().codigo(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        SubprocessoDetalheDto.UnidadeDto unidade =
+                SubprocessoDetalheDto.UnidadeDto.builder()
+                        .codigo(1L)
+                        .sigla(SIGLA)
+                        .nome(NOME)
+                        .build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel =
+                SubprocessoDetalheDto.ResponsavelDto.builder()
+                        .codigo(1L)
+                        .nome(NOME)
+                        .tipoResponsabilidade("Tipo")
+                        .ramal("Ramal")
+                        .email("email@exemplo.com")
+                        .build();
         LocalDateTime prazo = LocalDateTime.now();
         List<MovimentacaoDto> movimentacoes = List.of();
 
-        SubprocessoDetalheDto dto = SubprocessoDetalheDto.builder()
-                .unidade(unidade)
-                .responsavel(responsavel)
-                .situacao(SituacaoSubprocesso.NAO_INICIADO.name())
-                .localizacaoAtual("Localizacao")
-                .processoDescricao("Processo Teste")
-                .tipoProcesso("MAPEAMENTO")
-                .prazoEtapaAtual(prazo)
-                .movimentacoes(movimentacoes)
-                .build();
+        SubprocessoDetalheDto dto =
+                SubprocessoDetalheDto.builder()
+                        .unidade(unidade)
+                        .responsavel(responsavel)
+                        .situacao(SituacaoSubprocesso.NAO_INICIADO.name())
+                        .localizacaoAtual("Localizacao")
+                        .processoDescricao("Processo Teste")
+                        .tipoProcesso("MAPEAMENTO")
+                        .prazoEtapaAtual(prazo)
+                        .movimentacoes(movimentacoes)
+                        .build();
 
         assertEquals(unidade, dto.getUnidade());
         assertEquals(responsavel, dto.getResponsavel());
@@ -231,7 +270,12 @@ class SubprocessoDtoTest {
 
     @Test
     void subprocessoDetalheDtoUnidadeDtoRecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDto unidade = SubprocessoDetalheDto.UnidadeDto.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
+        SubprocessoDetalheDto.UnidadeDto unidade =
+                SubprocessoDetalheDto.UnidadeDto.builder()
+                        .codigo(1L)
+                        .sigla(SIGLA)
+                        .nome(NOME)
+                        .build();
 
         assertEquals(1L, unidade.getCodigo());
         assertEquals(SIGLA, unidade.getSigla());
@@ -240,7 +284,14 @@ class SubprocessoDtoTest {
 
     @Test
     void subprocessoDetalheDtoResponsavelDtoRecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().codigo(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel =
+                SubprocessoDetalheDto.ResponsavelDto.builder()
+                        .codigo(1L)
+                        .nome(NOME)
+                        .tipoResponsabilidade("Tipo")
+                        .ramal("Ramal")
+                        .email("email@exemplo.com")
+                        .build();
 
         assertEquals(1L, responsavel.getCodigo());
         assertEquals(NOME, responsavel.getNome());
@@ -255,17 +306,17 @@ class SubprocessoDtoTest {
         LocalDateTime dataLimite2 = LocalDateTime.now().plusDays(30);
         LocalDateTime dataFim1 = dataLimite1.plusDays(1);
 
-        SubprocessoDto dto = new SubprocessoDto(
-                1L,
-                2L,
-                3L,
-                4L,
-                dataLimite1,
-                dataFim1,
-                dataLimite2,
-                null,
-                SituacaoSubprocesso.NAO_INICIADO
-        );
+        SubprocessoDto dto =
+                new SubprocessoDto(
+                        1L,
+                        2L,
+                        3L,
+                        4L,
+                        dataLimite1,
+                        dataFim1,
+                        dataLimite2,
+                        null,
+                        SituacaoSubprocesso.NAO_INICIADO);
 
         assertEquals(1L, dto.getCodigo());
         assertEquals(2L, dto.getCodProcesso());

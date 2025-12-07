@@ -3,6 +3,9 @@ package sgc.processo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,18 +14,17 @@ import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Controller REST para Processos.
- * Implementa endpoints CRUD e ações de iniciar/finalizar processo conforme CDU-03.
+ * Controller REST para Processos. Implementa endpoints CRUD e ações de iniciar/finalizar processo
+ * conforme CDU-03.
  */
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
-@Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
+@Tag(
+        name = "Processos",
+        description =
+                "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoController {
     private final ProcessoService processoService;
 
@@ -30,8 +32,8 @@ public class ProcessoController {
      * Cria um novo processo.
      *
      * @param requisicao O DTO com os dados para a criação do processo.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
-     *         processo e o {@link ProcessoDto} criado no corpo da resposta.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo processo e o {@link
+     *     ProcessoDto} criado no corpo da resposta.
      */
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
@@ -41,18 +43,17 @@ public class ProcessoController {
     }
 
     /**
-     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado
-     * ou de um processo específico, útil para desabilitar checkboxes no frontend.
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado ou de
+     * um processo específico, útil para desabilitar checkboxes no frontend.
      *
-     * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
      * @param codProcesso Código opcional do processo a ser considerado
      * @return Objeto contendo lista de unidades desabilitadas
      */
     @GetMapping("/status-unidades")
     @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
     public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
-            @RequestParam String tipo,
-            @RequestParam(required = false) Long codProcesso) {
+            @RequestParam String tipo, @RequestParam(required = false) Long codProcesso) {
         List<Long> unidadesDesabilitadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
         return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
     }
@@ -65,7 +66,8 @@ public class ProcessoController {
      */
     @GetMapping("/{codigo}")
     public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long codigo) {
-        return processoService.obterPorId(codigo)
+        return processoService
+                .obterPorId(codigo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -78,7 +80,8 @@ public class ProcessoController {
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
-    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
+    public ResponseEntity<ProcessoDto> atualizar(
+            @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
         ProcessoDto atualizado = processoService.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
@@ -118,8 +121,8 @@ public class ProcessoController {
     }
 
     /**
-     * Retorna os detalhes completos de um processo, incluindo as unidades participantes
-     * e o resumo de seus respectivos subprocessos.
+     * Retorna os detalhes completos de um processo, incluindo as unidades participantes e o resumo
+     * de seus respectivos subprocessos.
      *
      * @param codigo O código do processo a ser detalhado.
      * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
@@ -132,19 +135,18 @@ public class ProcessoController {
 
     /**
      * Inicia um processo, disparando a criação dos subprocessos e notificações.
-     * <p>
-     * Corresponde ao CDU-03. O comportamento varia com base no tipo de processo:
-     * 'MAPEAMENTO' ou 'REVISAO'.
      *
-     * @param codigo       O código do processo a ser iniciado.
+     * <p>Corresponde ao CDU-03. O comportamento varia com base no tipo de processo: 'MAPEAMENTO' ou
+     * 'REVISAO'.
+     *
+     * @param codigo O código do processo a ser iniciado.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{codigo}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<?> iniciar(
-            @PathVariable Long codigo,
-            @RequestBody IniciarProcessoReq req) {
-        
+            @PathVariable Long codigo, @RequestBody IniciarProcessoReq req) {
+
         List<String> erros;
         if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
             erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
@@ -158,16 +160,18 @@ public class ProcessoController {
             return ResponseEntity.badRequest().body(Map.of("erros", erros));
         }
 
-        ProcessoDto processoAtualizado = processoService.obterPorId(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        ProcessoDto processoAtualizado =
+                processoService
+                        .obterPorId(codigo)
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
         return ResponseEntity.ok(processoAtualizado);
     }
 
     /**
-     * Finaliza um processo, tornando os mapas de seus subprocessos homologados
-     * como os novos mapas vigentes para as respectivas unidades.
-     * <p>
-     * Corresponde ao CDU-21.
+     * Finaliza um processo, tornando os mapas de seus subprocessos homologados como os novos mapas
+     * vigentes para as respectivas unidades.
+     *
+     * <p>Corresponde ao CDU-21.
      *
      * @param codigo O código do processo a ser finalizado.
      * @return Um {@link ResponseEntity} com status 200 OK.
@@ -180,8 +184,8 @@ public class ProcessoController {
     }
 
     /**
-     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado.
-     * Útil para desabilitar checkboxes no frontend durante criação/edição de processos.
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado. Útil
+     * para desabilitar checkboxes no frontend durante criação/edição de processos.
      *
      * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
      * @return Lista de códigos de unidades bloqueadas
@@ -194,22 +198,24 @@ public class ProcessoController {
     }
 
     /**
-     * Retorna uma lista de subprocessos elegíveis para ações em bloco (aceite/homologação)
-     * para o usuário autenticado.
+     * Retorna uma lista de subprocessos elegíveis para ações em bloco (aceite/homologação) para o
+     * usuário autenticado.
      *
      * @param codigo O código do processo.
      * @return Lista de DTOs representando os subprocessos elegíveis.
      */
     @GetMapping("/{codigo}/subprocessos-elegiveis")
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
-    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(@PathVariable Long codigo) {
-        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
+    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(
+            @PathVariable Long codigo) {
+        List<SubprocessoElegivelDto> elegiveis =
+                processoService.listarSubprocessosElegiveis(codigo);
         return ResponseEntity.ok(elegiveis);
     }
 
     /**
-     * Retorna todos os subprocessos de um processo.
-     * Utilizado pelo frontend para exibir a árvore de unidades e seus subprocessos.
+     * Retorna todos os subprocessos de um processo. Utilizado pelo frontend para exibir a árvore de
+     * unidades e seus subprocessos.
      *
      * @param codigo O código do processo.
      * @return Lista de subprocessos do processo.

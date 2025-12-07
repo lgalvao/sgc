@@ -3,6 +3,10 @@ package sgc.notificacao;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
-
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 
 @Service
 @Primary
@@ -40,18 +39,19 @@ public class NotificacaoEmailService {
     @Value("${aplicacao.email.assunto-prefixo}")
     private String prefixoAssunto;
 
-    private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern PADRAO_EMAIL =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
     /**
      * Envia um email de texto simples.
-     * <p>
-     * O processo de envio é assíncrono e inclui retentativas.
      *
-     * @param para    O endereço de email do destinatário.
+     * <p>O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para O endereço de email do destinatário.
      * @param assunto O assunto do email.
-     * @param corpo   O corpo do email em texto simples.
+     * @param corpo O corpo do email em texto simples.
      */
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
@@ -60,11 +60,11 @@ public class NotificacaoEmailService {
 
     /**
      * Envia um email com conteúdo HTML.
-     * <p>
-     * O processo de envio é assíncrono e inclui retentativas.
      *
-     * @param para      O endereço de email do destinatário.
-     * @param assunto   O assunto do email.
+     * <p>O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para O endereço de email do destinatário.
+     * @param assunto O assunto do email.
      * @param corpoHtml O corpo do email em formato HTML.
      */
     @Transactional
@@ -72,79 +72,108 @@ public class NotificacaoEmailService {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpoHtml, true));
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void processarEnvioDeEmail(EmailDto emailDto) {
         if (!isEmailValido(emailDto.getDestinatario())) {
-            log.error("Endereço de e-mail inválido, envio cancelado: {}", emailDto.getDestinatario());
+            log.error(
+                    "Endereço de e-mail inválido, envio cancelado: {}", emailDto.getDestinatario());
             return;
         }
 
         try {
             Notificacao notificacao = criarEntidadeNotificacao(emailDto);
             repositorioNotificacao.save(notificacao);
-            log.info("Notificação persistida no banco - Código: {}, Destinatário: {}",
-                    notificacao.getCodigo(), emailDto.getDestinatario());
+            log.info(
+                    "Notificação persistida no banco - Código: {}, Destinatário: {}",
+                    notificacao.getCodigo(),
+                    emailDto.getDestinatario());
 
             enviarEmailAssincrono(emailDto)
-                    .thenAccept(sucesso -> {
-                        if (Boolean.TRUE.equals(sucesso)) {
-                            log.info("E-mail para {} enviado.", emailDto.getDestinatario());
-                        } else {
-                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.getDestinatario(),
-                                    MAX_TENTATIVAS);
-                        }
-                    })
-                    .exceptionally(ex -> {
-                        log.error("Erro inesperado ao enviar e-mail para: {}", emailDto.getDestinatario(), ex);
-                        return null;
-                    });
+                    .thenAccept(
+                            sucesso -> {
+                                if (Boolean.TRUE.equals(sucesso)) {
+                                    log.info("E-mail para {} enviado.", emailDto.getDestinatario());
+                                } else {
+                                    log.error(
+                                            "Falha ao enviar e-mail para {} após {} tentativas.",
+                                            emailDto.getDestinatario(),
+                                            MAX_TENTATIVAS);
+                                }
+                            })
+                    .exceptionally(
+                            ex -> {
+                                log.error(
+                                        "Erro inesperado ao enviar e-mail para: {}",
+                                        emailDto.getDestinatario(),
+                                        ex);
+                                return null;
+                            });
 
-        } catch (Exception e) {
-            log.error("Erro ao processar notificação para {}: {}", emailDto.getDestinatario(), e.getMessage(), e);
+        } catch (RuntimeException e) {
+            log.error(
+                    "Erro ao processar notificação para {}: {}",
+                    emailDto.getDestinatario(),
+                    e.getMessage(),
+                    e);
         }
     }
 
     /**
      * Tenta enviar um email de forma assíncrona, com uma política de retentativas.
-     * <p>
-     * Este método é executado em uma thread separada. Ele tentará enviar o email
-     * até {@code MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre
-     * as tentativas.
+     *
+     * <p>Este método é executado em uma thread separada. Ele tentará enviar o email até {@code
+     * MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre as tentativas.
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
-     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
-     *         email for enviado, ou {@code false} caso contrário.
+     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o email for
+     *     enviado, ou {@code false} caso contrário.
      */
     @Async
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
-                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS,
+                log.debug(
+                        "Tentativa {} de {} para enviar e-mail para: {}",
+                        tentativa,
+                        MAX_TENTATIVAS,
                         emailDto.getDestinatario());
                 enviarEmailSmtp(emailDto);
                 log.info("E-mail enviado para: {}", emailDto.getDestinatario());
                 return CompletableFuture.completedFuture(true);
-            } catch (Exception e) {
+            } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
                 excecaoFinal = e;
-                log.warn("Falha na tentativa {} de {} ao enviar e-mail para {}: {}",
-                        tentativa, MAX_TENTATIVAS, emailDto.getDestinatario(), e.getMessage());
+                log.warn(
+                        "Falha na tentativa {} de {} ao enviar e-mail para {}: {}",
+                        tentativa,
+                        MAX_TENTATIVAS,
+                        emailDto.getDestinatario(),
+                        e.getMessage());
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
                         Thread.sleep(ESPERA_ENTRE_TENTATIVAS_MS * tentativa);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("Thread interrompida durante a espera para nova tentativa de envio.", ie);
+                        log.error(
+                                "Thread interrompida durante a espera para nova tentativa de"
+                                        + " envio.",
+                                ie);
                         break;
                     }
                 }
             }
         }
-        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS,
-                emailDto.getDestinatario(), excecaoFinal);
+        log.error(
+                "Não foi possível enviar o e-mail para {} após {} tentativas.",
+                MAX_TENTATIVAS,
+                emailDto.getDestinatario(),
+                excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
-    private void enviarEmailSmtp(EmailDto emailDto) throws UnsupportedEncodingException, MessagingException {
+    private void enviarEmailSmtp(EmailDto emailDto)
+            throws UnsupportedEncodingException, MessagingException {
         MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
@@ -155,14 +184,19 @@ public class NotificacaoEmailService {
         helper.setText(emailDto.getCorpo(), emailDto.isHtml());
 
         enviadorDeEmail.send(mensagem);
-        log.debug("E-mail enviado via SMTP para: {} - Assunto: {}", emailDto.getDestinatario(), assuntoCompleto);
+        log.debug(
+                "E-mail enviado via SMTP para: {} - Assunto: {}",
+                emailDto.getDestinatario(),
+                assuntoCompleto);
     }
 
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.getDestinatario(),
-                emailDto.getAssunto(), emailDto.getCorpo());
+        String conteudo =
+                String.format(
+                        "Para: %s | Assunto: %s | Corpo: %s",
+                        emailDto.getDestinatario(), emailDto.getAssunto(), emailDto.getCorpo());
         final int limite = 500;
         if (conteudo.length() > limite) {
             conteudo = "%s...".formatted(conteudo.substring(0, limite - 3));

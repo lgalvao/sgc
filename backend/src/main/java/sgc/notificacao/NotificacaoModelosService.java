@@ -1,26 +1,28 @@
 package sgc.notificacao;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 /**
- * Serviço responsável por criar templates HTML para diferentes tipos de e-mail.
- * Cada metodo cria um template específico para um caso de uso do sistema.
+ * Serviço responsável por criar templates HTML para diferentes tipos de e-mail. Cada metodo cria um
+ * template específico para um caso de uso do sistema.
  */
 @Service
+@lombok.RequiredArgsConstructor
 public class NotificacaoModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Constantes para títulos de e-mail
     private static final String TITULO_PROCESSO_INICIADO = "Processo iniciado - ";
-    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro disponibilizado para análise";
+    private static final String TITULO_CADASTRO_DISPONIBILIZADO =
+            "Cadastro disponibilizado para análise";
     private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro devolvido para ajustes";
-    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências disponibilizado";
+    private static final String TITULO_MAPA_DISPONIBILIZADO =
+            "Mapa de Competências disponibilizado";
     private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
     private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
     // TODO esse título parece fugir do padrao com esse prefixo 'SGC'
@@ -28,19 +30,15 @@ public class NotificacaoModelosService {
 
     private final SpringTemplateEngine templateEngine;
 
-    public NotificacaoModelosService(SpringTemplateEngine templateEngine) {
-        this.templateEngine = templateEngine;
-    }
-
     /**
      * Gera o conteúdo HTML para o email de notificação de início de processo.
-     * <p>
-     * Corresponde aos casos de uso CDU-04 e CDU-05.
      *
-     * @param nomeUnidade  O nome da unidade notificada.
+     * <p>Corresponde aos casos de uso CDU-04 e CDU-05.
+     *
+     * @param nomeUnidade O nome da unidade notificada.
      * @param nomeProcesso O nome do processo iniciado.
      * @param tipoProcesso O tipo do processo (e.g., MAPEAMENTO, REVISAO).
-     * @param dataLimite   A data limite para a conclusão da primeira etapa.
+     * @param dataLimite A data limite para a conclusão da primeira etapa.
      * @return O conteúdo HTML do email renderizado pelo Thymeleaf.
      */
     public String criarEmailDeProcessoIniciado(
@@ -60,19 +58,17 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica a disponibilização de um
-     * cadastro para análise.
-     * <p>
-     * Corresponde aos casos de uso CDU-09 e CDU-10.
+     * Gera o conteúdo HTML para o email que notifica a disponibilização de um cadastro para
+     * análise.
      *
-     * @param nomeUnidade          O nome da unidade que disponibilizou o cadastro.
-     * @param nomeProcesso         O nome do processo associado.
+     * <p>Corresponde aos casos de uso CDU-09 e CDU-10.
+     *
+     * @param nomeUnidade O nome da unidade que disponibilizou o cadastro.
+     * @param nomeProcesso O nome do processo associado.
      * @param quantidadeAtividades O número de atividades registradas.
      */
     public void criarEmailCadastroDisponibilizado(
-            String nomeUnidade,
-            String nomeProcesso,
-            int quantidadeAtividades) {
+            String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
 
         Context context = new Context();
         context.setVariable("titulo", TITULO_CADASTRO_DISPONIBILIZADO);
@@ -84,21 +80,17 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica a devolução de um cadastro
-     * para ajustes.
-     * <p>
-     * Corresponde ao caso de uso CDU-13.
+     * Gera o conteúdo HTML para o email que notifica a devolução de um cadastro para ajustes.
      *
-     * @param nomeUnidade  O nome da unidade que receberá a notificação.
+     * <p>Corresponde ao caso de uso CDU-13.
+     *
+     * @param nomeUnidade O nome da unidade que receberá a notificação.
      * @param nomeProcesso O nome do processo associado.
-     * @param motivo       O motivo da devolução.
-     * @param observacoes  Detalhes ou observações adicionais.
+     * @param motivo O motivo da devolução.
+     * @param observacoes Detalhes ou observações adicionais.
      */
     public void criarEmailCadastroDevolvido(
-            String nomeUnidade,
-            String nomeProcesso,
-            String motivo,
-            String observacoes) {
+            String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
 
         Context context = new Context();
         context.setVariable("titulo", TITULO_CADASTRO_DEVOLVIDO);
@@ -111,19 +103,16 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica a disponibilização de um mapa
-     * para validação.
-     * <p>
-     * Corresponde ao caso de uso CDU-17.
+     * Gera o conteúdo HTML para o email que notifica a disponibilização de um mapa para validação.
      *
-     * @param nomeUnidade         O nome da unidade que disponibilizou o mapa.
-     * @param nomeProcesso        O nome do processo associado.
+     * <p>Corresponde ao caso de uso CDU-17.
+     *
+     * @param nomeUnidade O nome da unidade que disponibilizou o mapa.
+     * @param nomeProcesso O nome do processo associado.
      * @param dataLimiteValidacao A data limite para a validação do mapa.
      */
     public void criarEmailMapaDisponibilizado(
-            String nomeUnidade,
-            String nomeProcesso,
-            LocalDateTime dataLimiteValidacao) {
+            String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
 
         Context context = new Context();
         context.setVariable("titulo", TITULO_MAPA_DISPONIBILIZADO);
@@ -136,10 +125,10 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email que notifica a validação de um mapa.
-     * <p>
-     * Corresponde ao caso de uso CDU-18.
      *
-     * @param nomeUnidade  O nome da unidade que validou o mapa.
+     * <p>Corresponde ao caso de uso CDU-18.
+     *
+     * @param nomeUnidade O nome da unidade que validou o mapa.
      * @param nomeProcesso O nome do processo associado.
      */
     public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
@@ -153,14 +142,15 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email que notifica a finalização de um processo.
-     * <p>
-     * Corresponde ao caso de uso CDU-21.
      *
-     * @param nomeProcesso    O nome do processo finalizado.
+     * <p>Corresponde ao caso de uso CDU-21.
+     *
+     * @param nomeProcesso O nome do processo finalizado.
      * @param dataFinalizacao A data em que o processo foi finalizado.
      * @param quantidadeMapas O número de mapas que se tornaram vigentes.
      */
-    public void criarEmailProcessoFinalizado(String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
+    public void criarEmailProcessoFinalizado(
+            String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         Context context = new Context();
         context.setVariable("titulo", TITULO_PROCESSO_FINALIZADO);
         context.setVariable("nomeProcesso", nomeProcesso);
@@ -171,10 +161,10 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica a conclusão de um processo
-     * para uma unidade específica.
-     * <p>
-     * Corresponde ao caso de uso CDU-21.
+     * Gera o conteúdo HTML para o email que notifica a conclusão de um processo para uma unidade
+     * específica.
+     *
+     * <p>Corresponde ao caso de uso CDU-21.
      *
      * @param siglaUnidade A sigla da unidade notificada.
      * @param nomeProcesso O nome do processo concluído.
@@ -182,7 +172,8 @@ public class NotificacaoModelosService {
      */
     public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
         Context context = new Context();
-        context.setVariable("titulo", "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
+        context.setVariable(
+                "titulo", "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
@@ -190,24 +181,25 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica uma unidade intermediária
-     * sobre a conclusão de um processo em suas unidades subordinadas.
-     * <p>
-     * Corresponde ao caso de uso CDU-21.
+     * Gera o conteúdo HTML para o email que notifica uma unidade intermediária sobre a conclusão de
+     * um processo em suas unidades subordinadas.
      *
-     * @param siglaUnidade               A sigla da unidade intermediária notificada.
-     * @param nomeProcesso               O nome do processo concluído.
-     * @param siglasUnidadesSubordinadas A lista de siglas das unidades subordinadas
-     *                                   que participaram do processo.
+     * <p>Corresponde ao caso de uso CDU-21.
+     *
+     * @param siglaUnidade A sigla da unidade intermediária notificada.
+     * @param nomeProcesso O nome do processo concluído.
+     * @param siglasUnidadesSubordinadas A lista de siglas das unidades subordinadas que
+     *     participaram do processo.
      * @return O conteúdo HTML do email.
      */
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
-            String siglaUnidade,
-            String nomeProcesso,
-            List<String> siglasUnidadesSubordinadas) {
+            String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
 
         Context context = new Context();
-        context.setVariable("titulo", "%s%s em unidades subordinadas".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
+        context.setVariable(
+                "titulo",
+                "%s%s em unidades subordinadas"
+                        .formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);

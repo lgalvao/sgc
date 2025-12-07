@@ -1,5 +1,10 @@
 package sgc.alerta.dto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -9,19 +14,13 @@ import sgc.alerta.model.Alerta;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @Mapper(componentModel = "spring")
 public abstract class AlertaMapper {
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
@@ -40,19 +39,21 @@ public abstract class AlertaMapper {
             return null;
         }
 
-        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        
+        Usuario usuario =
+                (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         // Try to find a subprocess for any of the user's units
         return usuario.getTodasAtribuicoes().stream()
-            .map(attr -> subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
-                alerta.getProcesso().getCodigo(),
-                attr.getUnidade().getCodigo()
-            ))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst()
-            .map(sp -> String.format("/subprocessos/%d", sp.getCodigo()))
-            .orElse(null);
+                .map(
+                        attr ->
+                                subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
+                                        alerta.getProcesso().getCodigo(),
+                                        attr.getUnidade().getCodigo()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst()
+                .map(sp -> String.format("/subprocessos/%d", sp.getCodigo()))
+                .orElse(null);
     }
 
     @Named("formatDataHora")

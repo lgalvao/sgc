@@ -10,13 +10,15 @@ plugins {
     jacoco
     checkstyle
     pmd
-    id("com.github.spotbugs") version "6.0.26"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.github.spotbugs") version "6.4.7"
+    id("com.diffplug.spotless") version "8.1.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
 }
 
 extra["jjwt.version"] = "0.13.0"
@@ -46,6 +48,8 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
+    testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
+    testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
 
     // MapStruct
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
@@ -64,21 +68,21 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    testImplementation("net.jqwik:jqwik:1.9.2")
+    testImplementation("net.jqwik:jqwik:1.9.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
+    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.36")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
-    implementation("org.apache.commons:commons-lang3:3.19.0")
-    implementation("ch.qos.logback:logback-classic:1.5.20")
-    implementation("ch.qos.logback:logback-core:1.5.20")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
+    implementation("ch.qos.logback:logback-classic:1.5.21")
+    implementation("ch.qos.logback:logback-core:1.5.21")
     
     // Quality Check Dependencies (SpotBugs)
-    spotbugs("com.github.spotbugs:spotbugs:4.8.6")
+    spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 }
 
 // --- Quality Checks Configurations ---
@@ -89,7 +93,8 @@ spotless {
     // Run './gradlew spotlessApply' to fix.
     isEnforceCheck = false
     java {
-        googleJavaFormat("1.19.2").aosp().reflowLongStrings()
+        googleJavaFormat("1.33.0").aosp().reflowLongStrings()
+        leadingTabsToSpaces(2)
         target("src/*/java/**/*.java")
         removeUnusedImports()
         trimTrailingWhitespace()
@@ -166,7 +171,7 @@ checkstyle {
 
 // PMD
 pmd {
-    toolVersion = "7.16.0"
+    toolVersion = "7.19.0"
     // ruleSets = listOf(file("config/pmd/ruleset.xml").toURI().toString())
     ruleSetFiles = files("config/pmd/ruleset.xml")
     isIgnoreFailures = true // Don't fail build

@@ -1,5 +1,7 @@
 package sgc.mapa.service;
 
+import java.util.HashSet;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,9 +11,6 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +25,13 @@ public class CompetenciaService {
         competenciaRepo.save(competencia);
     }
 
-    public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow(
-                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+    public void atualizarCompetencia(
+            Long codCompetencia, String descricao, List<Long> atividadesIds) {
+        Competencia competencia =
+                competenciaRepo
+                        .findById(codCompetencia)
+                        .orElseThrow(
+                                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         competencia.setDescricao(descricao);
 
@@ -43,8 +46,11 @@ public class CompetenciaService {
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow(
-                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+        Competencia competencia =
+                competenciaRepo
+                        .findById(codCompetencia)
+                        .orElseThrow(
+                                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         for (Atividade atividade : competencia.getAtividades()) {
             atividade.getCompetencias().remove(competencia);

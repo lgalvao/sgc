@@ -1,10 +1,9 @@
 package sgc.comum.erros;
 
+import java.util.Map;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.Map;
 
 @Getter
 @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
@@ -24,5 +23,4 @@ public class ErroValidacao extends RuntimeException {
     public Map<String, ?> getDetails() {
         return details != null ? new java.util.HashMap<>(details) : null;
     }
-
 }

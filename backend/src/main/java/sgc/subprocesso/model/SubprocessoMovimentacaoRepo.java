@@ -1,12 +1,10 @@
+package sgc.subprocesso.model;
 
-    package sgc.subprocesso.model;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-    import org.springframework.data.jpa.repository.JpaRepository;
-    import org.springframework.stereotype.Repository;
-
-    import java.util.List;
-
-    @Repository
-    public interface SubprocessoMovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
+@Repository
+public interface SubprocessoMovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
     List<Movimentacao> findBySubprocessoCodigoOrderByDataHoraDesc(Long subprocessoCodigo);
-    }
+}

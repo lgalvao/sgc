@@ -10,9 +10,9 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class ConfigThymeleaf {
     /**
      * Configura o mecanismo de templates do Thymeleaf.
-     * <p>
-     * Registra o 'resolvedor' de templates de email para que o Thymeleaf
-     * possa processar os templates localizados no classpath.
+     *
+     * <p>Registra o 'resolvedor' de templates de email para que o Thymeleaf possa processar os
+     * templates localizados no classpath.
      *
      * @return a instância configurada do {@link SpringTemplateEngine}.
      */
@@ -25,10 +25,10 @@ public class ConfigThymeleaf {
 
     /**
      * Configura o resolvedor de templates para emails.
-     * <p>
-     * Este método define a localização dos templates de email (dentro de
-     * 'resources/templates/email/'), o sufixo dos arquivos ('.html'), o modo
-     * do template (HTML5) e a codificação de caracteres (UTF-8).
+     *
+     * <p>Este método define a localização dos templates de email (dentro de
+     * 'resources/templates/email/'), o sufixo dos arquivos ('.html'), o modo do template (HTML5) e
+     * a codificação de caracteres (UTF-8).
      *
      * @return o {@link ClassLoaderTemplateResolver} configurado para os emails.
      */

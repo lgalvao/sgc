@@ -19,7 +19,7 @@ public class TestSecurityConfig {
     @Profile({"test", "jules"})
     public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 }

@@ -1,5 +1,14 @@
 package sgc.processo.dto.mappers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,32 +28,20 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ProcessoDetalheMapperCustomTest {
 
-    @Mock
-    private ProcessoDetalheMapper delegate;
+    @Mock private ProcessoDetalheMapper delegate;
 
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
+    @Mock private SubprocessoRepo subprocessoRepo;
 
-    @InjectMocks
-    private ProcessoDetalheMapperCustomImpl mapper;
+    @InjectMocks private ProcessoDetalheMapperCustomImpl mapper;
 
     // Concrete implementation for testing
     static class ProcessoDetalheMapperCustomImpl extends ProcessoDetalheMapperCustom {
         @Override
-        public ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(Unidade unidade) {
+        public ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(
+                Unidade unidade) {
             return null;
         }
 
@@ -54,7 +51,8 @@ class ProcessoDetalheMapperCustomTest {
         }
 
         @Override
-        public ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso) {
+        public ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(
+                Subprocesso subprocesso) {
             return null;
         }
     }
@@ -81,7 +79,8 @@ class ProcessoDetalheMapperCustomTest {
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(auth);
         when(auth.isAuthenticated()).thenReturn(false);
 
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(anyLong())).thenReturn(Collections.emptyList());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(anyLong()))
+                .thenReturn(Collections.emptyList());
 
         ProcessoDetalheDto dto = mapper.toDetailDTO(p);
 
@@ -104,16 +103,18 @@ class ProcessoDetalheMapperCustomTest {
 
         p.setParticipantes(new HashSet<>(List.of(pai, filho)));
 
-        ProcessoDetalheDto.UnidadeParticipanteDto dtoPai = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
-                .codUnidade(1L)
-                .sigla("PAI")
-                .build();
+        ProcessoDetalheDto.UnidadeParticipanteDto dtoPai =
+                ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+                        .codUnidade(1L)
+                        .sigla("PAI")
+                        .build();
 
-        ProcessoDetalheDto.UnidadeParticipanteDto dtoFilho = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
-                .codUnidade(2L)
-                .codUnidadeSuperior(1L)
-                .sigla("FILHO")
-                .build();
+        ProcessoDetalheDto.UnidadeParticipanteDto dtoFilho =
+                ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+                        .codUnidade(2L)
+                        .codUnidadeSuperior(1L)
+                        .sigla("FILHO")
+                        .build();
 
         when(delegate.unidadeToUnidadeParticipanteDTO(pai)).thenReturn(dtoPai);
         when(delegate.unidadeToUnidadeParticipanteDTO(filho)).thenReturn(dtoFilho);

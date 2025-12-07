@@ -8,8 +8,8 @@ import sgc.notificacao.EventoProcessoListener;
 import sgc.processo.eventos.EventoProcessoIniciado;
 
 /**
- * Configuração de teste que substitui o EventoProcessoListener real por um no-op
- * para evitar problemas com transações em testes de integração.
+ * Configuração de teste que substitui o EventoProcessoListener real por um no-op para evitar
+ * problemas com transações em testes de integração.
  */
 @TestConfiguration
 @Profile("test")

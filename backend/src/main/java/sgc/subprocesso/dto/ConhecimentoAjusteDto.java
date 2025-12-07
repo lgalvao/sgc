@@ -7,10 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para conhecimento no contexto de ajustes do mapa.
- * CDU-16 item 4 e 5
- */
+/** DTO para conhecimento no contexto de ajustes do mapa. CDU-16 item 4 e 5 */
 @Getter
 @Builder
 @AllArgsConstructor

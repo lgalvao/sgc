@@ -1,5 +1,11 @@
 package sgc.subprocesso.service;
 
+import static java.util.Collections.emptyList;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,13 +26,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -39,8 +38,14 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
-        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado: %d"
+                                                        .formatted(codSubprocesso)));
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
             return emptyList();
@@ -52,11 +57,13 @@ public class SubprocessoService {
         }
 
         return atividades.stream()
-                .filter(a -> {
-                    if (a.getCodigo() == null) return true;
-                    List<Conhecimento> ks = repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
-                    return ks == null || ks.isEmpty();
-                })
+                .filter(
+                        a -> {
+                            if (a.getCodigo() == null) return true;
+                            List<Conhecimento> ks =
+                                    repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
+                            return ks == null || ks.isEmpty();
+                        })
                 .collect(Collectors.toList());
     }
 
@@ -71,8 +78,7 @@ public class SubprocessoService {
         if (!competenciasSemAssociacao.isEmpty()) {
             throw new ErroValidacao(
                     "Existem competências que não foram associadas a nenhuma atividade.",
-                    Map.of("competenciasNaoAssociadas", competenciasSemAssociacao)
-            );
+                    Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
         }
 
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
@@ -83,7 +89,9 @@ public class SubprocessoService {
             }
         }
         if (!atividadesSemAssociacao.isEmpty()) {
-            throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.", Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
+            throw new ErroValidacao(
+                    "Existem atividades que não foram associadas a nenhuma competência.",
+                    Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
         }
     }
 
@@ -96,41 +104,44 @@ public class SubprocessoService {
 
     @Transactional
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
-        return repositorioSubprocesso.findById(codigo)
-                .map(subprocesso -> {
-                    if (subprocessoDto.getCodProcesso() != null) {
-                        Processo processo = new Processo();
-                        processo.setCodigo(subprocessoDto.getCodProcesso());
-                        subprocesso.setProcesso(processo);
-                    } else {
-                        subprocesso.setProcesso(null);
-                    }
+        return repositorioSubprocesso
+                .findById(codigo)
+                .map(
+                        subprocesso -> {
+                            if (subprocessoDto.getCodProcesso() != null) {
+                                Processo processo = new Processo();
+                                processo.setCodigo(subprocessoDto.getCodProcesso());
+                                subprocesso.setProcesso(processo);
+                            } else {
+                                subprocesso.setProcesso(null);
+                            }
 
-                    if (subprocessoDto.getCodUnidade() != null) {
-                        Unidade unidade = new Unidade();
-                        unidade.setCodigo(subprocessoDto.getCodUnidade());
-                        subprocesso.setUnidade(unidade);
-                    } else {
-                        subprocesso.setUnidade(null);
-                    }
+                            if (subprocessoDto.getCodUnidade() != null) {
+                                Unidade unidade = new Unidade();
+                                unidade.setCodigo(subprocessoDto.getCodUnidade());
+                                subprocesso.setUnidade(unidade);
+                            } else {
+                                subprocesso.setUnidade(null);
+                            }
 
-                    if (subprocessoDto.getCodMapa() != null) {
-                        Mapa mapa = new Mapa();
-                        mapa.setCodigo(subprocessoDto.getCodMapa());
-                        subprocesso.setMapa(mapa);
-                    } else {
-                        subprocesso.setMapa(null);
-                    }
+                            if (subprocessoDto.getCodMapa() != null) {
+                                Mapa mapa = new Mapa();
+                                mapa.setCodigo(subprocessoDto.getCodMapa());
+                                subprocesso.setMapa(mapa);
+                            } else {
+                                subprocesso.setMapa(null);
+                            }
 
-                    subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
-                    subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
-                    var dataFimEtapa2 = subprocessoDto.getDataFimEtapa2();
-                    subprocesso.setDataFimEtapa2(dataFimEtapa2);
-                    subprocesso.setSituacao(subprocessoDto.getSituacao());
-                    var atualizado = repositorioSubprocesso.save(subprocesso);
-                    return subprocessoMapper.toDTO(atualizado);
-                })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+                            subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
+                            subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
+                            var dataFimEtapa2 = subprocessoDto.getDataFimEtapa2();
+                            subprocesso.setDataFimEtapa2(dataFimEtapa2);
+                            subprocesso.setSituacao(subprocessoDto.getSituacao());
+                            var atualizado = repositorioSubprocesso.save(subprocesso);
+                            return subprocessoMapper.toDTO(atualizado);
+                        })
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     @Transactional

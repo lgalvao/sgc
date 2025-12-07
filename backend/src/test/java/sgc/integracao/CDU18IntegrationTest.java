@@ -1,5 +1,12 @@
 package sgc.integracao;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,40 +33,25 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
 class CDU18IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private MapaRepo mapaRepo;
+    @Autowired private MapaRepo mapaRepo;
 
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
+    @Autowired private CompetenciaRepo competenciaRepo;
 
-    @Autowired
-    private AtividadeRepo atividadeRepo;
+    @Autowired private AtividadeRepo atividadeRepo;
 
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired private ConhecimentoRepo conhecimentoRepo;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -75,22 +67,24 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         Mapa mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(
-            processo,
-            unidade,
-            mapa,
-            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-            LocalDateTime.now().plusMonths(1)
-        );
+        subprocesso =
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        mapa,
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                        LocalDateTime.now().plusMonths(1));
         subprocesso = subprocessoRepo.save(subprocesso);
-
 
         Atividade atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
         Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
 
-        Conhecimento conhecimento1 = conhecimentoRepo.save(new Conhecimento("Conhecimento 1.1", atividade1));
-        Conhecimento conhecimento2 = conhecimentoRepo.save(new Conhecimento("Conhecimento 1.2", atividade1));
-        Conhecimento conhecimento3 = conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
+        Conhecimento conhecimento1 =
+                conhecimentoRepo.save(new Conhecimento("Conhecimento 1.1", atividade1));
+        Conhecimento conhecimento2 =
+                conhecimentoRepo.save(new Conhecimento("Conhecimento 1.2", atividade1));
+        Conhecimento conhecimento3 =
+                conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
 
         atividade1.getConhecimentos().addAll(List.of(conhecimento1, conhecimento2));
         atividade2.getConhecimentos().add(conhecimento3);
@@ -110,18 +104,54 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void deveRetornarMapaParaVisualizacao() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{id}/mapa-visualizacao", subprocesso.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.unidade.sigla").value(unidade.getSigla()))
-            .andExpect(jsonPath("$.unidade.nome").value(unidade.getNome()))
-            .andExpect(jsonPath("$.competencias").isArray())
-            .andExpect(jsonPath("$.competencias.length()").value(2))
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades.length()").value(1))
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos.length()").value(2))
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos[?(@.descricao == 'Conhecimento 1.1')]").exists())
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos[?(@.descricao == 'Conhecimento 1.2')]").exists())
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades.length()").value(1))
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades[?(@.descricao == 'Atividade 2')].conhecimentos.length()").value(1))
-            .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades[?(@.descricao == 'Atividade 2')].conhecimentos[?(@.descricao == 'Conhecimento 2.1')]").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidade.sigla").value(unidade.getSigla()))
+                .andExpect(jsonPath("$.unidade.nome").value(unidade.getNome()))
+                .andExpect(jsonPath("$.competencias").isArray())
+                .andExpect(jsonPath("$.competencias.length()").value(2))
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                                + " 1')].atividades.length()")
+                                .value(1))
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                                + " 1')].atividades[?(@.descricao == 'Atividade"
+                                                + " 1')].conhecimentos.length()")
+                                .value(2))
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                            + " 1')].atividades[?(@.descricao == 'Atividade"
+                                            + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                            + " 1.1')]")
+                                .exists())
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                            + " 1')].atividades[?(@.descricao == 'Atividade"
+                                            + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                            + " 1.2')]")
+                                .exists())
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                                + " 2')].atividades.length()")
+                                .value(1))
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                                + " 2')].atividades[?(@.descricao == 'Atividade"
+                                                + " 2')].conhecimentos.length()")
+                                .value(1))
+                .andExpect(
+                        jsonPath(
+                                        "$.competencias[?(@.descricao == 'Competência"
+                                            + " 2')].atividades[?(@.descricao == 'Atividade"
+                                            + " 2')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                            + " 2.1')]")
+                                .exists());
     }
 
     @Test
@@ -129,6 +159,6 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void deveRetornar404ParaSubprocessoInexistente() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{id}/mapa-visualizacao", 9999L))
-            .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 }

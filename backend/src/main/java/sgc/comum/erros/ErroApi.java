@@ -2,14 +2,13 @@ package sgc.comum.erros;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.http.HttpStatusCode;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatusCode;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,8 +21,7 @@ public class ErroApi {
 
     private List<ErroSubApi> subErrors;
 
-    @Setter
-    private Map<String, ?> details;
+    @Setter private Map<String, ?> details;
 
     private ErroApi() {
         this.timestamp = LocalDateTime.now();

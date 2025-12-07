@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import sgc.comum.json.SanitizarHtml;
 
 /**
- * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8).
- * Usado pelo CHEFE da unidade para fornecer feedback sobre o mapa disponibilizado.
+ * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8). Usado pelo CHEFE da
+ * unidade para fornecer feedback sobre o mapa disponibilizado.
  */
 @Data
 @Builder

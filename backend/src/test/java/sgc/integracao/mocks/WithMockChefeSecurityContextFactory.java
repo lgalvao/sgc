@@ -12,7 +12,8 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
+public class WithMockChefeSecurityContextFactory
+        implements WithSecurityContextFactory<WithMockChefe> {
     @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
 
@@ -46,15 +47,17 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
         }
 
         if (usuario == null) {
-            usuario = new Usuario(
-                    annotation.value(),
-                    "Chefe Teste",
-                    "chefe@teste.com",
-                    "123",
-                    unidade
-            );
+            usuario =
+                    new Usuario(
+                            annotation.value(), "Chefe Teste", "chefe@teste.com", "123", unidade);
 
-            usuario.getAtribuicoes().add(UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+            usuario.getAtribuicoes()
+                    .add(
+                            UsuarioPerfil.builder()
+                                    .usuario(usuario)
+                                    .unidade(unidade)
+                                    .perfil(Perfil.CHEFE)
+                                    .build());
             if (dbAvailable && usuarioRepo != null) {
                 try {
                     usuarioRepo.save(usuario);
@@ -67,7 +70,13 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
         // Garante que a unidade está correta no usuário do contexto
         usuario.setUnidadeLotacao(unidade);
         if (usuario.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
-            usuario.getAtribuicoes().add(UsuarioPerfil.builder().usuario(usuario).unidade(unidade).perfil(Perfil.CHEFE).build());
+            usuario.getAtribuicoes()
+                    .add(
+                            UsuarioPerfil.builder()
+                                    .usuario(usuario)
+                                    .unidade(unidade)
+                                    .perfil(Perfil.CHEFE)
+                                    .build());
         }
         if (dbAvailable && usuarioRepo != null) {
             try {
@@ -77,8 +86,8 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
             }
         }
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                usuario, null, usuario.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         return context;

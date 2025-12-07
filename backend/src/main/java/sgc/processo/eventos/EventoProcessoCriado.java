@@ -5,10 +5,10 @@ import org.springframework.context.ApplicationEvent;
 
 /**
  * Evento de domínio publicado quando um novo Processo é persistido pela primeira vez.
- * <p>
- * Este evento é mais simples e normalmente usado para logging ou auditoria inicial.
- * O evento {@link EventoProcessoIniciado} é usado para as lógicas de negócio mais complexas
- * que ocorrem quando o processo efetivamente começa.
+ *
+ * <p>Este evento é mais simples e normalmente usado para logging ou auditoria inicial. O evento
+ * {@link EventoProcessoIniciado} é usado para as lógicas de negócio mais complexas que ocorrem
+ * quando o processo efetivamente começa.
  *
  * @see EventoProcessoIniciado
  */
@@ -20,5 +20,4 @@ public class EventoProcessoCriado extends ApplicationEvent {
         super(fonte);
         this.codProcesso = codProcesso;
     }
-
 }

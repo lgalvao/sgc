@@ -1,5 +1,15 @@
 package sgc.unidade.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,34 +25,18 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.*;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class UnidadeServiceTest {
 
-    @InjectMocks
-    private UnidadeService unidadeService;
+    @InjectMocks private UnidadeService unidadeService;
 
-    @Mock
-    private UnidadeRepo unidadeRepo;
+    @Mock private UnidadeRepo unidadeRepo;
 
-    @Mock
-    private MapaRepo mapaRepo;
+    @Mock private MapaRepo mapaRepo;
 
-    @Mock
-    private UsuarioRepo usuarioRepo;
+    @Mock private UsuarioRepo usuarioRepo;
 
-    @Mock
-    private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
+    @Mock private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
 
     @Test
     @DisplayName("buscarTodasUnidades deve retornar hierarquia correta")
@@ -72,9 +66,9 @@ class UnidadeServiceTest {
     void criarAtribuicaoTemporaria() {
         Long unidadeId = 1L;
         String usuarioId = "123456789012";
-        CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
-            usuarioId, LocalDate.now().plusDays(5), "Justificativa"
-        );
+        CriarAtribuicaoTemporariaRequest req =
+                new CriarAtribuicaoTemporariaRequest(
+                        usuarioId, LocalDate.now().plusDays(5), "Justificativa");
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(unidadeId);
@@ -159,6 +153,6 @@ class UnidadeServiceTest {
         when(unidadeRepo.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> unidadeService.buscarPorCodigo(id))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

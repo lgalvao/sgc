@@ -1,12 +1,11 @@
 package sgc.processo.dto;
 
-import lombok.*;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @Getter
 @Builder
@@ -21,11 +20,9 @@ public class ProcessoDetalheDto {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
 
-    @Builder.Default
-    private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
+    @Builder.Default private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
 
-    @Builder.Default
-    private final List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+    @Builder.Default private final List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
 
     private boolean podeFinalizar;
     private boolean podeHomologarCadastro;
@@ -46,7 +43,6 @@ public class ProcessoDetalheDto {
         private Long mapaCodigo;
         private Long codSubprocesso;
 
-        @Builder.Default
-        private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();
+        @Builder.Default private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();
     }
 }

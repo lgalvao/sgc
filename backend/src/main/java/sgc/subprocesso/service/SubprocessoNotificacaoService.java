@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -32,61 +31,78 @@ public class SubprocessoNotificacaoService {
         return templateEngine.process(template, context);
     }
 
-    private void criarEsalvarAlerta(String descricao, Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino,
+    private void criarEsalvarAlerta(
+            String descricao,
+            Processo processo,
+            Unidade unidadeOrigem,
+            Unidade unidadeDestino,
             Usuario usuarioDestino) {
-        Alerta alerta = Alerta.builder()
-                .descricao(descricao)
-                .processo(processo)
-                .dataHora(LocalDateTime.now())
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(unidadeDestino)
-                .usuarioDestino(usuarioDestino)
-                .build();
+        Alerta alerta =
+                Alerta.builder()
+                        .descricao(descricao)
+                        .processo(processo)
+                        .dataHora(LocalDateTime.now())
+                        .unidadeOrigem(unidadeOrigem)
+                        .unidadeDestino(unidadeDestino)
+                        .usuarioDestino(usuarioDestino)
+                        .build();
         repositorioAlerta.save(alerta);
     }
 
     /**
-     * Envia notificações (email e alerta) sobre a disponibilização de um mapa para
-     * validação.
-     * <p>
-     * Corresponde aos itens 10.10, 10.11 e 10.12 do CDU-17. Notifica a própria
-     * unidade, suas unidades superiores hierarquicamente e a SEDOC.
+     * Envia notificações (email e alerta) sobre a disponibilização de um mapa para validação.
+     *
+     * <p>Corresponde aos itens 10.10, 10.11 e 10.12 do CDU-17. Notifica a própria unidade, suas
+     * unidades superiores hierarquicamente e a SEDOC.
      *
      * @param sp O subprocesso cujo mapa foi disponibilizado.
      */
     public void notificarDisponibilizacaoMapa(Subprocesso sp) {
         Unidade unidade = sp.getUnidade();
-        if (unidade == null)
-            return;
+        if (unidade == null) return;
 
         String nomeProcesso = sp.getProcesso().getDescricao();
         String siglaUnidade = unidade.getSigla();
-        String dataLimite = sp.getDataLimiteEtapa2().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String dataLimite =
+                sp.getDataLimiteEtapa2()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         java.util.Map<String, Object> variaveis = new java.util.HashMap<>();
         variaveis.put("siglaUnidade", siglaUnidade);
         variaveis.put("nomeProcesso", nomeProcesso);
         variaveis.put("dataLimite", dataLimite);
 
-        String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação",
-                siglaUnidade);
+        String assuntoUnidade =
+                String.format(
+                        "SGC: Mapa de Competências da unidade %s disponibilizado para validação",
+                        siglaUnidade);
         String corpoUnidade = processarTemplate("mapa-disponibilizado", variaveis);
         notificacaoEmailService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
-        String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação",
-                siglaUnidade);
+        String assuntoSuperior =
+                String.format(
+                        "SGC: Mapa de Competências da unidade %s disponibilizado para validação",
+                        siglaUnidade);
         String corpoSuperior = processarTemplate("mapa-disponibilizado", variaveis);
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            notificacaoEmailService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
+            notificacaoEmailService.enviarEmail(
+                    superior.getSigla(), assuntoSuperior, corpoSuperior);
             superior = superior.getUnidadeSuperior();
         }
 
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new ErroUnidadeNaoEncontrada("Unidade 'SEDOC' não encontrada."));
+        Unidade sedoc =
+                unidadeRepo
+                        .findBySigla("SEDOC")
+                        .orElseThrow(
+                                () ->
+                                        new ErroUnidadeNaoEncontrada(
+                                                "Unidade 'SEDOC' não encontrada."));
 
         criarEsalvarAlerta(
-                String.format("Mapa de competências da unidade %s disponibilizado para análise", siglaUnidade),
+                String.format(
+                        "Mapa de competências da unidade %s disponibilizado para análise",
+                        siglaUnidade),
                 sp.getProcesso(),
                 sedoc,
                 unidade,
@@ -94,16 +110,14 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade superior sobre a disponibilização do cadastro de
-     * atividades.
-     * Corresponde ao CDU-09.
+     * Notifica a unidade superior sobre a disponibilização do cadastro de atividades. Corresponde
+     * ao CDU-09.
      *
-     * @param sp             O subprocesso cujo cadastro foi disponibilizado.
+     * @param sp O subprocesso cujo cadastro foi disponibilizado.
      * @param unidadeDestino A unidade que realizará a análise.
      */
     public void notificarDisponibilizacaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
-        if (unidadeDestino == null || sp.getUnidade() == null)
-            return;
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
 
         String siglaUnidadeOrigem = sp.getUnidade().getSigla();
         String nomeProcesso = sp.getProcesso().getDescricao();
@@ -114,12 +128,15 @@ public class SubprocessoNotificacaoService {
         variaveis.put("siglaUnidadeDestino", siglaUnidadeDestino);
         variaveis.put("nomeProcesso", nomeProcesso);
 
-        String assunto = "SGC: Cadastro de atividades e conhecimentos disponibilizado: " + siglaUnidadeOrigem;
+        String assunto =
+                "SGC: Cadastro de atividades e conhecimentos disponibilizado: "
+                        + siglaUnidadeOrigem;
         String corpo = processarTemplate("disponibilizacao-cadastro", variaveis);
         notificacaoEmailService.enviarEmail(siglaUnidadeDestino, assunto, corpo);
 
         criarEsalvarAlerta(
-                "Cadastro de atividades/conhecimentos da unidade " + siglaUnidadeOrigem
+                "Cadastro de atividades/conhecimentos da unidade "
+                        + siglaUnidadeOrigem
                         + " disponibilizado para análise",
                 sp.getProcesso(),
                 sp.getUnidade(),
@@ -147,23 +164,30 @@ public class SubprocessoNotificacaoService {
                             .formatted(sp.getUnidade().getSigla()),
                     processarTemplate("sugestoes-mapa", variaveis));
 
-            log.debug("Criando e salvando alerta para sugestões. Processo: {}, Unidade Origem: {}, Unidade Destino: {}",
-                    sp.getProcesso().getCodigo(), sp.getUnidade().getSigla(), unidadeSuperior.getSigla());
+            log.debug(
+                    "Criando e salvando alerta para sugestões. Processo: {}, Unidade Origem: {},"
+                            + " Unidade Destino: {}",
+                    sp.getProcesso().getCodigo(),
+                    sp.getUnidade().getSigla(),
+                    unidadeSuperior.getSigla());
             criarEsalvarAlerta(
-                    "Sugestões para o mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise",
+                    "Sugestões para o mapa de competências da "
+                            + sp.getUnidade().getSigla()
+                            + " aguardando análise",
                     sp.getProcesso(),
                     sp.getUnidade(),
                     unidadeSuperior,
                     null);
         } else {
-            log.debug("Unidade superior não encontrada para subprocesso {}. Não será criado alerta ou enviado e-mail.",
+            log.debug(
+                    "Unidade superior não encontrada para subprocesso {}. Não será criado alerta ou"
+                            + " enviado e-mail.",
                     sp.getCodigo());
         }
     }
 
     /**
-     * Notifica a unidade superior sobre a submissão de uma validação de mapa para
-     * análise.
+     * Notifica a unidade superior sobre a submissão de uma validação de mapa para análise.
      *
      * @param sp O subprocesso cuja validação foi submetida.
      */
@@ -176,12 +200,15 @@ public class SubprocessoNotificacaoService {
 
             notificacaoEmailService.enviarEmail(
                     unidadeSuperior.getSigla(),
-                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla()
+                    "SGC: Validação do mapa de competências da "
+                            + sp.getUnidade().getSigla()
                             + " submetida para análise",
                     processarTemplate("validacao-mapa", variaveis));
 
             criarEsalvarAlerta(
-                    "Validação do mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise",
+                    "Validação do mapa de competências da "
+                            + sp.getUnidade().getSigla()
+                            + " aguardando análise",
                     sp.getProcesso(),
                     sp.getUnidade(),
                     unidadeSuperior,
@@ -192,7 +219,7 @@ public class SubprocessoNotificacaoService {
     /**
      * Notifica uma unidade sobre a devolução da validação do seu mapa para ajustes.
      *
-     * @param sp               O subprocesso relacionado.
+     * @param sp O subprocesso relacionado.
      * @param unidadeDevolucao A unidade que receberá a notificação de devolução.
      */
     public void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
@@ -202,11 +229,14 @@ public class SubprocessoNotificacaoService {
 
         notificacaoEmailService.enviarEmail(
                 unidadeDevolucao.getSigla(),
-                "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
+                "SGC: Validação do mapa de competências da "
+                        + sp.getUnidade().getSigla()
+                        + " devolvida para ajustes",
                 processarTemplate("devolucao-validacao", variaveis));
 
         criarEsalvarAlerta(
-                "Cadastro de atividades e conhecimentos da unidade " + sp.getUnidade().getSigla()
+                "Cadastro de atividades e conhecimentos da unidade "
+                        + sp.getUnidade().getSigla()
                         + " devolvido para ajustes",
                 sp.getProcesso(),
                 sp.getUnidade().getUnidadeSuperior(),
@@ -215,8 +245,8 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade superior hierárquica sobre o aceite de uma validação,
-     * submetendo-a para a próxima etapa de análise.
+     * Notifica a unidade superior hierárquica sobre o aceite de uma validação, submetendo-a para a
+     * próxima etapa de análise.
      *
      * @param sp O subprocesso cuja validação foi aceita.
      */
@@ -229,12 +259,15 @@ public class SubprocessoNotificacaoService {
 
             notificacaoEmailService.enviarEmail(
                     unidadeSuperior.getSigla(),
-                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla()
+                    "SGC: Validação do mapa de competências da "
+                            + sp.getUnidade().getSigla()
                             + " submetida para análise",
                     processarTemplate("aceite-validacao", variaveis));
 
             criarEsalvarAlerta(
-                    "Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                    "Validação do mapa de competências da "
+                            + sp.getUnidade().getSigla()
+                            + " submetida para análise",
                     sp.getProcesso(),
                     sp.getUnidade().getUnidadeSuperior(),
                     unidadeSuperior,
@@ -243,15 +276,14 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade responsável sobre a devolução do seu cadastro de
-     * atividades
-     * para ajustes.
+     * Notifica a unidade responsável sobre a devolução do seu cadastro de atividades para ajustes.
      *
-     * @param sp               O subprocesso cujo cadastro foi devolvido.
+     * @param sp O subprocesso cujo cadastro foi devolvido.
      * @param unidadeDevolucao A unidade que receberá a notificação.
-     * @param motivo           O motivo da devolução.
+     * @param motivo O motivo da devolução.
      */
-    public void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
+    public void notificarDevolucaoCadastro(
+            Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
         java.util.Map<String, Object> variaveis = new java.util.HashMap<>();
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
@@ -259,11 +291,15 @@ public class SubprocessoNotificacaoService {
 
         notificacaoEmailService.enviarEmail(
                 unidadeDevolucao.getSigla(),
-                "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
+                "SGC: Cadastro de atividades da "
+                        + sp.getUnidade().getSigla()
+                        + " devolvido para ajustes",
                 processarTemplate("devolucao-cadastro", variaveis));
 
         criarEsalvarAlerta(
-                "Cadastro de atividades da unidade " + sp.getUnidade().getSigla() + " devolvido para ajustes: "
+                "Cadastro de atividades da unidade "
+                        + sp.getUnidade().getSigla()
+                        + " devolvido para ajustes: "
                         + motivo,
                 sp.getProcesso(),
                 sp.getUnidade().getUnidadeSuperior(),
@@ -272,17 +308,16 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade de destino sobre o aceite de um cadastro, submetendo-o
-     * para a próxima fase de análise.
-     * <p>
-     * Corresponde aos itens 10.7 e 10.8 do CDU-13.
+     * Notifica a unidade de destino sobre o aceite de um cadastro, submetendo-o para a próxima fase
+     * de análise.
      *
-     * @param sp             O subprocesso cujo cadastro foi aceito.
+     * <p>Corresponde aos itens 10.7 e 10.8 do CDU-13.
+     *
+     * @param sp O subprocesso cujo cadastro foi aceito.
      * @param unidadeDestino A unidade que realizará a próxima análise.
      */
     public void notificarAceiteCadastro(Subprocesso sp, Unidade unidadeDestino) {
-        if (unidadeDestino == null || sp.getUnidade() == null)
-            return;
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
 
         String siglaUnidadeOrigem = sp.getUnidade().getSigla();
         String nomeProcesso = sp.getProcesso().getDescricao();
@@ -293,13 +328,17 @@ public class SubprocessoNotificacaoService {
         variaveis.put("nomeProcesso", nomeProcesso);
 
         // 1. Enviar E-mail (CDU-13 Item 10.7)
-        String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem
-                + " submetido para análise";
+        String assunto =
+                "SGC: Cadastro de atividades e conhecimentos da "
+                        + siglaUnidadeOrigem
+                        + " submetido para análise";
         String corpo = processarTemplate("aceite-cadastro", variaveis);
         notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
 
         criarEsalvarAlerta(
-                "Cadastro de atividades e conhecimentos da unidade " + siglaUnidadeOrigem + " submetido para análise",
+                "Cadastro de atividades e conhecimentos da unidade "
+                        + siglaUnidadeOrigem
+                        + " submetido para análise",
                 sp.getProcesso(),
                 sp.getUnidade(),
                 unidadeDestino,
@@ -307,18 +346,15 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade superior sobre a disponibilização da revisão do cadastro
-     * de atividades.
-     * <p>
-     * Corresponde ao CDU-10.
+     * Notifica a unidade superior sobre a disponibilização da revisão do cadastro de atividades.
      *
-     * @param sp             O subprocesso cuja revisão de cadastro foi
-     *                       disponibilizada.
+     * <p>Corresponde ao CDU-10.
+     *
+     * @param sp O subprocesso cuja revisão de cadastro foi disponibilizada.
      * @param unidadeDestino A unidade que realizará a análise.
      */
     public void notificarDisponibilizacaoRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
-        if (unidadeDestino == null || sp.getUnidade() == null)
-            return;
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
 
         String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
         String descricaoProcesso = sp.getProcesso().getDescricao();
@@ -330,14 +366,19 @@ public class SubprocessoNotificacaoService {
         variaveis.put("nomeProcesso", descricaoProcesso);
 
         // CDU-10 Item 12: Notificação por e-mail
-        String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: %s",
-                siglaUnidadeSubprocesso);
+        String assunto =
+                String.format(
+                        "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada:"
+                                + " %s",
+                        siglaUnidadeSubprocesso);
         String corpo = processarTemplate("disponibilizacao-revisao-cadastro", variaveis);
         notificacaoEmailService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
 
         // CDU-10 Item 13: Alerta interno
         criarEsalvarAlerta(
-                String.format("Cadastro de atividades e conhecimentos da unidade %s disponibilizado para análise",
+                String.format(
+                        "Cadastro de atividades e conhecimentos da unidade %s disponibilizado para"
+                                + " análise",
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 sp.getUnidade(),
@@ -346,17 +387,16 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade responsável sobre a devolução da revisão de seu cadastro
-     * para ajustes.
-     * <p>
-     * Corresponde aos itens 10.9 e 10.10 do CDU-14.
+     * Notifica a unidade responsável sobre a devolução da revisão de seu cadastro para ajustes.
      *
-     * @param sp               O subprocesso cuja revisão foi devolvida.
-     * @param unidadeAnalise   A unidade que realizou a análise e devolução.
-     * @param unidadeDevolucao A unidade que receberá a notificação para ajustar o
-     *                         cadastro.
+     * <p>Corresponde aos itens 10.9 e 10.10 do CDU-14.
+     *
+     * @param sp O subprocesso cuja revisão foi devolvida.
+     * @param unidadeAnalise A unidade que realizou a análise e devolução.
+     * @param unidadeDevolucao A unidade que receberá a notificação para ajustar o cadastro.
      */
-    public void notificarDevolucaoRevisaoCadastro(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
+    public void notificarDevolucaoRevisaoCadastro(
+            Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
         String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
         String descricaoProcesso = sp.getProcesso().getDescricao();
 
@@ -365,13 +405,17 @@ public class SubprocessoNotificacaoService {
         variaveis.put("siglaUnidadeDestino", unidadeDevolucao.getSigla());
         variaveis.put("nomeProcesso", descricaoProcesso);
 
-        String assunto = String.format("SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes",
-                siglaUnidadeSubprocesso);
+        String assunto =
+                String.format(
+                        "SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes",
+                        siglaUnidadeSubprocesso);
         String corpo = processarTemplate("devolucao-revisao-cadastro", variaveis);
         notificacaoEmailService.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
 
         criarEsalvarAlerta(
-                String.format("Cadastro de atividades e conhecimentos da unidade %s devolvido para ajustes",
+                String.format(
+                        "Cadastro de atividades e conhecimentos da unidade %s devolvido para"
+                                + " ajustes",
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 unidadeAnalise,
@@ -380,17 +424,16 @@ public class SubprocessoNotificacaoService {
     }
 
     /**
-     * Notifica a unidade de destino sobre o aceite da revisão de um cadastro,
-     * submetendo-o para a próxima fase de análise.
-     * <p>
-     * Corresponde aos itens 11.7 e 11.8 do CDU-14.
+     * Notifica a unidade de destino sobre o aceite da revisão de um cadastro, submetendo-o para a
+     * próxima fase de análise.
      *
-     * @param sp             O subprocesso cuja revisão de cadastro foi aceita.
+     * <p>Corresponde aos itens 11.7 e 11.8 do CDU-14.
+     *
+     * @param sp O subprocesso cuja revisão de cadastro foi aceita.
      * @param unidadeDestino A unidade que realizará a próxima análise.
      */
     public void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
-        if (unidadeDestino == null || sp.getUnidade() == null)
-            return;
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
 
         String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
         String descricaoProcesso = sp.getProcesso().getDescricao();
@@ -402,14 +445,18 @@ public class SubprocessoNotificacaoService {
         variaveis.put("nomeProcesso", descricaoProcesso);
 
         // CDU-14 Item 11.7: Notificação por e-mail
-        String assunto = String.format(
-                "SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise",
-                siglaUnidadeSubprocesso);
+        String assunto =
+                String.format(
+                        "SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido"
+                                + " para análise",
+                        siglaUnidadeSubprocesso);
         String corpo = processarTemplate("aceite-revisao-cadastro", variaveis);
         notificacaoEmailService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
 
         criarEsalvarAlerta(
-                String.format("Revisão do cadastro de atividades e conhecimentos da unidade %s submetida para análise",
+                String.format(
+                        "Revisão do cadastro de atividades e conhecimentos da unidade %s submetida"
+                                + " para análise",
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 sp.getUnidade(),
@@ -418,8 +465,13 @@ public class SubprocessoNotificacaoService {
     }
 
     public void notificarHomologacaoMapa(Subprocesso sp) {
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new ErroUnidadeNaoEncontrada("Unidade 'SEDOC' não encontrada."));
+        Unidade sedoc =
+                unidadeRepo
+                        .findBySigla("SEDOC")
+                        .orElseThrow(
+                                () ->
+                                        new ErroUnidadeNaoEncontrada(
+                                                "Unidade 'SEDOC' não encontrada."));
 
         String descricaoProcesso = sp.getProcesso().getDescricao();
 
@@ -427,7 +479,9 @@ public class SubprocessoNotificacaoService {
         variaveis.put("nomeProcesso", descricaoProcesso);
 
         // Notificação por e-mail
-        String assunto = String.format("SGC: Mapa de competências do processo %s homologado", descricaoProcesso);
+        String assunto =
+                String.format(
+                        "SGC: Mapa de competências do processo %s homologado", descricaoProcesso);
         String corpo = processarTemplate("homologacao-mapa", variaveis);
         notificacaoEmailService.enviarEmail(sedoc.getSigla(), assunto, corpo);
 

@@ -1,6 +1,11 @@
 package sgc.sgrh;
 
 import jakarta.validation.Valid;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +16,6 @@ import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.service.UsuarioService;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,26 +38,24 @@ public class UsuarioController {
 
     /**
      * Autentica um usuário com base no título de eleitor e senha.
-     * <p>
-     * <b>Simulação:</b> Este endpoint simula o processo de autenticação.
+     *
+     * <p><b>Simulação:</b> Este endpoint simula o processo de autenticação.
      *
      * @param request O DTO contendo o título de eleitor e a senha.
-     * @return Um {@link ResponseEntity} com {@code true} se a autenticação for
-     *         bem-sucedida,
-     *         {@code false} caso contrário.
+     * @return Um {@link ResponseEntity} com {@code true} se a autenticação for bem-sucedida, {@code
+     *     false} caso contrário.
      */
     @PostMapping("/autenticar")
     public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request) {
-        boolean autenticado = usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
+        boolean autenticado =
+                usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
         return ResponseEntity.ok(autenticado);
     }
 
     /**
-     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
-     * acesso.
-     * <p>
-     * <b>Simulação:</b> Este endpoint simula a busca de perfis de um usuário no
-     * SGRH.
+     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem acesso.
+     *
+     * <p><b>Simulação:</b> Este endpoint simula a busca de perfis de um usuário no SGRH.
      *
      * @param tituloEleitoral O título de eleitor do usuário.
      * @return Um {@link ResponseEntity} contendo a lista de {@link PerfilUnidade}.
@@ -69,22 +67,23 @@ public class UsuarioController {
     }
 
     /**
-     * Finaliza o processo de login, registrando o perfil e a unidade escolhidos
-     * pelo usuário.
-     * <p>
-     * <b>Simulação:</b> Este endpoint simula a confirmação do perfil de acesso do
-     * usuário
-     * para a sessão.
+     * Finaliza o processo de login, registrando o perfil e a unidade escolhidos pelo usuário.
      *
-     * @param request O DTO contendo o título de eleitor e o perfil/unidade
-     *                selecionado.
+     * <p><b>Simulação:</b> Este endpoint simula a confirmação do perfil de acesso do usuário para a
+     * sessão.
+     *
+     * @param request O DTO contendo o título de eleitor e o perfil/unidade selecionado.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/entrar")
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
         usuarioService.entrar(request);
-        LoginResp response = new LoginResp(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()),
-                request.getUnidadeCodigo());
+        LoginResp response =
+                new LoginResp(
+                        request.getTituloEleitoral(),
+                        Perfil.valueOf(request.getPerfil()),
+                        request.getUnidadeCodigo());
 
         // Gerar JWT simulado
         try {
@@ -94,11 +93,12 @@ public class UsuarioController {
             claims.put("perfil", request.getPerfil());
             claims.put("unidadeCodigo", request.getUnidadeCodigo());
             String jsonClaims = objectMapper.writeValueAsString(claims);
-            String encodedClaims = Base64.getEncoder().encodeToString(jsonClaims.getBytes());
+            String encodedClaims =
+                    Base64.getEncoder().encodeToString(jsonClaims.getBytes(StandardCharsets.UTF_8));
             response.setToken(encodedClaims);
         } catch (Exception e) {
             // Logar o erro ou lançar uma exceção apropriada
-            log.error("Erro ao gerar token simulado: {}", e.getMessage());
+            log.error("Erro ao gerar token simulado", e);
             response.setToken("erro_geracao_token"); // Token de fallback em caso de erro
         }
 

@@ -1,21 +1,14 @@
 package sgc.subprocesso.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.atividade.dto.ConhecimentoDto;
 
-import java.util.List;
-
 /**
- * DTO agregado retornado pelo endpoint GET /api/subprocessos/{codigo}/cadastro
- * Estrutura:
- * {
- * subprocessoId: Long,
- * siglaUnidade: String,
- * atividades: [
- * { codigo: Long, descricao: String, conhecimentos: [ConhecimentoDto...] }
- * ]
- * }
+ * DTO agregado retornado pelo endpoint GET /api/subprocessos/{codigo}/cadastro Estrutura: {
+ * subprocessoId: Long, siglaUnidade: String, atividades: [ { codigo: Long, descricao: String,
+ * conhecimentos: [ConhecimentoDto...] } ] }
  */
 @Getter
 @Builder

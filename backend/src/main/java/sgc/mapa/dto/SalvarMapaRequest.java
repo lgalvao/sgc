@@ -2,17 +2,15 @@ package sgc.mapa.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
- * Request DTO para salvar um mapa completo.
- * Usado para criar ou atualizar o mapa com todas as suas competências
- * e vínculos com atividades de uma vez.
+ * Request DTO para salvar um mapa completo. Usado para criar ou atualizar o mapa com todas as suas
+ * competências e vínculos com atividades de uma vez.
  */
 @Data
 @Builder

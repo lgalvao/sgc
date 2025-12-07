@@ -1,6 +1,9 @@
 package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +13,6 @@ import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.unidade.model.Unidade;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")
 @Getter
@@ -21,7 +20,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Subprocesso extends EntidadeBase {
-    public Subprocesso(Long codigo, sgc.processo.model.Processo processo, sgc.unidade.model.Unidade unidade, sgc.mapa.model.Mapa mapa, SituacaoSubprocesso situacao, java.time.LocalDateTime dataLimiteEtapa1) {
+    public Subprocesso(
+            Long codigo,
+            sgc.processo.model.Processo processo,
+            sgc.unidade.model.Unidade unidade,
+            sgc.mapa.model.Mapa mapa,
+            SituacaoSubprocesso situacao,
+            java.time.LocalDateTime dataLimiteEtapa1) {
         super(codigo);
         this.processo = processo;
         this.unidade = unidade;
@@ -58,10 +63,13 @@ public class Subprocesso extends EntidadeBase {
     @Column(name = "situacao_id", length = 50)
     private SituacaoSubprocesso situacao;
 
-    /**
-     * Construtor de conveniência para criar um novo subprocesso no início de um processo.
-     */
-    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDateTime dataLimiteEtapa1) {
+    /** Construtor de conveniência para criar um novo subprocesso no início de um processo. */
+    public Subprocesso(
+            Processo processo,
+            Unidade unidade,
+            Mapa mapa,
+            SituacaoSubprocesso situacao,
+            LocalDateTime dataLimiteEtapa1) {
         super();
         this.processo = processo;
         this.unidade = unidade;
@@ -75,19 +83,19 @@ public class Subprocesso extends EntidadeBase {
     }
 
     public boolean isEmAndamento() {
-        final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
-            SituacaoSubprocesso.NAO_INICIADO
-        );
+        final List<SituacaoSubprocesso> situacoesFinalizadas =
+                Arrays.asList(
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.NAO_INICIADO);
         return !situacoesFinalizadas.contains(this.situacao);
     }
 
     public Integer getEtapaAtual() {
-        final List<SituacaoSubprocesso> situacoesFinalizadas = Arrays.asList(
-            SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-            SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO
-        );
+        final List<SituacaoSubprocesso> situacoesFinalizadas =
+                Arrays.asList(
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
         if (!situacoesFinalizadas.contains(this.situacao)) {
             return 1;
         }

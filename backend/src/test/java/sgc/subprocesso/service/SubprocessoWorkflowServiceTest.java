@@ -1,5 +1,15 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,17 +36,6 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -69,12 +68,15 @@ class SubprocessoWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id)).thenReturn(Collections.emptyList());
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
 
         service.disponibilizarCadastro(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroDisponibilizado.class));
+        assertThat(sp.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        verify(publicadorDeEventos)
+                .publishEvent(any(EventoSubprocessoCadastroDisponibilizado.class));
     }
 
     @Test
@@ -94,7 +96,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
-            .isInstanceOf(ErroAccessoNegado.class);
+                .isInstanceOf(ErroAccessoNegado.class);
     }
 
     @Test
@@ -109,10 +111,11 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id)).thenReturn(List.of(new Atividade()));
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(List.of(new Atividade()));
 
         assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     // --- Disponibilizar Revisão ---
@@ -133,12 +136,15 @@ class SubprocessoWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id)).thenReturn(Collections.emptyList());
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
 
         service.disponibilizarRevisao(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoDisponibilizada.class));
+        assertThat(sp.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        verify(publicadorDeEventos)
+                .publishEvent(any(EventoSubprocessoRevisaoDisponibilizada.class));
     }
 
     // --- Disponibilizar Mapa ---
@@ -181,7 +187,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.disponibilizarMapa(id, "obs", null, new Usuario()))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -195,7 +201,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.disponibilizarMapa(id, "obs", null, new Usuario()))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     // --- Apresentar Sugestões ---
@@ -400,7 +406,8 @@ class SubprocessoWorkflowServiceTest {
 
         service.devolverCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(sp.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(analiseService).criarAnalise(any());
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroDevolvido.class));
     }
@@ -423,7 +430,8 @@ class SubprocessoWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        assertThat(sp.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroAceito.class));
     }
 
@@ -440,7 +448,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.aceitarCadastro(id, "obs", user))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     // --- Homologar Cadastro ---
@@ -473,7 +481,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.homologarCadastro(id, "obs", new Usuario()))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     // --- Devolver Revisão Cadastro ---
@@ -532,7 +540,8 @@ class SubprocessoWorkflowServiceTest {
 
         service.aceitarRevisaoCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        assertThat(sp.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoAceita.class));
     }
 
@@ -567,7 +576,8 @@ class SubprocessoWorkflowServiceTest {
         Usuario user = new Usuario();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(impactoMapaService.verificarImpactos(id, user)).thenReturn(ImpactoMapaDto.semImpacto());
+        when(impactoMapaService.verificarImpactos(id, user))
+                .thenReturn(ImpactoMapaDto.semImpacto());
 
         service.homologarRevisaoCadastro(id, "obs", user);
 
@@ -585,6 +595,6 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", new Usuario()))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 }

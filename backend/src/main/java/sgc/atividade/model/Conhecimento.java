@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 
-/**
- * Representa um conhecimento específico necessário para realizar uma atividade.
- */
+/** Representa um conhecimento específico necessário para realizar uma atividade. */
 @Entity
 @Table(name = "CONHECIMENTO", schema = "sgc")
 @Getter

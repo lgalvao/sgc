@@ -3,6 +3,8 @@ package sgc.mapa;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,12 +12,9 @@ import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
 import sgc.mapa.service.MapaService;
 
-import java.net.URI;
-import java.util.List;
-
 /**
- * Controlador REST para gerenciar Mapas usando DTOs.
- * Evita expor entidades JPA diretamente nas APIs.
+ * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
+ * APIs.
  */
 @RestController
 @RequestMapping("/api/mapas")
@@ -33,10 +32,7 @@ public class MapaController {
     @GetMapping
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
-        return mapaService.listar()
-                .stream()
-                .map(mapaMapper::toDto)
-                .toList();
+        return mapaService.listar().stream().map(mapaMapper::toDto).toList();
     }
 
     /**
@@ -56,8 +52,8 @@ public class MapaController {
      * Cria um novo mapa de competências.
      *
      * @param mapaDto O DTO com os dados do mapa a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa
-     * e o {@link MapaDto} criado no corpo da resposta.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa e o {@link
+     *     MapaDto} criado no corpo da resposta.
      */
     @PostMapping
     @Operation(summary = "Cria um novo mapa")
@@ -77,7 +73,8 @@ public class MapaController {
      */
     @PostMapping("/{codMapa}/atualizar")
     @Operation(summary = "Atualiza um mapa existente")
-    public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
+    public ResponseEntity<MapaDto> atualizar(
+            @PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         var atualizado = mapaService.atualizar(codMapa, entidade);
         return ResponseEntity.ok(mapaMapper.toDto(atualizado));
@@ -95,5 +92,4 @@ public class MapaController {
         mapaService.excluir(codMapa);
         return ResponseEntity.noContent().build();
     }
-
 }

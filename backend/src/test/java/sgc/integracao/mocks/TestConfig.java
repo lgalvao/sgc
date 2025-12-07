@@ -16,8 +16,6 @@ public class TestConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return JsonMapper.builder()
-                .findAndAddModules()
-                .build();
+        return JsonMapper.builder().findAndAddModules().build();
     }
 }

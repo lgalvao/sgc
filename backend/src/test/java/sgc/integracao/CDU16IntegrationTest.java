@@ -1,5 +1,12 @@
 package sgc.integracao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,42 +41,28 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
 public class CDU16IntegrationTest extends BaseIntegrationTest {
-    private static final String API_SUBPROCESSO_MAPA_AJUSTE = "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
+    private static final String API_SUBPROCESSO_MAPA_AJUSTE =
+            "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private MapaRepo mapaRepo;
+    @Autowired private MapaRepo mapaRepo;
 
-    @Autowired
-    private AtividadeRepo atividadeRepo;
+    @Autowired private AtividadeRepo atividadeRepo;
 
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
+    @Autowired private CompetenciaRepo competenciaRepo;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -78,22 +71,22 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
     void setUp() {
         Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
 
-        Processo processo = new Processo(
-                "Processo de Revisão",
-                TipoProcesso.REVISAO,
-                SituacaoProcesso.EM_ANDAMENTO,
-                LocalDateTime.now().plusDays(30)
-        );
+        Processo processo =
+                new Processo(
+                        "Processo de Revisão",
+                        TipoProcesso.REVISAO,
+                        SituacaoProcesso.EM_ANDAMENTO,
+                        LocalDateTime.now().plusDays(30));
         processoRepo.save(processo);
 
         Mapa mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(
-                processo,
-                unidade,
-                mapa,
-                SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
-                processo.getDataLimite()
-        );
+        subprocesso =
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        mapa,
+                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
+                        processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
         var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
@@ -110,20 +103,25 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve submeter o mapa ajustado e alterar a situação do subprocesso")
     void deveSubmeterMapaAjustadoComSucesso() throws Exception {
-        var request = new SubmeterMapaAjustadoReq(
-                "Ajustes realizados conforme solicitado.",
-                LocalDateTime.now().plusDays(10)
-        );
+        var request =
+                new SubmeterMapaAjustadoReq(
+                        "Ajustes realizados conforme solicitado.",
+                        LocalDateTime.now().plusDays(10));
 
-        mockMvc.perform(post("/api/subprocessos/{id}/submeter-mapa-ajustado", subprocesso.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        post(
+                                        "/api/subprocessos/{id}/submeter-mapa-ajustado",
+                                        subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
-        Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
+        Subprocesso subprocessoAtualizado =
+                subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(subprocessoAtualizado.getSituacao())
+                .isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
     }
 
     @Nested
@@ -135,33 +133,38 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         void deveSalvarAjustesComSucesso() throws Exception {
             Competencia c1 = competenciaRepo.findAll().getFirst();
 
-            var request = new SalvarAjustesReq(List.of(
-                    CompetenciaAjusteDto.builder()
-                            .codCompetencia(c1.getCodigo())
-                            .nome("Competência Ajustada")
-                            .atividades(List.of(
-                                    AtividadeAjusteDto.builder()
-                                            .codAtividade(atividade1.getCodigo())
-                                            .nome("Atividade 1 Ajustada")
-                                            .conhecimentos(List.of())
-                                            .build()
-                            ))
-                            .build()
-            ));
+            var request =
+                    new SalvarAjustesReq(
+                            List.of(
+                                    CompetenciaAjusteDto.builder()
+                                            .codCompetencia(c1.getCodigo())
+                                            .nome("Competência Ajustada")
+                                            .atividades(
+                                                    List.of(
+                                                            AtividadeAjusteDto.builder()
+                                                                    .codAtividade(
+                                                                            atividade1.getCodigo())
+                                                                    .nome("Atividade 1 Ajustada")
+                                                                    .conhecimentos(List.of())
+                                                                    .build()))
+                                            .build()));
 
-            mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            Subprocesso subprocessoAtualizado =
+                    subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(subprocessoAtualizado.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
-            Atividade atividadeAtualizada = atividadeRepo.findById(atividade1.getCodigo()).orElseThrow();
+            Atividade atividadeAtualizada =
+                    atividadeRepo.findById(atividade1.getCodigo()).orElseThrow();
             assertThat(atividadeAtualizada.getDescricao()).isEqualTo("Atividade 1 Ajustada");
         }
-
 
         @Test
         @DisplayName("Deve retornar 409 se tentar ajustar mapa em situação inválida")
@@ -171,10 +174,11 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
 
             var request = new SalvarAjustesReq(List.of());
 
-            mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent());
         }
     }

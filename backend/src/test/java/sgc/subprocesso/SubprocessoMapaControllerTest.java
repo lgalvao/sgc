@@ -1,5 +1,13 @@
 package sgc.subprocesso;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,15 +39,6 @@ import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)
 class SubprocessoMapaControllerTest {
@@ -65,10 +64,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("verificarImpactos")
     @WithMockUser
     void verificarImpactos() throws Exception {
-        when(impactoMapaService.verificarImpactos(eq(1L), any())).thenReturn(ImpactoMapaDto.semImpacto());
+        when(impactoMapaService.verificarImpactos(eq(1L), any()))
+                .thenReturn(ImpactoMapaDto.semImpacto());
 
-        mockMvc.perform(get("/api/subprocessos/1/impactos-mapa"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/impactos-mapa")).andExpect(status().isOk());
     }
 
     @Test
@@ -82,18 +81,17 @@ class SubprocessoMapaControllerTest {
         when(subprocessoConsultaService.getSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(get("/api/subprocessos/1/mapa"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("obterMapaVisualizacao")
     @WithMockUser
     void obterMapaVisualizacao() throws Exception {
-        when(mapaVisualizacaoService.obterMapaParaVisualizacao(1L)).thenReturn(new MapaVisualizacaoDto());
+        when(mapaVisualizacaoService.obterMapaParaVisualizacao(1L))
+                .thenReturn(new MapaVisualizacaoDto());
 
-        mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao")).andExpect(status().isOk());
     }
 
     @Test
@@ -104,12 +102,14 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any())).thenReturn(new MapaCompletoDto());
+        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any()))
+                .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(post("/api/subprocessos/1/mapa/atualizar")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/subprocessos/1/mapa/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 
@@ -117,10 +117,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaParaAjuste")
     @WithMockUser
     void obterMapaParaAjuste() throws Exception {
-        when(subprocessoDtoService.obterMapaParaAjuste(1L)).thenReturn(MapaAjusteDto.builder().build());
+        when(subprocessoDtoService.obterMapaParaAjuste(1L))
+                .thenReturn(MapaAjusteDto.builder().build());
 
-        mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste")).andExpect(status().isOk());
     }
 
     @Test
@@ -130,10 +130,11 @@ class SubprocessoMapaControllerTest {
         SalvarAjustesReq req = new SalvarAjustesReq();
         req.setCompetencias(List.of());
 
-        mockMvc.perform(post("/api/subprocessos/1/mapa-ajuste/atualizar")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/subprocessos/1/mapa-ajuste/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 
@@ -148,8 +149,7 @@ class SubprocessoMapaControllerTest {
         when(subprocessoConsultaService.getSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());
     }
 
     @Test
@@ -160,12 +160,14 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("obs");
         req.setCompetencias(List.of());
 
-        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any())).thenReturn(new MapaCompletoDto());
+        when(subprocessoMapaWorkflowService.salvarMapaSubprocesso(eq(1L), any(), any()))
+                .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(post("/api/subprocessos/1/mapa-completo/atualizar")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/subprocessos/1/mapa-completo/atualizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 
@@ -177,12 +179,14 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of());
 
-        when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any(), any())).thenReturn(new MapaCompletoDto());
+        when(subprocessoMapaWorkflowService.adicionarCompetencia(eq(1L), any(), any()))
+                .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(post("/api/subprocessos/1/competencias")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/subprocessos/1/competencias")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 
@@ -194,12 +198,14 @@ class SubprocessoMapaControllerTest {
         req.setDescricao("Comp");
         req.setAtividadesIds(List.of());
 
-        when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any(), any())).thenReturn(new MapaCompletoDto());
+        when(subprocessoMapaWorkflowService.atualizarCompetencia(eq(1L), eq(10L), any(), any()))
+                .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(put("/api/subprocessos/1/competencias/10")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        put("/api/subprocessos/1/competencias/10")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 
@@ -207,10 +213,10 @@ class SubprocessoMapaControllerTest {
     @DisplayName("removerCompetencia")
     @WithMockUser
     void removerCompetencia() throws Exception {
-        when(subprocessoMapaWorkflowService.removerCompetencia(eq(1L), eq(10L), any())).thenReturn(new MapaCompletoDto());
+        when(subprocessoMapaWorkflowService.removerCompetencia(eq(1L), eq(10L), any()))
+                .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(delete("/api/subprocessos/1/competencias/10")
-                .with(csrf()))
+        mockMvc.perform(delete("/api/subprocessos/1/competencias/10").with(csrf()))
                 .andExpect(status().isOk());
     }
 
@@ -222,10 +228,11 @@ class SubprocessoMapaControllerTest {
         req.setObservacoes("Obs");
         req.setDataLimite(java.time.LocalDate.now().plusDays(1));
 
-        mockMvc.perform(post("/api/subprocessos/1/disponibilizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+        mockMvc.perform(
+                        post("/api/subprocessos/1/disponibilizar")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 }

@@ -1,6 +1,12 @@
 package sgc.notificacao;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+
 import jakarta.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,23 +21,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
-    @Mock
-    private JavaMailSender enviadorDeEmail;
+    @Mock private JavaMailSender enviadorDeEmail;
 
-    @Mock
-    private NotificacaoRepo repositorioNotificacao;
+    @Mock private NotificacaoRepo repositorioNotificacao;
 
-    @InjectMocks
-    private NotificacaoEmailService notificacaoServico;
+    @InjectMocks private NotificacaoEmailService notificacaoServico;
 
     private MimeMessage mimeMessageReal;
 

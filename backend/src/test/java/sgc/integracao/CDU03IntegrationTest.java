@@ -1,5 +1,18 @@
 package sgc.integracao;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +29,6 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
 import tools.jackson.databind.ObjectMapper;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -40,18 +39,17 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{codigo}";
 
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-
-
-    private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
+    private CriarProcessoReq criarCriarProcessoReq(
+            String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
         return new CriarProcessoReq(descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
-    private AtualizarProcessoReq criarAtualizarProcessoReq(Long codigo, String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new AtualizarProcessoReq(codigo, descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
+    private AtualizarProcessoReq criarAtualizarProcessoReq(
+            Long codigo, String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
+        return new AtualizarProcessoReq(
+                codigo, descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
     @Test
@@ -59,21 +57,22 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         List<Long> unidades = new ArrayList<>();
         unidades.add(1L); // Assumindo que a unidade com código 1 existe
 
-        CriarProcessoReq requestDTO = criarCriarProcessoReq(
-                "Processo de Mapeamento Teste",
-                unidades,
-                LocalDateTime.now().plusDays(30)
-        );
+        CriarProcessoReq requestDTO =
+                criarCriarProcessoReq(
+                        "Processo de Mapeamento Teste", unidades, LocalDateTime.now().plusDays(30));
 
-        mockMvc.perform(post(API_PROCESSOS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.codigo").isNumber())
                 .andExpect(jsonPath("$.descricao").value("Processo de Mapeamento Teste"))
                 .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
-                .andExpect(jsonPath("$.situacao").value("CRIADO")); // Verifica se a situação inicial é 'Criado'
+                .andExpect(
+                        jsonPath("$.situacao")
+                                .value("CRIADO")); // Verifica se a situação inicial é 'Criado'
     }
 
     @Test
@@ -81,33 +80,38 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         List<Long> unidades = new ArrayList<>();
         unidades.add(1L);
 
-        CriarProcessoReq requestDTO = criarCriarProcessoReq(
-                "", // Descrição vazia
-                unidades,
-                LocalDateTime.now().plusDays(30)
-        );
+        CriarProcessoReq requestDTO =
+                criarCriarProcessoReq(
+                        "", // Descrição vazia
+                        unidades,
+                        LocalDateTime.now().plusDays(30));
 
-        mockMvc.perform(post(API_PROCESSOS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição")); // Mensagem de validação
+                .andExpect(
+                        jsonPath("$.subErrors[0].message")
+                                .value("Preencha a descrição")); // Mensagem de validação
     }
 
     @Test
     void testCriarProcesso_semUnidades_falha() throws Exception {
-        CriarProcessoReq requestDTO = criarCriarProcessoReq(
-                "Processo sem unidades",
-                Collections.emptyList(), // Sem unidades
-                LocalDateTime.now().plusDays(30)
-        );
+        CriarProcessoReq requestDTO =
+                criarCriarProcessoReq(
+                        "Processo sem unidades",
+                        Collections.emptyList(), // Sem unidades
+                        LocalDateTime.now().plusDays(30));
 
-        MvcResult result = mockMvc.perform(post(API_PROCESSOS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+        MvcResult result =
+                mockMvc.perform(
+                                post(API_PROCESSOS)
+                                        .with(csrf())
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(requestDTO)))
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
 
         String responseBody = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         try {
@@ -118,12 +122,15 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         }
 
         // Re-add the assertion to keep the test failing, but now we get the output
-        mockMvc.perform(post(API_PROCESSOS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.subErrors[0].message").value("Pelo menos uma unidade participante deve ser incluída."));
+                .andExpect(
+                        jsonPath("$.subErrors[0].message")
+                                .value("Pelo menos uma unidade participante deve ser incluída."));
     }
 
     // Teste para edição de processo (requer um processo existente)
@@ -132,37 +139,43 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         // 1. Criar um processo para ser editado
         List<Long> unidadesIniciais = new ArrayList<>();
         unidadesIniciais.add(1L);
-        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
-                "Processo para Edição",
-                unidadesIniciais,
-                LocalDateTime.now().plusDays(20)
-        );
+        CriarProcessoReq criarRequestDTO =
+                criarCriarProcessoReq(
+                        "Processo para Edição", unidadesIniciais, LocalDateTime.now().plusDays(20));
 
-        MvcResult result = mockMvc.perform(post(API_PROCESSOS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcResult result =
+                mockMvc.perform(
+                                post(API_PROCESSOS)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                        .andExpect(status().isCreated())
+                        .andReturn();
 
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        Long processoId =
+                objectMapper
+                        .readTree(result.getResponse().getContentAsString())
+                        .get("codigo")
+                        .asLong();
 
         // 2. Editar o processo
         List<Long> unidadesEditadas = new ArrayList<>();
         unidadesEditadas.add(1L);
         unidadesEditadas.add(2L); // Adiciona outra unidade
 
-        AtualizarProcessoReq editarRequestDTO = criarAtualizarProcessoReq(
-                processoId,
-                "Processo Editado",
-                // Tipo não pode ser alterado na edição, mas é enviado no DTO
-                unidadesEditadas,
-                LocalDateTime.now().plusDays(40) // Nova data limite
-        );
+        AtualizarProcessoReq editarRequestDTO =
+                criarAtualizarProcessoReq(
+                        processoId,
+                        "Processo Editado",
+                        // Tipo não pode ser alterado na edição, mas é enviado no DTO
+                        unidadesEditadas,
+                        LocalDateTime.now().plusDays(40) // Nova data limite
+                        );
 
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editarRequestDTO)))
+        mockMvc.perform(
+                        post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(processoId))
                 .andExpect(jsonPath("$.descricao").value("Processo Editado"));
@@ -173,17 +186,20 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         List<Long> unidades = new ArrayList<>();
         unidades.add(1L);
 
-        AtualizarProcessoReq editarRequestDTO = criarAtualizarProcessoReq(
-                999L, // Código que não existe
-                "Processo Inexistente",
-                unidades,
-                LocalDateTime.now().plusDays(30)
-        );
+        AtualizarProcessoReq editarRequestDTO =
+                criarAtualizarProcessoReq(
+                        999L, // Código que não existe
+                        "Processo Inexistente",
+                        unidades,
+                        LocalDateTime.now().plusDays(30));
 
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", 999L) // código que não existe
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editarRequestDTO)))
+        mockMvc.perform(
+                        post(
+                                        API_PROCESSOS + "/{codProcesso}/atualizar",
+                                        999L) // código que não existe
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
     }
 
@@ -192,35 +208,42 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         // 1. Criar um processo para ser removido
         List<Long> unidadesIniciais = new ArrayList<>();
         unidadesIniciais.add(1L);
-        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
-                "Processo para Remoção",
-                unidadesIniciais,
-                LocalDateTime.now().plusDays(20)
-        );
+        CriarProcessoReq criarRequestDTO =
+                criarCriarProcessoReq(
+                        "Processo para Remoção",
+                        unidadesIniciais,
+                        LocalDateTime.now().plusDays(20));
 
-        MvcResult result = mockMvc.perform(post(API_PROCESSOS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcResult result =
+                mockMvc.perform(
+                                post(API_PROCESSOS)
+                                        .with(csrf())
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                        .andExpect(status().isCreated())
+                        .andReturn();
 
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        Long processoId =
+                objectMapper
+                        .readTree(result.getResponse().getContentAsString())
+                        .get("codigo")
+                        .asLong();
 
         // 2. Remover o processo
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId)
-                        .with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId).with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
 
         // 3. Tentar buscar o processo removido para confirmar que não existe mais
-        mockMvc.perform(get(API_PROCESSOS_ID, processoId))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
     }
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L) // código que não existe
-                        .with(csrf()))
+        mockMvc.perform(
+                        post(
+                                        API_PROCESSOS + "/{codProcesso}/excluir",
+                                        999L) // código que não existe
+                                .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }
