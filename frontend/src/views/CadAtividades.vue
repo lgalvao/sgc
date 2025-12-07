@@ -312,7 +312,7 @@
         </BButton>
         <BButton
           variant="success"
-          data-testid="btn-disponibilizar-cadastro-confirmar"
+          data-testid="btn-confirmar-disponibilizacao"
           @click="confirmarDisponibilizacao"
         >
           Confirmar

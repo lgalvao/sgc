@@ -72,7 +72,22 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
+        // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
+        const unitRow = page.getByRole('row', {name: /Seção 221/});
+        const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
+
+        // Wait until one of them is visible
+        await expect(async () => {
+             const rowVisible = await unitRow.isVisible();
+             // CHEFE always sees edit card if permitted, or vis card if not. 
+             // In this context (Mapeamento initiating), it should be edit card.
+             const cardVisible = await subprocessCard.isVisible();
+             expect(rowVisible || cardVisible).toBeTruthy();
+        }).toPass();
+
+        if (await unitRow.isVisible()) {
+            await unitRow.click();
+        }
         await navegarParaAtividades(page);
 
         // Atividade 1

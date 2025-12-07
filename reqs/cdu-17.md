@@ -3,9 +3,9 @@
 Ator: ADMIN
 
 Pré-condições:
+
 - Usuário logado com perfil ADMIN.
-- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com
-ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
+- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão comao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
 - Tela Painel sendo exibida.
 
 Fluxo principal:
@@ -39,38 +39,45 @@ Fluxo principal:
 11. Caso ADMIN escolha Cancelar, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela
     Edição de mapa.
 12. ADMIN preenche as informações dos campos da tela modal e clica no botão Disponibilizar.
-13. O sistema registra a informação do campo Observações no mapa do subprocesso e a informação do campo Data limite para
-    a validação do mapa na data limite da etapa 2 do subprocesso.
+13. O sistema registra a informação do campo Observações no mapa do subprocesso e a informação do campo Data limite para a validação do mapa na data limite da etapa 2 do subprocesso.
 14. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
 15. O sistema registra uma movimentação para o subprocesso com os campos:
 
-    15.1. Data/hora: Data/hora atual
-    15.2. Unidade origem: SEDOC
-    15.3. Unidade destino: [SIGLA_UNIDADE_SUBPROCESSO]
-    15.4. Descrição: 'Disponibilização do mapa de competências'
+    - Data/hora: Data/hora atual
+    - Unidade origem: SEDOC
+    - Unidade destino: [SIGLA_UNIDADE_SUBPROCESSO]
+    - Descrição: 'Disponibilização do mapa de competências'
 
 16. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
+
     Assunto: SGC: Mapa de competências disponibilizado
+
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
     O mapa de competências de sua unidade foi disponibilizado no contexto do processo [DESCRICAO_PROCESSO].
-    A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para
-    conclusão desta etapa do processo é [DATA_LIMITE].
+
+    A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+
 17. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
     abaixo:
+
     Assunto: SGC: Mapa de competências disponibilizado - [SIGLA_UNIDADE_SUBPROCESSO]
+
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
     O mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] foi disponibilizado no contexto do
     processo [DESCRIÇÃO DO PROCESSO].
-    A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para
-    conclusão desta etapa do processo é [DATA_LIMITE].
+
+    A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+
 18. O sistema cria internamente um alerta:
 
-    18.1. Descrição: "Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
-    18.2. Processo: [DESCRICAO_PROCESSO]
-    18.3. Data/hora: Data/hora atual
-    18.4. Unidade de origem: SEDOC
-    18.5. Unidade de destino: [SIGLA_UNIDADE_SUBPROCESSO].
+    - Descrição: "Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
+    - Processo: [DESCRICAO_PROCESSO]
+    - Data/hora: Data/hora atual
+    - Unidade de origem: SEDOC
+    - Unidade de destino: [SIGLA_UNIDADE_SUBPROCESSO].
 
-19. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da
-    unidade.
+19. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da unidade.
+
 20. O sistema mostra confirmação: "Revisão do cadastro de atividades disponibilizada" e redireciona para o Painel.

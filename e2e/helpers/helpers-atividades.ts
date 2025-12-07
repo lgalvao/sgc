@@ -80,8 +80,8 @@ export async function disponibilizarCadastro(page: Page) {
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
     // Modal confirmation
-    await expect(page.getByTestId('btn-disponibilizar-cadastro-confirmar')).toBeVisible();
-    await page.getByTestId('btn-disponibilizar-cadastro-confirmar').click();
+    await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
+    await page.getByTestId('btn-confirmar-disponibilizacao').click();
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {

@@ -76,7 +76,6 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
-        await buscarProcessoDetalhe(idProcesso);
     }
 
     async function finalizarProcesso(idProcesso: number) {

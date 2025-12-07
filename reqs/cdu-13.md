@@ -33,11 +33,9 @@ Fluxo principal:
 
    9.1. Usuário clica em Devolver para ajustes.
 
-   9.2. O sistema abre tela modal (título Devolução) com a pergunta 'Confirma a devolução do cadastro para ajustes?', um
-   campo para preenchimento de uma observação (opcional) e os botões Confirmar ou Cancelar.
+   9.2. O sistema abre tela modal (título Devolução) com a pergunta 'Confirma a devolução do cadastro para ajustes?', um campo para preenchimento de uma observação (opcional) e os botões Confirmar ou Cancelar.
 
-   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de devolução do cadastro, permanecendo
-   na mesma tela.
+   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de devolução do cadastro, permanecendo na mesma tela.
 
    9.4. O usuário opcionalmente informa a observação e escolhe Confirmar.
 
@@ -59,8 +57,7 @@ Fluxo principal:
 
    9.7.4. Descrição: 'Devolução do cadastro de atividades e conhecimentos para ajustes'
 
-   9.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
-   para 'Cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
+   9.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para 'Cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
 
    9.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
@@ -77,16 +74,11 @@ Fluxo principal:
 
    9.10. O sistema cria internamente um alerta:
 
-   9.10.1. Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para
-   ajustes"
-
-   9.10.2. Processo: [DESCRICAO_PROCESSO]
-
-   9.10.3. Data/hora: Data/hora atual
-
-   9.10.4. Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-
-   9.10.5. Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
+   - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+   - Processo: [DESCRICAO_PROCESSO]
+   - Data/hora: Data/hora atual
+   - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+   - Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
 
    9.11. O sistema mostra a mensagem "Devolução realizada" e redireciona para o Painel.
 
@@ -110,13 +102,10 @@ campo para preenchimento de uma observação opcional e os botões Confirmar ou 
 
 10.6. O sistema registra uma movimentação para o subprocesso:
 
-10.6.1. Data/hora: Data/hora atual
-
-10.6.2. Unidade origem: [SIGLA_UNIDADE_ANALISE]
-
-10.6.3. Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
-
-10.6.4. Descrição: 'Cadastro de atividades e conhecimentos aceito'
+- Data/hora: Data/hora atual
+- Unidade origem: [SIGLA_UNIDADE_ANALISE]
+- Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
+- Descrição: 'Cadastro de atividades e conhecimentos aceito'
 
 10.7. O sistema envia notificação por e-mail para a unidade superior:
 
@@ -144,8 +133,7 @@ campo para preenchimento de uma observação opcional e os botões Confirmar ou 
 
 11.1. Usuário escolhe Homologar.
 
-11.2. O sistema abre um modal de confirmação (título Homologação do cadastro de atividades e conhecimentos) com a
-pergunta "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` ou `Cancelar`.
+11.2. O sistema abre um modal de confirmação (título Homologação do cadastro de atividades e conhecimentos) com a pergunta "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` ou `Cancelar`.
 
 11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendo
 na mesma tela.

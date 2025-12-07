@@ -124,7 +124,21 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByText(descProcessoMapeamento).click();
 
         // Passo 2.2: Clicar na unidade subordinada
-        await page.getByRole('row', { name: 'Seção 221' }).click();
+        // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
+        const unitRow = page.getByRole('row', { name: 'Seção 221' });
+        const subprocessCardVis = page.getByTestId('card-subprocesso-atividades-vis'); // ADMIN has vis permission
+
+        // Wait until one of them is visible
+        await expect(async () => {
+             const rowVisible = await unitRow.isVisible();
+             // ADMIN sees vis card.
+             const cardVisible = await subprocessCardVis.isVisible();
+             expect(rowVisible || cardVisible).toBeTruthy();
+        }).toPass();
+
+        if (await unitRow.isVisible()) {
+            await unitRow.click();
+        }
 
         // Passo 4: Clicar no card Atividades e conhecimentos
         await page.getByTestId('card-subprocesso-atividades-vis').click();
