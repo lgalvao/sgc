@@ -16,7 +16,7 @@
           :class="badgeClass(subprocesso.situacaoSubprocesso)"
           class="badge fs-6"
           data-testid="cad-atividades__txt-badge-situacao"
-        >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
+        >{{ subprocesso.situacaoLabel || situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
       </div>
     </div>
 

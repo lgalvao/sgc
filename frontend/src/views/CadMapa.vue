@@ -2,7 +2,7 @@
   <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
-      <span class="ms-3" data-testid="txt-badge-situacao">{{ situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao) }}</span>
+      <span class="ms-3" data-testid="txt-badge-situacao">{{ subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao) }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
