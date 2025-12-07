@@ -122,6 +122,7 @@ public class SubprocessoPermissoesService {
         boolean situacaoPermiteEdicao = 
             sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO
                 || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
                 || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
         
         boolean podeEditarMapa = acessoEdicao && situacaoPermiteEdicao;
