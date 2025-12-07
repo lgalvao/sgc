@@ -25,7 +25,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
-    const descProcessoMapeamento = `Mapeamento CDU-11 ${timestamp}`;
+    const descProcessoMapeamento = `AAA Mapeamento CDU-11 ${timestamp}`;
     const atividadeA = `Atividade A ${timestamp}`;
     const atividadeB = `Atividade B ${timestamp}`;
     const conhecimento1 = 'Conhecimento 1';
@@ -83,9 +83,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoMapeamento).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', { name: 'Seção 221' }).click();
-        }
+        await page.getByText(descProcessoMapeamento).click();
+        // Chefe vai direto para subprocesso
+
 
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -117,28 +117,16 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // 2.2 Usuário clica em unidade subordinada operacional/interoperacional
         // 2.3 Sistema mostra tela Detalhes do subprocesso
 
-        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-
-        // Passo 1: Clicar no processo em andamento
+        
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
 
         // Passo 2.2: Clicar na unidade subordinada
-        // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
+        // Robust navigation for Admin - Sempre vê a lista de unidades
         const unitRow = page.getByRole('row', { name: 'Seção 221' });
-        const subprocessCardVis = page.getByTestId('card-subprocesso-atividades-vis'); // ADMIN has vis permission
-
-        // Wait until one of them is visible
-        await expect(async () => {
-             const rowVisible = await unitRow.isVisible();
-             // ADMIN sees vis card.
-             const cardVisible = await subprocessCardVis.isVisible();
-             expect(rowVisible || cardVisible).toBeTruthy();
-        }).toPass();
-
-        if (await unitRow.isVisible()) {
-            await unitRow.click();
-        }
+        await expect(unitRow).toBeVisible();
+        await unitRow.click();
 
         // Passo 4: Clicar no card Atividades e conhecimentos
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -198,6 +186,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', { name: 'Seção 221' }).click();
 
@@ -266,7 +255,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Clicar na linha da unidade
         const linhaUnidade = page.getByRole('row', { name: 'Seção 221' });
-        await expect(linhaUnidade).toBeVisible({ timeout: 5000 });
+        await expect(linhaUnidade).toBeVisible();
         await linhaUnidade.click();
 
         // Esperar navegação para o subprocesso

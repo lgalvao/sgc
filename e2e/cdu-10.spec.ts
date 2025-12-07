@@ -25,8 +25,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
-    const descProcessoMapeamento = `Mapeamento Setup CDU-10 ${timestamp}`;
-    const descProcessoRevisao = `Revisão CDU-10 ${timestamp}`;
+    const descProcessoMapeamento = `AAA Mapeamento Setup CDU-10 ${timestamp}`;
+    const descProcessoRevisao = `AAA Revisão CDU-10 ${timestamp}`;
     let processoMapeamentoId: number;
     let processoRevisaoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
@@ -77,24 +77,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
+        // CHEFE vai direto para o subprocesso
         await page.getByText(descProcessoMapeamento).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
-            const unitRow = page.getByRole('row', {name: 'Seção 221'});
-            const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
-            
-            // Wait until one of them is visible
-            await expect(async () => {
-                 const rowVisible = await unitRow.isVisible();
-                 const cardVisible = await subprocessCard.isVisible();
-                 expect(rowVisible || cardVisible).toBeTruthy();
-            }).toPass();
-    
-            if (await unitRow.isVisible()) {
-                await unitRow.click();
-            }
-        }
-
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -117,23 +101,15 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
 
         // Robust navigation for Admin
         const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        const subprocessCardVis = page.getByTestId('card-subprocesso-atividades-vis'); // ADMIN has vis permission
-
-         // Wait until one of them is visible
-         await expect(async () => {
-              const rowVisible = await unitRow.isVisible();
-              const cardVisible = await subprocessCardVis.isVisible();
-              expect(rowVisible || cardVisible).toBeTruthy();
-         }).toPass();
-
-         if (await unitRow.isVisible()) {
-             await unitRow.click();
-         }
-
+        // Ensure unit row is visible before clicking (Admin flow always sees unit list)
+        await expect(unitRow).toBeVisible();
+        await unitRow.click();
+        
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -145,6 +121,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         
         // Robust navigation for Admin
@@ -209,8 +186,23 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
+        
+        // Robust navigation for Admin
+        const unitRow = page.getByRole('row', {name: 'Seção 221'});
+        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first();
+
+         // Wait until one of them is visible
+         await expect(async () => {
+              const rowVisible = await unitRow.isVisible();
+              const cardVisible = await mapCard.isVisible();
+              expect(rowVisible || cardVisible).toBeTruthy();
+         }).toPass();
+
+         if (await unitRow.isVisible()) {
+             await unitRow.click();
+         }
 
         await page.getByTestId('card-subprocesso-mapa-vis').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -258,14 +250,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        // Navegar pelo painel para o processo de revisão
+        // Navegar pelo painel para o processo de revisão (Chefe vai direto)
         await page.getByText(descProcessoRevisao).click();
         
-        // Se estiver na tela de lista de unidades, clicar na unidade
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
-
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
         
         // Verificar situação inicial - deve ser "Não Iniciado" (antes de qualquer alteração)
@@ -297,9 +284,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
 
@@ -332,9 +317,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
 
@@ -370,6 +353,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
@@ -390,9 +374,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         // Verificar situação voltou para 'em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão do cadastro em andamento/i);
@@ -431,6 +413,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
@@ -454,9 +437,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
         
@@ -471,6 +452,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
+        await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -484,9 +466,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-historico').click();
@@ -507,9 +487,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
 

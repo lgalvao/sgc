@@ -91,11 +91,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Navegar para o subprocesso
         await page.getByText(descricaoProcesso).click();
 
-        // Se cair na tela de processo (lista de unidades), clicar na unidade
-        if (page.url().match(/\/processo\/\d+$/)) {
-             await page.getByRole('row', {name: 'Assessoria 21'}).click();
-        }
-
+        // Para CHEFE, o clique no processo no painel já redireciona para o subprocesso
+        // se ele for da unidade participante.
         await verificarPaginaSubprocesso(page);
 
         // Validação: Card de atividades está visível
@@ -202,7 +199,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        // Navegar para o subprocesso
+        // Navegar para o subprocesso (CHEFE vai direto)
         await page.getByText(descProcesso).click();
         await verificarPaginaSubprocesso(page);
 

@@ -119,7 +119,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
     void shouldTransitionStatusWhenActivityIsAddedViaApi() throws Exception {
         // GIVEN: Same setup as above
         Long unitCodigo = 10L;
-        String titularTitulo = "333333333333";
+
         
         Unidade unidade = unidadeRepo.findById(unitCodigo)
             .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));

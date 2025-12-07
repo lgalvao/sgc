@@ -29,8 +29,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
-    const descProcessoMapeamento = `Mapeamento CDU-12 ${timestamp}`;
-    const descProcessoRevisao = `Revisão CDU-12 ${timestamp}`;
+    const descProcessoMapeamento = `AAA Mapeamento CDU-12 ${timestamp}`;
+    const descProcessoRevisao = `AAA Revisão CDU-12 ${timestamp}`;
     let processoMapeamentoId: number;
     let processoRevisaoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
@@ -72,22 +72,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoMapeamento).click();
-        // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
-        const unitRow = page.getByRole('row', {name: /Seção 221/});
-        const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
-
-        // Wait until one of them is visible
-        await expect(async () => {
-             const rowVisible = await unitRow.isVisible();
-             // CHEFE always sees edit card if permitted, or vis card if not. 
-             // In this context (Mapeamento initiating), it should be edit card.
-             const cardVisible = await subprocessCard.isVisible();
-             expect(rowVisible || cardVisible).toBeTruthy();
-        }).toPass();
-
-        if (await unitRow.isVisible()) {
-            await unitRow.click();
-        }
+        // Chefe vai direto
         await navegarParaAtividades(page);
 
         // Atividade 1
@@ -113,12 +98,24 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        
+        // Aguardar conclusão e redirecionamento (comportamento padrão de homologação)
+        await verificarPaginaPainel(page);
 
         // 4. Admin cria competências (Mapa)
-        await page.goto('/painel');
+        // Já estamos no painel, mas garantimos o estado atualizando a view se necessário,
+        // mas aqui vamos clicar direto no processo.
+        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click(); // ou vis dependendo do estado, mas aqui é criação
+
+        // Verificar se o card de mapa EDITAVEL está visível (confirma permissão/status correto)
+        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
+        
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+
+        // Aguardar carregamento da tela do mapa (título da unidade)
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
 
         // Competência 1 ligada a Atividade 1
         await page.getByTestId('btn-abrir-criar-competencia').click();
@@ -155,7 +152,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -195,9 +192,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
 
         await navegarParaAtividades(page);
 
@@ -219,9 +214,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
         await navegarParaAtividades(page);
 
         // Adicionar nova atividade
@@ -245,9 +238,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
         await navegarParaAtividades(page);
 
         // Editar atividade existente (Atividade Base 2)
@@ -277,9 +268,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
         await navegarParaAtividades(page);
 
         // Remover atividade (Atividade Base 3)
@@ -307,9 +296,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoRevisao).click();
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
+        // Chefe vai direto
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
