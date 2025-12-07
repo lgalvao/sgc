@@ -1,8 +1,87 @@
 # Plano de Refatoração do Frontend SGC
 
-**Versão:** 1.0  
+**Versão:** 2.0 (Adaptado para Agentes de IA)  
 **Data:** 07 de dezembro de 2025  
 **Objetivo:** Remover lógica de negócio, validações complexas, filtragens e ordenações desnecessárias do frontend, transferindo essas responsabilidades para o backend, mantendo o frontend como um client otimizado e limpo.
+
+---
+
+## INSTRUÇÕES PARA AGENTES DE IA
+
+Este documento foi estruturado para ser executado por agentes de IA. Cada tarefa inclui:
+
+- **Contexto**: O que precisa ser feito e por quê
+- **Verificação**: Como validar que a tarefa foi completada corretamente
+- **Comandos**: Comandos específicos para executar
+- **Arquivos**: Lista exata de arquivos a modificar/criar
+- **Critérios de Sucesso**: Métricas objetivas e mensuráveis
+
+### Regras Fundamentais para Agentes
+
+1. **SEMPRE** leia o `AGENTS.md` antes de começar qualquer tarefa
+2. **SEMPRE** execute os testes após modificações:
+   - Frontend: `cd frontend && npm run typecheck && npm run lint`
+   - Backend: `./gradlew :backend:test`
+   - E2E: `npm test` (apenas se houver mudanças em funcionalidades)
+3. **NUNCA** modifique código não relacionado à tarefa específica
+4. **SEMPRE** use Português Brasileiro em todo o código
+5. **SEMPRE** siga as convenções de nomenclatura do projeto (veja AGENTS.md)
+6. **SEMPRE** crie commits pequenos e focados após cada subtarefa
+7. **SEMPRE** verifique que os builds passam antes de prosseguir
+
+### Ordem de Execução Recomendada
+
+Para agentes de IA executando este plano:
+
+1. **Leia este documento inteiro primeiro** - Entenda o contexto completo
+2. **Escolha uma Fase** (ver seção 8) - Comece pela Fase 1 se não houver direcionamento
+3. **Para cada tarefa na fase**:
+   - Leia a seção relevante (1-7)
+   - Execute a "Refatoração Recomendada"
+   - Execute os "Comandos de Verificação"
+   - Valide os "Critérios de Sucesso"
+   - Commit o código
+4. **Ao final da fase** - Execute teste completo E2E
+
+### Comandos Essenciais de Verificação
+
+```bash
+# Verificar status do repositório
+git status
+
+# Verificar tipagem TypeScript do frontend
+cd frontend && npm run typecheck
+
+# Verificar linting do frontend
+cd frontend && npm run lint
+
+# Executar testes unitários do backend
+./gradlew :backend:test
+
+# Executar teste específico do backend
+./gradlew :backend:test --tests "sgc.processo.ProcessoServiceTest"
+
+# Executar build completo
+./gradlew build
+
+# Executar testes E2E (somente quando necessário)
+npm test
+
+# Executar teste E2E específico
+npx playwright test tests/processo.spec.ts
+```
+
+### Template de Commit para Agentes
+
+```
+refactor(módulo): descrição breve da mudança
+
+- Detalhe 1
+- Detalhe 2
+- Detalhe 3
+
+Refs: #issue (se aplicável)
+```
 
 ---
 
@@ -16,11 +95,44 @@ Após análise detalhada dos 14 views e 23 componentes Vue.js, identificamos mú
 **Total de Linhas Analisadas:** ~8.065 linhas em componentes e views  
 **Áreas Críticas Identificadas:** 47 pontos de melhoria
 
+### Como Usar Este Documento (Guia para Agentes)
+
+**Se você recebeu uma tarefa específica:**
+1. Localize a seção correspondente (use Ctrl+F com o nome do arquivo ou ID da tarefa)
+2. Leia o "Problema Atual" para entender o contexto
+3. Siga os "Passos de Implementação" na ordem
+4. Execute cada "Comando de Verificação" após implementar
+5. Marque cada item da "Checklist de Implementação"
+6. Verifique todos os "Critérios de Sucesso" antes de finalizar
+
+**Se você vai implementar uma fase completa:**
+1. Vá para a seção 8 "Plano de Implementação Sugerido"
+2. Escolha a fase (recomenda-se começar pela Fase 1)
+3. Para cada tarefa na fase, execute o processo acima
+4. Ao final da fase, execute teste E2E completo: `npm test`
+
+**Se você está analisando o escopo geral:**
+1. Leia o "Sumário Executivo"
+2. Revise a seção 7 "Resumo de Endpoints Necessários"
+3. Consulte a seção 9 "Métricas de Sucesso"
+4. Veja a seção 10 "Riscos e Mitigações"
+
+**Importante:**
+- NUNCA pule os comandos de verificação
+- SEMPRE execute testes após cada mudança
+- SEMPRE consulte AGENTS.md para convenções
+- Faça commits pequenos e frequentes
+- Se encontrar um problema, documente e peça orientação
+
 ---
 
 ## 1. Validações de Negócio no Frontend
 
 ### 1.1. CadAtividades.vue
+
+**ID da Tarefa:** REF-001  
+**Prioridade:** Alta  
+**Estimativa:** 2-3 horas
 
 **Problema Atual:**
 - **Linhas 631-635:** Validação de atividades sem conhecimento feita no frontend
@@ -101,9 +213,135 @@ async function disponibilizarCadastro() {
 - `frontend/src/services/subprocessoService.ts`
 - `backend/src/main/java/sgc/subprocesso/` (novo endpoint)
 
+**Passos de Implementação para o Agente:**
+
+1. **Criar endpoint no backend** (`backend/src/main/java/sgc/subprocesso/SubprocessoController.java`):
+   ```java
+   @PostMapping("/{id}/disponibilizar-cadastro")
+   public ResponseEntity<Void> disponibilizarCadastro(@PathVariable Integer id) {
+       subprocessoService.disponibilizarCadastro(id);
+       return ResponseEntity.ok().build();
+   }
+   ```
+
+2. **Implementar lógica no service** (`backend/src/main/java/sgc/subprocesso/SubprocessoService.java`):
+   - Validar situação do subprocesso
+   - Buscar todas as atividades do subprocesso
+   - Validar que todas têm conhecimentos associados
+   - Lançar `ErroDadosInvalidos` com detalhes se falhar
+   - Executar disponibilização se OK
+
+3. **Criar DTO de erro estruturado** (se ainda não existir):
+   ```java
+   // backend/src/main/java/sgc/comum/erros/DetalhesErroValidacao.java
+   public class DetalhesErroValidacao {
+       private String campo;
+       private String mensagem;
+       private Object valorRejeitado;
+       // getters, setters, construtores
+   }
+   ```
+
+4. **Atualizar service no frontend** (`frontend/src/services/subprocessoService.ts`):
+   ```typescript
+   async disponibilizarCadastro(codSubprocesso: number): Promise<void> {
+     await apiClient.post(`/api/subprocessos/${codSubprocesso}/disponibilizar-cadastro`);
+   }
+   ```
+
+5. **Atualizar store** (`frontend/src/stores/subprocessos.ts`):
+   ```typescript
+   async disponibilizarCadastro(codSubprocesso: number) {
+     await subprocessoService.disponibilizarCadastro(codSubprocesso);
+   }
+   ```
+
+6. **Simplificar view** (`frontend/src/views/CadAtividades.vue`):
+   - Remover funções `validarAtividades()` (linhas 631-635)
+   - Simplificar `disponibilizarCadastro()` para apenas chamar store e navegar
+   - Remover lógica de validação de situação (linhas 669-697)
+
+**Comandos de Verificação:**
+
+```bash
+# 1. Verificar que o código compila (backend)
+./gradlew :backend:compileJava
+
+# 2. Executar testes do módulo subprocesso
+./gradlew :backend:test --tests "sgc.subprocesso.*"
+
+# 3. Verificar tipagem TypeScript (frontend)
+cd frontend && npm run typecheck
+
+# 4. Verificar lint (frontend)
+cd frontend && npm run lint
+
+# 5. Executar servidor e testar manualmente
+./gradlew bootRun
+# Em outro terminal:
+cd frontend && npm run dev
+# Navegar para CadAtividades e testar disponibilização
+```
+
+**Critérios de Sucesso:**
+
+- [ ] Endpoint `POST /api/subprocessos/{id}/disponibilizar-cadastro` existe e responde
+- [ ] Backend valida situação correta antes de disponibilizar
+- [ ] Backend valida que todas atividades têm conhecimentos
+- [ ] Backend retorna erro 400 com detalhes estruturados em caso de falha
+- [ ] Frontend chama endpoint e trata erro genérico via interceptor
+- [ ] View CadAtividades.vue tem ~50-70 linhas a menos
+- [ ] Todos os testes passam: `./gradlew :backend:test`
+- [ ] TypeScript compila sem erros: `npm run typecheck`
+- [ ] Lint passa sem erros: `npm run lint`
+- [ ] Funcionalidade de disponibilizar cadastro continua funcionando
+
+**Testes a Criar:**
+
+```java
+// backend/src/test/java/sgc/subprocesso/SubprocessoServiceTest.java
+@Test
+void deveDisponibilizarCadastroQuandoValido() {
+    // Arrange: criar subprocesso com atividades válidas
+    // Act: chamar disponibilizarCadastro
+    // Assert: verificar que situação mudou
+}
+
+@Test
+void deveLancarErroQuandoAtividadeSemConhecimento() {
+    // Arrange: criar subprocesso com atividade sem conhecimento
+    // Act & Assert: verificar que lança ErroDadosInvalidos
+}
+
+@Test
+void deveLancarErroQuandoSituacaoInvalida() {
+    // Arrange: criar subprocesso em situação incorreta
+    // Act & Assert: verificar que lança ErroOperacaoInvalida
+}
+```
+
+**Checklist de Implementação:**
+
+- [ ] Ler e entender código atual em CadAtividades.vue (linhas 631-697)
+- [ ] Criar endpoint POST /api/subprocessos/{id}/disponibilizar-cadastro
+- [ ] Implementar validações no SubprocessoService
+- [ ] Criar testes unitários para o service (mínimo 3 testes)
+- [ ] Atualizar subprocessoService.ts
+- [ ] Atualizar store subprocessos.ts
+- [ ] Simplificar CadAtividades.vue removendo validações
+- [ ] Executar `./gradlew :backend:test` - DEVE PASSAR
+- [ ] Executar `npm run typecheck` - DEVE PASSAR
+- [ ] Executar `npm run lint` - DEVE PASSAR
+- [ ] Testar manualmente a funcionalidade
+- [ ] Commit com mensagem: "refactor(subprocesso): move validação de disponibilização para backend"
+
 ---
 
 ### 1.2. CadMapa.vue
+
+**ID da Tarefa:** REF-002  
+**Prioridade:** Alta  
+**Estimativa:** 1-2 horas
 
 **Problema Atual:**
 - **Linhas 452-453:** Validação de campos obrigatórios no frontend
@@ -156,9 +394,118 @@ async function adicionarCompetenciaEFecharModal() {
 - `frontend/src/views/CadMapa.vue`
 - `backend/src/main/java/sgc/mapa/dto/` (validações Bean Validation)
 
+**Passos de Implementação para o Agente:**
+
+1. **Adicionar validações no DTO** (`backend/src/main/java/sgc/mapa/dto/CompetenciaRequest.java` ou similar):
+   ```java
+   public class CompetenciaRequest {
+       @NotBlank(message = "Descrição da competência é obrigatória")
+       @Size(min = 3, max = 500, message = "Descrição deve ter entre 3 e 500 caracteres")
+       private String descricao;
+       
+       @NotEmpty(message = "Pelo menos uma atividade deve ser associada à competência")
+       private List<Integer> codigosAtividades;
+       
+       // getters, setters
+   }
+   ```
+
+2. **Atualizar Controller** para usar `@Valid`:
+   ```java
+   @PostMapping("/{idMapa}/competencias")
+   public ResponseEntity<CompetenciaDTO> adicionarCompetencia(
+       @PathVariable Integer idMapa,
+       @Valid @RequestBody CompetenciaRequest request
+   ) {
+       CompetenciaDTO competencia = mapaService.adicionarCompetencia(idMapa, request);
+       return ResponseEntity.ok(competencia);
+   }
+   ```
+
+3. **Implementar validações adicionais no service** se necessário:
+   - Validar que atividades pertencem ao mapa correto
+   - Validar que não há duplicação de descrição (se aplicável)
+   - Validar que atividades existem no sistema
+
+4. **Simplificar frontend** (`frontend/src/views/CadMapa.vue`):
+   - Remover validação manual nas linhas 452-453
+   - Simplificar método `adicionarCompetenciaEFecharModal()`
+   - Confiar no backend para validações
+
+**Comandos de Verificação:**
+
+```bash
+# 1. Compilar backend
+./gradlew :backend:compileJava
+
+# 2. Executar testes do módulo mapa
+./gradlew :backend:test --tests "sgc.mapa.*"
+
+# 3. Verificar frontend
+cd frontend && npm run typecheck && npm run lint
+
+# 4. Teste manual
+./gradlew bootRun
+# Navegar para CadMapa e tentar criar competência sem atividades
+```
+
+**Critérios de Sucesso:**
+
+- [ ] DTO tem anotações `@NotBlank` e `@NotEmpty`
+- [ ] Controller usa `@Valid` no parâmetro do DTO
+- [ ] Backend retorna erro 400 quando descrição vazia
+- [ ] Backend retorna erro 400 quando lista de atividades vazia
+- [ ] Frontend removeu validação manual (linhas 452-453)
+- [ ] Mensagem de erro do backend é clara e em português
+- [ ] Testes unitários passam
+- [ ] TypeCheck e Lint passam
+- [ ] Funcionalidade continua operacional
+
+**Testes a Criar:**
+
+```java
+@Test
+void deveLancarErroQuandoDescricaoVazia() {
+    CompetenciaRequest request = new CompetenciaRequest();
+    request.setDescricao("");
+    request.setCodigosAtividades(List.of(1, 2));
+    
+    assertThrows(MethodArgumentNotValidException.class, () -> {
+        mapaController.adicionarCompetencia(1, request);
+    });
+}
+
+@Test
+void deveLancarErroQuandoSemAtividades() {
+    CompetenciaRequest request = new CompetenciaRequest();
+    request.setDescricao("Competência Teste");
+    request.setCodigosAtividades(Collections.emptyList());
+    
+    assertThrows(MethodArgumentNotValidException.class, () -> {
+        mapaController.adicionarCompetencia(1, request);
+    });
+}
+```
+
+**Checklist de Implementação:**
+
+- [ ] Localizar ou criar CompetenciaRequest.java
+- [ ] Adicionar anotações Bean Validation
+- [ ] Atualizar MapaController com @Valid
+- [ ] Criar/atualizar testes unitários (mínimo 2)
+- [ ] Simplificar CadMapa.vue removendo validações
+- [ ] Executar `./gradlew :backend:test` - DEVE PASSAR
+- [ ] Executar `npm run typecheck && npm run lint` - DEVE PASSAR
+- [ ] Testar manualmente cenários de erro
+- [ ] Commit: "refactor(mapa): adiciona validações Bean Validation para competências"
+
 ---
 
 ### 1.3. CadProcesso.vue
+
+**ID da Tarefa:** REF-003  
+**Prioridade:** Alta  
+**Estimativa:** 2-3 horas
 
 **Problema Atual:**
 - **Linhas 296-315:** Validação complexa de dados no frontend antes de salvar
@@ -264,14 +611,190 @@ public Processo criarProcesso(CriarProcessoRequest request) {
 - `backend/src/main/java/sgc/processo/dto/CriarProcessoRequest.java`
 - `backend/src/main/java/sgc/processo/ProcessoService.java`
 
+**Passos de Implementação para o Agente:**
+
+1. **Criar/Atualizar DTO com validações** (`CriarProcessoRequest.java`):
+   ```java
+   public class CriarProcessoRequest {
+       @NotBlank(message = "Descrição é obrigatória")
+       @Size(min = 10, max = 500, message = "Descrição deve ter entre 10 e 500 caracteres")
+       private String descricao;
+       
+       @NotNull(message = "Tipo é obrigatório")
+       private TipoProcesso tipo;
+       
+       @NotNull(message = "Data limite é obrigatória")
+       @FutureOrPresent(message = "Data limite deve ser presente ou futura")
+       private LocalDateTime dataLimiteEtapa1;
+       
+       @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")
+       private List<Integer> codigosUnidades;
+       
+       // getters, setters, builder
+   }
+   ```
+
+2. **Implementar validação de elegibilidade no service** (`ProcessoService.java`):
+   ```java
+   public Processo criarProcesso(CriarProcessoRequest request) {
+       // Filtrar apenas unidades elegíveis baseado no tipo
+       List<Integer> unidadesElegiveis = filtrarUnidadesElegiveis(
+           request.getCodigosUnidades(), 
+           request.getTipo()
+       );
+       
+       if (unidadesElegiveis.isEmpty()) {
+           throw new ErroDadosInvalidos(
+               "Nenhuma unidade elegível foi selecionada para o tipo de processo " 
+               + request.getTipo().getLabel()
+           );
+       }
+       
+       // Continuar com criação...
+   }
+   
+   private List<Integer> filtrarUnidadesElegiveis(
+       List<Integer> codigosUnidades, 
+       TipoProcesso tipo
+   ) {
+       return codigosUnidades.stream()
+           .map(cod -> unidadeRepo.findById(cod).orElse(null))
+           .filter(Objects::nonNull)
+           .filter(unidade -> verificarElegibilidade(unidade, tipo))
+           .map(Unidade::getCodigo)
+           .toList();
+   }
+   
+   private boolean verificarElegibilidade(Unidade unidade, TipoProcesso tipo) {
+       // Implementar regra de elegibilidade
+       // Ex: INTEROPERACIONAL só aceita unidades de certo nível
+       return unidade.isElegivel(); // ou lógica mais complexa
+   }
+   ```
+
+3. **Atualizar Controller** para usar `@Valid`:
+   ```java
+   @PostMapping
+   public ResponseEntity<ProcessoDTO> criarProcesso(
+       @Valid @RequestBody CriarProcessoRequest request
+   ) {
+       Processo processo = processoService.criarProcesso(request);
+       return ResponseEntity.ok(processoMapper.toDTO(processo));
+   }
+   ```
+
+4. **Simplificar frontend** (`CadProcesso.vue`):
+   - Remover método `validarDados()` ou similar
+   - Remover filtragem de unidades elegíveis (linhas 302-305, 376-380)
+   - Simplificar `salvarProcesso()` para apenas enviar dados
+
+**Comandos de Verificação:**
+
+```bash
+# 1. Compilar e testar backend
+./gradlew :backend:clean :backend:test --tests "sgc.processo.*"
+
+# 2. Verificar frontend
+cd frontend && npm run typecheck && npm run lint
+
+# 3. Executar teste E2E específico (se existir)
+npx playwright test tests/processo.spec.ts
+
+# 4. Teste manual completo
+./gradlew bootRun
+# Em outro terminal:
+cd frontend && npm run dev
+```
+
+**Critérios de Sucesso:**
+
+- [ ] DTO `CriarProcessoRequest` tem todas as validações Bean Validation
+- [ ] Backend valida elegibilidade de unidades
+- [ ] Backend retorna erro 400 com mensagem clara quando dados inválidos
+- [ ] Backend retorna erro 400 quando nenhuma unidade elegível
+- [ ] Frontend CadProcesso.vue tem ~100 linhas a menos
+- [ ] Frontend não faz filtragem de elegibilidade
+- [ ] Todos os testes passam
+- [ ] Funcionalidade de criar processo continua operacional
+- [ ] Mensagens de erro são em português e compreensíveis
+
+**Testes a Criar/Atualizar:**
+
+```java
+// ProcessoServiceTest.java
+@Test
+void deveCriarProcessoComUnidadesElegiveis() {
+    // Arrange
+    CriarProcessoRequest request = CriarProcessoRequest.builder()
+        .descricao("Processo de Teste")
+        .tipo(TipoProcesso.MAPEAMENTO)
+        .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+        .codigosUnidades(List.of(1, 2, 3))
+        .build();
+    
+    // Act
+    Processo processo = processoService.criarProcesso(request);
+    
+    // Assert
+    assertNotNull(processo);
+    assertTrue(processo.getUnidadesParticipantes().size() > 0);
+}
+
+@Test
+void deveLancarErroQuandoNenhumaUnidadeElegivel() {
+    CriarProcessoRequest request = CriarProcessoRequest.builder()
+        .descricao("Processo de Teste")
+        .tipo(TipoProcesso.INTEROPERACIONAL) // Tipo restritivo
+        .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+        .codigosUnidades(List.of(999)) // Unidade não elegível
+        .build();
+    
+    assertThrows(ErroDadosInvalidos.class, () -> {
+        processoService.criarProcesso(request);
+    });
+}
+
+@Test
+void deveLancarErroQuandoDescricaoVazia() {
+    // Teste de validação Bean Validation
+}
+
+@Test
+void deveLancarErroQuandoDataPassada() {
+    // Teste de validação @FutureOrPresent
+}
+```
+
+**Checklist de Implementação:**
+
+- [ ] Localizar/criar CriarProcessoRequest.java
+- [ ] Adicionar todas as anotações de validação Bean Validation
+- [ ] Implementar método `filtrarUnidadesElegiveis` no ProcessoService
+- [ ] Implementar método `verificarElegibilidade` no ProcessoService
+- [ ] Atualizar ProcessoController com @Valid
+- [ ] Criar/atualizar testes unitários (mínimo 4 testes)
+- [ ] Remover validações do frontend (CadProcesso.vue linhas 296-315)
+- [ ] Remover filtragem de elegibilidade do frontend (linhas 302-305, 376-380)
+- [ ] Simplificar método `salvarProcesso()` no frontend
+- [ ] Executar `./gradlew :backend:test` - DEVE PASSAR
+- [ ] Executar `npm run typecheck && npm run lint` - DEVE PASSAR
+- [ ] Testar criação de processo com unidades não elegíveis (deve falhar gracefully)
+- [ ] Testar criação de processo com dados válidos (deve funcionar)
+- [ ] Commit: "refactor(processo): move validações e filtro de elegibilidade para backend"
+
 ---
 
 ### 1.4. DiagnosticoEquipe.vue
+
+**ID da Tarefa:** REF-004  
+**Prioridade:** Alta (Módulo Completo Faltando)  
+**Estimativa:** 6-8 horas (inclui criação do módulo backend)
 
 **Problema Atual:**
 - **Linhas 225-230:** Validação de avaliações pendentes no frontend
 - **Linha 176-186:** Inicialização com valores padrão no frontend (domínio 3, importância 3)
 - **TODO na linha 243:** Comentário indica que falta implementação no backend
+- **CRÍTICO:** Não existe módulo `diagnostico` no backend
 
 ```typescript
 // Código atual
@@ -333,6 +856,415 @@ async function confirmarFinalizacao() {
 - `frontend/src/views/DiagnosticoEquipe.vue`
 - `frontend/src/services/` (novo `diagnosticoService.ts`)
 - `backend/src/main/java/sgc/` (novo módulo `diagnostico/`)
+
+**Passos de Implementação para o Agente:**
+
+**IMPORTANTE:** Esta tarefa requer criar um módulo backend completo. Siga a estrutura dos módulos existentes (processo, mapa, subprocesso).
+
+**Fase 1: Criar Estrutura do Módulo Backend**
+
+1. **Criar estrutura de pacotes**:
+   ```bash
+   mkdir -p backend/src/main/java/sgc/diagnostico
+   mkdir -p backend/src/main/java/sgc/diagnostico/dto
+   mkdir -p backend/src/test/java/sgc/diagnostico
+   ```
+
+2. **Criar entidade Diagnostico**:
+   ```java
+   // backend/src/main/java/sgc/diagnostico/Diagnostico.java
+   @Entity
+   @Table(name = "diagnostico")
+   public class Diagnostico {
+       @Id
+       @GeneratedValue(strategy = GenerationType.IDENTITY)
+       private Integer codigo;
+       
+       @ManyToOne
+       @JoinColumn(name = "cod_subprocesso")
+       private Subprocesso subprocesso;
+       
+       @Enumerated(EnumType.STRING)
+       private SituacaoDiagnostico situacao; // NAO_INICIADO, EM_ANDAMENTO, FINALIZADO
+       
+       @OneToMany(mappedBy = "diagnostico", cascade = CascadeType.ALL)
+       private List<AvaliacaoCompetencia> avaliacoes = new ArrayList<>();
+       
+       private LocalDateTime dataFinalizacao;
+       private LocalDateTime dataCriacao;
+       
+       // getters, setters, builder
+   }
+   ```
+
+3. **Criar entidade AvaliacaoCompetencia**:
+   ```java
+   // backend/src/main/java/sgc/diagnostico/AvaliacaoCompetencia.java
+   @Entity
+   @Table(name = "avaliacao_competencia")
+   public class AvaliacaoCompetencia {
+       @Id
+       @GeneratedValue(strategy = GenerationType.IDENTITY)
+       private Integer codigo;
+       
+       @ManyToOne
+       @JoinColumn(name = "cod_diagnostico")
+       private Diagnostico diagnostico;
+       
+       @ManyToOne
+       @JoinColumn(name = "cod_competencia")
+       private Competencia competencia;
+       
+       @Min(1) @Max(5)
+       private Integer importancia; // 1-5
+       
+       @Min(1) @Max(5)
+       private Integer dominio; // 1-5
+       
+       @Column(length = 1000)
+       private String observacoes;
+       
+       private LocalDateTime dataAvaliacao;
+       
+       // Campos calculados (podem ser @Transient ou persistidos)
+       @Transient
+       public Integer getGap() {
+           return importancia - dominio;
+       }
+       
+       @Transient
+       public Integer getCriticidade() {
+           return importancia * Math.abs(getGap());
+       }
+       
+       // getters, setters
+   }
+   ```
+
+4. **Criar repositórios**:
+   ```java
+   // DiagnosticoRepo.java
+   public interface DiagnosticoRepo extends JpaRepository<Diagnostico, Integer> {
+       Optional<Diagnostico> findBySubprocessoCodigo(Integer codSubprocesso);
+   }
+   
+   // AvaliacaoCompetenciaRepo.java
+   public interface AvaliacaoCompetenciaRepo extends JpaRepository<AvaliacaoCompetencia, Integer> {
+       List<AvaliacaoCompetencia> findByDiagnosticoCodigo(Integer codDiagnostico);
+       Optional<AvaliacaoCompetencia> findByDiagnosticoCodigoAndCompetenciaCodigo(
+           Integer codDiagnostico, 
+           Integer codCompetencia
+       );
+   }
+   ```
+
+5. **Criar DTOs**:
+   ```java
+   // dto/AvaliacaoRequest.java
+   public class AvaliacaoRequest {
+       @NotNull(message = "Código da competência é obrigatório")
+       private Integer codigoCompetencia;
+       
+       @NotNull(message = "Importância é obrigatória")
+       @Min(value = 1, message = "Importância deve ser entre 1 e 5")
+       @Max(value = 5, message = "Importância deve ser entre 1 e 5")
+       private Integer importancia;
+       
+       @NotNull(message = "Domínio é obrigatório")
+       @Min(value = 1, message = "Domínio deve ser entre 1 e 5")
+       @Max(value = 5, message = "Domínio deve ser entre 1 e 5")
+       private Integer dominio;
+       
+       @Size(max = 1000, message = "Observações não podem ter mais de 1000 caracteres")
+       private String observacoes;
+   }
+   
+   // dto/AvaliacaoDTO.java
+   public class AvaliacaoDTO {
+       private Integer codigo;
+       private Integer codigoCompetencia;
+       private String descricaoCompetencia;
+       private Integer importancia;
+       private Integer dominio;
+       private Integer gap;
+       private Integer criticidade;
+       private String observacoes;
+       private LocalDateTime dataAvaliacao;
+   }
+   ```
+
+**Fase 2: Implementar Service**
+
+6. **Criar DiagnosticoService**:
+   ```java
+   @Service
+   public class DiagnosticoService {
+       private final DiagnosticoRepo diagnosticoRepo;
+       private final AvaliacaoCompetenciaRepo avaliacaoRepo;
+       private final SubprocessoRepo subprocessoRepo;
+       private final CompetenciaRepo competenciaRepo;
+       
+       public DiagnosticoDTO buscarOuCriarDiagnostico(Integer codSubprocesso) {
+           // Busca ou cria diagnóstico para o subprocesso
+       }
+       
+       public AvaliacaoDTO salvarAvaliacao(Integer codSubprocesso, AvaliacaoRequest request) {
+           // Valida e salva avaliação
+           Diagnostico diagnostico = buscarDiagnostico(codSubprocesso);
+           
+           // Verifica se já existe avaliação para esta competência
+           Optional<AvaliacaoCompetencia> existente = avaliacaoRepo
+               .findByDiagnosticoCodigoAndCompetenciaCodigo(
+                   diagnostico.getCodigo(), 
+                   request.getCodigoCompetencia()
+               );
+           
+           AvaliacaoCompetencia avaliacao = existente.orElse(new AvaliacaoCompetencia());
+           avaliacao.setDiagnostico(diagnostico);
+           avaliacao.setCompetencia(competenciaRepo.findById(request.getCodigoCompetencia())
+               .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada")));
+           avaliacao.setImportancia(request.getImportancia());
+           avaliacao.setDominio(request.getDominio());
+           avaliacao.setObservacoes(request.getObservacoes());
+           avaliacao.setDataAvaliacao(LocalDateTime.now());
+           
+           avaliacao = avaliacaoRepo.save(avaliacao);
+           return mapearParaDTO(avaliacao);
+       }
+       
+       public List<AvaliacaoDTO> buscarAvaliacoes(Integer codSubprocesso) {
+           // Retorna todas as avaliações do diagnóstico
+       }
+       
+       public void finalizarDiagnostico(Integer codSubprocesso) {
+           Diagnostico diagnostico = buscarDiagnostico(codSubprocesso);
+           
+           // Validar que todas as competências foram avaliadas
+           List<Competencia> competencias = buscarCompetenciasDoSubprocesso(codSubprocesso);
+           List<AvaliacaoCompetencia> avaliacoes = avaliacaoRepo
+               .findByDiagnosticoCodigo(diagnostico.getCodigo());
+           
+           if (avaliacoes.size() < competencias.size()) {
+               throw new ErroDadosInvalidos(
+                   "Diagnóstico não pode ser finalizado. " +
+                   (competencias.size() - avaliacoes.size()) + 
+                   " competências ainda não foram avaliadas."
+               );
+           }
+           
+           // Validar que todas as avaliações têm valores válidos
+           boolean temAvaliacaoIncompleta = avaliacoes.stream()
+               .anyMatch(a -> a.getImportancia() == null || 
+                             a.getDominio() == null ||
+                             a.getImportancia() < 1 || 
+                             a.getDominio() < 1);
+           
+           if (temAvaliacaoIncompleta) {
+               throw new ErroDadosInvalidos(
+                   "Diagnóstico não pode ser finalizado. " +
+                   "Há avaliações com valores inválidos."
+               );
+           }
+           
+           diagnostico.setSituacao(SituacaoDiagnostico.FINALIZADO);
+           diagnostico.setDataFinalizacao(LocalDateTime.now());
+           diagnosticoRepo.save(diagnostico);
+           
+           // TODO: Gerar alertas e notificações
+       }
+   }
+   ```
+
+**Fase 3: Criar Controller**
+
+7. **Criar DiagnosticoController**:
+   ```java
+   @RestController
+   @RequestMapping("/api/diagnosticos")
+   public class DiagnosticoController {
+       private final DiagnosticoService diagnosticoService;
+       
+       @GetMapping("/{codSubprocesso}")
+       public ResponseEntity<DiagnosticoDTO> buscar(@PathVariable Integer codSubprocesso) {
+           return ResponseEntity.ok(diagnosticoService.buscarOuCriarDiagnostico(codSubprocesso));
+       }
+       
+       @PostMapping("/{codSubprocesso}/avaliacoes")
+       public ResponseEntity<AvaliacaoDTO> salvarAvaliacao(
+           @PathVariable Integer codSubprocesso,
+           @Valid @RequestBody AvaliacaoRequest request
+       ) {
+           return ResponseEntity.ok(diagnosticoService.salvarAvaliacao(codSubprocesso, request));
+       }
+       
+       @GetMapping("/{codSubprocesso}/avaliacoes")
+       public ResponseEntity<List<AvaliacaoDTO>> buscarAvaliacoes(
+           @PathVariable Integer codSubprocesso
+       ) {
+           return ResponseEntity.ok(diagnosticoService.buscarAvaliacoes(codSubprocesso));
+       }
+       
+       @PostMapping("/{codSubprocesso}/finalizar")
+       public ResponseEntity<Void> finalizar(@PathVariable Integer codSubprocesso) {
+           diagnosticoService.finalizarDiagnostico(codSubprocesso);
+           return ResponseEntity.ok().build();
+       }
+   }
+   ```
+
+**Fase 4: Atualizar Frontend**
+
+8. **Criar diagnosticoService.ts**:
+   ```typescript
+   // frontend/src/services/diagnosticoService.ts
+   import apiClient from './apiClient';
+   
+   export interface AvaliacaoRequest {
+     codigoCompetencia: number;
+     importancia: number;
+     dominio: number;
+     observacoes?: string;
+   }
+   
+   export interface AvaliacaoDTO {
+     codigo: number;
+     codigoCompetencia: number;
+     descricaoCompetencia: string;
+     importancia: number;
+     dominio: number;
+     gap: number;
+     criticidade: number;
+     observacoes?: string;
+     dataAvaliacao: string;
+   }
+   
+   export const diagnosticoService = {
+     async salvarAvaliacao(
+       codSubprocesso: number, 
+       avaliacao: AvaliacaoRequest
+     ): Promise<AvaliacaoDTO> {
+       const response = await apiClient.post(
+         `/api/diagnosticos/${codSubprocesso}/avaliacoes`,
+         avaliacao
+       );
+       return response.data;
+     },
+     
+     async buscarAvaliacoes(codSubprocesso: number): Promise<AvaliacaoDTO[]> {
+       const response = await apiClient.get(
+         `/api/diagnosticos/${codSubprocesso}/avaliacoes`
+       );
+       return response.data;
+     },
+     
+     async finalizarDiagnostico(codSubprocesso: number): Promise<void> {
+       await apiClient.post(`/api/diagnosticos/${codSubprocesso}/finalizar`);
+     }
+   };
+   ```
+
+9. **Atualizar DiagnosticoEquipe.vue**:
+   - Remover validação `avaliacoesPendentes` computed (linhas 225-230)
+   - Remover inicialização com valores padrão (linhas 176-186)
+   - Implementar método `confirmarFinalizacao()` (linha 243)
+   - Salvar avaliações incrementalmente ao alterar valores
+
+**Comandos de Verificação:**
+
+```bash
+# 1. Criar migration do banco (se necessário)
+# Adicionar em backend/src/main/resources/db/migration/
+
+# 2. Compilar backend
+./gradlew :backend:compileJava
+
+# 3. Executar testes do módulo
+./gradlew :backend:test --tests "sgc.diagnostico.*"
+
+# 4. Verificar frontend
+cd frontend && npm run typecheck && npm run lint
+
+# 5. Teste manual completo
+./gradlew bootRun
+cd frontend && npm run dev
+# Navegar para DiagnosticoEquipe e testar fluxo completo
+```
+
+**Critérios de Sucesso:**
+
+- [ ] Pacote `sgc.diagnostico` criado com estrutura completa
+- [ ] Entidades `Diagnostico` e `AvaliacaoCompetencia` criadas
+- [ ] Repositórios criados e funcionais
+- [ ] DTOs com validações Bean Validation
+- [ ] Service implementa toda lógica de negócio
+- [ ] Controller expõe 4 endpoints REST
+- [ ] Testes unitários cobrem service (mínimo 80%)
+- [ ] Frontend usa novo service
+- [ ] Validação de pendências removida do frontend
+- [ ] Finalização funciona e valida backend
+- [ ] Todos os testes passam
+- [ ] Funcionalidade end-to-end operacional
+
+**Testes a Criar:**
+
+```java
+// DiagnosticoServiceTest.java
+@Test
+void deveCriarDiagnosticoQuandoNaoExiste() { }
+
+@Test
+void deveSalvarAvaliacaoComDadosValidos() { }
+
+@Test
+void deveAtualizarAvaliacaoExistente() { }
+
+@Test
+void deveLancarErroQuandoImportanciaInvalida() { }
+
+@Test
+void deveLancarErroQuandoDominioInvalido() { }
+
+@Test
+void deveFinalizarDiagnosticoQuandoTodasAvaliacoesCompletas() { }
+
+@Test
+void deveLancarErroAoFinalizarComAvaliacoesPendentes() { }
+
+@Test
+void deveLancarErroAoFinalizarComAvaliacoesInvalidas() { }
+```
+
+**Checklist de Implementação:**
+
+- [ ] Criar estrutura de pacotes backend
+- [ ] Criar entidade Diagnostico
+- [ ] Criar entidade AvaliacaoCompetencia
+- [ ] Criar enum SituacaoDiagnostico
+- [ ] Criar repositórios
+- [ ] Criar DTOs com validações
+- [ ] Implementar DiagnosticoService completo
+- [ ] Criar DiagnosticoController
+- [ ] Criar testes unitários (mínimo 8 testes)
+- [ ] Criar diagnosticoService.ts no frontend
+- [ ] Atualizar DiagnosticoEquipe.vue
+- [ ] Remover validações do frontend
+- [ ] Executar `./gradlew :backend:test` - DEVE PASSAR
+- [ ] Executar `npm run typecheck && npm run lint` - DEVE PASSAR
+- [ ] Testar fluxo completo manualmente
+- [ ] Criar README.md no pacote diagnostico explicando o módulo
+- [ ] Commit: "feat(diagnostico): implementa módulo completo de diagnóstico"
+
+**Observações Importantes:**
+
+- Este é o módulo mais complexo da refatoração
+- Pode requerer migration de banco de dados
+- Coordenar com módulos `mapa`, `subprocesso` e `competencia`
+- Considerar criar o módulo em múltiplos commits:
+  - Commit 1: Entidades e repositórios
+  - Commit 2: Service e lógica de negócio
+  - Commit 3: Controller e endpoints
+  - Commit 4: Frontend integration
+  - Commit 5: Testes
 
 ---
 
@@ -990,80 +1922,501 @@ public Page<ProcessoResumo> listar(
 
 ## 8. Plano de Implementação Sugerido
 
+### INSTRUÇÕES PARA AGENTES: Como Executar as Fases
+
+**Antes de iniciar qualquer fase:**
+1. Leia `AGENTS.md` na raiz do repositório
+2. Execute `git status` e `git pull` para garantir repositório atualizado
+3. Crie uma branch específica: `git checkout -b refactor/fase-X-nome`
+4. Revise todas as tarefas da fase
+
+**Durante a execução:**
+- Faça commits pequenos após cada tarefa concluída
+- Execute testes após cada mudança
+- Não pule verificações
+- Documente problemas encontrados
+
+**Ao finalizar a fase:**
+- Execute suite completa de testes: `./gradlew build && npm test`
+- Revise todos os commits
+- Crie PR com descrição detalhada
+- Aguarde code review
+
+---
+
 ### Fase 1: Validações Críticas (2-3 semanas)
 
-**Objetivo:** Mover validações de negócio para backend
+**Objetivo:** Mover validações de negócio para backend  
+**Tarefas:** REF-001, REF-002, REF-003  
+**Prioridade:** ALTA - Começar por esta fase
 
-1. Implementar validações em `CadAtividades.vue` → Backend
-2. Implementar validações em `CadProcesso.vue` → Backend
-3. Implementar validações em `CadMapa.vue` → Backend
-4. Atualizar DTOs com Bean Validation
-5. Criar testes unitários para validações
+#### Tarefas da Fase 1
+
+1. **REF-001: CadAtividades.vue** (Seção 1.1)
+   - Endpoint: `POST /api/subprocessos/{id}/disponibilizar-cadastro`
+   - Tempo estimado: 2-3 horas
+   - Arquivos: 4 arquivos (backend + frontend)
+
+2. **REF-002: CadMapa.vue** (Seção 1.2)
+   - Validações Bean Validation em CompetenciaRequest
+   - Tempo estimado: 1-2 horas
+   - Arquivos: 2 arquivos (backend DTO + frontend view)
+
+3. **REF-003: CadProcesso.vue** (Seção 1.3)
+   - Endpoint: `POST /api/processos` (melhorar existente)
+   - Filtro de elegibilidade no backend
+   - Tempo estimado: 2-3 horas
+   - Arquivos: 4 arquivos
+
+#### Ordem de Execução Recomendada
+
+```
+REF-002 → REF-001 → REF-003
+(mais simples) → (média) → (mais complexa)
+```
+
+#### Comandos de Verificação da Fase 1
+
+```bash
+# Após concluir todas as tarefas da Fase 1
+
+# 1. Build completo
+./gradlew clean build
+
+# 2. Testes backend
+./gradlew :backend:test
+
+# 3. Frontend typecheck e lint
+cd frontend && npm run typecheck && npm run lint
+
+# 4. Testes E2E relacionados
+npx playwright test tests/cadastro.spec.ts
+npx playwright test tests/processo.spec.ts
+
+# 5. Verificar redução de linhas
+git diff --stat origin/main frontend/src/views/CadAtividades.vue
+git diff --stat origin/main frontend/src/views/CadMapa.vue
+git diff --stat origin/main frontend/src/views/CadProcesso.vue
+```
+
+#### Critérios de Sucesso da Fase 1
+
+- [ ] Todos os testes passam: `./gradlew build` sem erros
+- [ ] TypeCheck passa: `npm run typecheck` sem erros
+- [ ] Lint passa: `npm run lint` sem erros
+- [ ] Testes E2E de cadastro passam
+- [ ] Frontend reduzido em ~200 linhas (verificar com `git diff --stat`)
+- [ ] Backend tem novos testes unitários (mínimo 9 testes)
+- [ ] Mensagens de erro todas em português
+- [ ] Funcionalidades continuam operacionais
 
 **Entregáveis:**
 - Endpoints de cadastro validam dados completamente
 - Frontend simplificado (remove 200+ linhas de validação)
 - Mensagens de erro estruturadas
+- Documentação atualizada
+
+---
 
 ### Fase 2: Módulo Diagnóstico (3-4 semanas)
 
-**Objetivo:** Criar backend para funcionalidades de diagnóstico
+**Objetivo:** Criar backend para funcionalidades de diagnóstico  
+**Tarefas:** REF-004, REF-005 (OcupacoesCriticas)  
+**Prioridade:** ALTA - Funcionalidade crítica sem backend
 
-1. Criar entidades e repositórios
-2. Criar serviços de negócio
-3. Criar controllers e DTOs
-4. Implementar endpoints para avaliações
-5. Implementar endpoints para ocupações críticas
-6. Integrar com sistema de notificações e alertas
-7. Criar testes E2E
+**ATENÇÃO:** Esta fase requer criar módulo backend completo do zero
+
+#### Tarefas da Fase 2
+
+1. **REF-004: DiagnosticoEquipe.vue** (Seção 1.4)
+   - Criar módulo completo `sgc.diagnostico`
+   - Endpoints para avaliações
+   - Tempo estimado: 6-8 horas
+   - Arquivos: 15+ arquivos novos
+
+2. **REF-005: OcupacoesCriticas.vue** (Seção 1.5)
+   - Estender módulo diagnóstico
+   - Endpoints para ocupações críticas
+   - Tempo estimado: 4-6 horas
+   - Arquivos: 8+ arquivos
+
+#### Estrutura do Módulo a Criar
+
+```
+backend/src/main/java/sgc/diagnostico/
+├── Diagnostico.java (entidade)
+├── AvaliacaoCompetencia.java (entidade)
+├── OcupacaoCritica.java (entidade)
+├── SituacaoDiagnostico.java (enum)
+├── DiagnosticoRepo.java
+├── AvaliacaoCompetenciaRepo.java
+├── OcupacaoCriticaRepo.java
+├── DiagnosticoService.java
+├── DiagnosticoController.java
+├── dto/
+│   ├── DiagnosticoDTO.java
+│   ├── AvaliacaoRequest.java
+│   ├── AvaliacaoDTO.java
+│   ├── OcupacaoCriticaRequest.java
+│   └── OcupacaoCriticaDTO.java
+└── README.md (documentação do módulo)
+
+backend/src/test/java/sgc/diagnostico/
+├── DiagnosticoServiceTest.java
+└── DiagnosticoControllerTest.java
+```
+
+#### Ordem de Execução Recomendada
+
+**Dia 1-2: Estrutura e Entidades**
+1. Criar estrutura de pacotes
+2. Criar entidades (Diagnostico, AvaliacaoCompetencia)
+3. Criar enums
+4. Criar repositórios
+5. Commit: "feat(diagnostico): cria entidades e repositórios"
+
+**Dia 3-4: Service e Lógica de Negócio**
+1. Criar DTOs com validações
+2. Implementar DiagnosticoService
+3. Criar testes unitários do service
+4. Commit: "feat(diagnostico): implementa service de avaliações"
+
+**Dia 5-6: Controller e Endpoints**
+1. Criar DiagnosticoController
+2. Testar endpoints com Postman/Insomnia
+3. Criar testes de integração
+4. Commit: "feat(diagnostico): adiciona endpoints REST"
+
+**Dia 7-8: Integração Frontend**
+1. Criar diagnosticoService.ts
+2. Atualizar DiagnosticoEquipe.vue
+3. Testar fluxo E2E completo
+4. Commit: "feat(diagnostico): integra frontend com backend"
+
+**Dia 9-10: Ocupações Críticas**
+1. Estender entidades (OcupacaoCritica)
+2. Implementar lógica no service
+3. Atualizar controller
+4. Atualizar OcupacoesCriticas.vue
+5. Commit: "feat(diagnostico): adiciona ocupações críticas"
+
+#### Comandos de Verificação da Fase 2
+
+```bash
+# Verificar estrutura criada
+tree backend/src/main/java/sgc/diagnostico/
+tree backend/src/test/java/sgc/diagnostico/
+
+# Build e testes
+./gradlew :backend:compileJava
+./gradlew :backend:test --tests "sgc.diagnostico.*"
+
+# Coverage (se configurado)
+./gradlew :backend:jacocoTestReport
+# Verificar que módulo diagnostico tem >80% cobertura
+
+# Frontend
+cd frontend && npm run typecheck && npm run lint
+
+# E2E
+npx playwright test tests/diagnostico.spec.ts
+```
+
+#### Critérios de Sucesso da Fase 2
+
+- [ ] Módulo `sgc.diagnostico` existe e está completo
+- [ ] 5 entidades criadas (Diagnostico, AvaliacaoCompetencia, OcupacaoCritica, etc)
+- [ ] 6+ endpoints REST funcionais
+- [ ] Cobertura de testes >80% no módulo
+- [ ] Frontend integrado e funcional
+- [ ] Dados persistem no banco
+- [ ] Validações funcionam no backend
+- [ ] README.md do módulo criado
+- [ ] Testes E2E passam
 
 **Entregáveis:**
 - Módulo `diagnostico` completo
 - Views funcionando com persistência real
-- Relatórios de diagnóstico
+- Relatórios de diagnóstico (se aplicável)
+- Documentação do módulo
+
+---
 
 ### Fase 3: Otimização de DTOs (2 semanas)
 
-**Objetivo:** Enriquecer DTOs com dados formatados
+**Objetivo:** Enriquecer DTOs com dados formatados  
+**Tarefas:** Múltiplas, espalhadas pelas seções 2 e 3  
+**Prioridade:** MÉDIA
 
-1. Adicionar campos `*Label` em todos os enums
-2. Adicionar campos `*Formatada` em datas
-3. Adicionar objeto `permissoes` em DTOs principais
-4. Remover mapeamentos do frontend
-5. Simplificar `utils/index.ts`
+**ATENÇÃO:** Esta fase toca muitos arquivos. Fazer incrementalmente.
+
+#### Tarefas da Fase 3
+
+1. **Adicionar campos `*Label` em todos os enums**
+   - TipoProcesso, SituacaoProcesso, SituacaoSubprocesso, etc
+   - Tempo: 1-2 horas
+   - Pattern:
+   ```java
+   public enum TipoProcesso {
+       MAPEAMENTO("Mapeamento"),
+       REVISAO("Revisão"),
+       DIAGNOSTICO("Diagnóstico");
+       
+       private final String label;
+       
+       TipoProcesso(String label) { this.label = label; }
+       public String getLabel() { return label; }
+   }
+   ```
+
+2. **Adicionar campos formatados em DTOs de datas**
+   - ProcessoDTO, SubprocessoDTO, etc
+   - Pattern:
+   ```java
+   public class ProcessoDTO {
+       private LocalDateTime dataLimiteEtapa1;
+       private String dataLimiteEtapa1Formatada; // "01/12/2025"
+       
+       // No mapper
+       dto.setDataLimiteEtapa1Formatada(
+           DateTimeFormatter.ofPattern("dd/MM/yyyy")
+               .format(processo.getDataLimiteEtapa1())
+       );
+   }
+   ```
+
+3. **Adicionar objeto `permissoes` em DTOs principais**
+   - ProcessoDTO, UnidadeParticipanteDTO
+   - Ver seção 4.1 para detalhes
+
+4. **Remover mapeamentos do frontend**
+   - Simplificar `utils/index.ts`
+   - Remover funções de formatação duplicadas
+   - Usar campos do DTO diretamente
+
+#### Ordem de Execução Recomendada
+
+```
+1. Enums com labels (mais fácil, baixo risco)
+2. Datas formatadas nos DTOs principais
+3. Objeto permissões (mais complexo)
+4. Limpeza do frontend
+```
+
+#### Comandos de Verificação da Fase 3
+
+```bash
+# Verificar que DTOs têm campos formatados
+grep -r "Formatada" backend/src/main/java/sgc/*/dto/
+
+# Verificar que enums têm labels
+grep -r "getLabel()" backend/src/main/java/sgc/*/
+
+# Build e testes
+./gradlew build
+
+# Verificar redução de utils/index.ts
+git diff --stat origin/main frontend/src/utils/index.ts
+# Deve mostrar redução significativa (~66%)
+```
+
+#### Critérios de Sucesso da Fase 3
+
+- [ ] Todos os enums têm método `getLabel()`
+- [ ] DTOs principais têm campos `*Formatada` para datas
+- [ ] DTOs principais têm objeto `permissoes` quando aplicável
+- [ ] Frontend `utils/index.ts` reduzido em ~150 linhas
+- [ ] Mapeamentos removidos do frontend
+- [ ] Todos os testes passam
+- [ ] Funcionalidades continuam operacionais
 
 **Entregáveis:**
 - DTOs autocontidos
 - Frontend 30% mais simples
 - Menos duplicação de código
 
+---
+
 ### Fase 4: Filtragens e Ordenações (1-2 semanas)
 
-**Objetivo:** Backend fornece dados filtrados e ordenados
+**Objetivo:** Backend fornece dados filtrados e ordenados  
+**Tarefas:** Seções 2.1, 2.2, 2.3  
+**Prioridade:** MÉDIA
 
-1. Adicionar query params de ordenação
-2. Melhorar endpoint de árvore de unidades
-3. Adicionar paginação onde necessário
-4. Otimizar queries do banco
+#### Tarefas da Fase 4
+
+1. **Adicionar query params de ordenação em endpoints de listagem**
+   ```java
+   @GetMapping
+   public Page<ProcessoDTO> listar(
+       @RequestParam(required = false) String sortBy,
+       @RequestParam(required = false) String sortOrder,
+       Pageable pageable
+   ) {
+       // Implementar ordenação
+   }
+   ```
+
+2. **Melhorar endpoint de árvore de unidades** (Seção 2.1)
+   - Adicionar filtros por tipo de processo
+   - Calcular flag `isElegivel` no backend
+   - Retornar árvore sem SEDOC se solicitado
+
+3. **Adicionar paginação onde necessário**
+   - Endpoints que retornam listas grandes
+   - Usar `Pageable` do Spring
+
+4. **Simplificar componentes do frontend**
+   - Remover lógica de ordenação local
+   - Remover filtragem complexa
+
+#### Comandos de Verificação da Fase 4
+
+```bash
+# Testar endpoints com query params
+curl "http://localhost:8080/api/processos?sortBy=descricao&sortOrder=asc"
+curl "http://localhost:8080/api/unidades/arvore?tipoProcesso=MAPEAMENTO&ocultarRaiz=true"
+
+# Build e testes
+./gradlew build
+
+# Verificar que frontend foi simplificado
+git diff --stat origin/main frontend/src/components/ArvoreUnidades.vue
+```
+
+#### Critérios de Sucesso da Fase 4
+
+- [ ] Endpoints principais aceitam `sortBy` e `sortOrder`
+- [ ] Endpoint de árvore filtra e calcula elegibilidade
+- [ ] Paginação implementada onde necessário
+- [ ] Frontend simplificado (menos lógica de filtro/sort)
+- [ ] Performance melhorada (medido com DevTools)
+- [ ] Testes passam
 
 **Entregáveis:**
 - APIs REST completas com suporte a sort/filter
 - Performance melhorada
 - Frontend apenas consome dados
 
+---
+
 ### Fase 5: Refatoração de Stores (1 semana)
 
-**Objetivo:** Simplificar stores
+**Objetivo:** Simplificar stores  
+**Tarefas:** Seção 3.3  
+**Prioridade:** BAIXA (mas importante para manutenibilidade)
 
-1. Remover computeds complexos
-2. Mover lógica para services
-3. Padronizar estrutura de stores
-4. Atualizar testes
+#### Tarefas da Fase 5
+
+1. **Revisar cada store** (`frontend/src/stores/*.ts`)
+2. **Remover computeds complexos** - mover para backend
+3. **Padronizar estrutura** de todas as stores
+4. **Atualizar testes** de stores
+
+#### Template de Store Simplificada
+
+```typescript
+// stores/exemplo.ts
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { exemploService } from '@/services/exemploService';
+
+export const useExemploStore = defineStore('exemplo', () => {
+  // State
+  const items = ref<Item[]>([]);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+  
+  // Actions (apenas chama service e armazena)
+  async function buscarItems() {
+    loading.value = true;
+    error.value = null;
+    try {
+      items.value = await exemploService.buscar();
+    } catch (e) {
+      error.value = 'Erro ao buscar items';
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
+  
+  // Computed simples (apenas formatação de UI)
+  const itemsOrdenados = computed(() => 
+    items.value.slice().sort((a, b) => a.ordem - b.ordem)
+  );
+  
+  return {
+    items,
+    loading,
+    error,
+    itemsOrdenados,
+    buscarItems
+  };
+});
+```
+
+#### Comandos de Verificação da Fase 5
+
+```bash
+# Verificar tamanho das stores
+wc -l frontend/src/stores/*.ts
+
+# TypeCheck e lint
+cd frontend && npm run typecheck && npm run lint
+
+# Testes unitários das stores (se existirem)
+cd frontend && npm run test:unit
+```
+
+#### Critérios de Sucesso da Fase 5
+
+- [ ] Todas as stores seguem padrão consistente
+- [ ] Computeds complexos removidos
+- [ ] Stores têm apenas state, actions simples, e getters básicos
+- [ ] Código 40% mais simples (medido por linhas)
+- [ ] Testes atualizados
+- [ ] TypeCheck passa
 
 **Entregáveis:**
 - Stores 40% mais simples
 - Código mais manutenível
 - Melhor separação de responsabilidades
+
+---
+
+### Resumo das Fases para Planejamento
+
+| Fase | Prioridade | Tempo | Complexidade | Risco |
+|------|-----------|-------|--------------|-------|
+| Fase 1: Validações | ALTA | 2-3 sem | Média | Baixo |
+| Fase 2: Diagnóstico | ALTA | 3-4 sem | Alta | Médio |
+| Fase 3: DTOs | MÉDIA | 2 sem | Média | Baixo |
+| Fase 4: Filtros/Sort | MÉDIA | 1-2 sem | Baixa | Baixo |
+| Fase 5: Stores | BAIXA | 1 sem | Baixa | Muito Baixo |
+| **TOTAL** | - | **9-12 sem** | - | - |
+
+### Estratégia de Execução para Agentes
+
+**Opção 1: Sequencial (Recomendado para agentes autônomos)**
+```
+Fase 1 → Fase 2 → Fase 3 → Fase 4 → Fase 5
+```
+- Cada fase é completada antes de iniciar próxima
+- Menor risco de conflitos
+- Mais fácil de testar incrementalmente
+
+**Opção 2: Paralela (Requer coordenação)**
+```
+Fase 1 + Fase 3 (em paralelo)
+↓
+Fase 2
+↓
+Fase 4 + Fase 5 (em paralelo)
+```
+- Mais rápido
+- Requer múltiplos agentes ou branches
+- Maior risco de conflitos de merge
 
 ---
 
@@ -1140,30 +2493,265 @@ public Page<ProcessoResumo> listar(
 
 ## 11. Checklist de Implementação
 
-### Para Cada View/Component Refatorado
+### INSTRUÇÕES PARA AGENTES: Como Usar Esta Checklist
 
-- [ ] Identificar validações de negócio
-- [ ] Identificar filtragens/ordenações complexas
-- [ ] Identificar mapeamentos duplicados
-- [ ] Criar/atualizar endpoints backend necessários
-- [ ] Criar/atualizar DTOs com validações
-- [ ] Implementar testes unitários backend
-- [ ] Atualizar services frontend
-- [ ] Simplificar componente/view
-- [ ] Atualizar testes E2E
-- [ ] Documentar mudanças
-- [ ] Code review
-- [ ] Testar em ambiente de staging
+Esta seção fornece um template de checklist que deve ser seguido **para cada tarefa** do plano de refatoração.
 
-### Para Cada Novo Endpoint
+**Como usar:**
+1. Copie a checklist relevante (view/component ou endpoint)
+2. Marque cada item conforme completa
+3. NÃO pule itens mesmo que pareçam óbvios
+4. Use esta checklist para validação final antes de commit
 
-- [ ] Especificar contrato (request/response)
-- [ ] Implementar validações
-- [ ] Implementar autorização
-- [ ] Criar testes unitários
-- [ ] Criar testes de integração
-- [ ] Documentar no Swagger/OpenAPI
-- [ ] Atualizar collection Postman/Insomnia
+---
+
+### Checklist: Para Cada View/Component Refatorado
+
+**Preparação:**
+- [ ] Li o `AGENTS.md` e entendo convenções do projeto
+- [ ] Li a seção específica deste documento para a tarefa
+- [ ] Entendo o problema atual (li código existente)
+- [ ] Identifiquei validações de negócio a mover
+- [ ] Identifiquei filtragens/ordenações a mover
+- [ ] Identifiquei mapeamentos duplicados
+- [ ] Criei branch específica: `git checkout -b refactor/nome-da-tarefa`
+
+**Backend - Endpoints:**
+- [ ] Criar/atualizar endpoint backend necessário
+- [ ] Adicionar anotação `@Valid` nos parâmetros
+- [ ] Implementar toda lógica de validação no service
+- [ ] Lançar exceções apropriadas (ErroApi hierarchy)
+- [ ] Retornar DTOs (nunca entidades JPA)
+- [ ] Endpoint retorna mensagens em português
+- [ ] Testado manualmente com Postman/Insomnia (se disponível)
+
+**Backend - DTOs:**
+- [ ] Criar/atualizar DTOs com Bean Validation
+- [ ] Adicionar `@NotNull`, `@NotBlank`, `@NotEmpty` onde apropriado
+- [ ] Adicionar `@Min`, `@Max`, `@Size` onde apropriado
+- [ ] Adicionar campos `*Label` para enums
+- [ ] Adicionar campos `*Formatada` para datas
+- [ ] DTOs têm JavaDoc explicando seu propósito
+- [ ] Usar Português em todos os nomes e mensagens
+
+**Backend - Service:**
+- [ ] Implementar validações de negócio
+- [ ] Implementar filtragens complexas
+- [ ] Implementar cálculos (se aplicável)
+- [ ] Lançar exceções apropriadas com mensagens claras
+- [ ] Método tem JavaDoc explicando regras de negócio
+- [ ] Service é testável (usa injeção de dependência)
+
+**Backend - Testes:**
+- [ ] Criar testes unitários do service (mínimo 3-5 testes)
+- [ ] Teste: cenário válido (happy path)
+- [ ] Teste: validação falha (cada campo obrigatório)
+- [ ] Teste: regra de negócio falha
+- [ ] Teste: exceções são lançadas corretamente
+- [ ] Executar `./gradlew :backend:test --tests "NomeTest"` - PASSA
+- [ ] Cobertura >80% no método testado (verificar se possível)
+
+**Frontend - Service:**
+- [ ] Atualizar/criar método no service TypeScript
+- [ ] Service retorna Promise tipada corretamente
+- [ ] Service usa apiClient (Axios configurado)
+- [ ] Service não faz validações de negócio
+- [ ] Service tem JSDoc explicando uso
+
+**Frontend - Store:**
+- [ ] Atualizar método na store Pinia
+- [ ] Store apenas chama service e armazena resultado
+- [ ] Store não faz validações de negócio
+- [ ] Store não faz filtragens complexas
+- [ ] Store não faz cálculos de negócio
+- [ ] Manter loading/error state se aplicável
+
+**Frontend - View/Component:**
+- [ ] Remover validações de negócio
+- [ ] Remover filtragens complexas  
+- [ ] Remover mapeamentos duplicados (usar DTO)
+- [ ] Simplificar métodos (menos linhas)
+- [ ] Manter apenas lógica de UI/UX
+- [ ] Usar try/catch e confiar em interceptor Axios
+- [ ] Componente permanece em Português
+
+**Verificação Final:**
+- [ ] Executar `git status` - revisar arquivos modificados
+- [ ] Executar `git diff` - revisar mudanças linha por linha
+- [ ] Executar `./gradlew :backend:compileJava` - SUCESSO
+- [ ] Executar `./gradlew :backend:test` - TODOS PASSAM
+- [ ] Executar `cd frontend && npm run typecheck` - SEM ERROS
+- [ ] Executar `cd frontend && npm run lint` - SEM ERROS
+- [ ] Testar funcionalidade manualmente - FUNCIONA
+- [ ] Testar cenários de erro manualmente - ERROS CLAROS
+- [ ] Verificar que mensagens são em português
+- [ ] Ler código modificado - está limpo e claro?
+- [ ] View/Component tem menos linhas que antes?
+
+**Documentação:**
+- [ ] Atualizar README.md do módulo (se aplicável)
+- [ ] Adicionar comentários em lógica complexa (se necessário)
+- [ ] Atualizar seção de API em documentação (se aplicável)
+
+**Git:**
+- [ ] Criar commit com mensagem descritiva
+- [ ] Mensagem segue padrão: `refactor(módulo): descrição`
+- [ ] Commit contém apenas arquivos relacionados à tarefa
+- [ ] Push para branch remota
+- [ ] Verificar que CI passa (se configurado)
+
+---
+
+### Checklist: Para Cada Novo Endpoint
+
+**Planejamento:**
+- [ ] Endpoint está documentado neste plano (seção 7)
+- [ ] Entendo o propósito do endpoint
+- [ ] Sei quais validações são necessárias
+- [ ] Sei qual resposta retornar (DTO definido)
+- [ ] Sei quais erros podem ocorrer
+
+**Contrato da API:**
+- [ ] Especificar método HTTP (GET/POST/PUT/DELETE)
+- [ ] Especificar URL path (ex: `/api/recurso/{id}/acao`)
+- [ ] Especificar parâmetros de path (@PathVariable)
+- [ ] Especificar parâmetros de query (@RequestParam)
+- [ ] Especificar body (Request DTO)
+- [ ] Especificar resposta (Response DTO ou void)
+- [ ] Especificar códigos de status (200, 400, 404, etc)
+
+**Request DTO:**
+- [ ] Criar classe Request DTO (se necessário)
+- [ ] Adicionar Bean Validation annotations
+- [ ] Mensagens de validação em português
+- [ ] Campos têm tipos corretos (não usar String para tudo)
+- [ ] DTO tem JavaDoc
+- [ ] DTO segue convenções do projeto (PascalCase)
+
+**Response DTO:**
+- [ ] Criar/usar classe Response DTO
+- [ ] DTO tem todos os campos necessários
+- [ ] DTO tem campos formatados (*Label, *Formatada)
+- [ ] DTO não expõe dados sensíveis
+- [ ] DTO tem JavaDoc
+- [ ] Mapper criado/atualizado (MapStruct)
+
+**Controller:**
+- [ ] Criar método no Controller
+- [ ] Anotação de mapping correta (@GetMapping, @PostMapping, etc)
+- [ ] Path correto e RESTful
+- [ ] Usar @Valid em Request DTOs
+- [ ] Usar @PathVariable e @RequestParam quando necessário
+- [ ] Retornar ResponseEntity tipado
+- [ ] Código de status correto (ok(), created(), etc)
+- [ ] JavaDoc explicando endpoint
+- [ ] Seguir padrão do projeto (veja AGENTS.md seção 3.2)
+
+**Service:**
+- [ ] Implementar lógica no Service (não no Controller)
+- [ ] Validar todos os dados de entrada
+- [ ] Validar regras de negócio
+- [ ] Lançar exceções apropriadas
+- [ ] Usar transações (@Transactional) se necessário
+- [ ] Logs apropriados (se aplicável)
+- [ ] Retornar DTO ou entidade (mapper converte)
+
+**Validações:**
+- [ ] Campos obrigatórios validados (@NotNull, @NotBlank, @NotEmpty)
+- [ ] Tamanhos validados (@Size, @Min, @Max)
+- [ ] Formatos validados (@Email, @Pattern, etc)
+- [ ] Regras de negócio validadas no service
+- [ ] Mensagens de erro claras e em português
+- [ ] Exceções corretas lançadas (ErroApi hierarchy)
+
+**Autorização:**
+- [ ] Verificar se endpoint precisa autenticação
+- [ ] Verificar permissões do usuário (se aplicável)
+- [ ] Incluir objeto `permissoes` no DTO (se aplicável)
+- [ ] Retornar 401/403 quando não autorizado
+
+**Testes Unitários:**
+- [ ] Teste: happy path (cenário válido)
+- [ ] Teste: cada validação Bean Validation
+- [ ] Teste: cada regra de negócio
+- [ ] Teste: cenários de exceção
+- [ ] Teste: autorização (se aplicável)
+- [ ] Mock de dependências externas
+- [ ] Todos os testes passam
+- [ ] Cobertura >80% no método
+
+**Testes de Integração (se necessário):**
+- [ ] Teste: endpoint responde corretamente
+- [ ] Teste: banco de dados persiste dados
+- [ ] Teste: transações funcionam
+- [ ] Usar @SpringBootTest e @AutoConfigureMockMvc
+- [ ] Usar profile de teste (H2)
+
+**Documentação:**
+- [ ] Endpoint documentado com comentários JavaDoc
+- [ ] Swagger/OpenAPI atualizado (auto-gerado)
+- [ ] Adicionar a collection Postman/Insomnia (se usado)
+- [ ] Atualizar seção 7 deste documento se necessário
+
+**Verificação Final:**
+- [ ] Compilar: `./gradlew :backend:compileJava` - SUCESSO
+- [ ] Testar: `./gradlew :backend:test` - TODOS PASSAM
+- [ ] Testar endpoint manualmente (Postman/curl)
+- [ ] Testar cenários de erro (dados inválidos)
+- [ ] Verificar resposta JSON está correta
+- [ ] Verificar mensagens de erro em português
+- [ ] Commit: `feat(modulo): adiciona endpoint X`
+
+---
+
+### Checklist: Finalização de Fase
+
+Após completar todas as tarefas de uma fase, use esta checklist:
+
+**Revisão de Código:**
+- [ ] Revisar todos os commits da fase
+- [ ] Commits têm mensagens claras e descritivas
+- [ ] Cada commit compila e testa isoladamente
+- [ ] Sem código comentado deixado para trás
+- [ ] Sem TODOs ou FIXMEs novos (a menos que documentados)
+- [ ] Sem console.log() ou System.out.println() esquecidos
+
+**Testes Completos:**
+- [ ] Backend: `./gradlew clean build` - SUCESSO
+- [ ] Backend: Todos os testes passam
+- [ ] Frontend: `npm run typecheck` - SEM ERROS
+- [ ] Frontend: `npm run lint` - SEM ERROS  
+- [ ] E2E: `npm test` - TODOS OS TESTES RELEVANTES PASSAM
+- [ ] Teste manual de cada funcionalidade modificada
+- [ ] Teste de regressão (funcionalidades não modificadas ainda funcionam)
+
+**Métricas:**
+- [ ] Verificar redução de linhas: `git diff --stat origin/main`
+- [ ] Frontend reduzido conforme esperado (ver seção 9)
+- [ ] Backend cresceu de forma controlada (apenas o necessário)
+- [ ] Cobertura de testes mantida ou melhorada
+
+**Documentação:**
+- [ ] README.md atualizado (se necessário)
+- [ ] AGENTS.md atualizado (se novas convenções)
+- [ ] Este plano atualizado (se descobriu algo novo)
+- [ ] Comentários de código adequados
+- [ ] JavaDoc/JSDoc completo
+
+**Pull Request:**
+- [ ] Criar PR com título descritivo
+- [ ] Descrição do PR lista todas as mudanças
+- [ ] Descrição menciona testes executados
+- [ ] Descrição menciona métricas (linhas reduzidas, etc)
+- [ ] Screenshots de mudanças de UI (se aplicável)
+- [ ] Marcar reviewers apropriados
+- [ ] Linkar issues relacionadas
+
+**Comunicação:**
+- [ ] Documentar quaisquer problemas encontrados
+- [ ] Documentar decisões técnicas tomadas
+- [ ] Documentar desvios do plano original
+- [ ] Sugerir melhorias para próximas fases
 
 ---
 
@@ -1171,7 +2759,7 @@ public Page<ProcessoResumo> listar(
 
 Este plano de refatoração visa transformar o frontend SGC de um protótipo com lógica de negócio misturada para uma aplicação production-ready com separação clara de responsabilidades.
 
-**Benefícios Esperados:**
+### Benefícios Esperados
 
 1. **Manutenibilidade:** Código frontend 30% mais simples e focado em UI
 2. **Consistência:** Regras de negócio centralizadas no backend
@@ -1180,13 +2768,230 @@ Este plano de refatoração visa transformar o frontend SGC de um protótipo com
 5. **Testabilidade:** Lógica de negócio 100% testável no backend
 6. **Escalabilidade:** Fácil adicionar novos clientes (mobile, API pública)
 
-**Esforço Total Estimado:** 9-12 semanas (2-3 sprints de 3-4 semanas)
+### Esforço Total Estimado
 
-**Priorização:** Começar pela Fase 1 (validações críticas) pois tem maior impacto na segurança e qualidade.
+**9-12 semanas** (2-3 sprints de 3-4 semanas)
+
+### Priorização
+
+Começar pela **Fase 1 (validações críticas)** pois tem maior impacto na segurança e qualidade.
+
+---
+
+## 13. Guia Rápido para Agentes de IA
+
+### Se você está começando agora
+
+1. **Leia primeiro:**
+   - [ ] AGENTS.md (convenções do projeto)
+   - [ ] Este documento completo (entenda o contexto)
+   - [ ] Seção 8 (Plano de Implementação)
+
+2. **Escolha sua tarefa:**
+   - Se não especificado: Comece pela Fase 1, Tarefa REF-002 (mais simples)
+   - Se especificado: Vá para a seção indicada
+
+3. **Execute:**
+   - Siga "Passos de Implementação para o Agente"
+   - Execute cada "Comando de Verificação"
+   - Marque cada item da "Checklist"
+   - Verifique "Critérios de Sucesso"
+
+4. **Valide:**
+   - Testes passam?
+   - TypeCheck passa?
+   - Lint passa?
+   - Funcionalidade operacional?
+
+5. **Finalize:**
+   - Commit com mensagem apropriada
+   - Avance para próxima tarefa ou peça orientação
+
+### Comandos Essenciais (Resumo)
+
+```bash
+# Verificação rápida completa
+./gradlew :backend:compileJava && \
+./gradlew :backend:test && \
+cd frontend && \
+npm run typecheck && \
+npm run lint
+
+# Se tudo passar, você está pronto para commit
+git add .
+git commit -m "refactor(modulo): descrição"
+git push
+```
+
+### Quando Pedir Ajuda
+
+Peça orientação se:
+- Testes falharem após 2 tentativas de correção
+- Encontrar código que contradiz AGENTS.md
+- Não entender uma regra de negócio
+- Precisar modificar mais de 10 arquivos para uma tarefa simples
+- Encontrar problema de design/arquitetura
+- Migration de banco de dados for necessária
+
+### Boas Práticas para Agentes
+
+**FAÇA:**
+- ✅ Leia toda a seção relevante antes de começar
+- ✅ Execute testes após cada mudança
+- ✅ Faça commits pequenos e frequentes
+- ✅ Use Português em todo código e mensagens
+- ✅ Siga convenções do AGENTS.md religiosamente
+- ✅ Documente decisões não óbvias
+- ✅ Teste manualmente funcionalidades críticas
+
+**NÃO FAÇA:**
+- ❌ Pular comandos de verificação
+- ❌ Modificar código não relacionado
+- ❌ Criar novas convenções sem aprovação
+- ❌ Usar inglês em código/mensagens
+- ❌ Fazer commits gigantes
+- ❌ Ignorar testes falhando
+- ❌ Deixar TODO/FIXME sem documentar
+
+---
+
+## 14. Referências Rápidas
+
+### Estrutura de Arquivos Backend
+
+```
+backend/src/main/java/sgc/
+├── comum/           # Exceções, DTOs base, utilitários
+│   └── erros/       # ErroApi, ErroDadosInvalidos, etc
+├── processo/        # Processos (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+├── subprocesso/     # Workflows de cada unidade
+├── mapa/            # Mapas de competências
+├── atividade/       # CRUD de atividades
+├── diagnostico/     # [CRIAR NA FASE 2] Diagnósticos
+├── unidade/         # Estrutura organizacional
+├── notificacao/     # Notificações por email
+├── alerta/          # Alertas UI
+└── painel/          # Dashboards
+```
+
+### Estrutura de Arquivos Frontend
+
+```
+frontend/src/
+├── components/      # Componentes reutilizáveis
+├── views/          # Páginas da aplicação
+├── stores/         # Estado global (Pinia)
+├── services/       # Comunicação com API
+├── router/         # Rotas (Vue Router)
+├── utils/          # Funções utilitárias
+└── types/          # Definições TypeScript
+```
+
+### Exceções Comuns (Backend)
+
+```java
+// Usar estas exceções da hierarquia ErroApi
+throw new ErroEntidadeNaoEncontrada("Recurso não encontrado");
+throw new ErroDadosInvalidos("Dados inválidos: " + detalhes);
+throw new ErroOperacaoInvalida("Operação não permitida");
+throw new ErroAutenticacao("Não autenticado");
+throw new ErroAutorizacao("Sem permissão");
+```
+
+### Padrão de Service (Backend)
+
+```java
+@Service
+@Transactional
+public class ExemploService {
+    private final ExemploRepo repo;
+    
+    public ExemploDTO criar(ExemploRequest request) {
+        // 1. Validar regras de negócio
+        validarRegras(request);
+        
+        // 2. Criar entidade
+        Exemplo exemplo = new Exemplo();
+        exemplo.setDescricao(request.getDescricao());
+        
+        // 3. Persistir
+        exemplo = repo.save(exemplo);
+        
+        // 4. Converter para DTO e retornar
+        return ExemploMapper.toDTO(exemplo);
+    }
+    
+    private void validarRegras(ExemploRequest request) {
+        // Bean Validation já validou campos obrigatórios
+        // Aqui validamos regras de negócio
+        if (regra1Violada()) {
+            throw new ErroDadosInvalidos("Mensagem clara em português");
+        }
+    }
+}
+```
+
+### Padrão de Store (Frontend)
+
+```typescript
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { exemploService } from '@/services/exemploService';
+
+export const useExemploStore = defineStore('exemplo', () => {
+  const items = ref<Item[]>([]);
+  const loading = ref(false);
+  
+  async function buscar() {
+    loading.value = true;
+    try {
+      items.value = await exemploService.buscar();
+    } finally {
+      loading.value = false;
+    }
+  }
+  
+  return { items, loading, buscar };
+});
+```
+
+### Padrão de Service (Frontend)
+
+```typescript
+// services/exemploService.ts
+import apiClient from './apiClient';
+
+export interface ExemploDTO {
+  codigo: number;
+  descricao: string;
+}
+
+export const exemploService = {
+  async buscar(): Promise<ExemploDTO[]> {
+    const response = await apiClient.get('/api/exemplos');
+    return response.data;
+  },
+  
+  async criar(dados: Partial<ExemploDTO>): Promise<ExemploDTO> {
+    const response = await apiClient.post('/api/exemplos', dados);
+    return response.data;
+  }
+};
+```
 
 ---
 
 **Documento elaborado por:** GitHub Copilot  
 **Data de elaboração:** 07 de dezembro de 2025  
-**Versão:** 1.0  
-**Status:** Proposta para revisão
+**Versão:** 2.0 (Adaptado para Agentes de IA)  
+**Status:** Guia de Implementação para Agentes
+
+**Changelog:**
+- **v2.0 (07/12/2025):** Adaptado para uso por agentes de IA
+  - Adicionadas instruções específicas para agentes
+  - Adicionados comandos de verificação detalhados
+  - Adicionados critérios de sucesso mensuráveis
+  - Adicionadas checklists completas
+  - Adicionados passos de implementação detalhados
+  - Adicionado guia rápido e referências
+- **v1.0 (07/12/2025):** Versão inicial para equipe humana
