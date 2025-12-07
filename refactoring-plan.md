@@ -11,12 +11,14 @@
 ### ✅ Fases Concluídas
 
 #### Fase 1: Validações Críticas (COMPLETA)
+
 - ✅ REF-001: CadAtividades - Validações movidas para backend
 - ✅ REF-002: CadMapa - Bean Validation implementado
 - ✅ REF-003: CadProcesso - Validações de data e elegibilidade no backend
 - **Resultado**: 6 novos testes, 552 testes passando, ~70 linhas removidas do frontend
 
 #### Fase 3: Otimização de DTOs (COMPLETA)
+
 - ✅ Labels em português para `TipoProcesso` e `SituacaoProcesso`
 - ✅ Criado `FormatadorData` para formatação centralizada
 - ✅ Campos formatados em `ProcessoDto` e `ProcessoDetalheDto`
@@ -36,6 +38,7 @@
 #### Contexto
 
 Atualmente, `DiagnosticoEquipe.vue` e `OcupacoesCriticas.vue` contêm lógica de negócio que deveria estar no backend:
+
 - Validação de avaliações pendentes (frontend, linhas 225-230)
 - Inicialização com valores padrão (frontend, linhas 176-186)
 - Cálculo de gaps e criticidades (não implementado)
@@ -124,6 +127,7 @@ npm test  # E2E
 ##### REF-005: Árvore de Unidades com Filtros
 
 **Problema Atual:**
+
 - `ArvoreUnidades.vue` (linhas 89-103): Filtragem de elegibilidade no frontend
 - `ArvoreUnidades.vue` (linhas 105-120): Cálculo de `isElegivel` no frontend
 
@@ -135,11 +139,13 @@ GET /api/unidades/arvore?tipoProcesso={tipo}&ocultarRaiz={boolean}
 ```
 
 Backend deve:
+
 - Calcular `isElegivel` baseado no tipo de processo
 - Retornar árvore sem SEDOC se `ocultarRaiz=true`
 - Filtrar unidades não elegíveis se solicitado
 
 **Arquivos:**
+
 - `backend/src/main/java/sgc/unidade/UnidadeController.java`
 - `backend/src/main/java/sgc/unidade/UnidadeService.java`
 - `frontend/src/components/ArvoreUnidades.vue` (~30 linhas a remover)
@@ -149,18 +155,21 @@ Backend deve:
 ##### REF-006: Ordenação de Listas
 
 **Problema Atual:**
+
 - Múltiplos componentes ordenam dados localmente
 - Lógica de ordenação duplicada
 
 **Solução:**
 
 Adicionar query params de ordenação:
-```java
+
+```code
 GET /api/processos?sortBy={campo}&sortOrder={asc|desc}
 GET /api/atividades?sortBy={campo}&sortOrder={asc|desc}
 ```
 
 **Arquivos:**
+
 - Controllers principais (Processo, Atividade, etc.)
 - Componentes Vue que fazem ordenação local
 
@@ -177,6 +186,7 @@ GET /api/atividades?sortBy={campo}&sortOrder={asc|desc}
 ##### REF-007: Simplificar Stores
 
 **Problema Atual:**
+
 - Stores contêm computeds complexos
 - Lógica de transformação de dados nas stores
 - Mapeamentos que deveriam estar no backend
@@ -189,6 +199,7 @@ GET /api/atividades?sortBy={campo}&sortOrder={asc|desc}
 4. Usar dados do backend diretamente
 
 **Arquivos:**
+
 - `frontend/src/stores/processos.ts`
 - `frontend/src/stores/subprocessos.ts`
 - `frontend/src/stores/atividades.ts`
@@ -206,6 +217,7 @@ Estas melhorias podem ser feitas a qualquer momento para completar 100% da Fase 
 **Benefício:** ~40 linhas removidas
 
 **Passos:**
+
 1. Atualizar `SubprocessoCards.vue` para receber `situacaoLabel` como prop
 2. Atualizar `SubprocessoView.vue` para passar label ao invés de enum
 3. Remover função `situacaoLabel` de `utils/index.ts`
@@ -217,6 +229,7 @@ Estas melhorias podem ser feitas a qualquer momento para completar 100% da Fase 
 **Benefício:** ~20 linhas removidas
 
 **Passos:**
+
 1. Identificar usos de `formatDateBR` no frontend
 2. Substituir por campos `*Formatada` onde disponíveis
 3. Manter `formatDateBR` apenas para casos sem campo formatado
@@ -307,6 +320,7 @@ frontend/src/
 **Status:** Fases 1 e 3 concluídas, Fase 2 é a próxima prioridade
 
 **Changelog:**
+
 - **v3.0 (07/12/2025 20:22):** Plano enxuto focado em fases pendentes
   - Resumidas Fases 1 e 3 (concluídas)
   - Detalhada Fase 2 (próxima prioridade)
