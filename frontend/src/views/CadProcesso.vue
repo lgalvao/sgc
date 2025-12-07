@@ -279,41 +279,8 @@ function limparCampos() {
   unidadesSelecionadas.value = [];
 }
 
-
-// Helper para buscar unidade na árvore
-function findUnidadeById(codigo: number, nodes: Unidade[]): Unidade | null {
-  for (const node of nodes) {
-    if (node.codigo === codigo) return node;
-    if (node.filhas) {
-      const found = findUnidadeById(codigo, node.filhas);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
 async function salvarProcesso() {
-  if (!descricao.value) {
-    mostrarAlerta('danger', "Dados incompletos", "Preencha a descrição.");
-    return;
-  }
-
-  // Filtrar apenas unidades elegíveis
-  const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
-    const unidade = findUnidadeById(id, unidadesStore.unidades);
-    return unidade && unidade.isElegivel;
-  });
-
-  if (unidadesFiltradas.length === 0) {
-    mostrarAlerta('danger', "Dados incompletos", "Pelo menos uma unidade participante elegível deve ser incluída.");
-    return;
-  }
-
-  if (!dataLimite.value) {
-    mostrarAlerta('danger', "Dados incompletos", "Preencha a data limite.");
-    return;
-  }
-
+  // Validações agora são feitas no backend via Bean Validation
   try {
     if (processoEditando.value) {
       const request: AtualizarProcessoRequest = {
@@ -321,20 +288,19 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesFiltradas,
+        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
       await processosStore.atualizarProcesso(
         processoEditando.value.codigo,
         request,
       );
-      // Sucesso! Redirecionar. O alerta não aparecerá na outra tela, mas resolve o bloqueio.
       await router.push("/painel");
     } else {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesFiltradas,
+        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
       await processosStore.criarProcesso(request);
       await router.push("/painel");
@@ -347,19 +313,7 @@ async function salvarProcesso() {
 }
 
 async function abrirModalConfirmacao() {
-  if (!descricao.value) {
-    mostrarAlerta('danger', "Dados incompletos", "Preencha a descrição.");
-    return;
-  }
-  if (unidadesSelecionadas.value.length === 0) {
-    mostrarAlerta('danger', "Dados incompletos", "Pelo menos uma unidade participante deve ser incluída.");
-    return;
-  }
-  if (!dataLimite.value) {
-    mostrarAlerta('danger', "Dados incompletos", "Preencha a data limite.");
-    return;
-  }
-
+  // Validações serão feitas no backend ao criar/iniciar o processo
   mostrarModalConfirmacao.value = true;
 }
 
@@ -374,17 +328,13 @@ async function confirmarIniciarProcesso() {
 
   if (!codigoProcesso) {
     // Se não houver processo salvo, cria antes de iniciar
-    const unidadesFiltradas = unidadesSelecionadas.value.filter(id => {
-      const unidade = findUnidadeById(id, unidadesStore.unidades);
-      return unidade && unidade.isElegivel;
-    });
-
+    // Backend valida elegibilidade das unidades
     try {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesFiltradas,
+        unidades: unidadesSelecionadas.value,
       };
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;

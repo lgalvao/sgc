@@ -110,6 +110,55 @@ public class ProcessoControllerTest {
 
     @Test
     @WithMockUser
+    void criar_ProcessoComDataLimiteNull_RetornaBadRequest() throws Exception {
+        var req = new CriarProcessoReq(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, null, List.of(1L));
+
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void criar_ProcessoComDataLimitePassada_RetornaBadRequest() throws Exception {
+        var req =
+                new CriarProcessoReq(
+                        NOVO_PROCESSO,
+                        TipoProcesso.MAPEAMENTO,
+                        LocalDateTime.now().minusDays(1), // Data no passado
+                        List.of(1L));
+
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void criar_ProcessoComListaUnidadesVazia_RetornaBadRequest() throws Exception {
+        var req =
+                new CriarProcessoReq(
+                        NOVO_PROCESSO,
+                        TipoProcesso.MAPEAMENTO,
+                        LocalDateTime.now().plusDays(30),
+                        List.of()); // Lista vazia
+
+        mockMvc.perform(
+                        post(API_PROCESSOS)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
         var dto =
                 ProcessoDto.builder()
@@ -179,7 +228,12 @@ public class ProcessoControllerTest {
     @WithMockUser
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
         var req =
-                new AtualizarProcessoReq(999L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
+                new AtualizarProcessoReq(
+                        999L,
+                        "Teste",
+                        TipoProcesso.MAPEAMENTO,
+                        LocalDateTime.now().plusDays(30),
+                        List.of(1L));
 
         doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
                 .when(processoService)
@@ -196,7 +250,13 @@ public class ProcessoControllerTest {
     @Test
     @WithMockUser
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        var req = new AtualizarProcessoReq(1L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
+        var req =
+                new AtualizarProcessoReq(
+                        1L,
+                        "Teste",
+                        TipoProcesso.MAPEAMENTO,
+                        LocalDateTime.now().plusDays(30),
+                        List.of(1L));
 
         doThrow(new IllegalStateException())
                 .when(processoService)

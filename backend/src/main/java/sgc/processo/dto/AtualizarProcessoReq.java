@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,8 @@ public class AtualizarProcessoReq {
     @NotNull(message = "Tipo do processo é obrigatório")
     private TipoProcesso tipo;
 
+    @NotNull(message = "Preencha a data limite")
+    @Future(message = "A data limite deve ser futura")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dataLimiteEtapa1;
 
