@@ -3070,10 +3070,28 @@ export const exemploService = {
 
 **Documento elaborado por:** GitHub Copilot  
 **Data de elaboração:** 07 de dezembro de 2025  
-**Versão:** 2.1 (Atualizado pós-análise de viabilidade)  
-**Status:** Guia de Implementação para Agentes - APROVADO PARA EXECUÇÃO
+**Versão:** 2.2 (Fase 1 concluída)  
+**Status:** EM EXECUÇÃO - Fase 1 ✅ Completa
 
 **Changelog:**
+- **v2.2 (07/12/2025 20:00):** Fase 1 concluída com sucesso
+  - ✅ **REF-002 (CadMapa):** Validações Bean Validation implementadas (1h)
+    - Adicionado `@NotEmpty` em `CompetenciaReq.atividadesIds`
+    - Criados 3 novos testes de validação
+    - Removidas validações do frontend
+    - Commit: `32febc3e`
+  - ✅ **REF-003 (CadProcesso):** Validações de data e campos obrigatórios (2h)
+    - Adicionado `@NotNull` e `@Future` em `dataLimiteEtapa1`
+    - Criados 3 novos testes de validação
+    - Removidas ~35 linhas de validação do frontend
+    - Commit: `a3ebe202`
+  - ✅ **REF-001 (CadAtividades):** Validações duplicadas removidas (30min)
+    - Backend já implementava validações necessárias
+    - Removidas ~30 linhas de código frontend
+    - Commit: `3d05aca5`
+  - **Resultados:** 6 novos testes, 552 testes passando, ~70 linhas removidas
+  - **Tempo total Fase 1:** 3.5 horas
+  - **Próxima fase:** Fase 3 (DTOs Avançados)
 - **v2.1 (07/12/2025):** Atualizado com descobertas da análise de viabilidade
   - Adicionada seção "ATUALIZAÇÕES PÓS-ANÁLISE DE VIABILIDADE"
   - Descoberta: Backend já implementa validações críticas (REF-001)
