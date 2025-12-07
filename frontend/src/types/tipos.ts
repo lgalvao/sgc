@@ -147,6 +147,12 @@ export interface Processo {
     dataFinalizacao?: string;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: ProcessoResumo[];
+    // Campos formatados do backend
+    dataLimiteFormatada?: string;
+    dataCriacaoFormatada?: string;
+    dataFinalizacaoFormatada?: string;
+    situacaoLabel?: string;
+    tipoLabel?: string;
 }
 
 export interface ProcessoResumo {
@@ -281,6 +287,9 @@ export interface UnidadeParticipante {
     dataLimite: string;
     mapaCodigo?: number;
     filhos: UnidadeParticipante[];
+    // Campos formatados do backend
+    dataLimiteFormatada?: string;
+    situacaoLabel?: string;
 }
 
 export interface SubprocessoPermissoes {
