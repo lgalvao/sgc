@@ -11,29 +11,35 @@ Pré-condições:
 Fluxo principal:
 
 1. ADMIN escolhe o processo de mapeamento desejado.
-2. O sistema mostra tela Detalhes do processo.
-3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa
-   ajustado'.
-4. O sistema mostra a tela Detalhes de subprocesso.
-5. ADMIN clica no card Mapa de Competências.
-6. O sistema mostra a tela Edição de mapa preenchida com os dados do mapa de competências da unidade.
-7. ADMIN clica no botão Disponibilizar.
-8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da
-   unidade.
 
-   8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências
-   ainda permanecem sem associação.
+2. O sistema mostra tela Detalhes do processo.
+
+3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa ajustado'.
+
+4. O sistema mostra a tela Detalhes de subprocesso.
+
+5. ADMIN clica no card Mapa de Competências.
+
+6. O sistema mostra a tela Edição de mapa preenchida com os dados do mapa de competências da unidade.
+
+7. ADMIN clica no botão Disponibilizar.
+
+8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da unidade.
+
+   8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências ainda permanecem sem associação.
 
 9. O sistema verifica se todas as atividades foram associadas a pelo menos uma competência.
 
-   9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades
-   ainda estão sem associação a competências.
+   9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades ainda estão sem associação a competências.
 
 10. O sistema mostra uma janela modal com as seguintes características:
 
     10.1. Título: 'Disponibilização do mapa de competências'
+
     10.2. Campo de data, de preenchimento obrigatório, para armazenar a Data limite para a validação do mapa
+    
     10.3. Campo de texto formatado, de preenchimento opcional, para registro de Observações
+    
     10.4. Botões Disponibilizar e Cancelar.
 
 11. Caso ADMIN escolha Cancelar, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela
@@ -50,6 +56,7 @@ Fluxo principal:
 
 16. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
+    ```text
     Assunto: SGC: Mapa de competências disponibilizado
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
@@ -57,10 +64,12 @@ Fluxo principal:
     O mapa de competências de sua unidade foi disponibilizado no contexto do processo [DESCRICAO_PROCESSO].
 
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+    ```
 
 17. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
     abaixo:
 
+    ```text
     Assunto: SGC: Mapa de competências disponibilizado - [SIGLA_UNIDADE_SUBPROCESSO]
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
@@ -69,6 +78,7 @@ Fluxo principal:
     processo [DESCRIÇÃO DO PROCESSO].
 
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+    ```
 
 18. O sistema cria internamente um alerta:
 

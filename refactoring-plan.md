@@ -85,6 +85,123 @@ Refs: #issue (se aplicável)
 
 ---
 
+## ⚠️ ATUALIZAÇÕES PÓS-ANÁLISE DE VIABILIDADE
+
+**Data da Análise:** 07 de dezembro de 2025  
+**Status:** ✅ Plano confirmado como VIÁVEL com ajustes
+
+### Descobertas Importantes
+
+#### 1. Validações Já Implementadas no Backend
+
+**CRÍTICO:** O backend **já implementa** validações que o plano original assume não existirem:
+
+- ✅ `SubprocessoCadastroController.disponibilizarCadastro()` (linhas 67-94)
+  - **JÁ VALIDA** atividades sem conhecimento
+  - **JÁ RETORNA** erro estruturado com lista de atividades faltantes
+  - Usa `ErroValidacao` com detalhes em `Map<String, Object>`
+
+- ✅ `SubprocessoCadastroController.disponibilizarRevisao()` (linhas 106-132)
+  - Mesma validação para revisões
+  - Código duplicado entre os dois métodos
+
+**Impacto na REF-001:**
+- Estimativa original: 2-3 horas
+- **Estimativa ajustada: 30-60 minutos**
+- Tarefa se resume a:
+  1. Remover validações do frontend (`CadAtividades.vue` linhas 631-697)
+  2. Simplificar método `disponibilizarCadastro()` no frontend
+  3. Testar que erro do backend é exibido corretamente
+
+#### 2. Módulo Diagnóstico Não Existe
+
+**Confirmado:** Não existe módulo `sgc.diagnostico` no backend
+
+**Implicação:**
+- Fase 2 é realmente a mais complexa
+- Estimativa de 3-4 semanas está correta
+- Requer criação de migrations de banco de dados
+
+#### 3. Módulo `analise` Existe
+
+**Descoberta:** Existe módulo `sgc.analise` que pode estar relacionado
+
+**Ação Necessária:**
+- Verificar se `analise` já implementa parte do diagnóstico
+- Evitar duplicação de funcionalidades
+- Coordenar nomenclatura e responsabilidades
+
+### Ajustes no Plano de Execução
+
+#### Ordem Original (Plano v2.0)
+```
+Fase 1: Validações (2-3 sem)
+Fase 2: Diagnóstico (3-4 sem)
+Fase 3: DTOs (2 sem)
+Fase 4: Filtros/Sort (1-2 sem)
+Fase 5: Stores (1 sem)
+```
+
+#### ✅ Ordem Ajustada (Recomendada)
+```
+0. PREPARAÇÃO (1 dia)
+   - Verificar implementações existentes
+   - Mapear validações duplicadas
+   - Identificar regras de negócio no frontend
+
+1. FASE 1 - REVISADA (1-2 semanas)
+   REF-002 (CadMapa) → REF-003 (CadProcesso) → REF-001 (CadAtividades - simplificada)
+   
+2. FASE 3 (2 semanas) - ANTECIPADA
+   DTOs autocontidos (facilita Fase 2)
+   
+3. FASE 4 (1-2 semanas)
+   Filtragens e ordenações
+   
+4. FASE 2 (3-4 semanas) - ADIADA
+   Módulo Diagnóstico (mais complexo, aprende com fases anteriores)
+   
+5. FASE 5 (1 semana)
+   Refatoração de stores (polimento final)
+```
+
+**Justificativa:**
+- Fase 3 antes de Fase 2: DTOs enriquecidos facilitam implementação do módulo diagnóstico
+- Fase 2 por último: Permite aplicar aprendizados das fases anteriores
+- Menor risco de retrabalho
+
+### Checklist Pré-Execução Obrigatória
+
+Antes de iniciar qualquer tarefa:
+
+- [ ] Verificar se funcionalidade já existe no backend:
+  ```bash
+  grep -r "nome_da_funcao" backend/src/main/java/sgc/
+  ```
+- [ ] Verificar testes existentes:
+  ```bash
+  ./gradlew :backend:test --tests "sgc.modulo.*" --info
+  ```
+- [ ] Garantir que todos os testes passam:
+  ```bash
+  ./gradlew :backend:test
+  cd frontend && npm run typecheck && npm run lint
+  npm test
+  ```
+- [ ] Criar branch específica:
+  ```bash
+  git checkout -b refactor/fase-X-tarefa-REF-XXX
+  ```
+
+### Pontos de Atenção Adicionais
+
+1. **Migrations de Banco**: Verificar se projeto usa Flyway/Liquibase antes da Fase 2
+2. **Módulo `analise`**: Investigar relação com diagnóstico antes de criar novo módulo
+3. **Testes E2E**: Executar após cada tarefa, não apenas ao final da fase
+4. **Validações Duplicadas**: Sempre verificar backend antes de implementar
+
+---
+
 ## Sumário Executivo
 
 Após análise detalhada dos 14 views e 23 componentes Vue.js, identificamos múltiplas áreas onde o frontend contém lógica que deveria estar no backend. Este documento detalha todas as mudanças necessárias para criar uma separação clara de responsabilidades entre frontend e backend, garantindo que:
@@ -132,15 +249,21 @@ Após análise detalhada dos 14 views e 23 componentes Vue.js, identificamos mú
 
 **ID da Tarefa:** REF-001  
 **Prioridade:** Alta  
-**Estimativa:** 2-3 horas
+**Estimativa Original:** 2-3 horas  
+**⚠️ Estimativa Ajustada:** 30-60 minutos (validação já existe no backend)
+
+> **📝 ATUALIZAÇÃO (07/12/2025):**  
+> Análise de viabilidade confirmou que `SubprocessoCadastroController.disponibilizarCadastro()` (linhas 67-94) **JÁ IMPLEMENTA** a validação de atividades sem conhecimento.  
+> **Tarefa simplificada:** Remover validações do frontend e testar integração com erro do backend.
 
 **Problema Atual:**
 - **Linhas 631-635:** Validação de atividades sem conhecimento feita no frontend
 - **Linhas 669-697:** Lógica complexa de validação de situação antes de disponibilizar
 - **Linhas 683-694:** Validação e montagem de mensagens de erro no frontend
+- **❗ DUPLICAÇÃO:** Backend já valida tudo isso em `SubprocessoCadastroController`
 
 ```typescript
-// Código atual (frontend)
+// Código atual (frontend) - DUPLICADO
 function validarAtividades(): Atividade[] {
   return atividades.value.filter(
     (atividade) => atividade.conhecimentos.length === 0,
@@ -166,117 +289,101 @@ function disponibilizarCadastro() {
 }
 ```
 
-**Refatoração Recomendada:**
+**Backend Existente (JÁ IMPLEMENTADO):**
 
-1. **Criar endpoint no backend:** `POST /api/subprocessos/{id}/disponibilizar-cadastro`
-2. **Backend deve:**
-   - Validar situação do subprocesso
-   - Validar completude das atividades (todas devem ter conhecimentos)
-   - Retornar erro HTTP 400 com detalhes estruturados se validação falhar
-   - Executar a disponibilização se tudo estiver OK
-
-```typescript
-// Código refatorado (frontend)
-async function disponibilizarCadastro() {
-  if (!codSubrocesso.value) return;
-  
-  try {
-    await subprocessosStore.disponibilizarCadastro(codSubrocesso.value);
-    await router.push("/painel");
-  } catch (error) {
-    // O backend retorna erro estruturado com detalhes
-    // O interceptor do Axios já trata e exibe
-  }
-}
-```
-
-**Backend esperado:**
 ```java
-// Response de erro estruturado
-{
-  "status": 400,
-  "message": "Cadastro não pode ser disponibilizado",
-  "details": {
-    "atividadesSemConhecimento": [
-      {"codigo": 1, "descricao": "Desenvolver APIs"},
-      {"codigo": 2, "descricao": "Fazer testes"}
-    ],
-    "situacaoAtual": "CADASTRO_EM_ANDAMENTO",
-    "situacaoEsperada": "CADASTRO_EM_ANDAMENTO"
-  }
+// SubprocessoCadastroController.java (linhas 67-94)
+@PostMapping("/{codigo}/cadastro/disponibilizar")
+public ResponseEntity<RespostaDto> disponibilizarCadastro(
+        @PathVariable("codigo") Long codSubprocesso,
+        @AuthenticationPrincipal Object principal) {
+    String tituloUsuario = extractTituloUsuario(principal);
+    Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+    
+    // ✅ VALIDAÇÃO JÁ EXISTE
+    List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
+    if (faltando != null && !faltando.isEmpty()) {
+        var lista = faltando.stream()
+                .map(a -> Map.of(
+                        "codigo", a.getCodigo(),
+                        "descricao", a.getDescricao()))
+                .toList();
+        throw new ErroValidacao(
+                "Existem atividades sem conhecimentos associados.",
+                Map.of("atividadesSemConhecimento", lista));
+    }
+    
+    subprocessoWorkflowService.disponibilizarCadastro(codSubprocesso, usuario);
+    return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
 }
 ```
+
+**Refatoração Recomendada (SIMPLIFICADA):**
+
+Como o backend já implementa tudo, a tarefa se resume a:
+
+1. **Simplificar frontend** (`frontend/src/views/CadAtividades.vue`):
+   ```typescript
+   // Código refatorado - SIMPLIFICADO
+   async function disponibilizarCadastro() {
+     if (!codSubprocesso.value) return;
+     
+     try {
+       // Endpoint já existe: POST /api/subprocessos/{codigo}/cadastro/disponibilizar
+       await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
+       await router.push("/painel");
+     } catch (error) {
+       // Backend retorna ErroValidacao com detalhes
+       // Interceptor Axios já trata e exibe
+     }
+   }
+   ```
+
+2. **Remover código desnecessário**:
+   - Remover função `validarAtividades()` (linhas 631-635)
+   - Remover validação de situação (linhas 669-697)
+   - Remover montagem de mensagens de erro (linhas 683-694)
 
 **Arquivos Afetados:**
-- `frontend/src/views/CadAtividades.vue`
-- `frontend/src/stores/subprocessos.ts`
-- `frontend/src/services/subprocessoService.ts`
-- `backend/src/main/java/sgc/subprocesso/` (novo endpoint)
+- `frontend/src/views/CadAtividades.vue` (APENAS este arquivo!)
 
 **Passos de Implementação para o Agente:**
 
-1. **Criar endpoint no backend** (`backend/src/main/java/sgc/subprocesso/SubprocessoController.java`):
-   ```java
-   @PostMapping("/{id}/disponibilizar-cadastro")
-   public ResponseEntity<Void> disponibilizarCadastro(@PathVariable Integer id) {
-       subprocessoService.disponibilizarCadastro(id);
-       return ResponseEntity.ok().build();
-   }
+1. **⚠️ PRIMEIRO: Verificar endpoint existente**:
+   ```bash
+   # Confirmar que endpoint existe e funciona
+   grep -A 30 "disponibilizarCadastro" \
+     backend/src/main/java/sgc/subprocesso/SubprocessoCadastroController.java
    ```
 
-2. **Implementar lógica no service** (`backend/src/main/java/sgc/subprocesso/SubprocessoService.java`):
-   - Validar situação do subprocesso
-   - Buscar todas as atividades do subprocesso
-   - Validar que todas têm conhecimentos associados
-   - Lançar `ErroDadosInvalidos` com detalhes se falhar
-   - Executar disponibilização se OK
-
-3. **Criar DTO de erro estruturado** (se ainda não existir):
-   ```java
-   // backend/src/main/java/sgc/comum/erros/DetalhesErroValidacao.java
-   public class DetalhesErroValidacao {
-       private String campo;
-       private String mensagem;
-       private Object valorRejeitado;
-       // getters, setters, construtores
-   }
+2. **Verificar se store já chama o endpoint correto**:
+   ```bash
+   # Verificar implementação atual da store
+   grep -A 10 "disponibilizarCadastro" frontend/src/stores/subprocessos.ts
    ```
 
-4. **Atualizar service no frontend** (`frontend/src/services/subprocessoService.ts`):
-   ```typescript
-   async disponibilizarCadastro(codSubprocesso: number): Promise<void> {
-     await apiClient.post(`/api/subprocessos/${codSubprocesso}/disponibilizar-cadastro`);
-   }
-   ```
+3. **Simplificar CadAtividades.vue**:
+   - Abrir `frontend/src/views/CadAtividades.vue`
+   - Localizar método `disponibilizarCadastro()` (linha ~669)
+   - Remover toda lógica de validação
+   - Deixar apenas chamada para store e navegação
+   - Remover função `validarAtividades()` (linha ~631)
 
-5. **Atualizar store** (`frontend/src/stores/subprocessos.ts`):
-   ```typescript
-   async disponibilizarCadastro(codSubprocesso: number) {
-     await subprocessoService.disponibilizarCadastro(codSubprocesso);
-   }
-   ```
-
-6. **Simplificar view** (`frontend/src/views/CadAtividades.vue`):
-   - Remover funções `validarAtividades()` (linhas 631-635)
-   - Simplificar `disponibilizarCadastro()` para apenas chamar store e navegar
-   - Remover lógica de validação de situação (linhas 669-697)
+4. **Testar erro do backend**:
+   - Criar cenário com atividade sem conhecimento
+   - Tentar disponibilizar
+   - Verificar que erro do backend é exibido corretamente
 
 **Comandos de Verificação:**
 
 ```bash
-# 1. Verificar que o código compila (backend)
-./gradlew :backend:compileJava
-
-# 2. Executar testes do módulo subprocesso
-./gradlew :backend:test --tests "sgc.subprocesso.*"
-
-# 3. Verificar tipagem TypeScript (frontend)
+# 1. Verificar tipagem TypeScript (frontend)
 cd frontend && npm run typecheck
 
-# 4. Verificar lint (frontend)
+# 2. Verificar lint (frontend)
 cd frontend && npm run lint
 
-# 5. Executar servidor e testar manualmente
+# 3. Executar servidor e testar manualmente
 ./gradlew bootRun
 # Em outro terminal:
 cd frontend && npm run dev
@@ -285,55 +392,35 @@ cd frontend && npm run dev
 
 **Critérios de Sucesso:**
 
-- [ ] Endpoint `POST /api/subprocessos/{id}/disponibilizar-cadastro` existe e responde
-- [ ] Backend valida situação correta antes de disponibilizar
-- [ ] Backend valida que todas atividades têm conhecimentos
-- [ ] Backend retorna erro 400 com detalhes estruturados em caso de falha
-- [ ] Frontend chama endpoint e trata erro genérico via interceptor
+- [ ] ⚠️ **CRÍTICO**: Endpoint `POST /api/subprocessos/{codigo}/cadastro/disponibilizar` JÁ EXISTE
+- [ ] Frontend não faz validação de atividades sem conhecimento
+- [ ] Frontend não faz validação de situação
+- [ ] Frontend chama endpoint e trata erro via interceptor
 - [ ] View CadAtividades.vue tem ~50-70 linhas a menos
-- [ ] Todos os testes passam: `./gradlew :backend:test`
 - [ ] TypeScript compila sem erros: `npm run typecheck`
 - [ ] Lint passa sem erros: `npm run lint`
 - [ ] Funcionalidade de disponibilizar cadastro continua funcionando
+- [ ] Mensagem de erro do backend é exibida corretamente
 
-**Testes a Criar:**
+**Testes a Verificar (NÃO criar novos):**
 
-```java
-// backend/src/test/java/sgc/subprocesso/SubprocessoServiceTest.java
-@Test
-void deveDisponibilizarCadastroQuandoValido() {
-    // Arrange: criar subprocesso com atividades válidas
-    // Act: chamar disponibilizarCadastro
-    // Assert: verificar que situação mudou
-}
-
-@Test
-void deveLancarErroQuandoAtividadeSemConhecimento() {
-    // Arrange: criar subprocesso com atividade sem conhecimento
-    // Act & Assert: verificar que lança ErroDadosInvalidos
-}
-
-@Test
-void deveLancarErroQuandoSituacaoInvalida() {
-    // Arrange: criar subprocesso em situação incorreta
-    // Act & Assert: verificar que lança ErroOperacaoInvalida
-}
+```bash
+# Verificar testes existentes do backend
+./gradlew :backend:test --tests "sgc.subprocesso.*" --info | grep -i "disponibilizar"
 ```
 
 **Checklist de Implementação:**
 
-- [ ] Ler e entender código atual em CadAtividades.vue (linhas 631-697)
-- [ ] Criar endpoint POST /api/subprocessos/{id}/disponibilizar-cadastro
-- [ ] Implementar validações no SubprocessoService
-- [ ] Criar testes unitários para o service (mínimo 3 testes)
-- [ ] Atualizar subprocessoService.ts
-- [ ] Atualizar store subprocessos.ts
-- [ ] Simplificar CadAtividades.vue removendo validações
-- [ ] Executar `./gradlew :backend:test` - DEVE PASSAR
+- [ ] ⚠️ Verificar que endpoint já existe no backend
+- [ ] Verificar que store já chama endpoint correto
+- [ ] Remover função `validarAtividades()` de CadAtividades.vue
+- [ ] Remover validações de situação de CadAtividades.vue
+- [ ] Simplificar método `disponibilizarCadastro()` no frontend
 - [ ] Executar `npm run typecheck` - DEVE PASSAR
 - [ ] Executar `npm run lint` - DEVE PASSAR
-- [ ] Testar manualmente a funcionalidade
-- [ ] Commit com mensagem: "refactor(subprocesso): move validação de disponibilização para backend"
+- [ ] Testar manualmente com atividade sem conhecimento (deve mostrar erro do backend)
+- [ ] Testar manualmente com dados válidos (deve funcionar)
+- [ ] Commit: "refactor(frontend): remove validações duplicadas de CadAtividades"
 
 ---
 
@@ -2983,10 +3070,18 @@ export const exemploService = {
 
 **Documento elaborado por:** GitHub Copilot  
 **Data de elaboração:** 07 de dezembro de 2025  
-**Versão:** 2.0 (Adaptado para Agentes de IA)  
-**Status:** Guia de Implementação para Agentes
+**Versão:** 2.1 (Atualizado pós-análise de viabilidade)  
+**Status:** Guia de Implementação para Agentes - APROVADO PARA EXECUÇÃO
 
 **Changelog:**
+- **v2.1 (07/12/2025):** Atualizado com descobertas da análise de viabilidade
+  - Adicionada seção "ATUALIZAÇÕES PÓS-ANÁLISE DE VIABILIDADE"
+  - Descoberta: Backend já implementa validações críticas (REF-001)
+  - Ajustada estimativa REF-001: 2-3h → 30-60min
+  - Reordenada execução de fases: 1→3→4→2→5 (DTOs antes de Diagnóstico)
+  - Simplificados passos de implementação REF-001
+  - Adicionada checklist pré-execução obrigatória
+  - Identificados pontos de atenção: migrations, módulo `analise`, validações duplicadas
 - **v2.0 (07/12/2025):** Adaptado para uso por agentes de IA
   - Adicionadas instruções específicas para agentes
   - Adicionados comandos de verificação detalhados
@@ -2995,3 +3090,4 @@ export const exemploService = {
   - Adicionados passos de implementação detalhados
   - Adicionado guia rápido e referências
 - **v1.0 (07/12/2025):** Versão inicial para equipe humana
+
