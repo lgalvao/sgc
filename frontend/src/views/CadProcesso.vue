@@ -187,8 +187,7 @@ import {
   AtualizarProcessoRequest,
   CriarProcessoRequest,
   Processo as ProcessoModel,
-  TipoProcesso,
-  Unidade
+  TipoProcesso
 } from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;

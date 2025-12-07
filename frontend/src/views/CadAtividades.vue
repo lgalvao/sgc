@@ -285,23 +285,6 @@
           {{
             isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
           }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
-        </p>
-        <BAlert
-          v-if="atividadesSemConhecimento.length > 0"
-          variant="warning"
-          :model-value="true"
-          :fade="false"
-        >
-          <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
-          <ul>
-            <li
-              v-for="atividade in atividadesSemConhecimento"
-              :key="atividade.codigo"
-            >
-              {{ atividade.descricao }}
-            </li>
-          </ul>
-        </BAlert>
       </template>
       <template #footer>
         <BButton
@@ -368,7 +351,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";
@@ -615,7 +598,6 @@ const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
-const atividadesSemConhecimento = ref<Atividade[]>([]);
 
 
 
@@ -628,11 +610,7 @@ onMounted(async () => {
   }
 });
 
-function validarAtividades(): Atividade[] {
-  return atividades.value.filter(
-    (atividade) => atividade.conhecimentos.length === 0,
-  );
-}
+
 
 const historicoAnalises = computed(() => {
   if (!codSubrocesso.value) return [];
@@ -680,25 +658,12 @@ function disponibilizarCadastro() {
     return;
   }
 
-  atividadesSemConhecimento.value = validarAtividades();
-  if (atividadesSemConhecimento.value.length > 0) {
-    const atividadesDescricoes = atividadesSemConhecimento.value
-      .map((a) => `- ${a.descricao}`)
-      .join("\n");
-    feedbackStore.show(
-      "Atividades Incompletas",
-      `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`,
-      "warning"
-    );
-    return;
-  }
-
+  // Backend valida atividades sem conhecimento via SubprocessoCadastroController
   mostrarModalConfirmacao.value = true;
 }
 
 function fecharModalConfirmacao() {
   mostrarModalConfirmacao.value = false;
-  atividadesSemConhecimento.value = [];
 }
 
 async function confirmarDisponibilizacao() {
