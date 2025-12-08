@@ -131,7 +131,8 @@ public class SubprocessoPermissoesService {
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
-                SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+                SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
+                SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
 
         boolean situacaoPermiteEdicao = situacoesPermitemEdicao.contains(sp.getSituacao());
         
@@ -145,6 +146,7 @@ public class SubprocessoPermissoesService {
                 .podeDevolverCadastro(isAdmin || isGestorUnidade)
                 .podeAceitarCadastro(isAdmin || isGestorUnidade)
                 .podeVisualizarDiagnostico(true)
+                .podeRealizarAutoavaliacao(acessoEdicao && SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO == sp.getSituacao())
                 .podeAlterarDataLimite(isAdmin)
                 .podeVisualizarImpacto(podeVisualizarImpacto)
                 .build();

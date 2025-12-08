@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class DiagnosticoService {
 
     private final DiagnosticoRepo diagnosticoRepo;
@@ -101,49 +102,51 @@ public class DiagnosticoService {
     @Transactional
     public AvaliacaoServidorDto salvarAvaliacao(
             Long subprocessoCodigo, 
-            String servidorTitulo, // Servidor autenticado ou alvo
+            String servidorTitulo, 
             SalvarAvaliacaoRequest request) {
         
-        Diagnostico diagnostico = buscarOuCriarDiagnosticoEntidade(subprocessoCodigo);
-        
-        // Verifica se servidor existe
-        Usuario servidor = usuarioRepo.findById(servidorTitulo)
-                .orElseThrow(() -> new EntityNotFoundException("Servidor não encontrado: " + servidorTitulo));
-        
-        // Validação: Competência pertence ao mapa do subprocesso?
-        Subprocesso subprocesso = diagnostico.getSubprocesso();
-        Mapa mapa = subprocesso.getMapa();
-        if (mapa == null) {
-             throw new IllegalStateException("Subprocesso não possui mapa associado.");
+        try {
+            Diagnostico diagnostico = buscarOuCriarDiagnosticoEntidade(subprocessoCodigo);
+            
+            // Verifica se servidor existe
+            Usuario servidor = usuarioRepo.findById(servidorTitulo)
+                    .orElseThrow(() -> new EntityNotFoundException("Servidor não encontrado: " + servidorTitulo));
+            
+            // Validação: Competência pertence ao mapa do subprocesso?
+            Subprocesso subprocesso = diagnostico.getSubprocesso();
+            Mapa mapa = subprocesso.getMapa();
+            if (mapa == null) {
+                 throw new IllegalStateException("Subprocesso não possui mapa associado.");
+            }
+            
+            List<Competencia> competenciasDoMapa = competenciaRepo.findByMapaCodigo(mapa.getCodigo());
+            Competencia competencia = competenciasDoMapa.stream()
+                    .filter(c -> c.getCodigo().equals(request.competenciaCodigo()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Competência não pertence ao mapa da unidade."));
+            
+            // Busca avaliação existente ou cria nova
+            AvaliacaoServidor avaliacao = avaliacaoServidorRepo
+                    .findByDiagnosticoCodigoAndServidorTituloEleitoralAndCompetenciaCodigo(
+                            diagnostico.getCodigo(), servidorTitulo, request.competenciaCodigo())
+                    .orElse(new AvaliacaoServidor(diagnostico, servidor, competencia));
+            
+            // Atualiza dados
+            avaliacao.setImportancia(request.importancia());
+            avaliacao.setDominio(request.dominio());
+            avaliacao.setObservacoes(request.observacoes());
+            avaliacao.calcularGap();
+            
+            AvaliacaoServidor salvo = avaliacaoServidorRepo.save(avaliacao);
+            log.info("Avaliação salva com sucesso: diagnóstico={}, servidor={}, competencia={}", 
+                    diagnostico.getCodigo(), servidor.getTituloEleitoral(), competencia.getCodigo());
+            
+            return dtoService.toDto(salvo);
+        } catch (Exception e) {
+            log.error("Erro ao salvar avaliação: subprocesso={}, servidor={}, msg={}", 
+                    subprocessoCodigo, servidorTitulo, e.getMessage(), e);
+            throw e;
         }
-        
-        List<Competencia> competenciasDoMapa = competenciaRepo.findByMapaCodigo(mapa.getCodigo());
-        Competencia competencia = competenciasDoMapa.stream()
-                .filter(c -> c.getCodigo().equals(request.competenciaCodigo()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Competência não pertence ao mapa da unidade."));
-        
-        // Busca avaliação existente ou cria nova
-        AvaliacaoServidor avaliacao = avaliacaoServidorRepo
-                .findByDiagnosticoCodigoAndServidorTituloEleitoralAndCompetenciaCodigo(
-                        diagnostico.getCodigo(), servidorTitulo, request.competenciaCodigo())
-                .orElse(new AvaliacaoServidor(diagnostico, servidor, competencia));
-        
-        // Atualiza dados
-        avaliacao.setImportancia(request.importancia());
-        avaliacao.setDominio(request.dominio());
-        avaliacao.setObservacoes(request.observacoes());
-        avaliacao.calcularGap();
-        
-        // Por enquanto, sempre que salva uma avaliação individual, se estava concluída, volta para não concluída?
-        // Ou mantém? Vamos manter simples: Salvar avaliação não conclui o processo do servidor.
-        // Se o servidor já tinha concluído, reabrir? 
-        // CDU-02 diz: "Ao iniciar... não será mais possível editar". 
-        // Mas se o sistema permitir edição, deve voltar status?
-        // Vamos simplificar: salvar apenas atualiza os dados.
-        // A situação do servidor (AUTOAVALIACAO_NAO_REALIZADA -> CONCLUIDA) é gerida no método concluir.
-        
-        return dtoService.toDto(avaliacaoServidorRepo.save(avaliacao));
     }
     
     @Transactional

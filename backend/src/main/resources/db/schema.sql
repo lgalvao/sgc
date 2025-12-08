@@ -75,7 +75,8 @@ create table if not exists sgc.subprocesso
                                            'MAPEAMENTO_MAPA_VALIDADO', 'MAPEAMENTO_MAPA_HOMOLOGADO',
                                            'REVISAO_CADASTRO_EM_ANDAMENTO', 'REVISAO_CADASTRO_DISPONIBILIZADA', 'REVISAO_CADASTRO_HOMOLOGADA',
                                            'REVISAO_MAPA_AJUSTADO', 'REVISAO_MAPA_DISPONIBILIZADO', 'REVISAO_MAPA_COM_SUGESTOES',
-                                           'REVISAO_MAPA_VALIDADO', 'REVISAO_MAPA_HOMOLOGADO')),
+                                           'REVISAO_MAPA_VALIDADO', 'REVISAO_MAPA_HOMOLOGADO',
+                                           'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO', 'DIAGNOSTICO_MONITORAMENTO', 'DIAGNOSTICO_CONCLUIDO')),
     primary key (codigo)
 );
 

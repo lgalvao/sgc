@@ -1,4 +1,4 @@
-import api from './api';
+import apiClient from '../axios-setup';
 
 export interface DiagnosticoDto {
   codigo: number;
@@ -47,7 +47,7 @@ export interface OcupacaoCriticaDto {
 
 export const diagnosticoService = {
   async buscarDiagnostico(subprocessoId: number): Promise<DiagnosticoDto> {
-    const response = await api.get(`/api/diagnosticos/${subprocessoId}`);
+    const response = await apiClient.get(`/diagnosticos/${subprocessoId}`);
     return response.data;
   },
 
@@ -58,8 +58,8 @@ export const diagnosticoService = {
     dominio: string,
     observacoes?: string
   ): Promise<AvaliacaoServidorDto> {
-    const response = await api.post(
-      `/api/diagnosticos/${subprocessoId}/avaliacoes`,
+    const response = await apiClient.post(
+      `/diagnosticos/${subprocessoId}/avaliacoes`,
       { competenciaCodigo, importancia, dominio, observacoes }
     );
     return response.data;
@@ -70,8 +70,8 @@ export const diagnosticoService = {
     servidorTitulo?: string
   ): Promise<AvaliacaoServidorDto[]> {
     const params = servidorTitulo ? { servidorTitulo } : {};
-    const response = await api.get(
-      `/api/diagnosticos/${subprocessoId}/avaliacoes/minhas`,
+    const response = await apiClient.get(
+      `/diagnosticos/${subprocessoId}/avaliacoes/minhas`,
        { params }
     );
     return response.data;
@@ -81,8 +81,8 @@ export const diagnosticoService = {
     subprocessoId: number,
     justificativaAtraso?: string
   ): Promise<void> {
-    await api.post(
-      `/api/diagnosticos/${subprocessoId}/avaliacoes/concluir`,
+    await apiClient.post(
+      `/diagnosticos/${subprocessoId}/avaliacoes/concluir`,
       { justificativaAtraso }
     );
   },
@@ -93,8 +93,8 @@ export const diagnosticoService = {
     competenciaCodigo: number,
     situacao: string
   ): Promise<OcupacaoCriticaDto> {
-    const response = await api.post(
-      `/api/diagnosticos/${subprocessoId}/ocupacoes`,
+    const response = await apiClient.post(
+      `/diagnosticos/${subprocessoId}/ocupacoes`,
       { servidorTitulo, competenciaCodigo, situacao }
     );
     return response.data;
@@ -103,8 +103,8 @@ export const diagnosticoService = {
   async buscarOcupacoes(
     subprocessoId: number
   ): Promise<OcupacaoCriticaDto[]> {
-    const response = await api.get(
-      `/api/diagnosticos/${subprocessoId}/ocupacoes`
+    const response = await apiClient.get(
+      `/diagnosticos/${subprocessoId}/ocupacoes`
     );
     return response.data;
   },
@@ -113,8 +113,8 @@ export const diagnosticoService = {
     subprocessoId: number,
     justificativa?: string
   ): Promise<DiagnosticoDto> {
-    const response = await api.post(
-      `/api/diagnosticos/${subprocessoId}/concluir`,
+    const response = await apiClient.post(
+      `/diagnosticos/${subprocessoId}/concluir`,
       { justificativa }
     );
     return response.data;

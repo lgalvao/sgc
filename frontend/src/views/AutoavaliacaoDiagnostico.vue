@@ -177,8 +177,9 @@ async function salvar(competenciaCodigo: number, importancia: string, dominio: s
       observacoes || avaliacoes.value[competenciaCodigo].observacoes
     );
     avaliacoes.value[competenciaCodigo].salvo = true;
-  } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao salvar avaliação.', 'danger');
+  } catch (error: any) {
+    const msg = error.response?.data?.message || error.message || 'Erro ao salvar avaliação.';
+    feedbackStore.show('Erro', msg, 'danger');
   }
 }
 

@@ -134,3 +134,6 @@ INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (2001, 'Ativid
 
 -- Conhecimento para Atividade 1
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (200101, 'Conhecimento 1', 2001);
+
+INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('123456789012', 'Usuario Diagnostico Mock', 'mock.diagnostico@tre-pe.jus.br', NULL, 12);
+INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('123456789012', 'SERVIDOR', 12);
