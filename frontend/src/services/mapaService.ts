@@ -69,5 +69,5 @@ export async function disponibilizarMapa(
     codSubprocesso: number,
     data: DisponibilizarMapaRequest,
 ): Promise<void> {
-  await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar`, data);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-mapa`, data);
 }

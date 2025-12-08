@@ -97,15 +97,22 @@ public class SubprocessoWorkflowService {
                                     titularUnidade.getTituloEleitoral());
             throw new ErroAccessoNegado(msg);
         }
+
+        // Valida se há pelo menos uma atividade cadastrada
+        subprocessoService.validarExistenciaAtividades(codSubprocesso);
+
+        // Valida se todas as atividades têm conhecimentos associados
         if (!subprocessoService.obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
         }
+
         Mapa mapa = sp.getMapa();
         if (mapa == null || mapa.getCodigo() == null) {
             // TODO usar uma execção de negócio específica
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
     }
+
 
     @Transactional
     public void disponibilizarMapa(

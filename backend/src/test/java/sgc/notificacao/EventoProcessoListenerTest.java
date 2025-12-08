@@ -98,14 +98,13 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
 
         UsuarioDto titular =
-                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL);
         UsuarioDto substituto =
                 new UsuarioDto(
                         String.valueOf(S456),
                         SUBSTITUTO_TESTE,
                         SUBSTITUTO_EMAIL,
-                        RAMAL_SUBSTITUTO,
-                        TECNICO);
+                        RAMAL_SUBSTITUTO);
         when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                 .thenReturn(Optional.of(titular));
         when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456)))
@@ -162,7 +161,7 @@ class EventoProcessoListenerTest {
                 new ResponsavelDto(
                         100L, String.valueOf(T123), TITULAR_TESTE, null, null); // Sem substituto
         UsuarioDto titular =
-                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
@@ -203,7 +202,7 @@ class EventoProcessoListenerTest {
         ResponsavelDto responsavelDto =
                 new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
         UsuarioDto titular =
-                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
@@ -281,8 +280,7 @@ class EventoProcessoListenerTest {
                         String.valueOf(T123),
                         TITULAR_TESTE,
                         " ",
-                        RAMAL,
-                        ANALISTA); // Email em branco
+                        RAMAL); // Email em branco
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
@@ -318,7 +316,7 @@ class EventoProcessoListenerTest {
                         String.valueOf(S456),
                         SUBSTITUTO_TESTE);
         UsuarioDto titular =
-                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL, ANALISTA);
+                new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))

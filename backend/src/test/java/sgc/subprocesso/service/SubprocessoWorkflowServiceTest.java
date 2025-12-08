@@ -597,4 +597,65 @@ class SubprocessoWorkflowServiceTest {
         assertThatThrownBy(() -> service.homologarRevisaoCadastro(id, "obs", new Usuario()))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    // --- Validação de Lista Vazia de Atividades (CDU-09/10) ---
+
+    @Test
+    @DisplayName("disponibilizarCadastro deve rejeitar quando não há atividades cadastradas")
+    void disponibilizarCadastro_deveRejeitarQuandoListaVazia() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = new Unidade();
+        u.setTitular(user);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(mapa);
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        // Simula validação que lança exceção quando não há atividades
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
+        org.mockito.Mockito.doThrow(
+                        new ErroValidacao(
+                                "Pelo menos uma atividade deve ser cadastrada antes de"
+                                        + " disponibilizar."))
+                .when(subprocessoService)
+                .validarExistenciaAtividades(id);
+
+        assertThatThrownBy(() -> service.disponibilizarCadastro(id, user))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Pelo menos uma atividade deve ser cadastrada");
+    }
+
+    @Test
+    @DisplayName("disponibilizarRevisao deve rejeitar quando não há atividades cadastradas")
+    void disponibilizarRevisao_deveRejeitarQuandoListaVazia() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = new Unidade();
+        u.setTitular(user);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setMapa(mapa);
+
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
+        when(subprocessoService.obterAtividadesSemConhecimento(id))
+                .thenReturn(Collections.emptyList());
+        org.mockito.Mockito.doThrow(
+                        new ErroValidacao(
+                                "Pelo menos uma atividade deve ser cadastrada antes de"
+                                        + " disponibilizar."))
+                .when(subprocessoService)
+                .validarExistenciaAtividades(id);
+
+        assertThatThrownBy(() -> service.disponibilizarRevisao(id, user))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Pelo menos uma atividade deve ser cadastrada");
+    }
 }

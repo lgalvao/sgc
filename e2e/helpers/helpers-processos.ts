@@ -14,7 +14,7 @@ export function calcularDataLimite(dias: number): string {
  */
 export async function criarProcesso(page: Page, options: {
     descricao: string;
-    tipo: 'MAPEAMENTO' | 'REVISAO';
+    tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO';
     diasLimite: number;
     unidade: string;
     expandir?: string[];

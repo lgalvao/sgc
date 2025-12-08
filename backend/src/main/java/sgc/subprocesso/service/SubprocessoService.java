@@ -67,6 +67,29 @@ public class SubprocessoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public void validarExistenciaAtividades(Long codSubprocesso) {
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso não encontrado: %d"
+                                                        .formatted(codSubprocesso)));
+
+        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
+            throw new ErroValidacao("Subprocesso sem mapa associado.");
+        }
+
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+        if (atividades == null || atividades.isEmpty()) {
+            throw new ErroValidacao(
+                    "Pelo menos uma atividade deve ser cadastrada antes de disponibilizar.");
+        }
+    }
+
+
     public void validarAssociacoesMapa(Long mapaId) {
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapaId);
         List<String> competenciasSemAssociacao = new ArrayList<>();

@@ -61,7 +61,7 @@ class ProcessoNotificacaoEmailServiceTest {
                             Map.of(
                                     "123",
                                     new UsuarioDto(
-                                            "123", "Nome", "email@test.com", "mat", "cargo")));
+                                            "123", "Nome", "email@test.com", "mat")));
             when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any()))
                     .thenReturn("html");
 
@@ -88,7 +88,7 @@ class ProcessoNotificacaoEmailServiceTest {
                             Map.of(
                                     "123",
                                     new UsuarioDto(
-                                            "123", "Nome", "email@test.com", "mat", "cargo")));
+                                            "123", "Nome", "email@test.com", "mat")));
             when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
                             any(), any(), any()))
                     .thenReturn("html");

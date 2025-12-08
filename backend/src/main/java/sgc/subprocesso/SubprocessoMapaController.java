@@ -18,7 +18,6 @@ import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.CompetenciaReq;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.model.Subprocesso;
@@ -185,33 +184,7 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
-    // Compatibilidade: aceitar POST para atualizar e remover competências (frontend antigo)
     @PostMapping("/{codigo}/competencias/{codCompetencia}/atualizar")
-    @Transactional
-    public ResponseEntity<MapaCompletoDto> atualizarCompetenciaPost(
-            @PathVariable Long codigo,
-            @PathVariable Long codCompetencia,
-            @RequestBody @Valid CompetenciaReq request,
-            @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.atualizarCompetencia(
-                        codigo, codCompetencia, request, extractTituloUsuario(principal));
-        return ResponseEntity.ok(mapa);
-    }
-
-    @PostMapping("/{codigo}/competencias/{codCompetencia}/remover")
-    @Transactional
-    public ResponseEntity<MapaCompletoDto> removerCompetenciaPost(
-            @PathVariable Long codigo,
-            @PathVariable Long codCompetencia,
-            @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.removerCompetencia(
-                        codigo, codCompetencia, extractTituloUsuario(principal));
-        return ResponseEntity.ok(mapa);
-    }
-
-    @PutMapping("/{codigo}/competencias/{codCompetencia}")
     @Transactional
     @Operation(summary = "Atualiza uma competência existente em um mapa")
     public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
@@ -225,7 +198,7 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
-    @DeleteMapping("/{codigo}/competencias/{codCompetencia}")
+    @PostMapping("/{codigo}/competencias/{codCompetencia}/remover")
     @Transactional
     @Operation(summary = "Remove uma competência de um mapa")
     public ResponseEntity<MapaCompletoDto> removerCompetencia(
@@ -238,20 +211,9 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{codigo}/disponibilizar")
-    @Transactional
-    @Operation(summary = "Disponibiliza o mapa de competências para validação")
-    public ResponseEntity<Void> disponibilizarMapa(
-            @PathVariable Long codigo,
-            @RequestBody @Valid DisponibilizarMapaRequest request,
-            @AuthenticationPrincipal Object principal) {
-        String tituloUsuario = extractTituloUsuario(principal);
-        if (tituloUsuario == null)
-            throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
-        subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
-        return ResponseEntity.ok().build();
-    }
+
+
+
 
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;

@@ -213,10 +213,9 @@ public class SgrhService {
                 .matricula(
                         "MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no
                 // título
-                .cargo("Analista Judiciário") // Valor padrão, já que não temos cargo no modelo
-                // ainda
                 .build();
     }
+
 
     private UnidadeDto toUnidadeDto(Unidade unidade) {
         return UnidadeDto.builder()

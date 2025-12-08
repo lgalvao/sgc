@@ -264,8 +264,8 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                             "Competência Atualizada",
                             List.of(atividade1.getCodigo(), atividade2.getCodigo()));
             mockMvc.perform(
-                            put(
-                                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}",
+                            post(
+                                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/atualizar",
                                             subprocesso.getCodigo(),
                                             codCompetencia)
                                     .with(csrf())
@@ -302,8 +302,8 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
             // Remover
             mockMvc.perform(
-                            delete(
-                                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}",
+                            post(
+                                            "/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}/remover",
                                             subprocesso.getCodigo(),
                                             codCompetencia)
                                     .with(csrf()))

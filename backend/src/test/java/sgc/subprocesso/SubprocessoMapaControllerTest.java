@@ -29,7 +29,6 @@ import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.CompetenciaReq;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.model.Subprocesso;
@@ -251,7 +250,7 @@ class SubprocessoMapaControllerTest {
                 .thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(
-                        put("/api/subprocessos/1/competencias/10")
+                        post("/api/subprocessos/1/competencias/10/atualizar")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
@@ -265,23 +264,9 @@ class SubprocessoMapaControllerTest {
         when(subprocessoMapaWorkflowService.removerCompetencia(eq(1L), eq(10L), any()))
                 .thenReturn(new MapaCompletoDto());
 
-        mockMvc.perform(delete("/api/subprocessos/1/competencias/10").with(csrf()))
+        mockMvc.perform(post("/api/subprocessos/1/competencias/10/remover").with(csrf()))
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @DisplayName("disponibilizarMapa")
-    @WithMockUser
-    void disponibilizarMapa() throws Exception {
-        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest();
-        req.setObservacoes("Obs");
-        req.setDataLimite(java.time.LocalDate.now().plusDays(1));
 
-        mockMvc.perform(
-                        post("/api/subprocessos/1/disponibilizar")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-    }
 }

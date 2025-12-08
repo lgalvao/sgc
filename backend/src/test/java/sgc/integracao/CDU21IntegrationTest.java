@@ -145,22 +145,19 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                                                 "1",
                                                 "Titular Intermediaria",
                                                 "titular.intermediaria@test.com",
-                                                "123",
-                                                "Cargo"),
+                                                "123"),
                                 "2",
                                         new UsuarioDto(
                                                 "2",
                                                 "Titular Op1",
                                                 "titular.op1@test.com",
-                                                "123",
-                                                "Cargo"),
+                                                "123"),
                                 "3",
                                         new UsuarioDto(
                                                 "3",
                                                 "Titular Op2",
                                                 "titular.op2@test.com",
-                                                "123",
-                                                "Cargo")));
+                                                "123")));
     }
 
     @Test
