@@ -22,18 +22,18 @@ public class DiagnosticoDtoService {
             boolean podeSerConcluido,
             String motivoNaoPodeConcluir) {
         
-        return new DiagnosticoDto(
-                diagnostico.getCodigo(),
-                diagnostico.getSubprocesso().getCodigo(),
-                diagnostico.getSituacao().name(),
-                diagnostico.getSituacao().getLabel(),
-                diagnostico.getDataConclusao(),
-                FormatadorData.formatarDataHora(diagnostico.getDataConclusao()),
-                diagnostico.getJustificativaConclusao(),
-                servidores,
-                podeSerConcluido,
-                motivoNaoPodeConcluir
-        );
+        return DiagnosticoDto.builder()
+                .codigo(diagnostico.getCodigo())
+                .subprocessoCodigo(diagnostico.getSubprocesso().getCodigo())
+                .situacao(diagnostico.getSituacao().name())
+                .situacaoLabel(diagnostico.getSituacao().getLabel())
+                .dataConclusao(diagnostico.getDataConclusao())
+                .dataConclusaoFormatada(FormatadorData.formatarDataHora(diagnostico.getDataConclusao()))
+                .justificativaConclusao(diagnostico.getJustificativaConclusao())
+                .servidores(servidores)
+                .podeSerConcluido(podeSerConcluido)
+                .motivoNaoPodeConcluir(motivoNaoPodeConcluir)
+                .build();
     }
 
     public ServidorDiagnosticoDto toDto(
@@ -71,40 +71,40 @@ public class DiagnosticoDtoService {
                 .filter(a -> a.getImportancia() != null && a.getDominio() != null)
                 .count();
 
-        return new ServidorDiagnosticoDto(
-                servidor.getTituloEleitoral(),
-                servidor.getNome(),
-                situacao,
-                situacaoLabel,
-                avaliacoesDto,
-                ocupacoesDto,
-                totalCompetencias,
-                competenciasAvaliadas,
-                ocupacoes.size()
-        );
+        return ServidorDiagnosticoDto.builder()
+                .tituloEleitoral(servidor.getTituloEleitoral())
+                .nome(servidor.getNome())
+                .situacao(situacao)
+                .situacaoLabel(situacaoLabel)
+                .avaliacoes(avaliacoesDto)
+                .ocupacoes(ocupacoesDto)
+                .totalCompetencias(totalCompetencias)
+                .competenciasAvaliadas(competenciasAvaliadas)
+                .ocupacoesPreenchidas(ocupacoes.size())
+                .build();
     }
 
     public AvaliacaoServidorDto toDto(AvaliacaoServidor avaliacao) {
-        return new AvaliacaoServidorDto(
-                avaliacao.getCodigo(),
-                avaliacao.getCompetencia().getCodigo(),
-                avaliacao.getCompetencia().getDescricao(),
-                avaliacao.getImportancia() != null ? avaliacao.getImportancia().name() : null,
-                avaliacao.getImportancia() != null ? avaliacao.getImportancia().getLabel() : null,
-                avaliacao.getDominio() != null ? avaliacao.getDominio().name() : null,
-                avaliacao.getDominio() != null ? avaliacao.getDominio().getLabel() : null,
-                avaliacao.getGap(),
-                avaliacao.getObservacoes()
-        );
+        return AvaliacaoServidorDto.builder()
+                .codigo(avaliacao.getCodigo())
+                .competenciaCodigo(avaliacao.getCompetencia().getCodigo())
+                .competenciaDescricao(avaliacao.getCompetencia().getDescricao())
+                .importancia(avaliacao.getImportancia() != null ? avaliacao.getImportancia().name() : null)
+                .importanciaLabel(avaliacao.getImportancia() != null ? avaliacao.getImportancia().getLabel() : null)
+                .dominio(avaliacao.getDominio() != null ? avaliacao.getDominio().name() : null)
+                .dominioLabel(avaliacao.getDominio() != null ? avaliacao.getDominio().getLabel() : null)
+                .gap(avaliacao.getGap())
+                .observacoes(avaliacao.getObservacoes())
+                .build();
     }
 
     public OcupacaoCriticaDto toDto(OcupacaoCritica ocupacao) {
-        return new OcupacaoCriticaDto(
-                ocupacao.getCodigo(),
-                ocupacao.getCompetencia().getCodigo(),
-                ocupacao.getCompetencia().getDescricao(),
-                ocupacao.getSituacao().name(),
-                ocupacao.getSituacao().getLabel()
-        );
+        return OcupacaoCriticaDto.builder()
+                .codigo(ocupacao.getCodigo())
+                .competenciaCodigo(ocupacao.getCompetencia().getCodigo())
+                .competenciaDescricao(ocupacao.getCompetencia().getDescricao())
+                .situacao(ocupacao.getSituacao().name())
+                .situacaoLabel(ocupacao.getSituacao().getLabel())
+                .build();
     }
 }

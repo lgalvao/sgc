@@ -1,11 +1,13 @@
 package sgc.diagnostico.dto;
 
 import java.util.List;
+import lombok.Builder;
 
 /**
  * DTO de resposta para dados de um servidor no diagnóstico.
  * Conforme CDU-03 (monitoramento de servidores).
  */
+@Builder
 public record ServidorDiagnosticoDto(
         String tituloEleitoral,
         String nome,

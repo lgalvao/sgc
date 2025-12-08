@@ -447,8 +447,13 @@ public class ProcessoService {
                 || TipoUnidade.INTEROPERACIONAL == unidade.getTipo()) {
             Mapa mapa = mapaRepo.save(new Mapa());
             Subprocesso subprocesso =
-                    new Subprocesso(
-                            processo, unidade, mapa, NAO_INICIADO, processo.getDataLimite());
+                    Subprocesso.builder()
+                            .processo(processo)
+                            .unidade(unidade)
+                            .mapa(mapa)
+                            .situacao(NAO_INICIADO)
+                            .dataLimiteEtapa1(processo.getDataLimite())
+                            .build();
             Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
             movimentacaoRepo.save(
                     new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
@@ -465,8 +470,13 @@ public class ProcessoService {
         Mapa mapaCopiado =
                 servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
         Subprocesso subprocesso =
-                new Subprocesso(
-                        processo, unidade, mapaCopiado, NAO_INICIADO, processo.getDataLimite());
+                Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(mapaCopiado)
+                        .situacao(NAO_INICIADO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(
                 new Movimentacao(
@@ -506,8 +516,13 @@ public class ProcessoService {
                 servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
         
         Subprocesso subprocesso =
-                new Subprocesso(
-                        processo, unidade, mapaCopiado, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, processo.getDataLimite());
+                Subprocesso.builder()
+                        .processo(processo)
+                        .unidade(unidade)
+                        .mapa(mapaCopiado)
+                        .situacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
+                        .dataLimiteEtapa1(processo.getDataLimite())
+                        .build();
         // Diagnóstico começa como NAO_INICIADO
         // Mas a UI do teste espera "Realizar Autoavaliação".
         // Se estiver NAO_INICIADO, o Chefe vê o botão "Iniciar"?

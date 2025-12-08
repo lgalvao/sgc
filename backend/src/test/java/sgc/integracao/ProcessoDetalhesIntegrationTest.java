@@ -123,15 +123,6 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve retornar detalhes com unidades para processo FINALIZADO")
         void deveRetornarDetalhesComUnidades_QuandoProcessoFinalizado() throws Exception {
-            var result =
-                    mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
-                            .andExpect(status().isOk())
-                            .andReturn();
-
-            System.out.println(
-                    "Resposta JSON (finalizado): " + result.getResponse().getContentAsString());
-
-            // Por agora, só verificar código e situação sem verificar unidades
             mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo", is(processoFinalizado.getCodigo().intValue())))

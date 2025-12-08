@@ -1,8 +1,11 @@
 package sgc.diagnostico.dto;
 
+import lombok.Builder;
+
 /**
  * DTO de resposta para avaliação de competência por servidor.
  */
+@Builder
 public record AvaliacaoServidorDto(
         Long codigo,
         Long competenciaCodigo,

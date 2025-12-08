@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import sgc.unidade.model.Unidade;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Subprocesso extends EntidadeBase {
     public Subprocesso(
             Long codigo,
