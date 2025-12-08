@@ -50,13 +50,8 @@ dependendo da regra).
 * **Faltante:**
     * Destaque visual (negrito) para alertas não lidos na `TabelaAlertas.vue`.
 
-* **Incorreto:**
-    * **Lista de Unidades:** O `PainelService.paraProcessoResumoDto` concatena siglas de *todas* as unidades
-      participantes, violando a regra de exibir apenas unidades de nível superior imediato abaixo da raiz que possuam
-      todas as suas subordinadas participando.
-    * **Filtragem de Processos:** É necessário garantir que a lógica de filtragem hierárquica (processos da unidade ou
-      subordinadas) esteja rigorosamente aplicada no repositório/serviço, o que é complexo de validar apenas com análise
-      estática.
+* **Incorreto / Observação:** O `PainelService.paraProcessoResumoDto` não simplesmente concatena todas as siglas; implementa as funções `formatarUnidadesParticipantes` e `selecionarIdsVisiveis` que tentam escolher as siglas de unidades de nível superior visíveis (determinando candidatos com `todasSubordinadasParticipam`). Essa lógica parece atender ao requisito, mas precisa de cobertura de testes e revisão de casos de borda para garantir conformidade com a regra de exibir apenas unidades de nível superior imediato abaixo da raiz quando apropriado.
+    * **Filtragem de Processos:** A filtragem hierárquica está implementada (obterIdsUnidadesSubordinadas) — porém é recomendável adicionar testes de integração para validar regras de escopo (unidade + subordinadas) em conjuntos de dados complexos.
 
 ## CDU-03 - Manter processo
 
@@ -382,6 +377,101 @@ Encerramento global do processo. Tornar mapas vigentes.
     * Bloqueio de finalização se houver pendências.
 
 ---
-**Observação Geral:** A implementação backend está robusta em termos de cobertura de fluxos ("Caminho Feliz"), mas
-apresenta desvios arquiteturais (Snapshot de Unidades, Verbos HTTP) e validações de borda (Listas vazias) que precisam
-ser corrigidos para conformidade total com os requisitos.
+**Análise detalhada (atualizado 2025-12-08T01:18:53Z):**
+
+Abaixo está uma análise CDU-a-CDU com referências ao código (arquivo:linha quando pertinente) e recomendações prioritárias.
+
+CDU-01 (Login / estrutura de telas)
+- Implementação: backend `sgc/sgrh/UsuarioController.java`, `sgc/sgrh/service/SgrhService.java`; frontend `frontend/src/views/LoginView.vue`, `perfil` store.
+- Pronto: autenticação simulada e seleção de perfil suportadas.
+- Faltante/Incorreto: `SgrhService.toUsuarioDto` define cargo hardcoded (backend/src/main/java/sgc/sgrh/service/SgrhService.java:~220). Substituir por mapeamento real quando integrar com o SGRH.
+
+CDU-02 (Painel)
+- Implementação: `backend/src/main/java/sgc/painel/PainelService.java` e `PainelController` + frontend `PainelView.vue`.
+- Pronto: endpoints `/api/painel/processos` e `/api/painel/alertas` existem.
+- Observação: lógica de apresentação de unidades usa `formatarUnidadesParticipantes` / `selecionarIdsVisiveis` (PainelService.java) que tenta cumprir a regra de mostrar unidades 'visíveis'; porém faltam testes de integração para validar casos hierárquicos complexos e exibir destaque visual para alertas não lidos no frontend.
+
+CDU-03 (Manter Processo)
+- Implementação: `ProcessoController` / `ProcessoService` (backend/src/.../ProcessoService.java).
+- Pronto: CRUD e restrição de edição apenas em situação CRIADO.
+- Inconsistência UX: Frontend exige salvar antes de 'Iniciar' processo; considerar ajuste para permitir fluxo contínuo.
+- Risco: participantes vinculados diretamente — não há snapshot da hierarquia ao criar o processo (ver CDU-04/05).
+
+CDU-04 (Iniciar mapeamento)
+- Implementação: `ProcessoService.iniciarProcessoMapeamento` cria subprocessos e mapas vazios (ProcessoService.java).
+- Faltante: não há snapshot da hierarquia/unidades no momento do início; recomenda-se gravar referência imutável (snapshot) para histórico.
+- Notificações: uso de `NotificacaoEmailService` é suportado com mock (`NotificacaoEmailServiceMock`) — lógica de direcionamento de e-mails para unidades intermediárias precisa ser revisada (`sgc/subprocesso/service/SubprocessoNotificacaoService.java`).
+
+CDU-05 (Iniciar revisão)
+- Implementação: `iniciarProcessoRevisao` copia mapa vigente via `CopiaMapaService` (ProcessoService.java).
+- Pronto: cópia profunda implementada; valida existência de mapa vigente.
+- Faltante: snapshot de unidades e tratamento fino de notificações.
+
+CDU-06 (Detalhar processo)
+- Implementação: `ProcessoController.obterDetalhes` + frontend `ProcessoView.vue`.
+- Pronto: dados e lista de unidades com situação exibidos.
+
+CDU-07 (Detalhar subprocesso)
+- Implementação: `SubprocessoCrudController` / `SubprocessoDtoService` / `SubprocessoView.vue`.
+- Pronto: cards de Atividades/Mapa/Equipe e histórico de movimentações presentes.
+
+CDU-08 (Manter atividades e conhecimentos)
+- Implementação: `AtividadeController`, `AtividadeService`, `ConhecimentoRepo` e frontend `CadAtividades.vue`.
+- Pronto: CRUD e modal de importação.
+- Faltante: validações preventivas no frontend para evitar atividades sem conhecimento.
+
+CDU-09 / CDU-10 (Disponibilizar cadastro / revisão)
+- Implementação: `SubprocessoCadastroController.disponibilizarCadastro` e `disponibilizarRevisao` (backend/src/.../SubprocessoCadastroController.java).
+- Pronto: transições e registro de movimentação.
+- Incorreto: valida apenas "atividades sem conhecimento" mas não valida se existem zero atividades; acrescentar verificação "pelo menos uma atividade cadastrada".
+
+CDU-11 (Visualizar cadastro)
+- Implementação: `SubprocessoCadastroController.obterCadastro` e `VisAtividades.vue`.
+- Pronto: exibição hierárquica e controles de ação condicionais.
+
+CDU-12 (Verificar impactos no mapa)
+- Implementação: `SubprocessoMapaController.verificarImpactos` e `ImpactoMapaService`.
+- Pronto: algoritmo de comparação implementado.
+
+CDU-13 / CDU-14 (Analisar cadastro / revisão)
+- Implementação: endpoints de workflow em `SubprocessoCadastroController` e `SubprocessoWorkflowService`.
+- Pronto: aceitar, devolver, homologar e registro de análise.
+
+CDU-15 (Manter mapa)
+- Implementação: `SubprocessoMapaController`, `MapaService`, `CompetenciaService`, frontend `CadMapa.vue`.
+- Pronto: criação e associação N:N entre Competência e Atividade.
+- Incorreto: coexistem endpoints PUT/DELETE e equivalentes POST de compatibilidade (`SubprocessoMapaController.java`) — sugerir padronizar conforme convenção do projeto (usar POST para atualizar/remover ou migrar frontend para RESTful verbs e documentar).
+
+CDU-16 (Ajustar mapa)
+- Implementação: `salvarAjustesMapa` em `SubprocessoMapaController` e `SubprocessoMapaService`.
+- Pronto: endpoint para salvar ajustes presente.
+
+CDU-17 (Disponibilizar mapa)
+- Implementação: `SubprocessoMapaController.disponibilizarMapa` e `SubprocessoValidacaoController.disponibilizarMapa` (atenção: endpoints redundantes).
+- Incorreto: duplicidade de endpoints cria ambiguidade; consolidar e atualizar frontend.
+
+CDU-18 (Visualizar mapa)
+- Implementação: `obterMapaVisualizacao` (SubprocessoMapaController) e frontend `VisMapa.vue`.
+- Pronto: DTO otimizado para visualização implementado.
+
+CDU-19 (Validar mapa)
+- Implementação: `SubprocessoValidacaoController` e frontend `VisMapa.vue` ações.
+- Pronto: endpoints `validarMapa` e `apresentarSugestoes` implementados; sugestões armazenadas em campo texto.
+
+CDU-20 (Analisar validação)
+- Implementação: workflows em `SubprocessoValidacaoController`.
+- Faltante: controle explícito de marcação/consumo de sugestões lidas por SEDOC; sugere campo/flag para rastrear tratamento.
+
+CDU-21 (Finalizar processo)
+- Implementação: `ProcessoService.finalizar` (ProcessoService.java) — valida homologação de subprocessos e chama `tornarMapasVigentes`.
+- Pronto: vigência atualizada (`unidade.setMapaVigente`), datas e notificações finais enviadas.
+- Observação: tornarMapasVigentes grava `unidade.setMapaVigente(mapa)` — como não há snapshot separado, o histórico pode referenciar objetos que mudam com o tempo; recomenda-se persistir um snapshot/cópia histórica do relacionamento (ex: MapaVigenteHistorico).
+
+Recomendações e prioridades
+1) Snapshot da hierarquia e atribuições ao iniciar processos (CDU-03/CDU-04/CDU-05): implementar entidades de snapshot ou copiar informações essenciais ao Subprocesso.
+2) Validações de borda (CDU-09/10): bloquear disponibilização se não houver ao menos uma atividade cadastrada.
+3) Padronização de APIs (CDU-15/CDU-17): escolher entre endpoints RESTful (PUT/DELETE) ou convenção do projeto (POST .../remover) e refletir no frontend; remover endpoints redundantes.
+4) Testes de integração: criar cenários para PainelService (seleção de siglas) e fluxos de notificação para validar regras hierárquicas e envios de e-mail reais vs mocks.
+5) Registro/consumo de sugestões (CDU-20): adicionar flag 'sugestaoTratada' ou similar para rastrear tratamento.
+
+Se desejar, prossigo com: (A) gerar um diff detalhado por arquivo com trechos relevantes; (B) abrir PR com ajustes mínimos (ex: validação de "pelo menos uma atividade"); ou (C) implementar snapshot mínimo no backend para processos de mapeamento/revisão. Indique a opção.
