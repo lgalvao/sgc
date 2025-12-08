@@ -35,3 +35,4 @@ backend/bin/
 /backend/target/
 .DS_Store
 /backend/.jqwik-database
+scripts/stats/node_modules/
