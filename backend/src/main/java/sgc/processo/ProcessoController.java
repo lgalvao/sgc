@@ -152,6 +152,8 @@ public class ProcessoController {
             erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
         } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
             erros = processoService.iniciarProcessoMapeamento(codigo, req.unidades());
+        } else if (req.tipo() == sgc.processo.model.TipoProcesso.DIAGNOSTICO) {
+            erros = processoService.iniciarProcessoDiagnostico(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();
         }

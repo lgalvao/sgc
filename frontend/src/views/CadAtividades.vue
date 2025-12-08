@@ -84,6 +84,7 @@
           data-testid="btn-adicionar-atividade"
           title="Adicionar atividade"
           type="submit"
+          :disabled="!codSubrocesso"
         >
           <i
             class="bi bi-save"
@@ -285,6 +286,7 @@
           {{
             isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
           }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
+        </p>
       </template>
       <template #footer>
         <BButton
@@ -447,7 +449,11 @@ async function adicionarAtividade() {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(codSubrocesso.value, codMapa.value, request);
+    await atividadesStore.adicionarAtividade(
+      codSubrocesso.value,
+      codMapa.value,
+      request,
+    );
     novaAtividade.value = "";
     // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
     await processosStore.buscarProcessoDetalhe(codProcesso.value);

@@ -96,27 +96,32 @@ const routes: RouteRecordRaw[] = [
     },
 
     {
-        path: "/processo/:codProcesso/:siglaUnidade/diagnostico-equipe",
-        name: "DiagnosticoEquipe",
-        component: () => import("./views/DiagnosticoEquipe.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            siglaUnidade: route.params.siglaUnidade,
-        }),
-        meta: {
-            title: "Diagnóstico da Equipe",
-            breadcrumb: "Diagnóstico da Equipe",
-        },
+        path: "/diagnostico/:codSubprocesso/autoavaliacao",
+        name: "AutoavaliacaoDiagnostico",
+        component: () => import("./views/AutoavaliacaoDiagnostico.vue"),
+        props: true,
+        meta: {title: "Autoavaliação", breadcrumb: "Autoavaliação"},
     },
     {
-        path: "/processo/:codProcesso/:siglaUnidade/ocupacoes-criticas",
-        name: "OcupacoesCriticas",
-        component: () => import("./views/OcupacoesCriticas.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            siglaUnidade: route.params.siglaUnidade,
-        }),
+        path: "/diagnostico/:codSubprocesso/monitoramento",
+        name: "MonitoramentoDiagnostico",
+        component: () => import("./views/MonitoramentoDiagnostico.vue"),
+        props: true,
+        meta: {title: "Monitoramento", breadcrumb: "Monitoramento"},
+    },
+    {
+        path: "/diagnostico/:codSubprocesso/ocupacoes",
+        name: "OcupacoesCriticasDiagnostico",
+        component: () => import("./views/OcupacoesCriticasDiagnostico.vue"),
+        props: true,
         meta: {title: "Ocupações Críticas", breadcrumb: "Ocupações Críticas"},
+    },
+    {
+        path: "/diagnostico/:codSubprocesso/conclusao",
+        name: "ConclusaoDiagnostico",
+        component: () => import("./views/ConclusaoDiagnostico.vue"),
+        props: true,
+        meta: {title: "Conclusão", breadcrumb: "Conclusão"},
     },
     {
         path: "/unidade/:siglaUnidade",

@@ -64,26 +64,7 @@ const processoRoutes: RouteRecordRaw[] = [
         }),
         meta: {title: "Visualização de Atividades"},
     },
-    {
-        path: "/processo/:codProcesso/:siglaUnidade/diagnostico-equipe",
-        name: "DiagnosticoEquipe",
-        component: () => import("@/views/DiagnosticoEquipe.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            siglaUnidade: route.params.siglaUnidade,
-        }),
-        meta: {title: "Diagnóstico da Equipe"},
-    },
-    {
-        path: "/processo/:codProcesso/:siglaUnidade/ocupacoes-criticas",
-        name: "OcupacoesCriticas",
-        component: () => import("@/views/OcupacoesCriticas.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            siglaUnidade: route.params.siglaUnidade,
-        }),
-        meta: {title: "Ocupações Críticas"},
-    },
+
 ];
 
 export default processoRoutes;

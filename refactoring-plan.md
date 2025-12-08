@@ -29,13 +29,17 @@
 
 ## Fases Pendentes
 
-### Fase 2: Módulo Diagnóstico (PRÓXIMA PRIORIDADE)
+### Fase 2: Módulo Diagnóstico (CDU-02, 03, 07, 09) - CONCLUÍDO
 
-**Objetivo:** Criar backend completo para funcionalidades de diagnóstico  
-**Estimativa:** 3-4 semanas  
-**Prioridade:** ALTA - Funcionalidade crítica sem backend
+**Objetivo:** Migrar lógica do frontend "alucinado" para um backend robusto e implementar frontend correto.
 
-#### Contexto
+1. [x] Criar estrutura backend (DTOs, Entidades, Repos).
+2. [x] Implementar `DiagnosticoService` com regras de avaliação, gap e conclusão.
+3. [x] Implementar `DiagnosticoController`.
+4. [x] Criar `diagnosticoService.ts` no frontend.
+5. [x] Implementar novas Views (`Autoavaliacao`, `Monitoramento`, `Ocupacoes`, `Conclusao`).
+6. [x] Atualizar rotas e remover views antigas.
+7. [x] Testes Back e Front (E2E básico).
 
 Atualmente, `DiagnosticoEquipe.vue` e `OcupacoesCriticas.vue` contêm lógica de negócio que deveria estar no backend:
 

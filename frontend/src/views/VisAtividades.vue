@@ -177,6 +177,7 @@ import {useRouter} from "vue-router";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {useAtividadesStore} from "@/stores/atividades";
+import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -205,6 +206,7 @@ const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const perfilStore = usePerfilStore();
+const feedbackStore = useFeedbackStore();
 const router = useRouter();
 
 const mostrarModalImpacto = ref(false);
@@ -250,7 +252,11 @@ const isHomologacao = computed(() => {
   return (
       perfilSelecionado.value === Perfil.ADMIN &&
       (situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
-          situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO)
+       situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO ||
+       situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+       situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
+       situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+       situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
   );
 });
 
@@ -259,8 +265,9 @@ const podeVerImpacto = computed(() => {
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
   const situacaoCorreta =
-      subprocesso.value.situacaoSubprocesso ===
-      SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO;
+      subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
+      subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+      subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
   return podeVer && situacaoCorreta;
 });
 
@@ -297,23 +304,57 @@ async function confirmarValidacao() {
   const commonRequest = {
     observacoes: observacaoValidacao.value,
   };
+  
+  // Re-declare store removed
 
   if (isHomologacao.value) {
-    const req: HomologarCadastroRequest = { ...commonRequest };
-    if (isRevisao.value) {
-      await subprocessosStore.homologarRevisaoCadastro(
-          codSubrocesso.value,
-          req,
+    const req: HomologarCadastroRequest = {
+      observacoes: observacaoValidacao.value,
+    };
+    try {
+      if (isRevisao.value) {
+        await subprocessosStore.homologarRevisaoCadastro(
+            codSubrocesso.value,
+            req,
+        );
+      } else {
+        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
+      }
+      await router.push({name: "Painel"});
+      feedbackStore.show(
+        "Cadastro homologado",
+        "O cadastro de atividades foi homologado com sucesso.",
+        "success",
       );
-    } else {
-      await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
+    } catch (error) {
+      console.error(error);
+      feedbackStore.show(
+        "Erro ao homologar cadastro",
+        "Não foi possível homologar o cadastro.",
+        "danger",
+      );
     }
   } else {
     const req: AceitarCadastroRequest = {...commonRequest};
-    if (isRevisao.value) {
-      await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
-    } else {
-      await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
+    try {
+      if (isRevisao.value) {
+        await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
+      } else {
+        await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
+      }
+      await router.push({name: "Painel"});
+      feedbackStore.show(
+        "Cadastro aceito",
+        "O cadastro de atividades foi aceito com sucesso.",
+        "success",
+      );
+    } catch (error) {
+      console.error(error);
+      feedbackStore.show(
+        "Erro ao aceitar cadastro",
+        "Não foi possível aceitar o cadastro.",
+        "danger",
+      );
     }
   }
 

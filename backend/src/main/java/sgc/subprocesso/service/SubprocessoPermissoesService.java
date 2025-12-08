@@ -126,13 +126,11 @@ public class SubprocessoPermissoesService {
                 SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
                 SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
                 SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
-                SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO,
                 SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
 
         boolean situacaoPermiteEdicao = situacoesPermitemEdicao.contains(sp.getSituacao());

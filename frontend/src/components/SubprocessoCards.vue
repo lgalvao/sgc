@@ -93,13 +93,13 @@
           v-if="permissoes.podeVisualizarDiagnostico"
           class="h-100 card-actionable"
           data-testid="card-subprocesso-diagnostico"
-          @click="navegarPara('DiagnosticoEquipe')"
+          @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
         >
           <BCardTitle>
-            Diagnóstico da Equipe
+            Autoavaliação
           </BCardTitle>
           <BCardText class="text-muted">
-            Diagnóstico das competências pelos servidores da unidade
+            Realize sua autoavaliação de competências
           </BCardText>
           <span
             :class="badgeClass(situacao)"
@@ -115,13 +115,34 @@
         <BCard
           class="h-100 card-actionable"
           data-testid="card-subprocesso-ocupacoes"
-          @click="navegarPara('OcupacoesCriticas')"
+          @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
         >
           <BCardTitle>
             Ocupações Críticas
           </BCardTitle>
           <BCardText class="text-muted">
             Identificação das ocupações críticas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-monitoramento"
+          @click="navegarParaDiag('MonitoramentoDiagnostico')"
+        >
+          <BCardTitle>
+            Monitoramento
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Acompanhamento e conclusão do diagnóstico da unidade
           </BCardText>
           <span
             :class="badgeClass(situacao)"
@@ -166,6 +187,19 @@ const navegarPara = (routeName: string) => {
       codProcesso: codigoProcesso,
       siglaUnidade: sigla
     },
+  });
+};
+
+const navegarParaDiag = (routeName: string) => {
+  if (!props.codSubprocesso) return;
+  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
+
+  router.push({
+    name: routeName,
+    params: {
+      codSubprocesso: props.codSubprocesso,
+      siglaUnidade: sigla
+    }
   });
 };
 </script>

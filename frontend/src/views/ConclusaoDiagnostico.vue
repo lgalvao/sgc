@@ -1,0 +1,108 @@
+<template>
+  <BContainer class="mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <BCard title="Conclusão do Diagnóstico" class="shadow-sm">
+          <div v-if="loading" class="text-center py-5">
+            <BSpinner label="Carregando..." />
+          </div>
+          
+          <div v-else>
+            <div v-if="!diagnostico?.podeSerConcluido" class="alert alert-danger mb-4">
+              <i class="bi bi-exclamation-triangle-fill me-2" />
+              {{ diagnostico?.motivoNaoPodeConcluir }}
+              <hr>
+              <p class="mb-0">Para concluir com pendências, é obrigatório fornecer uma justificativa abaixo.</p>
+            </div>
+
+            <div v-else class="alert alert-success mb-4">
+              <i class="bi bi-check-circle-fill me-2" />
+              O diagnóstico está completo e pronto para ser concluído.
+            </div>
+
+            <BFormGroup 
+              label="Justificativa / Comentários Finais:" 
+              label-for="justificativa"
+              class="mb-4"
+            >
+              <BFormTextarea
+                id="justificativa"
+                v-model="justificativa"
+                rows="4"
+                :state="justificativaValida"
+                placeholder="Insira observações relevantes para a validação superior..."
+              />
+              <BFormInvalidFeedback>
+                A justificativa é obrigatória quando existem pendências.
+              </BFormInvalidFeedback>
+            </BFormGroup>
+
+            <div class="d-flex justify-content-end gap-2">
+                <BButton variant="outline-secondary" to="/painel">Cancelar</BButton>
+                <BButton 
+                    variant="success" 
+                    @click="concluir"
+                    :disabled="!botaoHabilitado"
+                    data-testid="btn-confirmar-conclusao"
+                >
+                    Confirmar Conclusão
+                </BButton>
+            </div>
+          </div>
+        </BCard>
+      </div>
+    </div>
+  </BContainer>
+</template>
+
+<script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { BContainer, BCard, BButton, BFormGroup, BFormTextarea, BFormInvalidFeedback, BSpinner } from 'bootstrap-vue-next';
+import { useFeedbackStore } from '@/stores/feedback';
+import { diagnosticoService, type DiagnosticoDto } from '@/services/diagnosticoService';
+
+const route = useRoute();
+const router = useRouter();
+const feedbackStore = useFeedbackStore();
+
+const loading = ref(true);
+const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
+const diagnostico = ref<DiagnosticoDto | null>(null);
+const justificativa = ref('');
+
+const justificativaValida = computed(() => {
+    if (diagnostico.value?.podeSerConcluido) return null; // Não valida se opcional
+    return justificativa.value.trim().length > 10;
+});
+
+const botaoHabilitado = computed(() => {
+    if (diagnostico.value?.podeSerConcluido) return true;
+    return justificativaValida.value === true;
+});
+
+onMounted(async () => {
+    try {
+        loading.value = true;
+        diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
+        if (diagnostico.value.situacao === 'CONCLUIDO') {
+            feedbackStore.show('Aviso', 'Este diagnóstico já foi concluído.', 'warning');
+            router.push('/painel');
+        }
+    } catch (error) {
+        feedbackStore.show('Erro', 'Erro ao carregar dados.', 'danger');
+    } finally {
+        loading.value = false;
+    }
+});
+
+async function concluir() {
+    try {
+        await diagnosticoService.concluirDiagnostico(codSubprocesso.value, justificativa.value);
+        feedbackStore.show('Sucesso', 'Diagnóstico da unidade concluído com sucesso!', 'success');
+        router.push('/painel');
+    } catch (error: any) {
+        feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
+    }
+}
+</script>
