@@ -144,7 +144,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
-        log.error("Estado ilegal da aplicação: {}", ex.getMessage(), ex);
+        log.warn("Estado ilegal da aplicação: {}", ex.getMessage());
         String message = "A operação não pode ser executada no estado atual do recurso.";
         return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, message));
     }

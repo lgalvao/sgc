@@ -1,25 +1,12 @@
 # SGC - Sistema de Gestão de Competências
 
-Última atualização: 2025-12-04 14:18:38Z
-
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3.5.x-green.svg)](https://vuejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.x-blue.svg)](https://www.typescriptlang.org/)
-
-Sistema para gerenciar sistematicamente as competências técnicas das unidades organizacionais do TRE-PE, incluindo
-mapeamento, revisão e diagnóstico de competências.
-
----
-
 ## Visão Geral
 
 O SGC permite:
 
 - **Mapeamento de Competências**: Coleta sistemática de atividades e conhecimentos de cada unidade operacional
-- **Revisão Periódica de Competências**: Atualização dos mapas de competencias
-- **Diagnóstico de Competências e Ocupações Críticas**: Avaliação de importância e domínio das competências,
-  identificando gaps
+- **Revisão Periódica de Competências**: Atualização dos mapas de competências
+- **Diagnóstico de Competências e Ocupações Críticas**: Avaliação de domínio das competências, identificando gaps
 
 ---
 

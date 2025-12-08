@@ -50,8 +50,7 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoWorkflowService.disponibilizarMapa(
-                codigo, request.getObservacoes(), request.getDataLimite().atStartOfDay(), usuario);
+        subprocessoWorkflowService.disponibilizarMapa(codigo, request.getObservacoes(), request.getDataLimite().atStartOfDay(), usuario);
         return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
     }
 

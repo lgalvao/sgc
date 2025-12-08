@@ -8,8 +8,6 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
     const UNIDADE_ALVO = 'UNIT_TEST_DIAG';
     const USUARIO_CHEFE = '123456789012';
     const SENHA_CHEFE = '123'; // Senha padrão
-    const NOME_CHEFE = 'Usuario Diagnostico Mock';
-    const EMAIL_CHEFE = 'mock.diagnostico@tre-pe.jus.br';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 

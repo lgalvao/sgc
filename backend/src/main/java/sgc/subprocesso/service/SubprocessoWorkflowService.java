@@ -123,9 +123,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
-        if (situacaoAtual != REVISAO_CADASTRO_HOMOLOGADA
-                && situacaoAtual != REVISAO_MAPA_AJUSTADO) {
-            // TODO usar uma execção de negócio específica
+        if (situacaoAtual != REVISAO_CADASTRO_HOMOLOGADA   && situacaoAtual != REVISAO_MAPA_AJUSTADO) {
             throw new IllegalStateException(
                     "O mapa de competências só pode ser disponibilizado a partir dos estados"
                             + " 'Revisão de Cadastro Homologada' ou 'Mapa Ajustado'. Estado atual: "

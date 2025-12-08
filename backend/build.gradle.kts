@@ -153,14 +153,6 @@ spotbugs {
     reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
 }
 
-tasks.withType<SpotBugsTask> {
-    reports {
-        create("html") {
-            required.set(true)
-        }
-    }
-}
-
 // Checkstyle
 checkstyle {
     toolVersion = "12.2.0"
