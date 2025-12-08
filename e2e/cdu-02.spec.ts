@@ -110,17 +110,24 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await btnSecretaria.waitFor({ state: 'visible' });
             await btnSecretaria.click();
 
-            // Verifica que COORD_11 (INTERMEDIARIA) está desabilitada
+            // Verifica que COORD_11 (INTERMEDIARIA) está HABILITADA (novo comportamento)
             const checkboxIntermediaria = page.getByTestId('chk-arvore-unidade-COORD_11');
-            await expect(checkboxIntermediaria).toBeDisabled();
+            await expect(checkboxIntermediaria).toBeEnabled();
+            await expect(checkboxIntermediaria).not.toBeChecked();
 
-            // Expande COORD_11 para acessar SECAO_111
+            // Clica em COORD_11 (INTERMEDIARIA) para selecionar suas filhas
+            await checkboxIntermediaria.click();
+
+            // Verifica que COORD_11 NÃO foi marcada (não deve fazer parte da seleção)
+            await expect(checkboxIntermediaria).not.toBeChecked();
+
+            // Expande COORD_11 para ver as filhas
             await page.getByTestId('btn-arvore-expand-COORD_11').click();
 
-            // Seleciona as filhas OPERACIONAIS
-            await page.getByTestId('chk-arvore-unidade-SECAO_111').check();
-            await page.getByTestId('chk-arvore-unidade-SECAO_112').check();
-            await page.getByTestId('chk-arvore-unidade-SECAO_113').check();
+            // Verifica que as filhas OPERACIONAIS foram selecionadas automaticamente
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_111')).toBeChecked();
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_112')).toBeChecked();
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_113')).toBeChecked();
 
             // Salva o processo
             await page.getByTestId('btn-processo-salvar').click();

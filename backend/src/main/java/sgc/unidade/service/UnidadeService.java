@@ -55,11 +55,13 @@ public class UnidadeService {
             Long codigoPai =
                     u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
 
-            // Determine elegibility based on whether unit has vigente map AND is not
-            // INTERMEDIARIA
+            // Elegibilidade simples (não recursiva):
+            // 1. NÃO é INTERMEDIARIA
+            // 2. Tem mapa vigente (se requerido)
+            // 3. NÃO está em outro processo ativo (TODO: implementar verificação)
             boolean isElegivel =
-                    (!requerMapaVigente || u.getMapaVigente() != null)
-                            && u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
+                    u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA
+                            && (!requerMapaVigente || u.getMapaVigente() != null);
 
             UnidadeDto dto =
                     new UnidadeDto(

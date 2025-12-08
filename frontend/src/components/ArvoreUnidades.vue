@@ -1,109 +1,23 @@
 <template>
   <div class="arvore-unidades">
-    <template
+    <UnidadeTreeNode
         v-for="unidade in unidadesExibidas"
         :key="unidade.sigla"
-    >
-      <div class="form-check">
-        <BFormCheckbox
-            :id="`chk-${unidade.sigla}`"
-            :model-value="isChecked(unidade.codigo)"
-            :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-            :disabled="!unidade.isElegivel"
-            :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
-            @update:model-value="(val) => toggle(unidade, val as boolean)"
-        >
-          <label
-              :for="`chk-${unidade.sigla}`"
-              class="form-check-label ms-2"
-              :class="{ 'text-muted': !unidade.isElegivel }"
-          >
-            <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-          </label>
-        </BFormCheckbox>
-      </div>
-
-      <!-- Mostrar filhas se a unidade tem filhas -->
-      <span
-          v-if="unidade.filhas && unidade.filhas.length > 0"
-          class="me-2 cursor-pointer user-select-none"
-          :data-testid="`btn-arvore-expand-${unidade.sigla}`"
-          @click="toggleExpand(unidade)"
-      >
-        {{ isExpanded(unidade) ? '[-]' : '[+]' }}
-      </span>
-      <div
-          v-if="unidade.filhas && unidade.filhas.length"
-          class="ms-4"
-      >
-        <template
-            v-for="filha in unidade.filhas"
-            :key="filha.sigla"
-        >
-          <div class="form-check">
-            <BFormCheckbox
-                :id="`chk-${filha.sigla}`"
-                :model-value="isChecked(filha.codigo)"
-                :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                :disabled="!filha.isElegivel"
-                :data-testid="`chk-arvore-unidade-${filha.sigla}`"
-                @update:model-value="(val) => toggle(filha, val as boolean)"
-            >
-              <label
-                  :for="`chk-${filha.sigla}`"
-                  class="form-check-label ms-2"
-                  :class="{ 'text-muted': !filha.isElegivel }"
-              >
-                <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-              </label>
-            </BFormCheckbox>
-          </div>
-
-          <span
-              v-if="filha.filhas && filha.filhas.length > 0"
-              class="me-2 cursor-pointer user-select-none"
-              :data-testid="`btn-arvore-expand-${filha.sigla}`"
-              @click="toggleExpand(filha)"
-          >
-            {{ isExpanded(filha) ? '[-]' : '[+]' }}
-          </span>
-          <div
-              v-if="filha.filhas && filha.filhas.length && isExpanded(filha)"
-              class="ms-4"
-          >
-            <template
-                v-for="neta in filha.filhas"
-                :key="neta.sigla"
-            >
-              <div class="form-check">
-                <BFormCheckbox
-                    :id="`chk-${neta.sigla}`"
-                    :model-value="isChecked(neta.codigo)"
-                    :disabled="!neta.isElegivel"
-                    :data-testid="`chk-arvore-unidade-${neta.sigla}`"
-                    @update:model-value="(val) => toggle(neta, val as boolean)"
-                >
-                  <label
-                      :for="`chk-${neta.sigla}`"
-                      class="form-check-label ms-2"
-                      :class="{ 'text-muted': !neta.isElegivel }"
-                  >
-                    <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                  </label>
-                </BFormCheckbox>
-              </div>
-            </template>
-          </div>
-        </template>
-      </div>
-    </template>
+        :unidade="unidade"
+        :is-checked="isChecked"
+        :get-estado-selecao="getEstadoSelecao"
+        :is-expanded="isExpanded"
+        :is-habilitado="isHabilitado"
+        :on-toggle="toggle"
+        :on-toggle-expand="toggleExpand"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import {BFormCheckbox} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import type {Unidade} from "@/types/tipos";
+import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 
 interface Props {
   unidades: Unidade[];
@@ -185,33 +99,64 @@ function isChecked(codigo: number): boolean {
   return unidadesSelecionadasLocal.value.includes(codigo);
 }
 
+// Verifica se unidade deve estar habilitada (recursivo)
+// Habilitado se: elegível OU tem pelo menos uma filha elegível
+function isHabilitado(unidade: Unidade): boolean {
+  if (unidade.isElegivel) return true;
+  
+  if (!unidade.filhas || unidade.filhas.length === 0) return false;
+  
+  return unidade.filhas.some(filha => isHabilitado(filha));
+}
+
 // Obtém estado de seleção (true, false ou 'indeterminate')
 function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   const selfSelected = isChecked(unidade.codigo);
 
+  // Se é folha, retorna o próprio estado
   if (isFolha(unidade)) {
     return selfSelected;
   }
 
-  const subunidades = getTodasSubunidades(unidade);
-  if (subunidades.length === 0) {
+  // Se não tem filhas, retorna o próprio estado
+  if (!unidade.filhas || unidade.filhas.length === 0) {
     return selfSelected;
   }
-  const selecionadas = subunidades.filter((codigo) => isChecked(codigo)).length;
 
-  if (selecionadas === 0 && !selfSelected) {
-    return false;
+  // Verifica o estado de cada filha DIRETA (recursivamente)
+  let todasMarcadas = true;
+  let algumaMarcada = false;
+
+  for (const filha of unidade.filhas) {
+    const estadoFilha = getEstadoSelecao(filha);
+    
+    if (estadoFilha === true) {
+      algumaMarcada = true;
+    } else if (estadoFilha === false) {
+      todasMarcadas = false;
+    } else {
+      // Se alguma filha está indeterminada, o pai também fica indeterminado
+      todasMarcadas = false;
+      algumaMarcada = true;
+    }
   }
-  if (selecionadas === subunidades.length && selfSelected) {
+
+  // Se todas as filhas estão marcadas
+  if (todasMarcadas) {
     return true;
   }
 
-  // Se for Interoperacional e estiver selecionada, mostra como true (não indeterminate),
-  // mesmo que nem todas as filhas estejam selecionadas.
+  // Se nenhuma filha está marcada
+  if (!algumaMarcada) {
+    return false;
+  }
+
+  // Exceção INTEROPERACIONAL: pode estar marcada mesmo sem todas filhas
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
 
+  // Algumas filhas marcadas, mas não todas
   return "indeterminate";
 }
 
@@ -222,7 +167,8 @@ function toggle(unidade: Unidade, checked: boolean) {
   const idsToToggle = [unidade.codigo, ...getTodasSubunidades(unidade)];
 
   if (checked) {
-    // Filtrar apenas unidades elegíveis ao adicionar
+    // Adiciona apenas unidades elegíveis (filtra INTERMEDIARIA automaticamente)
+    // INTERMEDIARIA nunca é elegível, então nunca será adicionada
     idsToToggle.forEach(id => {
       const unidadeParaAdicionar = findUnidadeById(id);
       if (unidadeParaAdicionar?.isElegivel) {
@@ -249,18 +195,17 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
     const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
 
     if (allChildrenSelected) {
-      // Apenas adiciona o pai se ele for elegível
+      // Adiciona o pai se ele for elegível
+      // INTERMEDIARIA nunca é elegível, então nunca será adicionada aqui
       if (parent.isElegivel) {
         selectionSet.add(parent.codigo);
       }
     } else {
       // Se não forem todas as filhas selecionadas, remove o pai
-      // EXCETO se o pai for INTEROPERACIONAL (regra 2.3.2.5)
+      // EXCETO se o pai for INTEROPERACIONAL (regra especial)
       if (parent.tipo !== 'INTEROPERACIONAL') {
         selectionSet.delete(parent.codigo);
       }
-      // Se for INTEROPERACIONAL, mantemos o estado atual dele (seja selecionado ou não)
-      // a menos que a ação explicita de desmarcar tenha ocorrido nele (tratado no passo 1)
     }
     current = parent;
   }
