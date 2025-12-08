@@ -265,7 +265,7 @@ export interface CriarConhecimentoRequest {
 export interface CriarProcessoRequest {
     descricao: string;
     tipo: TipoProcesso;
-    dataLimiteEtapa1: string;
+    dataLimiteEtapa1: string | null;
     unidades: number[];
 }
 
@@ -273,7 +273,7 @@ export interface AtualizarProcessoRequest {
     codigo: number;
     descricao: string;
     tipo: TipoProcesso;
-    dataLimiteEtapa1: string;
+    dataLimiteEtapa1: string | null;
     unidades: number[];
 }
 

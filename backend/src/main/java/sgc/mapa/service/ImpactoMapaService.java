@@ -130,7 +130,7 @@ public class ImpactoMapaService {
         final SituacaoSubprocesso situacao = subprocesso.getSituacao();
 
         if (hasRole(usuario, "CHEFE")) {
-            validarSituacao(situacao, List.of(REVISAO_CADASTRO_EM_ANDAMENTO), MSG_ERRO_CHEFE);
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO), MSG_ERRO_CHEFE);
         } else if (hasRole(usuario, "GESTOR")) {
             validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA), MSG_ERRO_GESTOR);
         } else if (hasRole(usuario, "ADMIN")) {

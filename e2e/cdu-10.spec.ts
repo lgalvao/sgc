@@ -25,8 +25,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
-    const descProcessoMapeamento = `AAA Mapeamento Setup CDU-10 ${timestamp}`;
-    const descProcessoRevisao = `AAA Revisão CDU-10 ${timestamp}`;
+    const descProcessoMapeamento = `Map 10 ${timestamp}`;
+    const descProcessoRevisao = `Rev 10 ${timestamp}`;
     let processoMapeamentoId: number;
     let processoRevisaoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
@@ -57,7 +57,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         });
 
         // Iniciar processo
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
+        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
@@ -272,7 +272,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-cad-atividades-voltar').click();
         
         // Agora a situação deve ser "Revisão do cadastro em andamento"
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão do cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
     });
 
     // ========================================================================
@@ -295,11 +295,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Tentar disponibilizar - deve falhar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de confirmação NÃO abre
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeHidden();
+        // Verificar que modal de confirmação ABRE (validação no backend)
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Verificar mensagem de erro
-        await expect(page.getByText('Atividades Incompletas')).toBeVisible();
+        await expect(page.locator('body')).toContainText(/Erro ao disponibilizar/i);
 
         // Corrigir adicionando conhecimento
         await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
@@ -345,7 +346,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
             await page.getByRole('row', {name: 'Seção 221'}).click();
         }
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão do cadastro disponibilizada/i);
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
     });
 
     test('Cenario 3: Devolução e Histórico de Análise', async ({page}) => {

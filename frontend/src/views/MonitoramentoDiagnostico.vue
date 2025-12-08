@@ -16,6 +16,7 @@
         </BButton>
         <BButton 
           variant="success" 
+          data-testid="btn-concluir-diagnostico"
           :to="`/diagnostico/${codSubprocesso}/conclusao`"
           :disabled="!diagnostico?.podeSerConcluido"
         >

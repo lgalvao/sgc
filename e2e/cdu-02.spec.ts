@@ -42,7 +42,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_11'
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
             });
 
             // Capturar ID do processo para cleanup
@@ -65,7 +66,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_11'
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
             });
 
             // Capturar ID do processo para cleanup
@@ -118,8 +120,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             // Clica em COORD_11 (INTERMEDIARIA) para selecionar suas filhas
             await checkboxIntermediaria.click();
 
-            // Verifica que COORD_11 NÃO foi marcada (não deve fazer parte da seleção)
-            await expect(checkboxIntermediaria).not.toBeChecked();
+            // Verifica que COORD_11 foi marcada (comportamento visual, embora filtrada no envio)
+            await expect(checkboxIntermediaria).toBeChecked();
 
             // Expande COORD_11 para ver as filhas
             await page.getByTestId('btn-arvore-expand-COORD_11').click();

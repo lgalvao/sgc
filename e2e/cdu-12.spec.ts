@@ -207,7 +207,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Assumindo que isso é um toast ou um alerta visível.
         // Se a implementação abrir um modal mesmo vazio, ajustaremos. Mas o texto diz "sistema mostra a mensagem".
         // Vamos verificar se aparece um texto na tela.
-        await expect(page.getByText('Nenhum impacto no mapa da unidade')).toBeVisible();
+        await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
     test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {

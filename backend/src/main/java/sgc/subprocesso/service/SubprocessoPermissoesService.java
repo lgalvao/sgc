@@ -105,7 +105,9 @@ public class SubprocessoPermissoesService {
         // FALSE but got TRUE.
         // This means we need to check the situation for Impact visualization as well.
         boolean situacaoImpactoValida =
-                sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
+                sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
 
         // But test "naoDevePermitirVisualizarImpactoParaNaoAdmin" failed with NPE, but implied it
         // expects FALSE.

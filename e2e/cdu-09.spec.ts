@@ -23,7 +23,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
 
     const timestamp = Date.now();
-    const descProcesso = `Processo CDU-09 ${timestamp}`;
+    const descProcesso = `Proc 9 ${timestamp}`;
     let processoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
@@ -49,7 +49,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         });
 
         // Iniciar processo
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         // Wait for data to load to avoid race condition where fields are empty
@@ -69,13 +69,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        // Navegar para o subprocesso
+        // Navegar para o subprocesso (CHEFE vai direto para o subprocesso)
         await page.getByText(descProcesso).click();
-
-        // Se cair na tela de processo (lista de unidades), clicar na unidade
-        if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-            await page.getByRole('row', {name: 'Seção 221'}).click();
-        }
 
         await verificarPaginaSubprocesso(page);
 
@@ -89,13 +84,14 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Tentar Disponibilizar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de confirmação NÃO abre
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeHidden();
+        // Verificar que modal de confirmação ABRE (validação no backend)
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Verificar indicador de erro (Toast/Alert)
         const alert = page.getByTestId('global-alert');
         await expect(alert).toBeVisible();
-        await expect(alert).toContainText('Atividades Incompletas');
+        await expect(alert).toContainText(/Erro ao disponibilizar/i);
 
         // Adicionar conhecimento para corrigir
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');

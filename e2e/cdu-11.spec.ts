@@ -24,52 +24,65 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
-    const timestamp = Date.now();
-    const descProcessoMapeamento = `AAA Mapeamento CDU-11 ${timestamp}`;
-    const atividadeA = `Atividade A ${timestamp}`;
-    const atividadeB = `Atividade B ${timestamp}`;
-    const conhecimento1 = 'Conhecimento 1';
-    const conhecimento2 = 'Conhecimento 2';
-    const conhecimento3 = 'Conhecimento 3';
-
-    let processoMapeamentoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({ request }) => {
-        await cleanup.limpar(request);
-    });
-
-    // ========================================================================
-    // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
-    // ========================================================================
-
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({ page }) => {
-        await page.goto('/login');
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-
-        await criarProcesso(page, {
-            descricao: descProcessoMapeamento,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+        const timestamp = Date.now();
+        const descProcessoMapeamento = `Map 11 ${timestamp}`;
+        const atividadeA = `Atividade A ${timestamp}`;
+        const atividadeB = `Atividade B ${timestamp}`;
+        const conhecimento1 = 'Conhecimento 1';
+        const conhecimento2 = 'Conhecimento 2';
+        const conhecimento3 = 'Conhecimento 3';
+    
+        let processoMapeamentoId: number;
+        let cleanup: ReturnType<typeof useProcessoCleanup>;
+    
+        test.beforeAll(async ({ request }) => {
+            await resetDatabase(request);
+            cleanup = useProcessoCleanup();
         });
-
-        // Selecionar o processo na tabela para obter o ID
-        const linhaProcesso = page.locator('tr', { has: page.getByText(descProcessoMapeamento) });
-        await linhaProcesso.click();
-
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
-
-        // Capturar ID do processo para cleanup
-        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+    
+        test.afterAll(async ({ request }) => {
+            await cleanup.limpar(request);
+        });
+    
+        // ========================================================================
+        // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
+        // ========================================================================
+    
+        test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({ page }) => {
+            await page.goto('/login');
+            await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+    
+            await criarProcesso(page, {
+                descricao: descProcessoMapeamento,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: UNIDADE_ALVO,
+                expandir: ['SECRETARIA_2', 'COORD_22']
+            });
+    
+                            // Selecionar o processo na tabela para obter o ID
+    
+                            const linhaProcesso = page.locator('tr').filter({ has: page.getByText(descProcessoMapeamento) });
+    
+                            await linhaProcesso.click();
+    
+                    
+    
+                            await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
+    
+                            await expect(page.getByText('Carregando unidades...')).toBeHidden();
+    
+                    
+    
+                            // Capturar ID do processo para cleanup
+    
+                            processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+    
+                            if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+    
+                    
+    
+                            // Iniciar processo
 
         // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
@@ -117,6 +130,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // 2.2 Usuário clica em unidade subordinada operacional/interoperacional
         // 2.3 Sistema mostra tela Detalhes do subprocesso
 
+        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
@@ -218,6 +232,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
+        
+        // Wait for status update to ensure visibility for Chef
+        await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
 
         // Chefe valida mapa
         await fazerLogout(page);

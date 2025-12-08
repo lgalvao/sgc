@@ -286,7 +286,7 @@ async function salvarProcesso() {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
         unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
       await processosStore.atualizarProcesso(
@@ -298,15 +298,21 @@ async function salvarProcesso() {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
         unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
       await processosStore.criarProcesso(request);
       await router.push("/painel");
     }
     limparCampos();
-  } catch (error) {
-    mostrarAlerta('danger', "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
+  } catch (error: any) {
+    let msg = "Não foi possível salvar o processo. Verifique os dados e tente novamente.";
+    if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
+      msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
+    } else if (error.response?.data?.message) {
+      msg = error.response.data.message;
+    }
+    mostrarAlerta('danger', "Erro ao salvar processo", msg);
     console.error("Erro ao salvar processo:", error);
   }
 }
@@ -332,13 +338,19 @@ async function confirmarIniciarProcesso() {
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
         unidades: unidadesSelecionadas.value,
       };
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
-    } catch (error) {
-      mostrarAlerta('danger', "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+    } catch (error: any) {
+      let msg = "Não foi possível criar o processo para iniciá-lo.";
+      if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
+        msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
+      } else if (error.response?.data?.message) {
+        msg = error.response.data.message;
+      }
+      mostrarAlerta('danger', "Erro ao criar processo", msg);
       console.error("Erro ao criar processo:", error);
       return;
     }
@@ -352,8 +364,14 @@ async function confirmarIniciarProcesso() {
     );
     await router.push("/painel");
     limparCampos();
-  } catch (error) {
-    mostrarAlerta('danger', "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
+  } catch (error: any) {
+    let msg = "Não foi possível iniciar o processo. Tente novamente.";
+    if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
+      msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
+    } else if (error.response?.data?.message) {
+      msg = error.response.data.message;
+    }
+    mostrarAlerta('danger', "Erro ao iniciar processo", msg);
     console.error("Erro ao iniciar processo:", error);
   }
 }
@@ -375,8 +393,14 @@ async function confirmarRemocao() {
         // Only clear fields if it was a new process
         limparCampos();
       }
-    } catch (error) {
-      mostrarAlerta('danger', "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
+    } catch (error: any) {
+      let msg = "Não foi possível remover o processo. Tente novamente.";
+      if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
+        msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
+      } else if (error.response?.data?.message) {
+        msg = error.response.data.message;
+      }
+      mostrarAlerta('danger', "Erro ao remover processo", msg);
       console.error("Erro ao remover processo:", error);
     }
   }

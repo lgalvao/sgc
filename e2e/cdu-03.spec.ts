@@ -31,7 +31,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         // Preenche descrição e tenta salvar -> Erro de unidade
         await page.getByTestId('inp-processo-descricao').fill('Descrição Teste');
         await page.getByTestId('btn-processo-salvar').click();
-        await expect(page.getByText('Pelo menos uma unidade participante elegível deve ser incluída.')).toBeVisible();
+        await expect(page.getByText('Pelo menos uma unidade participante deve ser incluída.')).toBeVisible();
     });
 
     test('Deve editar um processo existente', async ({ page }) => {
@@ -41,7 +41,8 @@ test.describe('CDU-03 - Manter Processo', () => {
             descricao: descricaoOriginal,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'ASSESSORIA_11'
+            unidade: 'ASSESSORIA_11',
+            expandir: ['SECRETARIA_1']
         });
 
         // Capturar ID do processo para cleanup
@@ -51,6 +52,11 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         // Verifica que os dados foram carregados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
+        
+        // Expandir árvore para verificar seleção
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+
         await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_11')).toBeChecked();
 
         // Modifica o processo
@@ -72,7 +78,8 @@ test.describe('CDU-03 - Manter Processo', () => {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'ASSESSORIA_11'
+            unidade: 'ASSESSORIA_11',
+            expandir: ['SECRETARIA_1']
         });
 
         await page.getByText(descricao).click();

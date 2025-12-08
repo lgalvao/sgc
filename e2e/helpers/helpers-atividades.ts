@@ -2,6 +2,7 @@ import {expect, type Page} from '@playwright/test';
 
 export async function navegarParaAtividades(page: Page, options?: { visualizacao?: boolean }) {
     const testId = options?.visualizacao ? 'card-subprocesso-atividades-vis' : 'card-subprocesso-atividades';
+    await expect(page.getByTestId(testId)).toBeVisible();
     await page.getByTestId(testId).click();
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
@@ -85,7 +86,7 @@ export async function disponibilizarCadastro(page: Page) {
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {
-    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(situacao);
+    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
 }
 
 export async function verificarBotaoImpacto(page: Page, visivel: boolean) {

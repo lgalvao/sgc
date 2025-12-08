@@ -76,7 +76,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: /Assessoria 21/i}).click();
+        await page.getByRole('row', {name: /Unit Test Diag/i}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -84,7 +84,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         // Cria Competência no Mapa
         await expect(page).toHaveURL(/.*\/painel/);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: /Assessoria 21/i}).click();
+        await page.getByRole('row', {name: /Unit Test Diag/i}).click();
         await page.getByTestId('card-subprocesso-mapa').click();
         
         await page.getByTestId('btn-abrir-criar-competencia').click();
@@ -109,7 +109,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: /Assessoria 21/i}).click();
+        await page.getByRole('row', {name: /Unit Test Diag/i}).click();
         await page.locator('[data-testid="card-subprocesso-mapa-vis"]').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -244,11 +244,12 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         
         await page.getByTestId('card-subprocesso-monitoramento').click();
         
-        const btnConcluir = page.getByTestId('btn-concluir-diagnostico');
-        await expect(btnConcluir).toBeVisible();
-        await btnConcluir.click();
+        await page.getByTestId('btn-concluir-diagnostico').click();
         
         await expect(page.getByRole('heading', { name: 'Conclusão do Diagnóstico' })).toBeVisible();
+        
+        const btnConfirmar = page.getByTestId('btn-confirmar-conclusao');
+        await expect(btnConfirmar).toBeVisible();
         
         // Preenche justificativa se necessário
         const temPendencias = await page.getByText(/Existem.*pendências/).isVisible();
@@ -256,9 +257,9 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
             await page.getByLabel('Justificativa').fill('Conclusão de teste E2E');
         }
         
-        await page.getByRole('button', { name: 'Confirmar Conclusão' }).click();
+        await btnConfirmar.click();
         
-        await expect(page.getByText('Diagnóstico concluído com sucesso!')).toBeVisible();
+        await expect(page.getByText('Diagnóstico da unidade concluído com sucesso!')).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
         
         // Verifica status final

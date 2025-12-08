@@ -593,11 +593,26 @@ const subprocesso = computed(() => {
 });
 
 const podeVerImpacto = computed(() => {
-  if (!isChefe.value || !subprocesso.value) return false;
-  return (
-    subprocesso.value.situacaoSubprocesso ===
-    SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-  );
+  if (!subprocesso.value) return false;
+
+  const situacao = subprocesso.value.situacaoSubprocesso;
+
+  // 3.1. CHEFE
+  if (isChefe.value) {
+    return situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO ||
+           (isRevisao.value && situacao === SituacaoSubprocesso.NAO_INICIADO);
+  }
+  
+  // 3.2. GESTOR ou ADMIN (Visualização)
+  // Note: This component is also used by ADMIN/GESTOR to view/edit if they are "editing" 
+  // but usually they use VisAtividades.vue for read-only.
+  // However, if they land here, we should support it.
+  if (perfilSelecionado.value === Perfil.GESTOR || perfilSelecionado.value === Perfil.ADMIN) {
+      // Check location logic would be needed here, but for now checking status:
+      return situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+  }
+
+  return false;
 });
 
 const mostrarModalImpacto = ref(false);
@@ -675,14 +690,17 @@ function fecharModalConfirmacao() {
 async function confirmarDisponibilizacao() {
   if (!codSubrocesso.value) return;
 
+  let sucesso = false;
   if (isRevisao.value) {
-    await subprocessosStore.disponibilizarRevisaoCadastro(codSubrocesso.value);
+    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubrocesso.value);
   } else {
-    await subprocessosStore.disponibilizarCadastro(codSubrocesso.value);
+    sucesso = await subprocessosStore.disponibilizarCadastro(codSubrocesso.value);
   }
 
   fecharModalConfirmacao();
-  await router.push("/painel");
+  if (sucesso) {
+    await router.push("/painel");
+  }
 }
 
 function abrirModalImpacto() {

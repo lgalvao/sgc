@@ -28,7 +28,8 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'ASSESSORIA_11'
+            unidade: 'ASSESSORIA_11',
+            expandir: ['SECRETARIA_1']
         });
 
         // 2. Entra na edição
