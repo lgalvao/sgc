@@ -1,41 +1,59 @@
-import {defineStore} from 'pinia';
-import {Alerta} from '../mappers/alertas';
-import * as painelService from '../services/painelService';
-import {Page} from '../services/painelService';
-import * as alertaService from '../services/alertaService';
-import {usePerfilStore} from './perfil';
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import type {Page} from "@/services/painelService";
+import type {Alerta} from "@/types/tipos";
+import * as alertaService from "../services/alertaService";
+import * as painelService from "../services/painelService";
+import {usePerfilStore} from "./perfil";
 
-export const useAlertasStore = defineStore('alertas', {
-    state: () => ({
-        alertas: [] as Alerta[],
-        alertasPage: {} as Page<Alerta>,
-    }),
-    getters: {
-        // Não há mais a propriedade 'lido' no DTO do backend, então este getter não é mais aplicável
-        // getAlertasNaoLidos: (state) => () => {
-        //     return state.alertas.filter(alerta => !alerta.lido);
-        // }
-    },
-    actions: {
-        async fetchAlertas(usuarioTitulo: string, unidade: number, page: number, size: number) {
-            const response = await painelService.listarAlertas(usuarioTitulo, unidade, page, size);
-            this.alertas = response.content;
-            this.alertasPage = response;
-        },
+export const useAlertasStore = defineStore("alertas", () => {
+    const alertas = ref<Alerta[]>([]);
+    const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 
-        async marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
-            try {
-                await alertaService.marcarComoLido(idAlerta);
-                // Após marcar como lido, recarregar a lista de alertas para refletir a mudança
-                const perfilStore = usePerfilStore();
-                if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
-                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20); // Recarrega a primeira página
-                }
-                return true;
-            } catch (error) {
-                console.error('Erro ao marcar alerta como lido:', error);
-                return false;
-            }
-        },
+    async function buscarAlertas(
+        usuarioTitulo: number,
+        unidade: number,
+        page: number,
+        size: number,
+        sort?: "data" | "processo",
+        order?: "asc" | "desc",
+    ) {
+        const response = await painelService.listarAlertas(
+            usuarioTitulo,
+            unidade,
+            page,
+            size,
+            sort,
+            order,
+        );
+        alertas.value = response.content;
+        alertasPage.value = response;
     }
+
+    async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
+        try {
+            await alertaService.marcarComoLido(idAlerta);
+            const perfilStore = usePerfilStore();
+            if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
+                await buscarAlertas(
+                    Number(perfilStore.servidorId),
+                    Number(perfilStore.unidadeSelecionada),
+                    0,
+                    20,
+                    undefined,
+                    undefined,
+                );
+            }
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    return {
+        alertas,
+        alertasPage,
+        buscarAlertas,
+        marcarAlertaComoLido,
+    };
 });

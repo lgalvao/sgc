@@ -20,9 +20,18 @@ backend/build/
 backend/out/
 backend/bin/
 /backend/src/main/generated/
+!/backend/build/test-results/test
+/backend/build/test-results/test/binary
 
 # Logs
-*.log
 
-# Arquivos compilados
+*.gz
+
+# Arquivos compilados/binários
 *.class
+/frontend/tsconfig.tsbuildinfo
+/node_modules/
+!backend/build/reports/tests/test/index.html
+/backend/target/
+.DS_Store
+/backend/.jqwik-database

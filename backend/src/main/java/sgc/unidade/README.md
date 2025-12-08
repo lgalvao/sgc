@@ -1,9 +1,9 @@
-# Pacote Unidade (Modelo de Dados)
+# Pacote Unidade
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
-Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que representa uma unidade organizacional (secretaria, seção, etc.), e seu repositório.
 
-**Nota Arquitetural Importante:** Este pacote é estritamente um **módulo de modelo de dados**. Ele **não contém lógica de negócio, serviços ou controllers**. Sua única responsabilidade é definir a estrutura da entidade `Unidade` e como ela é persistida.
+Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que representa uma unidade organizacional (secretaria, seção, etc.), seu repositório e uma camada de serviço para operações relacionadas.
 
 ## Arquitetura e Propósito
 A entidade `Unidade` serve como a "fonte da verdade" para a hierarquia organizacional dentro do SGC. Outros módulos consomem os dados deste pacote para executar seus fluxos de trabalho.
@@ -13,6 +13,8 @@ graph TD
     subgraph "Pacote Unidade (este pacote)"
         Modelo(Unidade)
         Repo[UnidadeRepo]
+        Controller[UnidadeController]
+        Service[UnidadeService]
     end
 
     subgraph "Módulos Consumidores"
@@ -29,17 +31,34 @@ graph TD
 
     SgrhService -- Alimenta/Atualiza dados em --> Repo
 
+    Controller -- Usa --> Service
+    Service -- Gerencia --> Repo
     Repo -- Gerencia --> Modelo
 ```
 
 ## Componentes Principais
-- **`Unidade`**: A entidade JPA que representa uma unidade organizacional. Seus campos mais importantes são:
-  - `unidadeSuperior`: Auto-relacionamento que define a hierarquia.
-  - `tipo`: Um enum que classifica a unidade (ex: `OPERACIONAL`), usado para direcionar a lógica em outros módulos.
-- **`UnidadeRepo`**: O repositório Spring Data JPA para acessar a entidade `Unidade`.
 
-## Como os Dados são Gerenciados?
-- **Leitura:** Diversos serviços (`ProcessoService`, `SubprocessoService`, etc.) utilizam o `UnidadeRepo` para buscar informações sobre a estrutura organizacional.
-- **Escrita:** A criação e atualização das unidades **não são feitas por uma API de CRUD**. A responsabilidade de manter os dados da tabela `UNIDADE` sincronizados recai sobre o `SgrhService`, que deve buscar os dados de um sistema de RH externo (a fonte de verdade oficial) e populá-los no banco de dados do SGC.
+### Controladores e Serviços
+- **`UnidadeController`**: Expõe endpoints REST para consulta e operações pontuais.
+  - `GET /api/unidades`: Lista hierárquica.
+  - `GET /api/unidades/arvore-com-elegibilidade`: Árvore de unidades com flag de elegibilidade para processos.
+  - `GET /api/unidades/{id}/servidores`: Lista servidores da unidade.
+  - `POST /api/unidades/{id}/atribuicoes-temporarias`: Cria atribuição temporária.
+- **`UnidadeService`**: Camada de serviço para lógica de negócio e consultas.
 
-Em resumo, este pacote fornece o "esqueleto" organizacional sobre o qual os outros módulos operam.
+### Modelo de Dados (`model`)
+- **`Unidade`**: Entidade JPA principal.
+- **`UnidadeRepo`**: Repositório Spring Data.
+- **`AtribuicaoTemporaria`**: Entidade para gerenciar atribuições temporárias de servidores.
+- **`VinculacaoUnidade`**: Entidade para relacionamentos adicionais entre unidades.
+- **`TipoUnidade`**: Enum (`OPERACIONAL`, `INTERMEDIARIA`, `INTEROPERACIONAL`).
+- **`SituacaoUnidade`**: Enum (`ATIVA`, `EXTINTA`).
+
+## Gerenciamento de Dados
+- **Leitura:** Diversos serviços utilizam o `UnidadeRepo` para buscar informações estruturais.
+- **Escrita:** A estrutura básica (entidade `Unidade`) é sincronizada via `SgrhService`. No entanto, o módulo permite operações específicas como a criação de `AtribuicaoTemporaria` via API.
+
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

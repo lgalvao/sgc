@@ -1,137 +1,129 @@
-# Sobre o projeto
+# Frontend SGC
+Última atualização: 2025-12-04 14:18:38Z
 
-Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, **desenvolvido** em Vue 3 e Vite, com TypeScript, Vue Router, Bootstrap 5 e Pinia. O objetivo do sistema será gerir os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE, centralizando todos os dados no front-end via mocks em JSON. O sistema está em desenvolvimento ativo, com muitas funcionalidades já implementadas e outras em andamento.
+Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema de Gestão de Competências). Este documento serve como um guia para desenvolvedores, detalhando a arquitetura, as tecnologias e as convenções do projeto.
 
-## Antes de qualquer coisa
+## Tecnologias
 
-- Este é um **protótipo**. Não vamos nos preocupar com desempenho ou reuso; o foco é no funcionamento da UX/UI do sistema.
-- **Não** antecipe otimizações e abstrações; faça só o necessário para o momento.
-- O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
-- O código, comentários e dados devem estar sempre em **português do Brasil**.
+- **Framework:** [Vue.js](https://vuejs.org/) 3.5 (usando a Composition API)
+- **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+- **Builds:** [Vite](https://vitejs.dev/)
+- **Gerenciamento de estado:** [Pinia](https://pinia.vuejs.org/)
+- **Roteamento:** [Vue Router](https://router.vuejs.org/)
+- **Componentes de UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/)
+- **Ícones:** [Bootstrap Icons](https://icons.getbootstrap.com/)
+- **Testes unitários:** [Vitest](https://vitest.dev/)
+- **Cliente HTTP:** [Axios](https://axios-http.com/)
 
-## Testes e Qualidade de Código
+### Executando a Aplicação
 
-O projeto utiliza Vitest para testes unitários e Playwright para testes de integração (e2e). ESLint é usado para garantir a consistência do código.
+Para iniciar o servidor de desenvolvimento com hot-reload, execute:
 
-### Arquitetura dos Testes E2E
+```bash
+npm run dev
+```
 
-Os testes E2E seguem uma arquitetura semântica em 3 camadas para garantir que sejam legíveis, robustos e fáceis de manter:
+A aplicação estará disponível em `http://localhost:5173`.
 
-1.  **Dados e Constantes (`/e2e/cdu/helpers/dados`):** Centraliza todos os seletores (`data-testid`), textos da UI e URLs, eliminando "strings mágicas" dos testes.
-2.  **Helpers - Ações e Verificações (`/e2e/cdu/helpers`):** Camada que encapsula toda a lógica de interação e verificação com o Playwright. As funções são nomeadas de forma semântica (ex: `criarProcessoCompleto`, `verificarProcessoFinalizadoNoPainel`) e são o único local onde `expect` e seletores complexos são permitidos.
-3.  **Especificações (`/e2e/cdu/*.spec.ts`):** Os arquivos de teste em si, que devem ser lidos como uma narrativa de usuário, orquestrando chamadas aos helpers sem conter detalhes técnicos.
+## Arquitetura
 
-Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no código-fonte para criar seletores resilientes. Para uma documentação mais detalhada sobre a arquitetura e os helpers, consulte o [README dos testes E2E](./e2e/cdu/README.md).
+O frontend segue uma arquitetura de camadas bem definida, projetada para separação de responsabilidades e manutenibilidade. O fluxo de dados e lógica é o seguinte:
 
-### Localização dos Testes
+1. **Views (`src/views`):** São os componentes de página, ativados pelo Vue Router. Elas orquestram a exibição de componentes de UI e disparam ações.
+2. **Stores (`src/stores`):** As `Views` interagem com as stores do Pinia para obter estado e invocar ações de negócio (ex: `buscarProcessos()`). As stores são a fonte única de verdade para o estado da aplicação.
+3. **Services (`src/services`):** As ações nas `stores` não fazem chamadas de API diretamente. Em vez disso, elas delegam essa responsabilidade para os `services`. Cada `service` agrupa um conjunto de chamadas de API relacionadas a uma entidade (ex: `processoService`).
+4. **API (Axios):** Os `services` utilizam uma instância configurada do Axios (`src/axios-setup.ts`) para realizar as requisições HTTP para o backend.
 
-- **Testes Unitários (Vitest)**: Ficam localizados em diretórios `__tests__/` adjacentes aos arquivos que estão testando (ex: `src/components/__tests__/Navbar.spec.ts`).
-- **Testes E2E (Playwright)**: Todos os testes de ponta a ponta ficam no diretório `/e2e`, organizados por funcionalidade (ex: `e2e/cdu/cdu-01.spec.ts`).
+### Autenticação e Gerenciamento de Sessão
 
-### Comandos
+A autenticação é gerenciada via token JWT. O fluxo é o seguinte:
 
-- **Executar testes unitários**:
-  
-  ```bash
-  npm run test:unit
-  ```
-- **Executar testes end-to-end**:
-  
-  ```bash
-  npm run test:e2e
-  ```
-- **Verificar o estilo do código (Lint)**:
-  
-  ```bash
-  npm run lint
-  ```
-- **Verificar os tipos do TypeScript**:
-  
-  ```bash
-  npm run typecheck
-  ```
+- Após o login, o perfil do usuário e o token JWT são armazenados no `localStorage`.
+- O arquivo `axios-setup.ts` configura um **interceptor de requisição** do Axios que anexa automaticamente o token (`Authorization: Bearer ...`) a cada chamada para a API.
+- Um **interceptor de resposta** do Axios verifica se a API retorna um erro `401 Unauthorized`. Se isso acontecer, ele limpa o `localStorage` e redireciona o usuário para a página de login, efetivamente encerrando a sessão.
 
-## Estrutura de Diretórios:
+## Estrutura do Projeto
 
-- `/src/components/`: Componentes Vue reutilizáveis
-- `/src/views/`: Páginas/rotas da aplicação
-- `/src/stores/`: Gerenciamento de estado com Pinia
-- `/src/mocks/`: Dados simulados em JSON
-- `/src/composables/`: Lógica reutilizável
-- `/src/constants/`: Constantes e enums centralizados
-- `/src/utils/`: Utilitários auxiliares para funcionalidades comuns
-- `/src/types/`: Definições de tipos TypeScript
+```text
+frontend/
+├── src/
+│   ├── components/     # Componentes Vue reutilizáveis e sem estado direto
+│   ├── composables/    # Funções "composables" da Vue para lógica reutilizável
+│   ├── constants/      # Constantes da aplicação (ex: chaves de localStorage)
+│   ├── mappers/        # Funções para transformar dados entre a API e o frontend
+│   ├── router/         # Configuração de rotas (Vue Router)
+│   ├── services/       # Camada de serviço para comunicação com a API
+│   ├── stores/         # Módulos de estado (Pinia)
+│   ├── types/          # Definições de tipos e interfaces TypeScript
+│   ├── utils/          # Funções utilitárias gerais
+│   ├── views/          # Componentes de página (associados às rotas)
+│   ├── App.vue         # Componente raiz da aplicação
+│   ├── axios-setup.ts  # Configuração central do Axios (interceptors)
+│   └── main.ts         # Ponto de entrada da aplicação
+└── ...
+```
 
-## Visão geral de design
+## Gerenciamento de Estado (Pinia)
 
-- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local.
-- **Perfis de Usuário**: O perfil (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) é determinado dinamicamente com base na lotação do servidor logado, através do composable `usePerfil`. O `idServidor` logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
-- **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, com um seletor para pares "perfil - unidade" quando houver múltiplas opções.
+- O estado da aplicação é gerenciado pelo Pinia.
+- As `stores` são modulares e organizadas por entidade (ex: `useProcessosStore`, `usePerfilStore`).
+- A `usePerfilStore` é responsável por persistir e ler os dados do usuário do `localStorage`, garantindo que a sessão do usuário seja mantida entre recarregamentos da página.
 
-## Arquitetura e Componentes
+## Roteamento (Vue Router)
 
-### Stores (`/src/stores/`)
+- As rotas são definidas no diretório `src/router`.
+- A configuração é modular, com rotas separadas em arquivos por funcionalidade (ex: `processo.routes.ts`).
+- Um **guarda de navegação global** (`router.beforeEach` em `src/router/index.ts`) protege as rotas que exigem autenticação, redirecionando usuários não autenticados para a página de login.
 
-Cada domínio possui um store dedicado:
+## Testes
 
-- `processos.ts`: Gerencia o estado dos processos.
-- `subprocessos.ts`: Gerencia os dados e a lógica de negócio dos subprocessos.
-- `mapas.ts`: Gerencia os mapas de competência.
-- `atividades.ts`: Gerencia atividades e conhecimentos.
-- `atribuicoes.ts`: Gerencia atribuições temporárias de servidores.
-- `perfil.ts`: Gerencia o `idServidor`, perfil e unidade do usuário logado.
-- `servidores.ts`: Gerencia os dados dos servidores.
-- `unidades.ts`: Gerencia as unidades organizacionais.
-- `revisao.ts`: Gerencia o estado das mudanças durante a revisão de um mapa.
-- `alertas.ts`: Fornece dados mockados de alertas para o painel.
-- `notificacoes.ts`: Gerencia o sistema de notificações da aplicação.
-- `configuracoes.ts`: Gerencia as configurações globais do sistema.
+O projeto utiliza [Vitest](https://vitest.dev/) para testes. A estratégia de testes é dividida em duas categorias:
 
-### Componentes (`/src/components/`)
+1. **Testes de Unidade:**
+    - **Arquivos:** `*.test.ts` ou `*.spec.ts` dentro de `src/`.
+    - **Objetivo:** Testar componentes, funções e stores de forma isolada.
+    - **Comando:** `npm run test:unit`
 
-- `AceitarMapaModal.vue`: Modal para GESTORES/CHEFES aceitarem um mapa ou para o ADMIN homologá-lo.
-- `AcoesEmBlocoModal.vue`: Modal para aceitar ou homologar cadastros de atividades em lote.
-- `BarraNavegacao.vue`: Agrupa o botão "Voltar" e breadcrumbs dinâmicos.
-- `CriarCompetenciaModal.vue`: Modal para criar ou editar uma competência.
-- `DisponibilizarMapaModal.vue`: Modal para o ADMIN disponibilizar um mapa para validação.
-- `HistoricoAnaliseModal.vue`: Modal que exibe o histórico de análises e observações de um mapa.
-- `ImpactoMapaModal.vue`: Exibe o impacto das alterações de atividades em um mapa em revisão.
-- `ImportarAtividadesModal.vue`: Permite importar atividades de processos finalizados.
-- `Navbar.vue`: Barra de navegação superior principal, com links, seletor de perfil e logout.
-- `NotificacaoContainer.vue`: Container global para exibição de notificações (toasts).
-- `SistemaNotificacoesModal.vue`: Central que exibe o histórico de todas as notificações.
-- `SubprocessoCards.vue`: Apresenta cards de navegação dinâmicos na tela de subprocesso.
-- `SubprocessoHeader.vue`: Cabeçalho da página de subprocesso com informações de contexto.
-- `SubprocessoModal.vue`: Modal para o ADMIN alterar a data limite de uma etapa.
-- `TabelaProcessos.vue`: Componente reutilizável para exibir listas de processos com ordenação.
-- `TreeRow.vue` e `TreeTable.vue`: Componentes para criar tabelas hierárquicas expansíveis.
-- `UnidadeTreeItem.vue`: Componente recursivo para renderizar uma árvore de unidades com checkboxes.
+## Estilo de Código e Linting
 
-### Views (`/src/views/`)
+- O projeto utiliza [ESLint](https://eslint.org/) com `typescript-eslint` e `eslint-plugin-vue` para garantir um estilo de código consistente.
+- A configuração pode ser encontrada em `eslint.config.js`.
+- Para verificar e corrigir problemas de estilo, execute:
 
-- `Login.vue`: Tela de login simulado.
-- `Painel.vue`: Painel inicial com processos e alertas.
-- `Processo.vue`: Detalhes de um processo e sua árvore de unidades.
-- `Subprocesso.vue`: Detalhes do subprocesso de uma unidade.
-- `CadProcesso.vue`: Formulário para CRUD de processos.
-- `CadAtividades.vue`: Tela para cadastro de atividades e conhecimentos de uma unidade.
-- `CadAtribuicao.vue`: Formulário para criar atribuições temporárias.
-- `CadMapa.vue`: Tela para criação e edição de mapas de competências.
-- `Configuracoes.vue`: Página para o ADMIN ajustar configurações globais.
-- `DiagnosticoEquipe.vue`: Tela para avaliação de competências pela equipe.
-- `Historico.vue`: Exibe a lista de processos finalizados.
-- `OcupacoesCriticas.vue`: Tela para cadastrar ocupações críticas da unidade.
-- `Relatorios.vue`: Painel para visualização e exportação de relatórios.
-- `Unidade.vue`: Detalhes de uma unidade organizacional.
-- `VisAtividades.vue`: Tela para visualização e validação do cadastro de atividades.
-- `VisMapa.vue`: Tela para visualização e validação de um mapa de competências.
+    ```bash
+    npm run lint
+    ```
 
-## Regras Importantes ao Codificar
+## 🛡️ Verificações de Qualidade
 
-- **Stores Pinia**: Sempre centralize dados e a lógica de acesso nos stores. Nunca acesse arquivos JSON diretamente de componentes.
-- **Idioma**: Mantenha todo o código, comentários e dados em português do Brasil.
-- **Padrões**: Siga os padrões de navegação, componentização e UI/UX já estabelecidos no projeto.
-- **Contexto do Usuário**: Para obter o perfil e a unidade do usuário, utilize `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
-- **Utilitários**: Use as funções centralizadas em `/src/utils/index.ts` para operações comuns (datas, IDs, etc.).
-- **Constantes**: Utilize as constantes em `/src/constants/` para evitar o uso de strings "mágicas".
-- **Notificações**: Use a store `notificacoes.ts` (via `useNotificacoesStore()`) para disparar feedbacks ao usuário com os Metodos `sucesso()`, `erro()`, `aviso()`, etc.
+O frontend possui scripts dedicados para garantir a qualidade do código e cobertura de testes.
+
+### Ferramentas
+- **ESLint**: Análise estática e formatação.
+- **vue-tsc**: Verificação de tipos TypeScript.
+- **Vitest Coverage**: Relatório de cobertura de testes.
+
+### Como Executar
+Para rodar todas as verificações (sem falhar o build em caso de avisos):
+```bash
+npm run quality:all
+```
+
+Para gerar os relatórios de cobertura (já incluído em `quality:all`):
+```bash
+npm run coverage:unit
+```
+
+Os relatórios de cobertura ficam em `coverage/`.
+
+## Scripts Disponíveis
+
+- `npm run dev`: Inicia o servidor de desenvolvimento.
+- `npm run lint`: Executa o linter para análise e correção de código.
+- `npm run typecheck`: Verifica a tipagem do código com TypeScript.
+- `npm run test:unit`: Executa os testes de unidade.
+- `npm run quality:all`: Executa verificações de qualidade (testes, lint, typecheck).
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

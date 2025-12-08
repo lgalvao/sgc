@@ -7,45 +7,78 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-
-import java.util.Set;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
 
 @Component
-public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
-
-    private final UsuarioRepo usuarioRepo;
-
-    @Autowired
-    public WithMockGestorSecurityContextFactory(UsuarioRepo usuarioRepo) {
-        this.usuarioRepo = usuarioRepo;
-    }
+public class WithMockGestorSecurityContextFactory
+        implements WithSecurityContextFactory<WithMockGestor> {
+    @Autowired(required = false)
+    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        long gestorId;
-        try {
-            gestorId = Long.parseLong(customUser.value());
-        } catch (NumberFormatException e) {
-            gestorId = 222222222222L; // Default value
+        String tituloGestor = customUser.value();
+        Usuario principal = null;
+        boolean dbAvailable = false;
+        if (usuarioRepo != null) {
+            try {
+                principal = usuarioRepo.findById(tituloGestor).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
 
-        final Long finalGestorId = gestorId;
-        Usuario principal = usuarioRepo.findById(finalGestorId)
-            .orElseGet(() -> {
-                Usuario gestor = new Usuario();
-                gestor.setTituloEleitoral(finalGestorId);
-                gestor.setNome("Gestor User");
-                gestor.setEmail("gestor@example.com");
-                gestor.setPerfis(Set.of(Perfil.GESTOR));
-                return usuarioRepo.save(gestor);
-            });
+        if (principal == null) {
+            principal = new Usuario();
+            principal.setTituloEleitoral(tituloGestor);
+            principal.setNome("Gestor User");
+            principal.setEmail("gestor@example.com");
+            Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+            principal.setUnidadeLotacao(u);
+            principal
+                    .getAtribuicoes()
+                    .add(
+                            sgc.sgrh.model.UsuarioPerfil.builder()
+                                    .usuario(principal)
+                                    .unidade(u)
+                                    .perfil(Perfil.GESTOR)
+                                    .build());
+
+            if (dbAvailable) {
+                try {
+                    usuarioRepo.save(principal);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        } else {
+            if (principal.getAtribuicoes().stream()
+                    .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
+                Unidade u = new Unidade("Unidade Mock", "UO_SUP");
+                principal
+                        .getAtribuicoes()
+                        .add(
+                                sgc.sgrh.model.UsuarioPerfil.builder()
+                                        .usuario(principal)
+                                        .unidade(u)
+                                        .perfil(Perfil.GESTOR)
+                                        .build());
+            }
+            try {
+                usuarioRepo.save(principal);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
 
         Authentication auth =
-                new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+                new UsernamePasswordAuthenticationToken(
+                        principal, "password", principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
     }

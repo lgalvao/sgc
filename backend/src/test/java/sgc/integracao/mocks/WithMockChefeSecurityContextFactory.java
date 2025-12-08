@@ -5,42 +5,91 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import org.springframework.stereotype.Component;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
-import java.util.Set;
-
-@Component
-public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
-
-    @Autowired
+public class WithMockChefeSecurityContextFactory
+        implements WithSecurityContextFactory<WithMockChefe> {
+    @Autowired(required = false)
     private UsuarioRepo usuarioRepo;
+
+    @Autowired(required = false)
+    private UnidadeRepo unidadeRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        long chefeId;
-        try {
-            chefeId = Long.parseLong(annotation.value());
-        } catch (NumberFormatException e) {
-            chefeId = 333333333333L; // Default value
+        Unidade unidade = null;
+        boolean dbAvailable = false;
+        if (unidadeRepo != null) {
+            try {
+                unidade = unidadeRepo.findById(10L).orElse(null);
+                dbAvailable = true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        if (unidade == null) {
+            unidade = new Unidade("Unidade Mock", "SESEL");
+            unidade.setCodigo(10L);
         }
 
-        final Long finalChefeId = chefeId;
-        Usuario usuario = usuarioRepo.findByTituloEleitoral(finalChefeId)
-            .orElseGet(() -> {
-                Usuario newUser = new Usuario();
-                newUser.setTituloEleitoral(finalChefeId);
-                newUser.setNome("Chefe User");
-                newUser.setEmail("chefe@example.com");
-                newUser.setPerfis(Set.of(Perfil.CHEFE));
-                return usuarioRepo.save(newUser);
-            });
+        Usuario usuario = null;
+        if (usuarioRepo != null) {
+            try {
+                usuario = usuarioRepo.findById(annotation.value()).orElse(null);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-        context.setAuthentication(token);
+        if (usuario == null) {
+            usuario =
+                    new Usuario(
+                            annotation.value(), "Chefe Teste", "chefe@teste.com", "123", unidade);
+
+            usuario.getAtribuicoes()
+                    .add(
+                            UsuarioPerfil.builder()
+                                    .usuario(usuario)
+                                    .unidade(unidade)
+                                    .perfil(Perfil.CHEFE)
+                                    .build());
+            if (dbAvailable && usuarioRepo != null) {
+                try {
+                    usuarioRepo.save(usuario);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+
+        // Garante que a unidade está correta no usuário do contexto
+        usuario.setUnidadeLotacao(unidade);
+        if (usuario.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+            usuario.getAtribuicoes()
+                    .add(
+                            UsuarioPerfil.builder()
+                                    .usuario(usuario)
+                                    .unidade(unidade)
+                                    .perfil(Perfil.CHEFE)
+                                    .build());
+        }
+        if (dbAvailable && usuarioRepo != null) {
+            try {
+                usuarioRepo.save(usuario);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
         return context;
     }
 }

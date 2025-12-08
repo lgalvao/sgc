@@ -1,4 +1,4 @@
-import {Servidor} from '@/types/tipos';
+import type {Servidor} from "@/types/tipos";
 
 /**
  * src/mappers/servidores.ts
@@ -18,16 +18,20 @@ import {Servidor} from '@/types/tipos';
 export function mapVWUsuarioToServidor(vw: any): Servidor {
   const candidateId =
     vw?.id ??
-    (typeof vw?.titulo === 'string' && /^\d+$/.test(vw.titulo) ? Number(vw.titulo) : undefined) ??
+    vw?.codigo ??
+      (typeof vw?.titulo === "string" && /^\d+$/.test(vw.titulo)
+          ? Number(vw.titulo)
+          : undefined) ??
     undefined;
-  const id = Number(candidateId ?? 0);
+  const codigo = Number(candidateId ?? 0);
 
   return {
-    id,
-    nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? '',
-    unidade: vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? '',
+    codigo,
+      nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? "",
+      unidade: vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "",
     email: vw?.email ?? null,
-    ramal: vw?.ramal ?? vw?.ramal_telefone ?? null
+    ramal: vw?.ramal ?? vw?.ramal_telefone ?? null,
+      tituloEleitoral: vw?.titulo_eleitoral ?? vw?.titulo ?? "",
   };
 }
 

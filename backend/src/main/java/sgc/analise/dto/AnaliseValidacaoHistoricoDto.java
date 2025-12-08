@@ -1,16 +1,23 @@
 package sgc.analise.dto;
 
-import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.analise.modelo.TipoAnalise;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
+import sgc.analise.model.TipoAcaoAnalise;
+import sgc.analise.model.TipoAnalise;
 
-public record AnaliseValidacaoHistoricoDto(
-    LocalDateTime dataHora,
-    String observacoes,
-    TipoAcaoAnalise acao,
-    String unidadeSigla,
-    String analistaUsuarioTitulo,
-    String motivo,
-    TipoAnalise tipo
-) {}
+@Value
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+public class AnaliseValidacaoHistoricoDto {
+    LocalDateTime dataHora;
+    String observacoes;
+    TipoAcaoAnalise acao;
+    String unidadeSigla;
+    String analistaUsuarioTitulo;
+    String motivo;
+    TipoAnalise tipo;
+}

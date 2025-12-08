@@ -2,35 +2,84 @@
  * Utilitários centralizados do projeto SGC (Português BR)
  */
 
-import {CLASSES_BADGE_SITUACAO} from '@/constants/situacoes';
-import {TipoNotificacao} from '@/stores/notificacoes';
-
-// ===== GERAÇÃO DE IDs =====
-let counter = 0;
-export function generateUniqueId(): number {
-  return Date.now() * 1000 + (counter++ % 1000);
-}
+import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from "@/constants/situacoes";
+// import type {TipoNotificacao} from "@/stores/notificacoes"; // Removed
 
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
-  return CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] || 'bg-secondary';
+    return (
+        CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] ||
+        "bg-secondary"
+    );
+}
+
+// ===== LABELS DE SITUAÇÃO =====
+export function situacaoLabel(situacao?: string | null): string {
+    if (!situacao) return "Não disponibilizado";
+
+    const backendLabels: Record<string, string> = {
+        // Initial status
+        NAO_INICIADO: "Não iniciado",
+
+        // Mapeamento statuses
+        MAPEAMENTO_CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
+        MAPEAMENTO_CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
+        MAPEAMENTO_CADASTRO_HOMOLOGADO: "Cadastro homologado",
+        MAPEAMENTO_MAPA_CRIADO: "Mapa criado",
+        MAPEAMENTO_MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+        MAPEAMENTO_MAPA_COM_SUGESTOES: "Mapa com sugestões",
+        MAPEAMENTO_MAPA_VALIDADO: "Mapa validado",
+        MAPEAMENTO_MAPA_HOMOLOGADO: "Mapa homologado",
+
+        // Revisão statuses
+        REVISAO_CADASTRO_EM_ANDAMENTO: "Revisão de cadastro em andamento",
+        REVISAO_CADASTRO_DISPONIBILIZADA: "Revisão de cadastro disponibilizada",
+        REVISAO_CADASTRO_HOMOLOGADA: "Revisão de cadastro homologada",
+        REVISAO_MAPA_AJUSTADO: "Mapa ajustado",
+        REVISAO_MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+        REVISAO_MAPA_COM_SUGESTOES: "Mapa com sugestões",
+        REVISAO_MAPA_VALIDADO: "Mapa validado",
+        REVISAO_MAPA_HOMOLOGADO: "Mapa homologado",
+
+        // Legacy statuses (for backward compatibility)
+        MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+        MAPA_VALIDADO: "Mapa validado",
+        MAPA_HOMOLOGADO: "Mapa homologado",
+        CADASTRO_HOMOLOGADO: "Cadastro homologado",
+        CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
+        CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
+    };
+
+    if (backendLabels[situacao]) return backendLabels[situacao];
+
+    return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
 }
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====
-export const iconeTipo = (tipo: TipoNotificacao): string => {
+// Define local type for iconeTipo since TipoNotificacao was removed
+export type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
+
+export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
   switch (tipo) {
-    case 'success': return 'bi bi-check-circle-fill text-success';
-    case 'error': return 'bi bi-exclamation-triangle-fill text-danger';
-    case 'warning': return 'bi bi-exclamation-triangle-fill text-warning';
-    case 'info': return 'bi bi-info-circle-fill text-info';
-    case 'email': return 'bi bi-envelope-fill text-primary';
-    default: return 'bi bi-bell-fill';
+      case "success":
+          return "bi bi-check-circle-fill text-success";
+      case "error":
+          return "bi bi-exclamation-triangle-fill text-danger";
+      case "warning":
+          return "bi bi-exclamation-triangle-fill text-warning";
+      case "info":
+          return "bi bi-info-circle-fill text-info";
+      default:
+          return "bi bi-bell-fill";
   }
 };
 
 // ===== UTILITÁRIOS DE DATA =====
-export function parseDate(dateInput: string | number | Date | null | undefined): Date | null {
-  if (dateInput === null || dateInput === undefined || dateInput === '') return null;
+export function parseDate(
+    dateInput: string | number | Date | null | undefined,
+): Date | null {
+    if (dateInput === null || dateInput === undefined || dateInput === "")
+        return null;
 
   // Se já for Date
   if (dateInput instanceof Date) {
@@ -38,13 +87,13 @@ export function parseDate(dateInput: string | number | Date | null | undefined):
   }
 
   // Se for número (timestamp)
-  if (typeof dateInput === 'number') {
+    if (typeof dateInput === "number") {
     const d = new Date(dateInput);
     return isNaN(d.getTime()) ? null : d;
   }
 
   // Se for string
-  if (typeof dateInput === 'string') {
+    if (typeof dateInput === "string") {
     const s = dateInput.trim();
     if (!s) return null;
 
@@ -54,8 +103,8 @@ export function parseDate(dateInput: string | number | Date | null | undefined):
     const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
     if (isoDateWithOptionalTimeRe.test(s)) {
       // Se for somente data (sem 'T'), construir em horário local
-      if (!s.includes('T')) {
-        const parts = s.split('-');
+        if (!s.includes("T")) {
+            const parts = s.split("-");
         const year = Number(parts[0]);
         const month = Number(parts[1]);
         const day = Number(parts[2]);
@@ -83,9 +132,14 @@ export function parseDate(dateInput: string | number | Date | null | undefined):
       const month = parseInt(m[2], 10);
       const year = parseInt(m[3], 10);
       if (year >= 1000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-        const d = new Date(year, month -1, day);
+          const d = new Date(year, month - 1, day);
         // Verifica componentes para evitar 31/02 etc.
-        if (!isNaN(d.getTime()) && d.getUTCFullYear() === year && d.getUTCMonth() === month -1 && d.getUTCDate() === day) {
+          if (
+              !isNaN(d.getTime()) &&
+              d.getUTCFullYear() === year &&
+              d.getUTCMonth() === month - 1 &&
+              d.getUTCDate() === day
+          ) {
           return d;
         }
       }
@@ -101,43 +155,51 @@ export function parseDate(dateInput: string | number | Date | null | undefined):
 export function formatDateBR(
   date: Date | string | number | null | undefined,
   options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+  },
 ): string {
-  if (!date) return 'Não informado';
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
-  if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
+    if (!date) return "Não informado";
+    const dateObj =
+        typeof date === "string" || typeof date === "number"
+            ? parseDate(date as any)
+            : date;
+    if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
   try {
-    return dateObj.toLocaleDateString('pt-BR', options);
+      return dateObj.toLocaleDateString("pt-BR", options);
   } catch {
-    return 'Data inválida';
+      return "Data inválida";
   }
 }
 
 export function formatDateForInput(date: Date | null | undefined): string {
-  if (!date || isNaN(date.getTime())) return '';
+    if (!date || isNaN(date.getTime())) return "";
   try {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   } catch {
-    return '';
+      return "";
   }
 }
 
-export function formatDateTimeBR(date: Date | string | number | null | undefined): string {
-  if (!date) return 'Não informado';
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
-  if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
+export function formatDateTimeBR(
+    date: Date | string | number | null | undefined,
+): string {
+    if (!date) return "Não informado";
+    const dateObj =
+        typeof date === "string" || typeof date === "number"
+            ? parseDate(date as any)
+            : date;
+    if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
   return formatDateBR(dateObj, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
   });
 }
 
@@ -145,10 +207,13 @@ export function isDateValidAndFuture(date: Date | null | undefined): boolean {
   if (!date) return false;
   try {
     const today = new Date();
-    today.setHours(0,0,0,0);
-    const d = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
+      today.setHours(0, 0, 0, 0);
+      const d =
+          typeof date === "string" || typeof date === "number"
+              ? parseDate(date as any)
+              : date;
     if (!d) return false;
-    d.setHours(0,0,0,0);
+      d.setHours(0, 0, 0, 0);
     return d >= today;
   } catch {
     return false;

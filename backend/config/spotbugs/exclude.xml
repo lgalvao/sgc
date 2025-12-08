@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Package name="~.*\.generated\..*"/>
+    </Match>
+    <Match>
+        <Or>
+            <Class name="~.*\.dto\..*"/>
+            <Class name="~.*\.entity\..*"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="sgc.Sgc"/>
+    </Match>
+    <Match>
+        <Class name="~.*MapperImpl"/>
+    </Match>
+</FindBugsFilter>

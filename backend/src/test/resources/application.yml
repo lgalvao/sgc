@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./target/testdb-${random.uuid};DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:data.sql
+
+aplicacao:
+  email:
+    remetente: test@example.com
+    remetente-nome: Test
+    assunto-prefixo: '[SGC-TEST]'
+logging:
+  level:
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.orm.jpa: ERROR
+    org.springframework.jdbc: ERROR
+    com.zaxxer.hikari: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
+    sgc: INFO

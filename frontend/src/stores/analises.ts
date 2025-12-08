@@ -1,50 +1,57 @@
-import {defineStore} from 'pinia'
-import analisesMock from '../mocks/analises.json'
-import type {AnaliseValidacao} from '@/types/tipos'
-import {ResultadoAnalise} from '@/types/tipos'
-import {generateUniqueId, parseDate} from '@/utils'
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import * as analiseService from "@/services/analiseService";
+import {useFeedbackStore} from "@/stores/feedback";
 
-export function mapResultadoAnalise(resultado: string): string {
-    switch (resultado) {
-        case 'Devolução':
-            return 'Devolução';
-        case 'Aceite':
-            return 'Aceite';
-        default:
-            return 'Aceite';
+import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
+
+type Analise = AnaliseCadastro | AnaliseValidacao;
+
+export const useAnalisesStore = defineStore("analises", () => {
+    const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
+    const feedbackStore = useFeedbackStore();
+
+    const obterAnalisesPorSubprocesso = computed(() => (codSubrocesso: number) => {
+        return analisesPorSubprocesso.value.get(codSubrocesso) || [];
+    });
+
+    async function buscarAnalisesCadastro(codSubrocesso: number) {
+
+        try {
+            const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
+            const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
+            const outras = atuais.filter((a) => !("unidadeSigla" in a));
+            analisesPorSubprocesso.value.set(codSubrocesso, [...outras, ...analises]);
+        } catch {
+            feedbackStore.show(
+                "Erro",
+                "Erro ao buscar histórico de análises de cadastro.",
+                "danger"
+            );
+        }
     }
-}
 
-export function parseAnaliseDates(analise: any): AnaliseValidacao {
+    async function buscarAnalisesValidacao(codSubrocesso: number) {
+
+        try {
+            const analises =
+                await analiseService.listarAnalisesValidacao(codSubrocesso);
+            const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
+            const outras = atuais.filter((a) => !("unidade" in a));
+            analisesPorSubprocesso.value.set(codSubrocesso, [...outras, ...analises]);
+        } catch {
+            feedbackStore.show(
+                "Erro",
+                "Erro ao buscar histórico de análises de validação.",
+                "danger"
+            );
+        }
+    }
+
     return {
-        ...analise,
-        dataHora: parseDate(analise.dataHora)?.toISOString() || new Date().toISOString(),
-        resultado: mapResultadoAnalise(analise.resultado),
+        analisesPorSubprocesso,
+        obterAnalisesPorSubprocesso,
+        buscarAnalisesCadastro,
+        buscarAnalisesValidacao,
     };
-}
-
-export const useAnalisesStore = defineStore('analises', {
-    state: () => ({
-        analises: analisesMock.map(parseAnaliseDates) as AnaliseValidacao[] // Initialize with mock data
-    }),
-    getters: {
-        getAnalisesPorSubprocesso: (state) => (idSubprocesso: number): AnaliseValidacao[] => {
-            return state.analises
-                .filter(analise => analise.idSubprocesso === idSubprocesso)
-                .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
-        }
-    },
-    actions: {
-        registrarAnalise(payload: Omit<AnaliseValidacao, 'codigo'>) {
-            const novaAnalise: AnaliseValidacao = {
-                ...payload,
-                codigo: generateUniqueId()
-            }
-            this.analises.push(novaAnalise)
-            return novaAnalise
-        },
-        removerAnalisesPorSubprocesso(idSubprocesso: number) {
-            this.analises = this.analises.filter(analise => analise.idSubprocesso !== idSubprocesso);
-        }
-    }
-})
+});

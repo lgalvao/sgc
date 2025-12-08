@@ -1,124 +1,206 @@
 <template>
-  <div class="row">
-    <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
-          data-testid="atividades-card"
-          @click="$emit('irParaAtividades')"
+  <BRow>
+    <template v-if="tipoProcesso === TipoProcessoEnum.MAPEAMENTO || tipoProcesso === TipoProcessoEnum.REVISAO">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeEditarMapa"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-atividades"
+          @click="navegarPara('SubprocessoCadastro')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Atividades e conhecimentos
-            </h5>
-            <p class="card-text text-muted">
-              Cadastro de atividades e conhecimentos da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO[SITUACOES_MAPA.DISPONIVEL_VALIDACAO] }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Cadastro de atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+        <BCard
+          v-else-if="permissoes.podeVisualizarMapa"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-atividades-vis"
+          @click="navegarPara('SubprocessoVisCadastro')"
+        >
+          <BCardTitle>
+            Atividades e conhecimentos
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização das atividades e conhecimentos da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeEditarMapa"
           :class="{ 'disabled-card': !mapa }"
-          class="card h-100 card-actionable"
-          data-testid="mapa-card"
-          @click="handleMapaClick"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-mapa"
+          @click="navegarPara('SubprocessoMapa')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Mapa de Competências
-            </h5>
-            <p class="card-text text-muted">
-              Mapa de competências técnicas da unidade
-            </p>
-            <div v-if="mapa">
-              <div v-if="situacao === 'Mapa em andamento'">
-                <span class="badge bg-warning text-dark">Em andamento</span>
-              </div>
-              <div v-else-if="situacao === 'Mapa disponibilizado'">
-                <span class="badge bg-success">Disponibilizado</span>
-              </div>
-              <div v-else-if="situacao">
-                <span class="badge bg-secondary">{{ situacao }}</span>
-              </div>
-              <div v-else>
-                <span class="badge bg-secondary">Disponibilizado</span>
-              </div>
-            </div>
-            <div v-else>
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Mapa de competências técnicas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+        <BCard
+          v-else-if="permissoes.podeVisualizarMapa"
+          :class="{ 'disabled-card': !mapa }"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-mapa-vis"
+          @click="navegarPara('SubprocessoVisMapa')"
+        >
+          <BCardTitle>
+            Mapa de Competências
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Visualização do mapa de competências técnicas
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
 
-    <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
-          @click="$emit('irParaDiagnosticoEquipe')"
+    <template v-else-if="tipoProcesso === TipoProcessoEnum.DIAGNOSTICO">
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          v-if="permissoes.podeVisualizarDiagnostico"
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-diagnostico"
+          @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Diagnóstico da Equipe
-            </h5>
-            <p class="card-text text-muted">
-              Diagnóstico das competências pelos servidores da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Autoavaliação
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Realize sua autoavaliação de competências
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
 
-      <section class="col-md-4 mb-3">
-        <div
-          class="card h-100 card-actionable"
-          @click="$emit('irParaOcupacoesCriticas')"
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-ocupacoes"
+          @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
         >
-          <div class="card-body">
-            <h5 class="card-title">
-              Ocupações Críticas
-            </h5>
-            <p class="card-text text-muted">
-              Identificação das ocupações críticas da unidade
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ LABELS_SITUACAO.NAO_DISPONIBILIZADO }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          <BCardTitle>
+            Ocupações Críticas
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Identificação das ocupações críticas da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
+      <BCol
+        md="4"
+        class="mb-3"
+      >
+        <BCard
+          class="h-100 card-actionable"
+          data-testid="card-subprocesso-monitoramento"
+          @click="navegarParaDiag('MonitoramentoDiagnostico')"
+        >
+          <BCardTitle>
+            Monitoramento
+          </BCardTitle>
+          <BCardText class="text-muted">
+            Acompanhamento e conclusão do diagnóstico da unidade
+          </BCardText>
+          <span
+            :class="badgeClass(situacao)"
+            class="badge"
+          >{{ situacaoLabel(situacao) }}</span>
+        </BCard>
+      </BCol>
     </template>
-  </div>
+  </BRow>
 </template>
 
 <script lang="ts" setup>
-import {Mapa, TipoProcesso} from '@/types/tipos';
-import {LABELS_SITUACAO, SITUACOES_MAPA} from '@/constants/situacoes';
+import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
+import {type Mapa, type MapaCompleto, SubprocessoPermissoes, TipoProcesso,} from "@/types/tipos";
+import {badgeClass, situacaoLabel} from "@/utils";
 
-defineProps<{
+const TipoProcessoEnum = TipoProcesso;
+
+const props = defineProps<{
   tipoProcesso: TipoProcesso;
-  mapa: Mapa | null;
+  mapa: Mapa | MapaCompleto | null;
   situacao?: string;
+  permissoes: SubprocessoPermissoes;
+  codSubprocesso?: number | null;
+  codProcesso?: number;
+  siglaUnidade?: string;
 }>();
 
-const emit = defineEmits<{
-  irParaAtividades: [];
-  navegarParaMapa: [];
-  irParaDiagnosticoEquipe: [];
-  irParaOcupacoesCriticas: [];
-}>();
+const router = useRouter();
+const route = router.currentRoute;
 
+const navegarPara = (routeName: string) => {
+  const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
+  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
 
-const handleMapaClick = () => {
-  emit('navegarParaMapa');
+  if (!codigoProcesso || !sigla) return;
+
+  router.push({
+    name: routeName,
+    params: {
+      codProcesso: codigoProcesso,
+      siglaUnidade: sigla
+    },
+  });
+};
+
+const navegarParaDiag = (routeName: string) => {
+  if (!props.codSubprocesso) return;
+  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
+
+  router.push({
+    name: routeName,
+    params: {
+      codSubprocesso: props.codSubprocesso,
+      siglaUnidade: sigla
+    }
+  });
 };
 </script>
 
@@ -134,8 +216,6 @@ const handleMapaClick = () => {
 }
 
 .card-actionable.disabled-card {
-  /* Allow clicks for testing purposes */
-  /* pointer-eventos: none; */
   opacity: 0.6;
 }
 </style>

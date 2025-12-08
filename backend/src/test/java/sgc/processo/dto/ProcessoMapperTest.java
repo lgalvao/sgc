@@ -1,22 +1,22 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.TipoProcesso;
-
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 
 class ProcessoMapperTest {
     private static final String TEST_DESCRIPTION = "Test Description";
     private final ProcessoMapper mapper = Mappers.getMapper(ProcessoMapper.class);
 
     @Test
-    void testToDTO() {
+    void testToDto() {
         // Create a Processo entity
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -28,7 +28,7 @@ class ProcessoMapperTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         // Map to DTO
-        ProcessoDto dto = mapper.toDTO(processo);
+        ProcessoDto dto = mapper.toDto(processo);
 
         // Verify mapping
         assertEquals(1L, dto.getCodigo());
@@ -43,15 +43,16 @@ class ProcessoMapperTest {
     @Test
     void testToEntity() {
         // Create a ProcessoDto
-        ProcessoDto dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .dataFinalizacao(LocalDateTime.now().plusDays(1))
-            .dataLimite(LocalDateTime.now().plusDays(5))
-            .descricao(TEST_DESCRIPTION)
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo(TipoProcesso.MAPEAMENTO.name())
-            .build();
+        ProcessoDto dto =
+                ProcessoDto.builder()
+                        .codigo(1L)
+                        .dataCriacao(LocalDateTime.now())
+                        .dataFinalizacao(LocalDateTime.now().plusDays(1))
+                        .dataLimite(LocalDateTime.now().plusDays(5))
+                        .descricao(TEST_DESCRIPTION)
+                        .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                        .tipo(TipoProcesso.MAPEAMENTO.name())
+                        .build();
 
         // Map to entity
         Processo processo = mapper.toEntity(dto);

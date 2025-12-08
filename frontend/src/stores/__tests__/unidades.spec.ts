@@ -1,105 +1,184 @@
-import {beforeEach, describe, expect, it} from 'vitest';
-import {useUnidadesStore} from '../unidades';
-import {initPinia} from '@/test-utils/helpers';
-import {expectContainsAll} from '@/test-utils/uiHelpers';
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import * as unidadesService from "@/services/unidadesService";
+import {initPinia} from "@/test-utils/helpers";
 
-describe('useUnidadesStore', () => {
-    let unidadesStore: ReturnType<typeof useUnidadesStore>;
+import type {Unidade} from "@/types/tipos";
+import {useUnidadesStore} from "../unidades";
 
-  
-    beforeEach(() => {
-          initPinia();
-          unidadesStore = useUnidadesStore();
-      });
+const mockUnidades: Unidade[] = [
+  {
+    sigla: "SEDOC",
+    nome: "Seção de Desenvolvimento Organizacional e Capacitação",
+    tipo: "INTEROPERACIONAL",
+    idServidorTitular: 7,
+    responsavel: null,
+    codigo: 1,
+    filhas: [
+      {
+        sigla: "SGP",
+        nome: "Secretaria de Gestao de Pessoas",
+        tipo: "INTERMEDIARIA",
+        idServidorTitular: 2,
+        responsavel: null,
+        filhas: [],
+        codigo: 3,
+      },
+      {
+        sigla: "COEDE",
+        nome: "Coordenadoria de Educação Especial",
+        tipo: "INTERMEDIARIA",
+        idServidorTitular: 3,
+        responsavel: null,
+        filhas: [
+          {
+            sigla: "SEMARE",
+            nome: "Seção Magistrados e Requisitados",
+            tipo: "OPERACIONAL",
+            idServidorTitular: 4,
+            responsavel: null,
+            filhas: [],
+            codigo: 5,
+          },
+        ],
+        codigo: 4,
+      },
+    ],
+  },
+];
 
-    it('should initialize with mock unidades', () => {
-        expect(unidadesStore.unidades.length).toBeGreaterThan(0);
-        expect(unidadesStore.unidades[0].sigla).toBeDefined();
+vi.mock("@/services/unidadesService", () => ({
+  buscarTodasUnidades: vi.fn(() => Promise.resolve(mockUnidades)),
+  buscarUnidadePorSigla: vi.fn(),
+  buscarUnidadePorCodigo: vi.fn(),
+  buscarArvoreComElegibilidade: vi.fn(() => Promise.resolve(mockUnidades)),
+  buscarArvoreUnidade: vi.fn(),
+  buscarSubordinadas: vi.fn(),
+  buscarSuperior: vi.fn(),
+}));
+
+describe("useUnidadesStore", () => {
+  let unidadesStore: ReturnType<typeof useUnidadesStore>;
+
+  beforeEach(() => {
+    initPinia();
+    unidadesStore = useUnidadesStore();
+    unidadesStore.unidades = mockUnidades;
+    vi.clearAllMocks();
+  });
+
+  it("should initialize with mock unidades", () => {
+    expect(unidadesStore.unidades.length).toBeGreaterThan(0);
+    expect(unidadesStore.unidades[0].sigla).toBeDefined();
+  });
+
+  describe("actions", () => {
+    it("should fetch and set unidades", async () => {
+      unidadesStore.unidades = [];
+      await unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO");
+      expect(
+        unidadesService.buscarArvoreComElegibilidade,
+      ).toHaveBeenCalledTimes(1);
+      expect(unidadesStore.unidades.length).toBeGreaterThan(0);
     });
 
-    describe('actions', () => {
-        it('pesquisarUnidade should find SEDOC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDOC');
-            expect(unidade).toBeDefined();
-            expect(unidade?.nome).toBe('Seção de Desenvolvimento Organizacional e Capacitação');
-        });
-
-        it('pesquisarUnidade should find STIC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('STIC');
-            expect(unidade).toBeDefined();
-            expect(unidade?.nome).toBe('Secretaria de Informática e Comunicações');
-        });
-
-        it('pesquisarUnidade should find nested SEDESENV unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDESENV');
-            expect(unidade).toBeDefined();
-            expect(unidade?.nome).toBe('Seção de Desenvolvimento de Sistemas');
-        });
-
-        it('pesquisarUnidade should return null if unit not found', () => {
-            const unidade = unidadesStore.pesquisarUnidade('NONEXISTENT');
-            expect(unidade).toBeNull();
-        });
-
-        it('getUnidadesSubordinadas should return direct and indirect subordinate units for a root unit (e.g., "SEDOC")', () => {
-            const subordinadas = unidadesStore.getUnidadesSubordinadas('SEDOC');
-            expectContainsAll(subordinadas, [
-              'SGP','COEDE','SEMARE','STIC','COSIS','SEDESENV','SEDIA','SESEL','COSINF','SENIC','COJUR','SEJUR','SEPRO'
-            ]);
-            expect(subordinadas.length).toBe(14); // Total de unidades no mock
-        });
-
-        it('getUnidadesSubordinadas should return subordinate units for an intermediate unit (e.g., "STIC")', () => {
-            const subordinadas = unidadesStore.getUnidadesSubordinadas('STIC');
-            expectContainsAll(subordinadas, [
-              'COSIS','SEDESENV','SEDIA','SESEL','COSINF','SENIC','COJUR','SEJUR','SEPRO'
-            ]);
-            expect(subordinadas.length).toBe(10);
-        });
-
-        it('getUnidadesSubordinadas should return an empty array for an operational unit (e.g., "SEMARE")', () => {
-            const subordinadas = unidadesStore.getUnidadesSubordinadas('SEMARE');
-            expect(subordinadas).toEqual(['SEMARE']); // A própria unidade é incluída
-        });
-
-        it('getUnidadesSubordinadas should return an empty array for a non-existent unit', () => {
-            const subordinadas = unidadesStore.getUnidadesSubordinadas('NONEXISTENT');
-            expect(subordinadas).toEqual([]);
-        });
-
-        it('getUnidadeSuperior should return the superior unit sigla for a child unit (e.g., "SEMARE" -> "COEDE")', () => {
-            const superior = unidadesStore.getUnidadeSuperior('SEMARE');
-            expect(superior).toBe('COEDE');
-        });
-
-        it('getUnidadeSuperior should return the superior unit sigla for an intermediate unit (e.g., "COEDE" -> "SGP")', () => {
-            const superior = unidadesStore.getUnidadeSuperior('COEDE');
-            expect(superior).toBe('SGP');
-        });
-
-        it('getUnidadeSuperior should return null for a root unit (e.g., "SEDOC")', () => {
-            const superior = unidadesStore.getUnidadeSuperior('SEDOC');
-            expect(superior).toBeNull();
-        });
-
-        it('getUnidadeSuperior should return null for a non-existent unit', () => {
-            const superior = unidadesStore.getUnidadeSuperior('NONEXISTENT');
-            expect(superior).toBeNull();
-        });
-
-        it('getUnidadeImediataSuperior should return the immediate superior unit sigla (e.g., "SEDESENV" -> "COSIS")', () => {
-            const superior = unidadesStore.getUnidadeImediataSuperior('SEDESENV');
-            expect(superior).toBe('COSIS');
-        });
-
-        it('getUnidadeImediataSuperior should return null for a root unit (e.g., "SEDOC")', () => {
-            const superior = unidadesStore.getUnidadeImediataSuperior('SEDOC');
-            expect(superior).toBeNull();
-        });
-
-        it('getUnidadeImediataSuperior should return null for a non-existent unit', () => {
-            const superior = unidadesStore.getUnidadeImediataSuperior('NONEXISTENT');
-            expect(superior).toBeNull();
-        });
+    it("should handle error in buscarUnidadesParaProcesso", async () => {
+      vi.mocked(
+        unidadesService.buscarArvoreComElegibilidade,
+      ).mockRejectedValueOnce(new Error("API Error"));
+      await unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO");
+      expect(unidadesStore.error).toContain("Falha ao carregar unidades");
     });
+
+    it("buscarUnidade should set unidade state", async () => {
+      const mockUnit = { sigla: "TEST", nome: "Test Unit" };
+      vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue(
+        mockUnit as any,
+      );
+
+      await unidadesStore.buscarUnidade("TEST");
+
+      expect(unidadesService.buscarUnidadePorSigla).toHaveBeenCalledWith(
+        "TEST",
+      );
+      expect(unidadesStore.unidade).toEqual(mockUnit);
+    });
+
+    it("buscarUnidade should handle error", async () => {
+      vi.mocked(unidadesService.buscarUnidadePorSigla).mockRejectedValue(
+        new Error("Fail"),
+      );
+      await unidadesStore.buscarUnidade("TEST");
+      expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+    });
+
+    it("buscarUnidadePorCodigo should set unidade state", async () => {
+      const mockUnit = { codigo: 123, nome: "Test Unit" };
+      vi.mocked(unidadesService.buscarUnidadePorCodigo).mockResolvedValue(
+        mockUnit as any,
+      );
+
+      await unidadesStore.buscarUnidadePorCodigo(123);
+
+      expect(unidadesService.buscarUnidadePorCodigo).toHaveBeenCalledWith(123);
+      expect(unidadesStore.unidade).toEqual(mockUnit);
+    });
+
+    it("buscarUnidadePorCodigo should handle error", async () => {
+      vi.mocked(unidadesService.buscarUnidadePorCodigo).mockRejectedValue(
+        new Error("Fail"),
+      );
+      await unidadesStore.buscarUnidadePorCodigo(123);
+      expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+    });
+
+    it("buscarArvoreUnidade should call service and set unidade", async () => {
+      const mockUnit = { codigo: 1, filhas: [] };
+      vi.mocked(unidadesService.buscarArvoreUnidade).mockResolvedValue(mockUnit as any);
+
+      await unidadesStore.buscarArvoreUnidade(1);
+
+      expect(unidadesService.buscarArvoreUnidade).toHaveBeenCalledWith(1);
+      expect(unidadesStore.unidade).toEqual(mockUnit);
+    });
+
+    it("buscarArvoreUnidade should handle error", async () => {
+        vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(new Error("Fail"));
+        await unidadesStore.buscarArvoreUnidade(1);
+        expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+    });
+
+    it("obterUnidadesSubordinadas should call service", async () => {
+      const mockSubordinadas = ["A", "B"];
+      vi.mocked(unidadesService.buscarSubordinadas).mockResolvedValue(mockSubordinadas);
+
+      const result = await unidadesStore.obterUnidadesSubordinadas("TEST");
+
+      expect(unidadesService.buscarSubordinadas).toHaveBeenCalledWith("TEST");
+      expect(result).toEqual(mockSubordinadas);
+    });
+
+    it("obterUnidadesSubordinadas should handle error", async () => {
+        vi.mocked(unidadesService.buscarSubordinadas).mockRejectedValue(new Error("Fail"));
+        const result = await unidadesStore.obterUnidadesSubordinadas("TEST");
+        expect(unidadesStore.error).toContain("Falha ao buscar subordinadas");
+        expect(result).toEqual([]);
+    });
+
+    it("obterUnidadeSuperior should call service", async () => {
+      const mockSuperior = "SUP";
+      vi.mocked(unidadesService.buscarSuperior).mockResolvedValue(mockSuperior);
+
+      const result = await unidadesStore.obterUnidadeSuperior("TEST");
+
+      expect(unidadesService.buscarSuperior).toHaveBeenCalledWith("TEST");
+      expect(result).toEqual(mockSuperior);
+    });
+
+    it("obterUnidadeSuperior should handle error", async () => {
+        vi.mocked(unidadesService.buscarSuperior).mockRejectedValue(new Error("Fail"));
+        const result = await unidadesStore.obterUnidadeSuperior("TEST");
+        expect(unidadesStore.error).toContain("Falha ao buscar superior");
+        expect(result).toBeNull();
+    });
+  });
 });

@@ -1,11 +1,10 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.Test;
-import sgc.processo.SituacaoProcesso;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import sgc.processo.model.SituacaoProcesso;
 
 class ProcessoDtoTest {
     @Test
@@ -13,15 +12,16 @@ class ProcessoDtoTest {
         var now = LocalDateTime.now();
         var limitDate = LocalDateTime.now();
 
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(now)
-            .dataFinalizacao(now)
-            .dataLimite(limitDate)
-            .descricao("Test Description")
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo("TIPO_A")
-            .build();
+        var dto =
+                ProcessoDto.builder()
+                        .codigo(1L)
+                        .dataCriacao(now)
+                        .dataFinalizacao(now)
+                        .dataLimite(limitDate)
+                        .descricao("Test Description")
+                        .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                        .tipo("TIPO_A")
+                        .build();
 
         assertEquals(1L, dto.getCodigo());
         assertEquals(now, dto.getDataCriacao());

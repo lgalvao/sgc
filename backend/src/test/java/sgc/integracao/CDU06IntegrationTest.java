@@ -1,89 +1,234 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
-
-import java.time.LocalDateTime;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
+
 @SpringBootTest(classes = Sgc.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockAdmin
 @Import(TestSecurityConfig.class)
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
-public class CDU06IntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
+public class CDU06IntegrationTest extends BaseIntegrationTest {
+    private static final String TEST_USER_ID = "123456789";
 
-    @Autowired
-    private ProcessoRepo processoRepo;
+    @Autowired private ProcessoRepo processoRepo;
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
+
+    @MockitoBean private SgrhService sgrhService;
 
     private Processo processo;
 
     @BeforeEach
     void setUp() {
-        Unidade unidade = new Unidade();
-        unidade.setNome("Unidade de Teste");
-        unidade.setSigla("UT");
-        unidadeRepo.save(unidade);
-
         processo = new Processo();
         processo.setDescricao("Processo de Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
+        processo = processoRepo.save(processo);
+        SecurityContextHolder.clearContext();
+    }
+
+    private void setupSecurityContext(Unidade unidade, Perfil perfil) {
+        Usuario principal =
+                new Usuario(TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123", unidade);
+        principal
+                .getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(principal)
+                                .unidade(unidade)
+                                .perfil(perfil)
+                                .build());
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        principal, null, principal.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+
+        when(sgrhService.buscarPerfisUsuario(anyString()))
+                .thenReturn(
+                        List.of(
+                                new PerfilDto(
+                                        TEST_USER_ID,
+                                        unidade.getCodigo(),
+                                        unidade.getNome(),
+                                        perfil.name())));
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve detalhar processo para Admin")
+    void testDetalharProcesso_sucesso() throws Exception {
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                        processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve retornar 404 para processo inexistente")
+    void testDetalharProcesso_naoEncontrado() throws Exception {
+        mockMvc.perform(get("/api/processos/{id}/detalhes", 9999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
+    void testPodeFinalizar_true_comAdmin() throws Exception {
+        Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(true));
+    }
+
+    @Test
+    @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
+    void testPodeFinalizar_false_semAdmin() throws Exception {
+        Unidade unidade = unidadeRepo.findById(102L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        setupSecurityContext(unidade, Perfil.CHEFE);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(false));
+    }
+
+    @Test
+    @DisplayName(
+            "Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro"
+                    + " disponibilizado")
+    void testPodeHomologarCadastro_true() throws Exception {
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        setupSecurityContext(unidade, Perfil.GESTOR);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
+    }
+
+    @Test
+    @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
+    void testPodeHomologarMapa_true() throws Exception {
+        Unidade unidade = unidadeRepo.findById(9L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        setupSecurityContext(unidade, Perfil.GESTOR);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarMapa").value(true));
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve retornar detalhes da unidade com situação do subprocesso correta")
+    void testDetalharProcesso_dadosSubprocesso() throws Exception {
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
         processoRepo.save(processo);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
+        Subprocesso subprocesso =
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
-    }
 
-    @Test
-    void testDetalharProcesso_sucesso() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}/detalhes?perfil=ADMIN", processo.getCodigo()))
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(processo.getCodigo()))
-                .andExpect(jsonPath("$.descricao").value("Processo de Teste"))
-                .andExpect(jsonPath("$.tipo").value(TipoProcesso.MAPEAMENTO.name()))
-                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()))
-                .andExpect(jsonPath("$.unidades[0].nome").value("Unidade de Teste"))
-                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()));
-    }
-
-    @Test
-    void testDetalharProcesso_naoEncontrado_falha() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}/detalhes?perfil=ADMIN", 999L)) // ID que não existe
-                .andExpect(status().isNotFound());
+                .andExpect(
+                        jsonPath("$.unidades[0].situacaoSubprocesso")
+                                .value("MAPEAMENTO_MAPA_HOMOLOGADO"))
+                .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
     }
 }

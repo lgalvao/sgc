@@ -1,57 +1,92 @@
 package sgc.analise;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.dto.CriarAnaliseRequestDto;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.analise.dto.CriarAnaliseRequest;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
+import sgc.analise.model.TipoAnalise;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 
+/** Serviço para gerenciar as análises de subprocessos. */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
-    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo codSubprocesso;
 
+    /**
+     * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
+     *
+     * @param codSubprocesso O código do subprocesso.
+     * @param tipoAnalise O tipoAnalise de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
+     * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
+     */
     @Transactional(readOnly = true)
-    public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipo) {
-        if (subprocessoRepo.findById(codSubprocesso).isEmpty()) {
-            throw new ErroDominioNaoEncontrado("Subprocesso", codSubprocesso);
+    public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
+        if (this.codSubprocesso.findById(codSubprocesso).isEmpty()) {
+            throw new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso);
         }
-        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso)
-            .stream()
-            .filter(a -> a.getTipo() == tipo)
-            .toList();
+
+        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
+                .filter(analise -> analise.getTipo() == tipoAnalise)
+                .toList();
     }
 
+    /**
+     * Cria e persiste uma nova análise com base nos dados fornecidos.
+     *
+     * @param req O DTO contendo todas as informações necessárias para criar a análise.
+     * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso associado à análise não for encontrado.
+     */
     @Transactional
-    public Analise criarAnalise(CriarAnaliseRequestDto request) {
+    public Analise criarAnalise(CriarAnaliseRequest req) {
+        Subprocesso sp =
+                codSubprocesso
+                        .findById(req.getCodSubprocesso())
+                        .orElseThrow(
+                                () ->
+                                        new ErroEntidadeNaoEncontrada(
+                                                "Subprocesso", req.getCodSubprocesso()));
 
-        Subprocesso sp = subprocessoRepo.findById(request.subprocessoCodigo())
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", request.subprocessoCodigo()));
+        Analise analise =
+                Analise.builder()
+                        .subprocesso(sp)
+                        .dataHora(LocalDateTime.now())
+                        .observacoes(req.getObservacoes())
+                        .tipo(req.getTipo())
+                        .acao(req.getAcao())
+                        .unidadeSigla(req.getSiglaUnidade())
+                        .analistaUsuarioTitulo(req.getTituloUsuario())
+                        .motivo(req.getMotivo())
+                        .build();
 
-        Analise a = new Analise();
-        a.setSubprocesso(sp);
-        a.setDataHora(LocalDateTime.now());
-        a.setObservacoes(request.observacoes());
-        a.setTipo(request.tipo());
-        a.setAcao(request.acao());
-        a.setUnidadeSigla(request.unidadeSigla());
-        a.setAnalistaUsuarioTitulo(request.analistaUsuarioTitulo());
-        a.setMotivo(request.motivo());
-
-        return analiseRepo.save(a);
+        return analiseRepo.save(analise);
     }
 
-    @Transactional
-    public void removerPorSubprocesso(Long subprocessoCodigo) {
-        analiseRepo.deleteBySubprocessoCodigo(subprocessoCodigo);
+    /**
+     * Remove todas as análises associadas a um subprocesso específico.
+     *
+     * <p>Para cenários de limpeza de dados, como a exclusão de um subprocesso, garantindo que suas
+     * análises dependentes também sejam removidas.
+     *
+     * <p>Este método deve ser chamado dentro de uma transação existente.
+     *
+     * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
+     */
+    public void removerPorSubprocesso(Long codSubprocesso) {
+        List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
+        if (!analises.isEmpty()) {
+            analiseRepo.deleteAll(analises);
+        }
     }
 }

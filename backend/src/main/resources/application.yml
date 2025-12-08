@@ -1,30 +1,32 @@
 spring:
   main.banner-mode: off
+  jackson:
+    use-jackson2-defaults: true
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
+  test.mockmvc.print: none
   jpa:
-    hibernate.ddl-auto: create
-    properties:
-      hibernate.default_schema: sgc
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate.ddl-auto: create-drop
+    properties.hibernate.default_schema: sgc
     show-sql: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      platform: postgresql
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-            required: true
-        transport:
-          protocol: smtp
-    default-encoding: UTF-8
+            enable: false
 server:
   port: 10000
 aplicacao:
@@ -36,15 +38,18 @@ aplicacao:
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
 springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
+  api-docs.enabled: false
+  swagger-ui.enabled: false
+  api-docs.path: /api-docs
+  swagger-ui.path: /swagger-ui.html
   info:
     title: SGC - Sistema de Gestão de Competências API
     version: v1
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
+
 logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
   level:
     org.hibernate: ERROR
     org.hibernate.SQL: ERROR
@@ -53,4 +58,6 @@ logging:
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO

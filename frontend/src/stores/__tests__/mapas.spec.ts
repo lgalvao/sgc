@@ -1,211 +1,347 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {initPinia} from '@/test-utils/helpers';
-import {useMapasStore} from '../mapas';
-import type {Competencia, Mapa} from '@/types/tipos';
+import {createPinia, setActivePinia} from "pinia";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import * as mapaService from "@/services/mapaService";
+import * as subprocessoService from "@/services/subprocessoService";
+import type {ImpactoMapa} from "@/types/impacto";
+import type {MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
+import {useMapasStore} from "../mapas";
 
-// Mock the mapas.json import
-vi.mock('../../mocks/mapas.json', () => ({
-    default: [
-        {
-            "id": 1,
-            "unidade": "SESEL",
-            "idProcesso": 1,
-            "situacao": "em_andamento",
-            "competencias": [
-                {"id": 1, "descricao": "Acompanhamento de processos eleitorais", "atividadesAssociadas": [6]}
-            ],
-            "dataCriacao": "2025-06-01",
-            "dataDisponibilizacao": null,
-            "dataFinalizacao": null
-        },
-        {
-            "id": 2,
-            "unidade": "COSIS",
-            "idProcesso": 2,
-            "situacao": "finalizado",
-            "competencias": [],
-            "dataCriacao": "2025-05-01",
-            "dataDisponibilizacao": "2025-05-10",
-            "dataFinalizacao": "2025-05-30"
-        }
-    ]
+vi.mock("@/services/mapaService", () => ({
+    obterMapaCompleto: vi.fn(),
+    salvarMapaCompleto: vi.fn(),
+    obterMapaAjuste: vi.fn(),
+    salvarMapaAjuste: vi.fn(),
+    verificarImpactosMapa: vi.fn(),
+    obterMapaVisualizacao: vi.fn(),
+    disponibilizarMapa: vi.fn(),
 }));
 
-describe('useMapasStore', () => {
-    let mapasStore: ReturnType<typeof useMapasStore>;
+vi.mock("@/services/subprocessoService", () => ({
+    adicionarCompetencia: vi.fn(),
+    atualizarCompetencia: vi.fn(),
+    removerCompetencia: vi.fn(),
+}));
+
+describe("useMapasStore", () => {
+    let store: ReturnType<typeof useMapasStore>;
+    const codSubrocesso = 1;
 
     beforeEach(() => {
-        initPinia();
-        mapasStore = useMapasStore();
-        // Reset the store state to the mock data before each test
-        // Manually reset the state based on the initial mock data, parsing dates
-        mapasStore.$patch({
-            mapas: [
-                {
-                    "id": 1,
-                    "unidade": "SESEL",
-                    "idProcesso": 1,
-                    "situacao": "em_andamento",
-                    "competencias": [
-                        {"id": 1, "descricao": "Acompanhamento de processos eleitorais", "atividadesAssociadas": [6]}
-                    ],
-                    "dataCriacao": "2025-06-01",
-                    "dataDisponibilizacao": null,
-                    "dataFinalizacao": null
-                },
-                {
-                    "id": 2,
-                    "unidade": "COSIS",
-                    "idProcesso": 2,
-                    "situacao": "finalizado",
-                    "competencias": [],
-                    "dataCriacao": "2025-05-01",
-                    "dataDisponibilizacao": "2025-05-10",
-                    "dataFinalizacao": "2025-05-30"
-                }
-            ].map(mapa => ({
-                ...mapa,
-                dataCriacao: new Date(mapa.dataCriacao),
-                dataDisponibilizacao: mapa.dataDisponibilizacao ? new Date(mapa.dataDisponibilizacao) : null,
-                dataFinalizacao: mapa.dataFinalizacao ? new Date(mapa.dataFinalizacao) : null,
-            }))
-        });
+        setActivePinia(createPinia());
+        store = useMapasStore();
+        vi.clearAllMocks();
     });
 
-    it('should initialize with mock mapas and parsed dates', () => {
-        expect(mapasStore.mapas.length).toBe(2); // Directly use the expected length
-        expect(mapasStore.mapas[0].dataCriacao).toBeInstanceOf(Date);
-        expect(mapasStore.mapas[1].dataDisponibilizacao).toBeInstanceOf(Date);
-        expect(mapasStore.mapas[1].dataFinalizacao).toBeInstanceOf(Date);
+    it("should initialize with null values", () => {
+        expect(store.mapaCompleto).toBeNull();
+        expect(store.mapaAjuste).toBeNull();
+        expect(store.impactoMapa).toBeNull();
     });
 
-    describe('getters', () => {
-        it('getMapaByUnidadeId should return the correct map by unidade and idProcesso', () => {
-            const mapa = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapa).toBeDefined();
-            expect(mapa?.id).toBe(1);
-            expect(mapa?.unidade).toBe('SESEL');
-        });
-
-        it('getMapaByUnidadeId should return undefined if no matching map is found', () => {
-            const mapa = mapasStore.getMapaByUnidadeId('NONEXISTENT', 999);
-            expect(mapa).toBeUndefined();
-        });
-
-        it('getMapaVigentePorUnidade should return the correct "em_andamento" map by unidade', () => {
-            const mapa = mapasStore.getMapaVigentePorUnidade('SESEL');
-            expect(mapa).toBeDefined();
-            expect(mapa?.id).toBe(1);
-            expect(mapa?.situacao).toBe('em_andamento');
-        });
-
-        it('getMapaVigentePorUnidade should return undefined if no "em_andamento" map is found', () => {
-            const mapa = mapasStore.getMapaVigentePorUnidade('COSIS'); // COSIS map is 'finalizado'
-            expect(mapa).toBeUndefined();
-        });
-    });
-
-    describe('actions', () => {
-        it('adicionarMapa should add a new map to the store', () => {
-            const novaCompetencia: Competencia = {
-                id: 10,
-                descricao: "Nova Competencia",
-                atividadesAssociadas: [100]
-            };
-            const novoMapa: Mapa = {
-                id: 3,
-                unidade: 'NOVA',
-                idProcesso: 3,
-                situacao: 'em_andamento',
-                competencias: [novaCompetencia],
-                dataCriacao: new Date('2025-07-01'),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null
-            };
-            const initialLength = mapasStore.mapas.length;
-
-            mapasStore.adicionarMapa(novoMapa);
-
-            expect(mapasStore.mapas.length).toBe(initialLength + 1);
-            expect(mapasStore.mapas[initialLength]).toEqual(novoMapa);
-        });
-
-        it('editarMapa should update an existing map', () => {
-            const novosDados: Partial<Mapa> = {
-                situacao: 'finalizado',
-                dataFinalizacao: new Date('2025-07-15')
-            };
-            mapasStore.editarMapa(1, novosDados);
-
-            const mapaAtualizado = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapaAtualizado?.situacao).toBe('finalizado');
-            expect(mapaAtualizado?.dataFinalizacao).toEqual(new Date('2025-07-15'));
-        });
-
-        it('editarMapa should not change state if map not found', () => {
-            const initialMapas = [...mapasStore.mapas]; // Clone to compare
-            const novosDados: Partial<Mapa> = {
-                situacao: 'finalizado'
-            };
-            mapasStore.editarMapa(999, novosDados);
-            expect(mapasStore.mapas).toEqual(initialMapas);
-        });
-
-        it('definirMapaComoVigente should set the specified map as vigente and demote existing vigente maps', () => {
-            // Add a map that is already vigente
-            const mapaVigente: Mapa = {
-                id: 3,
-                unidade: 'SESEL',
-                idProcesso: 3,
-                situacao: 'vigente',
+    describe("buscarMapaCompleto", () => {
+        it("should call service and update state on success", async () => {
+            const mockMapa: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
                 competencias: [],
-                dataCriacao: new Date('2025-01-01'),
-                dataDisponibilizacao: new Date('2025-01-02'),
-                dataFinalizacao: new Date('2025-01-03')
+                situacao: "EM_ANDAMENTO",
             };
-            mapasStore.adicionarMapa(mapaVigente);
+            vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            // Verify initial state
-            const mapaVigenteInicial = mapasStore.getMapaByUnidadeId('SESEL', 3);
-            expect(mapaVigenteInicial?.situacao).toBe('vigente');
+            await store.buscarMapaCompleto(codSubrocesso);
 
-            // Call definirMapaComoVigente
-            mapasStore.definirMapaComoVigente('SESEL', 1);
-
-            // Check that the previous vigente map was demoted to disponibilizado
-            const mapaDemoted = mapasStore.getMapaByUnidadeId('SESEL', 3);
-            expect(mapaDemoted?.situacao).toBe('disponibilizado');
-
-            // Check that the new map is now vigente
-            const mapaNovoVigente = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapaNovoVigente?.situacao).toBe('vigente');
-            expect(mapaNovoVigente?.dataFinalizacao).toBeInstanceOf(Date);
+            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
+            expect(store.mapaCompleto).toEqual(mockMapa);
         });
 
-        it('definirMapaComoVigente should handle case when no previous vigente map exists', () => {
-            // SESEL has an 'em_andamento' map, not 'vigente'
-            const mapaEmAndamento = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapaEmAndamento?.situacao).toBe('em_andamento');
+        it("should set state to null on failure", async () => {
+            vi.mocked(mapaService.obterMapaCompleto).mockRejectedValue(
+                new Error("Failed"),
+            );
+            store.mapaCompleto = {} as any; // Pre-set state
 
-            // Call definirMapaComoVigente
-            mapasStore.definirMapaComoVigente('SESEL', 1);
+            await expect(store.buscarMapaCompleto(codSubrocesso)).rejects.toThrow("Failed");
 
-            // Check that the map is now vigente
-            const mapaAgoraVigente = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapaAgoraVigente?.situacao).toBe('vigente');
-            expect(mapaAgoraVigente?.dataFinalizacao).toBeInstanceOf(Date);
+            expect(store.mapaCompleto).toBeNull();
+        });
+    });
+
+    describe("salvarMapa", () => {
+        it("should call service and update state on success", async () => {
+            const request = {competencias: []};
+            const mockResponse: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
+                competencias: [
+                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                ],
+                situacao: "EM_ANDAMENTO",
+            };
+            vi.mocked(mapaService.salvarMapaCompleto).mockResolvedValue(mockResponse);
+
+            await store.salvarMapa(codSubrocesso, request);
+
+            expect(mapaService.salvarMapaCompleto).toHaveBeenCalledWith(
+                codSubrocesso,
+                request,
+            );
+            expect(store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it('definirMapaComoVigente should not change state if map not found', () => {
-            const initialMapas = [...mapasStore.mapas];
-            const initialSituacao = mapasStore.getMapaByUnidadeId('SESEL', 1)?.situacao;
+        it("should throw error on failure", async () => {
+            const request = {competencias: []};
+            vi.mocked(mapaService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
-            mapasStore.definirMapaComoVigente('NONEXISTENT', 999);
+            await expect(store.salvarMapa(codSubrocesso, request)).rejects.toThrow("Fail");
+        });
+    });
 
-            // State should remain unchanged
-            expect(mapasStore.mapas).toEqual(initialMapas);
-            const mapaInalterado = mapasStore.getMapaByUnidadeId('SESEL', 1);
-            expect(mapaInalterado?.situacao).toBe(initialSituacao);
+    describe("buscarMapaAjuste", () => {
+        it("should call service and update state on success", async () => {
+            const mockMapa: MapaAjuste = {
+                codigo: 1,
+                descricao: "teste",
+                competencias: [],
+            };
+            vi.mocked(mapaService.obterMapaAjuste).mockResolvedValue(mockMapa);
+
+            await store.buscarMapaAjuste(codSubrocesso);
+
+            expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubrocesso);
+            expect(store.mapaAjuste).toEqual(mockMapa);
+        });
+
+        it("should set state to null on failure", async () => {
+            vi.mocked(mapaService.obterMapaAjuste).mockRejectedValue(new Error("Fail"));
+            store.mapaAjuste = {} as any;
+
+            await expect(store.buscarMapaAjuste(codSubrocesso)).rejects.toThrow("Fail");
+            expect(store.mapaAjuste).toBeNull();
+        });
+    });
+
+    describe("salvarAjustes", () => {
+        it("should call service successfully", async () => {
+            const request = {competencias: [], atividades: [], sugestoes: ""};
+            vi.mocked(mapaService.salvarMapaAjuste).mockResolvedValue(undefined);
+
+            await store.salvarAjustes(codSubrocesso, request);
+
+            expect(mapaService.salvarMapaAjuste).toHaveBeenCalledWith(
+                codSubrocesso,
+                request,
+            );
+        });
+
+        it("should throw error on failure", async () => {
+            const request = {competencias: [], atividades: [], sugestoes: ""};
+            vi.mocked(mapaService.salvarMapaAjuste).mockRejectedValue(new Error("Fail"));
+
+            await expect(store.salvarAjustes(codSubrocesso, request)).rejects.toThrow("Fail");
+        });
+    });
+
+    describe("buscarImpactoMapa", () => {
+        it("should call service and update state on success", async () => {
+            const mockImpacto: ImpactoMapa = {
+                temImpactos: true,
+                totalAtividadesInseridas: 0,
+                totalAtividadesRemovidas: 0,
+                totalAtividadesAlteradas: 0,
+                totalCompetenciasImpactadas: 0,
+                atividadesInseridas: [],
+                atividadesRemovidas: [],
+                atividadesAlteradas: [],
+                competenciasImpactadas: [],
+            };
+            vi.mocked(mapaService.verificarImpactosMapa).mockResolvedValue(
+                mockImpacto,
+            );
+
+            await store.buscarImpactoMapa(codSubrocesso);
+
+            expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(
+                codSubrocesso,
+            );
+            expect(store.impactoMapa).toEqual(mockImpacto);
+        });
+
+        it("should set state to null on failure", async () => {
+            vi.mocked(mapaService.verificarImpactosMapa).mockRejectedValue(new Error("Fail"));
+            store.impactoMapa = {} as any;
+
+            await expect(store.buscarImpactoMapa(codSubrocesso)).rejects.toThrow("Fail");
+            expect(store.impactoMapa).toBeNull();
+        });
+    });
+
+    describe("adicionarCompetencia", () => {
+        it("should call service and update state on success", async () => {
+            const competencia = {
+                descricao: "Nova Competencia",
+                codigo: 0,
+                atividadesAssociadas: [],
+            };
+            const mockResponse: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
+                competencias: [
+                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                ],
+                situacao: "EM_ANDAMENTO",
+            };
+            vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(
+                mockResponse,
+            );
+
+            await store.adicionarCompetencia(codSubrocesso, competencia);
+
+            expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
+                codSubrocesso,
+                competencia,
+            );
+            expect(store.mapaCompleto).toEqual(mockResponse);
+        });
+
+        it("should throw error on failure", async () => {
+            const competencia = {
+                descricao: "Nova Competencia",
+                codigo: 0,
+                atividadesAssociadas: [],
+            };
+            vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValue(new Error("Fail"));
+
+            await expect(store.adicionarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+        });
+    });
+
+    describe("atualizarCompetencia", () => {
+        it("should call service and update state on success", async () => {
+            const competencia = {
+                codigo: 1,
+                descricao: "Competencia Atualizada",
+                atividadesAssociadas: [],
+            };
+            const mockResponse: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
+                competencias: [
+                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                ],
+                situacao: "EM_ANDAMENTO",
+            };
+            vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(
+                mockResponse,
+            );
+
+            await store.atualizarCompetencia(codSubrocesso, competencia);
+
+            expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
+                codSubrocesso,
+                competencia,
+            );
+            expect(store.mapaCompleto).toEqual(mockResponse);
+        });
+
+        it("should throw error on failure", async () => {
+            const competencia = {
+                codigo: 1,
+                descricao: "Competencia Atualizada",
+                atividadesAssociadas: [],
+            };
+            vi.mocked(subprocessoService.atualizarCompetencia).mockRejectedValue(new Error("Fail"));
+
+            await expect(store.atualizarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+        });
+    });
+
+    describe("removerCompetencia", () => {
+        it("should call service and update state on success", async () => {
+            const idCompetencia = 1;
+            const mockResponse: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
+                competencias: [
+                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                ],
+                situacao: "EM_ANDAMENTO",
+            };
+            vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue(
+                mockResponse,
+            );
+
+            await store.removerCompetencia(codSubrocesso, idCompetencia);
+
+            expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(
+                codSubrocesso,
+                idCompetencia,
+            );
+            expect(store.mapaCompleto).toEqual(mockResponse);
+        });
+
+        it("should throw error on failure", async () => {
+            const idCompetencia = 1;
+            vi.mocked(subprocessoService.removerCompetencia).mockRejectedValue(new Error("Fail"));
+
+            await expect(store.removerCompetencia(codSubrocesso, idCompetencia)).rejects.toThrow("Fail");
+        });
+    });
+
+    describe("buscarMapaVisualizacao", () => {
+        it("should call service and update state on success", async () => {
+            const mockMapa: MapaVisualizacao = {
+                codigo: 1,
+                descricao: "Teste",
+                competencias: [],
+            };
+            vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
+
+            await store.buscarMapaVisualizacao(codSubrocesso);
+
+            expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(
+                codSubrocesso,
+            );
+            expect(store.mapaVisualizacao).toEqual(mockMapa);
+        });
+
+        it("should set state to null on failure", async () => {
+            vi.mocked(mapaService.obterMapaVisualizacao).mockRejectedValue(
+                new Error("Failed"),
+            );
+            store.mapaVisualizacao = {} as any; // Pre-set state
+
+            await expect(store.buscarMapaVisualizacao(codSubrocesso)).rejects.toThrow("Failed");
+
+            expect(store.mapaVisualizacao).toBeNull();
+        });
+    });
+
+    describe("disponibilizarMapa", () => {
+        it("should call service successfully", async () => {
+            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
+            vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue(undefined);
+
+            await store.disponibilizarMapa(codSubrocesso, request);
+
+            expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(
+                codSubrocesso,
+                request,
+            );
+        });
+
+        it("should throw error on failure", async () => {
+            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
+            const error = {response: {data: {message: "Error"}}};
+            vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);
+
+            await expect(
+                store.disponibilizarMapa(codSubrocesso, request),
+            ).rejects.toThrow();
         });
     });
 });

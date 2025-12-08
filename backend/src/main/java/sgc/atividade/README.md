@@ -1,12 +1,13 @@
 # Módulo de Atividade
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
 Este pacote gerencia a entidade `Atividade`, que representa uma tarefa ou atribuição dentro de um `Mapa` de competências.
 
-Uma mudança arquitetural importante foi a **centralização da gestão de Conhecimentos** neste módulo. Agora, a entidade `Conhecimento` é tratada como um recurso filho de `Atividade`, e seu ciclo de vida (criação, atualização, exclusão) é gerenciado através da API de `Atividade`. Isso reflete a relação de negócio onde um conhecimento só existe no contexto de uma atividade.
+Uma característica arquitetural importante é a **centralização da gestão de Conhecimentos** neste módulo. A entidade `Conhecimento` é tratada como um sub-recurso de `Atividade`, e seu ciclo de vida (criação, atualização, exclusão) é gerenciado através da API de `Atividade`. Isso reflete a relação de negócio onde um conhecimento só existe no contexto de uma atividade.
 
 ## Arquitetura e Componentes
-A lógica de negócio foi movida do `AtividadeControle` para o `AtividadeService`, alinhando este módulo com a arquitetura padrão da aplicação. O `AtividadeControle` agora é responsável apenas por expor a API REST e delegar as operações para a camada de serviço.
+A lógica de negócio reside no `AtividadeService`. O `AtividadeController` atua apenas como interface REST, delegando as operações para a camada de serviço.
 
 ```mermaid
 graph TD
@@ -15,7 +16,7 @@ graph TD
     end
 
     subgraph "Módulo Atividade"
-        Controle(AtividadeControle)
+        Controle(AtividadeController)
         Service(AtividadeService)
         subgraph "Repositórios"
             AtividadeRepo
@@ -41,19 +42,37 @@ graph TD
 ```
 
 ## Componentes Principais
-- **`AtividadeControle`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos` aninhados.
-  - **Endpoints de Atividade**:
+
+### Controladores e Serviços
+- **`AtividadeController`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos`. Seguindo as convenções do projeto, operações de atualização e exclusão utilizam o verbo POST com sufixos na URL.
+  - **Atividades**:
+    - `GET /api/atividades`: Lista todas as atividades.
+    - `GET /api/atividades/{id}`: Obtém uma atividade por ID.
     - `POST /api/atividades`: Cria uma nova atividade.
-    - `PUT /api/atividades/{id}`: Atualiza uma atividade.
-    - `DELETE /api/atividades/{id}`: Exclui uma atividade.
-  - **Endpoints de Conhecimento (Sub-recurso)**:
-    - `POST /api/atividades/{atividadeId}/conhecimentos`: Adiciona um conhecimento a uma atividade.
-    - `PUT /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}`: Atualiza um conhecimento.
-    - `DELETE /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}`: Remove um conhecimento de uma atividade.
-- **`AtividadeService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e as regras de validação.
+    - `POST /api/atividades/{id}/atualizar`: Atualiza uma atividade.
+    - `POST /api/atividades/{id}/excluir`: Exclui uma atividade.
+  - **Conhecimentos (Sub-recurso)**:
+    - `GET /api/atividades/{id}/conhecimentos`: Lista conhecimentos de uma atividade.
+    - `POST /api/atividades/{id}/conhecimentos`: Adiciona um conhecimento.
+    - `POST /api/atividades/{id}/conhecimentos/{cid}/atualizar`: Atualiza um conhecimento.
+    - `POST /api/atividades/{id}/conhecimentos/{cid}/excluir`: Remove um conhecimento.
+
+- **`AtividadeService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e regras de validação.
+
+### Modelo de Dados (`model`)
 - **`Atividade`**: Entidade JPA que representa uma atividade. Possui uma relação `OneToMany` com `Conhecimento`.
-- **`Conhecimento`**: Entidade JPA que representa um conhecimento necessário para realizar uma atividade. Está sempre associada a uma `Atividade`.
-- **`AtividadeRepo` / `ConhecimentoRepo`**: Repositórios Spring Data para a persistência das entidades.
+- **`Conhecimento`**: Entidade JPA que representa um conhecimento necessário para realizar uma atividade.
+- **`AtividadeRepo` / `ConhecimentoRepo`**: Repositórios Spring Data.
+
+### DTOs (`dto`)
+- **`AtividadeDto`**: DTO para transporte de dados de atividade.
+- **`ConhecimentoDto`**: DTO para transporte de dados de conhecimento.
+- **`AtividadeMapper` / `ConhecimentoMapper`**: Interfaces MapStruct para conversão Entidade <-> DTO.
 
 ## Propósito da Centralização
-A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter um endpoint `POST /api/conhecimentos` que exigiria a passagem manual do ID da atividade, o novo modelo `POST /api/atividades/{atividadeId}/conhecimentos` é mais semântico, seguro e alinhado com as melhores práticas de design de APIs RESTful.
+A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter endpoints soltos para conhecimentos, o acesso hierárquico `/api/atividades/{atividadeId}/conhecimentos` garante que todo conhecimento esteja sempre corretamente vinculado à sua atividade pai.
+
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

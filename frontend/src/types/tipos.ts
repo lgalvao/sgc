@@ -2,33 +2,28 @@
  * Tipos de situação de um processo.
  */
 export enum SituacaoProcesso {
-    CRIADO = 'CRIADO',
-    EM_ELABORACAO = 'EM_ELABORACAO',
-    FINALIZADO = 'FINALIZADO',
-    AGUARDANDO_INICIO = 'AGUARDANDO_INICIO',
-    EM_ANDAMENTO = 'EM_ANDAMENTO',
-    CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
-    CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
+    CRIADO = "CRIADO",
+    FINALIZADO = "FINALIZADO",
+    EM_ANDAMENTO = "EM_ANDAMENTO",
 }
 
 /**
  * Tipos de processo.
  */
 export enum TipoProcesso {
-    MAPEAMENTO = 'MAPEAMENTO',
-    REVISAO = 'REVISAO',
-    DIAGNOSTICO = 'DIAGNOSTICO',
+    MAPEAMENTO = "MAPEAMENTO",
+    REVISAO = "REVISAO",
+    DIAGNOSTICO = "DIAGNOSTICO",
 }
 
 /**
  * Perfis de usuário no sistema.
  */
 export enum Perfil {
-    ADMIN = 'ADMIN',
-    GESTOR = 'GESTOR',
-    CHEFE = 'CHEFE',
-    SERVIDOR = 'SERVIDOR',
+    ADMIN = "ADMIN",
+    GESTOR = "GESTOR",
+    CHEFE = "CHEFE",
+    SERVIDOR = "SERVIDOR",
 }
 
 /**
@@ -42,16 +37,23 @@ export interface Unidade {
     filhas?: Unidade[];
     tipo?: string;
     idServidorTitular?: number;
-    responsavel?: Servidor;
+    isElegivel?: boolean;
+    responsavel?: Responsavel | null;
 }
 
-/**
- * Representa um responsável por uma unidade.
- */
 export interface Responsavel {
+    codigo: number;
+    nome: string;
+    tituloEleitoral: string;
+    unidade: Unidade;
+    email: string;
+    ramal: string;
     usuarioTitulo: string;
     unidadeCodigo: number;
+    idServidor: number;
     tipo: string;
+    dataInicio: string;
+    dataFim: string | null;
 }
 
 /**
@@ -60,59 +62,61 @@ export interface Responsavel {
 export interface PerfilUnidade {
     perfil: Perfil;
     unidade: Unidade;
-}
-
-/**
- * Representa a requisição para entrar no sistema.
- */
-export interface EntrarRequest {
-    tituloEleitoral: string;
-    perfil: Perfil;
-    unidadeCodigo: number;
+    siglaUnidade: string;
 }
 
 /**
  * Tipos de situação de um subprocesso.
  */
 export enum SituacaoSubprocesso {
-    NAO_INICIADO = 'NAO_INICIADO',
-    AGUARDANDO_DEFINICAO_ATIVIDADES = 'AGUARDANDO_DEFINICAO_ATIVIDADES',
-    ATIVIDADES_EM_DEFINICAO = 'ATIVIDADES_EM_DEFINICAO',
-    AGUARDANDO_VALIDACAO_ATIVIDADES = 'AGUARDANDO_VALIDACAO_ATIVIDADES',
-    ATIVIDADES_EM_VALIDACAO = 'ATIVIDADES_EM_VALIDACAO',
-    ATIVIDADES_VALIDADAS = 'ATIVIDADES_VALIDADAS',
-    AGUARDANDO_REVISAO_ATIVIDADES = 'AGUARDANDO_REVISAO_ATIVIDADES',
-    ATIVIDADES_EM_REVISAO = 'ATIVIDADES_EM_REVISAO',
-    ATIVIDADES_REVISADAS = 'ATIVIDADES_REVISADAS',
-    AGUARDANDO_HOMOLOGACAO_ATIVIDADES = 'AGUARDANDO_HOMOLOGACAO_ATIVIDADES',
-    ATIVIDADES_EM_HOMOLOGACAO = 'ATIVIDADES_EM_HOMOLOGACAO',
-    ATIVIDADES_HOMOLOGADAS = 'ATIVIDADES_HOMOLOGADAS',
-    AGUARDANDO_MAPEAMENTO = 'AGUARDANDO_MAPEAMENTO',
-    MAPEAMENTO_EM_ANDAMENTO = 'MAPEAMENTO_EM_ANDAMENTO',
-    MAPEAMENTO_CONCLUIDO = 'MAPEAMENTO_CONCLUIDO',
-    AGUARDANDO_VALIDACAO_MAPA = 'AGUARDANDO_VALIDACAO_MAPA',
-    MAPA_EM_VALIDACAO = 'MAPA_EM_VALIDACAO',
-    MAPA_VALIDADO = 'MAPA_VALIDADO',
-    AGUARDANDO_AJUSTES_MAPA = 'AGUARDANDO_AJUSTES_MAPA',
-    MAPA_EM_AJUSTE = 'MAPA_EM_AJUSTE',
-    MAPA_AJUSTADO = 'MAPA_AJUSTADO',
-    AGUARDANDO_HOMOLOGACAO_MAPA = 'AGUARDANDO_HOMOLOGACAO_MAPA',
-    MAPA_EM_HOMOLOGACAO = 'MAPA_EM_HOMOLOGACAO',
-    MAPA_HOMOLOGADO = 'MAPA_HOMOLOGADO',
-    CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
-    CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
+    NAO_INICIADO = "NAO_INICIADO",
+
+    // Mapeamento statuses
+    MAPEAMENTO_CADASTRO_EM_ANDAMENTO = "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+    MAPEAMENTO_CADASTRO_DISPONIBILIZADO = "MAPEAMENTO_CADASTRO_DISPONIBILIZADO",
+    MAPEAMENTO_CADASTRO_HOMOLOGADO = "MAPEAMENTO_CADASTRO_HOMOLOGADO",
+    MAPEAMENTO_MAPA_CRIADO = "MAPEAMENTO_MAPA_CRIADO",
+    MAPEAMENTO_MAPA_DISPONIBILIZADO = "MAPEAMENTO_MAPA_DISPONIBILIZADO",
+    MAPEAMENTO_MAPA_COM_SUGESTOES = "MAPEAMENTO_MAPA_COM_SUGESTOES",
+    MAPEAMENTO_MAPA_VALIDADO = "MAPEAMENTO_MAPA_VALIDADO",
+    MAPEAMENTO_MAPA_HOMOLOGADO = "MAPEAMENTO_MAPA_HOMOLOGADO",
+
+    // Revisão statuses
+    REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
+    REVISAO_CADASTRO_DISPONIBILIZADA = "REVISAO_CADASTRO_DISPONIBILIZADA",
+    REVISAO_CADASTRO_HOMOLOGADA = "REVISAO_CADASTRO_HOMOLOGADA",
+    REVISAO_MAPA_AJUSTADO = "REVISAO_MAPA_AJUSTADO",
+    REVISAO_MAPA_DISPONIBILIZADO = "REVISAO_MAPA_DISPONIBILIZADO",
+    REVISAO_MAPA_COM_SUGESTOES = "REVISAO_MAPA_COM_SUGESTOES",
+    REVISAO_MAPA_VALIDADO = "REVISAO_MAPA_VALIDADO",
+    REVISAO_MAPA_HOMOLOGADO = "REVISAO_MAPA_HOMOLOGADO",
+
+    // Legacy statuses (deprecated, kept for backward compatibility)
+    ATIVIDADES_REVISADAS = "ATIVIDADES_REVISADAS",
+    CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
+    CADASTRO_DISPONIBILIZADO = "CADASTRO_DISPONIBILIZADO",
+    CADASTRO_HOMOLOGADO = "CADASTRO_HOMOLOGADO",
+    ATIVIDADES_HOMOLOGADAS = "ATIVIDADES_HOMOLOGADAS",
+    MAPA_CRIADO = "MAPA_CRIADO",
+    MAPA_ELABORADO = "MAPA_ELABORADO",
+    MAPA_DISPONIBILIZADO = "MAPA_DISPONIBILIZADO",
+    MAPA_COM_SUGESTOES = "MAPA_COM_SUGESTOES",
+    MAPA_VALIDADO = "MAPA_VALIDADO",
+    MAPA_HOMOLOGADO = "MAPA_HOMOLOGADO",
+    MAPA_AJUSTADO = "MAPA_AJUSTADO",
+    CONCLUIDO = "CONCLUIDO",
 }
 
 export interface Conhecimento {
-    codigo: number;
+    id: number;
     descricao: string;
 }
 
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: Conhecimento[];
+    conhecimentos: { id: number; descricao: string }[];
+    mapaCodigo?: number;
 }
 
 export interface Competencia {
@@ -125,7 +129,7 @@ export interface Mapa {
     codigo: number;
     descricao: string;
     unidade: Unidade;
-    idProcesso: number;
+    codProcesso: number;
     competencias: Competencia[];
     situacao: string;
     dataCriacao: string;
@@ -141,21 +145,29 @@ export interface Processo {
     dataLimite: string;
     dataCriacao: string;
     dataFinalizacao?: string;
-    unidades: Unidade[];
-    resumoSubprocessos: Subprocesso[];
+    unidades: UnidadeParticipante[];
+    resumoSubprocessos: ProcessoResumo[];
+    // Campos formatados do backend
+    dataLimiteFormatada?: string;
+    dataCriacaoFormatada?: string;
+    dataFinalizacaoFormatada?: string;
+    situacaoLabel?: string;
+    tipoLabel?: string;
 }
 
 export interface ProcessoResumo {
     codigo: number;
     descricao: string;
     situacao: SituacaoProcesso;
-    tipo: string;
+    tipo: TipoProcesso;
     dataLimite: string;
     dataCriacao: string;
     unidadeCodigo: number;
     unidadeNome: string;
-    unidades: Unidade[];
+    unidadesParticipantes?: string;
     dataFinalizacao?: string;
+    dataFinalizacaoFormatada?: string;
+    linkDestino?: string;
 }
 
 export interface Subprocesso {
@@ -163,11 +175,13 @@ export interface Subprocesso {
     unidade: Unidade;
     situacao: SituacaoSubprocesso;
     dataLimite: string;
+    dataFimEtapa1: string;
+    dataLimiteEtapa2: string;
     atividades: Atividade[];
     codUnidade: number;
 }
 
-export interface Servidor {
+export interface Usuario {
     codigo: number;
     nome: string;
     tituloEleitoral: string;
@@ -178,23 +192,27 @@ export interface Servidor {
 
 export interface Alerta {
     codigo: number;
+    codProcesso: number;
+    unidadeOrigem: string;
+    unidadeDestino: string;
+    descricao: string;
+    dataHora: string;
+    dataHoraLeitura: string | null;
+    linkDestino: string;
     mensagem: string;
-    data: string;
-    lido: boolean;
+    dataHoraFormatada: string;
+    origem: string;
+    processo: string;
 }
 
 export interface Movimentacao {
     codigo: number;
+    subprocesso: Subprocesso;
     dataHora: string;
-    descricao: string;
-    usuario: string;
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
-}
-
-export interface ResultadoAnalise {
-    aprovado: boolean;
-    observacoes: string;
+    descricao: string;
+    usuario: Usuario;
 }
 
 export interface AnaliseValidacao {
@@ -205,16 +223,28 @@ export interface AnaliseValidacao {
     acao: string;
     observacoes: string;
     resultado: string;
-    idSubprocesso: number;
+    codSubrocesso: number;
+}
+
+export interface AnaliseCadastro {
+    codigo: number;
+    dataHora: string;
+    analista: string;
+    unidadeSigla: string;
+    acao: string;
+    observacoes: string;
+    resultado: string;
+    codSubrocesso: number;
 }
 
 export interface AtribuicaoTemporaria {
     codigo: number;
-    servidor: Servidor;
+    servidor: Usuario;
     unidade: Unidade;
     dataInicio: string;
     dataFim: string;
     dataTermino: string;
+    justificativa: string;
 }
 
 export interface UnidadeSnapshot {
@@ -222,12 +252,6 @@ export interface UnidadeSnapshot {
     nome: string;
     sigla: string;
     filhas?: UnidadeSnapshot[];
-}
-
-export enum TipoResponsabilidade {
-    CHEFE = 'CHEFE',
-    GESTOR = 'GESTOR',
-    ATRIBUICAO = 'ATRIBUICAO',
 }
 
 export interface CriarAtividadeRequest {
@@ -257,20 +281,140 @@ export interface UnidadeParticipante {
     nome: string;
     sigla: string;
     codUnidade: number;
+    codSubprocesso: number;
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
     dataLimite: string;
+    mapaCodigo?: number;
     filhos: UnidadeParticipante[];
+    // Campos formatados do backend
+    dataLimiteFormatada?: string;
+    situacaoLabel?: string;
 }
 
-export interface ProcessoDetalhe {
+export interface SubprocessoPermissoes {
+    podeVerPagina: boolean;
+    podeEditarMapa: boolean;
+    podeVisualizarMapa: boolean;
+    podeDisponibilizarCadastro: boolean;
+    podeDevolverCadastro: boolean;
+    podeAceitarCadastro: boolean;
+    podeVisualizarDiagnostico: boolean;
+    podeAlterarDataLimite: boolean;
+    podeVisualizarImpacto: boolean;
+}
+
+export interface SubprocessoDetalhe {
+    unidade: Unidade;
+    titular: Usuario;
+    responsavel: Usuario;
+    situacao: SituacaoSubprocesso;
+    situacaoLabel: string;
+    localizacaoAtual: string;
+    processoDescricao: string;
+    tipoProcesso: TipoProcesso;
+    prazoEtapaAtual: string;
+    isEmAndamento: boolean;
+    etapaAtual: number;
+    movimentacoes: Movimentacao[];
+    elementosProcesso: any[];
+    permissoes: SubprocessoPermissoes;
+}
+
+export interface ConhecimentoVisualizacao {
+    id: number;
+    descricao: string;
+}
+
+export interface AtividadeVisualizacao {
     codigo: number;
     descricao: string;
-    tipo: TipoProcesso;
-    situacao: SituacaoProcesso;
+    conhecimentos: ConhecimentoVisualizacao[];
+}
+
+export interface CompetenciaVisualizacao {
+    codigo: number;
+    descricao: string;
+    atividades: AtividadeVisualizacao[];
+}
+
+export interface MapaVisualizacao {
+    codigo: number;
+    descricao: string;
+    competencias: CompetenciaVisualizacao[];
+    atividadesSemCompetencia?: AtividadeVisualizacao[];
+}
+
+export interface AceitarCadastroRequest {
+    observacoes: string;
+}
+
+export interface DevolverCadastroRequest {
+    observacoes: string;
+}
+
+export interface HomologarCadastroRequest {
+    observacoes: string;
+}
+
+export interface SalvarMapaRequest {
+    competencias: {
+        codigo?: number;
+        descricao: string;
+        atividades: {
+            codigo?: number;
+            descricao: string;
+            conhecimentos: {
+                id?: number;
+                descricao: string;
+            }[];
+        }[];
+    }[];
+}
+
+export interface SalvarAjustesRequest {
+    competencias: {
+        codigo: number;
+        descricao: string;
+    }[];
+    atividades: {
+        codigo: number;
+        descricao: string;
+    }[];
+    sugestoes: string;
+}
+
+export interface MapaCompleto {
+    codigo: number;
+    subprocessoCodigo: number;
+    observacoes: string;
+    competencias: Competencia[];
+    situacao: string;
+}
+
+export interface MapaAjuste {
+    codigo: number;
+    descricao: string;
+    competencias: Competencia[];
+}
+
+export interface DisponibilizarMapaRequest {
     dataLimite: string;
-    dataCriacao: string;
-    dataFinalizacao?: string;
-    unidades: UnidadeParticipante[];
-    resumoSubprocessos: Subprocesso[];
+    observacoes: string;
+}
+
+export interface SubprocessoElegivel {
+    codSubprocesso: number;
+    unidadeNome: string;
+    unidadeSigla: string;
+    situacao: SituacaoSubprocesso;
+}
+
+export interface Servidor {
+    codigo: number;
+    nome: string;
+    tituloEleitoral: string;
+    unidade: Unidade;
+    email: string;
+    ramal: string;
 }

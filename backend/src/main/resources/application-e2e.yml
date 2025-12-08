@@ -1,0 +1,47 @@
+spring:
+  jackson:
+    use-jackson2-defaults: true
+  datasource:
+    url: jdbc:h2:mem:sgc-e2e;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: sgc
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: file:../e2e/setup/seed.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      enabled: true
+
+# Configuração de logging otimizada para e2e
+logging:
+  pattern:
+    # Sem timestamp para economizar tokens e melhorar cache
+    console: "%-5level %logger{30}.%M:%L - %msg%n"
+  level:
+    sgc: INFO
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.orm.jpa: ERROR
+    org.springframework.jdbc: ERROR
+    com.zaxxer.hikari: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR

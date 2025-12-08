@@ -1,15 +1,11 @@
 package sgc.processo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @Getter
 @Builder
@@ -24,13 +20,23 @@ public class ProcessoDetalheDto {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
 
-    @Builder.Default
-    private List<UnidadeParticipanteDto> unidades = new ArrayList<>();
+    @Builder.Default private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
 
-    @Builder.Default
-    private List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+    @Builder.Default private final List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+
+    private boolean podeFinalizar;
+    private boolean podeHomologarCadastro;
+    private boolean podeHomologarMapa;
+
+    // Campos formatados para apresentação
+    private String dataLimiteFormatada;
+    private String dataCriacaoFormatada;
+    private String dataFinalizacaoFormatada;
+    private String situacaoLabel;
+    private String tipoLabel;
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -41,8 +47,13 @@ public class ProcessoDetalheDto {
         private Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
+        private Long mapaCodigo;
+        private Long codSubprocesso;
 
-        @Builder.Default
-        private List<UnidadeParticipanteDto> filhos = new ArrayList<>();
+        @Builder.Default private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();
+
+        // Campos formatados para apresentação
+        private String dataLimiteFormatada;
+        private String situacaoLabel;
     }
 }

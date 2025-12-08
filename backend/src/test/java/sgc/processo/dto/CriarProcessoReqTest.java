@@ -1,11 +1,11 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import sgc.processo.model.TipoProcesso;
 
 class CriarProcessoReqTest {
     @Test
@@ -13,18 +13,15 @@ class CriarProcessoReqTest {
         var unidades = List.of(1L, 2L);
         var dataLimite = LocalDateTime.now();
 
-        var req = new CriarProcessoReq(
-            "Test Description",
-            "TIPO_A",
-            dataLimite,
-            unidades
-        );
+        var req =
+                new CriarProcessoReq(
+                        "Test Description", TipoProcesso.MAPEAMENTO, dataLimite, unidades);
 
-        assertEquals("Test Description", req.descricao());
-        assertEquals("TIPO_A", req.tipo());
-        assertEquals(dataLimite, req.dataLimiteEtapa1());
-        assertEquals(2, req.unidades().size());
-        assertEquals(1L, req.unidades().get(0));
-        assertEquals(2L, req.unidades().get(1));
+        assertEquals("Test Description", req.getDescricao());
+        assertEquals(TipoProcesso.MAPEAMENTO, req.getTipo());
+        assertEquals(dataLimite, req.getDataLimiteEtapa1());
+        assertEquals(2, req.getUnidades().size());
+        assertEquals(1L, req.getUnidades().get(0));
+        assertEquals(2L, req.getUnidades().get(1));
     }
 }

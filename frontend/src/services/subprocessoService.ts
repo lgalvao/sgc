@@ -1,17 +1,81 @@
-import apiClient from '../axios-setup';
+import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
+import type {Competencia, MapaCompleto} from "@/types/tipos";
+import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
-  subprocessoOrigemId: number;
+  codSubprocessoOrigem: number;
 }
 
-export async function importarAtividades(idSubprocessoDestino: number, idSubprocessoOrigem: number): Promise<void> {
-  try {
+export async function importarAtividades(
+    codSubprocessoDestino: number,
+    codSubprocessoOrigem: number,
+): Promise<void> {
     const request: ImportarAtividadesRequest = {
-      subprocessoOrigemId: idSubprocessoOrigem,
+        codSubprocessoOrigem: codSubprocessoOrigem,
     };
-    await apiClient.post(`/subprocessos/${idSubprocessoDestino}/importar-atividades`, request);
-  } catch (error) {
-    console.error(`Erro ao importar atividades para o subprocesso ${idSubprocessoDestino}:`, error);
-    throw error;
-  }
+    await apiClient.post(
+        `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
+        request,
+    );
+}
+
+export async function buscarSubprocessoDetalhe(
+    codSubprocesso: number,
+    perfil: string,
+    unidadeCodigo: number,
+) {
+  const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
+    params: { perfil, unidadeUsuario: unidadeCodigo },
+  });
+  return response.data;
+}
+
+export async function buscarSubprocessoPorProcessoEUnidade(
+    codProcesso: number,
+    siglaUnidade: string,
+) {
+    const response = await apiClient.get("/subprocessos/buscar", {
+        params: {codProcesso, siglaUnidade},
+    });
+    return response.data;
+}
+
+export async function adicionarCompetencia(
+    codSubprocesso: number,
+    competencia: Competencia,
+): Promise<MapaCompleto> {
+    const requestBody = {
+        descricao: competencia.descricao,
+        atividadesIds: competencia.atividadesAssociadas,
+    };
+    const response = await apiClient.post(
+        `/subprocessos/${codSubprocesso}/competencias`,
+        requestBody,
+    );
+    return mapMapaCompletoDtoToModel(response.data);
+}
+
+export async function atualizarCompetencia(
+    codSubprocesso: number,
+    competencia: Competencia,
+): Promise<MapaCompleto> {
+    const requestBody = {
+        descricao: competencia.descricao,
+        atividadesIds: competencia.atividadesAssociadas,
+    };
+    const response = await apiClient.post(
+        `/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`,
+        requestBody,
+    );
+    return mapMapaCompletoDtoToModel(response.data);
+}
+
+export async function removerCompetencia(
+    codSubprocesso: number,
+    codCompetencia: number,
+): Promise<MapaCompleto> {
+    const response = await apiClient.post(
+        `/subprocessos/${codSubprocesso}/competencias/${codCompetencia}/remover`,
+    );
+    return mapMapaCompletoDtoToModel(response.data);
 }

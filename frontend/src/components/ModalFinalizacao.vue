@@ -1,0 +1,55 @@
+<template>
+  <BModal
+    :fade="false"
+    :model-value="mostrar"
+    :title="processoDescricao ? 'Finalização de processo' : 'Finalização'"
+    header-bg-variant="success"
+    header-text-variant="white"
+    size="lg"
+    centered
+    hide-footer
+    @hide="emit('fechar')"
+  >
+    <BAlert
+      variant="info"
+      :model-value="true"
+      :fade="false"
+    >
+      <i class="bi bi-info-circle" />
+      Confirma a finalização do processo <strong>{{ processoDescricao }}</strong>?<br>
+      Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
+      participantes do processo.
+    </BAlert>
+    <template #footer>
+      <BButton
+        variant="secondary"
+        data-testid="btn-finalizar-processo-cancelar"
+        @click="emit('fechar')"
+      >
+        <i class="bi bi-x-circle" /> Cancelar
+      </BButton>
+      <BButton
+        variant="success"
+        data-testid="btn-finalizar-processo-confirmar"
+        @click="emit('confirmar')"
+      >
+        <i class="bi bi-check-circle" />
+        Confirmar
+      </BButton>
+    </template>
+  </BModal>
+</template>
+
+<script lang="ts" setup>
+import {BAlert, BButton, BModal} from "bootstrap-vue-next";
+
+defineProps<{
+  mostrar: boolean;
+  processoDescricao: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "fechar"): void;
+  (e: "confirmar"): void;
+}>();
+</script>

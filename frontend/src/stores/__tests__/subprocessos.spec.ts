@@ -1,59 +1,264 @@
-import {beforeEach, describe, expect, it} from 'vitest';
-import {useSubprocessosStore} from '../subprocessos';
-import {initPinia} from '@/test-utils/helpers';
+import {createPinia, setActivePinia} from "pinia";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import * as cadastroService from "@/services/cadastroService";
+import * as subprocessoService from "@/services/subprocessoService";
+import {Perfil} from "@/types/tipos";
 
-describe('useSubprocessosStore', () => {
-    let subprocessosStore: ReturnType<typeof useSubprocessosStore>;
+import {usePerfilStore} from "../perfil";
+import {useProcessosStore} from "../processos";
+import {useSubprocessosStore} from "../subprocessos";
 
-  
+// Mock dependencies
+vi.mock("@/services/subprocessoService", () => ({
+    buscarSubprocessoDetalhe: vi.fn(),
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+}));
+
+vi.mock("@/services/cadastroService", () => ({
+    aceitarCadastro: vi.fn(),
+    aceitarRevisaoCadastro: vi.fn(),
+    devolverCadastro: vi.fn(),
+    devolverRevisaoCadastro: vi.fn(),
+    disponibilizarCadastro: vi.fn(),
+    disponibilizarRevisaoCadastro: vi.fn(),
+    homologarCadastro: vi.fn(),
+    homologarRevisaoCadastro: vi.fn(),
+}));
+
+describe("Subprocessos Store", () => {
     beforeEach(() => {
-          initPinia();
-          subprocessosStore = useSubprocessosStore();
-      });
-
-    it('should initialize with mock subprocessos', () => {
-        expect(subprocessosStore.subprocessos.length).toBeGreaterThan(0);
-        expect(subprocessosStore.subprocessos[0].dataLimiteEtapa1).toBeInstanceOf(Date);
+        setActivePinia(createPinia());
+        vi.restoreAllMocks();
     });
 
-    describe('getters', () => {
-        it('getUnidadesDoProcesso should filter subprocessos by idProcesso', () => {
-            const subprocessos = subprocessosStore.getUnidadesDoProcesso(1);
-            expect(Array.isArray(subprocessos)).toBe(true);
-            subprocessos.forEach(sp => {
-                expect(sp.idProcesso).toBe(1);
-            });
-        });
+    it("buscarSubprocessoDetalhe deve carregar detalhes com sucesso", async () => {
+        const store = useSubprocessosStore();
+        const perfilStore = usePerfilStore();
+        const mockDetalhe = {codigo: 123, situacao: "EM_ANDAMENTO"};
 
-        it('getUnidadesDoProcesso should return empty array for non-existent idProcesso', () => {
-            const subprocessos = subprocessosStore.getUnidadesDoProcesso(999);
-            expect(subprocessos).toEqual([]);
-        });
+        // Setup perfil store state
+        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        perfilStore.unidadeSelecionada = 99;
+        perfilStore.perfisUnidades = [
+            {
+                perfil: Perfil.GESTOR,
+                unidade: {codigo: 99, sigla: "TEST", nome: "Teste"},
+                siglaUnidade: "TEST",
+            },
+        ];
 
-        it('getMovementsForSubprocesso should return movements for existing subprocesso', () => {
-            const movements = subprocessosStore.getMovementsForSubprocesso(1);
-            expect(Array.isArray(movements)).toBe(true);
-        });
+        vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue(
+            mockDetalhe as any,
+        );
 
-        it('getMovementsForSubprocesso should return empty array for non-existent subprocesso', () => {
-            const movements = subprocessosStore.getMovementsForSubprocesso(999);
-            expect(movements).toEqual([]);
-        });
+        await store.buscarSubprocessoDetalhe(123);
 
-        it('getSubprocessosElegiveisHomologacaoBloco should filter by idProcesso and situacao', () => {
-            const elegiveis = subprocessosStore.getSubprocessosElegiveisHomologacaoBloco(1);
-            expect(Array.isArray(elegiveis)).toBe(true);
-            elegiveis.forEach(sp => {
-                expect(sp.idProcesso).toBe(1);
-                expect(['Cadastro disponibilizado', 'Revisão do cadastro disponibilizada']).toContain(sp.situacao);
-            });
-        });
+        expect(subprocessoService.buscarSubprocessoDetalhe).toHaveBeenCalledWith(
+            123,
+            "GESTOR",
+            99,
+        );
+        expect(store.subprocessoDetalhe).toEqual(mockDetalhe);
     });
 
-    describe('actions', () => {
-        it('reset should clear all subprocessos', () => {
-            subprocessosStore.reset();
-            expect(subprocessosStore.subprocessos).toEqual([]);
-        });
+    it("buscarSubprocessoDetalhe deve notificar erro se perfil não selecionado", async () => {
+        const store = useSubprocessosStore();
+        const perfilStore = usePerfilStore();
+
+
+        // Perfil not selected
+        perfilStore.perfilSelecionado = null;
+
+        await store.buscarSubprocessoDetalhe(123);
+
+        expect(store.subprocessoDetalhe).toBeNull();
+    });
+
+    it("buscarSubprocessoDetalhe deve notificar erro se unidade não encontrada para perfil", async () => {
+        const store = useSubprocessosStore();
+        const perfilStore = usePerfilStore();
+
+
+        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        perfilStore.unidadeSelecionada = 99;
+        perfilStore.perfisUnidades = []; // No matching unit
+
+        await store.buscarSubprocessoDetalhe(123);
+
+    });
+
+    it("buscarSubprocessoDetalhe deve tratar erro do serviço", async () => {
+        const store = useSubprocessosStore();
+        const perfilStore = usePerfilStore();
+
+
+        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        perfilStore.unidadeSelecionada = 99;
+        perfilStore.perfisUnidades = [
+            {
+                perfil: Perfil.GESTOR,
+                unidade: {codigo: 99, sigla: "TEST", nome: "Teste"},
+                siglaUnidade: "TEST",
+            },
+        ];
+
+        vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockRejectedValue(
+            new Error("Fail"),
+        );
+
+        await store.buscarSubprocessoDetalhe(123);
+
+    });
+
+    it("buscarSubprocessoPorProcessoEUnidade deve retornar código com sucesso", async () => {
+        const store = useSubprocessosStore();
+        vi.mocked(
+            subprocessoService.buscarSubprocessoPorProcessoEUnidade,
+        ).mockResolvedValue({codigo: 555} as any);
+
+        const result = await store.buscarSubprocessoPorProcessoEUnidade(1, "UNID");
+
+        expect(result).toBe(555);
+        expect(
+            subprocessoService.buscarSubprocessoPorProcessoEUnidade,
+        ).toHaveBeenCalledWith(1, "UNID");
+    });
+
+    it("buscarSubprocessoPorProcessoEUnidade deve tratar erro", async () => {
+        const store = useSubprocessosStore();
+
+        vi.mocked(
+            subprocessoService.buscarSubprocessoPorProcessoEUnidade,
+        ).mockRejectedValue(new Error("Fail"));
+
+        const result = await store.buscarSubprocessoPorProcessoEUnidade(1, "UNID");
+
+        expect(result).toBeNull();
+    });
+
+    it("alterarDataLimiteSubprocesso deve delegar para processosStore", async () => {
+        const store = useSubprocessosStore();
+        const processosStore = useProcessosStore();
+
+        vi.spyOn(processosStore, "alterarDataLimiteSubprocesso").mockResolvedValue(
+            undefined,
+        );
+
+        await store.alterarDataLimiteSubprocesso(1, {novaData: "2023-01-01"});
+
+        expect(processosStore.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(
+            1,
+            {novaData: "2023-01-01"},
+        );
+    });
+
+    it("disponibilizarCadastro deve executar ação com sucesso e atualizar processo", async () => {
+        const store = useSubprocessosStore();
+        const processosStore = useProcessosStore();
+
+
+        vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue(
+            {} as any,
+        );
+
+        processosStore.processoDetalhe = {codigo: 10} as any;
+        vi.spyOn(processosStore, "buscarProcessoDetalhe").mockResolvedValue(
+            undefined,
+        );
+
+        const success = await store.disponibilizarCadastro(123);
+
+        expect(success).toBe(true);
+        expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
+
+
+        expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(10);
+    });
+
+    it("disponibilizarCadastro deve tratar erro", async () => {
+        const store = useSubprocessosStore();
+
+
+        vi.mocked(cadastroService.disponibilizarCadastro).mockRejectedValue(
+            new Error("Fail"),
+        );
+
+        const success = await store.disponibilizarCadastro(123);
+
+        expect(success).toBe(false);
+    });
+
+    it("disponibilizarRevisaoCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        vi.mocked(cadastroService.disponibilizarRevisaoCadastro).mockResolvedValue(
+            {} as any,
+        );
+        await store.disponibilizarRevisaoCadastro(123);
+        expect(cadastroService.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(
+            123,
+        );
+    });
+
+    it("devolverCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {motivo: "X"} as any;
+        vi.mocked(cadastroService.devolverCadastro).mockResolvedValue({} as any);
+        await store.devolverCadastro(123, req);
+        expect(cadastroService.devolverCadastro).toHaveBeenCalledWith(123, req);
+    });
+
+    it("aceitarCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {analise: "OK"} as any;
+        vi.mocked(cadastroService.aceitarCadastro).mockResolvedValue({} as any);
+        await store.aceitarCadastro(123, req);
+        expect(cadastroService.aceitarCadastro).toHaveBeenCalledWith(123, req);
+    });
+
+    it("homologarCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {analise: "OK"} as any;
+        vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
+        await store.homologarCadastro(123, req);
+        expect(cadastroService.homologarCadastro).toHaveBeenCalledWith(123, req);
+    });
+
+    it("devolverRevisaoCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {motivo: "X"} as any;
+        vi.mocked(cadastroService.devolverRevisaoCadastro).mockResolvedValue(
+            {} as any,
+        );
+        await store.devolverRevisaoCadastro(123, req);
+        expect(cadastroService.devolverRevisaoCadastro).toHaveBeenCalledWith(
+            123,
+            req,
+        );
+    });
+
+    it("aceitarRevisaoCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {analise: "OK"} as any;
+        vi.mocked(cadastroService.aceitarRevisaoCadastro).mockResolvedValue(
+            {} as any,
+        );
+        await store.aceitarRevisaoCadastro(123, req);
+        expect(cadastroService.aceitarRevisaoCadastro).toHaveBeenCalledWith(
+            123,
+            req,
+        );
+    });
+
+    it("homologarRevisaoCadastro deve chamar serviço correto", async () => {
+        const store = useSubprocessosStore();
+        const req = {analise: "OK"} as any;
+        vi.mocked(cadastroService.homologarRevisaoCadastro).mockResolvedValue(
+            {} as any,
+        );
+        await store.homologarRevisaoCadastro(123, req);
+        expect(cadastroService.homologarRevisaoCadastro).toHaveBeenCalledWith(
+            123,
+            req,
+        );
     });
 });

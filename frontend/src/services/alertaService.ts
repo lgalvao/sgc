@@ -1,10 +1,5 @@
-import apiClient from '../axios-setup';
+import apiClient from "../axios-setup";
 
-export async function marcarComoLido(id: number): Promise<void> {
-  try {
-    await apiClient.post(`/alertas/${id}/marcar-como-lido`);
-  } catch (error) {
-    console.error(`Erro ao marcar alerta ${id} como lido:`, error);
-    throw error;
-  }
+export async function marcarComoLido(codAlerta: number): Promise<void> {
+  await apiClient.post(`/alertas/${codAlerta}/marcar-como-lido`);
 }

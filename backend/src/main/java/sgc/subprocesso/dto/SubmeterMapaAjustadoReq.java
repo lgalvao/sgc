@@ -3,14 +3,23 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import sgc.comum.json.SanitizarHtml;
 
-public record SubmeterMapaAjustadoReq(
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SubmeterMapaAjustadoReq {
     @NotBlank(message = "O campo 'observacoes' é obrigatório.")
-    String observacoes,
+    @SanitizarHtml
+    private String observacoes;
 
     @NotNull(message = "O campo 'dataLimiteEtapa2' é obrigatório.")
     @Future(message = "A data limite da etapa 2 deve ser uma data futura.")
-    LocalDateTime dataLimiteEtapa2
-) {}
+    private LocalDateTime dataLimiteEtapa2;
+}

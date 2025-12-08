@@ -1,99 +1,221 @@
-import { defineStore } from 'pinia';
-import type { Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/types/tipos';
-import * as atividadeService from '@/services/atividadeService';
-import * as subprocessoService from '@/services/subprocessoService';
-import { useNotificacoesStore } from './notificacoes';
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {mapMapaVisualizacaoToAtividades} from "@/mappers/mapas";
+import * as atividadeService from "@/services/atividadeService";
+import * as mapaService from "@/services/mapaService";
+import * as subprocessoService from "@/services/subprocessoService";
+import {useFeedbackStore} from "@/stores/feedback";
+import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 
-export const useAtividadesStore = defineStore('atividades', {
-    state: () => ({
-        atividades: [] as Atividade[],
-        atividadesPorSubprocesso: new Map<number, Atividade[]>(),
-    }),
-    getters: {
-        getAtividadesPorSubprocesso: (state) => (idSubprocesso: number): Atividade[] => {
-            return state.atividadesPorSubprocesso.get(idSubprocesso) || [];
-        }
-    },
-    actions: {
-        async fetchAtividades() {
-            try {
-                this.atividades = await atividadeService.listarAtividades();
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao buscar atividades', 'Não foi possível carregar a lista de atividades.');
-            }
-        },
 
-        async fetchAtividadesParaSubprocesso(idSubprocesso: number) {
-            // No backend atual, não há um endpoint direto para buscar atividades por subprocesso.
-            // A lógica de negócio associa atividades a um mapa, que por sua vez está ligado a um subprocesso.
-            // Esta action precisará ser ajustada quando a lógica de busca de mapa estiver implementada.
-            // Por enquanto, vamos simular buscando todas e filtrando (ineficiente, para desenvolvimento).
-            if (this.atividades.length === 0) {
-                await this.fetchAtividades();
-            }
-            // A filtragem real dependerá da estrutura de dados do subprocesso.
-            // Ex: this.atividadesPorSubprocesso.set(idSubprocesso, this.atividades.filter(a => a.mapaCodigo === subprocesso.mapaCodigo));
-            // Por enquanto, apenas para demonstração:
-            this.atividadesPorSubprocesso.set(idSubprocesso, [...this.atividades]);
-        },
+export const useAtividadesStore = defineStore("atividades", () => {
+    const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
+    const feedbackStore = useFeedbackStore();
 
-        async adicionarAtividade(request: CriarAtividadeRequest) {
-            try {
-                const novaAtividade = await atividadeService.criarAtividade(request);
-                this.atividades.push(novaAtividade);
-                // O ideal seria associar a atividade ao subprocesso correto aqui.
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
-            }
-        },
+    const obterAtividadesPorSubprocesso = computed(
+        () =>
+            (codSubrocesso: number): Atividade[] => {
+                return atividadesPorSubprocesso.value.get(codSubrocesso) || [];
+            },
+    );
 
-        async removerAtividade(atividadeId: number) {
-            try {
-                await atividadeService.excluirAtividade(atividadeId);
-                this.atividades = this.atividades.filter(a => a.codigo !== atividadeId);
-                // Também remover de todos os maps de subprocesso
-                this.atividadesPorSubprocesso.forEach((atividades, id) => {
-                    this.atividadesPorSubprocesso.set(id, atividades.filter(a => a.codigo !== atividadeId));
-                });
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao remover atividade', 'Não foi possível remover a atividade.');
-            }
-        },
-
-        async adicionarConhecimento(atividadeId: number, request: CriarConhecimentoRequest) {
-            try {
-                const novoConhecimento = await atividadeService.criarConhecimento(atividadeId, request);
-                const atividade = this.atividades.find(a => a.codigo === atividadeId);
-                if (atividade) {
-                    atividade.conhecimentos.push(novoConhecimento);
-                }
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao adicionar conhecimento', 'Não foi possível salvar o novo conhecimento.');
-            }
-        },
-
-        async removerConhecimento(atividadeId: number, conhecimentoId: number) {
-            try {
-                await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-                const atividade = this.atividades.find(a => a.codigo === atividadeId);
-                if (atividade) {
-                    atividade.conhecimentos = atividade.conhecimentos.filter(c => c.codigo !== conhecimentoId);
-                }
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao remover conhecimento', 'Não foi possível remover o conhecimento.');
-            }
-        },
-
-        async importarAtividades(idSubprocessoDestino: number, idSubprocessoOrigem: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await subprocessoService.importarAtividades(idSubprocessoDestino, idSubprocessoOrigem);
-                notificacoes.sucesso('Atividades importadas', 'As atividades foram importadas com sucesso.');
-                // Recarregar as atividades do subprocesso de destino para refletir a importação
-                await this.fetchAtividadesParaSubprocesso(idSubprocessoDestino);
-            } catch (error) {
-                notificacoes.erro('Erro ao importar', 'Não foi possível importar as atividades.');
-            }
+    async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
+        try {
+            const mapa = await mapaService.obterMapaVisualizacao(codSubrocesso);
+            const atividades = mapMapaVisualizacaoToAtividades(mapa);
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+        } catch (error) {
+            feedbackStore.show(
+                "Erro ao buscar atividades",
+                "Não foi possível carregar as atividades para o subprocesso.",
+                "danger"
+            );
+            atividadesPorSubprocesso.value.set(codSubrocesso, []);
+            throw error; // Re-throw to propagate error to UI
         }
     }
+
+    async function adicionarAtividade(
+        codSubprocesso: number,
+        codMapa: number,
+        request: CriarAtividadeRequest,
+    ) {
+        try {
+            const novaAtividade = await atividadeService.criarAtividade(
+                request,
+                codMapa,
+            );
+            if (novaAtividade) {
+                const atividades =
+                    atividadesPorSubprocesso.value.get(codSubprocesso) || [];
+                atividades.push(novaAtividade);
+                atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
+            }
+            // Re-fetch to ensure consistency with backend
+            await buscarAtividadesParaSubprocesso(codSubprocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.", "danger");
+            throw error;
+        }
+    }
+
+    async function removerAtividade(codSubrocesso: number, atividadeId: number) {
+        try {
+            await atividadeService.excluirAtividade(atividadeId);
+            atividadesPorSubprocesso.value.set(
+                codSubrocesso,
+                (atividadesPorSubprocesso.value.get(codSubrocesso) || []).filter(
+                    (a) => a.codigo !== atividadeId,
+                ),
+            );
+            // Re-fetch to ensure data consistency
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao remover atividade", "Não foi possível remover a atividade.", "danger");
+            throw error;
+        }
+    }
+
+    async function adicionarConhecimento(
+        codSubrocesso: number,
+        atividadeId: number,
+        request: CriarConhecimentoRequest,
+    ) {
+        try {
+            const novoConhecimento = await atividadeService.criarConhecimento(
+                atividadeId,
+                request,
+            );
+            const updatedAtividades = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((a) => {
+                if (a.codigo === atividadeId) {
+                    return {
+                        ...a,
+                        conhecimentos: [...a.conhecimentos, novoConhecimento],
+                    };
+                }
+                return a;
+            });
+            atividadesPorSubprocesso.value.set(codSubrocesso, updatedAtividades);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao adicionar conhecimento", "Não foi possível adicionar o conhecimento.", "danger");
+            throw error;
+        }
+    }
+
+    async function removerConhecimento(
+        codSubrocesso: number,
+        atividadeId: number,
+        conhecimentoId: number,
+    ) {
+        try {
+            await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+            const atividades =
+                (atividadesPorSubprocesso.value.get(codSubrocesso) || []).map(
+                    (a) => {
+                        if (a.codigo === atividadeId) {
+                            return {
+                                ...a,
+                                conhecimentos: a.conhecimentos.filter(
+                                    (c) => c.id !== conhecimentoId,
+                                ),
+                            };
+                        }
+                        return a;
+                    },
+                );
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividades);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao remover conhecimento", "Não foi possível remover o conhecimento.", "danger");
+            throw error;
+        }
+    }
+
+    async function importarAtividades(
+        codSubrocessoDestino: number,
+        codSubrocessoOrigem: number,
+    ) {
+        try {
+            await subprocessoService.importarAtividades(
+                codSubrocessoDestino,
+                codSubrocessoOrigem,
+            );
+            // Recarregar as atividades do subprocesso de destino para refletir a importação
+            await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
+        } catch (error) {
+            feedbackStore.show("Erro ao importar atividades", "Não foi possível importar as atividades.", "danger");
+            throw error;
+        }
+    }
+
+    async function atualizarAtividade(
+        codSubrocesso: number,
+        atividadeId: number,
+        data: Atividade,
+    ) {
+        try {
+            const atividadeAtualizada = await atividadeService.atualizarAtividade(
+                atividadeId,
+                data,
+            );
+            const atividadesAtualizadas = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((a) => (a.codigo === atividadeId ? atividadeAtualizada : a));
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao atualizar atividade", "Não foi possível atualizar a atividade.", "danger");
+            throw error;
+        }
+    }
+
+    async function atualizarConhecimento(
+        codSubrocesso: number,
+        atividadeId: number,
+        conhecimentoId: number,
+        data: Conhecimento,
+    ) {
+        try {
+            const conhecimentoAtualizado =
+                await atividadeService.atualizarConhecimento(
+                    atividadeId,
+                    conhecimentoId,
+                    data,
+                );
+            const atividadesAtualizadas = (
+                atividadesPorSubprocesso.value.get(codSubrocesso) || []
+            ).map((atividade) => {
+                if (atividade.codigo === atividadeId) {
+                    return {
+                        ...atividade,
+                        conhecimentos: atividade.conhecimentos.map((c) =>
+                            c.id === conhecimentoId ? conhecimentoAtualizado : c,
+                        ),
+                    };
+                }
+                return atividade;
+            });
+            atividadesPorSubprocesso.value.set(codSubrocesso, atividadesAtualizadas);
+            await buscarAtividadesParaSubprocesso(codSubrocesso);
+        } catch (error) {
+            feedbackStore.show("Erro ao atualizar conhecimento", "Não foi possível atualizar o conhecimento.", "danger");
+            throw error;
+        }
+    }
+
+    return {
+        atividadesPorSubprocesso,
+        obterAtividadesPorSubprocesso,
+        buscarAtividadesParaSubprocesso,
+        adicionarAtividade,
+        removerAtividade,
+        adicionarConhecimento,
+        removerConhecimento,
+        importarAtividades,
+        atualizarAtividade,
+        atualizarConhecimento,
+    };
 });

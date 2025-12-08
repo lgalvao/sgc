@@ -1,159 +1,287 @@
-import {beforeEach, describe, expect, it, vi, Mocked} from 'vitest';
-import {useProcessosStore} from '../processos';
-import {SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
-import {useNotificacoesStore} from '../notificacoes';
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'; // Adicionado
-import {initPinia} from '@/test-utils/helpers';
+import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
+import {initPinia} from "@/test-utils/helpers";
+import type {Processo} from "@/types/tipos";
+import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {useProcessosStore} from "../processos";
 
-// Mock dos serviços
-vi.mock('@/services/painelService');
-vi.mock('@/services/processoService');
+// Mocks
+vi.mock("@/services/painelService");
+vi.mock("@/services/processoService");
+vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
+vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
 
-// Mock dos stores
-vi.mock('../unidades', () => ({
-    useUnidadesStore: vi.fn(() => ({
-        getUnidadeImediataSuperior: vi.fn((unidade: string) => {
-            if (unidade === 'SESEL') return 'UNIDADE_SUPERIOR_SESEL';
-            if (unidade === 'COSIS') return 'UNIDADE_SUPERIOR_COSIS';
-            if (unidade === 'UNIDADE_GESTOR') return 'UNIDADE_SUPERIOR_SESEL';
-            return null;
-        }),
-    })),
-}));
-vi.mock('../alertas', () => ({
-    useAlertasStore: vi.fn(() => ({
-        criarAlerta: vi.fn(),
-    })),
-}));
-vi.mock('../notificacoes', () => ({
-    useNotificacoesStore: vi.fn(() => ({
-        email: vi.fn(),
-    })),
-}));
+describe("useProcessosStore", () => {
+    let store: ReturnType<typeof useProcessosStore>;
+    let painelService: Mocked<typeof import("@/services/painelService")>;
+    let processoService: Mocked<typeof import("@/services/processoService")>;
 
-
-describe('useProcessosStore', () => {
-    let processosStore: ReturnType<typeof useProcessosStore>;
-    let painelService: Mocked<typeof import('@/services/painelService')>;
-    let processoService: Mocked<typeof import('@/services/processoService')>;
-
+    const MOCK_ERROR = new Error("Service failed");
+    const MOCK_PROCESSO_DETALHE: Processo = {
+        codigo: 1,
+        descricao: "Teste",
+        tipo: TipoProcesso.MAPEAMENTO,
+        situacao: SituacaoProcesso.EM_ANDAMENTO,
+        dataLimite: "2025-12-31",
+        dataCriacao: "2025-01-01",
+        unidades: [],
+        resumoSubprocessos: [],
+    };
 
     beforeEach(async () => {
         initPinia();
-        processosStore = useProcessosStore();
-
-        // Importar os módulos mockados dinamicamente
-        painelService = (await import('@/services/painelService')) as Mocked<typeof import('@/services/painelService')>;
-        processoService = (await import('@/services/processoService')) as Mocked<typeof import('@/services/processoService')>;
-
-        vi.clearAllMocks();
-
-        // Resetar o estado do store
-        processosStore.$reset();
+        store = useProcessosStore();
+        painelService = (await import("@/services/painelService")) as Mocked<
+            typeof import("@/services/painelService")
+        >;
+        processoService = (await import("@/services/processoService")) as Mocked<
+            typeof import("@/services/processoService")
+        >;
+        vi.restoreAllMocks();
     });
 
-    it('should initialize with mock processos and subprocessos with parsed dates', () => {
-        expect(processosStore.processosPainel).toEqual([]);
-        expect(processosStore.processosPainelPage).toEqual({});
-        expect(processosStore.processoDetalhe).toBeNull();
+    it("deve inicializar com o estado padrão", () => {
+        expect(store.processosPainel).toEqual([]);
+        expect(store.processoDetalhe).toBeNull();
     });
 
-    describe('actions', () => {
-        it('fetchProcessosPainel should call painelService and update state', async () => {
-            const mockPage = {
-                content: [{codigo: 1, descricao: 'Teste', tipo: 'MAPEAMENTO', situacao: 'EM_ANDAMENTO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE'}],
-                totalPages: 1,
-                totalElements: 1,
-                number: 0,
-                size: 10,
-                first: true,
-                last: true,
-                empty: false
-            };
-            painelService.listarProcessos.mockResolvedValue(mockPage);
+    describe("Actions", () => {
+        describe("buscarProcessosPainel", () => {
+            it("deve atualizar o estado em caso de sucesso", async () => {
+                const mockPage = {content: [{id: 1}], totalPages: 1};
+                painelService.listarProcessos.mockResolvedValue(mockPage as any);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10);
+                const calls = painelService.listarProcessos.mock.calls[0];
+                expect(calls[0]).toBe("perfil");
+                expect(calls[1]).toBe(1);
+                expect(calls[2]).toBe(0);
+                expect(calls[3]).toBe(10);
+                // sort and order may be undefined by default
+                expect(calls[4]).toBeUndefined();
+                expect(calls[5]).toBeUndefined();
+                expect(store.processosPainel).toEqual(mockPage.content);
+            });
 
-            await processosStore.fetchProcessosPainel('perfil', 1, 0, 10);
+            it("deve respeitar ordenacao personalizada", async () => {
+                const mockPage = {content: [{id: 2}], totalPages: 1};
+                painelService.listarProcessos.mockResolvedValue(mockPage as any);
+                await store.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
+                expect(painelService.listarProcessos).toHaveBeenCalledWith(
+                    "perfil",
+                    1,
+                    0,
+                    10,
+                    "descricao",
+                    "asc",
+                );
+                expect(store.processosPainel).toEqual(mockPage.content);
+            });
 
-            expect(painelService.listarProcessos).toHaveBeenCalledWith('perfil', 1, 0, 10);
-            expect(processosStore.processosPainel).toEqual(mockPage.content);
-            expect(processosStore.processosPainelPage).toEqual(mockPage);
+            it("não deve atualizar o estado em caso de falha", async () => {
+                painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
+                await expect(
+                    store.buscarProcessosPainel("perfil", 1, 0, 10),
+                ).rejects.toThrow(MOCK_ERROR);
+            });
         });
 
-        it('fetchProcessoDetalhe should call processoService and update state', async () => {
-            const mockDetalhe = {
-                codigo: 1,
-                descricao: 'Detalhe Teste',
-                tipo: 'MAPEAMENTO',
-                situacao: 'EM_ANDAMENTO',
-                dataLimite: '2025-12-31',
-                dataCriacao: '2025-01-01',
-                dataFinalizacao: '2025-12-31',
-                unidades: [],
-                resumoSubprocessos: []
-            };
-            processoService.obterDetalhesProcesso.mockResolvedValue(mockDetalhe);
+        describe("buscarProcessoDetalhe", () => {
+            it("deve atualizar o estado em caso de sucesso", async () => {
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.buscarProcessoDetalhe(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+                expect(store.processoDetalhe).toEqual(MOCK_PROCESSO_DETALHE);
+            });
 
-            await processosStore.fetchProcessoDetalhe(1);
-
-            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-            expect(processosStore.processoDetalhe).toEqual(mockDetalhe);
+            it("não deve atualizar o estado em caso de falha", async () => {
+                processoService.obterDetalhesProcesso.mockRejectedValue(MOCK_ERROR);
+                await expect(store.buscarProcessoDetalhe(1)).rejects.toThrow(MOCK_ERROR);
+            });
         });
 
-        it('criarProcesso should call processoService', async () => {
+        describe("criarProcesso", () => {
             const payload = {
-                descricao: 'Novo Processo',
-                tipo: 'MAPEAMENTO',
-                dataLimiteEtapa1: '2025-12-31',
-                unidades: [1]
+                descricao: "Novo",
+                tipo: TipoProcesso.MAPEAMENTO,
+                dataLimiteEtapa1: "2025-01-01",
+                unidades: [1],
             };
-            processoService.criarProcesso.mockResolvedValue({ codigo: 2, descricao: 'Novo Processo', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-02-01', dataFinalizacao: '' });
+            it("deve chamar o processoService", async () => {
+                processoService.criarProcesso.mockResolvedValue({} as any);
+                await store.criarProcesso(payload);
+                expect(processoService.criarProcesso).toHaveBeenCalledWith(payload);
+            });
 
-            await processosStore.criarProcesso(payload);
-
-            expect(processoService.criarProcesso).toHaveBeenCalledWith(payload);
+            it("deve lançar um erro em caso de falha", async () => {
+                processoService.criarProcesso.mockRejectedValue(MOCK_ERROR);
+                await expect(store.criarProcesso(payload)).rejects.toThrow(MOCK_ERROR);
+            });
         });
 
-        it('atualizarProcesso should call processoService', async () => {
+        describe("atualizarProcesso", () => {
             const payload = {
                 codigo: 1,
-                descricao: 'Processo Atualizado',
-                tipo: 'MAPEAMENTO',
-                dataLimiteEtapa1: '2025-12-31',
-                unidades: [1]
+                descricao: "Atualizado",
+                tipo: TipoProcesso.MAPEAMENTO,
+                dataLimiteEtapa1: "2025-01-01",
+                unidades: [1],
             };
-            processoService.atualizarProcesso.mockResolvedValue({ codigo: 1, descricao: 'Processo Atualizado', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', dataFinalizacao: '' });
+            it("deve chamar o processoService", async () => {
+                processoService.atualizarProcesso.mockResolvedValue({} as any);
+                await store.atualizarProcesso(1, payload);
+                expect(processoService.atualizarProcesso).toHaveBeenCalledWith(
+                    1,
+                    payload,
+                );
+            });
 
-            await processosStore.atualizarProcesso(1, payload);
-
-            expect(processoService.atualizarProcesso).toHaveBeenCalledWith(1, payload);
+            it("deve lançar um erro em caso de falha", async () => {
+                processoService.atualizarProcesso.mockRejectedValue(MOCK_ERROR);
+                await expect(store.atualizarProcesso(1, payload)).rejects.toThrow(
+                    MOCK_ERROR,
+                );
+            });
         });
 
-        it('removerProcesso should call processoService', async () => {
-            processoService.excluirProcesso.mockResolvedValue();
+        describe("removerProcesso", () => {
+            it("deve chamar o processoService", async () => {
+                processoService.excluirProcesso.mockResolvedValue();
+                await store.removerProcesso(1);
+                expect(processoService.excluirProcesso).toHaveBeenCalledWith(1);
+            });
 
-            await processosStore.removerProcesso(1);
-
-            expect(processoService.excluirProcesso).toHaveBeenCalledWith(1);
+            it("deve lançar um erro em caso de falha", async () => {
+                processoService.excluirProcesso.mockRejectedValue(MOCK_ERROR);
+                await expect(store.removerProcesso(1)).rejects.toThrow(MOCK_ERROR);
+            });
         });
 
-        it('iniciarProcesso should call processoService with correct parameters', async () => {
-            processoService.iniciarProcesso.mockResolvedValue();
-            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
+        describe("iniciarProcesso", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                processoService.iniciarProcesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]);
+                expect(processoService.iniciarProcesso).toHaveBeenCalledWith(
+                    1,
+                    TipoProcesso.MAPEAMENTO,
+                    [10],
+                );
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
 
-            await processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20]);
-
-            expect(processoService.iniciarProcesso).toHaveBeenCalledWith(1, 'MAPEAMENTO', [10, 20]);
-            expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            it("deve lançar um erro em caso de falha", async () => {
+                processoService.iniciarProcesso.mockRejectedValue(MOCK_ERROR);
+                await expect(
+                    store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]),
+                ).rejects.toThrow(MOCK_ERROR);
+            });
         });
 
-        it('finalizarProcesso should call processoService and reload details', async () => {
-            processoService.finalizarProcesso.mockResolvedValue();
-            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
+        describe("buscarProcessosFinalizados", () => {
+            it("deve atualizar o estado em caso de sucesso", async () => {
+                const mockProcessos = [{id: 1}];
+                processoService.buscarProcessosFinalizados.mockResolvedValue(
+                    mockProcessos as any,
+                );
+                await store.buscarProcessosFinalizados();
+                expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
+                expect(store.processosFinalizados).toEqual(mockProcessos);
+            });
+        });
 
-            await processosStore.finalizarProcesso(1);
+        describe("buscarSubprocessosElegiveis", () => {
+            it("deve atualizar o estado em caso de sucesso", async () => {
+                const mockSubprocessos = [{id: 1}];
+                processoService.buscarSubprocessosElegiveis.mockResolvedValue(
+                    mockSubprocessos as any,
+                );
+                await store.buscarSubprocessosElegiveis(1);
+                expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(
+                    1,
+                );
+                expect(store.subprocessosElegiveis).toEqual(mockSubprocessos);
+            });
+        });
 
-            expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-            expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+        describe("finalizarProcesso", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                processoService.finalizarProcesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.finalizarProcesso(1);
+                expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("processarCadastroBloco", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                const payload = {
+                    codProcesso: 1,
+                    unidades: ["1"],
+                    tipoAcao: "aceitar",
+                    unidadeUsuario: "1",
+                } as any;
+                processoService.processarAcaoEmBloco.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.processarCadastroBloco(payload);
+                expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(
+                    payload,
+                );
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("alterarDataLimiteSubprocesso", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                const payload = {novaData: "2026-01-01"};
+                processoService.alterarDataLimiteSubprocesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.alterarDataLimiteSubprocesso(1, payload);
+                expect(
+                    processoService.alterarDataLimiteSubprocesso,
+                ).toHaveBeenCalledWith(1, payload);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("apresentarSugestoes", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                const payload = {sugestoes: "sugestoes"};
+                processoService.apresentarSugestoes.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.apresentarSugestoes(1, payload);
+                expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(
+                    1,
+                    payload,
+                );
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("validarMapa", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                processoService.validarMapa.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.validarMapa(1);
+                expect(processoService.validarMapa).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
         });
     });
 });

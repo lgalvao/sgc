@@ -1,5 +1,10 @@
 package sgc.sgrh;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,94 +12,108 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilUnidade;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.service.UsuarioService;
+import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para UsuarioService")
 class UsuarioServiceTest {
 
-    @Mock
-    private SgrhService sgrhService;
+    @Mock private UsuarioRepo usuarioRepo;
 
-    @Mock
-    private UnidadeRepo unidadeRepo;
-
-    @InjectMocks
-    private UsuarioService usuarioService;
+    @InjectMocks private UsuarioService usuarioService;
 
     private Unidade unidadeMock;
+    private Usuario usuarioMock;
 
     @BeforeEach
     void setUp() {
         unidadeMock = new Unidade("Secretaria de Documentação", "SEDOC");
         unidadeMock.setCodigo(1L);
+        unidadeMock.setTipo(TipoUnidade.INTEROPERACIONAL);
+        usuarioMock =
+                new Usuario(
+                        "123456789", "Usuário de Teste", "teste@email.com", "1234", unidadeMock);
+
+        usuarioMock
+                .getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(usuarioMock)
+                                .unidade(unidadeMock)
+                                .perfil(Perfil.ADMIN)
+                                .build());
+        usuarioMock
+                .getAtribuicoes()
+                .add(
+                        sgc.sgrh.model.UsuarioPerfil.builder()
+                                .usuario(usuarioMock)
+                                .unidade(unidadeMock)
+                                .perfil(Perfil.CHEFE)
+                                .build());
     }
 
     @Test
-    @DisplayName("Deve autenticar com sucesso")
+    @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() {
-        boolean resultado = usuarioService.autenticar(123456789L, "senha");
+        boolean resultado = usuarioService.autenticar("123456789", "senha");
         assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("Deve retornar lista de perfis e unidades autorizados")
     void autorizar_deveRetornarListaDePerfisUnidades() {
-        long tituloEleitoral = 123456789L;
-        List<PerfilDto> perfisDto = List.of(
-            new PerfilDto(String.valueOf(tituloEleitoral), 1L, "SEDOC", "ADMIN"),
-            new PerfilDto(String.valueOf(tituloEleitoral), 1L, "SEDOC", "CHEFE")
-        );
+        String tituloEleitoral = "123456789";
 
-        when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(perfisDto);
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidadeMock));
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
 
         List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
 
         assertThat(resultado).hasSize(2);
-        assertThat(resultado.get(0).getPerfil()).isEqualTo(Perfil.ADMIN);
-        assertThat(resultado.get(0).getUnidade().getSigla()).isEqualTo("SEDOC");
-        assertThat(resultado.get(1).getPerfil()).isEqualTo(Perfil.CHEFE);
-        assertThat(resultado.get(1).getUnidade().getSigla()).isEqualTo("SEDOC");
+        assertThat(resultado)
+                .extracting(PerfilUnidade::getPerfil)
+                .containsExactlyInAnyOrder(Perfil.ADMIN, Perfil.CHEFE);
+        assertThat(resultado)
+                .extracting(pu -> pu.getUnidade().getSigla())
+                .allMatch(sigla -> sigla.equals("SEDOC"));
 
-        verify(sgrhService, times(1)).buscarPerfisUsuario(String.valueOf(tituloEleitoral));
-        verify(unidadeRepo, times(2)).findById(1L);
+        verify(usuarioRepo, times(1)).findById(tituloEleitoral);
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando unidade não for encontrada")
-    void autorizar_deveLancarExcecao_quandoUnidadeNaoEncontrada() {
-        long tituloEleitoral = 123456789L;
-        List<PerfilDto> perfisDto = List.of(new PerfilDto(String.valueOf(tituloEleitoral), 99L, "INEXISTENTE", "ADMIN"));
+    @DisplayName("Deve lançar exceção quando usuário não for encontrado")
+    void autorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
+        String tituloEleitoral = "999";
 
-        when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(perfisDto);
-        when(unidadeRepo.findById(99L)).thenReturn(Optional.empty());
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.autorizar(tituloEleitoral))
-            .isInstanceOf(ErroDominioNaoEncontrado.class)
-            .hasMessage("Unidade não encontrada com código: 99");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Usuário' com codigo '999' não encontrado");
     }
 
     @Test
-    @DisplayName("Deve simular a entrada com sucesso")
+    @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
-        long tituloEleitoral = 123456789L;
-        PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeMock);
+        String tituloEleitoral = "123456789";
+        UnidadeDto unidadeDtoMock =
+                new UnidadeDto(
+                        unidadeMock.getCodigo(),
+                        unidadeMock.getNome(),
+                        unidadeMock.getSigla(),
+                        null,
+                        unidadeMock.getTipo().name(),
+                        false);
+        PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 
-        // Apenas verifica se o método executa sem lançar exceções,
-        // já que a implementação atual apenas loga a informação.
-        usuarioService.entrar(tituloEleitoral, perfilUnidade);
+        assertThatCode(() -> usuarioService.entrar(tituloEleitoral, perfilUnidade))
+                .doesNotThrowAnyException();
     }
 }

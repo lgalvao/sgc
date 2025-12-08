@@ -7,6 +7,7 @@
         :checked="isChecked(unidade.sigla)"
         class="form-check-input"
         type="checkbox"
+        :data-testid="`chk-unidade-tree-${unidade.sigla}`"
         :indeterminate.prop="isIndeterminate(unidade) !== false"
         @change="() => toggleUnidade(unidade)"
       >
@@ -34,8 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-import {PropType} from 'vue';
-import {Unidade} from '@/types/tipos';
+import type {PropType} from "vue";
+import type {Unidade} from "@/types/tipos";
 
 defineProps({
   unidade: {
@@ -51,7 +52,7 @@ defineProps({
     required: true,
   },
   isIndeterminate: {
-    type: Function as PropType<(unidade: Unidade) => boolean | 'indeterminate'>,
+    type: Function as PropType<(unidade: Unidade) => boolean | "indeterminate">,
     required: true,
   },
 });

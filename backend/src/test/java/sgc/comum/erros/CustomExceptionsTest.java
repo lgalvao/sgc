@@ -1,44 +1,24 @@
 package sgc.comum.erros;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 class CustomExceptionsTest {
     @Test
-    @DisplayName("Deve instanciar ErroDominioAccessoNegado")
+    @DisplayName("Deve instanciar ErroAccessoNegado")
     void testErroDominioAccessoNegado() {
         String message = "Acesso negado";
-        ErroDominioAccessoNegado exception = new ErroDominioAccessoNegado(message);
+        ErroAccessoNegado exception = new ErroAccessoNegado(message);
         assertEquals(message, exception.getMessage());
     }
 
     @Test
-    @DisplayName("Deve instanciar ErroDominioNaoEncontrado")
+    @DisplayName("Deve instanciar ErroEntidadeNaoEncontrada")
     void testErroDominioNaoEncontrado() {
         String message = "Dominio não encontrado";
-        ErroDominioNaoEncontrado exception = new ErroDominioNaoEncontrado(message);
+        ErroEntidadeNaoEncontrada exception = new ErroEntidadeNaoEncontrada(message);
         assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Deve instanciar ErroServicoExterno com mensagem")
-    void testErroServicoExternoWithMessage() {
-        String message = "Erro de serviço externo";
-        ErroServicoExterno exception = new ErroServicoExterno(message);
-        assertEquals(message, exception.getMessage());
-        assertNull(exception.getCause());
-    }
-
-    @Test
-    @DisplayName("Deve instanciar ErroServicoExterno com mensagem e causa")
-    void testErroServicoExternoWithMessageAndCause() {
-        String message = "Erro de serviço externo";
-        Throwable cause = new RuntimeException("Causa raiz");
-        ErroServicoExterno exception = new ErroServicoExterno(message, cause);
-        assertEquals(message, exception.getMessage());
-        assertEquals(cause, exception.getCause());
     }
 }

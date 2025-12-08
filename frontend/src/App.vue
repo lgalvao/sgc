@@ -1,60 +1,90 @@
 <script lang="ts" setup>
-import Navbar from './components/Navbar.vue'
-import {useRoute} from 'vue-router'
-import {computed, ref, watch} from 'vue'
-import BarraNavegacao from './components/BarraNavegacao.vue';
-import NotificacaoContainer from './components/NotificacaoContainer.vue';
-import pkg from '../package.json';
+import {computed, ref, watch} from "vue";
+import {useRoute} from "vue-router";
+import {BAlert, BOrchestrator} from "bootstrap-vue-next";
+import {useFeedbackStore} from "@/stores/feedback";
+import pkg from "../package.json";
+import BarraNavegacao from "./components/BarraNavegacao.vue";
+import MainNavbar from "./components/MainNavbar.vue";
 
 interface PackageJson {
   version: string;
-  [key: string]: unknown;
+
+  [key: string]: any;
 }
 
-const route = useRoute()
+const route = useRoute();
+const feedbackStore = useFeedbackStore();
 
-const hideExtrasOnce = ref(false)
+const hideExtrasOnce = ref(false);
 
 function refreshHideFlag() {
-  let came = false
+  let came = false;
   try {
-    came = sessionStorage.getItem('cameFromNavbar') === '1'
+    came = sessionStorage.getItem("cameFromNavbar") === "1";
   } catch {
+    //
   }
-  hideExtrasOnce.value = came
+  hideExtrasOnce.value = came;
   if (came) {
     try {
-      sessionStorage.removeItem('cameFromNavbar')
+      sessionStorage.removeItem("cameFromNavbar");
     } catch {
+      //
     }
   }
 }
 
-watch(() => route.fullPath, () => refreshHideFlag(), {immediate: true})
-const version = (pkg as PackageJson).version
+watch(
+    () => route.fullPath,
+    () => refreshHideFlag(),
+    {immediate: true},
+);
+const version = (pkg as PackageJson).version;
 
 const shouldShowNavBarExtras = computed(() => {
-  if (route.path === '/login') return false
-  if (route.path === '/painel') return false
-  return !hideExtrasOnce.value
-})
+  if (route.path === "/login") return false;
+  if (route.path === "/painel") return false;
+  return !hideExtrasOnce.value;
+});
 </script>
 
 <template>
-  <Navbar v-if="route.path !== '/login'" />
+  <BOrchestrator/>
+  <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
+    <BAlert
+        v-model="feedbackStore.currentFeedback.show"
+        :variant="feedbackStore.currentFeedback.variant"
+        dismissible
+        :fade="false"
+        class="shadow-sm"
+        style="pointer-events: auto; min-width: 300px; max-width: 600px;"
+        data-testid="global-alert"
+        @closed="feedbackStore.close()"
+    >
+      <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">
+        {{ feedbackStore.currentFeedback.title }}
+      </h6>
+      <p class="mb-0">
+        {{ feedbackStore.currentFeedback.message }}
+      </p>
+    </BAlert>
+  </div>
+
+  <MainNavbar v-if="route.path !== '/login'"/>
   <div
-    v-if="shouldShowNavBarExtras"
-    class="bg-light border-bottom"
+      v-if="shouldShowNavBarExtras"
+      class="bg-light border-bottom"
   >
     <div class="container py-2">
-      <BarraNavegacao />
+      <BarraNavegacao/>
     </div>
   </div>
-  <router-view />
-  <NotificacaoContainer />
+  <router-view/>
+
   <footer
-    v-if="route.path !== '/login'"
-    class="bg-light text-muted border-top mt-4"
+      v-if="route.path !== '/login'"
+      class="bg-light text-muted border-top mt-4"
   >
     <div class="container py-3 small d-flex justify-content-between align-items-center">
       <span>Versão {{ version }}</span>

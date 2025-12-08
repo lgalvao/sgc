@@ -1,38 +1,37 @@
 <template>
-  <BaseModal
-    :mostrar="mostrar"
-    titulo="Disponibilizar Mapa"
-    tipo="primary"
-    icone="bi bi-share"
-    @fechar="fechar"
+  <BModal
+    :fade="false"
+    :model-value="mostrar"
+    title="Disponibilizar Mapa"
+    header-bg-variant="primary"
+    header-text-variant="white"
+    centered
+    hide-footer
+    @hide="fechar"
   >
-    <template #conteudo>
-      <div class="mb-3">
-        <label
-          class="form-label"
-          for="dataLimite"
-        >Data limite para validação</label>
-        <input
-          id="dataLimite"
-          v-model="dataLimiteValidacao"
-          class="form-control"
-          type="date"
-          data-testid="input-data-limite"
-        >
-      </div>
-      <div
-        v-if="notificacao"
-        class="alert alert-info mt-3"
-      >
-        {{ notificacao }}
-      </div>
-    </template>
+    <div class="mb-3">
+      <label
+        class="form-label"
+        for="dataLimite"
+      >Data limite para validação</label>
+      <BFormInput
+        id="dataLimite"
+        v-model="dataLimiteValidacao"
+        type="date"
+        data-testid="input-data-limite"
+      />
+    </div>    <div
+      v-if="notificacao"
+      class="alert alert-info mt-3"
+    >
+      {{ notificacao }}
+    </div>
 
-    <template #acoes>
+    <template #footer>
       <button
         class="btn btn-secondary"
         type="button"
-        data-testid="btn-modal-cancelar"
+        data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
@@ -47,37 +46,40 @@
         Disponibilizar
       </button>
     </template>
-  </BaseModal>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import BaseModal from './BaseModal.vue'
+import {BFormInput, BModal} from "bootstrap-vue-next";
+import {ref, watch} from "vue";
 
 const props = defineProps<{
-  mostrar: boolean
-}>()
+  mostrar: boolean;
+}>();
 
 const emit = defineEmits<{
-  fechar: []
-  disponibilizar: [dataLimite: string]
-}>()
+  fechar: [];
+  disponibilizar: [dataLimite: string];
+}>();
 
-const dataLimiteValidacao = ref('')
-const notificacao = ref('')
+const dataLimiteValidacao = ref("");
+const notificacao = ref("");
 
-watch(() => props.mostrar, (mostrar) => {
-  if (mostrar) {
-    dataLimiteValidacao.value = ''
-    notificacao.value = ''
-  }
-})
+watch(
+    () => props.mostrar,
+    (mostrar) => {
+      if (mostrar) {
+        dataLimiteValidacao.value = "";
+        notificacao.value = "";
+      }
+    },
+);
 
 function fechar() {
-  emit('fechar')
+  emit("fechar");
 }
 
 function disponibilizar() {
-  emit('disponibilizar', dataLimiteValidacao.value)
+  emit("disponibilizar", dataLimiteValidacao.value);
 }
 </script>

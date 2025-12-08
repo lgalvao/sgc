@@ -1,408 +1,146 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
-import {createPinia} from 'pinia';
-import {initPinia} from '@/test-utils/helpers';
-import {
-    assertUnidadeOptions,
-    expectImportButtonDisabled,
-    expectImportButtonEnabled,
-    selecionarProcessoEUnidade,
-    selectFirstCheckbox
-} from '@/test-utils/uiHelpers';
-import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
-import {
-  Atividade,
-  Processo,
-  SituacaoProcesso,
-  Subprocesso,
-  TipoProcesso,
-  Unidade,
-  UnidadeParticipante
-} from '@/types/tipos';
+import {flushPromises, mount, type VueWrapper} from "@vue/test-utils";
+import {BFormSelect} from "bootstrap-vue-next";
+import {createPinia, setActivePinia} from "pinia";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {ref} from "vue";
+// Mock data
+import {type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
+import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
 
-// Mock dos stores
-const mockProcessosStore = {
-    processos: [] as Processo[],
-    getUnidadesDoProcesso: vi.fn(),
+// Helper type for the component instance
+type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
+
+const mockProcessos: ProcessoResumo[] = [
+    {
+        codigo: 1,
+        descricao: "Processo 1",
+        tipo: TipoProcesso.MAPEAMENTO,
+        situacao: SituacaoProcesso.FINALIZADO,
+        dataCriacao: "2021-01-01",
+        dataLimite: "2021-01-01",
+        unidadeCodigo: 1,
+        unidadeNome: "test",
+    },
+];
+const mockProcessoDetalhe = {
+    unidades: [{codUnidade: 10, sigla: "U1", codSubprocesso: 100}],
 };
+const mockAtividades: Atividade[] = [
+    {codigo: 1, descricao: "Atividade A", conhecimentos: []},
+];
 
-const mockAtividadesStore = {
-    fetchAtividadesPorSubprocesso: vi.fn(),
-    getAtividadesPorSubprocesso: vi.fn(),
-};
-
-vi.mock('@/stores/processos', () => ({
-    useProcessosStore: () => mockProcessosStore,
+// Mock composable and stores
+const mockExecute = vi.fn();
+vi.mock("@/composables/useApi", () => ({
+    useApi: () => ({
+        execute: mockExecute,
+        error: ref(null),
+        isLoading: ref(false),
+        clearError: vi.fn(),
+    }),
+}));
+vi.mock("@/stores/processos", () => ({
+  useProcessosStore: () => ({
+    processosPainel: mockProcessos,
+    processoDetalhe: mockProcessoDetalhe,
+    buscarProcessosPainel: vi.fn(),
+    buscarProcessoDetalhe: vi.fn(),
+  }),
+}));
+vi.mock("@/stores/atividades", () => ({
+  useAtividadesStore: () => ({
+    obterAtividadesPorSubprocesso: () => mockAtividades,
+    buscarAtividadesParaSubprocesso: vi.fn(),
+    importarAtividades: vi.fn(),
+  }),
 }));
 
-vi.mock('@/stores/atividades', () => ({
-    useAtividadesStore: () => mockAtividadesStore,
-}));
+describe("ImportarAtividadesModal", () => {
+  let wrapper: VueWrapper<ImportarAtividadesModalVM>;
 
-// Helpers para reduzir repetição nos testes
-const criarProcesso = (overrides = {}): Processo => ({
-    codigo: 1,
-    descricao: 'Processo Teste',
-    tipo: TipoProcesso.MAPEAMENTO,
-    situacao: SituacaoProcesso.FINALIZADO,
-    dataLimite: new Date().toISOString(),
-    dataCriacao: new Date().toISOString(),
-    dataFinalizacao: new Date().toISOString(),
-    unidades: [],
-    resumoSubprocessos: [],
-    ...overrides
-});
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+    wrapper = mount(ImportarAtividadesModal, {
+      props: { mostrar: true, codSubrocessoDestino: 999 },
+    });
+  });
 
-function aplicarMocks({
-                          processos = [],
-                          unidades = [],
-                          atividades = []
-                      }: {
-    processos?: Processo[];
-    unidades?: UnidadeParticipante[];
-    atividades?: Atividade[];
-} = {}) {
-    mockProcessosStore.processos = processos;
-    mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue(unidades);
-    mockAtividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue(atividades);
-    mockAtividadesStore.fetchAtividadesPorSubprocesso = vi.fn();
-}
+  it('deve emitir "fechar" ao clicar em Cancelar', async () => {
+      await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
+      expect(wrapper.emitted("fechar")).toBeTruthy();
+  });
 
-describe('ImportarAtividadesModal.vue', () => {
-    let pinia: ReturnType<typeof createPinia>;
+    it("deve habilitar o botão de importação e chamar a API ao importar", async () => {
+    const importButton = wrapper.find('[data-testid="btn-importar"]');
+    expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
-    beforeEach(() => {
-        pinia = initPinia();
+    // Simulate user selecting a process and unit
+    const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+    await flushPromises();
+        await selects[1].setValue("10");
+    await flushPromises();
 
-        // Reset mocks
-        vi.clearAllMocks();
+    // Find and check the checkbox for the activity
+    await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
+
+    // Now, the button should be enabled
+    expect((importButton.element as HTMLButtonElement).disabled).toBe(false);
+
+    // Simulate the import click
+    mockExecute.mockResolvedValue(true);
+        await importButton.trigger("click");
+
+    // Verify the API call and emitted events
+    expect(mockExecute).toHaveBeenCalledWith(
+      999,
+      mockProcessoDetalhe.unidades[0].codSubprocesso,
+        [mockAtividades[0].codigo],
+    );
+        expect(wrapper.emitted("importar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeTruthy();
+  });
+
+    it("deve resetar o modal quando a prop 'mostrar' mudar para true", async () => {
+        // Simulate selecting something first
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+
+        await wrapper.setProps({mostrar: false});
+        await wrapper.setProps({mostrar: true});
+
+        // Check if reset
+        expect((wrapper.vm as any).processoSelecionadoId).toBeNull();
     });
 
-    const mountComponent = (props: { mostrar: boolean } = {mostrar: true}) => {
-        return mount(ImportarAtividadesModal, {
-            props,
-            global: {
-                plugins: [pinia]
-            }
-        });
-    };
+    it("deve lidar com erro na importação", async () => {
+        // Setup selection
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+        await selects[1].setValue("10");
+        await flushPromises();
+        await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
 
-    describe('Renderização', () => {
-        it('deve renderizar o modal quando mostrar=true', () => {
-            const wrapper = mountComponent({mostrar: true});
+        mockExecute.mockRejectedValue(new Error("Fail"));
+        const importButton = wrapper.find('[data-testid="btn-importar"]');
+        await importButton.trigger("click");
 
-            expect(wrapper.find('.modal').exists()).toBe(true);
-            expect(wrapper.find('.modal-dialog').exists()).toBe(true);
-            expect(wrapper.find('.modal-content').exists()).toBe(true);
-            expect(wrapper.find('.modal-header').exists()).toBe(true);
-            expect(wrapper.find('.modal-body').exists()).toBe(true);
-            expect(wrapper.find('.modal-footer').exists()).toBe(true);
-        });
-
-        it('não deve renderizar o modal quando mostrar=false', () => {
-            const wrapper = mountComponent({mostrar: false});
-
-            expect(wrapper.find('.modal').exists()).toBe(false);
-            expect(wrapper.find('.modal-backdrop').exists()).toBe(false);
-        });
-
-        it('deve renderizar o título correto', () => {
-            const wrapper = mountComponent();
-
-            expect(wrapper.find('.modal-title').text()).toBe('Importação de atividades');
-        });
-
-        it('deve renderizar os botões de fechar e importar', () => {
-            const wrapper = mountComponent();
-
-            const buttons = wrapper.findAll('.modal-footer button');
-            expect(buttons).toHaveLength(2);
-            expect(buttons[0].text()).toBe('Cancelar');
-            expect(buttons[1].text()).toBe('Importar');
-        });
+        expect(mockExecute).toHaveBeenCalled();
+        expect(wrapper.emitted("importar")).toBeFalsy();
     });
 
-    describe('Seleção de Processo', () => {
-        beforeEach(() => {
-            aplicarMocks({
-                processos: [
-                    criarProcesso({
-                        codigo: 1,
-                        descricao: 'Processo de Mapeamento 1',
-                        tipo: TipoProcesso.MAPEAMENTO,
-                        situacao: SituacaoProcesso.FINALIZADO,
-                    }),
-                    criarProcesso({
-                        codigo: 2,
-                        descricao: 'Processo de Revisão 1',
-                        tipo: TipoProcesso.REVISAO,
-                        situacao: SituacaoProcesso.FINALIZADO,
-                    }),
-                    criarProcesso({
-                        codigo: 3,
-                        descricao: 'Processo em Andamento',
-                        tipo: TipoProcesso.MAPEAMENTO,
-                        situacao: SituacaoProcesso.EM_ANDAMENTO,
-                        dataFinalizacao: undefined
-                    }),
-                ]
-            });
-        });
+    it("deve limpar seleção se selecionar processo vazio", async () => {
+        const selects = wrapper.findAllComponents(BFormSelect as any);
+        await selects[0].setValue("1");
+        await flushPromises();
+        // BFormSelect/setValue might set it as string "1" even if bound to number
+        expect((wrapper.vm as any).processoSelecionadoId).toBe("1");
 
-        it('deve exibir apenas processos finalizados de mapeamento/revisão', async () => {
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            const options = wrapper.findAll('select#processo-select option');
-            expect(options).toHaveLength(3); // 2 finalizados + 1 disabled
-            expect(options[1].text()).toBe('Processo de Mapeamento 1');
-            expect(options[2].text()).toBe('Processo de Revisão 1');
-        });
-
-        it('deve mostrar mensagem quando não há processos disponíveis', async () => {
-            mockProcessosStore.processos = [
-                {
-                    id: 3,
-                    descricao: 'Processo em Andamento',
-                    tipo: TipoProcesso.MAPEAMENTO,
-                    situacao: SituacaoProcesso.EM_ANDAMENTO,
-                    dataLimite: new Date(),
-                    dataFinalizacao: null,
-                },
-            ];
-
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            expect(wrapper.text()).toContain('Nenhum processo disponível para importação.');
-        });
-
-        it('deve desabilitar seleção de unidade quando nenhum processo selecionado', () => {
-            const wrapper = mountComponent();
-
-            const unidadeSelect = wrapper.find('select#unidade-select');
-            expect(unidadeSelect.attributes('disabled')).toBeDefined();
-        });
-    });
-
-    describe('Seleção de Unidade', () => {
-        beforeEach(() => {
-            aplicarMocks({
-                processos: [criarProcesso()],
-                unidades: [
-                    {codUnidade: 1, sigla: 'UNID1'},
-                    {codUnidade: 2, sigla: 'UNID2'},
-                ]
-            });
-        });
-
-        it('deve carregar unidades quando processo selecionado', async () => {
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-            await selecionarProcessoEUnidade(wrapper);
-            assertUnidadeOptions(wrapper, ['UNID1', 'UNID2']);
-        });
-
-        it('deve mostrar mensagem quando não há atividades', async () => {
-            mockAtividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue([]);
-
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            await selecionarProcessoEUnidade(wrapper);
-
-            expect(wrapper.text()).toContain('Nenhuma atividade encontrada para esta unidade/processo.');
-        });
-
-    });
-
-    describe('Botão Importar', () => {
-        beforeEach(() => {
-            aplicarMocks({
-                processos: [criarProcesso()],
-                unidades: [
-                    {codUnidade: 1, sigla: 'UNID1'},
-                ],
-                atividades: [
-                    {codigo: 1, descricao: 'Atividade 1', conhecimentos: []},
-                    {codigo: 2, descricao: 'Atividade 2', conhecimentos: []},
-                ]
-            });
-        });
-
-        it('deve estar desabilitado quando nenhuma atividade selecionada', async () => {
-            const wrapper = mountComponent();
-    
-            await wrapper.vm.$nextTick();
-    
-            await selecionarProcessoEUnidade(wrapper);
-    
-            expectImportButtonDisabled(wrapper);
-        });
-
-        it('deve estar habilitado quando atividades selecionadas', async () => {
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            await selecionarProcessoEUnidade(wrapper);
-            await selectFirstCheckbox(wrapper);
-            expectImportButtonEnabled(wrapper);
-        });
-
-        // duplicate test removed: cobertura mantida por the other "deve estar desabilitado..." test above
-    });
-
-    describe('Eventos', () => {
-        beforeEach(() => {
-            aplicarMocks({
-                processos: [criarProcesso()],
-                unidades: [
-                    {codUnidade: 1, sigla: 'UNID1'},
-                ],
-                atividades: [
-                    {codigo: 1, descricao: 'Atividade 1', conhecimentos: []},
-                    {codigo: 2, descricao: 'Atividade 2', conhecimentos: []},
-                ]
-            });
-        });
-
-        it('deve emitir evento fechar ao clicar no botão fechar', async () => {
-            const wrapper = mountComponent();
-
-            const closeButton = wrapper.find('.btn-close');
-            await closeButton.trigger('click');
-
-            expect(wrapper.emitted().fechar).toBeTruthy();
-        });
-
-        it('deve emitir evento fechar ao clicar no botão cancelar', async () => {
-            const wrapper = mountComponent();
-
-            const cancelButton = wrapper.find('.btn-outline-secondary');
-            await cancelButton.trigger('click');
-
-            expect(wrapper.emitted().fechar).toBeTruthy();
-        });
-
-        it('deve emitir evento importar com atividades selecionadas', async () => {
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            await selecionarProcessoEUnidade(wrapper);
-            await selectFirstCheckbox(wrapper);
-
-            // Clicar importar
-            const importarButton = wrapper.find('.btn-outline-primary');
-            await importarButton.trigger('click');
-
-            expect(wrapper.emitted().importar).toBeTruthy();
-            expect(wrapper.emitted().importar[0]).toEqual([
-                [{id: 1, descricao: 'Atividade 1', idSubprocesso: 1, conhecimentos: []}]
-            ]);
-        });
-
-    });
-
-    describe('Reset do Modal', () => {
-        it('deve resetar o modal quando mostrar muda para true', async () => {
-            const wrapper = mountComponent({mostrar: false});
-
-            // Simular que o modal foi mostrado antes
-            await wrapper.setProps({mostrar: true});
-
-            await wrapper.vm.$nextTick();
-
-            // Verificar se os elementos do modal estão presentes
-            expect(wrapper.find('.modal').exists()).toBe(true);
-        });
-    });
-
-    describe('Funcionalidade de Async', () => {
-        it('deve chamar fetchAtividadesPorSubprocesso quando unidade selecionada', async () => {
-            aplicarMocks({
-                processos: [criarProcesso()],
-                unidades: [
-                    {codUnidade: 1, sigla: 'UNID1'},
-                ]
-            });
-
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            await selecionarProcessoEUnidade(wrapper);
-
-            expect(mockAtividadesStore.fetchAtividadesPorSubprocesso).toHaveBeenCalledWith(1);
-        });
-    });
-
-    describe('Edge Cases e Validações', () => {
-        it('deve lidar com processo sem unidades', async () => {
-            aplicarMocks({
-                processos: [
-                    {
-                        id: 1,
-                        descricao: 'Processo sem Unidades',
-                        tipo: TipoProcesso.MAPEAMENTO,
-                        situacao: SituacaoProcesso.FINALIZADO,
-                        dataLimite: new Date(),
-                        dataFinalizacao: new Date()
-                    },
-                ],
-                unidades: []
-            });
-
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            const processoSelect = wrapper.find('select#processo-select');
-            await processoSelect.setValue(1);
-
-            await wrapper.vm.$nextTick();
-
-            // Simular que processoSelecionadoId se torna null
-
-            const vm = wrapper.vm as any;
-            await vm.selecionarProcesso(null);
-
-            // Verificar que o estado foi resetado
-            expect(vm.processoSelecionado).toBeNull();
-            expect(vm.unidadesParticipantes).toEqual([]);
-            expect(vm.unidadeSelecionada).toBeNull();
-            expect(vm.unidadeSelecionadaId).toBeNull();
-        });
-
-        it('deve chamar selecionarUnidade(null) quando unidadeSelecionadaId é null', async () => {
-            mockProcessosStore.processos = [
-                criarProcesso({
-                    codigo: 1,
-                    descricao: 'Processo Teste',
-                }),
-            ];
-
-            mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue([
-                {codUnidade: 1, sigla: 'UNID1'},
-            ]);
-
-            const wrapper = mountComponent();
-
-            await wrapper.vm.$nextTick();
-
-            await selecionarProcessoEUnidade(wrapper);
-
-            // Verificar que botão importar está desabilitado
-            const importarButton = wrapper.find('.btn-outline-primary');
-            expect(importarButton.attributes('disabled')).toBeDefined();
-
-            // Verificar que não emitiu evento de importar
-            expect(wrapper.emitted().importar).toBeFalsy();
-        });
+        await selects[0].setValue(""); // Select placeholder/empty
+        await flushPromises();
+        expect((wrapper.vm as any).processoSelecionadoId).toBe("");
     });
 });

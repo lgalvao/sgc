@@ -1,41 +1,38 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2>Criar atribuição temporária</h2>
-    <div class="card mb-4 mt-4">
-      <div class="card-body">
+    <BCard class="mb-4 mt-4">
+      <BCardBody>
         <h5 class="card-title mb-3">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
         </h5>
-        <form @submit.prevent="criarAtribuicao">
+        <BForm @submit.prevent="criarAtribuicao">
           <div class="mb-3">
             <label
               class="form-label"
               for="servidor"
             >Servidor</label>
-            <select
+            <BFormSelect
               id="servidor"
               v-model="servidorSelecionado"
-              class="form-select"
               data-testid="select-servidor"
               required
+              :options="servidores"
+              value-field="codigo"
+              text-field="nome"
             >
-              <option
-                :value="null"
-                disabled
-              >
-                Selecione um servidor
-              </option>
-              <option
-                v-for="servidor in servidoresElegiveis"
-                :key="servidor.codigo"
-                :value="servidor.codigo"
-              >
-                {{ servidor.nome }}
-              </option>
-            </select>
+              <template #first>
+                <BFormSelectOption
+                  :value="null"
+                  disabled
+                >
+                  Selecione um servidor
+                </BFormSelectOption>
+              </template>
+            </BFormSelect>
             <div
               v-if="erroServidor"
-              class="text-danger small"
+              class="text-danger small mt-1"
             >
               {{ erroServidor }}
             </div>
@@ -46,14 +43,13 @@
               class="form-label"
               for="dataTermino"
             >Data de término</label>
-            <input
+            <BFormInput
               id="dataTermino"
               v-model="dataTermino"
-              class="form-control"
               data-testid="input-data-termino"
               required
               type="date"
-            >
+            />
           </div>
 
           <div class="mb-3">
@@ -61,118 +57,123 @@
               class="form-label"
               for="justificativa"
             >Justificativa</label>
-            <textarea
+            <BFormTextarea
               id="justificativa"
               v-model="justificativa"
-              class="form-control"
               data-testid="textarea-justificativa"
               required
             />
           </div>
-          <button
-            class="btn btn-primary"
-            data-testid="btn-criar-atribuicao"
+          <BButton
+            variant="primary"
+            data-testid="cad-atribuicao__btn-criar-atribuicao"
             type="submit"
           >
             Criar
-          </button>
-          <button
-            class="btn btn-secondary ms-2"
+          </BButton>
+          <BButton
+            variant="secondary"
+            class="ms-2"
             data-testid="btn-cancelar-atribuicao"
             type="button"
             @click="router.push(`/unidade/${sigla}`)"
           >
             Cancelar
-          </button>
-        </form>
+          </BButton>
+        </BForm>
 
-        <div
+        <BAlert
           v-if="sucesso"
-          class="alert alert-success mt-3"
+          variant="success"
+          class="mt-3"
+          :model-value="true"
+          :fade="false"
         >
-          Atribuição criada com sucesso!
-        </div>
-      </div>
-    </div>
-  </div>
+          Atribuição criada!
+        </BAlert>
+        <BAlert
+          v-if="erroApi"
+          variant="danger"
+          class="mt-3"
+          :model-value="true"
+          :fade="false"
+        >
+          {{ erroApi }}
+        </BAlert>
+      </BCardBody>
+    </BCard>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import servidoresMock from '@/mocks/servidores.json'
-import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
+import {
+  BAlert,
+  BButton,
+  BCard,
+  BCardBody,
+  BContainer,
+  BForm,
+  BFormInput,
+  BFormSelect,
+  BFormSelectOption,
+  BFormTextarea,
+} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
+import {buscarUnidadePorSigla} from "@/services/unidadesService";
+import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
+import type {Unidade, Usuario} from "@/types/tipos";
 
-const props = defineProps<{ sigla: string }>()
+const props = defineProps<{ sigla: string }>();
 
-const router = useRouter()
-const sigla = computed(() => props.sigla)
-const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
-const atribuicaoStore = useAtribuicaoTemporariaStore()
+const router = useRouter();
+const sigla = computed(() => props.sigla);
 
-function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
+const unidade = ref<Unidade | null>(null);
+const servidores = ref<Usuario[]>([]);
+const servidorSelecionado = ref<string | null>(null);
+const dataTermino = ref("");
+const justificativa = ref("");
+
+const sucesso = ref(false);
+const erroServidor = ref("");
+const erroApi = ref("");
+
+onMounted(async () => {
+  try {
+    unidade.value = await buscarUnidadePorSigla(sigla.value);
+    if (unidade.value) {
+      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }
+  } catch (error) {
+    erroServidor.value = "Falha ao carregar dados da unidade ou servidores.";
+    console.error(error);
   }
-  return null
-}
+});
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
-const atribuicoes = computed<AtribuicaoTemporaria[]>(() =>
-    atribuicaoStore.atribuicoes
-        ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade.sigla === sigla.value)
-        : []
-)
-
-const servidorSelecionado = ref<number | null>(null)
-const dataTermino = ref("")
-const justificativa = ref("")
-const sucesso = ref(false)
-const erroServidor = ref("")
-
-const servidores = ref<Servidor[]>(servidoresMock as unknown as Servidor[])
-
-const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade.sigla === sigla.value)
-})
-
-const servidoresElegiveis = computed<Servidor[]>(() => {
-  const titularId = unidade.value?.idServidorTitular
-  return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === servidor.codigo)
-    return servidor.codigo !== titularId && !jaTemAtribuicao
-  })
-})
-
-function criarAtribuicao() {
-  erroServidor.value = ""
-  if (!servidorSelecionado.value) {
-    erroServidor.value = "Selecione um servidor elegível."
-    return
+async function criarAtribuicao() {
+  if (!unidade.value || !servidorSelecionado.value) {
+    return;
   }
 
-  if (atribuicoes.value.some(a => a.servidor.codigo === servidorSelecionado.value)) {
-    erroServidor.value = "Este servidor já possui atribuição temporária nesta unidade."
-    return
+  erroApi.value = "";
+  sucesso.value = false;
+
+  try {
+    await criarAtribuicaoTemporaria(unidade.value.codigo, {
+      tituloEleitoralServidor: servidorSelecionado.value,
+      dataTermino: dataTermino.value,
+      justificativa: justificativa.value,
+    });
+    sucesso.value = true;
+    // Reset form
+    servidorSelecionado.value = null;
+    dataTermino.value = "";
+    justificativa.value = "";
+  } catch (error) {
+    erroApi.value = "Falha ao criar atribuição. Tente novamente.";
+    console.error(error);
   }
-  atribuicaoStore.criarAtribuicao({
-    unidade: unidade.value as Unidade,
-    servidor: servidores.value.find(s => s.codigo === servidorSelecionado.value) as Servidor,
-    dataInicio: new Date().toISOString(),
-    dataFim: new Date(dataTermino.value).toISOString(),
-    dataTermino: new Date(dataTermino.value).toISOString(),
-    justificativa: justificativa.value,
-    codigo: 0
-  })
-  sucesso.value = true
-  router.push(`/unidade/${sigla.value}`)
 }
 </script>

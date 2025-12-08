@@ -1,9 +1,8 @@
 # Backend do Sistema de Gestão de Competências (SGC)
+Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
-Este diretório contém o código-fonte do backend do SGC, uma aplicação Spring Boot (Java 21) que serve como a espinha dorsal para o gerenciamento de competências e seus fluxos de trabalho associados. Ele fornece uma API REST modular para ser consumida pelo frontend.
-
-A arquitetura é organizada em pacotes que representam domínios de negócio específicos, promovendo alta coesão e baixo acoplamento. A comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio, o que garante a separação de responsabilidades.
+Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos. Parte da comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio.
 
 ## Diagrama de Arquitetura
 O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências principais entre os pacotes.
@@ -25,7 +24,7 @@ graph TD
 
     subgraph "4. Camada de Domínio e Dados"
         Dominio[Entidades JPA & Repositórios]
-        IntegracaoRH[SGRH & Unidade]
+        IntegracaoSGRH[SGRH & Unidade]
     end
 
     subgraph "5. Módulos Reativos & Suporte"
@@ -43,7 +42,7 @@ graph TD
     Eventos --> Notificacao
     Eventos --> Alerta
 
-    IntegracaoRH -- Popula Dados --> Dominio
+    IntegracaoSGRH -- Popula Dados --> Dominio
 
     Comum -- Suporte Geral --> Servico & Dominio & Notificacao & Alerta
 ```
@@ -54,12 +53,19 @@ graph TD
 - **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros módulos, mantendo o sistema desacoplado.
 
 ### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
-- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (operações de workflow e validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
 
-### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
+- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma *
+  *máquina de estados**, transitando as tarefas entre diferentes situações e mantendo um histórico imutável de todas as
+  ações através da entidade `Movimentacao`. Para melhor organização, o controlador foi dividido em
+  `SubprocessoCrudController` (operações CRUD), `SubprocessoCadastroController` (ações de workflow da etapa de
+  cadastro), `SubprocessoMapaController` (operações relacionadas ao mapa) e `SubprocessoValidacaoController` (ações de
+  workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de
+  salvamento do mapa no contexto do workflow.
+
+### 3. `mapa` e `atividade` (Domínio Principal)
 - **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
-- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências.
-- **`competencia`:** Define as competências que compõem um mapa.
+- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências. Contém a lógica para gerenciar
+  competências através do `CompetenciaService`.
 - **`atividade`:** Define as atividades associadas às competências. Este módulo também é responsável por gerenciar os **conhecimentos** vinculados a cada atividade.
 
 ### 4. `analise` (Auditoria e Revisão)
@@ -75,8 +81,12 @@ graph TD
 - **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica de negócio.
 - **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar dados de um sistema de RH externo (atualmente simulado).
 
-### 7. `comum` (Componentes Transversais)
-- **Responsabilidade:** Contém código de suporte utilizado por toda a aplicação, como o tratador global de exceções (`RestExceptionHandler`), classes de erro, e a `EntidadeBase` para entidades JPA.
+### 7. `comum` e `util` (Componentes Transversais)
+- **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
+- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro customizadas e a
+  `EntidadeBase` para entidades JPA. Contém também configurações do Spring (`config`) e suporte para serialização JSON (
+  `json`).
+- **`util`**: Contém classes de utilidade diversas.
 
 ## Como Construir e Executar
 Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da raiz do repositório:
@@ -84,22 +94,45 @@ Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da
 ./gradlew :backend:build
 ```
 
-Para executar a aplicação:
-```bash
-./gradlew :backend:bootRun
-```
-A API estará disponível em `http://localhost:8080`.
+A API estará disponível em `http://localhost:10000`.
 
 ## Documentação da API (Swagger UI)
 A documentação da API é gerada automaticamente com SpringDoc e está acessível em:
-[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+[http://localhost:10000/swagger-ui.html](http://localhost:10000/swagger-ui.html)
 
 A especificação OpenAPI em formato JSON pode ser encontrada em:
-[http://localhost:8080/api-docs](http://localhost:8080/api-docs)
+[http://localhost:10000/api-docs](http://localhost:10000/api-docs)
+
+## 🛡️ Verificações de Qualidade
+
+O backend utiliza um conjunto de ferramentas de análise estática para garantir a qualidade do código. As verificações são não-bloqueantes (warnings only).
+
+### Ferramentas Configuradas
+- **Checkstyle**: Verifica a aderência ao padrão de código (Google Checks).
+- **PMD**: Analisa o código em busca de más práticas e código morto.
+- **SpotBugs**: Detecta bugs potenciais através de análise de bytecode.
+- **JaCoCo**: Mede a cobertura de testes unitários.
+
+### Como Executar
+Na raiz do projeto:
+```bash
+./gradlew :backend:qualityCheck
+```
+
+### Relatórios
+Os relatórios HTML são gerados em `backend/build/reports/`:
+- `checkstyle/main.html`
+- `pmd/main.html`
+- `spotbugs/main.html`
+- `jacoco/test/html/index.html`
 
 ## Padrões de Design e Boas Práticas
-- **Injeção de Dependência:** Utilizada extensivamente pelo Spring Framework.
-- **DTO (Data Transfer Object):** Usado em toda a camada de controle para desacoplar a API das entidades JPA.
+- **Lombok:** Utilizado para reduzir código repetitivo.
+- **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
+
+## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+
+Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

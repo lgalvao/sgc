@@ -1,23 +1,33 @@
 package sgc.mapa.dto;
 
-import sgc.mapa.modelo.TipoImpactoCompetencia;
-
-import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import sgc.mapa.model.TipoImpactoCompetencia;
 
 /**
- * DTO que representa uma competência que foi impactada pelas mudanças
- * nas atividades durante a revisão do cadastro.
- * <p>
- * CDU-12 - Verificar impactos no mapa de competências
+ * DTO que representa uma competência que foi impactada pelas mudanças nas atividades durante a
+ * revisão do cadastro.
+ *
+ * <p>CDU-12 - Verificar impactos no mapa de competências
  */
-public record CompetenciaImpactadaDto(
-    Long codigo,
-    String descricao,
-    List<String> atividadesAfetadas,  // Descrições das atividades que causaram impacto
-    TipoImpactoCompetencia tipoImpacto  // NOVA_ATIVIDADE, ATIVIDADE_REMOVIDA, ATIVIDADE_ALTERADA
-) {
-    public CompetenciaImpactadaDto {
-        atividadesAfetadas = new ArrayList<>(atividadesAfetadas);
-    }
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CompetenciaImpactadaDto {
+    /** O código da competência. */
+    private Long codigo;
+
+    /** A descrição da competência. */
+    private String descricao;
+
+    /** Lista com as descrições das atividades que causaram o impacto. */
+    private List<String> atividadesAfetadas; // Descrições das atividades que causaram impacto
+
+    /** O tipo de impacto sofrido pela competência (e.g., nova atividade associada). */
+    private TipoImpactoCompetencia
+            tipoImpacto; // NOVA_ATIVIDADE, ATIVIDADE_REMOVIDA, ATIVIDADE_ALTERADA
 }

@@ -1,18 +1,19 @@
 <template>
-  <div
-    class="card mb-4"
-    data-testid="subprocesso-header"
+  <BCard
+    class="mb-4"
+    data-testid="header-subprocesso"
+    no-body
   >
-    <div class="card-body">
+    <BCardBody>
       <p
         class="text-muted small mb-1"
-        data-testid="processo-info"
+        data-testid="txt-header-processo"
       >
         Processo: {{ processoDescricao }}
       </p>
       <h2
         class="display-6 mb-3"
-        data-testid="unidade-info"
+        data-testid="subprocesso-header__txt-header-unidade"
       >
         {{ unidadeSigla }} - {{ unidadeNome }}
       </h2>
@@ -21,7 +22,7 @@
         <span
           :class="badgeClass(situacao)"
           class="badge"
-          data-testid="situacao-badge"
+          data-testid="subprocesso-header__txt-badge-situacao"
         >{{ situacao }}</span>
       </p>
 
@@ -43,27 +44,27 @@
         <strong>Unidade atual:</strong> {{ unidadeAtual }}
       </p>
 
-      <!-- Botão para alterar data limite (apenas para ADMIN) -->
+      <!-- Botão para alterar data limite -->
       <div
-        v-if="mostrarBotaoAlterarData && isSubprocessoEmAndamento"
+        v-if="podeAlterarDataLimite"
         class="mt-3"
       >
-        <button
-          class="btn btn-outline-primary"
-          @click="$emit('alterarDataLimite')"
+        <BButton
+          variant="outline-primary"
+          data-testid="btn-alterar-data-limite"
+          @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1" />
           Alterar data limite
-        </button>
+        </BButton>
       </div>
-    </div>
-  </div>
+    </BCardBody>
+  </BCard>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
-import {Perfil} from '@/types/tipos';
-import {badgeClass} from '@/utils'; // Importar a função badgeClass
+import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import {badgeClass} from "@/utils";
 
 interface Props {
   processoDescricao: string;
@@ -77,15 +78,16 @@ interface Props {
   responsavelRamal?: string;
   responsavelEmail?: string;
   unidadeAtual?: string;
-  perfilUsuario: Perfil | null;
-  isSubprocessoEmAndamento: boolean;
+  podeAlterarDataLimite: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
-defineEmits<{
-  alterarDataLimite: [];
-}>();
+const emit = defineEmits({
+  alterarDataLimite: null,
+});
 
-const mostrarBotaoAlterarData = computed(() => props.perfilUsuario === Perfil.ADMIN);
+const handleAlterarDataLimite = () => {
+  emit("alterarDataLimite");
+};
 </script>

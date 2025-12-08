@@ -1,52 +1,54 @@
 package sgc.subprocesso.dto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
 
-    @Mock
-    private ProcessoRepo processoRepo;
-    @Mock
-    private UnidadeRepo unidadeRepo;
-    @Mock
-    private MapaRepo mapaRepo;
+    @Mock private ProcessoRepo processoRepo;
 
-    private final MovimentacaoMapper movimentacaoMapper = Mappers.getMapper(MovimentacaoMapper.class);
+    @Mock private UnidadeRepo unidadeRepo;
+
+    @Mock private MapaRepo mapaRepo;
+
+    private final MovimentacaoMapper movimentacaoMapper =
+            Mappers.getMapper(MovimentacaoMapper.class);
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
-        java.lang.reflect.Field processoRepoField = SubprocessoMapper.class.getDeclaredField("processoRepo");
+        java.lang.reflect.Field processoRepoField =
+                SubprocessoMapper.class.getDeclaredField("processoRepo");
         processoRepoField.setAccessible(true);
         processoRepoField.set(subprocessoMapper, processoRepo);
 
-        java.lang.reflect.Field unidadeRepoField = SubprocessoMapper.class.getDeclaredField("unidadeRepo");
+        java.lang.reflect.Field unidadeRepoField =
+                SubprocessoMapper.class.getDeclaredField("unidadeRepo");
         unidadeRepoField.setAccessible(true);
         unidadeRepoField.set(subprocessoMapper, unidadeRepo);
 
-        java.lang.reflect.Field mapaRepoField = SubprocessoMapper.class.getDeclaredField("mapaRepo");
+        java.lang.reflect.Field mapaRepoField =
+                SubprocessoMapper.class.getDeclaredField("mapaRepo");
         mapaRepoField.setAccessible(true);
         mapaRepoField.set(subprocessoMapper, mapaRepo);
     }
@@ -71,31 +73,31 @@ class MapperTest {
         entity.setDataFimEtapa1(LocalDateTime.now());
         entity.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
-        entity.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        entity.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         SubprocessoDto dto = subprocessoMapper.toDTO(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getCodigo());
-        assertEquals(100L, dto.getProcessoCodigo());
-        assertEquals(200L, dto.getUnidadeCodigo());
-        assertEquals(300L, dto.getMapaCodigo());
-        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, dto.getSituacao());
+        assertEquals(100L, dto.getCodProcesso());
+        assertEquals(200L, dto.getCodUnidade());
+        assertEquals(300L, dto.getCodMapa());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
 
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
-        SubprocessoDto dto = new SubprocessoDto(
-                1L,
-                100L,
-                200L,
-                300L,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(10),
-                SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
-        );
+        SubprocessoDto dto =
+                new SubprocessoDto(
+                        1L,
+                        100L,
+                        200L,
+                        300L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusDays(10),
+                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Processo processo = new Processo();
         processo.setCodigo(100L);
@@ -118,7 +120,7 @@ class MapperTest {
         assertEquals(200L, entity.getUnidade().getCodigo());
         assertNotNull(entity.getMapa());
         assertEquals(300L, entity.getMapa().getCodigo());
-        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, entity.getSituacao());
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, entity.getSituacao());
     }
 
     @Test
@@ -147,13 +149,13 @@ class MapperTest {
         MovimentacaoDto dto = movimentacaoMapper.toDTO(entity);
 
         assertNotNull(dto);
-        assertEquals(1L, dto.codigo());
-        assertEquals(100L, dto.unidadeOrigemCodigo());
-        assertEquals("ORIGEM", dto.unidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
-        assertEquals(200L, dto.unidadeDestinoCodigo());
-        assertEquals("DESTINO", dto.unidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
-        assertEquals("Descrição da movimentação", dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(100L, dto.getUnidadeOrigemCodigo());
+        assertEquals("ORIGEM", dto.getUnidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
+        assertEquals(200L, dto.getUnidadeDestinoCodigo());
+        assertEquals("DESTINO", dto.getUnidadeDestinoSigla());
+        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
+        assertEquals("Descrição da movimentação", dto.getDescricao());
     }
 }

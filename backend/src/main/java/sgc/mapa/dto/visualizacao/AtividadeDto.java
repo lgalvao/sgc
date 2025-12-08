@@ -1,19 +1,17 @@
 package sgc.mapa.dto.visualizacao;
 
-import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record AtividadeDto(
-    Long id,
-    String descricao,
-    List<ConhecimentoDto> conhecimentos
-) {
-    public AtividadeDto {
-        conhecimentos = new ArrayList<>(conhecimentos);
-    }
-
-    @Override
-    public List<ConhecimentoDto> conhecimentos() {
-        return new ArrayList<>(conhecimentos);
-    }
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AtividadeDto {
+    private Long codigo;
+    private String descricao;
+    private List<ConhecimentoDto> conhecimentos;
 }

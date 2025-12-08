@@ -1,32 +1,44 @@
 package sgc.processo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import sgc.processo.model.TipoProcesso;
 
-public record CriarProcessoReq(
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CriarProcessoReq {
+
     @NotBlank(message = "Preencha a descrição")
-    String descricao,
+    private String descricao;
 
-    @NotBlank(message = "Tipo do processo é obrigatório")
-    String tipo,
+    @NotNull(message = "Tipo do processo é obrigatório")
+    private TipoProcesso tipo;
 
+    @NotNull(message = "Preencha a data limite")
+    @Future(message = "A data limite deve ser futura")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime dataLimiteEtapa1,
+    private LocalDateTime dataLimiteEtapa1;
 
     @NotEmpty(message = "Pelo menos uma unidade participante deve ser incluída.")
-    List<Long> unidades
-) {
-    public CriarProcessoReq {
-        unidades = new ArrayList<>(unidades);
+    private List<Long> unidades;
+
+    public List<Long> getUnidades() {
+        return unidades == null ? null : new ArrayList<>(unidades);
     }
 
-    @Override
-    public List<Long> unidades() {
-        return new ArrayList<>(unidades);
+    public void setUnidades(List<Long> unidades) {
+        this.unidades = unidades == null ? null : new ArrayList<>(unidades);
     }
 }

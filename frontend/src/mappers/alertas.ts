@@ -1,21 +1,18 @@
-export interface Alerta {
-  codigo: number;
-  processoCodigo: number;
-  descricao: string;
-  dataHora: string; // Ou Date, dependendo de como será usado no frontend
-  unidadeOrigemCodigo: number;
-  unidadeDestinoCodigo: number;
-  usuarioDestinoTitulo: string;
-}
+import type {Alerta} from "@/types/tipos";
 
 export function mapAlertaDtoToFrontend(dto: any): Alerta {
   return {
     codigo: dto.codigo,
-    processoCodigo: dto.processoCodigo,
+    codProcesso: dto.codProcesso,
     descricao: dto.descricao,
     dataHora: dto.dataHora,
-    unidadeOrigemCodigo: dto.unidadeOrigemCodigo,
-    unidadeDestinoCodigo: dto.unidadeDestinoCodigo,
-    usuarioDestinoTitulo: dto.usuarioDestinoTitulo,
+    unidadeOrigem: dto.unidadeOrigem,
+    unidadeDestino: dto.unidadeDestino,
+    dataHoraLeitura: dto.dataHoraLeitura,
+    linkDestino: dto.linkDestino,
+    mensagem: dto.mensagem,
+    dataHoraFormatada: dto.dataHoraFormatada,
+    origem: dto.origem,
+    processo: dto.processo,
   };
 }

@@ -1,78 +1,106 @@
-import {beforeEach, describe, expect, it, vi, Mocked} from 'vitest';
-import {initPinia} from '@/test-utils/helpers';
-import {useAlertasStore} from '../alertas';
-import {usePerfilStore} from '../perfil';
-import type {Alerta} from '@/types/tipos';
+import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
+import {initPinia} from "@/test-utils/helpers";
+import type {Alerta} from "@/types/tipos";
+import {useAlertasStore} from "../alertas";
 
 // Mock dos serviços
-vi.mock('@/services/painelService');
-vi.mock('@/services/alertaService');
+vi.mock("@/services/painelService");
+vi.mock("@/services/alertaService");
 
-// Mock do perfilStore
-vi.mock('../perfil', () => ({
-    usePerfilStore: vi.fn(() => ({
-        servidorId: 123, // Mock de um ID de servidor
-        unidadeSelecionada: '456', // Mock de uma unidade selecionada
-    })),
+// Mock do perfilStore para garantir que a mesma instância seja usada
+const mockPerfilStoreValues = {
+    servidorId: 123 as number | null,
+    unidadeSelecionada: "456" as string | null,
+};
+vi.mock("../perfil", () => ({
+    usePerfilStore: vi.fn(() => mockPerfilStoreValues),
 }));
 
-describe('useAlertasStore', () => {
+describe("useAlertasStore", () => {
     let alertasStore: ReturnType<typeof useAlertasStore>;
-    let painelService: Mocked<typeof import('@/services/painelService')>;
-    let alertaService: Mocked<typeof import('@/services/alertaService')>;
-    let perfilStore: ReturnType<typeof usePerfilStore>;
+    let painelService: Mocked<typeof import("@/services/painelService")>;
+    let alertaService: Mocked<typeof import("@/services/alertaService")>;
+
+    const mockAlerta: Alerta = {
+        codigo: 1,
+        codProcesso: 1,
+        unidadeOrigem: "Origem",
+        unidadeDestino: "Destino",
+        descricao: "Alerta Teste",
+        dataHora: "2025-01-01T10:00:00",
+        dataHoraLeitura: null,
+        linkDestino: "/destino",
+        mensagem: "Mensagem Teste",
+        dataHoraFormatada: "01/01/2025 10:00",
+        origem: "Origem",
+        processo: "Processo Teste",
+    };
 
     beforeEach(async () => {
         initPinia();
         alertasStore = useAlertasStore();
-        perfilStore = usePerfilStore(); // Obter a instância mockada
 
-        painelService = (await import('@/services/painelService')) as Mocked<typeof import('@/services/painelService')>;
-        alertaService = (await import('@/services/alertaService')) as Mocked<typeof import('@/services/alertaService')>;
+        // Resetar o estado do mock antes de cada teste
+        mockPerfilStoreValues.servidorId = 123;
+        mockPerfilStoreValues.unidadeSelecionada = "456";
+
+        painelService = (await import("@/services/painelService")) as Mocked<
+            typeof import("@/services/painelService")
+        >;
+        alertaService = (await import("@/services/alertaService")) as Mocked<
+            typeof import("@/services/alertaService")
+        >;
 
         vi.clearAllMocks();
-        alertasStore.$reset();
     });
 
-    it('should initialize with mock alerts and parsed dates', () => {
+    it("should initialize with mock alerts and parsed dates", () => {
         expect(alertasStore.alertas).toEqual([]);
         expect(alertasStore.alertasPage).toEqual({});
     });
 
-    describe('actions', () => {
-        it('fetchAlertas should call painelService and update state', async () => {
+    describe("actions", () => {
+        it("buscarAlertas should call painelService and update state", async () => {
             const mockPage = {
-                content: [{codigo: 1, descricao: 'Alerta Teste', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, unidadeDestinoCodigo: 2, usuarioDestinoTitulo: '123'}],
+                content: [mockAlerta],
                 totalPages: 1,
                 totalElements: 1,
                 number: 0,
                 size: 10,
                 first: true,
                 last: true,
-                empty: false
+                empty: false,
             };
             painelService.listarAlertas.mockResolvedValue(mockPage);
 
-            await alertasStore.fetchAlertas('123', 456, 0, 10);
+            await alertasStore.buscarAlertas(123, 456, 0, 10);
 
-            expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 10);
+            expect(painelService.listarAlertas).toHaveBeenCalledWith(
+                123,
+                456,
+                0,
+                10,
+                undefined,
+                undefined,
+            );
             expect(alertasStore.alertas).toEqual(mockPage.content);
             expect(alertasStore.alertasPage).toEqual(mockPage);
         });
 
-        describe('marcarAlertaComoLido', () => {
-            it('should call alertaService and reload alerts on success', async () => {
+        describe("marcarAlertaComoLido", () => {
+            it("should call alertaService and reload alerts on success", async () => {
                 alertaService.marcarComoLido.mockResolvedValue();
-                // Mock para o fetchAlerts que é chamado internamente
                 const mockReloadPage = {
-                    content: [{codigo: 2, descricao: 'Alerta Recarregado', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, unidadeDestinoCodigo: 2, usuarioDestinoTitulo: '123'}],
+                    content: [
+                        {...mockAlerta, codigo: 2, descricao: "Alerta Recarregado"},
+                    ],
                     totalPages: 1,
                     totalElements: 1,
                     number: 0,
                     size: 10,
                     first: true,
                     last: true,
-                    empty: false
+                    empty: false,
                 };
                 painelService.listarAlertas.mockResolvedValue(mockReloadPage);
 
@@ -80,12 +108,21 @@ describe('useAlertasStore', () => {
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 20);
+                expect(painelService.listarAlertas).toHaveBeenCalledWith(
+                    123,
+                    456,
+                    0,
+                    20,
+                    undefined,
+                    undefined,
+                );
                 expect(alertasStore.alertas).toEqual(mockReloadPage.content);
             });
 
-            it('should return false on service failure', async () => {
-                alertaService.marcarComoLido.mockRejectedValue(new Error('Falha no serviço'));
+            it("should return false on service failure", async () => {
+                alertaService.marcarComoLido.mockRejectedValue(
+                    new Error("Falha no serviço"),
+                );
 
                 const result = await alertasStore.marcarAlertaComoLido(1);
 
@@ -93,10 +130,9 @@ describe('useAlertasStore', () => {
                 expect(painelService.listarAlertas).not.toHaveBeenCalled();
             });
 
-            it('should handle missing perfilStore data', async () => {
-                // Configurar o mock para retornar null
-                (perfilStore as any).servidorId = null;
-                (perfilStore as any).unidadeSelecionada = null;
+            it("should handle missing perfilStore data", async () => {
+                mockPerfilStoreValues.servidorId = null;
+                mockPerfilStoreValues.unidadeSelecionada = null;
 
                 alertaService.marcarComoLido.mockResolvedValue();
 
@@ -104,7 +140,6 @@ describe('useAlertasStore', () => {
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                // Não deve tentar recarregar os alertas se os dados do perfil não estiverem disponíveis
                 expect(painelService.listarAlertas).not.toHaveBeenCalled();
             });
         });

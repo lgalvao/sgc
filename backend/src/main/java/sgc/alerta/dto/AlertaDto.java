@@ -1,13 +1,22 @@
 package sgc.alerta.dto;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Value;
 
-public record AlertaDto(
-    Long codigo,
-    Long processoCodigo,
-    String descricao,
-    LocalDateTime dataHora,
-    Long unidadeOrigemCodigo,
-    Long unidadeDestinoCodigo,
-    String usuarioDestinoTitulo
-) {}
+@Value
+@Builder
+public class AlertaDto {
+    Long codigo;
+    Long codProcesso;
+    String unidadeOrigem;
+    String unidadeDestino;
+    String descricao;
+    LocalDateTime dataHora;
+    LocalDateTime dataHoraLeitura;
+    String linkDestino;
+    String mensagem;
+    String dataHoraFormatada;
+    String origem;
+    String processo;
+}

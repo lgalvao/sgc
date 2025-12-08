@@ -1,9 +1,8 @@
 package sgc.processo.dto;
 
-import lombok.*;
-import sgc.processo.SituacaoProcesso;
-
 import java.time.LocalDateTime;
+import lombok.*;
+import sgc.processo.model.SituacaoProcesso;
 
 @Getter
 @Builder
@@ -18,4 +17,6 @@ public class ProcessoResumoDto {
     private LocalDateTime dataCriacao;
     private Long unidadeCodigo;
     private String unidadeNome;
+    private String unidadesParticipantes;
+    private String linkDestino;
 }

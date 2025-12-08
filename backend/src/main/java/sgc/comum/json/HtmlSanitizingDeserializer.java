@@ -1,0 +1,28 @@
+package sgc.comum.json;
+
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
+
+/**
+ * Custom JSON deserializer that sanitizes HTML content in String fields. Prevents XSS attacks by
+ * removing potentially malicious HTML/JavaScript.
+ */
+public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
+    private static final PolicyFactory HTML_POLICY = new HtmlPolicyBuilder().toFactory();
+
+    public HtmlSanitizingDeserializer() {
+        super(String.class);
+    }
+
+    @Override
+    public String deserialize(JsonParser parser, DeserializationContext ctxt) {
+        String value = parser.getValueAsString();
+        if (value == null || value.isBlank()) {
+            return value;
+        }
+        return HTML_POLICY.sanitize(value);
+    }
+}

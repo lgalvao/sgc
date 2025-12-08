@@ -1,46 +1,44 @@
 package sgc.processo.eventos;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 class EventosTest {
     @Test
     void processoCriadoEvento_Getters() {
-        ProcessoCriadoEvento evento = new ProcessoCriadoEvento(this, 1L);
+        EventoProcessoCriado evento = new EventoProcessoCriado(this, 1L);
 
-        assertEquals(1L, evento.getIdProcesso());
+        assertEquals(1L, evento.getCodProcesso());
         assertEquals(this, evento.getSource());
     }
 
     @Test
     void processoFinalizadoEvento_Getters() {
-        ProcessoFinalizadoEvento evento = new ProcessoFinalizadoEvento(this, 1L);
+        EventoProcessoFinalizado evento = new EventoProcessoFinalizado(this, 1L);
 
-        assertEquals(1L, evento.getIdProcesso());
+        assertEquals(1L, evento.getCodProcesso());
         assertEquals(this, evento.getSource());
     }
 
     @Test
     void processoIniciadoEvento_Getters() {
-        ProcessoIniciadoEvento evento = new ProcessoIniciadoEvento(
-                1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L)
-        );
+        EventoProcessoIniciado evento =
+                new EventoProcessoIniciado(1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L));
 
-        assertEquals(1L, evento.idProcesso());
-        assertEquals("MAPEAMENTO", evento.tipo());
-        assertNotNull(evento.dataHoraInicio());
-        assertEquals(List.of(1L, 2L), evento.idsUnidades());
+        assertEquals(1L, evento.getCodProcesso());
+        assertEquals("MAPEAMENTO", evento.getTipo());
+        assertNotNull(evento.getDataHoraInicio());
+        assertEquals(List.of(1L, 2L), evento.getCodUnidades());
     }
 
     @Test
     void subprocessoDisponibilizadoEvento_Getters() {
-        SubprocessoDisponibilizadoEvento evento = new SubprocessoDisponibilizadoEvento(1L);
+        EventoSubprocessoDisponibilizado evento = new EventoSubprocessoDisponibilizado(1L);
 
-        assertEquals(1L, evento.idSubprocesso());
+        assertEquals(1L, evento.getCodSubprocesso());
     }
 }

@@ -1,559 +1,385 @@
 <template>
-  <div class="container mt-4">
+  <BContainer class="mt-4">
     <h2>Cadastro de processo</h2>
 
-    <form class="mt-4 col-md-6 col-sm-8 col-12">
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="descricao"
-        >Descrição</label>
-        <input
-            id="descricao"
-            v-model="descricao"
-            class="form-control"
-            placeholder="Descreva o processo"
-            type="text"
-        >
-      </div>
+    <BAlert
+      v-model="alertState.show"
+      :variant="alertState.variant"
+      dismissible
+      :fade="false"
+      class="mt-3"
+    >
+      <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
+      <p class="mb-0">{{ alertState.body }}</p>
+    </BAlert>
 
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="tipo"
-        >Tipo</label>
-        <select
-            id="tipo"
-            v-model="tipo"
-            class="form-select"
-        >
-          <option
-              v-for="tipoOption in TipoProcesso"
-              :key="tipoOption"
-              :value="tipoOption"
-          >
-            {{ tipoOption }}
-          </option>
-        </select>
-      </div>
+    <BForm class="mt-4 col-md-6 col-sm-8 col-12">
+      <BFormGroup
+        label="Descrição"
+        label-for="descricao"
+        class="mb-3"
+      >
+        <BFormInput
+          id="descricao"
+          v-model="descricao"
+          placeholder="Descreva o processo"
+          type="text"
+          data-testid="inp-processo-descricao"
+        />
+      </BFormGroup>
 
-      <div class="mb-3">
-        <label class="form-label">Unidades participantes</label>
+      <BFormGroup
+        label="Tipo"
+        label-for="tipo"
+        class="mb-3"
+      >
+        <BFormSelect
+          id="tipo"
+          v-model="tipo"
+          data-testid="sel-processo-tipo"
+          :options="Object.values(TipoProcessoEnum)"
+        />
+      </BFormGroup>
+
+      <BFormGroup
+        label="Unidades participantes"
+        class="mb-3"
+      >
         <div class="border rounded p-3">
-          <div>
-            <template
-                v-for="unidade in unidadesStore.unidades"
-                :key="unidade.sigla"
-            >
-              <div
-                  :style="{ marginLeft: '0' }"
-                  class="form-check"
-              >
-                <!--suppress HtmlUnknownAttribute -->
-                <input
-                    :id="`chk-${unidade.sigla}`"
-                    :checked="getEstadoSelecao(unidade) === true"
-                    class="form-check-input"
-                    type="checkbox"
-                    :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-                    @change="() => toggleUnidade(unidade)"
-                >
-                <label
-                    :for="`chk-${unidade.sigla}`"
-                    class="form-check-label ms-2"
-                >
-                  <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-                </label>
-              </div>
-              <div
-                  v-if="unidade.filhas && unidade.filhas.length"
-                  class="ms-4"
-              >
-                <template
-                    v-for="filha in unidade.filhas"
-                    :key="filha.sigla"
-                >
-                  <div class="form-check">
-                    <!--suppress HtmlUnknownAttribute -->
-                    <input
-                        :id="`chk-${filha.sigla}`"
-                        :checked="getEstadoSelecao(filha) === true"
-                        class="form-check-input"
-                        type="checkbox"
-                        :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                        @change="() => toggleUnidade(filha)"
-                    >
-                    <label
-                        :for="`chk-${filha.sigla}`"
-                        class="form-check-label ms-2"
-                    >
-                      <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-                    </label>
-                  </div>
-
-                  <div
-                      v-if="filha.filhas && filha.filhas.length"
-                      class="ms-4"
-                  >
-                    <div
-                        v-for="neta in filha.filhas"
-                        :key="neta.sigla"
-                        class="form-check"
-                    >
-                      <input
-                          :id="`chk-${neta.sigla}`"
-                          :checked="isChecked(neta.codigo)"
-                          class="form-check-input"
-                          type="checkbox"
-                          @change="() => toggleUnidade(neta)"
-                      >
-                      <label
-                          :for="`chk-${neta.sigla}`"
-                          class="form-check-label ms-2"
-                      >
-                        <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                      </label>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </template>
+          <ArvoreUnidades
+            v-if="!unidadesStore.isLoading"
+            v-model="unidadesSelecionadas"
+            :unidades="unidadesStore.unidades"
+          />
+          <div
+            v-else
+            class="text-center py-3"
+          >
+            <span class="spinner-border spinner-border-sm me-2" />
+            Carregando unidades...
           </div>
         </div>
-      </div>
+      </BFormGroup>
 
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="dataLimite"
-        >Data limite</label>
-        <input
-            id="dataLimite"
-            v-model="dataLimite"
-            class="form-control"
-            type="date"
-        >
-      </div>
-      <button
-          class="btn btn-primary"
-          type="button"
-          @click="salvarProcesso"
+      <BFormGroup
+        label="Data limite"
+        label-for="dataLimite"
+        class="mb-3"
+      >
+        <BFormInput
+          id="dataLimite"
+          v-model="dataLimite"
+          type="date"
+          data-testid="inp-processo-data-limite"
+        />
+      </BFormGroup>
+
+      <BButton
+        variant="primary"
+        type="button"
+        data-testid="btn-processo-salvar"
+        @click="salvarProcesso"
       >
         Salvar
-      </button>
-      <button
-          class="btn btn-success ms-2"
-          data-testid="btn-iniciar-processo"
-          type="button"
-          @click="abrirModalConfirmacao"
+      </BButton>
+      <BButton
+        variant="success"
+        class="ms-2"
+        data-testid="btn-processo-iniciar"
+        @click="abrirModalConfirmacao"
       >
         Iniciar processo
-      </button>
-      <button
-          v-if="processoEditando"
-          class="btn btn-danger ms-2"
-          type="button"
-          @click="abrirModalRemocao"
+      </BButton>
+      <BButton
+        v-if="processoEditando"
+        variant="danger"
+        class="ms-2"
+        data-testid="btn-processo-remover"
+        @click="abrirModalRemocao"
       >
         Remover
-      </button>
-      <router-link
-          class="btn btn-secondary ms-2"
-          to="/painel"
+      </BButton>
+      <BButton
+        variant="secondary"
+        class="ms-2"
+        to="/painel"
       >
         Cancelar
-      </router-link>
-    </form>
+      </BButton>
+    </BForm>
 
     <!-- Modal de confirmação CDU-05 -->
-    <div
-        v-if="mostrarModalConfirmacao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+    <BModal
+      v-model="mostrarModalConfirmacao"
+      :fade="false"
+      title="Iniciar processo"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Iniciar processo
-            </h5>
-            <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalConfirmacao"
-            />
-          </div>
-          <div class="modal-body">
-            <p>Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
-              serão notificadas por e-mail.</p>
-          </div>
-          <div class="modal-footer">
-            <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalConfirmacao"
-            >
-              Cancelar
-            </button>
-            <button
-                type="button"
-                class="btn btn-primary"
-                @click="confirmarIniciarProcesso"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-        v-if="mostrarModalConfirmacao"
-        class="modal-backdrop fade show"
-    />
+      <template #default>
+        <p><strong>Descrição:</strong> {{ descricao }}</p>
+        <p><strong>Tipo:</strong> {{ tipo }}</p>
+        <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
+        <hr>
+        <p>
+          Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
+          serão notificadas por e-mail.
+        </p>
+      </template>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          data-testid="btn-iniciar-processo-cancelar"
+          @click="fecharModalConfirmacao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="primary"
+          data-testid="btn-iniciar-processo-confirmar"
+          @click="confirmarIniciarProcesso"
+        >
+          Confirmar
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal de confirmação de remoção -->
-    <div
-        v-if="mostrarModalRemocao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+    <BModal
+      v-model="mostrarModalRemocao"
+      :fade="false"
+      title="Remover processo"
+      centered
+      hide-footer
     >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Iniciar processo
-            </h5>
-            <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalRemocao"
-            />
-          </div>
-          <div class="modal-body">
-            <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
-          </div>
-          <div class="modal-footer">
-            <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalRemocao"
-            >
-              Cancelar
-            </button>
-            <button
-                type="button"
-                class="btn btn-danger"
-                @click="confirmarRemocao"
-            >
-              Remover
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-        v-if="mostrarModalRemocao"
-        class="modal-backdrop fade show"
-    />
-  </div>
+      <template #default>
+        <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
+      </template>
+      <template #footer>
+        <BButton
+          variant="secondary"
+          @click="fecharModalRemocao"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+          variant="danger"
+          @click="confirmarRemocao"
+        >
+          Remover
+        </BButton>
+      </template>
+    </BModal>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useProcessosStore} from '@/stores/processos'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useMapasStore} from '@/stores/mapas'
-import {useServidoresStore} from '@/stores/servidores'
-import {useAlertasStore} from '@/stores/alertas'
+import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal} from "bootstrap-vue-next";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
+// import {TEXTOS} from "@/constants"; // Removed
+import * as processoService from "@/services/processoService";
+
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
 import {
-  TipoProcesso,
-  type Unidade,
-  type Processo as ProcessoModel,
-  type CriarProcessoRequest,
-  type AtualizarProcessoRequest
-} from '@/types/tipos'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {TEXTOS} from '@/constants';
-import * as processoService from '@/services/processoService';
+  AtualizarProcessoRequest,
+  CriarProcessoRequest,
+  Processo as ProcessoModel,
+  TipoProcesso
+} from "@/types/tipos";
 
-const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
-const descricao = ref<string>('')
-const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
-const dataLimite = ref<string>('')
-const router = useRouter()
-const route = useRoute()
-const processosStore = useProcessosStore()
-const unidadesStore = useUnidadesStore()
-const mapasStore = useMapasStore()
-const servidoresStore = useServidoresStore()
-const alertasStore = useAlertasStore()
-const notificacoesStore = useNotificacoesStore()
-const mostrarModalConfirmacao = ref(false)
-const mostrarModalRemocao = ref(false)
-const processoEditando = ref<ProcessoModel | null>(null)
+const TipoProcessoEnum = TipoProcesso;
 
-const tiposProcessoDisponiveis = ref<string[]>(Object.values(TipoProcesso));
+const unidadesSelecionadas = ref<number[]>([]);
+const descricao = ref<string>("");
+const tipo = ref<string>("MAPEAMENTO");
+const dataLimite = ref<string>("");
+const router = useRouter();
+const route = useRoute();
+const processosStore = useProcessosStore();
+const unidadesStore = useUnidadesStore();
 
-// Carregar processo se estiver editando
+const mostrarModalConfirmacao = ref(false);
+const mostrarModalRemocao = ref(false);
+const processoEditando = ref<ProcessoModel | null>(null);
+
+interface AlertState {
+  show: boolean;
+  variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+  title: string;
+  body: string;
+}
+
+const alertState = ref<AlertState>({
+  show: false,
+  variant: 'info',
+  title: '',
+  body: ''
+});
+
+function mostrarAlerta(variant: AlertState['variant'], title: string, body: string) {
+  alertState.value = {
+    show: true,
+    variant,
+    title,
+    body
+  };
+  window.scrollTo(0, 0);
+}
+
 onMounted(async () => {
-  const idProcesso = route.query.idProcesso;
-  if (idProcesso) {
+  const codProcesso = route.query.codProcesso;
+  if (codProcesso) {
     try {
-      const processo = await processoService.obterProcessoPorId(Number(idProcesso));
+      await processosStore.buscarProcessoDetalhe(Number(codProcesso));
+      const processo = processosStore.processoDetalhe;
       if (processo) {
+        // Redirect if process is not in CRIADO state (cannot be edited)
+        if (processo.situacao !== 'CRIADO') {
+          // Como vamos redirecionar, não adianta mostrar alerta local.
+          // Idealmente usaríamos um store global, mas aqui apenas logamos/redirecionamos
+          await router.push(`/processo/${processo.codigo}`);
+          return;
+        }
+
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
-
-        // TODO: Carregar unidades participantes do processo detalhe
-        // Por enquanto, vamos assumir que o processo retornado por obterProcessoPorId
-        // não contém as unidades participantes para seleção na tela de edição.
-        // Isso será ajustado quando usarmos obterDetalhesProcesso.
+        dataLimite.value = processo.dataLimite.split("T")[0];
+        unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
+        await unidadesStore.buscarUnidadesParaProcesso(
+          processo.tipo,
+          processo.codigo,
+        );
+        await nextTick();
       }
     } catch (error) {
-      notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
-      console.error('Erro ao carregar processo:', error);
+      mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
+      console.error("Erro ao carregar processo:", error);
     }
+  } else {
+    await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
   }
-})
+});
+
+watch(tipo, async (novoTipo) => {
+  const codProcesso = processoEditando.value
+    ? processoEditando.value.codigo
+    : undefined;
+  await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
+});
 
 function limparCampos() {
-  descricao.value = ''
-  tipo.value = 'MAPEAMENTO'
-  dataLimite.value = ''
-  unidadesSelecionadas.value = []
-}
-
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
-function isUnidadeIntermediaria(codigo: number): boolean {
-  // Lógica de verificação de unidade intermediária
-  return false;
-}
-
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
-function unidadeTemMapaVigente(codigo: number): boolean {
-  // Lógica de verificação de mapa vigente
-  return true;
-}
-
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
-function unidadeTemServidores(codigo: number): boolean {
-  // Lógica de verificação de servidores
-  return true;
-}
-
-function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecionadas: number[]): number[] {
-  let unidadesValidas = unidadesSelecionadas.filter(codigo => !isUnidadeIntermediaria(codigo));
-
-  if (tipoProcesso === 'REVISAO' || tipoProcesso === 'DIAGNOSTICO') {
-    unidadesValidas = unidadesValidas.filter(codigo => unidadeTemMapaVigente(codigo));
-  }
-
-  if (tipoProcesso === 'DIAGNOSTICO') {
-    unidadesValidas = unidadesValidas.filter(codigo => unidadeTemServidores(codigo));
-  }
-
-  return unidadesValidas;
+  descricao.value = "";
+  tipo.value = "MAPEAMENTO";
+  dataLimite.value = "";
+  unidadesSelecionadas.value = [];
 }
 
 async function salvarProcesso() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-        'Dados incompletos',
-        'Preencha todos os campos e selecione ao menos uma unidade.'
-    );
-    return
-  }
-
-  const unidadesFiltradas = validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-
-  if (unidadesFiltradas.length === 0) {
-    notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
-    );
-    return
-  }
-
+  // Validações agora são feitas no backend via Bean Validation
   try {
     if (processoEditando.value) {
-      // Editando processo existente
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
-        unidades: unidadesFiltradas
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
-      await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-
-      notificacoesStore.sucesso(
-          'Processo alterado',
-          'O processo foi alterado com sucesso!'
+      await processosStore.atualizarProcesso(
+        processoEditando.value.codigo,
+        request,
       );
+      await router.push("/painel");
     } else {
-      // Criando novo processo
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
-        unidades: unidadesFiltradas
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
-      await processoService.criarProcesso(request);
-
-      notificacoesStore.sucesso(
-          'Processo salvo',
-          'O processo foi salvo com sucesso!'
-      );
+      await processosStore.criarProcesso(request);
+      await router.push("/painel");
     }
-    router.push('/painel');
     limparCampos();
   } catch (error) {
-    notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
-    console.error('Erro ao salvar processo:', error);
+    mostrarAlerta('danger', "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
+    console.error("Erro ao salvar processo:", error);
   }
 }
 
-function abrirModalConfirmacao() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
-    notificacoesStore.erro(
-        'Dados incompletos',
-        'Preencha todos os campos e selecione ao menos uma unidade.'
-    );
-    return
-  }
-
-  const unidadesFiltradas = validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-
-  if (unidadesFiltradas.length === 0) {
-    notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
-    );
-    return
-  }
-
-  mostrarModalConfirmacao.value = true
+async function abrirModalConfirmacao() {
+  // Validações serão feitas no backend ao criar/iniciar o processo
+  mostrarModalConfirmacao.value = true;
 }
 
 function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false
+  mostrarModalConfirmacao.value = false;
 }
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (processoEditando.value) {
+
+  let codigoProcesso = processoEditando.value?.codigo;
+
+  if (!codigoProcesso) {
+    // Se não houver processo salvo, cria antes de iniciar
+    // Backend valida elegibilidade das unidades
     try {
-      // Usa a action da store, passando os parâmetros necessários
-      await processosStore.iniciarProcesso(
-          processoEditando.value.codigo,
-          tipo.value as TipoProcesso, // Garante a tipagem correta
-          unidadesSelecionadas.value
-      );
-      notificacoesStore.sucesso(
-          'Processo iniciado',
-          'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
-      );
-      router.push('/painel');
-      limparCampos();
+      const request: CriarProcessoRequest = {
+        descricao: descricao.value,
+        tipo: tipo.value as TipoProcesso,
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
+        unidades: unidadesSelecionadas.value,
+      };
+      const novoProcesso = await processosStore.criarProcesso(request);
+      codigoProcesso = novoProcesso.codigo;
     } catch (error) {
-      notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
-      console.error('Erro ao iniciar processo:', error);
+      mostrarAlerta('danger', "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+      console.error("Erro ao criar processo:", error);
+      return;
     }
-  } else {
-    // Idealmente, o processo deveria ser salvo primeiro.
-    // O fluxo atual de salvar e depois ter que voltar para iniciar não é ideal.
-    // Por enquanto, mantemos a lógica de que apenas processos já salvos (em edição) podem ser iniciados.
-    notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
+  }
+
+  try {
+    await processosStore.iniciarProcesso(
+      codigoProcesso,
+      tipo.value as TipoProcesso,
+      unidadesSelecionadas.value,
+    );
+    await router.push("/painel");
+    limparCampos();
+  } catch (error) {
+    mostrarAlerta('danger', "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
+    console.error("Erro ao iniciar processo:", error);
   }
 }
 
 function abrirModalRemocao() {
-  mostrarModalRemocao.value = true
+  mostrarModalRemocao.value = true;
 }
 
 function fecharModalRemocao() {
-  mostrarModalRemocao.value = false
+  mostrarModalRemocao.value = false;
 }
 
 async function confirmarRemocao() {
   if (processoEditando.value) {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
-      notificacoesStore.adicionarNotificacao({
-        tipo: 'success',
-        titulo: 'Processo removido',
-        mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
-        testId: 'notificacao-remocao'
-      });
-      router.push('/painel');
+      await router.push("/painel");
+      if (!processoEditando.value) {
+        // Only clear fields if it was a new process
+        limparCampos();
+      }
     } catch (error) {
-      notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
-      console.error('Erro ao remover processo:', error);
+      mostrarAlerta('danger', "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
+      console.error("Erro ao remover processo:", error);
     }
   }
   fecharModalRemocao();
 }
-
-// Funções de manipulação de unidades (serão ajustadas em uma etapa posterior)
-function getTodasSubunidades(unidade: Unidade): number[] {
-    let subunidades: number[] = [];
-    if (unidade.filhas) {
-        for (const filha of unidade.filhas) {
-            subunidades.push(filha.codigo);
-            subunidades = subunidades.concat(getTodasSubunidades(filha));
-        }
-    }
-    return subunidades;
-}
-
-function isFolha(unidade: Unidade): boolean {
-    return !unidade.filhas || unidade.filhas.length === 0;
-}
-
-function isChecked(codigo: number): boolean {
-    return unidadesSelecionadas.value.includes(codigo);
-}
-
-function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
-    const selfSelected = isChecked(unidade.codigo);
-
-    if (isFolha(unidade)) {
-        return selfSelected;
-    }
-
-    const subunidades = getTodasSubunidades(unidade);
-    if (subunidades.length === 0) {
-        return selfSelected;
-    }
-    const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length;
-
-    if (selecionadas === 0 && !selfSelected) {
-        return false;
-    }
-    if (selecionadas === subunidades.length && selfSelected) {
-        return true;
-    }
-    return 'indeterminate';
-}
-
-function toggleUnidade(unidade: Unidade) {
-    const todasSubunidades = [unidade.codigo, ...getTodasSubunidades(unidade)];
-    const todasEstaoSelecionadas = todasSubunidades.every(codigo => isChecked(codigo));
-
-    if (todasEstaoSelecionadas) {
-        unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
-            codigo => !todasSubunidades.includes(codigo)
-        );
-    } else {
-        todasSubunidades.forEach(codigo => {
-            if (!unidadesSelecionadas.value.includes(codigo)) {
-                unidadesSelecionadas.value.push(codigo);
-            }
-        });
-    }
-}
+</script>

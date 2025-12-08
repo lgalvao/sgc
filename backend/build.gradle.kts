@@ -1,17 +1,24 @@
+import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
     java
+    jacoco
+    checkstyle
     pmd
+    id("com.github.spotbugs") version "6.4.7"
+    id("com.diffplug.spotless") version "8.1.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 extra["jjwt.version"] = "0.13.0"
@@ -20,21 +27,28 @@ extra["lombok.version"] = "1.18.42"
 
 dependencies {
     // Spring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // BD
     runtimeOnly("org.postgresql:postgresql")
+    implementation("com.h2database:h2")
 
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
+    testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
 
     // MapStruct
@@ -51,50 +65,201 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     // Testes
-    testImplementation("com.h2database:h2")
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
+    testImplementation("net.jqwik:jqwik:1.9.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
+    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.36")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
-    implementation("org.apache.commons:commons-lang3:3.19.0")
-    implementation("ch.qos.logback:logback-classic:1.5.19")
-    implementation("ch.qos.logback:logback-core:1.5.19")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
+    implementation("ch.qos.logback:logback-classic:1.5.21")
+    implementation("ch.qos.logback:logback-core:1.5.21")
+
+    // Quality Check Dependencies (SpotBugs)
+    spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 }
 
-tasks.named<ProcessResources>("processResources") {
-    if (project.hasProperty("withFrontend") && project.property("withFrontend").toString() == "true") {
-        dependsOn(":copyFrontend")
+// --- Quality Checks Configurations ---
+
+// Spotless
+spotless {
+    // EnforceCheck is disabled by default to avoid breaking CI for existing formatting issues.
+    // Run './gradlew spotlessApply' to fix.
+    isEnforceCheck = false
+    java {
+        googleJavaFormat("1.33.0").aosp().reflowLongStrings()
+        leadingTabsToSpaces(2)
+        target("src/*/java/**/*.java")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
+}
+
+// JaCoCo
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
+    }
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            exclude(
+                "**/config/**",
+                "**/dto/**",
+                "**/entity/**",
+                "**/mapper/**",
+                "**/*Application.class",
+                "**/Sgc.class"
+            )
+        }
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90.toBigDecimal()
+            }
+        }
+    }
+    classDirectories.setFrom(tasks.jacocoTestReport.get().classDirectories)
+}
+
+// SpotBugs
+spotbugs {
+    toolVersion.set("4.9.8")
+    excludeFilter.set(file("config/spotbugs/exclude.xml"))
+    ignoreFailures.set(true) // Don't fail build
+    effort.set(com.github.spotbugs.snom.Effort.MAX)
+    reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
+}
+
+tasks.withType<SpotBugsTask> {
+    reports {
+        create("html") {
+            required.set(true)
+        }
+    }
+}
+
+// Checkstyle
+checkstyle {
+    toolVersion = "12.2.0"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
+    isIgnoreFailures = true // Don't fail build, we check manually via quality task
+}
+
+// PMD
+pmd {
+    toolVersion = "7.19.0"
+    // ruleSets = listOf(file("config/pmd/ruleset.xml").toURI().toString())
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    isIgnoreFailures = true // Don't fail build
+}
+
+tasks.named("pmdTest") {
+    enabled = false
+}
+
+// --- Custom Quality Tasks ---
+
+tasks.register("qualityCheck") {
+    group = "quality"
+    description = "Runs all quality checks (tests, coverage, SpotBugs, Checkstyle, PMD)"
+
+    dependsOn(tasks.test)
+    dependsOn(tasks.jacocoTestReport)
+    dependsOn(tasks.jacocoTestCoverageVerification)
+    dependsOn(tasks.checkstyleMain)
+    dependsOn(tasks.checkstyleTest)
+    dependsOn(tasks.pmdMain)
+    dependsOn(tasks.pmdTest)
+    dependsOn(tasks.spotbugsMain)
+    dependsOn(tasks.spotbugsTest)
+
+    val buildDir = layout.buildDirectory.get().asFile.absolutePath
+
+    doLast {
+        println("\n=== Quality Check Summary ===")
+        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
+        println("Checkstyle Main: file://$buildDir/reports/checkstyle/main.html")
+        println("Checkstyle Test: file://$buildDir/reports/checkstyle/test.html")
+        println("PMD Main: file://$buildDir/reports/pmd/main.html")
+        println("PMD Test: file://$buildDir/reports/pmd/test.html")
+        println("SpotBugs Main: file://$buildDir/reports/spotbugs/main.html")
+        println("SpotBugs Test: file://$buildDir/reports/spotbugs/test.html")
+    }
+}
+
+tasks.register("qualityCheckFast") {
+    group = "quality"
+    description = "Runs only tests and coverage"
+
+    dependsOn(tasks.test)
+    dependsOn(tasks.jacocoTestReport)
+    dependsOn(tasks.jacocoTestCoverageVerification)
+
+    val buildDir = layout.buildDirectory.get().asFile.absolutePath
+
+    doLast {
+        println("\n=== Quality Check Fast Summary ===")
+        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
+    }
+}
+
+// Ensure quality checks don't run on normal 'check'
+tasks.named("check") {
+    setDependsOn(dependsOn.filter {
+        it != tasks.checkstyleMain &&
+        it != tasks.checkstyleTest &&
+        it != tasks.pmdMain &&
+        it != tasks.pmdTest &&
+        it != tasks.spotbugsMain &&
+        it != tasks.spotbugsTest
+    })
 }
 
 tasks.withType<BootJar> {
     enabled = true
-    if (project.hasProperty("withFrontend") && project.property("withFrontend").toString() == "true") {
-        dependsOn(":copyFrontend")
-    }
     mainClass.set("sgc.Sgc")
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
-    forkEvery = 100L
+
+    testLogging {
+        events("skipped", "failed")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStackTraces = true
+        showCauses = true
+        showStandardStreams = false
+        stackTraceFilters = setOf(TestStackTraceFilter.ENTRY_POINT)
+    }
+
     jvmArgs = listOf(
-        "-Xmx4g",
-        "-Dlogging.level.root=ERROR",
-        "-Dlogging.level.sgc=ERROR",
-        "-Dlogging.level.org.hibernate=ERROR",
-        "-Dlogging.level.org.springframework=ERROR",
+        "-Dlogging.level.root=INFO",
+        "-Dlogging.level.sgc=INFO",
         "-Dspring.jpa.show-sql=false",
-        "-Dspring.jpa.properties.hibernate.show_sql=false",
-        "-Dspring.jpa.properties.hibernate.format_sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
@@ -110,225 +275,16 @@ tasks.withType<Test> {
         if (byteBuddyAgentFile != null) {
             jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
         } else {
-            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
+            logger.warn("byte-buddy-agent nao encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
-
-    testLogging {
-        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED)
-        exceptionFormat = TestExceptionFormat.SHORT
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-        showStandardStreams = false
-    }
-
-    addTestListener(object : TestListener {
-        private val failures = mutableListOf<TestFailure>()
-        private val skipped = mutableListOf<String>()
-        private var totalTests = 0
-        private var passedTests = 0
-
-        override fun beforeSuite(suite: TestDescriptor) {}
-        override fun beforeTest(testDescriptor: TestDescriptor) {}
-
-        override fun afterTest(desc: TestDescriptor, result: TestResult) {
-            when (result.resultType) {
-                TestResult.ResultType.SUCCESS -> {
-                    passedTests++
-                    totalTests++
-                }
-
-                TestResult.ResultType.FAILURE -> {
-                    totalTests++
-                    val exception = result.exception
-                    val rootCause = getRootCause(exception)
-                    failures.add(
-                        TestFailure(
-                            testClass = desc.className ?: "Unknown",
-                            testMethod = desc.name,
-                            errorMessage = rootCause?.message ?: exception?.message ?: "Erro desconhecido",
-                            errorType = rootCause?.javaClass?.simpleName ?: exception?.javaClass?.simpleName
-                            ?: "Exception",
-                            stackTrace = filterStackTrace(rootCause ?: exception)
-                        )
-                    )
-                }
-
-                TestResult.ResultType.SKIPPED -> {
-                    totalTests++
-                    skipped.add("${desc.className ?: "Unknown"}.${desc.name}")
-                }
-
-                else -> {}
-            }
-        }
-
-        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            if (suite.parent == null) outputAgentSummary(result, failures, skipped)
-        }
-
-        private fun getRootCause(exception: Throwable?): Throwable? {
-            var cause = exception
-            while (cause?.cause != null && cause.cause != cause) {
-                cause = cause.cause
-            }
-            return cause
-        }
-
-        private fun filterStackTrace(exception: Throwable?): List<String> {
-            if (exception == null) return emptyList()
-
-            return exception.stackTrace
-                .filter { element ->
-                    val className = element.className
-                    (className.startsWith("sgc") ||
-                            className.startsWith("org.springframework.web") ||
-                            className.startsWith("org.springframework.data") ||
-                            className.startsWith("org.hibernate") ||
-                            className.startsWith("org.springframework.security") ||
-                            (className.startsWith("org.springframework.boot") && !className.contains(".test."))) &&
-                            !className.contains("gradle") &&
-                            !className.contains("junit") &&
-                            !className.contains("mockito")
-                }
-                .take(15)
-                .map { element ->
-                    "    ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
-                }
-        }
-
-        private fun outputAgentSummary(
-            result: TestResult,
-            failures: List<TestFailure>,
-            skipped: List<String>
-        ) {
-            val status = if (result.failedTestCount == 0L) "SUCESSO" else "FALHA"
-            val durationSec = (result.endTime - result.startTime) / 1000.0
-            val separator = "=".repeat(20)
-            val separator2 = "-".repeat(20)
-
-            println("\n$separator")
-            println("RESUMO DOS TESTES")
-            println(separator)
-            println("Situacao: $status")
-            println("Total:    ${result.testCount}")
-            println("Sucesso:  ${result.successfulTestCount}")
-            println("Falhas:   ${result.failedTestCount}")
-            println("Ignorados: ${result.skippedTestCount}")
-            println("Tempo:  %.2fs".format(durationSec))
-            if (failures.isNotEmpty()) {
-                println(separator2)
-                println("TESTES FALHANDO (${failures.size})")
-                println(separator2)
-                failures.forEachIndexed { index, failure ->
-                    println("\n${index + 1}. ${failure.testClass}")
-                    println("   Metodo: ${failure.testMethod}")
-                    println("   Erro: [${failure.errorType}] ${failure.errorMessage}")
-                    if (failure.stackTrace.isNotEmpty()) {
-                        println("   Stack trace filtrado:")
-                        failure.stackTrace.forEach { line -> println("   $line") }
-                    } else {
-                        println("   (sem stack trace da aplicacao)")
-                    }
-                }
-            }
-            if (skipped.isNotEmpty()) {
-                println("\n$separator2")
-                println("TESTES IGNORADOS (${skipped.size})")
-                println(separator2)
-                skipped.forEach { println("  • $it") }
-            }
-            println(separator)
-        }
-    })
-
-    reports {
-        html.required.set(false)
-        junitXml.required.set(false)
-    }
-
-    failFast = project.hasProperty("failFast")
 }
-
-data class TestFailure(
-    val testClass: String,
-    val testMethod: String,
-    val errorMessage: String,
-    val errorType: String,
-    val stackTrace: List<String>
-)
 
 tasks.withType<JavaCompile> {
     options.apply {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
-        compilerArgs.add("-Xlint:-options")
+        compilerArgs.add("-Xlint:deprecation")
     }
-    options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: emptyList()) + listOf(
-        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED",
-        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--add-opens=java.base/java.lang=ALL-UNNAMED"
-    )
-}
-
-tasks.named("build") { outputs.cacheIf { true } }
-
-pmd {
-    toolVersion = "7.17.0"
-    rulesMinimumPriority = 5
-}
-
-tasks.withType<Pmd> {
-    ruleSets = listOf()
-    ruleSetFiles = files("config/pmd/custom-ruleset.xml")
-    reports.xml.required.set(true)
-    reports.html.required.set(false)
-}
-
-tasks.register("agentTest") {
-    group = "verification"
-    description = "Rodar testes com saída otimizada para agentes"
-    dependsOn("test")
-}
-
-tasks.register<Test>("verboseTest") {
-    useJUnitPlatform()
-    group = "verification"
-    description = "Rodar testes com saída completa"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
-    jvmArgs.addAll(tasks.withType<Test>().getByName("test").jvmArgs)
-
-    val byteBuddyAgentFile =
-        project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
-
-    doFirst {
-        if (byteBuddyAgentFile != null) {
-            jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
-        } else {
-            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
-        }
-    }
-
-    testLogging {
-        events = setOf(TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.FULL
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-        showStandardStreams = true
-    }
-
-    testClassesDirs = tasks.test.get().testClassesDirs
-    classpath = tasks.test.get().classpath
-}
-
-// Desabilita a tarefa pmdTest para ignorar os arquivos de teste
-tasks.named("pmdTest") {
-    enabled = false
-}
-
-tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
-    jvmArgs = listOf("-Djdk.internal.vm.debug=release")
 }

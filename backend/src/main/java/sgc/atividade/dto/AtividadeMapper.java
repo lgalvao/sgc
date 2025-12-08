@@ -2,32 +2,33 @@ package sgc.atividade.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sgc.atividade.modelo.Atividade;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
+import sgc.atividade.model.Atividade;
 
-/**
- * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
- */
+/** Mapper (usando MapStruct) entre a entidade Atividade e seu DTO. */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class AtividadeMapper {
-    @Autowired
-    protected MapaRepo mapaRepo;
 
+    /**
+     * Converte uma entidade {@link Atividade} em um DTO {@link AtividadeDto}.
+     *
+     * @param atividade A entidade a ser convertida.
+     * @return O DTO correspondente.
+     */
     @Mapping(source = "mapa.codigo", target = "mapaCodigo")
-    public abstract AtividadeDto toDTO(Atividade atividade);
+    public abstract AtividadeDto toDto(Atividade atividade);
 
-    @Mapping(source = "mapaCodigo", target = "mapa")
+    /**
+     * Converte um DTO {@link AtividadeDto} em uma entidade {@link Atividade}.
+     *
+     * @param atividadeDto O DTO a ser convertido.
+     * @return A entidade correspondente.
+     */
+    @Mapping(target = "mapa", ignore = true)
     @Mapping(target = "conhecimentos", ignore = true)
-    public abstract Atividade toEntity(AtividadeDto atividadeDTO);
+    @Mapping(target = "competencias", ignore = true)
+    public abstract Atividade toEntity(AtividadeDto atividadeDto);
 
-    public Mapa map(Long idMapa) {
-        if (idMapa == null) return null;
-        return mapaRepo.findById(idMapa).orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", idMapa));
-    }
 }

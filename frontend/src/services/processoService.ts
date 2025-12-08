@@ -1,76 +1,113 @@
-import apiClient from '../axios-setup';
-import {
+import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
-    mapProcessoDetalheDtoToFrontend,
-    mapProcessoDtoToFrontend,
     Processo,
-    ProcessoDetalhe,
-} from '../mappers/processos';
+    ProcessoResumo,
+    Subprocesso,
+    SubprocessoElegivel,
+} from "@/types/tipos";
+import apiClient from "../axios-setup";
 
-export async function criarProcesso(request: CriarProcessoRequest): Promise<Processo> {
-  try {
-    const response = await apiClient.post<any>('/processos', request);
-    return mapProcessoDtoToFrontend(response.data);
-  } catch (error) {
-    console.error('Erro ao criar processo:', error);
-    throw error;
-  }
+export async function criarProcesso(
+    request: CriarProcessoRequest,
+): Promise<Processo> {
+    const response = await apiClient.post<Processo>("/processos", request);
+    return response.data;
 }
 
-export async function iniciarProcesso(id: number, tipo: string, unidadesIds: number[]): Promise<void> {
-  try {
-    await apiClient.post(`/processos/${id}/iniciar?tipo=${tipo}`, unidadesIds);
-  } catch (error) {
-    console.error(`Erro ao iniciar o processo ${id}:`, error);
-    throw error;
-  }
+export async function buscarProcessosFinalizados(): Promise<ProcessoResumo[]> {
+    const response = await apiClient.get<ProcessoResumo[]>(
+        "/processos/finalizados",
+    );
+    return response.data;
 }
 
-export async function finalizarProcesso(id: number): Promise<void> {
-  try {
-    await apiClient.post(`/processos/${id}/finalizar`);
-  } catch (error) {
-    console.error(`Erro ao finalizar o processo ${id}:`, error);
-    throw error;
-  }
+export async function iniciarProcesso(
+    codProcesso: number,
+    tipo: string,
+    codigosUnidades: number[],
+): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/iniciar`, {
+        tipo,
+        unidades: codigosUnidades
+    });
 }
 
-export async function obterProcessoPorId(id: number): Promise<Processo> {
-  try {
-    const response = await apiClient.get<any>(`/processos/${id}`);
-    return mapProcessoDtoToFrontend(response.data);
-  } catch (error) {
-    console.error(`Erro ao obter processo ${id}:`, error);
-    throw error;
-  }
+export async function finalizarProcesso(codProcesso: number): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/finalizar`);
 }
 
-export async function atualizarProcesso(id: number, request: AtualizarProcessoRequest): Promise<Processo> {
-  try {
-    const response = await apiClient.put<any>(`/processos/${id}`, request);
-    return mapProcessoDtoToFrontend(response.data);
-  } catch (error) {
-    console.error(`Erro ao atualizar processo ${id}:`, error);
-    throw error;
-  }
+export async function obterProcessoPorCodigo(codProcesso: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${codProcesso}`);
+    return response.data;
 }
 
-export async function excluirProcesso(id: number): Promise<void> {
-  try {
-    await apiClient.delete(`/processos/${id}`);
-  } catch (error) {
-    console.error(`Erro ao excluir processo ${id}:`, error);
-    throw error;
-  }
+export async function atualizarProcesso(
+    codProcesso: number,
+    request: AtualizarProcessoRequest,
+): Promise<Processo> {
+    const response = await apiClient.post<Processo>(
+        `/processos/${codProcesso}/atualizar`,
+        request,
+    );
+    return response.data;
 }
 
-export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe> {
-  try {
-    const response = await apiClient.get<any>(`/processos/${id}/detalhes`);
-    return mapProcessoDetalheDtoToFrontend(response.data);
-  } catch (error) {
-    console.error(`Erro ao obter detalhes do processo ${id}:`, error);
-    throw error;
-  }
+export async function excluirProcesso(codProcesso: number): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/excluir`);
+}
+
+export async function obterDetalhesProcesso(codProcesso: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${codProcesso}/detalhes`);
+    return response.data;
+}
+
+export async function processarAcaoEmBloco(payload: {
+    codProcesso: number;
+    unidades: string[];
+    tipoAcao: "aceitar" | "homologar";
+    unidadeUsuario: string;
+}): Promise<void> {
+    await apiClient.post(
+        `/processos/${payload.codProcesso}/acoes-em-bloco`,
+        payload,
+    );
+}
+
+export async function buscarSubprocessosElegiveis(
+    codProcesso: number,
+): Promise<SubprocessoElegivel[]> {
+    const response = await apiClient.get<SubprocessoElegivel[]>(
+        `/processos/${codProcesso}/subprocessos-elegiveis`,
+    );
+    return response.data;
+}
+
+export async function alterarDataLimiteSubprocesso(
+    codSubprocesso: number,
+    dados: { novaData: string },
+): Promise<void> {
+    await apiClient.post(`/processos/alterar-data-limite`, { id: codSubprocesso, ...dados });
+}
+
+export async function apresentarSugestoes(
+    codSubprocesso: number,
+    dados: { sugestoes: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, dados);
+}
+
+export async function validarMapa(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
+}
+
+export async function homologarValidacao(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`);
+}
+
+export async function buscarSubprocessos(
+    codProcesso: number,
+): Promise<Subprocesso[]> {
+    const response = await apiClient.get(`/processos/${codProcesso}/subprocessos`);
+    return response.data;
 }

@@ -1,37 +1,37 @@
 package sgc.processo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import sgc.processo.model.TipoProcesso;
 
-/**
- * DTO usado para atualizar um processo existente.
- */
-public record AtualizarProcessoReq(
-    Long codigo,
+/** DTO usado para atualizar um processo existente. */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AtualizarProcessoReq {
+    private Long codigo;
 
     @NotBlank(message = "Preencha a descrição")
-    String descricao,
+    private String descricao;
 
-    @NotBlank(message = "Tipo do processo é obrigatório")
-    String tipo,
+    @NotNull(message = "Tipo do processo é obrigatório")
+    private TipoProcesso tipo;
 
+    @NotNull(message = "Preencha a data limite")
+    @Future(message = "A data limite deve ser futura")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime dataLimiteEtapa1,
+    private LocalDateTime dataLimiteEtapa1;
 
     @NotEmpty(message = "Pelo menos uma unidade participante deve ser incluída.")
-    List<Long> unidades
-) {
-    public AtualizarProcessoReq {
-        unidades = new ArrayList<>(unidades);
-    }
-
-    @Override
-    public List<Long> unidades() {
-        return new ArrayList<>(unidades);
-    }
+    private List<Long> unidades;
 }

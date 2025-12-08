@@ -1,33 +1,51 @@
 package sgc.sgrh.dto;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * DTO para dados de unidade do SGRH.
- * Suporta estrutura hierárquica com subunidades.
- */
-public record UnidadeDto(
-    Long codigo,
-    String nome,
-    String sigla,
-    Long codigoPai,
-    String tipo,
-    List<UnidadeDto> subunidades  // Para árvore hierárquica
-) {
-    public UnidadeDto {
-        subunidades = subunidades != null ? new ArrayList<>(subunidades) : null;
+/** DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades. */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UnidadeDto {
+    private Long codigo;
+    private String nome;
+    private String sigla;
+    private Long codigoPai;
+    private String tipo;
+    private List<UnidadeDto> subunidades; // Para árvore hierárquica
+
+    @JsonProperty("isElegivel")
+    private boolean isElegivel;
+
+    /** Construtor sem subunidades. */
+    public UnidadeDto(
+            Long codigo,
+            String nome,
+            String sigla,
+            Long codigoPai,
+            String tipo,
+            boolean isElegivel) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.codigoPai = codigoPai;
+        this.tipo = tipo;
+        this.subunidades = null;
+        this.isElegivel = isElegivel;
     }
 
-    /**
-     * Construtor sem subunidades.
-     */
-    public UnidadeDto(Long codigo, String nome, String sigla, Long codigoPai, String tipo) {
-        this(codigo, nome, sigla, codigoPai, tipo, null);
-    }
-
-    @Override
-    public List<UnidadeDto> subunidades() {
-        return subunidades != null ? new ArrayList<>(subunidades) : null;
+    public void setElegivel(boolean elegivel) {
+        isElegivel = elegivel;
+        if (subunidades != null) {
+            for (UnidadeDto subunidade : subunidades) {
+                subunidade.setElegivel(elegivel);
+            }
+        }
     }
 }

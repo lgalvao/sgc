@@ -1,89 +1,101 @@
 <template>
   <div>
-    <table
-      class="table table-hover"
-      data-testid="tabela-processos"
+    <BTable
+      :items="processos"
+      :fields="fields"
+      hover
+      responsive
+      data-testid="tbl-processos"
+      :tbody-tr-attr="rowAttr"
+      :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
+      :sort-desc="[!direcaoOrdenacaoAsc]"
+      @row-clicked="handleSelecionarProcesso"
+      @sort-changed="handleSortChange"
     >
-      <thead>
-        <tr>
-          <th
-            data-testid="coluna-descricao"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'descricao')"
-          >
-            Descrição
-            <span v-if="criterioOrdenacao === 'descricao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            data-testid="coluna-tipo"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'tipo')"
-          >
-            Tipo
-            <span v-if="criterioOrdenacao === 'tipo'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            data-testid="coluna-unidades"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'unidades')"
-          >
-            Unidades participantes
-            <span v-if="criterioOrdenacao === 'unidades'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            v-if="showDataFinalizacao"
-            data-testid="coluna-data-finalizacao"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'dataFinalizacao')"
-          >
-            Finalizado em
-            <span v-if="criterioOrdenacao === 'dataFinalizacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            data-testid="coluna-situacao"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'situacao')"
-          >
-            Situação
-            <span v-if="criterioOrdenacao === 'situacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="processo in processos"
-          :key="processo.codigo"
-          class="clickable-row"
-          style="cursor:pointer;"
-          @click="emit('selecionarProcesso', processo)"
-        >
-          <td>
-            {{ processo.descricao }}
-          </td>
-          <td>{{ processo.tipo }}</td>
-          <td>{{ processo.unidadesFormatadas }}</td>
-          <td v-if="showDataFinalizacao">
-            {{ processo.dataFinalizacaoFormatada }}
-          </td>
-          <td>{{ processo.situacao }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <template #empty>
+        <div class="text-center text-muted">
+          Nenhum processo encontrado.
+        </div>
+      </template>
+
+      <template #cell(situacao)="data">
+        {{ formatarSituacao(data.value as string) }}
+      </template>
+
+      <template #cell(tipo)="data">
+        {{ formatarTipo(data.value as string) }}
+      </template>
+    </BTable>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {Processo} from '@/types/tipos';
+import {BTable} from "bootstrap-vue-next";
+import {computed} from "vue";
+import type {ProcessoResumo} from "@/types/tipos";
 
-defineProps<{
-  processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
-  criterioOrdenacao: keyof Processo | 'unidades' | 'dataFinalizacao';
+const props = defineProps<{
+  processos: ProcessoResumo[];
+  criterioOrdenacao: keyof ProcessoResumo | "dataFinalizacao";
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', campo: keyof Processo | 'unidades' | 'dataFinalizacao'): void;
-  (e: 'selecionarProcesso', processo: Processo): void;
+  (e: "ordenar", campo: keyof ProcessoResumo | "dataFinalizacao"): void;
+  (e: "selecionarProcesso", processo: ProcessoResumo): void;
 }>();
+
+const fields = computed(() => {
+  const baseFields = [
+    {key: "descricao", label: "Descrição", sortable: true},
+    {key: "tipo", label: "Tipo", sortable: true},
+    {key: "unidadesParticipantes", label: "Unidades Participantes", sortable: false},
+  ];
+
+  if (props.showDataFinalizacao) {
+    baseFields.push({
+      key: "dataFinalizacaoFormatada",
+      label: "Finalizado em",
+      sortable: true,
+    });
+  }
+
+  baseFields.push({key: "situacao", label: "Situação", sortable: true});
+
+  return baseFields;
+});
+
+const handleSortChange = (ctx: any) => {
+  emit("ordenar", ctx.sortBy);
+};
+
+const handleSelecionarProcesso = (processo: ProcessoResumo) => {
+  emit("selecionarProcesso", processo);
+};
+
+function formatarSituacao(situacao: string): string {
+  const mapa: Record<string, string> = {
+    EM_ANDAMENTO: "Em Andamento",
+    FINALIZADO: "Finalizado",
+    CRIADO: "Criado",
+  };
+  return mapa[situacao] || situacao;
+}
+
+function formatarTipo(tipo: string): string {
+  const mapa: Record<string, string> = {
+    MAPEAMENTO: "Mapeamento",
+    REVISAO: "Revisão",
+    DIAGNOSTICO: "Diagnóstico",
+  };
+  return mapa[tipo] || tipo;
+}
+
+const rowAttr = (item: ProcessoResumo | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-processo-${item.codigo}` };
+  }
+  return {};
+};
 </script>

@@ -1,0 +1,49 @@
+<template>
+  <div class="mt-4">
+    <h4>Movimentações do Processo</h4>
+    <div
+      v-if="movimentacoes.length === 0"
+      class="alert alert-info"
+    >
+      Nenhuma movimentação registrada para este subprocesso.
+    </div>
+    <BTable
+      v-else
+      striped
+      :items="movimentacoes"
+      :fields="fields"
+      primary-key="codigo"
+      data-testid="tbl-movimentacoes"
+      :tbody-tr-attr="rowAttr"
+    >
+      <template #cell(dataHora)="data">
+        {{ formatDateTimeBR(data.item.dataHora) }}
+      </template>
+    </BTable>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {BTable} from "bootstrap-vue-next";
+import {ref} from "vue";
+import type {Movimentacao} from "@/types/tipos";
+import {formatDateTimeBR} from "@/utils";
+
+defineProps<{
+  movimentacoes: Movimentacao[];
+}>();
+
+const fields = ref([
+  {key: "dataHora", label: "Data/Hora"},
+  {key: "unidadeOrigem", label: "Unidade Origem"},
+  {key: "unidadeDestino", label: "Unidade Destino"},
+  {key: "descricao", label: "Descrição"},
+]);
+
+const rowAttr = (item: Movimentacao | null, type: string) => {
+  if (item && type === 'row') {
+    return { 'data-testid': `row-movimentacao-${item.codigo}` };
+  }
+  return {};
+};
+</script>
