@@ -57,9 +57,7 @@ Fluxo principal:
 
     9.1.2. Itens adicionais, alinhados à direita:
     - Para todos os perfis:
-        - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`). Se perfil for ADMIN,
-          não
-          mostrar sigla da unidade, apenas o perfil: `ADMIN`.
+        - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`). Se perfil for ADMIN, não mostrar sigla da unidade, apenas o perfil: `ADMIN`.
         - `Ícone de logout` - faz logout e mostra tela Login
     - Se perfil ADMIN:
         - Mostrar `Ícone de engrenagem` para acesso à tela `Configurações`

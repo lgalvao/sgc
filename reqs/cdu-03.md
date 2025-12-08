@@ -39,7 +39,7 @@
 
 7. O sistema redireciona para o Painel, onde já será mostrada uma linha para o processo recém-criado.
 
-### Edição de processo:
+### Edição de processo
 
 1. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do Painel (apenas processos na situação 'Criado' podem ser editados). Além dos botões Cancelar, Salvar e Iniciar processo, também será exibido o botão Remover.
 
@@ -53,7 +53,7 @@
 
 6. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
 
-### Remoção:
+### Remoção
 
 1. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do Painel (apenas processos
    na situação 'Criado' podem ser removidos). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`, também será

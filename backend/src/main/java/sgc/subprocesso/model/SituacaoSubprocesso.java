@@ -26,7 +26,12 @@ public enum SituacaoSubprocesso {
     REVISAO_MAPA_DISPONIBILIZADO("Mapa Disponibilizado"),
     REVISAO_MAPA_COM_SUGESTOES("Mapa com Sugestões"),
     REVISAO_MAPA_VALIDADO("Mapa Validado"),
-    REVISAO_MAPA_HOMOLOGADO("Mapa Homologado");
+    REVISAO_MAPA_HOMOLOGADO("Mapa Homologado"),
+
+    // Diagnóstico
+    DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO("Autoavaliação em Andamento"),
+    DIAGNOSTICO_MONITORAMENTO("Monitoramento"),
+    DIAGNOSTICO_CONCLUIDO("Concluído");
 
     private final String descricao;
 }

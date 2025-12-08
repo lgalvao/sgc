@@ -507,7 +507,7 @@ public class ProcessoService {
         
         Subprocesso subprocesso =
                 new Subprocesso(
-                        processo, unidade, mapaCopiado, NAO_INICIADO, processo.getDataLimite());
+                        processo, unidade, mapaCopiado, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, processo.getDataLimite());
         // Diagnóstico começa como NAO_INICIADO
         // Mas a UI do teste espera "Realizar Autoavaliação".
         // Se estiver NAO_INICIADO, o Chefe vê o botão "Iniciar"?
