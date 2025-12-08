@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.mjs,.ts --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "test:unit": "vitest --run --reporter=dot",
+    "test:unit": "vitest --run --reporter=dot --no-color",
     "coverage:unit": "vitest --run --coverage --reporter=dot",
     "quality:test": "vitest --run --coverage --reporter=dot",
     "quality:lint": "eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist || true",

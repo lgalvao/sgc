@@ -15,7 +15,7 @@
       <!-- Checkbox com label -->
       <BFormCheckbox
           :id="`chk-${unidade.sigla}`"
-          :model-value="isChecked(unidade.codigo)"
+          :model-value="getEstadoSelecao(unidade) === true"
           :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
           :disabled="!isHabilitado(unidade)"
           :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
@@ -34,7 +34,7 @@
 
     <!-- Filhas (recursivo) -->
     <div
-        v-if="unidade.filhas && unidade.filhas.length && (depth === 0 || isExpanded(unidade))"
+        v-if="unidade.filhas && unidade.filhas.length && isExpanded(unidade)"
         class="unidade-children"
     >
       <UnidadeTreeNode

@@ -31,7 +31,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
+// Estado local sincronizado com props.modelValue
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+
+// Watch para sincronizar props.modelValue -> local (apenas quando props mudam externamente)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    // Só atualiza se for diferente (evita loop)
+    if (JSON.stringify(newValue) !== JSON.stringify(unidadesSelecionadasLocal.value)) {
+      unidadesSelecionadasLocal.value = [...newValue];
+    }
+  },
+  { deep: true }
+);
 
 // Map to find parent of a unit
 const parentMap = computed(() => {
@@ -110,53 +123,51 @@ function isHabilitado(unidade: Unidade): boolean {
 }
 
 // Obtém estado de seleção (true, false ou 'indeterminate')
+// Baseado APENAS no modelValue - fonte única de verdade
 function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   const selfSelected = isChecked(unidade.codigo);
 
-  // Se é folha, retorna o próprio estado
-  if (isFolha(unidade)) {
-    return selfSelected;
-  }
-
-  // Se não tem filhas, retorna o próprio estado
+  // 1. Se não tem filhas, retorna se está no modelValue
   if (!unidade.filhas || unidade.filhas.length === 0) {
     return selfSelected;
   }
 
-  // Verifica o estado de cada filha DIRETA (recursivamente)
-  let todasMarcadas = true;
-  let algumaMarcada = false;
+  // 2. Conta descendentes ELEGÍVEIS
+  const descendentesElegiveis = getTodasSubunidades(unidade).filter(codigo => {
+    const desc = findUnidadeById(codigo);
+    return desc?.isElegivel;
+  });
 
-  for (const filha of unidade.filhas) {
-    const estadoFilha = getEstadoSelecao(filha);
-    
-    if (estadoFilha === true) {
-      algumaMarcada = true;
-    } else if (estadoFilha === false) {
-      todasMarcadas = false;
-    } else {
-      // Se alguma filha está indeterminada, o pai também fica indeterminado
-      todasMarcadas = false;
-      algumaMarcada = true;
-    }
+  // 3. Se não tem descendentes elegíveis, retorna próprio estado
+  if (descendentesElegiveis.length === 0) {
+    return selfSelected;
   }
 
-  // Se todas as filhas estão marcadas
-  if (todasMarcadas) {
+  // 4. Conta quantas descendentes elegíveis estão no modelValue
+  const descendentesSelecionadas = descendentesElegiveis.filter(codigo => 
+    isChecked(codigo)
+  ).length;
+
+  // 5. Todas descendentes selecionadas? → marcada
+  if (descendentesSelecionadas === descendentesElegiveis.length) {
     return true;
   }
 
-  // Se nenhuma filha está marcada
-  if (!algumaMarcada) {
+  // 6. Nenhuma descendente selecionada? → desmarcada (ou marcada se INTEROPERACIONAL)
+  if (descendentesSelecionadas === 0) {
+    // INTEROPERACIONAL pode estar marcada sozinha
+    if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
+      return true;
+    }
     return false;
   }
 
-  // Exceção INTEROPERACIONAL: pode estar marcada mesmo sem todas filhas
+  // 7. Algumas descendentes selecionadas → indeterminada (ou marcada se INTEROPERACIONAL)
+  // INTEROPERACIONAL pode estar marcada mesmo sem todas filhas
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
-
-  // Algumas filhas marcadas, mas não todas
+  
   return "indeterminate";
 }
 
@@ -225,7 +236,10 @@ watch(
 );
 
 // Estado de expansão das unidades
-const expandedUnits = ref<Set<number>>(new Set());
+// Inicializa com as raízes expandidas
+const expandedUnits = ref<Set<number>>(
+  new Set(props.unidades.map(u => u.codigo))
+);
 
 function isExpanded(unidade: Unidade): boolean {
   return expandedUnits.value.has(unidade.codigo);
@@ -239,13 +253,16 @@ function toggleExpand(unidade: Unidade) {
   }
 }
 
-// Watch para reagir a mudanças internas e emitir para o pai
+// Watch para emitir mudanças locais para o pai
 watch(
-    unidadesSelecionadasLocal,
-    (novoValor) => {
-      emit("update:modelValue", novoValor);
-    },
-    {deep: true},
+  unidadesSelecionadasLocal,
+  (newValue) => {
+    // Só emite se for diferente do props (evita loop)
+    if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
+      emit("update:modelValue", newValue);
+    }
+  },
+  { deep: true }
 );
 </script>
 
