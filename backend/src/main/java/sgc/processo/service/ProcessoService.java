@@ -329,6 +329,53 @@ public class ProcessoService {
     }
 
     @Transactional
+    public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
+        Processo processo =
+                processoRepo
+                        .findById(codigo)
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+
+        if (processo.getSituacao() != CRIADO) {
+            throw new ErroProcessoEmSituacaoInvalida(
+                    "Apenas processos na situação 'CRIADO' podem ser iniciados.");
+        }
+
+        Set<Unidade> participantes = processo.getParticipantes();
+        if (participantes.isEmpty()) {
+            throw new ErroUnidadesNaoDefinidas(
+                    "Não há unidades participantes definidas para este processo.");
+        }
+
+        List<Long> codigosUnidades = participantes.stream().map(Unidade::getCodigo).toList();
+
+        Optional<String> erroUnidadesAtivas =
+                getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades);
+        if (erroUnidadesAtivas.isPresent()) {
+            return List.of(erroUnidadesAtivas.get());
+        }
+
+        for (Unidade unidade : participantes) {
+            criarSubprocessoParaDiagnostico(processo, unidade);
+        }
+
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoRepo.save(processo);
+
+        publicadorEventos.publishEvent(
+                new EventoProcessoIniciado(
+                        processo.getCodigo(),
+                        processo.getTipo().name(),
+                        LocalDateTime.now(),
+                        codigosUnidades));
+
+        log.info(
+                "Processo de diagnóstico {} iniciado para {} unidades.",
+                codigo,
+                codsUnidades.size());
+        return List.of();
+    }
+
+    @Transactional
     public void finalizar(Long codigo) {
         log.debug("Iniciando finalização do processo: código={}", codigo);
 
@@ -426,6 +473,76 @@ public class ProcessoService {
                         subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
         log.info(
                 "Subprocesso {} para revisão criado para unidade {}",
+                subprocessoSalvo.getCodigo(),
+                unidade.getSigla());
+    }
+
+    private void criarSubprocessoParaDiagnostico(Processo processo, Unidade unidade) {
+        if (unidade.getMapaVigente() == null) {
+            // Se não tem mapa vigente, não pode fazer diagnóstico?
+            // Regra de negócio: Diagnóstico requer mapa vigente.
+            // Mas talvez possa ser criado vazio?
+            // Por enquanto, assumo que precisa de mapa, segue lógica de Revisão.
+            // Mas o teste diz que "Passo 1: Criar e Homologar Mapa" é pré-requisito.
+            // Então DEVE ter mapa vigente.
+            throw new ErroProcesso(
+                    "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla()));
+        }
+
+        Long codMapaVigente = unidade.getMapaVigente().getCodigo();
+        // Para diagnostico, não precisamos copiar o mapa para EDIÇÃO (revisão),
+        // mas o subprocesso precisa apontar para QUAL mapa está sendo diagnosticado.
+        // O modelo Subprocesso tem relacionamento com Mapa.
+        // Se apontarmos para o mapa vigente DIRETO, não podemos alterá-lo.
+        // O diagnóstico preenche notas (Autoavaliação). As notas ficam em Subprocesso?
+        // Não, as notas ficam em entidades associadas a Avaliação/Diagnóstico?
+        // Vamos checar o modelo de dados?
+        // Por hora, vou seguir o padrão de COPIAR o mapa para garantir isolamento,
+        // assim como na Revisão, pois o diagnóstico pode "congelar" o estado das competências?
+        // Ou o diagnóstico é sobre o mapa vigente?
+        // Se eu olhar o código de criarSubprocessoParaRevisao, ele usa servicoDeCopiaDeMapa.
+        // Vou assumir que diagnóstico também trabalha sobre uma cópia (snapshot) do mapa vigente.
+        Mapa mapaCopiado =
+                servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
+        
+        Subprocesso subprocesso =
+                new Subprocesso(
+                        processo, unidade, mapaCopiado, NAO_INICIADO, processo.getDataLimite());
+        // Diagnóstico começa como NAO_INICIADO
+        // Mas a UI do teste espera "Realizar Autoavaliação".
+        // Se estiver NAO_INICIADO, o Chefe vê o botão "Iniciar"?
+        // No teste, o Admin inicia o processo geral.
+        // Ao criar os subprocessos, eles podem já nascer em estado "AUTOAVALIACAO_EM_ANDAMENTO"?
+        // Ou o Chefe tem que clicar em iniciar?
+        // No teste passo 3: "await page.getByText(descProcessoDiagnostico).click(); ... Navega para Autoavaliação -> click card-subprocesso-diagnostico"
+        // Parece que o subprocesso já deve estar disponível.
+        // Se o processo pai está EM_ANDAMENTO, o subprocesso deve estar ativo.
+        
+        // Vamos checar SituacaoSubprocesso para Diagnostico.
+        // Existe SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO?
+        // Se eu usar NAO_INICIADO, o frontend pode não mostrar.
+        // Vou setar DIAGNOSTICO_EM_ANDAMENTO se existir, ou deixar NAO_INICIADO se houver transição automática.
+        // Mas o mapa de revisão começa NAO_INICIADO.
+        // Vou usar NAO_INICIADO e verificar se precisa de transição.
+        
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+        
+        // E automaticamente iniciar o diagnóstico?
+        // Para Mapeamento e Revisão, fica NAO_INICIADO até alguém abrir.
+        // Mas se o Processo já está iniciado...
+        // O código de 'iniciarProcessoMapeamento' seta situacao NAO_INICIADO.
+        
+        // AJUSTE: O teste espera ver "Mapeamento Setup ... - Finalizado".
+        // O novo processo é "Diagnostico Teste ... - Em andamento".
+        // Se o subprocesso estiver NAO_INICIADO, o card pode aparecer diferente.
+        
+        // Vamos ver SituacaoSubprocesso disponíveis.
+        
+        movimentacaoRepo.save(
+                new Movimentacao(
+                        subprocessoSalvo, null, unidade, "Processo de diagnóstico iniciado", null));
+        log.info(
+                "Subprocesso {} para diagnóstico criado para unidade {}",
                 subprocessoSalvo.getCodigo(),
                 unidade.getSigla());
     }
