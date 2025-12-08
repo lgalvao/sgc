@@ -2,50 +2,6 @@
 
 # **Especificação de Casos de Uso**
 
-[CDU-01 – Iniciar Processo de Diagnóstico](#cdu-01-–-iniciar-processo-de-diagnóstico)
-
-[CDU-02 – Realizar autoavaliação de Diagnóstico](#cdu-02-–-realizar-autoavaliação-de-diagnóstico)
-
-[CDU-03 – Monitorar autoavaliação de servidores](#cdu-03-–-monitorar-autoavaliação-de-servidores)
-
-[CDU-04 – Criar/editar avaliação de consenso](#cdu-04-–-criar/editar-avaliação-de-consenso)
-
-[CDU-05 – Consultar avaliação de consenso](#cdu-05-–-consultar-avaliação-de-consenso)
-
-[CDU-06 – Aprovar avaliação de consenso](#cdu-06-–-aprovar-avaliação-de-consenso)
-
-[CDU-07 – Preencher ocupações críticas](#cdu-07-–-preencher-ocupações-críticas)
-
-[CDU-08 – Indicar impossibilidade de avaliação de servidor](#cdu-08-–-indicar-impossibilidade-de-avaliação-de-servidor)
-
-[CDU-09 – Concluir Diagnóstico de unidade](#cdu-09-–-concluir-diagnóstico-de-unidade)
-
-[CDU-10 – Ajustar Diagnóstico](#cdu-10-–-ajustar-diagnóstico)
-
-[CDU-11 – Monitorar Diagnóstico de unidades subordinadas](#cdu-11-–-monitorar-diagnóstico-de-unidades-subordinadas)
-
-[CDU-12 – Validar Diagnóstico de unidade subordinada](#cdu-12-–-validar-diagnóstico-de-unidade-subordinada)
-
-[CDU-13 – Devolver Diagnóstico para ajustes](#cdu-13-–-devolver-diagnóstico-para-ajustes)
-
-[CDU-14 – Validar Diagnósticos em bloco](#cdu-14-–-validar-diagnósticos-em-bloco)
-
-[CDU-15 – Monitorar andamento de Diagnóstico](#cdu-15-–-monitorar-andamento-de-diagnóstico)
-
-[CDU-16 – Alterar prazo de diagnóstico da unidade](#cdu-16-–-alterar-prazo-de-diagnóstico-da-unidade)
-
-[CDU-17 – Homologar Diagnóstico](#cdu-17-–-homologar-diagnóstico)
-
-[CDU-18 – Gerar Relatório de Gaps e Ocupações Críticas](#cdu-18-–-gerar-relatório-de-gaps-e-ocupações-críticas)
-
-[Situações](#situações)
-
-[Situações de processo](#situações-de-processo)
-
-[Situações do Subprocesso](#situações-do-subprocesso)
-
-[Situações relacionadas ao servidor](#situações-relacionadas-ao-servidor)
-
 ## **CDU-01 – Iniciar Processo de Diagnóstico**  {#cdu-01-–-iniciar-processo-de-diagnóstico}
 
 Ator: ADMIN
