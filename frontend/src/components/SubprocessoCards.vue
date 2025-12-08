@@ -59,9 +59,9 @@
             Mapa de competências técnicas da unidade
           </BCardText>
           <span
-            :class="badgeClass(mapa?.situacao)"
+            :class="badgeClass(situacao)"
             class="badge"
-          >{{ situacaoLabel(mapa?.situacao) }}</span>
+          >{{ situacaoLabel(situacao) }}</span>
         </BCard>
         <BCard
           v-else-if="permissoes.podeVisualizarMapa"
@@ -77,9 +77,9 @@
             Visualização do mapa de competências técnicas
           </BCardText>
           <span
-            :class="badgeClass(mapa?.situacao)"
+            :class="badgeClass(situacao)"
             class="badge"
-          >{{ situacaoLabel(mapa?.situacao) }}</span>
+          >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
     </template>

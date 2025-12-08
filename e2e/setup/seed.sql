@@ -135,5 +135,9 @@ INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (2001, 'Ativid
 -- Conhecimento para Atividade 1
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (200101, 'Conhecimento 1', 2001);
 
-INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('123456789012', 'Usuario Diagnostico Mock', 'mock.diagnostico@tre-pe.jus.br', NULL, 12);
-INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('123456789012', 'SERVIDOR', 12);
+-- Unidade Isolada para Teste de Diagnóstico (Garante 100% de conclusão com Mock User)
+INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (99, 'Unit Test Diag', 'UNIT_TEST_DIAG', 'OPERACIONAL', 'ATIVA', 11);
+
+INSERT INTO sgc.usuario (titulo_eleitoral, nome, email, ramal, unidade_codigo) VALUES ('123456789012', 'Usuario Diagnostico Mock', 'mock.diagnostico@tre-pe.jus.br', NULL, 99);
+INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo) VALUES ('123456789012', 'CHEFE', 99);
+UPDATE sgc.unidade SET titular_titulo = '123456789012' WHERE codigo = 99;

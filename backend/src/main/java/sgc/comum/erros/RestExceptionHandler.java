@@ -58,6 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             @Nullable HttpHeaders headers,
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
+        log.warn("Erro de mensagem HTTP não legível: {}", ex != null ? ex.getMessage() : "sem detalhe");
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }

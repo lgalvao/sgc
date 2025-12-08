@@ -45,7 +45,7 @@
                 :id="`sel-imp-${comp.codigo}`"
                 v-model="avaliacoes[comp.codigo].importancia"
                 :options="OPCOES_NIVEL"
-                @change="(val) => salvar(comp.codigo, val, avaliacoes[comp.codigo].dominio)"
+                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
                 :data-testid="`sel-importancia-${comp.codigo}`"
               />
             </div>
@@ -56,7 +56,7 @@
                 :id="`sel-dom-${comp.codigo}`"
                 v-model="avaliacoes[comp.codigo].dominio"
                 :options="OPCOES_NIVEL"
-                @change="(val) => salvar(comp.codigo, avaliacoes[comp.codigo].importancia, val)"
+                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
                 :data-testid="`sel-dominio-${comp.codigo}`"
               />
             </div>

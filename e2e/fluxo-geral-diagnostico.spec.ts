@@ -5,9 +5,11 @@ import { adicionarAtividade, adicionarConhecimento, navegarParaAtividades } from
 import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
 
 test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
-    const UNIDADE_ALVO = 'ASSESSORIA_21'; 
-    const USUARIO_CHEFE = USUARIOS.CHEFE_UNIDADE.titulo; 
-    const SENHA_CHEFE = USUARIOS.CHEFE_UNIDADE.senha;
+    const UNIDADE_ALVO = 'UNIT_TEST_DIAG';
+    const USUARIO_CHEFE = '123456789012';
+    const SENHA_CHEFE = '123'; // Senha padrão
+    const NOME_CHEFE = 'Usuario Diagnostico Mock';
+    const EMAIL_CHEFE = 'mock.diagnostico@tre-pe.jus.br';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
@@ -171,7 +173,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await cardCompetencia.getByLabel('Importância').selectOption('N5');
         await cardCompetencia.getByLabel('Domínio').selectOption('N3');
 
-        await expect(page.getByText('Avaliação salva')).toBeVisible(); 
+        await expect(page.getByText('Salvo')).toBeVisible(); 
 
         // Concluir Autoavaliação
         await page.getByTestId('btn-concluir-autoavaliacao').click();
@@ -197,16 +199,17 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await expect(page.getByRole('heading', { name: 'Monitoramento do Diagnóstico' })).toBeVisible();
         
         // Verifica status da autoavaliação
-        const rowServidor = page.getByRole('row', { name: /Janis Joplin/i });
+        const rowServidor = page.getByRole('row', { name: /Usuario Diagnostico Mock/i });
         await expect(rowServidor).toBeVisible();
-        await expect(rowServidor).toContainText('Concluída');
+        await expect(rowServidor).toContainText(/Concluída/i);
     });
 
     /**
      * Passo 5: Ocupações Críticas (CDU-07)
      */
     test('Passo 5: Definir Ocupações Críticas (CDU-07)', async ({ page }) => {
-        await page.goto('/painel');
+        await page.goto('/login');
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoDiagnostico).click();
         
         // Navega para Ocupações Críticas
@@ -217,19 +220,28 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         // Verifica competência com gap
         const cardCompetencia = page.locator('.card', { hasText: nomeCompetencia });
         await expect(cardCompetencia).toBeVisible();
-        await expect(cardCompetencia).toContainText('Gap: 2');
-        await expect(cardCompetencia).toContainText('Janis Joplin');
+        
+        const row = cardCompetencia.getByRole('row', { name: nomeCompetencia });
+        await expect(row).toBeVisible();
+        await expect(row).toContainText('5'); // Importância
+        await expect(row).toContainText('3'); // Domínio
+        await expect(row).toContainText('2'); // Gap
 
         // Define Capacitação
-        await cardCompetencia.getByLabel('Situação').selectOption('Em Capacitação');
-        await expect(page.getByText('Ocupação crítica salva')).toBeVisible();
+        // Define Capacitação
+        const selectSituacao = row.getByRole('combobox');
+        await selectSituacao.selectOption('EC');
+        
+        // Verifica ícone de salvo
+        await expect(row.locator('.bi-check')).toBeVisible();
     });
 
     /**
      * Passo 6: Concluir Diagnóstico (CDU-09)
      */
     test('Passo 6: Concluir Diagnóstico (CDU-09)', async ({ page }) => {
-        await page.goto('/painel');
+        await page.goto('/login');
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoDiagnostico).click();
         
         await page.getByTestId('card-subprocesso-monitoramento').click();

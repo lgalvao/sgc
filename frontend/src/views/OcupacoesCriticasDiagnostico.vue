@@ -49,7 +49,7 @@
                       v-model="gap.ocupacao.situacao"
                       :options="OPCOES_SITUACAO"
                       size="sm"
-                      @change="(val) => salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, val)"
+                      @change="salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, gap.ocupacao.situacao)"
                     />
                     <small v-if="gap.salvo" class="text-success ms-2"><i class="bi bi-check" /></small>
                   </td>
