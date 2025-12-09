@@ -419,7 +419,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         await page.getByTestId('card-subprocesso-atividades-vis').click();
-        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
         await verificarPaginaPainel(page);

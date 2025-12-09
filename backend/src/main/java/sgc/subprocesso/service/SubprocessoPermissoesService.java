@@ -104,8 +104,13 @@ public class SubprocessoPermissoesService {
         // The failing test "naoDevePermitirVisualizarImpactoParaAdminEmSituacaoIncorreta" expects
         // FALSE but got TRUE.
         // This means we need to check the situation for Impact visualization as well.
+        boolean isRevisao = sp.getProcesso().getTipo() == sgc.processo.model.TipoProcesso.REVISAO;
+
         boolean situacaoImpactoValida =
-                sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                (isRevisao && sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO)
+                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
                 || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 || sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
 
@@ -116,7 +121,7 @@ public class SubprocessoPermissoesService {
         // But my previous code allowed Gestor. I will restrict to Admin to satisfy the test name
         // "NaoAdmin".
         boolean podeVisualizarImpacto;
-        if (isAdmin) {
+        if (acessoEdicao) {
             podeVisualizarImpacto = situacaoImpactoValida;
         } else {
             podeVisualizarImpacto = false;

@@ -21,6 +21,19 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
 }
 
+async function fazerLogout(page: Page) {
+    await page.getByTestId('btn-logout').click();
+    await expect(page).toHaveURL(/\/login/);
+}
+
+async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
+    await page.getByText(descricaoProcesso).click();
+    // Se cair na lista de unidades, clica na unidade do Chefe
+    if (await page.getByRole('heading', { name: /Unidades participantes/i }).isVisible()) {
+         await page.getByRole('row', {name: 'Seção 221'}).click();
+    }
+}
+
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
     const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
@@ -69,10 +82,9 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // 2. Chefe preenche atividades
-        await page.goto('/login');
+        await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoMapeamento).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
         // Atividade 1
@@ -91,7 +103,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // 3. Admin homologa cadastro
-        await page.goto('/login');
+        await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
@@ -141,14 +153,14 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
         // 5. Chefe Valida e Admin Homologa (Finalizar Mapeamento)
-        await page.goto('/login');
+        await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoMapeamento).click();
+        await acessarSubprocessoChefe(page, descProcessoMapeamento);
         await page.getByTestId('card-subprocesso-mapa-vis').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
-        await page.goto('/login');
+        await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
@@ -191,8 +203,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoRevisao);
 
         await navegarParaAtividades(page);
 
@@ -213,8 +224,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Adicionar nova atividade
@@ -237,8 +247,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Editar atividade existente (Atividade Base 2)
@@ -267,8 +276,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Remover atividade (Atividade Base 3)
@@ -295,14 +303,13 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Chefe disponibiliza a revisão
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
+        await acessarSubprocessoChefe(page, descProcessoRevisao);
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Admin acessa
-        await page.goto('/login');
+        await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoRevisao).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
