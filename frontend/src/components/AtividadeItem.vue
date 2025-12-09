@@ -68,7 +68,7 @@
 
       <div class="mt-3 ms-3">
         <div
-            v-for="(conhecimento, cidx) in atividade.conhecimentos"
+          v-for="conhecimento in atividade.conhecimentos"
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >

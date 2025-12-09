@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
@@ -38,6 +40,9 @@ class SubprocessoPermissoesServiceTest {
         Subprocesso sub = mock(Subprocesso.class);
         when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
+        Processo processo = mock(Processo.class);
+        when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(sub.getProcesso()).thenReturn(processo);
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
 
@@ -55,6 +60,9 @@ class SubprocessoPermissoesServiceTest {
         Subprocesso sub = mock(Subprocesso.class);
         when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
+        Processo processo = mock(Processo.class);
+        when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(sub.getProcesso()).thenReturn(processo);
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
 
@@ -72,6 +80,9 @@ class SubprocessoPermissoesServiceTest {
         Subprocesso sub = mock(Subprocesso.class);
         when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         when(sub.getUnidade()).thenReturn(new Unidade());
+        Processo processo = mock(Processo.class);
+        when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(sub.getProcesso()).thenReturn(processo);
 
         SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
 

@@ -73,11 +73,6 @@ const unidadesExibidas = computed(() => {
   return lista;
 });
 
-// Verifica se é folha (sem filhas)
-function isFolha(unidade: Unidade): boolean {
-  return !unidade.filhas || unidade.filhas.length === 0;
-}
-
 // Busca uma unidade por código na árvore
 function findUnidadeById(codigo: number): Unidade | null {
   const search = (nodes: Unidade[]): Unidade | null => {
