@@ -1,11 +1,12 @@
 import {expect, type Page} from '@playwright/test';
 
-export async function navegarParaAtividades(page: Page, options?: { visualizacao?: boolean }) {
-    const testId = options?.visualizacao ? 'card-subprocesso-atividades-vis' : 'card-subprocesso-atividades';
+export async function navegarParaAtividades(page: Page) {
+    const testId = 'card-subprocesso-atividades';
     await expect(page.getByTestId(testId)).toBeVisible();
     await page.getByTestId(testId).click();
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
+
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);

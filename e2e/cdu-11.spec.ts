@@ -143,7 +143,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await unitRow.click();
 
         // Passo 4: Clicar no card Atividades e conhecimentos
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Passo 5 e 6: Verificar tela de atividades com dados da unidade
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
@@ -177,7 +177,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Passo 4: Clicar no card Atividades e conhecimentos
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Passo 5 e 6: Verificar tela de atividades
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
@@ -205,7 +205,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByRole('row', { name: 'Seção 221' }).click();
 
         // Aceitar cadastro
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
@@ -213,7 +213,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Adicionar competências e disponibilizar mapa
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', { name: 'Seção 221' }).click();
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
@@ -241,7 +241,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         
@@ -256,7 +256,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', { name: 'Seção 221' }).click();
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -284,7 +284,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // O card deve estar visível para visualização em processo finalizado
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();
@@ -303,7 +303,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Visualizar atividades
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();

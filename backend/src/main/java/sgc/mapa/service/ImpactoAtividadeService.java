@@ -37,7 +37,7 @@ public class ImpactoAtividadeService {
      * @return Uma {@link List} de {@link Atividade}s.
      */
     public List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        log.info("Buscando atividades e conhecimentos para o mapa {}", mapa.getCodigo());
+        log.debug("Buscando atividades e conhecimentos para o mapa {}", mapa.getCodigo());
         return atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
     }
 

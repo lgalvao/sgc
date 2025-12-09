@@ -77,7 +77,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
 
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: /Unit Test Diag/i}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         
@@ -101,7 +101,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.getByText(descProcessoMapeamento).click();
-        await page.locator('[data-testid="card-subprocesso-mapa-vis"]').click();
+        await page.locator('[data-testid="card-subprocesso-mapa"]').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         
@@ -110,7 +110,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: /Unit Test Diag/i}).click();
-        await page.locator('[data-testid="card-subprocesso-mapa-vis"]').click();
+        await page.locator('[data-testid="card-subprocesso-mapa"]').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         

@@ -214,7 +214,7 @@
         </ul>
       </div>
       <template #footer>
-        <BButton variant="secondary" @click="mostrarModalErros = false">Fechar</BButton>
+        <BButton variant="secondary" data-testid="btn-fechar-modal-pendencias" @click="mostrarModalErros = false">Fechar</BButton>
       </template>
     </BModal>
   </BContainer>
@@ -532,7 +532,7 @@ function fecharModalConfirmacao() {
 async function confirmarDisponibilizacao() {
   if (!codSubrocesso.value) return;
 
-  let sucesso = false;
+  let sucesso: boolean;
   if (isRevisao.value) {
     sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubrocesso.value);
   } else {
@@ -553,8 +553,3 @@ function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
 }
 </script>
-
-<style>
-/* Estilos globais ou específicos de modais que não foram movidos */
-</style>
-

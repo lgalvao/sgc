@@ -25,7 +25,7 @@
         <BCard
           v-else-if="permissoes.podeVisualizarMapa"
           class="h-100 card-actionable"
-          data-testid="card-subprocesso-atividades-vis"
+          data-testid="card-subprocesso-atividades"
           @click="navegarPara('SubprocessoVisCadastro')"
         >
           <BCardTitle>
@@ -67,7 +67,7 @@
           v-else-if="permissoes.podeVisualizarMapa"
           :class="{ 'disabled-card': !mapa }"
           class="h-100 card-actionable"
-          data-testid="card-subprocesso-mapa-vis"
+          data-testid="card-subprocesso-mapa"
           @click="navegarPara('SubprocessoVisMapa')"
         >
           <BCardTitle>

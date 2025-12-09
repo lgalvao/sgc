@@ -143,7 +143,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Entrar no cadastro de atividades (visualização)
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Homologar cadastro
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -167,7 +167,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Entrar no Mapa de Competencias
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         // Adicionar Competência
         await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
@@ -204,7 +204,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Abrir mapa para validação
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Validar o Mapa
         await page.getByTestId('btn-mapa-validar').click();
@@ -226,7 +226,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Abrir mapa para homologar
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Validação: Botão de homologar está visível
         await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();

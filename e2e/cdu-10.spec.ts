@@ -110,7 +110,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(unitRow).toBeVisible();
         await unitRow.click();
         
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -126,7 +126,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         
         // Robust navigation for Admin
         const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first();
+        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first();
 
          // Wait until one of them is visible
          await expect(async () => {
@@ -139,7 +139,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
              await unitRow.click();
          }
 
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         // Adicionar primeira competência
         await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
@@ -174,7 +174,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -191,7 +191,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         
         // Robust navigation for Admin
         const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first();
+        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first();
 
          // Wait until one of them is visible
          await expect(async () => {
@@ -204,7 +204,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
              await unitRow.click();
          }
 
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -292,15 +292,16 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         const atividadeIncompleta = `Atividade Incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
 
-        // Tentar disponibilizar - deve falhar
+        // Tentar disponibilizar - deve mostrar modal de pendências
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de confirmação ABRE (validação no backend)
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        // Verificar que modal de pendências ABRE com o erro
+        await expect(page.getByRole('heading', {name: /Pendências para disponibilização/i})).toBeVisible();
+        await expect(page.locator('body')).toContainText(/Atividade sem conhecimento/i);
+        await expect(page.locator('body')).toContainText(atividadeIncompleta);
 
-        // Verificar mensagem de erro
-        await expect(page.locator('body')).toContainText(/Erro ao disponibilizar/i);
+        // Fechar o modal de pendências
+        await page.getByTestId('btn-fechar-modal-pendencias').click();
 
         // Corrigir adicionando conhecimento
         await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
@@ -356,10 +357,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
+
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Entrar na visualização de atividades
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Devolver
         await page.getByTestId('btn-acao-devolver').click();
@@ -410,24 +414,50 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     });
 
     test('Cenario 4: Verificar que histórico foi excluído após nova disponibilização', async ({page}) => {
-        // Admin aceita a revisão
+        // Admin devolve a revisão (primeira devolução)
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
+
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-devolver').click();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await page.getByTestId('inp-devolucao-cadastro-obs').fill('Primeira devolução');
+        await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
 
         await verificarPaginaPainel(page);
 
-        // Devolver novamente
+        // Chefe disponibiliza novamente para permitir segunda devolução
+        await fazerLogout(page);
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+
         await page.getByText(descProcessoRevisao).click();
+        await navegarParaAtividades(page);
+
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
+        await verificarPaginaPainel(page);
+
+        // Admin faz segunda devolução
+        await fazerLogout(page);
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await page.getByText(descProcessoRevisao).click();
+
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -440,8 +470,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByText(descProcessoRevisao).click();
         // Chefe vai direto
 
-        await navegarParaAtividades(page, { visualizacao: true });
-        
+        await navegarParaAtividades(page);
+
         // Disponibilizar novamente
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -449,14 +479,21 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
         await verificarPaginaPainel(page);
         
-        // Agora Admin devolve mais uma vez
+        // Agora Admin devolve mais uma vez (terceira devolução)
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
+
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();

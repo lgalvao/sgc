@@ -93,14 +93,15 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Tentar Disponibilizar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de confirmação ABRE (validação no backend)
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        // Verificar que modal de pendências ABRE (validação no backend retornou erro)
+        const modalPendencias = page.locator('.modal-content').filter({ hasText: 'Pendências para disponibilização' });
+        await expect(modalPendencias).toBeVisible();
+        await expect(modalPendencias.getByText(/Corrija as seguintes pendências/i)).toBeVisible();
+        await expect(modalPendencias.getByText(/Atividade sem conhecimento/i)).toBeVisible();
+        await expect(modalPendencias.getByText(/não possui conhecimentos associados/i)).toBeVisible();
 
-        // Verificar indicador de erro (Toast/Alert)
-        const alert = page.getByTestId('global-alert');
-        await expect(alert).toBeVisible();
-        await expect(alert).toContainText(/Erro ao disponibilizar/i);
+        // Fechar modal de pendências
+        await page.getByTestId('btn-fechar-modal-pendencias').click();
 
         // Adicionar conhecimento para corrigir
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
@@ -151,7 +152,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Navigate to visualization of activities
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Clicar em Analisar (Devolver)
         await page.getByTestId('btn-acao-devolver').click();

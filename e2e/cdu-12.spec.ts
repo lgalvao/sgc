@@ -107,7 +107,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         
@@ -124,7 +124,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Verificar se o card de mapa EDITAVEL está visível (confirma permissão/status correto)
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         // Aguardar carregamento da tela do mapa (título da unidade)
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
@@ -156,7 +156,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefe(page, descProcessoMapeamento);
-        await page.getByTestId('card-subprocesso-mapa-vis').click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
@@ -164,7 +164,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa-vis"]').first().click();
+        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -315,7 +315,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Acessar visualização
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('card-subprocesso-atividades').click();
 
         // Verificar botão de impacto
         await verificarBotaoImpacto(page, true);

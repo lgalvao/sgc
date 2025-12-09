@@ -19,7 +19,7 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 ### 2.2. Convenções de Nomenclatura
 
 - **Classes:** PascalCase (ex: `UsuarioService`).
-- **Métodos e Variáveis:** camelCase (ex: `buscarPorId`).
+- **Métodos e Variáveis:** camelCase (ex: `buscarPorCodigo`).
 - **Exceções:** Prefixo `Erro` (ex: `ErroEntidadeNaoEncontrada`).
 - **Repositórios JPA:** Sufixo `Repo` (ex: `SubprocessoRepo`).
 - **Serviços:** Sufixo `Service` (ex: `MapaService`).
