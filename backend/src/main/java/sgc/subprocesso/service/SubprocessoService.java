@@ -24,9 +24,11 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoMapper;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
+import sgc.subprocesso.dto.SubprocessoStatusDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +73,25 @@ public class SubprocessoService {
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
                 .conhecimentos(conhecimentosDto)
+                .build();
+    }
+
+    /**
+     * Obtém o status atual de um subprocesso de forma leve.
+     * 
+     * @param codSubprocesso O código do subprocesso.
+     * @return DTO com informações básicas de status.
+     */
+    @Transactional(readOnly = true)
+    public SubprocessoStatusDto obterStatus(Long codSubprocesso) {
+        Subprocesso subprocesso = repositorioSubprocesso
+                .findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+
+        return SubprocessoStatusDto.builder()
+                .codigo(subprocesso.getCodigo())
+                .situacao(subprocesso.getSituacao())
+                .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null)
                 .build();
     }
 

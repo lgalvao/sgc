@@ -455,8 +455,7 @@ async function adicionarAtividade() {
       request,
     );
     novaAtividade.value = "";
-    // Refresh process details to update subprocess status (e.g. NAO_INICIADO -> CADASTRO_EM_ANDAMENTO)
-    await processosStore.buscarProcessoDetalhe(codProcesso.value);
+    // Status do subprocesso já foi atualizado pela store
   }
 }
 
@@ -472,7 +471,7 @@ async function removerAtividade(idx: number) {
       codSubrocesso.value,
       atividadeRemovida.codigo,
     );
-    await processosStore.buscarProcessoDetalhe(codProcesso.value);
+    // Status do subprocesso já foi atualizado pela store
   }
 }
 
@@ -489,7 +488,7 @@ async function adicionarConhecimento(idx: number) {
       request,
     );
     atividade.novoConhecimento = "";
-    await processosStore.buscarProcessoDetalhe(codProcesso.value);
+    // Status do subprocesso já foi atualizado pela store
   }
 }
 

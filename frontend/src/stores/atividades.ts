@@ -38,8 +38,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         request: CriarAtividadeRequest,
     ) {
         try {
-            await atividadeService.criarAtividade(request, codMapa);
+            const response = await atividadeService.criarAtividade(request, codMapa);
             await buscarAtividadesParaSubprocesso(codSubprocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao adicionar atividade", "Não foi possível adicionar a atividade.", "danger");
             throw error;
@@ -48,8 +49,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
 
     async function removerAtividade(codSubrocesso: number, atividadeId: number) {
         try {
-            await atividadeService.excluirAtividade(atividadeId);
+            const response = await atividadeService.excluirAtividade(atividadeId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao remover atividade", "Não foi possível remover a atividade.", "danger");
             throw error;
@@ -62,8 +64,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         request: CriarConhecimentoRequest,
     ) {
         try {
-            await atividadeService.criarConhecimento(atividadeId, request);
+            const response = await atividadeService.criarConhecimento(atividadeId, request);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao adicionar conhecimento", "Não foi possível adicionar o conhecimento.", "danger");
             throw error;
@@ -76,8 +79,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         conhecimentoId: number,
     ) {
         try {
-            await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+            const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao remover conhecimento", "Não foi possível remover o conhecimento.", "danger");
             throw error;
@@ -103,8 +107,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         data: Atividade,
     ) {
         try {
-            await atividadeService.atualizarAtividade(atividadeId, data);
+            const response = await atividadeService.atualizarAtividade(atividadeId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao atualizar atividade", "Não foi possível atualizar a atividade.", "danger");
             throw error;
@@ -118,8 +123,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         data: Conhecimento,
     ) {
         try {
-            await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
+            const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             feedbackStore.show("Erro ao atualizar conhecimento", "Não foi possível atualizar o conhecimento.", "danger");
             throw error;

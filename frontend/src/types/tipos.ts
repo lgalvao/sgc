@@ -418,3 +418,21 @@ export interface Servidor {
     email: string;
     ramal: string;
 }
+
+/**
+ * Status leve de um subprocesso retornado nas operações CRUD.
+ */
+export interface SubprocessoStatus {
+    codigo: number;
+    situacao: SituacaoSubprocesso;
+    situacaoLabel: string;
+}
+
+/**
+ * Resposta enriquecida das operações CRUD em atividades/conhecimentos.
+ * Inclui a atividade afetada e o status atualizado do subprocesso.
+ */
+export interface AtividadeOperacaoResponse {
+    atividade: Atividade | null;
+    subprocesso: SubprocessoStatus;
+}

@@ -276,7 +276,10 @@ describe("CadAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    vi.mocked(atividadeService.excluirAtividade).mockResolvedValue();
+    vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({
+      atividade: null,
+      subprocesso: { codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, situacaoLabel: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO" }
+    } as any);
 
     await wrapper
       .find('[data-testid="btn-remover-atividade"]')
@@ -316,7 +319,10 @@ describe("CadAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue();
+    vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({
+      atividade: { codigo: 1, descricao: "Atividade 1", conhecimentos: [{ id: 102, descricao: "Conhecimento 1.2" }] },
+      subprocesso: { codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, situacaoLabel: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO" }
+    } as any);
 
     await wrapper
       .find('[data-testid="btn-remover-conhecimento"]')

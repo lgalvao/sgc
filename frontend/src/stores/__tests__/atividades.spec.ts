@@ -44,9 +44,10 @@ describe("useAtividadesStore", () => {
                 descricao: "Nova Atividade",
                 conhecimentos: [],
             };
-            vi.spyOn(atividadeService, "criarAtividade").mockResolvedValue(
-                novaAtividade,
-            );
+            vi.spyOn(atividadeService, "criarAtividade").mockResolvedValue({
+                atividade: novaAtividade,
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
                 novaAtividade
             ] as any);
@@ -73,9 +74,10 @@ describe("useAtividadesStore", () => {
             store.atividadesPorSubprocesso.set(1, [
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ]);
-            vi.spyOn(atividadeService, "excluirAtividade").mockResolvedValue(
-                undefined,
-            );
+            vi.spyOn(atividadeService, "excluirAtividade").mockResolvedValue({
+                atividade: null,
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue(
                 [] as any
             );
@@ -100,9 +102,10 @@ describe("useAtividadesStore", () => {
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ]);
             const novoConhecimento = {id: 1, descricao: "Novo Conhecimento"};
-            vi.spyOn(atividadeService, "criarConhecimento").mockResolvedValue(
-                novoConhecimento,
-            );
+            vi.spyOn(atividadeService, "criarConhecimento").mockResolvedValue({
+                atividade: { codigo: 1, descricao: "Atividade Teste", conhecimentos: [novoConhecimento] },
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([{
                 codigo: 1,
                 descricao: "Atividade Teste",
@@ -140,9 +143,10 @@ describe("useAtividadesStore", () => {
                     conhecimentos: [{id: 1, descricao: "Conhecimento Teste"}],
                 },
             ]);
-            vi.spyOn(atividadeService, "excluirConhecimento").mockResolvedValue(
-                undefined,
-            );
+            vi.spyOn(atividadeService, "excluirConhecimento").mockResolvedValue({
+                atividade: { codigo: 1, descricao: "Atividade Teste", conhecimentos: [] },
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([{
                 codigo: 1,
                 descricao: "Atividade Teste",
@@ -197,9 +201,10 @@ describe("useAtividadesStore", () => {
             store.atividadesPorSubprocesso.set(1, [
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ]);
-            vi.spyOn(atividadeService, "atualizarAtividade").mockResolvedValue(
-                atividadeAtualizada,
-            );
+            vi.spyOn(atividadeService, "atualizarAtividade").mockResolvedValue({
+                atividade: atividadeAtualizada,
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
                 atividadeAtualizada
             ] as any);
@@ -248,9 +253,10 @@ describe("useAtividadesStore", () => {
                     conhecimentos: [{id: 1, descricao: "Conhecimento Teste"}],
                 },
             ]);
-            vi.spyOn(atividadeService, "atualizarConhecimento").mockResolvedValue(
-                conhecimentoAtualizado,
-            );
+            vi.spyOn(atividadeService, "atualizarConhecimento").mockResolvedValue({
+                atividade: atividadeComConhecimentoAtualizado,
+                subprocesso: { codigo: 1, situacao: "CADASTRO_EM_ANDAMENTO" as any, situacaoLabel: "CADASTRO_EM_ANDAMENTO" }
+            });
             vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
                 atividadeComConhecimentoAtualizado
             ] as any);
