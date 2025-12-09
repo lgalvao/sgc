@@ -93,179 +93,17 @@
       </BCol>
     </BForm>
 
-    <BCard
-      v-for="(atividade, idx) in atividades"
-      :key="atividade.codigo || idx"
-      class="mb-3 atividade-card"
-      no-body
-    >
-      <BCardBody class="py-2">
-        <div
-          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
-        >
-          <template v-if="editandoAtividade === atividade.codigo">
-            <BFormInput
-              v-model="atividadeEditada"
-              class="me-2 atividade-edicao-input"
-              data-testid="inp-editar-atividade"
-              aria-label="Editar atividade"
-            />
-            <BButton
-              variant="outline-success"
-              size="sm"
-              class="me-1 botao-acao"
-              data-testid="btn-salvar-edicao-atividade"
-              title="Salvar"
-              @click="salvarEdicaoAtividade(atividade.codigo)"
-            >
-              <i class="bi bi-save" />
-            </BButton>
-            <BButton
-              variant="outline-secondary"
-              size="sm"
-              class="botao-acao"
-              data-testid="btn-cancelar-edicao-atividade"
-              title="Cancelar"
-              @click="cancelarEdicaoAtividade()"
-            >
-              <i class="bi bi-x" />
-            </BButton>
-          </template>
-
-          <template v-else>
-            <strong
-              class="atividade-descricao"
-              data-testid="cad-atividades__txt-atividade-descricao"
-            >{{ atividade?.descricao }}</strong>
-            <div
-              v-if="permissoes?.podeEditarMapa"
-              class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
-            >
-              <BButton
-                variant="outline-primary"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-editar-atividade"
-                title="Editar"
-                @click="iniciarEdicaoAtividade(atividade.codigo, atividade.descricao)"
-              >
-                <i
-                  class="bi bi-pencil"
-                />
-              </BButton>
-              <BButton
-                variant="outline-danger"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-remover-atividade"
-                title="Remover"
-                @click="removerAtividade(idx)"
-              >
-                <i
-                  class="bi bi-trash"
-                />
-              </BButton>
-            </div>
-          </template>
-        </div>
-
-        <div class="mt-3 ms-3">
-          <div
-            v-for="(conhecimento, cidx) in atividade.conhecimentos"
-            :key="conhecimento.id"
-            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
-          >
-            <template v-if="conhecimentoEmEdicao && conhecimentoEmEdicao.conhecimentoId === conhecimento.id">
-                <BFormInput
-                  v-model="conhecimentoEmEdicao.descricao"
-                  class="me-2"
-                  size="sm"
-                  data-testid="inp-editar-conhecimento"
-                  aria-label="Editar conhecimento"
-                />
-                <BButton
-                  variant="outline-success"
-                  size="sm"
-                  class="me-1 botao-acao"
-                  data-testid="btn-salvar-edicao-conhecimento"
-                  title="Salvar"
-                  @click="salvarEdicaoConhecimento"
-                >
-                  <i class="bi bi-save" />
-                </BButton>
-                <BButton
-                  variant="outline-secondary"
-                  size="sm"
-                  class="botao-acao"
-                  data-testid="btn-cancelar-edicao-conhecimento"
-                  title="Cancelar"
-                  @click="cancelarEdicaoConhecimento"
-                >
-                  <i class="bi bi-x" />
-                </BButton>
-            </template>
-            <template v-else>
-                <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
-                <div
-                  v-if="permissoes?.podeEditarMapa"
-                  class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
-                >
-                  <BButton
-                    variant="outline-primary"
-                    size="sm"
-                    class="botao-acao"
-                    data-testid="btn-editar-conhecimento"
-                    title="Editar"
-                    @click="iniciarEdicaoConhecimento(atividade.codigo, conhecimento)"
-                  >
-                    <i class="bi bi-pencil" />
-                  </BButton>
-                  <BButton
-                    variant="outline-danger"
-                    size="sm"
-                    class="botao-acao"
-                    data-testid="btn-remover-conhecimento"
-                    title="Remover"
-                    @click="removerConhecimento(idx, cidx)"
-                  >
-                    <i class="bi bi-trash" />
-                  </BButton>
-                </div>
-            </template>
-          </div>
-          <BForm
-            v-if="permissoes?.podeEditarMapa"
-            class="row g-2 align-items-center"
-            data-testid="form-novo-conhecimento"
-            @submit.prevent="adicionarConhecimento(idx)"
-          >
-            <BCol>
-              <BFormInput
-                v-model="atividade.novoConhecimento"
-                size="sm"
-                data-testid="inp-novo-conhecimento"
-                placeholder="Novo conhecimento"
-                type="text"
-                aria-label="Novo conhecimento"
-              />
-            </BCol>
-            <BCol cols="auto">
-              <BButton
-                variant="outline-secondary"
-                size="sm"
-                data-testid="btn-adicionar-conhecimento"
-                title="Adicionar Conhecimento"
-                type="submit"
-              >
-                <i
-                  class="bi bi-save"
-                />
-              </BButton>
-            </BCol>
-          </BForm>
-        </div>
-      </BCardBody>
-    </BCard>
+    <div v-for="(atividade, idx) in atividades" :key="atividade.codigo || idx">
+      <AtividadeItem
+        :atividade="atividade"
+        :pode-editar="!!permissoes?.podeEditarMapa"
+        @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
+        @remover-atividade="() => removerAtividade(idx)"
+        @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
+        @atualizar-conhecimento="(idC, desc) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
+        @remover-conhecimento="(idC) => removerConhecimento(idx, idC)"
+      />
+    </div>
 
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
@@ -356,11 +194,34 @@
         </BButton>
       </template>
     </BModal>
+
+    <BModal
+      v-model="mostrarModalErros"
+      title="Pendências para disponibilização"
+      centered
+      hide-footer
+      header-bg-variant="warning"
+      header-text-variant="dark"
+    >
+      <div v-if="errosValidacao.length > 0">
+        <p class="mb-3">Corrija as seguintes pendências antes de disponibilizar:</p>
+        <ul class="list-group">
+            <li v-for="(erro, index) in errosValidacao" :key="index" class="list-group-item list-group-item-warning">
+                <div class="fw-bold">{{ erro.tipo === 'ATIVIDADE_SEM_CONHECIMENTO' ? 'Atividade sem conhecimento' : erro.tipo }}</div>
+                <div v-if="erro.descricaoAtividade" class="small text-muted">{{ erro.descricaoAtividade }}</div>
+                <div>{{ erro.mensagem }}</div>
+            </li>
+        </ul>
+      </div>
+      <template #footer>
+        <BButton variant="secondary" @click="mostrarModalErros = false">Fechar</BButton>
+      </template>
+    </BModal>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
+import {BButton, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";
@@ -370,6 +231,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
+import AtividadeItem from "@/components/AtividadeItem.vue";
 import {useFeedbackStore} from "@/stores/feedback";
 
 import {useProcessosStore} from "@/stores/processos";
@@ -384,18 +246,11 @@ import {
   SituacaoSubprocesso,
   TipoProcesso,
   type SubprocessoPermissoes,
+  type ErroValidacao,
 } from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";
 
-interface AtividadeComEdicao extends Atividade {
-  novoConhecimento?: string;
-}
 
-interface ConhecimentoEdicao {
-  atividadeId: number;
-  conhecimentoId: number;
-  descricao: string;
-}
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -437,13 +292,10 @@ const codMapa = computed(
     )?.mapaCodigo,
 );
 
-const atividades = computed<AtividadeComEdicao[]>({
+const atividades = computed({
   get: () => {
     if (codSubrocesso.value === undefined) return [];
-    const result = atividadesStore
-      .obterAtividadesPorSubprocesso(codSubrocesso.value)
-      .map((a) => ({ ...a, novoConhecimento: "" }));
-    return result;
+    return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value);
   },
   set: () => {},
 });
@@ -486,83 +338,58 @@ async function removerAtividade(idx: number) {
   }
 }
 
-async function adicionarConhecimento(idx: number) {
+async function adicionarConhecimento(idx: number, descricao: string) {
   if (!codSubrocesso.value) return;
   const atividade = atividades.value[idx];
-  if (atividade.novoConhecimento?.trim()) {
+  if (descricao.trim()) {
     const request: CriarConhecimentoRequest = {
-      descricao: atividade.novoConhecimento.trim(),
+      descricao: descricao.trim(),
     };
     await atividadesStore.adicionarConhecimento(
       codSubrocesso.value,
       atividade.codigo,
       request,
     );
-    atividade.novoConhecimento = "";
-    // Status do subprocesso já foi atualizado pela store
+     // Status do subprocesso já foi atualizado pela store
   }
 }
 
-async function removerConhecimento(idx: number, cidx: number) {
+async function removerConhecimento(idx: number, idConhecimento: number) {
   if (!codSubrocesso.value) return;
   const atividade = atividades.value[idx];
-  const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm("Confirma a remoção deste conhecimento?")) {
     await atividadesStore.removerConhecimento(
       codSubrocesso.value,
       atividade.codigo,
-      conhecimentoRemovido.id,
+      idConhecimento,
     );
   }
 }
 
-const conhecimentoEmEdicao = ref<ConhecimentoEdicao | null>(null);
+async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: number, descricao: string) {
+  if (!codSubrocesso.value) return;
 
-function iniciarEdicaoConhecimento(atividadeId: number, conhecimento: Conhecimento) {
-  conhecimentoEmEdicao.value = {
-    atividadeId,
-    conhecimentoId: conhecimento.id,
-    descricao: conhecimento.descricao,
-  };
-}
-
-function cancelarEdicaoConhecimento() {
-  conhecimentoEmEdicao.value = null;
-}
-
-async function salvarEdicaoConhecimento() {
-  if (!codSubrocesso.value || !conhecimentoEmEdicao.value) return;
-
-  if (conhecimentoEmEdicao.value.descricao.trim()) {
+  if (descricao.trim()) {
       const conhecimentoAtualizado: Conhecimento = {
-        id: conhecimentoEmEdicao.value.conhecimentoId,
-        descricao: conhecimentoEmEdicao.value.descricao.trim(),
+        id: conhecimentoId,
+        descricao: descricao.trim(),
       };
       await atividadesStore.atualizarConhecimento(
         codSubrocesso.value,
-        conhecimentoEmEdicao.value.atividadeId,
-        conhecimentoEmEdicao.value.conhecimentoId,
+        atividadeId,
+        conhecimentoId,
         conhecimentoAtualizado,
       );
   }
-  cancelarEdicaoConhecimento();
 }
 
-const editandoAtividade = ref<number | null>(null);
-const atividadeEditada = ref("");
-
-function iniciarEdicaoAtividade(id: number, valorAtual: string) {
-  editandoAtividade.value = id;
-  atividadeEditada.value = valorAtual;
-}
-
-async function salvarEdicaoAtividade(id: number) {
-  if (String(atividadeEditada.value).trim() && codSubrocesso.value) {
+async function salvarEdicaoAtividade(id: number, descricao: string) {
+  if (descricao.trim() && codSubrocesso.value) {
     const atividadeOriginal = atividades.value.find((a) => a.codigo === id);
     if (atividadeOriginal) {
       const atividadeAtualizada: Atividade = {
         ...atividadeOriginal,
-        descricao: atividadeEditada.value.trim(),
+        descricao: descricao.trim(),
       };
       await atividadesStore.atualizarAtividade(
         codSubrocesso.value,
@@ -571,12 +398,6 @@ async function salvarEdicaoAtividade(id: number) {
       );
     }
   }
-  cancelarEdicaoAtividade();
-}
-
-function cancelarEdicaoAtividade() {
-  editandoAtividade.value = null;
-  atividadeEditada.value = "";
 }
 
 async function handleImportAtividades() {
@@ -607,7 +428,10 @@ const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto)
 const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
+
 const mostrarModalHistorico = ref(false);
+const mostrarModalErros = ref(false);
+const errosValidacao = ref<ErroValidacao[]>([]);
 
 
 
@@ -654,7 +478,7 @@ function formatarAcaoAnalise(acao: string | undefined): string {
   }
 }
 
-function disponibilizarCadastro() {
+async function disponibilizarCadastro() {
   const sub = subprocesso.value;
   const situacaoEsperada = isRevisao.value
     ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
@@ -669,8 +493,20 @@ function disponibilizarCadastro() {
     return;
   }
 
-  // Backend valida atividades sem conhecimento via SubprocessoCadastroController
-  mostrarModalConfirmacao.value = true;
+  // Backend valida atividades sem conhecimento via SubprocessoCadastroController/DTO
+  if (codSubrocesso.value) {
+    try {
+        const resultado = await subprocessoService.validarCadastro(codSubrocesso.value);
+        if (resultado.valido) {
+            mostrarModalConfirmacao.value = true;
+        } else {
+            errosValidacao.value = resultado.erros;
+            mostrarModalErros.value = true;
+        }
+    } catch (error) {
+        feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
+    }
+  }
 }
 
 function fecharModalConfirmacao() {
@@ -703,81 +539,6 @@ function fecharModalImpacto() {
 </script>
 
 <style>
-.atividade-edicao-input {
-  flex-grow: 1;
-  min-width: 0;
-}
-
-.atividade-card {
-  transition: box-shadow 0.2s;
-}
-
-.atividade-card:hover {
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
-}
-
-.botoes-acao-atividade,
-.botoes-acao {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.atividade-hover-row:hover .botoes-acao-atividade,
-.conhecimento-hover-row:hover .botoes-acao {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.botao-acao {
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 1.1rem;
-  border-width: 2px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.botao-acao:focus,
-.botao-acao:hover {
-  background: var(--bs-primary-bg-subtle);
-  box-shadow: 0 0 0 2px var(--bs-primary);
-}
-
-.fade-group {
-  transition: opacity 0.2s;
-}
-
-.atividade-descricao {
-  word-break: break-word;
-  max-width: 100%;
-  display: inline-block;
-}
-
-.conhecimento-hover-row:hover span {
-  font-weight: bold;
-}
-
-.atividade-hover-row:hover .atividade-descricao {
-  font-weight: bold;
-}
-
-.atividade-titulo-card {
-  background: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
-}
-
-
+/* Estilos globais ou específicos de modais que não foram movidos */
 </style>
 

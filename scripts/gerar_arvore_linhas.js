@@ -8,7 +8,7 @@ function getFiles() {
         const output = execSync('git ls-files', { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10 });
         return output.trim().split(/\r?\n/).filter(line => line);
     } catch (e) {
-        console.log("Git não encontrado ou erro ao executar. Tentando fallback para varredura manual...");
+        console.log("Git não encontrado ou erro ao executar. Tentando varredura manual...");
         return walkDir('.');
     }
 }
@@ -37,7 +37,7 @@ function walkDir(dir, fileList = []) {
 function countLines(filePath) {
     try {
         const content = fs.readFileSync(filePath, 'utf-8');
-        // Conta linhas cheias + 1 se o arquivo não terminar com newline, ou simplificado split
+        // Conta linhas cheias + 1 se o arquivo não terminar com newline
         return content.split(/\r?\n/).length;
     } catch (e) {
         // Retorna 0 para arquivos binários ou erros de leitura

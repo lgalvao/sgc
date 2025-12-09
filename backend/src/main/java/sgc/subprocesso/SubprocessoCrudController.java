@@ -1,5 +1,6 @@
 package sgc.subprocesso;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -11,6 +12,8 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
+import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
@@ -36,6 +39,18 @@ public class SubprocessoCrudController {
     public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
         SubprocessoPermissoesDto permissoes = subprocessoDtoService.obterPermissoes(codigo);
         return ResponseEntity.ok(permissoes);
+    }
+
+    @GetMapping("/{codigo}/validar-cadastro")
+    @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
+    public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
+        return ResponseEntity.ok(subprocessoDtoService.validarCadastro(codigo));
+    }
+
+    @GetMapping("/{codigo}/status")
+    @Operation(summary = "Obtém apenas o status atual do subprocesso")
+    public ResponseEntity<SubprocessoStatusDto> obterStatus(@PathVariable Long codigo) {
+        return ResponseEntity.ok(subprocessoDtoService.obterStatus(codigo));
     }
 
     /**

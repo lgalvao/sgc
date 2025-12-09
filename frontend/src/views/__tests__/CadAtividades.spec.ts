@@ -65,6 +65,7 @@ vi.mock("@/services/subprocessoService", () => ({
   removerCompetencia: vi.fn(),
   listarAtividades: vi.fn(),
   obterPermissoes: vi.fn(),
+  validarCadastro: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
@@ -238,6 +239,10 @@ describe("CadAtividades.vue", () => {
         podeAlterarDataLimite: false,
         podeVisualizarImpacto: true,
         podeRealizarAutoavaliacao: false,
+    });
+    vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
+        valido: true,
+        erros: []
     });
   });
 
@@ -519,4 +524,24 @@ describe("CadAtividades.vue", () => {
     expect(wrapper.text()).toContain("REJEITADO");
   });
 
+  it("deve mostrar erros de validação ao tentar disponibilizar se cadastro inválido", async () => {
+    vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
+        valido: false,
+        erros: [
+            { tipo: 'ATIVIDADE_SEM_CONHECIMENTO', mensagem: 'Erro teste', atividadeId: 1 }
+        ]
+    });
+
+    const { wrapper: w } = createWrapper();
+    wrapper = w;
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Atividade sem conhecimento");
+    expect(wrapper.text()).toContain("Erro teste");
+    
+    expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').exists()).toBe(false);
+  });
 });

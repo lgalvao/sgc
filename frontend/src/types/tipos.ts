@@ -435,6 +435,18 @@ export interface SubprocessoPermissoes {
     podeRealizarAutoavaliacao: boolean;
 }
 
+export interface ErroValidacao {
+  tipo: string;
+  atividadeId?: number;
+  descricaoAtividade?: string;
+  mensagem: string;
+}
+
+export interface ValidacaoCadastro {
+  valido: boolean;
+  erros: ErroValidacao[];
+}
+
 /**
  * Status leve de um subprocesso retornado nas operações CRUD.
  */

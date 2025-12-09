@@ -257,6 +257,67 @@ public class SubprocessoDtoService {
         return subprocessoPermissoesService.calcularPermissoes(sp, usuario);
     }
 
+    @Transactional(readOnly = true)
+    public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
+        log.debug("Validando cadastro para disponibilização. Subprocesso: {}", codSubprocesso);
+        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+
+        List<ErroValidacaoDto> erros = new ArrayList<>();
+
+        if (sp.getMapa() == null) {
+             // Teoricamente impossível chegar aqui em estágios avançados sem mapa, mas é bom prevenir
+             return ValidacaoCadastroDto.builder().valido(false).erros(List.of(
+                     ErroValidacaoDto.builder()
+                         .tipo("MAPA_INEXISTENTE")
+                         .mensagem("O subprocesso não possui um mapa associado.")
+                         .build()
+             )).build();
+        }
+
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+
+        if (atividades == null || atividades.isEmpty()) {
+            erros.add(ErroValidacaoDto.builder()
+                .tipo("SEM_ATIVIDADES")
+                .mensagem("O mapa não possui atividades cadastradas.")
+                .build());
+        } else {
+            for (Atividade atividade : atividades) {
+                // Valida se tem conhecimentos
+                long qtdConhecimentos = repositorioConhecimento.countByAtividadeCodigo(atividade.getCodigo());
+                if (qtdConhecimentos == 0) {
+                     erros.add(ErroValidacaoDto.builder()
+                         .tipo("ATIVIDADE_SEM_CONHECIMENTO")
+                         .atividadeId(atividade.getCodigo())
+                         .descricaoAtividade(atividade.getDescricao())
+                         .mensagem("A atividade '" + atividade.getDescricao() + "' não possui conhecimentos associados.")
+                         .build());
+                }
+            }
+        }
+
+        // Adicionar outras validações aqui se necessário (ex: competências)
+
+        return ValidacaoCadastroDto.builder()
+            .valido(erros.isEmpty())
+            .erros(erros)
+            .build();
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoStatusDto obterStatus(Long codSubprocesso) {
+        log.debug("Obtendo status para o subprocesso {}", codSubprocesso);
+        Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+
+        return SubprocessoStatusDto.builder()
+                .codigo(sp.getCodigo())
+                .situacao(sp.getSituacao())
+                .situacaoLabel(sp.getSituacao().getDescricao())
+                .build();
+    }
+
     private Usuario obterUsuarioAutenticado() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
