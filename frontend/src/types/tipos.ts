@@ -420,6 +420,22 @@ export interface Servidor {
 }
 
 /**
+ * Permissões do usuário para um subprocesso.
+ */
+export interface SubprocessoPermissoes {
+    podeVerPagina: boolean;
+    podeEditarMapa: boolean;
+    podeVisualizarMapa: boolean;
+    podeDisponibilizarCadastro: boolean; // Confirmação de disponibilidade
+    podeDevolverCadastro: boolean;
+    podeAceitarCadastro: boolean;
+    podeVisualizarDiagnostico: boolean;
+    podeAlterarDataLimite: boolean;
+    podeVisualizarImpacto: boolean;
+    podeRealizarAutoavaliacao: boolean;
+}
+
+/**
  * Status leve de um subprocesso retornado nas operações CRUD.
  */
 export interface SubprocessoStatus {

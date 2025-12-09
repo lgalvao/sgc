@@ -27,6 +27,8 @@ import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.atividade.model.Atividade;
+import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoStatusDto;
@@ -151,6 +153,15 @@ class AtividadeControllerTest {
             when(atividadeService.criar(any(AtividadeDto.class), any()))
                     .thenReturn(atividadeSalvaDto);
 
+            // Mock específico para este teste, para que a atividade retorne a descrição correta.
+            AtividadeVisualizacaoDto atividadeCriadaVis = AtividadeVisualizacaoDto.builder()
+                    .codigo(1L)
+                    .descricao(NOVA_ATIVIDADE)
+                    .conhecimentos(Collections.emptyList())
+                    .build();
+            // O código do subprocesso mockado no setup é 100L
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeCriadaVis));
+
             mockMvc.perform(
                             post(API_ATIVIDADES)
                                     .with(csrf())
@@ -159,8 +170,7 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.atividade.codigo").value(1L))
-                    .andExpect(jsonPath("$.atividade.descricao").value(NOVA_ATIVIDADE))
-                    .andExpect(jsonPath("$.atividade.mapaCodigo").value(10L));
+                    .andExpect(jsonPath("$.atividade.descricao").value(NOVA_ATIVIDADE));
         }
 
         @Test
@@ -190,6 +200,22 @@ class AtividadeControllerTest {
 
             when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class)))
                     .thenReturn(atividadeAtualizadaDto);
+
+            // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
+            Atividade atividadeMock = new Atividade();
+            atividadeMock.setCodigo(1L);
+            Mapa mapaMock = new Mapa();
+            mapaMock.setCodigo(10L);
+            atividadeMock.setMapa(mapaMock);
+            when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
+
+            // Mock específico para este teste, para que a atividade retorne a descrição correta.
+            AtividadeVisualizacaoDto atividadeAtualizadaVis = AtividadeVisualizacaoDto.builder()
+                    .codigo(1L)
+                    .descricao(DESCRICAO_ATUALIZADA)
+                    .conhecimentos(Collections.emptyList())
+                    .build();
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeAtualizadaVis));
 
             mockMvc.perform(
                             post("/api/atividades/1/atualizar")
@@ -226,7 +252,18 @@ class AtividadeControllerTest {
         @DisplayName("Deve excluir uma atividade e retornar 204 No Content")
         @WithMockUser
         void deveExcluirAtividade() throws Exception {
+            // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso antes da exclusão
+            Atividade atividadeMock = new Atividade();
+            atividadeMock.setCodigo(1L);
+            Mapa mapaMock = new Mapa();
+            mapaMock.setCodigo(10L);
+            atividadeMock.setMapa(mapaMock);
+            when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
+
             doNothing().when(atividadeService).excluir(1L);
+
+            // Mock para listar atividades retornando vazio (atividade excluída)
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(Collections.emptyList());
 
             mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
                     .andExpect(status().isOk())
@@ -239,7 +276,8 @@ class AtividadeControllerTest {
         @DisplayName("Deve retornar 404 Not Found para código inexistente")
         @WithMockUser
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            doThrow(new ErroEntidadeNaoEncontrada("")).when(atividadeService).excluir(99L);
+            when(atividadeService.obterEntidadePorCodigo(99L))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 99L));
 
             mockMvc.perform(post("/api/atividades/99/excluir").with(csrf()))
                     .andExpect(status().isNotFound());
@@ -280,6 +318,14 @@ class AtividadeControllerTest {
             when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoSalvoDto);
 
+            // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
+            Atividade atividadeMock = new Atividade();
+            atividadeMock.setCodigo(1L);
+            Mapa mapaMock = new Mapa();
+            mapaMock.setCodigo(10L);
+            atividadeMock.setMapa(mapaMock);
+            when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
+
             // Mock específico para este teste, para que a atividade retorne o conhecimento criado.
             AtividadeVisualizacaoDto atividadeComConhecimento = AtividadeVisualizacaoDto.builder()
                     .codigo(1L)
@@ -291,7 +337,7 @@ class AtividadeControllerTest {
                                     .build()
                     ))
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeComConhecimento));
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimento));
 
             mockMvc.perform(
                             post(API_CONHECIMENTOS)
@@ -312,6 +358,14 @@ class AtividadeControllerTest {
             when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoDto);
 
+            // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
+            Atividade atividadeMock = new Atividade();
+            atividadeMock.setCodigo(1L);
+            Mapa mapaMock = new Mapa();
+            mapaMock.setCodigo(10L);
+            atividadeMock.setMapa(mapaMock);
+            when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
+
             // Mock específico para este teste
             AtividadeVisualizacaoDto atividadeComConhecimentoAtualizado = AtividadeVisualizacaoDto.builder()
                     .codigo(1L)
@@ -323,7 +377,7 @@ class AtividadeControllerTest {
                                     .build()
                     ))
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
 
             mockMvc.perform(
                             post(API_CONHECIMENTOS_1_ATUALIZAR)
@@ -340,13 +394,21 @@ class AtividadeControllerTest {
         void deveExcluirConhecimento() throws Exception {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
+            // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
+            Atividade atividadeMock = new Atividade();
+            atividadeMock.setCodigo(1L);
+            Mapa mapaMock = new Mapa();
+            mapaMock.setCodigo(10L);
+            atividadeMock.setMapa(mapaMock);
+            when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
+
             // Mock específico para este teste, para simular a remoção do conhecimento
             AtividadeVisualizacaoDto atividadeSemConhecimento = AtividadeVisualizacaoDto.builder()
                     .codigo(1L)
                     .descricao(ATIVIDADE_TESTE) // ou outra descrição relevante
                     .conhecimentos(Collections.emptyList()) // Lista vazia após exclusão
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeSemConhecimento));
+            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeSemConhecimento));
 
             mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
                     .andExpect(status().isOk())

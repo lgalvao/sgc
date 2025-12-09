@@ -1,6 +1,6 @@
 import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import type {Competencia, MapaCompleto, Atividade} from "@/types/tipos";
+import type {Competencia, MapaCompleto, Atividade, SubprocessoPermissoes} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
@@ -23,6 +23,11 @@ export async function importarAtividades(
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
     const response = await apiClient.get<any[]>(`/subprocessos/${codSubprocesso}/atividades`);
     return response.data.map(mapAtividadeVisualizacaoToModel);
+}
+
+export async function obterPermissoes(codSubprocesso: number): Promise<SubprocessoPermissoes> {
+    const response = await apiClient.get<SubprocessoPermissoes>(`/subprocessos/${codSubprocesso}/permissoes`);
+    return response.data;
 }
 
 export async function buscarSubprocessoDetalhe(

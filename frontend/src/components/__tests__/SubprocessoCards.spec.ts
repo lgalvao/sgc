@@ -35,6 +35,7 @@ describe("SubprocessoCards.vue", () => {
     podeVisualizarDiagnostico: true,
     podeAlterarDataLimite: true,
     podeVisualizarImpacto: true,
+    podeRealizarAutoavaliacao: true,
   };
 
   const createWrapper = (propsOverride: any = {}) => {

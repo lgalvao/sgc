@@ -64,6 +64,7 @@ vi.mock("@/services/subprocessoService", () => ({
   atualizarCompetencia: vi.fn(),
   removerCompetencia: vi.fn(),
   listarAtividades: vi.fn(),
+  obterPermissoes: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
@@ -226,6 +227,18 @@ describe("CadAtividades.vue", () => {
     );
     vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
     vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([]);
+    vi.mocked(subprocessoService.obterPermissoes).mockResolvedValue({
+        podeVerPagina: true,
+        podeEditarMapa: true,
+        podeVisualizarMapa: true,
+        podeDisponibilizarCadastro: true,
+        podeDevolverCadastro: false,
+        podeAceitarCadastro: false,
+        podeVisualizarDiagnostico: false,
+        podeAlterarDataLimite: false,
+        podeVisualizarImpacto: true,
+        podeRealizarAutoavaliacao: false,
+    });
   });
 
   afterEach(() => {

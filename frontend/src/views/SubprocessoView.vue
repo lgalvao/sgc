@@ -25,7 +25,7 @@
       :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       :mapa="mapa"
       :situacao="subprocesso.situacao"
-      :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true }"
+      :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false }"
       :cod-subprocesso="codSubprocesso"
       :cod-processo="props.codProcesso"
       :sigla-unidade="props.siglaUnidade"

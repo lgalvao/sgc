@@ -52,7 +52,7 @@
           Importar atividades
         </BButton>
         <BButton
-          v-if="isChefe"
+          v-if="!!permissoes?.podeDisponibilizarCadastro"
           variant="outline-success"
           data-testid="btn-cad-atividades-disponibilizar"
           title="Disponibilizar"
@@ -84,7 +84,7 @@
           data-testid="btn-adicionar-atividade"
           title="Adicionar atividade"
           type="submit"
-          :disabled="!codSubrocesso"
+          :disabled="!codSubrocesso || !permissoes?.podeEditarMapa"
         >
           <i
             class="bi bi-save"
@@ -137,7 +137,10 @@
               class="atividade-descricao"
               data-testid="cad-atividades__txt-atividade-descricao"
             >{{ atividade?.descricao }}</strong>
-            <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
+            <div
+              v-if="permissoes?.podeEditarMapa"
+              class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
+            >
               <BButton
                 variant="outline-primary"
                 size="sm"
@@ -203,7 +206,10 @@
             </template>
             <template v-else>
                 <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
-                <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
+                <div
+                  v-if="permissoes?.podeEditarMapa"
+                  class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
+                >
                   <BButton
                     variant="outline-primary"
                     size="sm"
@@ -228,6 +234,7 @@
             </template>
           </div>
           <BForm
+            v-if="permissoes?.podeEditarMapa"
             class="row g-2 align-items-center"
             data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento(idx)"
@@ -376,7 +383,9 @@ import {
   Perfil,
   SituacaoSubprocesso,
   TipoProcesso,
+  type SubprocessoPermissoes,
 } from "@/types/tipos";
+import * as subprocessoService from "@/services/subprocessoService";
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -443,6 +452,8 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(
   () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
 );
+
+const permissoes = ref<SubprocessoPermissoes | null>(null);
 
 async function adicionarAtividade() {
   if (novaAtividade.value?.trim() && codMapa.value && codSubrocesso.value) {
@@ -591,28 +602,7 @@ const subprocesso = computed(() => {
   );
 });
 
-const podeVerImpacto = computed(() => {
-  if (!subprocesso.value) return false;
-
-  const situacao = subprocesso.value.situacaoSubprocesso;
-
-  // 3.1. CHEFE
-  if (isChefe.value) {
-    return situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO ||
-           (isRevisao.value && situacao === SituacaoSubprocesso.NAO_INICIADO);
-  }
-  
-  // 3.2. GESTOR ou ADMIN (Visualização)
-  // Note: This component is also used by ADMIN/GESTOR to view/edit if they are "editing" 
-  // but usually they use VisAtividades.vue for read-only.
-  // However, if they land here, we should support it.
-  if (perfilSelecionado.value === Perfil.GESTOR || perfilSelecionado.value === Perfil.ADMIN) {
-      // Check location logic would be needed here, but for now checking status:
-      return situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-  }
-
-  return false;
-});
+const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
 
 const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
@@ -627,6 +617,7 @@ onMounted(async () => {
   if (codSubrocesso.value) {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
     await analisesStore.buscarAnalisesCadastro(codSubrocesso.value);
+    permissoes.value = await subprocessoService.obterPermissoes(codSubrocesso.value);
   }
 });
 

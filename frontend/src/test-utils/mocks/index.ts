@@ -45,5 +45,6 @@ export const mockProcessoDetalhe: SubprocessoDetalhe = {
         podeVisualizarDiagnostico: true,
         podeAlterarDataLimite: true,
         podeVisualizarImpacto: true,
+        podeRealizarAutoavaliacao: true,
     },
 };
