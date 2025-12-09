@@ -10,6 +10,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
@@ -262,6 +263,11 @@ public class DiagnosticoService {
         diagnostico.setJustificativaConclusao(request.justificativa());
         
         diagnosticoRepo.save(diagnostico);
+        
+        // Atualiza situação do subprocesso
+        Subprocesso sp = diagnostico.getSubprocesso();
+        sp.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocessoRepo.save(sp);
         
         // Notificação seria enviada aqui
         

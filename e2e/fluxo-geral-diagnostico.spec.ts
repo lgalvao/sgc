@@ -264,6 +264,6 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         
         // Verifica status final
         await page.getByText(descProcessoDiagnostico).click();
-        await expect(page.locator('.badge')).toContainText('Concluído');
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toContainText('Concluído');
     });
 });

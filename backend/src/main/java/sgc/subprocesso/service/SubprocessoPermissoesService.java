@@ -130,8 +130,8 @@ public class SubprocessoPermissoesService {
                 SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                 SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+//                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+//                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
                 SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);

@@ -183,7 +183,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
 
         // Verificar sigla da unidade
-        await expect(page.getByText('Seção 221')).toBeVisible();
+        await expect(page.getByRole('heading', {name: /Seção 221/})).toBeVisible();
 
         // Verificar atividades aparecem como tabelas com descrição
         await expect(page.getByText(atividadeA)).toBeVisible();
@@ -244,6 +244,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('card-subprocesso-mapa-vis').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        
+        // Wait for transition or logout?
+        // Wait for something that indicates validation success?
+        // Admin login next.
+        await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
 
         // Admin homologa mapa e finaliza processo
         await fazerLogout(page);

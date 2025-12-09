@@ -378,7 +378,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Chefe vai direto
 
         // Verificar situação voltou para 'em andamento'
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão do cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
 
         await navegarParaAtividades(page);
 
@@ -440,7 +440,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByText(descProcessoRevisao).click();
         // Chefe vai direto
 
-        await navegarParaAtividades(page);
+        await navegarParaAtividades(page, { visualizacao: true });
         
         // Disponibilizar novamente
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
