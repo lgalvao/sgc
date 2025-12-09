@@ -16,6 +16,7 @@ export const USUARIOS = {
     CHEFE_ASSESSORIA_11: { titulo: '555555', senha: 'senha' }, // David Bowie (Assessoria 11)
     CHEFE_ASSESSORIA_12: { titulo: '151515', senha: 'senha' }, // Axl Rose (Assessoria 12)
     CHEFE_SECAO_121: { titulo: '171717', senha: 'senha' }, // Lemmy Kilmister (Seção 121)
+    GESTOR_COORD_22: { titulo: '131313', senha: 'senha' }, // Mick Jagger (Coordenadoria 22)
     INVALIDO: { titulo: '00000000000', senha: 'senhaerrada' }
 } as const;
 

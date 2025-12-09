@@ -4,6 +4,7 @@ export async function navegarParaAtividades(page: Page) {
     const testId = 'card-subprocesso-atividades';
     await expect(page.getByTestId(testId)).toBeVisible();
     await page.getByTestId(testId).click();
+    await expect(page).toHaveURL(/\/atividades$|\/cadastro$/);
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
