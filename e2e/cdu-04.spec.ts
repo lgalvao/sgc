@@ -6,9 +6,7 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-    });
+    test.beforeAll(async ({ request }) => await resetDatabase(request));
 
     test.beforeEach(async ({ page }) => {
         cleanup = useProcessoCleanup();
@@ -16,9 +14,7 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
-    test.afterEach(async ({ request }) => {
-        await cleanup.limpar(request);
-    });
+    test.afterEach(async ({ request }) => await cleanup.limpar(request));
 
     test('Deve iniciar um processo com sucesso', async ({ page }) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;

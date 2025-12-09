@@ -36,9 +36,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await page.waitForLoadState('networkidle');
             await page.getByText(descricaoProcesso).click();
             
-            // If on process detail page (with table of units), click on the unit row
-            // If already on subprocess page (direct navigation for CHEFE), skip this step
-            // Robust navigation: wait for either the unit row (if on Process Detail) or the card (if on Subprocess Detail)
             const unitRow = page.getByRole('row', {name: /ASSESSORIA_11/});
             const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
 
@@ -49,11 +46,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 expect(rowVisible || cardVisible).toBeTruthy();
             }).toPass();
 
-            // If unit row is visible, we are on Process Detail page, so click it
             if (await unitRow.isVisible()) {
                 await unitRow.click();
             }
-            
+
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 
@@ -79,10 +75,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.removerConhecimento(page, atividade1Editada, conhecimento1Editado);
             await AtividadeHelpers.removerAtividade(page, atividade1Editada);
         });
-
-        /*
-        Passo 5 removido temporariamente devido a instabilidade no mock de rede.
-        */
 
         await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
             await AtividadeHelpers.verificarBotaoImpacto(page, false);
@@ -127,7 +119,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Adicionar uma atividade para garantir que o status mude para EM_ANDAMENTO e o botão apareça
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade Trigger');
-
             await AtividadeHelpers.verificarBotaoImpacto(page, true);
             await AtividadeHelpers.abrirModalImpacto(page);
             await AtividadeHelpers.fecharModalImpacto(page);

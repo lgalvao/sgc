@@ -17,10 +17,6 @@ async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
 }
 
-async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
-}
-
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
     await expect(page).toHaveURL(/\/login/);
@@ -29,8 +25,8 @@ async function fazerLogout(page: Page) {
 async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
     // Se cair na lista de unidades, clica na unidade do Chefe
-    if (await page.getByRole('heading', { name: /Unidades participantes/i }).isVisible()) {
-         await page.getByRole('row', {name: 'Seção 221'}).click();
+    if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
+        await page.getByRole('row', {name: 'Seção 221'}).click();
     }
 }
 
@@ -44,16 +40,16 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     const timestamp = Date.now();
     const descProcessoMapeamento = `AAA Mapeamento CDU-12 ${timestamp}`;
     const descProcessoRevisao = `AAA Revisão CDU-12 ${timestamp}`;
-    let processoMapeamentoId: number;
+    let codProcessoMapeamento: number;
     let processoRevisaoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
+    test.beforeAll(async ({request}) => {
         await resetDatabase(request);
         cleanup = useProcessoCleanup();
     });
 
-    test.afterAll(async ({ request }) => {
+    test.afterAll(async ({request}) => {
         await cleanup.limpar(request);
     });
 
@@ -75,8 +71,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
-        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+        codProcessoMapeamento = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (codProcessoMapeamento > 0) cleanup.registrar(codProcessoMapeamento);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -110,21 +106,18 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        
+
         // Aguardar conclusão e redirecionamento (comportamento padrão de homologação)
         await verificarPaginaPainel(page);
 
         // 4. Admin cria competências (Mapa)
-        // Já estamos no painel, mas garantimos o estado atualizando a view se necessário,
-        // mas aqui vamos clicar direto no processo.
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Verificar se o card de mapa EDITAVEL está visível (confirma permissão/status correto)
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-        
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Aguardar carregamento da tela do mapa (título da unidade)
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
@@ -141,11 +134,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByText(`Atividade Base 2 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
 
-         // Competência 3 ligada a Atividade 3
-         await page.getByTestId('btn-abrir-criar-competencia').click();
-         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 3 ${timestamp}`);
-         await page.getByText(`Atividade Base 3 ${timestamp}`).click();
-         await page.getByTestId('btn-criar-competencia-salvar').click();
+        // Competência 3 ligada a Atividade 3
+        await page.getByTestId('btn-abrir-criar-competencia').click();
+        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 3 ${timestamp}`);
+        await page.getByText(`Atividade Base 3 ${timestamp}`).click();
+        await page.getByTestId('btn-criar-competencia-salvar').click();
 
         // Disponibilizar Mapa
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
@@ -164,7 +157,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -212,12 +205,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         // 2. Clicar no botão
         await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
-
-        // 3. Deve mostrar apenas toast ou mensagem de "Nenhum impacto" se não houver modal
-        // O CDU diz: "Se nenhuma divergência for detectada, o sistema mostra a mensagem 'Nenhum impacto no mapa da unidade.'"
-        // Assumindo que isso é um toast ou um alerta visível.
-        // Se a implementação abrir um modal mesmo vazio, ajustaremos. Mas o texto diz "sistema mostra a mensagem".
-        // Vamos verificar se aparece um texto na tela.
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
@@ -265,11 +252,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Deve mostrar a Competência 2
         await expect(modal.getByText(`Competência 2 ${timestamp}`)).toBeVisible();
 
-        // Deve mostrar o detalhe da alteração
-        // O texto exato pode variar na implementação, mas deve conter a descrição da atividade.
+        // Deve mostrar o detalhe da alteração. O texto exato pode variar na implementação, mas deve conter a descrição da atividade.
         await expect(modal.getByText(descNova)).toBeVisible();
-        // Talvez verifique se menciona "Alterada" ou algo assim
-
         await fecharModalImpacto(page);
     });
 

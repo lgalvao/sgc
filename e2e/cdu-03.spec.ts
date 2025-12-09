@@ -6,21 +6,19 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 test.describe('CDU-03 - Manter Processo', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-    });
+    test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         cleanup = useProcessoCleanup();
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
-    test.afterEach(async ({ request }) => {
+    test.afterEach(async ({request}) => {
         await cleanup.limpar(request);
     });
 
-    test('Deve validar campos obrigatórios', async ({ page }) => {
+    test('Deve validar campos obrigatórios', async ({page}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -34,7 +32,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText('Pelo menos uma unidade participante deve ser incluída.')).toBeVisible();
     });
 
-    test('Deve editar um processo existente', async ({ page }) => {
+    test('Deve editar um processo existente', async ({page}) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         // Cria um processo inicial
         await criarProcesso(page, {
@@ -52,7 +50,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         // Verifica que os dados foram carregados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
-        
+
         // Expandir árvore para verificar seleção
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
@@ -62,17 +60,14 @@ test.describe('CDU-03 - Manter Processo', () => {
         // Modifica o processo
         const novaDescricao = descricaoOriginal + ' (Editado)';
         await page.getByTestId('inp-processo-descricao').fill(novaDescricao);
-
         await page.getByTestId('btn-processo-salvar').click();
 
-        // Verifica redirecionamento e mensagem (se houver toast, mas aqui verificamos a tabela)
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(novaDescricao)).toBeVisible();
-        // Use exact: true to avoid matching the new description which contains the old one
-        await expect(page.getByText(descricaoOriginal, { exact: true })).not.toBeVisible();
+        await expect(page.getByText(descricaoOriginal, {exact: true})).not.toBeVisible();
     });
 
-    test('Deve remover um processo', async ({ page }) => {
+    test('Deve remover um processo', async ({page}) => {
         const descricao = `Processo para Remoção - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
@@ -84,19 +79,14 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByText(descricao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-
-        // Clica em Remover
         await page.getByTestId('btn-processo-remover').click();
-
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeVisible();
 
-        const btnsRemover = page.getByRole('button', { name: 'Remover' });
+        const btnsRemover = page.getByRole('button', {name: 'Remover'});
         await expect(btnsRemover).toHaveCount(2);
         await btnsRemover.last().click();
 
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
-        
-        // Processo já foi removido pela aplicação, não precisa cleanup
     });
 });

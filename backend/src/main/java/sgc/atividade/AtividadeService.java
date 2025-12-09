@@ -21,7 +21,9 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 
-/** Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos. */
+/**
+ * Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos.
+ */
 @Slf4j
 @Service
 @Transactional
@@ -73,12 +75,12 @@ public class AtividadeService {
     /**
      * Cria uma nova atividade, realizando validações de segurança e de estado do subprocesso.
      *
-     * @param atividadeDto O DTO com os dados da nova atividade.
+     * @param atividadeDto  O DTO com os dados da nova atividade.
      * @param tituloUsuario O título de eleitor do usuário que está criando a atividade.
      * @return O {@link AtividadeDto} da atividade criada.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou o usuário não forem encontrados.
-     * @throws ErroAccessoNegado se o usuário não for o titular da unidade do subprocesso.
-     * @throws ErroSituacaoInvalida se o subprocesso já estiver finalizado.
+     * @throws ErroAccessoNegado         se o usuário não for o titular da unidade do subprocesso.
+     * @throws ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
         if (atividadeDto.getMapaCodigo() == null) {
@@ -127,31 +129,31 @@ public class AtividadeService {
     /**
      * Atualiza uma atividade existente.
      *
-     * @param codigo O código da atividade a ser atualizada.
+     * @param codigo       O código da atividade a ser atualizada.
      * @param atividadeDto O DTO com os novos dados da atividade.
      * @return O {@link AtividadeDto} da atividade atualizada.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public AtividadeDto atualizar(Long codigo, AtividadeDto atividadeDto) {
-        log.info("Atualizando atividade com código: {}", codigo);
+        log.debug("Atualizando atividade com código: {}", codigo);
         try {
             return atividadeRepo
                     .findById(codigo)
-                    .map(
-                            existente -> {
-                                log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(), 
-                                    existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
-                                if (existente.getMapa() != null) {
-                                    atualizarSituacaoSubprocessoSeNecessario(
-                                            existente.getMapa().getCodigo());
-                                }
-                                var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
-                                existente.setDescricao(entidadeParaAtualizar.getDescricao());
+                    .map(existente -> {
+                        log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(),
+                                existente.getMapa() != null ? existente.getMapa().getCodigo() : "null");
 
-                                var atualizado = atividadeRepo.save(existente);
-                                log.info("Atividade {} atualizada com sucesso", codigo);
-                                return atividadeMapper.toDto(atualizado);
-                            })
+                        if (existente.getMapa() != null) {
+                            atualizarSituacaoSubprocessoSeNecessario(existente.getMapa().getCodigo());
+                        }
+
+                        var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
+                        existente.setDescricao(entidadeParaAtualizar.getDescricao());
+
+                        var atualizado = atividadeRepo.save(existente);
+                        log.info("Atividade {} atualizada", codigo);
+                        return atividadeMapper.toDto(atualizado);
+                    })
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
         } catch (Exception e) {
             log.error("Erro ao atualizar atividade {}: {}", codigo, e.getMessage(), e);
@@ -201,69 +203,62 @@ public class AtividadeService {
     /**
      * Cria um novo conhecimento e o associa a uma atividade existente.
      *
-     * @param codAtividade O código da atividade à qual o conhecimento será associado.
+     * @param codAtividade    O código da atividade à qual o conhecimento será associado.
      * @param conhecimentoDto O DTO com os dados do novo conhecimento.
      * @return O {@link ConhecimentoDto} do conhecimento criado.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public ConhecimentoDto criarConhecimento(Long codAtividade, ConhecimentoDto conhecimentoDto) {
-        return atividadeRepo
-                .findById(codAtividade)
-                .map(
-                        atividade -> {
-                            atualizarSituacaoSubprocessoSeNecessario(
-                                    atividade.getMapa().getCodigo());
-                            var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
-                            conhecimento.setAtividade(atividade);
-                            var salvo = conhecimentoRepo.save(conhecimento);
-                            return conhecimentoMapper.toDto(salvo);
-                        })
+        return atividadeRepo.findById(codAtividade)
+                .map(atividade -> {
+                    atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
+                    var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
+                    conhecimento.setAtividade(atividade);
+                    var salvo = conhecimentoRepo.save(conhecimento);
+                    return conhecimentoMapper.toDto(salvo);
+                })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
 
     /**
      * Atualiza um conhecimento existente, verificando se ele pertence à atividade especificada.
      *
-     * @param codAtividade O código da atividade pai.
+     * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
      * @return O {@link ConhecimentoDto} do conhecimento atualizado.
      * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
-     *     atividade.
+     *                                   atividade.
      */
     public ConhecimentoDto atualizarConhecimento(
             Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
-        return conhecimentoRepo
-                .findById(codConhecimento)
+
+        return conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .map(
-                        existente -> {
-                            atualizarSituacaoSubprocessoSeNecessario(
-                                    existente.getAtividade().getMapa().getCodigo());
-                            var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
-                            existente.setDescricao(paraAtualizar.getDescricao());
-                            var atualizado = conhecimentoRepo.save(existente);
-                            return conhecimentoMapper.toDto(atualizado);
-                        })
+                .map(existente -> {
+                    atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());
+                    var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
+                    existente.setDescricao(paraAtualizar.getDescricao());
+                    var atualizado = conhecimentoRepo.save(existente);
+                    return conhecimentoMapper.toDto(atualizado);
+                })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
     }
 
     /**
      * Exclui um conhecimento, verificando se ele pertence à atividade especificada.
      *
-     * @param codAtividade O código da atividade pai.
+     * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
      * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
-     *     atividade.
+     *                                   atividade.
      */
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        conhecimentoRepo
-                .findById(codConhecimento)
+        conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .ifPresentOrElse(
                         conhecimento -> {
-                            atualizarSituacaoSubprocessoSeNecessario(
-                                    conhecimento.getAtividade().getMapa().getCodigo());
+                            atualizarSituacaoSubprocessoSeNecessario(conhecimento.getAtividade().getMapa().getCodigo());
                             conhecimentoRepo.delete(conhecimento);
                         },
                         () -> {
@@ -283,9 +278,8 @@ public class AtividadeService {
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada(
-                        "Processo não associado ao Subprocesso %d"
-                                .formatted(subprocesso.getCodigo()));
+                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d"
+                        .formatted(subprocesso.getCodigo()));
             }
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {

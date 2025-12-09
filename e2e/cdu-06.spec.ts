@@ -7,17 +7,11 @@ test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-    });
+    test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(() => {
-        cleanup = useProcessoCleanup();
-    });
+    test.beforeEach(() => cleanup = useProcessoCleanup());
 
-    test.afterEach(async ({ request }) => {
-        await cleanup.limpar(request);
-    });
+    test.afterEach(async ({request}) => await cleanup.limpar(request));
 
     test('Deve exibir detalhes do processo para ADMIN', async ({page}) => {
         const timestamp = Date.now();
@@ -40,7 +34,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         // Navegar para detalhes do processo
         await page.getByRole('row', {name: descricao}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        
+
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
@@ -89,7 +83,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await page.getByRole('row', {name: descricao}).click();
 
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        
+
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);

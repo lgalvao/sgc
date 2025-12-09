@@ -40,9 +40,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         cleanup = useProcessoCleanup();
     });
 
-    test.afterAll(async ({ request }) => {
-        await cleanup.limpar(request);
-    });
+    test.afterAll(async ({ request }) => await cleanup.limpar(request));
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
         await page.goto('/login');

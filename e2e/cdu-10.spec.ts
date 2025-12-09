@@ -463,13 +463,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
 
-        // Chefe disponibiliza novamente (isso deve excluir o histórico anterior - CDU-10 passo 15)
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await page.getByText(descProcessoRevisao).click();
-        // Chefe vai direto
-
         await navegarParaAtividades(page);
 
         // Disponibilizar novamente

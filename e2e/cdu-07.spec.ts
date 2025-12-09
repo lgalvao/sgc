@@ -9,17 +9,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-    });
+    test.beforeAll(async ({ request }) => await resetDatabase(request));
 
-    test.beforeEach(() => {
-        cleanup = useProcessoCleanup();
-    });
+    test.beforeEach(() => cleanup = useProcessoCleanup());
 
-    test.afterEach(async ({ request }) => {
-        await cleanup.limpar(request);
-    });
+    test.afterEach(async ({ request }) => await cleanup.limpar(request));
 
     test('Deve exibir detalhes do subprocesso para CHEFE', async ({page}) => {
         const timestamp = Date.now();

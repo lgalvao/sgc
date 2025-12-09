@@ -4,10 +4,7 @@ import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-proces
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
-    // Reset completo do banco antes de TODOS os testes
-    test.beforeAll(async ({ request }) => {
-        await resetDatabase(request);
-    });
+    test.beforeAll(async ({ request }) => await resetDatabase(request));
 
     test.beforeEach(async ({ page }) => await page.goto('/login'));
 
