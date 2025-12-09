@@ -63,10 +63,13 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("mapped", true);
     });
 
-    it("criarAtividade should map request, post, and map response", async () => {
+    it("criarAtividade should map request, post, and return AtividadeOperacaoResponse", async () => {
         const request = {descricao: "Nova Atividade"};
         const requestDto = {...request, mapped: true};
-        const responseDto = {id: 2, ...requestDto};
+        const responseDto = {
+            atividade: {id: 2, ...requestDto},
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarAtividade(request, 123);
@@ -76,17 +79,20 @@ describe("atividadeService", () => {
             123,
         );
         expect(mockApi.post).toHaveBeenCalledWith("/atividades", requestDto);
-        expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto);
-        expect(result).toHaveProperty("mapped", true);
+        expect(result).toHaveProperty("atividade");
+        expect(result).toHaveProperty("subprocesso");
     });
 
-    it("atualizarAtividade should post and map response", async () => {
+    it("atualizarAtividade should post and return AtividadeOperacaoResponse", async () => {
         const request: Atividade = {
             codigo: 1,
             descricao: "Atividade Atualizada",
             conhecimentos: [],
         };
-        const responseDto = {...request};
+        const responseDto = {
+            atividade: {...request},
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.atualizarAtividade(request.codigo, request);
@@ -101,14 +107,19 @@ describe("atividadeService", () => {
             `/atividades/${request.codigo}/atualizar`,
             expectedPayload,
         );
-        expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto);
-        expect(result).toHaveProperty("mapped", true);
+        expect(result).toHaveProperty("atividade");
+        expect(result).toHaveProperty("subprocesso");
     });
 
-    it("excluirAtividade should call post", async () => {
-        mockApi.post.mockResolvedValue({});
-        await service.excluirAtividade(1);
+    it("excluirAtividade should call post and return AtividadeOperacaoResponse", async () => {
+        const responseDto = {
+            atividade: null,
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
+        mockApi.post.mockResolvedValue({data: responseDto});
+        const result = await service.excluirAtividade(1);
         expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/excluir");
+        expect(result).toHaveProperty("subprocesso");
     });
 
     it("listarConhecimentos should fetch and map conhecimentos", async () => {
@@ -125,10 +136,13 @@ describe("atividadeService", () => {
         expect(result[0]).toHaveProperty("mapped", true);
     });
 
-    it("criarConhecimento should map request, post, and map response", async () => {
+    it("criarConhecimento should map request, post, and return AtividadeOperacaoResponse", async () => {
         const request = {descricao: "Novo Conhecimento"};
         const requestDto = {...request, mapped: true};
-        const responseDto = {id: 2, ...requestDto};
+        const responseDto = {
+            atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{id: 2, ...requestDto}]},
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarConhecimento(1, request);
@@ -141,16 +155,19 @@ describe("atividadeService", () => {
             "/atividades/1/conhecimentos",
             requestDto,
         );
-        expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto);
-        expect(result).toHaveProperty("mapped", true);
+        expect(result).toHaveProperty("atividade");
+        expect(result).toHaveProperty("subprocesso");
     });
 
-    it("atualizarConhecimento should post and map response", async () => {
+    it("atualizarConhecimento should post and return AtividadeOperacaoResponse", async () => {
         const request: Conhecimento = {
             id: 1,
             descricao: "Conhecimento Atualizado",
         };
-        const responseDto = {...request};
+        const responseDto = {
+            atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{...request}]},
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.atualizarConhecimento(1, request.id, request);
@@ -165,16 +182,21 @@ describe("atividadeService", () => {
             `/atividades/1/conhecimentos/${request.id}/atualizar`,
             expectedPayload,
         );
-        expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto);
-        expect(result).toHaveProperty("mapped", true);
+        expect(result).toHaveProperty("atividade");
+        expect(result).toHaveProperty("subprocesso");
     });
 
-    it("excluirConhecimento should call post", async () => {
-        mockApi.post.mockResolvedValue({});
-        await service.excluirConhecimento(1, 1);
+    it("excluirConhecimento should call post and return AtividadeOperacaoResponse", async () => {
+        const responseDto = {
+            atividade: {codigo: 1, descricao: "Atividade", conhecimentos: []},
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+        };
+        mockApi.post.mockResolvedValue({data: responseDto});
+        const result = await service.excluirConhecimento(1, 1);
         expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos/1/excluir",
         );
+        expect(result).toHaveProperty("subprocesso");
     });
 
     // Error handling tests
