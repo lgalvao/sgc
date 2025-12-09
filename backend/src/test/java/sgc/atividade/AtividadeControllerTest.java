@@ -28,6 +28,7 @@ import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoStatusDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
@@ -196,7 +197,7 @@ class AtividadeControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.descricao").value(DESCRICAO_ATUALIZADA));
+                    .andExpect(jsonPath("$.atividade.descricao").value(DESCRICAO_ATUALIZADA));
         }
 
         @Test
@@ -228,7 +229,8 @@ class AtividadeControllerTest {
             doNothing().when(atividadeService).excluir(1L);
 
             mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.atividade").doesNotExist());
 
             verify(atividadeService, times(1)).excluir(1L);
         }
@@ -278,6 +280,19 @@ class AtividadeControllerTest {
             when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoSalvoDto);
 
+            // Mock específico para este teste, para que a atividade retorne o conhecimento criado.
+            AtividadeVisualizacaoDto atividadeComConhecimento = AtividadeVisualizacaoDto.builder()
+                    .codigo(1L)
+                    .descricao(ATIVIDADE_TESTE)
+                    .conhecimentos(List.of(
+                            ConhecimentoVisualizacaoDto.builder()
+                                    .codigo(1L)
+                                    .descricao(NOVO_CONHECIMENTO)
+                                    .build()
+                    ))
+                    .build();
+            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeComConhecimento));
+
             mockMvc.perform(
                             post(API_CONHECIMENTOS)
                                     .with(csrf())
@@ -285,7 +300,7 @@ class AtividadeControllerTest {
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_CONHECIMENTOS_1))
-                    .andExpect(jsonPath("$.codigo").value(1L));
+                    .andExpect(jsonPath("$.atividade.conhecimentos[0].codigo").value(1L));
         }
 
         @Test
@@ -297,13 +312,26 @@ class AtividadeControllerTest {
             when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class)))
                     .thenReturn(conhecimentoDto);
 
+            // Mock específico para este teste
+            AtividadeVisualizacaoDto atividadeComConhecimentoAtualizado = AtividadeVisualizacaoDto.builder()
+                    .codigo(1L)
+                    .descricao(ATIVIDADE_TESTE) // ou outra descrição relevante
+                    .conhecimentos(List.of(
+                            ConhecimentoVisualizacaoDto.builder()
+                                    .codigo(1L)
+                                    .descricao("Atualizado")
+                                    .build()
+                    ))
+                    .build();
+            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
+
             mockMvc.perform(
                             post(API_CONHECIMENTOS_1_ATUALIZAR)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.descricao").value("Atualizado"));
+                    .andExpect(jsonPath("$.atividade.conhecimentos[0].descricao").value("Atualizado"));
         }
 
         @Test
@@ -312,8 +340,17 @@ class AtividadeControllerTest {
         void deveExcluirConhecimento() throws Exception {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
+            // Mock específico para este teste, para simular a remoção do conhecimento
+            AtividadeVisualizacaoDto atividadeSemConhecimento = AtividadeVisualizacaoDto.builder()
+                    .codigo(1L)
+                    .descricao(ATIVIDADE_TESTE) // ou outra descrição relevante
+                    .conhecimentos(Collections.emptyList()) // Lista vazia após exclusão
+                    .build();
+            when(subprocessoService.listarAtividadesPorSubprocesso(1L)).thenReturn(List.of(atividadeSemConhecimento));
+
             mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.atividade.conhecimentos").isEmpty());
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);
         }
