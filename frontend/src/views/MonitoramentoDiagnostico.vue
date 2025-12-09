@@ -100,11 +100,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { BContainer, BButton, BCard, BSpinner } from 'bootstrap-vue-next';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService, type DiagnosticoDto, type ServidorDiagnosticoDto } from '@/services/diagnosticoService';
+import {computed, onMounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
+import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
+import {useFeedbackStore} from '@/stores/feedback';
+import {type DiagnosticoDto, diagnosticoService, type ServidorDiagnosticoDto} from '@/services/diagnosticoService';
 
 const route = useRoute();
 const feedbackStore = useFeedbackStore();

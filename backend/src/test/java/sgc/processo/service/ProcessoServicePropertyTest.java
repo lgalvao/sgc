@@ -1,16 +1,6 @@
 package sgc.processo.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import jakarta.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import net.jqwik.api.*;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.model.MapaRepo;
@@ -29,6 +19,17 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ProcessoServicePropertyTest {
 

@@ -1,8 +1,9 @@
 package sgc.diagnostico.dto;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Builder;
 
 /**
  * DTO de resposta para diagnóstico completo.

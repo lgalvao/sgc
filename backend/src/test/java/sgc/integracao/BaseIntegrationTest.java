@@ -1,7 +1,5 @@
 package sgc.integracao;
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +16,8 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
+
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest
 @Transactional

@@ -1,10 +1,5 @@
 package sgc.sgrh;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +16,12 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para UsuarioService")

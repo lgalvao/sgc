@@ -1,14 +1,6 @@
 package sgc.processo.service;
 
-import static sgc.processo.model.SituacaoProcesso.CRIADO;
-import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
-import static sgc.processo.model.TipoProcesso.REVISAO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
-
 import jakarta.validation.ConstraintViolationException;
-import java.time.LocalDateTime;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,6 +33,15 @@ import sgc.subprocesso.model.*;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static sgc.processo.model.SituacaoProcesso.CRIADO;
+import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
+import static sgc.processo.model.TipoProcesso.REVISAO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
 @RequiredArgsConstructor

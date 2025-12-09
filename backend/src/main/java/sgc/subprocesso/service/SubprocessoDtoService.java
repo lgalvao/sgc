@@ -1,9 +1,5 @@
 package sgc.subprocesso.service;
 
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +27,11 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor

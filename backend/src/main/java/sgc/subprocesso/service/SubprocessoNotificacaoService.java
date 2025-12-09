@@ -1,6 +1,5 @@
 package sgc.subprocesso.service;
 
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,8 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

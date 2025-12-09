@@ -1,7 +1,8 @@
 package sgc.diagnostico.dto;
 
-import java.util.List;
 import lombok.Builder;
+
+import java.util.List;
 
 /**
  * DTO de resposta para dados de um servidor no diagnóstico.

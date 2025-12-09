@@ -2,65 +2,65 @@
   <BCard class="mb-3 atividade-card" no-body>
     <BCardBody class="py-2">
       <div
-        class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
       >
         <template v-if="emEdicao">
           <BFormInput
-            v-model="atividadeEditada"
-            class="me-2 atividade-edicao-input"
-            data-testid="inp-editar-atividade"
-            aria-label="Editar atividade"
+              v-model="atividadeEditada"
+              class="me-2 atividade-edicao-input"
+              data-testid="inp-editar-atividade"
+              aria-label="Editar atividade"
           />
           <BButton
-            variant="outline-success"
-            size="sm"
-            class="me-1 botao-acao"
-            data-testid="btn-salvar-edicao-atividade"
-            title="Salvar"
-            @click="salvarEdicaoAtividade"
+              variant="outline-success"
+              size="sm"
+              class="me-1 botao-acao"
+              data-testid="btn-salvar-edicao-atividade"
+              title="Salvar"
+              @click="salvarEdicaoAtividade"
           >
-            <i class="bi bi-save" />
+            <i class="bi bi-save"/>
           </BButton>
           <BButton
-            variant="outline-secondary"
-            size="sm"
-            class="botao-acao"
-            data-testid="btn-cancelar-edicao-atividade"
-            title="Cancelar"
-            @click="cancelarEdicaoAtividade"
+              variant="outline-secondary"
+              size="sm"
+              class="botao-acao"
+              data-testid="btn-cancelar-edicao-atividade"
+              title="Cancelar"
+              @click="cancelarEdicaoAtividade"
           >
-            <i class="bi bi-x" />
+            <i class="bi bi-x"/>
           </BButton>
         </template>
 
         <template v-else>
           <strong
-            class="atividade-descricao"
-            data-testid="cad-atividades__txt-atividade-descricao"
+              class="atividade-descricao"
+              data-testid="cad-atividades__txt-atividade-descricao"
           >{{ atividade?.descricao }}</strong>
           <div
-            v-if="podeEditar"
-            class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
+              v-if="podeEditar"
+              class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
           >
             <BButton
-              variant="outline-primary"
-              size="sm"
-              class="botao-acao"
-              data-testid="btn-editar-atividade"
-              title="Editar"
-              @click="iniciarEdicaoAtividade"
+                variant="outline-primary"
+                size="sm"
+                class="botao-acao"
+                data-testid="btn-editar-atividade"
+                title="Editar"
+                @click="iniciarEdicaoAtividade"
             >
-              <i class="bi bi-pencil" />
+              <i class="bi bi-pencil"/>
             </BButton>
             <BButton
-              variant="outline-danger"
-              size="sm"
-              class="botao-acao"
-              data-testid="btn-remover-atividade"
-              title="Remover"
-              @click="$emit('remover-atividade')"
+                variant="outline-danger"
+                size="sm"
+                class="botao-acao"
+                data-testid="btn-remover-atividade"
+                title="Remover"
+                @click="$emit('remover-atividade')"
             >
-              <i class="bi bi-trash" />
+              <i class="bi bi-trash"/>
             </BButton>
           </div>
         </template>
@@ -68,93 +68,93 @@
 
       <div class="mt-3 ms-3">
         <div
-          v-for="(conhecimento, cidx) in atividade.conhecimentos"
-          :key="conhecimento.id"
-          class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+            v-for="(conhecimento, cidx) in atividade.conhecimentos"
+            :key="conhecimento.id"
+            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >
           <template v-if="conhecimentoEmEdicao === conhecimento.id">
             <BFormInput
-              v-model="conhecimentoEditadoDescricao"
-              class="me-2"
-              size="sm"
-              data-testid="inp-editar-conhecimento"
-              aria-label="Editar conhecimento"
+                v-model="conhecimentoEditadoDescricao"
+                class="me-2"
+                size="sm"
+                data-testid="inp-editar-conhecimento"
+                aria-label="Editar conhecimento"
             />
             <BButton
-              variant="outline-success"
-              size="sm"
-              class="me-1 botao-acao"
-              data-testid="btn-salvar-edicao-conhecimento"
-              title="Salvar"
-              @click="salvarEdicaoConhecimento(conhecimento.id)"
+                variant="outline-success"
+                size="sm"
+                class="me-1 botao-acao"
+                data-testid="btn-salvar-edicao-conhecimento"
+                title="Salvar"
+                @click="salvarEdicaoConhecimento(conhecimento.id)"
             >
-              <i class="bi bi-save" />
+              <i class="bi bi-save"/>
             </BButton>
             <BButton
-              variant="outline-secondary"
-              size="sm"
-              class="botao-acao"
-              data-testid="btn-cancelar-edicao-conhecimento"
-              title="Cancelar"
-              @click="cancelarEdicaoConhecimento"
+                variant="outline-secondary"
+                size="sm"
+                class="botao-acao"
+                data-testid="btn-cancelar-edicao-conhecimento"
+                title="Cancelar"
+                @click="cancelarEdicaoConhecimento"
             >
-              <i class="bi bi-x" />
+              <i class="bi bi-x"/>
             </BButton>
           </template>
           <template v-else>
             <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
             <div
-              v-if="podeEditar"
-              class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
+                v-if="podeEditar"
+                class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
             >
               <BButton
-                variant="outline-primary"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-editar-conhecimento"
-                title="Editar"
-                @click="iniciarEdicaoConhecimento(conhecimento)"
+                  variant="outline-primary"
+                  size="sm"
+                  class="botao-acao"
+                  data-testid="btn-editar-conhecimento"
+                  title="Editar"
+                  @click="iniciarEdicaoConhecimento(conhecimento)"
               >
-                <i class="bi bi-pencil" />
+                <i class="bi bi-pencil"/>
               </BButton>
               <BButton
-                variant="outline-danger"
-                size="sm"
-                class="botao-acao"
-                data-testid="btn-remover-conhecimento"
-                title="Remover"
-                @click="$emit('remover-conhecimento', conhecimento.id)"
+                  variant="outline-danger"
+                  size="sm"
+                  class="botao-acao"
+                  data-testid="btn-remover-conhecimento"
+                  title="Remover"
+                  @click="$emit('remover-conhecimento', conhecimento.id)"
               >
-                <i class="bi bi-trash" />
+                <i class="bi bi-trash"/>
               </BButton>
             </div>
           </template>
         </div>
         <BForm
-          v-if="podeEditar"
-          class="row g-2 align-items-center"
-          data-testid="form-novo-conhecimento"
-          @submit.prevent="adicionarConhecimento"
+            v-if="podeEditar"
+            class="row g-2 align-items-center"
+            data-testid="form-novo-conhecimento"
+            @submit.prevent="adicionarConhecimento"
         >
           <BCol>
             <BFormInput
-              v-model="novoConhecimento"
-              size="sm"
-              data-testid="inp-novo-conhecimento"
-              placeholder="Novo conhecimento"
-              type="text"
-              aria-label="Novo conhecimento"
+                v-model="novoConhecimento"
+                size="sm"
+                data-testid="inp-novo-conhecimento"
+                placeholder="Novo conhecimento"
+                type="text"
+                aria-label="Novo conhecimento"
             />
           </BCol>
           <BCol cols="auto">
             <BButton
-              variant="outline-secondary"
-              size="sm"
-              data-testid="btn-adicionar-conhecimento"
-              title="Adicionar Conhecimento"
-              type="submit"
+                variant="outline-secondary"
+                size="sm"
+                data-testid="btn-adicionar-conhecimento"
+                title="Adicionar Conhecimento"
+                type="submit"
             >
-              <i class="bi bi-save" />
+              <i class="bi bi-save"/>
             </BButton>
           </BCol>
         </BForm>
@@ -164,9 +164,9 @@
 </template>
 
 <script lang="ts" setup>
-import { BButton, BCard, BCardBody, BCol, BForm, BFormInput } from "bootstrap-vue-next";
-import { ref, watch } from "vue";
-import type { Atividade, Conhecimento } from "@/types/tipos";
+import {BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
+import {ref} from "vue";
+import type {Atividade, Conhecimento} from "@/types/tipos";
 
 interface Props {
   atividade: Atividade;

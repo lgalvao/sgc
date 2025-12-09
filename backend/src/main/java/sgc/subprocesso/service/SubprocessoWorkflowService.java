@@ -1,8 +1,5 @@
 package sgc.subprocesso.service;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,6 +23,10 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.time.LocalDateTime;
+
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @RequiredArgsConstructor

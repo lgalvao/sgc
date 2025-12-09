@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test';
-import { login, USUARIOS } from './helpers/helpers-auth';
-import { criarProcesso } from './helpers/helpers-processos';
-import { adicionarAtividade, adicionarConhecimento, navegarParaAtividades } from './helpers/helpers-atividades';
-import { resetDatabase, useProcessoCleanup } from './hooks/hooks-limpeza';
+import {expect, test} from '@playwright/test';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso} from './helpers/helpers-processos';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
     const UNIDADE_ALVO = 'UNIT_TEST_DIAG';

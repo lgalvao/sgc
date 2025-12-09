@@ -3,8 +3,6 @@ package sgc.subprocesso;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
@@ -25,6 +23,9 @@ import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoWorkflowService;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/subprocessos")

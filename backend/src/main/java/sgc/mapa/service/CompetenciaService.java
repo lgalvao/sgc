@@ -1,7 +1,5 @@
 package sgc.mapa.service;
 
-import java.util.HashSet;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +9,9 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
+
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

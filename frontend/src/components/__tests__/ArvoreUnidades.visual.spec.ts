@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import {describe, expect, it} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {nextTick} from 'vue';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
+import type {Unidade} from '@/types/tipos';
 
 describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
   const criarUnidades = (): Unidade[] => [

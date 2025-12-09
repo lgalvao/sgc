@@ -3,12 +3,13 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import sgc.comum.json.SanitizarHtml;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder

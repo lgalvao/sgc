@@ -1,10 +1,11 @@
 package sgc.processo.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import sgc.processo.model.SituacaoProcesso;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProcessoDtoTest {
     @Test

@@ -1,6 +1,5 @@
 package sgc.mapa.service;
 
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +14,8 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

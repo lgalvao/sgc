@@ -1,7 +1,8 @@
 package sgc.mapa.dto;
 
-import java.util.List;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * DTO que representa o resultado completo da análise de impactos no mapa de competências devido a

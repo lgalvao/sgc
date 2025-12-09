@@ -1,10 +1,11 @@
 package sgc.mapa.dto;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /**
  * DTO para operações CRUD simples de Mapa.

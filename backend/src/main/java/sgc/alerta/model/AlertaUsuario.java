@@ -1,10 +1,11 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.*;
 import sgc.sgrh.model.Usuario;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Tabela de associação que conecta um {@link Alerta} a um {@link Usuario} específico.

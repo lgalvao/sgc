@@ -3,8 +3,6 @@ package sgc.atividade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,15 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.model.Atividade;
-import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoStatusDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoService;
+
+import java.net.URI;
+import java.util.List;
 
 /** Controlador REST para gerenciar Atividades e seus Conhecimentos associados. */
 @RestController

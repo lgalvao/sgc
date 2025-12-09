@@ -1,10 +1,11 @@
 package sgc.analise.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
 
 /**
  * Representa um registro de análise realizado em um subprocesso.

@@ -1,9 +1,5 @@
 package sgc.mapa.service;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +16,11 @@ import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+
+import java.util.List;
+import java.util.Optional;
+
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Interface do serviço responsável por detectar impactos no mapa de competências causados por

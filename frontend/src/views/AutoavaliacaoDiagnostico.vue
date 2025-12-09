@@ -84,14 +84,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { BContainer, BButton, BAlert, BSpinner, BCard, BFormSelect, BFormTextarea } from 'bootstrap-vue-next';
-import { useMapasStore } from '@/stores/mapas';
-import { useUnidadesStore } from '@/stores/unidades';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService } from '@/services/diagnosticoService';
-import type { Competencia } from '@/types/tipos';
+import {computed, onMounted, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
+import {useMapasStore} from '@/stores/mapas';
+import {useUnidadesStore} from '@/stores/unidades';
+import {useFeedbackStore} from '@/stores/feedback';
+import {diagnosticoService} from '@/services/diagnosticoService';
+import type {Competencia} from '@/types/tipos';
 
 const OPCOES_NIVEL = [
   { value: 'NA', text: 'NA - Não se aplica' },

@@ -1,13 +1,14 @@
 package sgc.processo.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Test;
-import sgc.processo.model.TipoProcesso;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AtualizarProcessoReqTest {
     @Test

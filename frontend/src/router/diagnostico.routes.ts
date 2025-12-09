@@ -1,4 +1,4 @@
-import type {RouteLocationNormalized, RouteRecordRaw} from "vue-router";
+import type {RouteRecordRaw} from "vue-router";
 
 const diagnosticoRoutes: RouteRecordRaw[] = [
     {

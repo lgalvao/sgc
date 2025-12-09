@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
+import type {Unidade} from '@/types/tipos';
 
 /**
  * TESTES DE INTEGRAÇÃO - Estes testes TERIAM PEGADO os bugs reais!

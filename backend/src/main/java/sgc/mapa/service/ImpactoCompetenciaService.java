@@ -1,7 +1,5 @@
 package sgc.mapa.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
@@ -12,6 +10,9 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.TipoImpactoCompetencia;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

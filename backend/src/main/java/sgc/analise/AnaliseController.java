@@ -2,8 +2,6 @@ package sgc.analise;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +9,9 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroRequisicaoSemCorpo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador REST para gerenciar as análises de subprocessos.

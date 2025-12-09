@@ -2,11 +2,12 @@ package sgc.mapa.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO que representa uma competência no contexto do mapa completo. Contém os dados da competência e

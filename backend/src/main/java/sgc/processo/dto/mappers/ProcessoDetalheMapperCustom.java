@@ -1,9 +1,5 @@
 package sgc.processo.dto.mappers;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +9,11 @@ import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
     @Autowired private ProcessoDetalheMapper delegate;

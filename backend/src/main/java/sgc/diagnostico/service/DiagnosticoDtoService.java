@@ -3,8 +3,14 @@ package sgc.diagnostico.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.util.FormatadorData;
-import sgc.diagnostico.dto.*;
-import sgc.diagnostico.model.*;
+import sgc.diagnostico.dto.AvaliacaoServidorDto;
+import sgc.diagnostico.dto.DiagnosticoDto;
+import sgc.diagnostico.dto.OcupacaoCriticaDto;
+import sgc.diagnostico.dto.ServidorDiagnosticoDto;
+import sgc.diagnostico.model.AvaliacaoServidor;
+import sgc.diagnostico.model.Diagnostico;
+import sgc.diagnostico.model.OcupacaoCritica;
+import sgc.diagnostico.model.SituacaoServidorDiagnostico;
 import sgc.sgrh.model.Usuario;
 
 import java.util.List;

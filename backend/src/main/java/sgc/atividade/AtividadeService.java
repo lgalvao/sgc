@@ -1,10 +1,9 @@
 package sgc.atividade;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
@@ -19,6 +18,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+
+import java.util.List;
 
 /** Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos. */
 @Slf4j

@@ -3,14 +3,15 @@ package sgc.mapa;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
 import sgc.mapa.service.MapaService;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas

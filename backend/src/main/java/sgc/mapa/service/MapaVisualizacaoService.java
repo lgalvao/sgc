@@ -1,6 +1,5 @@
 package sgc.mapa.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,8 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)

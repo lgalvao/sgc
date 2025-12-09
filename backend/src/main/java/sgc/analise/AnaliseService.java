@@ -1,7 +1,5 @@
 package sgc.analise;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +11,9 @@ import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /** Serviço para gerenciar as análises de subprocessos. */
 @Service

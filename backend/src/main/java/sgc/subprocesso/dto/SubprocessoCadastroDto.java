@@ -1,9 +1,10 @@
 package sgc.subprocesso.dto;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.atividade.dto.ConhecimentoDto;
+
+import java.util.List;
 
 /**
  * DTO agregado retornado pelo endpoint GET /api/subprocessos/{codigo}/cadastro Estrutura: {

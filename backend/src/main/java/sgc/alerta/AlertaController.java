@@ -2,14 +2,15 @@ package sgc.alerta;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.dto.AlertaDto;
 import sgc.sgrh.model.Usuario;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador REST para gerenciar alertas.

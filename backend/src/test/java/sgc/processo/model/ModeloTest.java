@@ -1,11 +1,12 @@
 package sgc.processo.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import sgc.processo.erros.ErroProcesso;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import org.junit.jupiter.api.Test;
-import sgc.processo.erros.ErroProcesso;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ModeloTest {
     @Test

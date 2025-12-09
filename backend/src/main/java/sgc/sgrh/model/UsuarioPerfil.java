@@ -1,10 +1,11 @@
 package sgc.sgrh.model;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
 import lombok.*;
 import sgc.unidade.model.Unidade;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "USUARIO_PERFIL", schema = "sgc")

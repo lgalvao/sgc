@@ -1,10 +1,6 @@
 package sgc.atividade.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +8,11 @@ import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Representa uma atividade desempenhada em um determinado contexto, associada a um mapa de

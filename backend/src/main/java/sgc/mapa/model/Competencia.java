@@ -1,14 +1,15 @@
 package sgc.mapa.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.atividade.model.Atividade;
 import sgc.comum.model.EntidadeBase;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /** Representa uma competência, conjunto de atividades e conhecimentos. */
 @Entity

@@ -1,11 +1,12 @@
 package sgc.mapa.dto;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import sgc.mapa.model.TipoImpactoCompetencia;
+
+import java.util.List;
 
 /**
  * DTO que representa uma competência que foi impactada pelas mudanças nas atividades durante a

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {mount} from '@vue/test-utils';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
+import type {Unidade} from '@/types/tipos';
 
 describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marcadas', () => {
   const criarUnidades = (): Unidade[] => [

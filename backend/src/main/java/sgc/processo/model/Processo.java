@@ -1,15 +1,16 @@
 package sgc.processo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 import sgc.unidade.model.Unidade;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "PROCESSO", schema = "sgc")

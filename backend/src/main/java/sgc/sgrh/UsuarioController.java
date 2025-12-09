@@ -1,11 +1,6 @@
 package sgc.sgrh;
 
 import jakarta.validation.Valid;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +11,12 @@ import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.service.UsuarioService;
 import tools.jackson.databind.ObjectMapper;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")

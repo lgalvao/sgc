@@ -64,12 +64,17 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { BContainer, BButton, BAlert, BSpinner, BFormSelect } from 'bootstrap-vue-next';
-import { useUnidadesStore } from '@/stores/unidades';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService, type DiagnosticoDto, type ServidorDiagnosticoDto, type AvaliacaoServidorDto, type OcupacaoCriticaDto } from '@/services/diagnosticoService';
+import {computed, onMounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
+import {BAlert, BButton, BContainer, BFormSelect, BSpinner} from 'bootstrap-vue-next';
+import {useUnidadesStore} from '@/stores/unidades';
+import {useFeedbackStore} from '@/stores/feedback';
+import {
+  type AvaliacaoServidorDto,
+  type DiagnosticoDto,
+  diagnosticoService,
+  type ServidorDiagnosticoDto
+} from '@/services/diagnosticoService';
 
 const OPCOES_SITUACAO = [
   { value: null, text: 'Selecione...' },

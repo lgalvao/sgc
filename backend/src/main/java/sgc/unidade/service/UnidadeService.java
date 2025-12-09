@@ -1,10 +1,5 @@
 package sgc.unidade.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -19,6 +14,12 @@ import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

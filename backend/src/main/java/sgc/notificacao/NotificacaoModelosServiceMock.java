@@ -1,11 +1,12 @@
 package sgc.notificacao;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Primary

@@ -1,9 +1,5 @@
 package sgc.notificacao;
 
-import static sgc.unidade.model.TipoUnidade.*;
-
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -23,6 +19,11 @@ import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
+
+import java.util.List;
+import java.util.Optional;
+
+import static sgc.unidade.model.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.

@@ -1,18 +1,15 @@
 package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.unidade.model.Unidade;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")

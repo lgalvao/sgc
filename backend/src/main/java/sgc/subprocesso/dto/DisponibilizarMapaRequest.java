@@ -2,8 +2,9 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter

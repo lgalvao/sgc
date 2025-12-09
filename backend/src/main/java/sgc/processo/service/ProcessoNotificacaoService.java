@@ -1,8 +1,5 @@
 package sgc.processo.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +11,10 @@ import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.service.SgrhService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

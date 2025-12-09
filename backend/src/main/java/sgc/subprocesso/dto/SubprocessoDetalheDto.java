@@ -1,14 +1,15 @@
 package sgc.subprocesso.dto;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /** DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07). */
 @Getter

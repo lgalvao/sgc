@@ -3,10 +3,6 @@ package sgc.notificacao;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
+
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Service
 @Primary

@@ -1,9 +1,5 @@
 package sgc.e2e;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.sql.SQLException;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,6 +11,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.service.SgrhService;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional

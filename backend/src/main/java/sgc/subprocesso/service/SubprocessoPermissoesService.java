@@ -1,7 +1,5 @@
 package sgc.subprocesso.service;
 
-import java.util.EnumSet;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.AtividadeRepo;
@@ -11,6 +9,8 @@ import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.util.EnumSet;
 
 @Service
 @RequiredArgsConstructor

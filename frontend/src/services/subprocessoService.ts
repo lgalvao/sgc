@@ -1,6 +1,6 @@
 import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import type {Competencia, MapaCompleto, Atividade, SubprocessoPermissoes, ValidacaoCadastro} from "@/types/tipos";
+import type {Atividade, Competencia, MapaCompleto, SubprocessoPermissoes, ValidacaoCadastro} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {

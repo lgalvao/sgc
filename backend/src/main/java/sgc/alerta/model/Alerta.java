@@ -1,12 +1,13 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
+
+import java.time.LocalDateTime;
 
 /**
  * Representa um alerta ou notificação dentro do sistema.

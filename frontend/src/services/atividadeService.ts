@@ -4,12 +4,7 @@ import {
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
 } from "@/mappers/atividades";
-import type {
-    Atividade,
-    Conhecimento,
-    CriarConhecimentoRequest,
-    AtividadeOperacaoResponse,
-} from "@/types/tipos";
+import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {

@@ -1,10 +1,11 @@
 package sgc.atividade.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.atividade.model.Atividade;
 import sgc.mapa.model.Mapa;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AtividadeMapperTest {
     private static final String TEST_DESCRIPTION = "Test Description";

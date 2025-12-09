@@ -1,11 +1,12 @@
 package sgc.comum;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class TestUtil {
 

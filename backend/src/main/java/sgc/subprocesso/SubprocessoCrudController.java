@@ -3,20 +3,17 @@ package sgc.subprocesso;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.dto.SubprocessoStatusDto;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subprocessos")

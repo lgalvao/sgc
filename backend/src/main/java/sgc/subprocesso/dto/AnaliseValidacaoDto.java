@@ -1,10 +1,11 @@
 package sgc.subprocesso.dto;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /** DTO para histórico de análise de validação (CDU-20 item 6). */
 @Data

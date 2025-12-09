@@ -1,11 +1,12 @@
 package sgc.mapa.dto;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import sgc.mapa.model.TipoImpactoAtividade;
+
+import java.util.List;
 
 /**
  * DTO que representa uma atividade que sofreu alteração durante a revisão do cadastro.

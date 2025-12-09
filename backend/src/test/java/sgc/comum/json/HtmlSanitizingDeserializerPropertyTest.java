@@ -1,12 +1,12 @@
 package sgc.comum.json;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import net.jqwik.api.*;
 import org.mockito.Mockito;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 class HtmlSanitizingDeserializerPropertyTest {
 

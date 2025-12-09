@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,9 +14,9 @@ import {
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import { usePerfilStore } from "@/stores/perfil"; // Adicionar esta linha
-import { useProcessosStore } from "@/stores/processos";
-import { useFeedbackStore } from "@/stores/feedback";
+import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,

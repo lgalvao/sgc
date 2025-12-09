@@ -3,7 +3,6 @@ package sgc.subprocesso;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,16 +17,14 @@ import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.subprocesso.service.SubprocessoMapaService;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subprocessos")

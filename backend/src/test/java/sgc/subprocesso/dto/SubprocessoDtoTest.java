@@ -1,12 +1,13 @@
 package sgc.subprocesso.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.Test;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SubprocessoDtoTest {
     private static final String OBSERVACOES = "Observações";

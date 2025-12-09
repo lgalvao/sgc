@@ -1,9 +1,5 @@
 package sgc.conhecimento.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +12,11 @@ import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConhecimentoMapperTest {

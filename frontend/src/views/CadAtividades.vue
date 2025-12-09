@@ -242,14 +242,13 @@ import {
   type Conhecimento,
   type CriarAtividadeRequest,
   type CriarConhecimentoRequest,
+  type ErroValidacao,
   Perfil,
   SituacaoSubprocesso,
-  TipoProcesso,
   type SubprocessoPermissoes,
-  type ErroValidacao,
+  TipoProcesso,
 } from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";
-
 
 
 const props = defineProps<{
@@ -312,13 +311,15 @@ async function adicionarAtividade() {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(
+    const status = await atividadesStore.adicionarAtividade(
       codSubrocesso.value,
       codMapa.value,
       request,
     );
     novaAtividade.value = "";
-    // Status do subprocesso já foi atualizado pela store
+    if (status) {
+        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+    }
   }
 }
 
@@ -330,11 +331,13 @@ async function removerAtividade(idx: number) {
       "Confirma a remoção desta atividade e todos os conhecimentos associados?",
     )
   ) {
-    await atividadesStore.removerAtividade(
+    const status = await atividadesStore.removerAtividade(
       codSubrocesso.value,
       atividadeRemovida.codigo,
     );
-    // Status do subprocesso já foi atualizado pela store
+    if (status) {
+        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+    }
   }
 }
 
@@ -345,12 +348,14 @@ async function adicionarConhecimento(idx: number, descricao: string) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
-    await atividadesStore.adicionarConhecimento(
+    const status = await atividadesStore.adicionarConhecimento(
       codSubrocesso.value,
       atividade.codigo,
       request,
     );
-     // Status do subprocesso já foi atualizado pela store
+    if (status) {
+        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+    }
   }
 }
 
@@ -358,11 +363,14 @@ async function removerConhecimento(idx: number, idConhecimento: number) {
   if (!codSubrocesso.value) return;
   const atividade = atividades.value[idx];
   if (confirm("Confirma a remoção deste conhecimento?")) {
-    await atividadesStore.removerConhecimento(
+    const status = await atividadesStore.removerConhecimento(
       codSubrocesso.value,
       atividade.codigo,
       idConhecimento,
     );
+    if (status) {
+        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+    }
   }
 }
 
@@ -374,12 +382,15 @@ async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: num
         id: conhecimentoId,
         descricao: descricao.trim(),
       };
-      await atividadesStore.atualizarConhecimento(
+      const status = await atividadesStore.atualizarConhecimento(
         codSubrocesso.value,
         atividadeId,
         conhecimentoId,
         conhecimentoAtualizado,
       );
+      if (status) {
+          processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      }
   }
 }
 
@@ -391,11 +402,14 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
         ...atividadeOriginal,
         descricao: descricao.trim(),
       };
-      await atividadesStore.atualizarAtividade(
+      const status = await atividadesStore.atualizarAtividade(
         codSubrocesso.value,
         id,
         atividadeAtualizada,
       );
+      if (status) {
+          processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      }
     }
   }
 }

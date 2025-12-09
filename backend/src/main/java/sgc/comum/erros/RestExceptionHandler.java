@@ -1,7 +1,6 @@
 package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -26,6 +25,8 @@ import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice

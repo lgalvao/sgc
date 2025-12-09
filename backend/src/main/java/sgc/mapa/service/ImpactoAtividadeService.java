@@ -1,10 +1,5 @@
 package sgc.mapa.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +10,12 @@ import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.TipoImpactoAtividade;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

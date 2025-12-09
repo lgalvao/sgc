@@ -56,11 +56,19 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { BContainer, BCard, BButton, BFormGroup, BFormTextarea, BFormInvalidFeedback, BSpinner } from 'bootstrap-vue-next';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService, type DiagnosticoDto } from '@/services/diagnosticoService';
+import {computed, onMounted, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {
+  BButton,
+  BCard,
+  BContainer,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormTextarea,
+  BSpinner
+} from 'bootstrap-vue-next';
+import {useFeedbackStore} from '@/stores/feedback';
+import {type DiagnosticoDto, diagnosticoService} from '@/services/diagnosticoService';
 
 const route = useRoute();
 const router = useRouter();

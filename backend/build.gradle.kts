@@ -1,4 +1,3 @@
-import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar

@@ -1,12 +1,5 @@
 package sgc.e2e;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
@@ -21,6 +14,14 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.service.SgrhService;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/e2e")
