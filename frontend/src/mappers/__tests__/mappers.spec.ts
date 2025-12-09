@@ -1,7 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {mapVWUsuariosArray, mapVWUsuarioToServidor,} from "@/mappers/servidores";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
-import type {Alerta, Mapa, MapaAjuste, MapaVisualizacao} from "@/types/tipos";
+import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
     mapAtividadeDtoToModel,
@@ -14,7 +14,6 @@ import {
     mapMapaAjusteDtoToModel,
     mapMapaCompletoDtoToModel,
     mapMapaDtoToModel,
-    mapMapaVisualizacaoToAtividades,
 } from "../mapas";
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
 import {
@@ -93,48 +92,6 @@ describe("mappers/atividades", () => {
 });
 
 describe("mappers/mapas", () => {
-    it("mapMapaVisualizacaoToAtividades should extract and map all activities including knowledge", () => {
-        const dto: MapaVisualizacao = {
-            codigo: 1,
-            descricao: "mapa",
-            competencias: [
-                {
-                    codigo: 1,
-                    descricao: "c1",
-                    atividades: [
-                        {
-                            codigo: 1,
-                            descricao: "A1",
-                            conhecimentos: [{id: 10, descricao: "K1"}],
-                        },
-                    ],
-                },
-                {
-                    codigo: 2,
-                    descricao: "c2",
-                    atividades: [
-                        {codigo: 2, descricao: "A2", conhecimentos: []},
-                        {codigo: 3, descricao: "A3", conhecimentos: []},
-                    ],
-                },
-            ],
-        };
-        const atividades = mapMapaVisualizacaoToAtividades(dto);
-        expect(atividades).toHaveLength(3);
-        expect(atividades[0].codigo).toBe(1);
-        expect(atividades[0].conhecimentos).toHaveLength(1);
-        expect(atividades[0].conhecimentos[0].id).toBe(10);
-        expect(atividades[2].codigo).toBe(3);
-    });
-
-    it("mapMapaVisualizacaoToAtividades should handle null or missing competencias", () => {
-        expect(mapMapaVisualizacaoToAtividades(null as any)).toEqual([]);
-        expect(mapMapaVisualizacaoToAtividades({} as any)).toEqual([]);
-        expect(
-            mapMapaVisualizacaoToAtividades({competencias: null} as any),
-        ).toEqual([]);
-    });
-
     it("mapMapaDtoToModel should map fields and handle dates", () => {
         const dto = {
             codigo: 1,

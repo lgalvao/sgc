@@ -178,15 +178,14 @@ describe("Router", () => {
         }
     });
 
-    it.skip("deve resolver a rota de AutoavaliacaoDiagnostico com props dinâmicos", async () => {
-        await router.push("/diagnostico/123/DTI/autoavaliacao");
+    it("deve resolver a rota de AutoavaliacaoDiagnostico com props dinâmicos", async () => {
+        await router.push("/diagnostico/123/autoavaliacao");
         const route = router.currentRoute.value;
         expect(route.name).toBe("AutoavaliacaoDiagnostico");
 
         const matched = route.matched.find((m) => m.name === "AutoavaliacaoDiagnostico");
         // props: true means params are passed as props
         expect(route.params.codSubprocesso).toBe("123");
-        expect(route.params.siglaUnidade).toBe("DTI");
     });
 
     it("deve resolver a rota de OcupacoesCriticasDiagnostico com props dinâmicos", async () => {

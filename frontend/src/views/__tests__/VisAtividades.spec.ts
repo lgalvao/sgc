@@ -97,7 +97,7 @@ describe("VisAtividades.vue", () => {
     wrapper?.unmount();
   });
 
-  it.skip('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
+  it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
     const { wrapper: w } = createWrapper(
       Perfil.GESTOR,
       SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
@@ -106,10 +106,10 @@ describe("VisAtividades.vue", () => {
     await flushPromises();
     await nextTick();
 
-    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
   });
 
-  it.skip('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
+  it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
     const { wrapper: w } = createWrapper(
       Perfil.ADMIN,
       SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
@@ -117,7 +117,7 @@ describe("VisAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
   });
 
   it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {

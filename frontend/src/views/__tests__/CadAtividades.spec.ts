@@ -11,6 +11,7 @@ import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
 import * as mapaService from "@/services/mapaService";
 import * as processoService from "@/services/processoService";
+import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadesService from "@/services/unidadesService";
 import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
@@ -62,6 +63,7 @@ vi.mock("@/services/subprocessoService", () => ({
   adicionarCompetencia: vi.fn(),
   atualizarCompetencia: vi.fn(),
   removerCompetencia: vi.fn(),
+  listarAtividades: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
@@ -223,6 +225,7 @@ describe("CadAtividades.vue", () => {
       mockMapaVisualizacao([]) as any,
     );
     vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -234,7 +237,7 @@ describe("CadAtividades.vue", () => {
     wrapper = w;
     await flushPromises();
 
-    expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(123);
+    expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123);
   });
 
   it("deve adicionar uma atividade", async () => {
@@ -267,9 +270,7 @@ describe("CadAtividades.vue", () => {
 
   it("deve remover uma atividade", async () => {
     // Setup mock BEFORE wrapper creation (or mock the fetch response)
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
     const { wrapper: w } = createWrapper();
     wrapper = w;
@@ -285,9 +286,7 @@ describe("CadAtividades.vue", () => {
   });
 
   it("deve adicionar um conhecimento", async () => {
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
     const { wrapper: w } = createWrapper();
     wrapper = w;
@@ -311,9 +310,7 @@ describe("CadAtividades.vue", () => {
   });
 
   it("deve remover um conhecimento", async () => {
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
     const { wrapper: w } = createWrapper();
     wrapper = w;
@@ -366,9 +363,7 @@ describe("CadAtividades.vue", () => {
   });
 
   it("deve permitir edição inline de atividade", async () => {
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
     const { wrapper: w } = createWrapper();
     wrapper = w;
@@ -400,9 +395,7 @@ describe("CadAtividades.vue", () => {
   });
 
   it("deve permitir edição inline de conhecimento", async () => {
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
     const { wrapper: w } = createWrapper();
     wrapper = w;

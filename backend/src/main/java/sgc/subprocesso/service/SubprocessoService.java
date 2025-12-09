@@ -22,6 +22,8 @@ import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoMapper;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -35,6 +37,42 @@ public class SubprocessoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final SubprocessoMapper subprocessoMapper;
+
+    @Transactional(readOnly = true)
+    public List<AtividadeVisualizacaoDto> listarAtividadesPorSubprocesso(Long codSubprocesso) {
+        Subprocesso subprocesso = repositorioSubprocesso
+                .findById(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+
+        if (subprocesso.getMapa() == null) {
+            return List.of();
+        }
+
+        List<Atividade> todasAtividades = 
+            atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+
+        return todasAtividades.stream()
+                .map(this::mapAtividadeToDto)
+                .toList();
+    }
+
+    private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
+        List<Conhecimento> conhecimentos = 
+            repositorioConhecimento.findByAtividadeCodigo(atividade.getCodigo());
+
+        List<ConhecimentoVisualizacaoDto> conhecimentosDto = conhecimentos.stream()
+                .map(c -> ConhecimentoVisualizacaoDto.builder()
+                        .codigo(c.getCodigo())
+                        .descricao(c.getDescricao())
+                        .build())
+                .toList();
+
+        return AtividadeVisualizacaoDto.builder()
+                .codigo(atividade.getCodigo())
+                .descricao(atividade.getDescricao())
+                .conhecimentos(conhecimentosDto)
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {

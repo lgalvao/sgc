@@ -47,10 +47,10 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
                     // Cria autenticação simples
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
-                                    titulo,
-                                    null,
-                                    Collections.singletonList(
-                                            new SimpleGrantedAuthority("ROLE_" + perfil)));
+                                titulo,
+                                null, 
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + perfil))
+                                );
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }

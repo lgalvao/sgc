@@ -1,11 +1,9 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as atividadeService from "@/services/atividadeService";
-import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useAtividadesStore} from "../atividades";
 
-vi.mock("@/services/mapaService");
 vi.mock("@/services/atividadeService");
 vi.mock("@/services/subprocessoService");
 
@@ -20,28 +18,19 @@ describe("useAtividadesStore", () => {
 
     describe("buscarAtividadesParaSubprocesso", () => {
         it("deve buscar e mapear as atividades", async () => {
-            const mockMapaVisualizacao = {
-                competencias: [
-                    {
-                        atividades: [
-                            {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
-                        ],
-                    },
-                ],
-            };
-            const spy = vi
-                .spyOn(mapaService, "obterMapaVisualizacao")
-                .mockResolvedValue(mockMapaVisualizacao as any);
-            await store.buscarAtividadesParaSubprocesso(1);
-            expect(spy).toHaveBeenCalledWith(1);
-            const expectedAtividades = [
+            const mockAtividades = [
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ];
-            expect(store.atividadesPorSubprocesso.get(1)).toEqual(expectedAtividades);
+            const spy = vi
+                .spyOn(subprocessoService, "listarAtividades")
+                .mockResolvedValue(mockAtividades as any);
+            await store.buscarAtividadesParaSubprocesso(1);
+            expect(spy).toHaveBeenCalledWith(1);
+            expect(store.atividadesPorSubprocesso.get(1)).toEqual(mockAtividades);
         });
 
         it("deve lidar com erros", async () => {
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockRejectedValue(
+            vi.spyOn(subprocessoService, "listarAtividades").mockRejectedValue(
                 new Error("Erro"),
             );
             await expect(store.buscarAtividadesParaSubprocesso(1)).rejects.toThrow("Erro");
@@ -58,9 +47,9 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "criarAtividade").mockResolvedValue(
                 novaAtividade,
             );
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [{atividades: [novaAtividade]}],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
+                novaAtividade
+            ] as any);
 
             await store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"});
 
@@ -87,10 +76,9 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "excluirAtividade").mockResolvedValue(
                 undefined,
             );
-            // Mock re-fetch to return empty list
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue(
+                [] as any
+            );
 
             await store.removerAtividade(1, 1);
 
@@ -115,16 +103,11 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "criarConhecimento").mockResolvedValue(
                 novoConhecimento,
             );
-            // Mock re-fetch to return activity with new knowledge
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [{
-                    atividades: [{
-                        codigo: 1,
-                        descricao: "Atividade Teste",
-                        conhecimentos: [novoConhecimento]
-                    }]
-                }],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([{
+                codigo: 1,
+                descricao: "Atividade Teste",
+                conhecimentos: [novoConhecimento]
+            }] as any);
 
             await store.adicionarConhecimento(1, 1, {
                 descricao: "Novo Conhecimento",
@@ -160,16 +143,11 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "excluirConhecimento").mockResolvedValue(
                 undefined,
             );
-            // Mock re-fetch to return activity with no knowledge
-             vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [{
-                    atividades: [{
-                        codigo: 1,
-                        descricao: "Atividade Teste",
-                        conhecimentos: []
-                    }]
-                }],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([{
+                codigo: 1,
+                descricao: "Atividade Teste",
+                conhecimentos: []
+            }] as any);
 
             await store.removerConhecimento(1, 1, 1);
 
@@ -192,9 +170,9 @@ describe("useAtividadesStore", () => {
             vi.spyOn(subprocessoService, "importarAtividades").mockResolvedValue(
                 undefined,
             );
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue(
+                [] as any
+            );
 
             await store.importarAtividades(1, 2);
 
@@ -222,10 +200,9 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "atualizarAtividade").mockResolvedValue(
                 atividadeAtualizada,
             );
-            // Mock re-fetch
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [{atividades: [atividadeAtualizada]}],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
+                atividadeAtualizada
+            ] as any);
 
             await store.atualizarAtividade(1, 1, atividadeAtualizada);
 
@@ -274,10 +251,9 @@ describe("useAtividadesStore", () => {
             vi.spyOn(atividadeService, "atualizarConhecimento").mockResolvedValue(
                 conhecimentoAtualizado,
             );
-            // Mock re-fetch
-            vi.spyOn(mapaService, "obterMapaVisualizacao").mockResolvedValue({
-                competencias: [{atividades: [atividadeComConhecimentoAtualizado]}],
-            } as any);
+            vi.spyOn(subprocessoService, "listarAtividades").mockResolvedValue([
+                atividadeComConhecimentoAtualizado
+            ] as any);
 
             await store.atualizarConhecimento(1, 1, 1, conhecimentoAtualizado);
 

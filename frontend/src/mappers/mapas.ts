@@ -1,50 +1,9 @@
 import type {AtividadeImpactada, CompetenciaImpactada, ImpactoMapa,} from "@/types/impacto";
 import type {
-    Atividade,
-    AtividadeVisualizacao,
-    Conhecimento,
-    ConhecimentoVisualizacao,
     Mapa,
     MapaAjuste,
     MapaCompleto,
-    MapaVisualizacao,
 } from "@/types/tipos";
-
-function mapConhecimentoVisualizacaoToModel(
-  dto: ConhecimentoVisualizacao,
-): Conhecimento {
-  if (!dto) return null as any;
-  return {
-    id: (dto as any).codigo || dto.id,
-    descricao: dto.descricao,
-  };
-}
-
-function mapAtividadeVisualizacaoToModel(
-    dto: AtividadeVisualizacao,
-  ): Atividade {
-    if (!dto) return null as any;
-    return {
-      codigo: dto.codigo,
-      descricao: dto.descricao,
-      conhecimentos: (dto.conhecimentos || []).map(mapConhecimentoVisualizacaoToModel).filter((c) => c !== null),
-    };
-  }
-
-  export function mapMapaVisualizacaoToAtividades(
-    dto: MapaVisualizacao,
-  ): Atividade[] {
-    if (!dto) {
-      return [];
-    }
-    const atividadesCompetencia = (dto.competencias || []).flatMap(
-      (competencia) => competencia.atividades || [],
-    );
-    const atividadesSemCompetencia = dto.atividadesSemCompetencia || [];
-    const todasAtividades = [...atividadesCompetencia, ...atividadesSemCompetencia];
-
-    return todasAtividades.map(mapAtividadeVisualizacaoToModel).filter((a) => a !== null);
-  }
 
   export function mapMapaDtoToModel(dto: any): Mapa {
     return {

@@ -1,5 +1,22 @@
 import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
 
+export function mapAtividadeVisualizacaoToModel(dto: any): Atividade {
+    if (!dto) return null as any;
+    return {
+        codigo: dto.codigo,
+        descricao: dto.descricao,
+        conhecimentos: (dto.conhecimentos || []).map(mapConhecimentoVisualizacaoToModel).filter((c: any) => c !== null),
+    };
+}
+
+export function mapConhecimentoVisualizacaoToModel(dto: any): Conhecimento {
+    if (!dto) return null as any;
+    return {
+        id: dto.codigo,
+        descricao: dto.descricao,
+    };
+}
+
 export function mapAtividadeDtoToModel(dto: any): Atividade {
   if (!dto) return null as any;
   return {

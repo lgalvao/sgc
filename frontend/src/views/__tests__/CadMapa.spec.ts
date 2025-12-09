@@ -54,6 +54,7 @@ vi.mock("@/services/subprocessoService", () => ({
   adicionarCompetencia: vi.fn(),
   atualizarCompetencia: vi.fn(),
   removerCompetencia: vi.fn(),
+  listarAtividades: vi.fn(),
 }));
 
 vi.mock("@/services/unidadesService", () => ({
@@ -246,6 +247,9 @@ describe("CadMapa.vue", () => {
     vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue({
       competencias: [{ atividades: mockAtividades }],
     } as any);
+    vi.mocked(subprocessoService.listarAtividades).mockResolvedValue(
+      mockAtividades as any,
+    );
   });
 
   afterEach(() => {
@@ -261,7 +265,7 @@ describe("CadMapa.vue", () => {
       subprocessoService.buscarSubprocessoPorProcessoEUnidade,
     ).toHaveBeenCalledWith(1, "TESTE");
     expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(123);
-    expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(123); // via atividadesStore
+    expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123); // via atividadesStore
 
     expect(wrapper.text()).toContain("TESTE - Teste");
 

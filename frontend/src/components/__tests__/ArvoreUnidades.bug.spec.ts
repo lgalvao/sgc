@@ -89,10 +89,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
 
     const vm = wrapper.vm as any;
     const coord11 = criarUnidades()[0].filhas![2];
-    
     const estado = vm.getEstadoSelecao(coord11);
-    console.log('Estado de COORD_11:', estado);
-    console.log('modelValue:', wrapper.props('modelValue'));
     
     // COORD_11 tem 3 filhas elegíveis: 131, 132, 133
     // Apenas 2 estão selecionadas: 132, 133

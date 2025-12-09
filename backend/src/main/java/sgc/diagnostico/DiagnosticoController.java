@@ -16,16 +16,7 @@ import java.util.List;
 @RequestMapping("/api/diagnosticos")
 @RequiredArgsConstructor
 public class DiagnosticoController {
-
     private final DiagnosticoService diagnosticoService;
-
-    // TODO: Obter usuário autenticado via Spring Security
-    // Por enquanto, vou mockar ou passar por header para facilitar testes se o security não estiver configurado para pegar contexto
-    // Num sistema real: @AuthenticationPrincipal Usuario usuario
-    // Vou assumir que o frontend passará o título do servidor no body quando necessário, 
-    // ou usaremos um header 'X-Usuario-Simulado' se estiver em dev.
-    // Mas os requests já têm 'servidorTitulo'.
-    // Para 'buscarMinhasAvaliacoes', vou pedir o servidorTitulo como param por enquanto.
 
     @GetMapping("/{subprocessoId}")
     public ResponseEntity<DiagnosticoDto> buscarDiagnostico(

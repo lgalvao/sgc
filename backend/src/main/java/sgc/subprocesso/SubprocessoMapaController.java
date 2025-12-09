@@ -3,6 +3,7 @@ package sgc.subprocesso;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,11 +21,13 @@ import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.SubprocessoService;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -41,6 +44,7 @@ public class SubprocessoMapaController {
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoConsultaService subprocessoConsultaService;
     private final SgrhService sgrhService;
+    private final SubprocessoService subprocessoService;
 
     /**
      * Analisa e retorna os impactos de uma revisão de mapa de competências.
@@ -84,6 +88,24 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-visualizacao")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
+    }
+
+    /**
+     * Lista todas as atividades de um subprocesso com seus conhecimentos.
+     *
+     * <p>Retorna uma lista plana de atividades (sem agrupamento por competências),
+     * ideal para uso em stores e componentes que precisam apenas da lista de atividades.
+     *
+     * @param codSubprocesso O código do subprocesso.
+     * @return Uma lista de {@link AtividadeVisualizacaoDto} com as atividades e conhecimentos.
+     */
+    @GetMapping("/{codSubprocesso}/atividades")
+    @Operation(summary = "Lista todas as atividades de um subprocesso")
+    public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
+            @PathVariable Long codSubprocesso) {
+        List<AtividadeVisualizacaoDto> atividades = 
+            subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso);
+        return ResponseEntity.ok(atividades);
     }
 
     /**
