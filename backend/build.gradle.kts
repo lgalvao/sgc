@@ -17,7 +17,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -249,6 +249,7 @@ tasks.withType<Test> {
     }
 
     jvmArgs = listOf(
+        "--enable-preview",
         "-Dlogging.level.root=INFO",
         "-Dlogging.level.sgc=INFO",
         "-Dspring.jpa.show-sql=false",
@@ -278,5 +279,6 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
         compilerArgs.add("-Xlint:deprecation")
+        compilerArgs.add("--enable-preview")
     }
 }

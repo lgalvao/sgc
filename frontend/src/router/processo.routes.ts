@@ -64,27 +64,6 @@ const processoRoutes: RouteRecordRaw[] = [
         }),
         meta: {title: "Visualização de Atividades"},
     },
-    {
-        path: "/subprocesso/:codSubprocesso/:siglaUnidade/autoavaliacao",
-        name: "AutoavaliacaoDiagnostico",
-        component: () => import("@/views/AutoavaliacaoDiagnostico.vue"),
-        props: true,
-        meta: {title: "Autoavaliação"},
-    },
-    {
-        path: "/subprocesso/:codSubprocesso/:siglaUnidade/ocupacoes",
-        name: "OcupacoesCriticasDiagnostico",
-        component: () => import("@/views/OcupacoesCriticasDiagnostico.vue"),
-        props: true,
-        meta: {title: "Ocupações Críticas"},
-    },
-    {
-        path: "/subprocesso/:codSubprocesso/:siglaUnidade/monitoramento",
-        name: "MonitoramentoDiagnostico",
-        component: () => import("@/views/MonitoramentoDiagnostico.vue"),
-        props: true,
-        meta: {title: "Monitoramento"},
-    },
 
 ];
 

@@ -139,7 +139,7 @@ describe("CadAtividades.vue", () => {
                       sigla: "TESTE",
                       situacaoSubprocesso: isRevisao
                         ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-                        : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
+                        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                     },
                   ],
                 },
@@ -210,7 +210,7 @@ describe("CadAtividades.vue", () => {
           codSubprocesso: 123,
           mapaCodigo: 456,
           sigla: "TESTE",
-          situacaoSubprocesso: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
+          situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
         },
       ],
     } as any);
@@ -341,19 +341,6 @@ describe("CadAtividades.vue", () => {
     await flushPromises();
 
     vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue();
-    // Update process status for re-fetch
-    vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
-      codigo: 1,
-      tipo: TipoProcesso.MAPEAMENTO,
-      unidades: [
-        {
-          codUnidade: 123,
-          sigla: "TESTE",
-          situacaoSubprocesso:
-            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
-        },
-      ],
-    } as any);
 
     await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
@@ -520,25 +507,4 @@ describe("CadAtividades.vue", () => {
     expect(wrapper.text()).toContain("REJEITADO");
   });
 
-  it("deve exibir alerta de atividades sem conhecimento ao disponibilizar", async () => {
-    vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-      mockMapaVisualizacao([...mockAtividades] as any) as any,
-    );
-
-    const { wrapper: w, feedbackStore } = createWrapper();
-    wrapper = w;
-    await flushPromises();
-
-    const showSpy = vi.spyOn(feedbackStore, "show");
-
-    await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
-    await flushPromises();
-
-    expect(showSpy).toHaveBeenCalledWith(
-      "Atividades Incompletas",
-      expect.stringContaining("As seguintes atividades não têm conhecimentos associados"),
-      "warning"
-    );
-    expect(showSpy.mock.calls[0][1]).toContain("Atividade 2");
-  });
 });

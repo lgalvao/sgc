@@ -41,9 +41,9 @@
                 <BButton variant="outline-secondary" to="/painel">Cancelar</BButton>
                 <BButton 
                     variant="success" 
-                    @click="concluir"
                     :disabled="!botaoHabilitado"
                     data-testid="btn-confirmar-conclusao"
+                    @click="concluir"
                 >
                     Confirmar Conclusão
                 </BButton>

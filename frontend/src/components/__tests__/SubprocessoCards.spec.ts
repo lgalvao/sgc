@@ -126,40 +126,42 @@ describe("SubprocessoCards.vue", () => {
       });
     });
 
-        it("deve navegar para DiagnosticoEquipe ao clicar no card de diagnostico", async () => {
+        it("deve navegar para AutoavaliacaoDiagnostico ao clicar no card de diagnostico", async () => {
             const wrapper = createWrapper({
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 mapa: null,
                 situacao: "Em andamento",
                 permissoes: {...defaultPermissoes, podeVisualizarDiagnostico: true},
+                codSubprocesso: 10,
             });
 
             const card = wrapper.find('[data-testid="card-subprocesso-diagnostico"]');
             await card.trigger("click");
 
             expect(pushMock).toHaveBeenCalledWith({
-                name: "DiagnosticoEquipe",
+                name: "AutoavaliacaoDiagnostico",
                 params: {
-                    codProcesso: 1,
+                    codSubprocesso: 10,
                     siglaUnidade: "TEST",
                 },
             });
     });
 
-        it("deve navegar para OcupacoesCriticas ao clicar no card de ocupações", async () => {
+        it("deve navegar para OcupacoesCriticasDiagnostico ao clicar no card de ocupações", async () => {
             const wrapper = createWrapper({
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 mapa: null,
                 situacao: "Em andamento",
+                codSubprocesso: 10,
             });
 
             const card = wrapper.find('[data-testid="card-subprocesso-ocupacoes"]');
             await card.trigger("click");
 
             expect(pushMock).toHaveBeenCalledWith({
-                name: "OcupacoesCriticas",
+                name: "OcupacoesCriticasDiagnostico",
                 params: {
-                    codProcesso: 1,
+                    codSubprocesso: 10,
                     siglaUnidade: "TEST",
                 },
             });

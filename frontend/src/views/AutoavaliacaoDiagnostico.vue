@@ -8,9 +8,9 @@
       <div class="d-flex gap-2">
         <BButton
           variant="success"
-          @click="concluirAutoavaliacao"
           :disabled="!podeConcluir"
           data-testid="btn-concluir-autoavaliacao"
+          @click="concluirAutoavaliacao"
         >
           <i class="bi bi-check-circle me-2" />Concluir Autoavaliação
         </BButton>
@@ -45,8 +45,8 @@
                 :id="`sel-imp-${comp.codigo}`"
                 v-model="avaliacoes[comp.codigo].importancia"
                 :options="OPCOES_NIVEL"
-                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
                 :data-testid="`sel-importancia-${comp.codigo}`"
+                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
               />
             </div>
 
@@ -56,8 +56,8 @@
                 :id="`sel-dom-${comp.codigo}`"
                 v-model="avaliacoes[comp.codigo].dominio"
                 :options="OPCOES_NIVEL"
-                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
                 :data-testid="`sel-dominio-${comp.codigo}`"
+                @change="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio)"
               />
             </div>
 
@@ -68,8 +68,8 @@
                 v-model="avaliacoes[comp.codigo].observacoes"
                 rows="2"
                 placeholder="Comentários..."
-                @blur="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio, $event.target.value)"
                 :data-testid="`txt-obs-${comp.codigo}`"
+                @blur="salvar(comp.codigo, avaliacoes[comp.codigo].importancia, avaliacoes[comp.codigo].dominio, $event.target.value)"
               />
             </div>
           </div>

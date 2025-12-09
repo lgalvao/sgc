@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 import type { Unidade } from '@/types/tipos';
 
@@ -169,7 +170,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
   });
 
   describe('Bug 3: Comportamento ao desmarcar', () => {
-    it('Desmarcar SECRETARIA_1 deve desmarcar todas filhas', () => {
+    it('Desmarcar SECRETARIA_1 deve desmarcar todas filhas', async () => {
       const wrapper = mount(ArvoreUnidades, {
         props: {
           unidades: criarUnidades(),
@@ -182,6 +183,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
       
       // Simula desmarcar SECRETARIA_1
       vm.toggle(secretaria, false);
+      await nextTick();
       
       const novoModelValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as number[];
       
@@ -305,7 +307,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
       expect(modelValue).toContain(133);
     });
 
-    it('Selecionar COORD_11 deve adicionar apenas filhas ao modelValue', () => {
+    it('Selecionar COORD_11 deve adicionar apenas filhas ao modelValue', async () => {
       const wrapper = mount(ArvoreUnidades, {
         props: {
           unidades: criarUnidades(),
@@ -318,6 +320,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
       
       // Selecionar COORD_11
       vm.toggle(coord11, true);
+      await nextTick();
       
       const novoModelValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as number[];
       

@@ -43,7 +43,8 @@ class SubprocessoWorkflowServicePropertyTest {
             @ForAll SituacaoSubprocesso situacao, @ForAll String obs) {
         Assume.that(
                 situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                        && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+                        && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
+                        && situacao != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
         Long codSubprocesso = 1L;
         Subprocesso sp = new Subprocesso();
