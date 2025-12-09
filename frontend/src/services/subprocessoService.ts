@@ -35,6 +35,11 @@ export async function validarCadastro(codSubprocesso: number): Promise<Validacao
     return response.data;
 }
 
+export async function obterStatus(codSubprocesso: number): Promise<any> { // Using any properly typed with SubprocessoStatus from tipos.ts would be better but SubprocessoStatus IS in tipos.ts, let's import it.
+    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/status`);
+    return response.data;
+}
+
 export async function buscarSubprocessoDetalhe(
     codSubprocesso: number,
     perfil: string,

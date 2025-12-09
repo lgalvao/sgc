@@ -404,6 +404,8 @@ async function handleImportAtividades() {
   mostrarModalImportar.value = false;
   if (codSubrocesso.value) {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+    const status = await subprocessoService.obterStatus(codSubrocesso.value);
+    processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
   }
   feedbackStore.show(
     "Importação Concluída",

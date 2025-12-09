@@ -118,6 +118,16 @@ export const useProcessosStore = defineStore("processos", () => {
         if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
     }
 
+    function atualizarStatusSubprocesso(codSubprocesso: number, dados: { situacao: any, situacaoLabel: string }) {
+        if (processoDetalhe.value) {
+            const unidade = processoDetalhe.value.unidades.find(u => u.codSubprocesso === codSubprocesso);
+            if (unidade) {
+                unidade.situacaoSubprocesso = dados.situacao;
+                unidade.situacaoLabel = dados.situacaoLabel;
+            }
+        }
+    }
+
     return {
         processosPainel,
         processosPainelPage,
@@ -139,5 +149,6 @@ export const useProcessosStore = defineStore("processos", () => {
         apresentarSugestoes,
         validarMapa,
         homologarValidacao,
+        atualizarStatusSubprocesso,
     };
 });
