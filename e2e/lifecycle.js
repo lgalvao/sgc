@@ -5,7 +5,7 @@ process.on('warning', (warning) => {
     console.warn(warning.name, warning.message);
 });
 
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -13,7 +13,6 @@ const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
 const FRONTEND_PORT = 5173;
-
 
 // Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
@@ -37,7 +36,7 @@ const LOG_FILTERS = [
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
     /Starting/,
-    
+
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
     /Initializing Spring/,
@@ -46,7 +45,7 @@ const LOG_FILTERS = [
     /Started .* in .* seconds/,
     /Tomcat started on port/,
     /Tomcat initialized with port/,
-    
+
     // Vite - Inicialização
     /^> sgc@.*dev$/,
     /^> vite$/,
@@ -54,11 +53,11 @@ const LOG_FILTERS = [
     /➜  Local:/,
     /➜  Network:/,
     /use --host to expose/,
-    
+
     // Logs de serviços mockados
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
-    
+
     // Linhas vazias
     /^\s*$/
 ];
@@ -81,7 +80,8 @@ function log(prefix, data) {
             console.log(line);
             try {
                 fs.appendFileSync(LOG_FILE, `[${prefix}] ${line}\n`);
-            } catch (e) { /* ignore */ }
+            } catch (e) { /* ignore */
+            }
         }
     });
 }
@@ -106,7 +106,7 @@ function startBackend() {
         shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
     };
-    
+
     backendProcess = spawn(gradlewPath, ['bootRun', '--args=--spring.profiles.active=e2e'], spawnOptions);
 
     backendProcess.stdout.on('data', data => log('BACKEND', data));
@@ -122,13 +122,13 @@ function startBackend() {
 
 function startFrontend() {
     const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
-    
+
     const spawnOptions = {
         cwd: FRONTEND_DIR,
         shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
     };
-    
+
     frontendProcess = spawn(npmExecutable, ['run', 'dev'], spawnOptions);
 
     frontendProcess.stdout.on('data', data => log('FRONTEND', data));
@@ -148,28 +148,30 @@ function cleanup() {
         try {
             if (isWindows) {
                 // /T mata a árvore de processos (Spring Boot), mas não afeta Daemons
-                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`, { stdio: 'ignore' });
+                require('child_process').execSync(`taskkill /pid ${backendProcess.pid} /T /F`, {stdio: 'ignore'});
             } else {
                 process.kill(-backendProcess.pid);
             }
         } catch (e) {
             try {
                 backendProcess.kill();
-            } catch (e2) { /* ignore */ }
+            } catch (e2) { /* ignore */
+            }
         }
     }
 
     if (frontendProcess) {
         try {
-             if (isWindows) {
-                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`, { stdio: 'ignore' });
+            if (isWindows) {
+                require('child_process').execSync(`taskkill /pid ${frontendProcess.pid} /T /F`, {stdio: 'ignore'});
             } else {
                 process.kill(-frontendProcess.pid);
             }
         } catch (e) {
             try {
                 frontendProcess.kill();
-            } catch (e2) { /* ignore */ }
+            } catch (e2) { /* ignore */
+            }
         }
     }
 
@@ -225,4 +227,5 @@ checkBackendHealth()
     .then(() => console.log('>>> Frontend e Backend no ar!'));
 
 // Keep alive
-setInterval(() => { }, 1000);
+setInterval(() => {
+}, 1000);
