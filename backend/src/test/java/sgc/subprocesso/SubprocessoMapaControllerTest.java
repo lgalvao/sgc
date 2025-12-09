@@ -50,6 +50,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     @MockitoBean private SubprocessoConsultaService subprocessoConsultaService;
     @MockitoBean private SgrhService sgrhService;
+    @MockitoBean private sgc.subprocesso.service.SubprocessoService subprocessoService;
 
     @Autowired private MockMvc mockMvc;
     private ObjectMapper objectMapper;
