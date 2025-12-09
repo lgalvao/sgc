@@ -118,8 +118,6 @@ npm run test:unit
 
 O projeto possui um sistema unificado de verificação de qualidade de código que engloba análise estática, linting e cobertura de testes para Backend e Frontend.
 
-**Filosofia**: As verificações são configuradas para **não bloquear o build** (warnings only). O objetivo é fornecer feedback contínuo sem impedir o desenvolvimento.
-
 ### Execução Rápida (Recomendado)
 
 Utilize o script wrapper na raiz do projeto:
@@ -156,7 +154,6 @@ Os relatórios são gerados em `backend/build/reports/`:
 
 - **Checkstyle**: Estilo de código (Google Checks).
 - **PMD**: Boas práticas e código morto.
-- **SpotBugs**: Bugs potenciais e problemas de segurança.
 - **JaCoCo**: Cobertura de testes (`backend/build/reports/jacoco/test/html/index.html`).
 - **Frontend**: Relatórios de cobertura em `frontend/coverage/`.
 
