@@ -33,8 +33,6 @@ import sgc.subprocesso.service.SubprocessoService;
 public class AtividadeController {
     private final AtividadeService atividadeService;
     private final SubprocessoService subprocessoService;
-    private final SubprocessoRepo subprocessoRepo;
-    private final AtividadeRepo atividadeRepo;
 
     /**
      * Retorna uma lista com todas as atividades cadastradas no sistema.
@@ -113,8 +111,7 @@ public class AtividadeController {
         var atualizado = atividadeService.atualizar(codigo, atividadeDto);
         
         // Buscar subprocesso e status
-        Atividade atividade = atividadeRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codigo));
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codigo);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
@@ -144,9 +141,7 @@ public class AtividadeController {
     @PostMapping("/{codAtividade}/excluir")
     @Operation(summary = "Exclui uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
-        // Buscar mapa antes de excluir
-        Atividade atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codMapa = atividade.getMapa().getCodigo();
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(codMapa);
         
@@ -191,8 +186,7 @@ public class AtividadeController {
         var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
         
         // Buscar subprocesso e status
-        Atividade atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
@@ -228,8 +222,7 @@ public class AtividadeController {
         atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto);
         
         // Buscar subprocesso e status
-        Atividade atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
@@ -261,8 +254,7 @@ public class AtividadeController {
         atividadeService.excluirConhecimento(codAtividade, codConhecimento);
         
         // Buscar subprocesso e status
-        Atividade atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
@@ -287,10 +279,7 @@ public class AtividadeController {
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoRepo
-                .findByMapaCodigo(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado para o mapa com código %d".formatted(codMapa)));
+        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 

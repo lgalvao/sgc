@@ -245,4 +245,24 @@ public class SubprocessoDtoService {
                                                         .formatted(codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
+    @Transactional(readOnly = true)
+    public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso) {
+        Subprocesso sp =
+                repositorioSubprocesso
+                        .findById(codSubprocesso)
+                        .orElseThrow(
+                                () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+
+        Usuario usuario = obterUsuarioAutenticado();
+        return subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+    }
+
+    private Usuario obterUsuarioAutenticado() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new ErroAccessoNegado("Usuário não autenticado.");
+        }
+        String username = authentication.getName();
+        return sgrhService.buscarUsuarioPorLogin(username);
+    }
 }

@@ -1,11 +1,5 @@
 package sgc.subprocesso.service;
 
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,14 +14,17 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoMapper;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 
 @Service
@@ -50,8 +47,8 @@ public class SubprocessoService {
             return List.of();
         }
 
-        List<Atividade> todasAtividades = 
-            atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+        List<Atividade> todasAtividades =
+                atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
 
         return todasAtividades.stream()
                 .map(this::mapAtividadeToDto)
@@ -59,8 +56,8 @@ public class SubprocessoService {
     }
 
     private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
-        List<Conhecimento> conhecimentos = 
-            repositorioConhecimento.findByAtividadeCodigo(atividade.getCodigo());
+        List<Conhecimento> conhecimentos =
+                repositorioConhecimento.findByAtividadeCodigo(atividade.getCodigo());
 
         List<ConhecimentoVisualizacaoDto> conhecimentosDto = conhecimentos.stream()
                 .map(c -> ConhecimentoVisualizacaoDto.builder()
@@ -78,7 +75,7 @@ public class SubprocessoService {
 
     /**
      * Obtém o status atual de um subprocesso de forma leve.
-     * 
+     *
      * @param codSubprocesso O código do subprocesso.
      * @return DTO com informações básicas de status.
      */
@@ -93,6 +90,22 @@ public class SubprocessoService {
                 .situacao(subprocesso.getSituacao())
                 .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null)
                 .build();
+    }
+
+    /**
+     * Busca um subprocesso pelo código do mapa e retorna a entidade.
+     *
+     * @param codMapa O código do mapa.
+     * @return A entidade {@link Subprocesso} correspondente.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
+     */
+    @Transactional(readOnly = true)
+    public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
+        return repositorioSubprocesso
+                .findByMapaCodigo(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado para o mapa com código %d".formatted(codMapa))
+                );
     }
 
     @Transactional(readOnly = true)

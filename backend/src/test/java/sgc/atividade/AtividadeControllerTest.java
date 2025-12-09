@@ -27,6 +27,10 @@ import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoService;
 import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AtividadeController.class)
@@ -44,12 +48,34 @@ class AtividadeControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean private AtividadeService atividadeService;
+    @MockitoBean private SubprocessoService subprocessoService;
     @MockitoBean private AtividadeMapper atividadeMapper;
     @MockitoBean private ConhecimentoMapper conhecimentoMapper;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
+
+        // Mock para SubprocessoService.obterEntidadePorCodigoMapa
+        Subprocesso subprocessoMock = new Subprocesso();
+        subprocessoMock.setCodigo(100L); // Valor arbitrário para o código do subprocesso
+        when(subprocessoService.obterEntidadePorCodigoMapa(anyLong())).thenReturn(subprocessoMock);
+
+        // Mock para SubprocessoService.obterStatus
+        SubprocessoStatusDto statusDtoMock = SubprocessoStatusDto.builder()
+            .codigo(100L)
+            .situacao(null) // ou um valor apropriado, se necessário
+            .situacaoLabel(null) // ou um valor apropriado, se necessário
+            .build();
+        when(subprocessoService.obterStatus(anyLong())).thenReturn(statusDtoMock);
+
+        // Mock para SubprocessoService.listarAtividadesPorSubprocesso
+        AtividadeVisualizacaoDto atividadeVisualizacaoDtoMock = AtividadeVisualizacaoDto.builder()
+            .codigo(1L)
+            .descricao(ATIVIDADE_TESTE)
+            .conhecimentos(Collections.emptyList())
+            .build();
+        when(subprocessoService.listarAtividadesPorSubprocesso(anyLong())).thenReturn(List.of(atividadeVisualizacaoDtoMock));
     }
 
     @Nested
@@ -131,9 +157,9 @@ class AtividadeControllerTest {
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
-                    .andExpect(jsonPath("$.codigo").value(1L))
-                    .andExpect(jsonPath("$.descricao").value(NOVA_ATIVIDADE))
-                    .andExpect(jsonPath("$.mapaCodigo").value(10L));
+                    .andExpect(jsonPath("$.atividade.codigo").value(1L))
+                    .andExpect(jsonPath("$.atividade.descricao").value(NOVA_ATIVIDADE))
+                    .andExpect(jsonPath("$.atividade.mapaCodigo").value(10L));
         }
 
         @Test

@@ -9,6 +9,7 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
+import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -52,6 +53,19 @@ public class AtividadeService {
         return atividadeRepo
                 .findById(codAtividade)
                 .map(atividadeMapper::toDto)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+    }
+
+    /**
+     * Busca uma atividade pelo seu código e retorna a entidade.
+     *
+     * @param codAtividade O código da atividade.
+     * @return A entidade {@link Atividade} correspondente.
+     * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
+     */
+    public Atividade obterEntidadePorCodigo(Long codAtividade) {
+        return atividadeRepo
+                .findById(codAtividade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
     }
 

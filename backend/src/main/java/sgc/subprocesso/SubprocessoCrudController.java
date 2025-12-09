@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
@@ -24,6 +25,18 @@ public class SubprocessoCrudController {
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
     private final UnidadeService unidadeService;
+
+    /**
+     * Obtém as permissões do usuário para um subprocesso.
+     *
+     * @param codigo O código do subprocesso.
+     * @return DTO com as permissões calculadas.
+     */
+    @GetMapping("/{codigo}/permissoes")
+    public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
+        SubprocessoPermissoesDto permissoes = subprocessoDtoService.obterPermissoes(codigo);
+        return ResponseEntity.ok(permissoes);
+    }
 
     /**
      * Lista todos os subprocessos.
