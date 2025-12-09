@@ -18,6 +18,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -49,12 +50,12 @@ public class ImpactoMapaService {
      * para garantir que a análise de impacto seja feita no momento correto do fluxo de trabalho.
      *
      * @param codSubprocesso O código do subprocesso cujo mapa será analisado.
-     * @param usuario O usuário autenticado que realiza a operação.
+     * @param usuario        O usuário autenticado que realiza a operação.
      * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos encontrados. Retorna um DTO
-     *     sem impactos se a unidade não possuir um mapa vigente.
+     * sem impactos se a unidade não possuir um mapa vigente.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem encontrados.
-     * @throws ErroAccessoNegado se o usuário não tiver permissão para executar a operação na
-     *     situação atual do subprocesso.
+     * @throws ErroAccessoNegado         se o usuário não tiver permissão para executar a operação na
+     *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
@@ -68,8 +69,7 @@ public class ImpactoMapaService {
 
         verificarAcesso(usuario, subprocesso);
 
-        Optional<Mapa> mapaVigenteOpt =
-                mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
+        Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
 
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
@@ -77,13 +77,10 @@ public class ImpactoMapaService {
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso =
-                mapaRepo.findBySubprocessoCodigo(codSubprocesso)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Mapa não encontrado para subprocesso",
-                                                codSubprocesso));
+        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Mapa não encontrado para subprocesso", codSubprocesso)
+                );
 
         List<Atividade> atividadesAtuais =
                 impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso);
@@ -93,12 +90,15 @@ public class ImpactoMapaService {
         List<AtividadeImpactadaDto> inseridas =
                 impactoAtividadeService.detectarAtividadesInseridas(
                         atividadesAtuais, atividadesVigentes);
+
         List<AtividadeImpactadaDto> removidas =
                 impactoAtividadeService.detectarAtividadesRemovidas(
                         atividadesAtuais, atividadesVigentes, mapaVigente);
+
         List<AtividadeImpactadaDto> alteradas =
                 impactoAtividadeService.detectarAtividadesAlteradas(
                         atividadesAtuais, atividadesVigentes, mapaVigente);
+
         List<CompetenciaImpactadaDto> competenciasImpactadas =
                 impactoCompetenciaService.identificarCompetenciasImpactadas(
                         mapaVigente, removidas, alteradas);
@@ -107,25 +107,27 @@ public class ImpactoMapaService {
                 ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
 
         log.info(
-                "ImpactoMapaService - Análise de impactos concluída: tem={}, inseridas={},"
-                        + " removidas={}, alteradas={}",
+                "Análise de impactos concluída: tem={}, inseridas={} removidas={}, alteradas={}",
                 impactos.isTemImpactos(),
                 impactos.getTotalAtividadesInseridas(),
                 impactos.getTotalAtividadesRemovidas(),
                 impactos.getTotalAtividadesAlteradas());
+
         return impactos;
     }
 
-    private static final String MSG_ERRO_CHEFE =
-            "O chefe da unidade só pode verificar os impactos com o subprocesso na situação"
-                    + " 'Revisão do cadastro em andamento'.";
-    private static final String MSG_ERRO_GESTOR =
-            "O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do"
-                    + " cadastro disponibilizada'.";
-    private static final String MSG_ERRO_ADMIN =
-            "O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão"
-                    + " do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa"
-                    + " Ajustado'.";
+    private static final String MSG_ERRO_CHEFE = """
+            O chefe da unidade só pode verificar os impactos com o subprocesso na situação\
+             'Revisão do cadastro em andamento'.""";
+
+    private static final String MSG_ERRO_GESTOR = """
+            O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do\
+             cadastro disponibilizada'.""";
+
+    private static final String MSG_ERRO_ADMIN = """
+            O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
+             do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
+             Ajustado'.""";
 
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
         final SituacaoSubprocesso situacao = subprocesso.getSituacao();
@@ -152,6 +154,6 @@ public class ImpactoMapaService {
 
     private boolean hasRole(Usuario usuario, String role) {
         return usuario.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_%s".formatted(role)));
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_%s".formatted(role)));
     }
 }
