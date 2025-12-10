@@ -1,0 +1,113 @@
+import {expect, type Page} from '@playwright/test';
+import {calcularDataLimite} from './helpers-processos';
+
+export async function navegarParaMapa(page: Page) {
+    const testId = 'card-subprocesso-mapa';
+    await expect(page.getByTestId(testId)).toBeVisible();
+    await page.getByTestId(testId).click();
+    await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+}
+
+export async function criarCompetencia(page: Page, descricao: string, atividades: string[]) {
+    await page.getByTestId('btn-abrir-criar-competencia').click();
+    const modal = page.getByTestId('mdl-criar-competencia');
+    await expect(modal).toBeVisible();
+
+    await page.getByTestId('inp-criar-competencia-descricao').fill(descricao);
+
+    for (const atividade of atividades) {
+        // Find the checkbox wrapper or label containing the activity description
+        await modal.getByTestId('chk-criar-competencia-atividade')
+            .filter({hasText: atividade})
+            .check();
+    }
+
+    await page.getByTestId('btn-criar-competencia-salvar').click();
+    await expect(modal).toBeHidden();
+
+    // Verify creation
+    await verificarCompetenciaNoMapa(page, descricao, atividades);
+}
+
+export async function editarCompetencia(page: Page, descricaoAtual: string, novaDescricao: string, novasAtividades?: string[], removerAtividades?: string[]) {
+    const card = page.locator('.competencia-card', {has: page.getByText(descricaoAtual, {exact: true})});
+
+    // Hover to see actions if necessary (css suggests they are always visible or on hover, but playwrigth hovers automatically on click usually, or we force it)
+    await card.locator('.competencia-hover-row').hover();
+    await card.getByTestId('btn-editar-competencia').click();
+
+    const modal = page.getByTestId('mdl-criar-competencia');
+    await expect(modal).toBeVisible();
+
+    // Verify current description
+    await expect(page.getByTestId('inp-criar-competencia-descricao')).toHaveValue(descricaoAtual);
+
+    await page.getByTestId('inp-criar-competencia-descricao').fill(novaDescricao);
+
+    if (removerAtividades) {
+        for (const atividade of removerAtividades) {
+            await modal.getByTestId('chk-criar-competencia-atividade')
+                .filter({hasText: atividade})
+                .uncheck();
+        }
+    }
+
+    if (novasAtividades) {
+        for (const atividade of novasAtividades) {
+            await modal.getByTestId('chk-criar-competencia-atividade')
+                .filter({hasText: atividade})
+                .check();
+        }
+    }
+
+    await page.getByTestId('btn-criar-competencia-salvar').click();
+    await expect(modal).toBeHidden();
+
+    await expect(page.getByText(novaDescricao)).toBeVisible();
+}
+
+export async function excluirCompetencia(page: Page, descricao: string, confirmar: boolean = true) {
+    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    await card.locator('.competencia-hover-row').hover();
+    await card.getByTestId('btn-excluir-competencia').click();
+
+    const modal = page.getByTestId('mdl-excluir-competencia');
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText(descricao);
+
+    if (confirmar) {
+        await page.getByRole('button', {name: 'Confirmar'}).click();
+        await expect(modal).toBeHidden();
+        await expect(page.getByText(descricao, {exact: true})).toBeHidden();
+    } else {
+        await page.getByRole('button', {name: 'Cancelar'}).click();
+        await expect(modal).toBeHidden();
+        await expect(page.getByText(descricao, {exact: true})).toBeVisible();
+    }
+}
+
+export async function verificarCompetenciaNoMapa(page: Page, descricao: string, atividades: string[]) {
+    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    await expect(card).toBeVisible();
+
+    for (const atividade of atividades) {
+        await expect(card.getByText(atividade)).toBeVisible();
+    }
+}
+
+export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {
+    await expect(page.getByTestId('txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
+}
+
+export async function disponibilizarMapa(page: Page, dataLimite?: string) {
+    const data = dataLimite || calcularDataLimite(30);
+
+    await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+    const modal = page.getByTestId('mdl-disponibilizar-mapa');
+    await expect(modal).toBeVisible();
+
+    await page.getByTestId('inp-disponibilizar-mapa-data').fill(data);
+    await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
+
+    await expect(modal).toBeHidden();
+}
