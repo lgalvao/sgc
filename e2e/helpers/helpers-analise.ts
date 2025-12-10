@@ -123,7 +123,7 @@ export async function devolverCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByText(/Devolução realizada|Cadastro devolvido/i).first()).toBeVisible();
+    await expect(page.getByText(/Devolução realizada|Cadastro devolvido|Revisão devolvida/i).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -161,7 +161,7 @@ export async function aceitarCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Aceite registrado|Cadastro aceito/i).first()).toBeVisible();
+    await expect(page.getByText(/Aceite registrado|Cadastro aceito|Revisão aceita/i).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -242,6 +242,45 @@ export async function homologarRevisaoSemImpactos(page: Page) {
     // Verificar situação após homologação
     await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
         .toHaveText(/Mapa homologado/i);
+}
+
+/**
+ * Homologa revisão (ADMIN) - Detecta automaticamente se há impactos ou não
+ */
+export async function homologarCadastroRevisao(page: Page) {
+    await page.getByTestId('btn-acao-analisar-principal').click();
+    
+    // Aguardar modal aparecer
+    await expect(page.getByRole('dialog')).toBeVisible();
+    
+    // Detectar qual tipo de modal foi aberto
+    const temMensagemSemImpactos = await page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i).isVisible();
+    
+    if (temMensagemSemImpactos) {
+        // Caminho SEM impactos (CDU-14 passo 12.2)
+        await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+        
+        // Verifica redirecionamento para tela de detalhes do subprocesso
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        
+        // Verificar situação após homologação
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+            .toHaveText(/Mapa homologado/i);
+    } else {
+        // Caminho COM impactos (CDU-14 passo 12.3)
+        await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+        
+        // Verifica redirecionamento para tela de detalhes do subprocesso
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        
+        // Verificar situação após homologação
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+            .toHaveText(/Revisão do cadastro homologada/i);
+    }
 }
 
 /**
