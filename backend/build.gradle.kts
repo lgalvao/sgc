@@ -248,9 +248,6 @@ tasks.withType<Test> {
     }
 
     jvmArgs = listOf(
-        "--enable-preview",
-        "-Dlogging.level.root=INFO",
-        "-Dlogging.level.sgc=INFO",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
@@ -278,6 +275,5 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
         compilerArgs.add("-Xlint:deprecation")
-        compilerArgs.add("--enable-preview")
     }
 }

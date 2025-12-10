@@ -324,7 +324,7 @@ async function confirmarValidacao() {
       
       feedbackStore.show(
         "Homologação efetivada",
-        "O cadastro de atividades foi homologado com sucesso.",
+        "O cadastro foi homologado com sucesso.",
         "success",
       );
       
@@ -354,11 +354,6 @@ async function confirmarValidacao() {
       } else {
         await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
       }
-      feedbackStore.show(
-        "Cadastro aceito",
-        "O cadastro de atividades foi aceito com sucesso.",
-        "success",
-      );
       
       fecharModalValidar();
       await router.push({name: "Painel"});
