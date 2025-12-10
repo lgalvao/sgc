@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
+import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaMovimentacoes from "../TabelaMovimentacoes.vue";
-import type {Movimentacao} from "@/types/tipos";
+import type {Movimentacao, Unidade} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
 
 // Mock do utils para formatDateTimeBR
@@ -9,15 +9,43 @@ vi.mock("@/utils", () => ({
     formatDateTimeBR: (date: string) => `Formatted ${date}`,
 }));
 
+const mockUnidadeOrigem: Unidade = {
+    codigo: 1,
+    nome: "Origem A",
+    sigla: "ORG"
+};
+
+const mockUnidadeDestino: Unidade = {
+    codigo: 2,
+    nome: "Destino B",
+    sigla: "DST"
+};
+
 const mockMovimentacoes: Movimentacao[] = [
     {
         codigo: 1,
         dataHora: "2024-01-01T10:00:00Z",
-        unidadeOrigem: "Origem A",
-        unidadeDestino: "Destino B",
+        unidadeOrigem: mockUnidadeOrigem,
+        unidadeDestino: mockUnidadeDestino,
         descricao: "Movimento 1",
-        usuarioNome: "User",
-        usuarioTitulo: "123"
+        usuario: {
+            codigo: 10,
+            nome: "User",
+            tituloEleitoral: "123",
+            email: "email@test.com",
+            ramal: "1234",
+            unidade: mockUnidadeOrigem
+        },
+        subprocesso: {
+            codigo: 99,
+            unidade: mockUnidadeOrigem,
+            situacao: "NAO_INICIADO" as any,
+            dataLimite: "",
+            dataFimEtapa1: "",
+            dataLimiteEtapa2: "",
+            atividades: [],
+            codUnidade: 1
+        }
     },
 ];
 
@@ -28,7 +56,7 @@ describe("TabelaMovimentacoes.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         expect(bTable.exists()).toBe(true);
         expect(bTable.props("items")).toEqual(mockMovimentacoes);
     });
@@ -50,7 +78,7 @@ describe("TabelaMovimentacoes.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         const rowAttrFn = bTable.props("tbodyTrAttr") || bTable.vm.$attrs["tbody-tr-attr"];
 
         expect(typeof rowAttrFn).toBe("function");
@@ -59,4 +87,3 @@ describe("TabelaMovimentacoes.vue", () => {
         expect(rowAttrFn(null, "row")).toEqual({});
     });
 });
-

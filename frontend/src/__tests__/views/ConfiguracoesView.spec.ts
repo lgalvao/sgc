@@ -47,7 +47,7 @@ describe("ConfiguracoesView.vue", () => {
         // Accessing component instance or dom value if implemented in stub
         // The stub binds :value.
         const inputInativacao = wrapper.find('[data-testid="inp-config-dias-inativacao"]');
-        expect(inputInativacao.element.value).toBe("30");
+        expect((inputInativacao.element as HTMLInputElement).value).toBe("30");
 
         expect(store.carregarConfiguracoes).toHaveBeenCalled();
     });

@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {mount} from "@vue/test-utils";
+import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaAlertas from "../TabelaAlertas.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
@@ -12,10 +12,12 @@ const mockAlertas: Alerta[] = [
         origem: "Origem 1",
         dataHoraFormatada: "01/01/2024",
         dataHoraLeitura: null,
-        dataHoraCriacao: "2024-01-01T00:00:00Z",
-        servidorTitulo: "123",
-        codigoProcesso: 101,
-        siglaUnidade: "DTI"
+        dataHora: "2024-01-01T00:00:00Z",
+        codProcesso: 101,
+        unidadeOrigem: "DTI",
+        unidadeDestino: "DEST",
+        linkDestino: "/link",
+        descricao: "Desc"
     },
     {
         codigo: 2,
@@ -24,10 +26,12 @@ const mockAlertas: Alerta[] = [
         origem: "Origem 2",
         dataHoraFormatada: "02/01/2024",
         dataHoraLeitura: "2024-01-02T10:00:00Z",
-        dataHoraCriacao: "2024-01-02T00:00:00Z",
-        servidorTitulo: "123",
-        codigoProcesso: 102,
-        siglaUnidade: "DTI"
+        dataHora: "2024-01-02T00:00:00Z",
+        codProcesso: 102,
+        unidadeOrigem: "DTI",
+        unidadeDestino: "DEST",
+        linkDestino: "/link",
+        descricao: "Desc"
     },
 ];
 
@@ -40,7 +44,7 @@ describe("TabelaAlertas.vue", () => {
             }
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         expect(bTable.exists()).toBe(true);
         expect(bTable.props("items")).toEqual(mockAlertas);
     });
@@ -51,7 +55,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         const rowClassFn = bTable.props("tbodyTrClass");
 
         // Testar a função passada
@@ -65,16 +69,12 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         // BTable do bootstrap-vue-next pode tratar isso como prop ou attr
         // No stub, vamos checar props primeiro, depois attrs
-        const rowAttrFn = bTable.props("tbodyTrAttr") || bTable.attributes("tbody-tr-attr");
 
         // Se for atributo, pode ser que o Vue Test Utils não retorne o valor da prop passada como função se ela não for definida como prop no stub.
         // Mas vamos tentar acessar via vm.$attrs se necessário.
-
-        // Se for undefined no props, tentamos attributes. Se attributes retornar string "[object Object]" ou similar, é problema.
-        // O melhor é acessar props().tbodyTrAttr se o stub tiver props definidas, mas 'BTable: true' não define props.
 
         // Vamos tentar acessar bTable.vm.$attrs se disponível
         const fn = bTable.props("tbodyTrAttr") || bTable.vm.$attrs["tbody-tr-attr"];
@@ -92,7 +92,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
         await bTable.vm.$emit("row-clicked", mockAlertas[0]);
 
         expect(wrapper.emitted("selecionar-alerta")).toBeTruthy();
@@ -105,7 +105,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable);
+        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
 
         await bTable.vm.$emit("sort-changed", {sortBy: "dataHoraFormatada"});
         expect(wrapper.emitted("ordenar")?.[0]).toEqual(["data"]);
@@ -114,4 +114,3 @@ describe("TabelaAlertas.vue", () => {
         expect(wrapper.emitted("ordenar")?.[1]).toEqual(["processo"]);
     });
 });
-

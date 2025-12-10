@@ -249,7 +249,7 @@ describe("ImpactoMapaModal.vue", () => {
         // Forçamos o estado de carregamento simulando a chamada
         const mapasStore = useMapasStore();
 
-        mapasStore.buscarImpactoMapa = vi.fn(() => new Promise(() => {
+        mapasStore.buscarImpactoMapa = vi.fn((_: number) => new Promise<void>(() => {
         })); // Promise que nunca resolve
 
         // Recriar para pegar a transição de props

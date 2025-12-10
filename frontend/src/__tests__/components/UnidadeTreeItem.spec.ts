@@ -71,6 +71,6 @@ describe("UnidadeTreeItem.vue", () => {
         const wrapper = createWrapper(mockUnidade);
 
         const checkbox = wrapper.find('input[type="checkbox"]');
-        expect(checkbox.element.indeterminate).toBe(true);
+        expect((checkbox.element as HTMLInputElement).indeterminate).toBe(true);
     });
 });

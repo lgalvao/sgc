@@ -39,7 +39,7 @@ describe("router/index.ts", () => {
 
         try {
             await router.push("/rota-protegida");
-        } catch (e) {
+        } catch {
             // Ignorar erros de navegação cancelada
         }
 
