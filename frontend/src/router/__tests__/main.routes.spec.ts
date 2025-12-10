@@ -20,7 +20,7 @@ describe("main.routes", () => {
         expect(route?.meta?.title).toBe("Login");
 
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -32,7 +32,7 @@ describe("main.routes", () => {
         expect(route?.meta?.title).toBe("Painel");
 
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -44,7 +44,7 @@ describe("main.routes", () => {
         expect(route?.meta?.title).toBe("Histórico");
 
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -56,7 +56,7 @@ describe("main.routes", () => {
         expect(route?.meta?.title).toBe("Relatórios");
 
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -68,7 +68,7 @@ describe("main.routes", () => {
         expect(route?.meta?.title).toBe("Configurações");
 
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });

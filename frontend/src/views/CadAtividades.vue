@@ -528,7 +528,7 @@ async function disponibilizarCadastro() {
         errosValidacao.value = resultado.erros;
         mostrarModalErros.value = true;
       }
-    } catch (error) {
+    } catch {
       feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
     }
   }

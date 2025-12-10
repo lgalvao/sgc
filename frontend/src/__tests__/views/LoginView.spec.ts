@@ -5,6 +5,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {useRouter} from "vue-router";
+import {Perfil} from "@/types/tipos";
 
 // Mocks
 vi.mock("vue-router", () => ({
@@ -97,8 +98,7 @@ describe("LoginView.vue", () => {
         // Mock do loginCompleto retornando sucesso
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         // Mock de um único perfil
-        // @ts-ignore - access readonly property for testing
-        perfilStore.perfisUnidades = [{perfil: "ADMIN", unidade: {sigla: "SEDE"}}];
+        perfilStore.perfisUnidades = [{perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"}];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -132,10 +132,9 @@ describe("LoginView.vue", () => {
         const perfilStore = usePerfilStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        // @ts-ignore
         perfilStore.perfisUnidades = [
-            {perfil: "ADMIN", unidade: {sigla: "SEDE"}},
-            {perfil: "USER", unidade: {sigla: "FILIAL"}}
+            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
+            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
         ];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -158,10 +157,9 @@ describe("LoginView.vue", () => {
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockResolvedValue(true);
         const mockPerfis = [
-            {perfil: "ADMIN", unidade: {sigla: "SEDE"}},
-            {perfil: "USER", unidade: {sigla: "FILIAL"}}
+            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
+            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
         ];
-        // @ts-ignore
         perfilStore.perfisUnidades = mockPerfis;
 
         // Passo 1

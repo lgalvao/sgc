@@ -16,7 +16,7 @@ describe("diagnostico.routes", () => {
 
         // Verificar componente lazy loading
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -30,7 +30,7 @@ describe("diagnostico.routes", () => {
 
         // Verificar componente lazy loading
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -44,7 +44,7 @@ describe("diagnostico.routes", () => {
 
         // Verificar componente lazy loading
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });
@@ -58,7 +58,7 @@ describe("diagnostico.routes", () => {
 
         // Verificar componente lazy loading
         if (typeof route?.component === "function") {
-            const component = await route.component();
+            const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
     });

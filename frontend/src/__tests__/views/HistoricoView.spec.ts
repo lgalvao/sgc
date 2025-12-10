@@ -87,11 +87,9 @@ describe("HistoricoView.vue", () => {
     });
 
     it("deve carregar processos finalizados ao montar", async () => {
+        mount(HistoricoView, mountOptions());
         const processosStore = useProcessosStore();
-
-        processosStore.buscarProcessosFinalizados = vi.fn();
-        const store3 = useProcessosStore();
-        expect(store3.buscarProcessosFinalizados).toHaveBeenCalled();
+        expect(processosStore.buscarProcessosFinalizados).toHaveBeenCalled();
     });
 
     it("deve renderizar tabela com processos ordenados (default descricao ASC)", () => {
