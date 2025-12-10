@@ -18,6 +18,9 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("SELECT u.sigla FROM Unidade u WHERE u.codigo IN :codigos")
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
 
+    @Query("SELECT u FROM Unidade u LEFT JOIN FETCH u.mapaVigente")
+    List<Unidade> findAllComMapas();
+
     List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo);
 
     List<Unidade> findByTitularTituloEleitoral(String tituloEleitoral);

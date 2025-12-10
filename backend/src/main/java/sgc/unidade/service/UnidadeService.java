@@ -36,12 +36,15 @@ public class UnidadeService {
 
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             TipoProcesso tipoProcesso, Long codProcesso) {
-        List<Unidade> todasUnidades = unidadeRepo.findAll();
-
-        // For MAPEAMENTO, all units are elegível
-        // For REVISAO and DIAGNOSTICO, only units with vigente maps are elegível
         boolean requerMapaVigente =
                 tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO;
+
+        List<Unidade> todasUnidades;
+        if (requerMapaVigente) {
+            todasUnidades = unidadeRepo.findAllComMapas();
+        } else {
+            todasUnidades = unidadeRepo.findAll();
+        }
 
         return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente);
     }

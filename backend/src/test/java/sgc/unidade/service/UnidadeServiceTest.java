@@ -12,6 +12,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.*;
 
@@ -160,5 +161,25 @@ class UnidadeServiceTest {
 
         assertThatThrownBy(() -> unidadeService.buscarPorCodigo(id))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve usar findAllComMapas quando requerMapaVigente")
+    void buscarArvoreComElegibilidadeRevisao() {
+        when(unidadeRepo.findAllComMapas()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+
+        unidadeService.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, 1L);
+
+        verify(unidadeRepo).findAllComMapas();
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve usar findAll quando nao requerMapaVigente")
+    void buscarArvoreComElegibilidadeMapeamento() {
+        when(unidadeRepo.findAll()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+
+        unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 1L);
+
+        verify(unidadeRepo).findAll();
     }
 }
