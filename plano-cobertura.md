@@ -62,19 +62,19 @@ Estes arquivos já possuem algum nível de cobertura, mas ainda há código não
     *   **Ação:** Analisar `statementMap` e `branchMap` para identificar linhas e branches não cobertos. Criar testes que exercitem esses caminhos de código, especialmente as condições de ramificação.
 *   `src/mappers/atividades.ts` (Cobertura Média: 54.46%) - **CONCLUÍDO**
     *   **Ação:** Garantir que todas as funções de mapeamento estejam cobertas com diferentes cenários de entrada e saída, incluindo casos de erro ou dados incompletos.
-*   `src/components/ImpactoMapaModal.vue` (Cobertura Média: 54.65%)
+*   `src/components/ImpactoMapaModal.vue` (Cobertura Média: 54.65%) - **CONCLUÍDO**
     *   **Ação:** Focar nos fluxos de interação do modal, validação de entrada, e a lógica de processamento do impacto.
-*   `src/stores/feedback.ts` (Cobertura Média: 65.56%)
+*   `src/stores/feedback.ts` (Cobertura Média: 65.56%) - **CONCLUÍDO**
     *   **Ação:** Escrever testes para todas as actions e getters da store, cobrindo cenários de sucesso, erro e diferentes estados.
-*   `src/services/subprocessoService.ts` (Cobertura Média: 68.18%)
+*   `src/services/subprocessoService.ts` (Cobertura Média: 68.18%) - **CONCLUÍDO**
     *   **Ação:** Identificar funções não cobertas e criar testes que simulem chamadas a essas funções, mockando as dependências.
-*   `src/components/UnidadeTreeNode.vue` (Cobertura Média: 68.25%)
+*   `src/components/UnidadeTreeNode.vue` (Cobertura Média: 68.25%) - **CONCLUÍDO**
     *   **Ação:** Semelhante ao `UnidadeTreeItem.vue`, focar nas ramificações e na lógica de renderização da árvore de nós.
-*   `src/axios-setup.ts` (Cobertura Média: 70.38%)
+*   `src/axios-setup.ts` (Cobertura Média: 70.38%) - **CONCLUÍDO**
     *   **Ação:** Testar os interceptors de requisição e resposta, garantindo que a lógica de autenticação (tokens), tratamento de erros (ex: redirecionamento para login em 401) e modificação de requisições/respostas esteja funcionando conforme o esperado.
-*   `src/components/TabelaProcessos.vue` (Cobertura Média: 72.51%)
+*   `src/components/TabelaProcessos.vue` (Cobertura Média: 72.51%) - **CONCLUÍDO**
     *   **Ação:** Testar a renderização da tabela, ordenação, paginação (se houver), e interações com as linhas ou ações dos processos.
-*   `src/stores/processos.ts` (Cobertura Média: 76.93%)
+*   `src/stores/processos.ts` (Cobertura Média: 76.93%) - **CONCLUÍDO**
     *   **Ação:** Expandir os testes existentes para cobrir mais actions, getters e estados da store, especialmente aqueles que interagem com o `processoService`.
 
 ## Estratégias e Ferramentas

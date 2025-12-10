@@ -43,8 +43,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(erroApi, HttpStatus.valueOf(erroApi.getStatus()));
     }
 
-    private ResponseEntity<Object> handleBusinessException(
-            Exception ex, HttpStatus status, String logLevel) {
+    private ResponseEntity<Object> handleBusinessException(Exception ex, HttpStatus status, String logLevel) {
         if (LOG_LEVEL_ERROR.equals(logLevel)) {
             log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         } else {
@@ -70,22 +69,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             @Nullable HttpHeaders headers,
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
-        log.warn(
-                "Erro de validação de argumento de método: {}",
-                ex != null ? ex.getMessage() : null);
+
+        log.info("Erro de validação de argumento");
+        log.debug(">> Detalhes do erro: {}", ex != null ? ex.getMessage() : null);
+
         String message = "A requisição contém dados de entrada inválidos.";
-        var subErrors =
-                ex != null
-                        ? ex.getBindingResult().getFieldErrors().stream()
-                                .map(
-                                        error ->
-                                                new ErroSubApi(
-                                                        error.getObjectName(),
-                                                        error.getField(),
-                                                        error.getRejectedValue(),
-                                                        sanitizar(error.getDefaultMessage())))
-                                .collect(Collectors.toList())
-                        : null;
+        var subErrors = ex != null
+                ? ex.getBindingResult().getFieldErrors().stream().map(
+                        error -> new ErroSubApi(error.getObjectName(),
+                                error.getField(),
+                                error.getRejectedValue(),
+                                sanitizar(error.getDefaultMessage())))
+                .toList() : null;
+
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
@@ -106,14 +102,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Erro de constraint de banco de dados: {}", ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
         var subErrors =
-                ex.getConstraintViolations().stream()
-                        .map(
-                                violation ->
-                                        new ErroSubApi(
-                                                violation.getRootBeanClass().getSimpleName(),
-                                                violation.getPropertyPath().toString(),
-                                                violation.getInvalidValue(),
-                                                sanitizar(violation.getMessage())))
+                ex.getConstraintViolations().stream().map(violation ->
+                                new ErroSubApi(
+                                        violation.getRootBeanClass().getSimpleName(),
+                                        violation.getPropertyPath().toString(),
+                                        violation.getInvalidValue(),
+                                        sanitizar(violation.getMessage())))
                         .collect(Collectors.toList());
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -176,11 +170,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({
-        ErroProcessoEmSituacaoInvalida.class,
-        ErroUnidadesNaoDefinidas.class,
-        ErroMapaEmSituacaoInvalida.class,
-        ErroAtividadesEmSituacaoInvalida.class,
-        ErroMapaNaoAssociado.class
+            ErroProcessoEmSituacaoInvalida.class,
+            ErroUnidadesNaoDefinidas.class,
+            ErroMapaEmSituacaoInvalida.class,
+            ErroAtividadesEmSituacaoInvalida.class,
+            ErroMapaNaoAssociado.class
     })
     protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
         return handleBusinessException(

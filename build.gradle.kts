@@ -67,13 +67,6 @@ tasks.register<Exec>("frontendQualityCheck") {
     ) else listOf("npm", "run", "quality:all")
 
     isIgnoreExitValue = true
-
-    val projectDir = layout.projectDirectory.asFile.absolutePath
-
-    doLast {
-        println("\n=== Frontend Quality Check Summary ===")
-        println("Coverage Report: file://$projectDir/frontend/coverage/index.html")
-    }
 }
 
 tasks.register("backendQualityCheck") {
@@ -92,19 +85,6 @@ tasks.register("qualityCheckAll") {
     group = "quality"
     description = "Runs all quality checks for both frontend and backend"
     dependsOn("backendQualityCheck", "frontendQualityCheck")
-
-    val projectDir = layout.projectDirectory.asFile.absolutePath
-
-    doLast {
-        println("\n=== Comprehensive Quality Check Summary ===")
-        println("Backend Reports:")
-        println("  JaCoCo: file://$projectDir/backend/build/reports/jacoco/test/html/index.html")
-        println("  SpotBugs: file://$projectDir/backend/build/reports/spotbugs/main.html")
-        println("  Checkstyle: file://$projectDir/backend/build/reports/checkstyle/main.html")
-        println("  PMD: file://$projectDir/backend/build/reports/pmd/main.html")
-        println("Frontend Reports:")
-        println("  Coverage: file://$projectDir/frontend/coverage/index.html")
-    }
 }
 
 tasks.register<Exec>("qualityCheckFast") {

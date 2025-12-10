@@ -145,4 +145,66 @@ describe("TabelaProcessos.vue", () => {
     const rows = wrapper.findAll("tbody tr");
     expect(rows[1].text()).toContain("26/08/2024");
   });
+
+  it("deve formatar corretamente situações e tipos variados e desconhecidos", async () => {
+     const processosVariados: ProcessoResumo[] = [
+       {
+         ...mockProcessos[0],
+         codigo: 3,
+         situacao: SituacaoProcesso.CRIADO,
+         tipo: TipoProcesso.DIAGNOSTICO
+       },
+       {
+         ...mockProcessos[0],
+         codigo: 4,
+         situacao: "DESCONHECIDO" as any,
+         tipo: "OUTRO" as any
+       }
+     ];
+     
+    const wrapper = mount(TabelaProcessos, {
+      props: {
+        processos: processosVariados,
+        criterioOrdenacao: "descricao",
+        direcaoOrdenacaoAsc: true,
+      },
+    });
+    
+    await wrapper.vm.$nextTick();
+    const rows = wrapper.findAll("tbody tr");
+    
+    const cells3 = rows[0].findAll("td");
+    expect(cells3[1].text()).toBe("Diagnóstico");
+    expect(cells3[3].text()).toBe("Criado");
+    
+    const cells4 = rows[1].findAll("td");
+    expect(cells4[1].text()).toBe("OUTRO");
+    expect(cells4[3].text()).toBe("DESCONHECIDO");
+  });
+
+  it("deve aplicar atributos nas linhas", async () => {
+       const wrapper = mount(TabelaProcessos, {
+          props: {
+            processos: mockProcessos,
+            criterioOrdenacao: "descricao",
+            direcaoOrdenacaoAsc: true,
+          },
+        });
+        await wrapper.vm.$nextTick();
+        const row = wrapper.find(`.row-processo-${mockProcessos[0].codigo}`);
+        expect(row.exists()).toBe(true);
+  });
+
+  it("deve exibir mensagem de vazio quando não houver processos", async () => {
+      const wrapper = mount(TabelaProcessos, {
+          props: {
+              processos: [],
+              criterioOrdenacao: "descricao",
+              direcaoOrdenacaoAsc: true,
+          },
+      });
+      // BTable renders empty slot when items is empty.
+      // We might need to check if the text exists.
+      expect(wrapper.text()).toContain("Nenhum processo encontrado.");
+  });
 });

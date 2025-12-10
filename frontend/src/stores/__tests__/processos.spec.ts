@@ -283,5 +283,47 @@ describe("useProcessosStore", () => {
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
         });
+
+        describe("homologarValidacao", () => {
+            it("deve chamar o processoService e recarregar os detalhes", async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                processoService.homologarValidacao.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(
+                    MOCK_PROCESSO_DETALHE,
+                );
+                await store.homologarValidacao(1);
+                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("atualizarStatusSubprocesso", () => {
+             it("deve atualizar o status de uma unidade no detalhe do processo", () => {
+                 const unidade = { codSubprocesso: 100, situacaoSubprocesso: "OLD", situacaoLabel: "Old" };
+                 store.processoDetalhe = { ...MOCK_PROCESSO_DETALHE, unidades: [unidade] } as any;
+                 
+                 store.atualizarStatusSubprocesso(100, { situacao: "NEW", situacaoLabel: "New" });
+                 
+                 const unidadeAtualizada = store.processoDetalhe!.unidades.find((u: any) => u.codSubprocesso === 100);
+                 expect(unidadeAtualizada!.situacaoSubprocesso).toBe("NEW");
+                 expect(unidadeAtualizada!.situacaoLabel).toBe("New");
+             });
+        });
+
+        describe("obterUnidadesDoProcesso (Getter)", () => {
+            it("deve retornar unidades do processo correto", () => {
+                 store.processoDetalhe = { ...MOCK_PROCESSO_DETALHE, codigo: 1, resumoSubprocessos: [{ codigo: 10 }] } as any;
+                 
+                 const unidades = store.obterUnidadesDoProcesso(1);
+                 expect(unidades).toEqual([{ codigo: 10 }]);
+            });
+
+            it("deve retornar lista vazia se processo não corresponder", () => {
+                 store.processoDetalhe = { ...MOCK_PROCESSO_DETALHE, codigo: 2 } as any;
+                 
+                 const unidades = store.obterUnidadesDoProcesso(1);
+                 expect(unidades).toEqual([]);
+            });
+        });
     });
 });

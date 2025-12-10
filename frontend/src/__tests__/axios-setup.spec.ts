@@ -1,5 +1,5 @@
 import {createPinia, setActivePinia} from "pinia";
-import {beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
 import {useFeedbackStore} from "@/stores/feedback";
 
@@ -40,6 +40,7 @@ vi.mock("axios", async (importOriginal) => {
 
 describe("axios-setup", () => {
     let requestInterceptor: (config: any) => any;
+    let requestErrorInterceptor: (error: any) => any;
     let responseErrorInterceptor: (error: any) => any;
 
     beforeAll(async () => {
@@ -52,14 +53,17 @@ describe("axios-setup", () => {
 
         if (requestUseCalls.length > 0) {
             requestInterceptor = requestUseCalls[0][0];
+            requestErrorInterceptor = requestUseCalls[0][1];
         }
         if (responseUseCalls.length > 0) {
+            // responseUseCalls[0][0] is success handler (identity)
             responseErrorInterceptor = responseUseCalls[0][1];
         }
     });
 
     beforeEach(async () => {
         setActivePinia(createPinia());
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
@@ -78,6 +82,11 @@ describe("axios-setup", () => {
         const config = {headers: {}};
         const result = requestInterceptor(config);
         expect(result.headers.Authorization).toBeUndefined();
+    });
+
+    it("request error interceptor should reject promise", async () => {
+        const error = new Error("Request error");
+        await expect(requestErrorInterceptor(error)).rejects.toThrow("Request error");
     });
 
     it("response error interceptor should redirect to login on 401", async () => {
@@ -103,7 +112,7 @@ describe("axios-setup", () => {
         expect(feedbackStore.show).not.toHaveBeenCalled();
     });
 
-    it("response error interceptor should show unexpected error for 500", async () => {
+    it("response error interceptor should show unexpected error for 500 with message", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -112,6 +121,21 @@ describe("axios-setup", () => {
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
+    });
+
+    it("response error interceptor should show generic error for 500 without message", async () => {
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
+
+        const error = {
+            response: {status: 500, data: {}},
+        };
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Erro Inesperado",
+            "Ocorreu um erro. Tente novamente mais tarde.",
+            "danger"
+        );
     });
 
     it("response error interceptor should show network error", async () => {
@@ -125,5 +149,27 @@ describe("axios-setup", () => {
             expect.stringContaining("Não foi possível conectar"),
             "danger"
         );
+    });
+
+    it("response error interceptor should show generic error with message property", async () => {
+        const feedbackStore = useFeedbackStore();
+        vi.spyOn(feedbackStore, "show");
+
+        const error = {message: "Generic failure"};
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Generic failure", "danger");
+    });
+    
+    it("response error interceptor should handle store errors gracefully", async () => {
+        const feedbackStore = useFeedbackStore();
+        // Force an error in store.show
+        vi.spyOn(feedbackStore, "show").mockImplementation(() => { throw new Error("Store error"); });
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+        const error = {message: "Generic failure"};
+        
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        
+        expect(consoleSpy).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
     });
 });
