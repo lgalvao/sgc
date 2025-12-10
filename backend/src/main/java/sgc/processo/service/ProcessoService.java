@@ -84,7 +84,7 @@ public class ProcessoService {
 
         return codUnidadeUsuario != null
                 && subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(
-                        codProcesso, codUnidadeUsuario);
+                codProcesso, codUnidadeUsuario);
     }
 
     @Transactional
@@ -515,7 +515,7 @@ public class ProcessoService {
         // Vou assumir que diagnóstico também trabalha sobre uma cópia (snapshot) do mapa vigente.
         Mapa mapaCopiado =
                 servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        
+
         Subprocesso subprocesso =
                 Subprocesso.builder()
                         .processo(processo)
@@ -533,27 +533,27 @@ public class ProcessoService {
         // No teste passo 3: "await page.getByText(descProcessoDiagnostico).click(); ... Navega para Autoavaliação -> click card-subprocesso-diagnostico"
         // Parece que o subprocesso já deve estar disponível.
         // Se o processo pai está EM_ANDAMENTO, o subprocesso deve estar ativo.
-        
+
         // Vamos checar SituacaoSubprocesso para Diagnostico.
         // Existe SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO?
         // Se eu usar NAO_INICIADO, o frontend pode não mostrar.
         // Vou setar DIAGNOSTICO_EM_ANDAMENTO se existir, ou deixar NAO_INICIADO se houver transição automática.
         // Mas o mapa de revisão começa NAO_INICIADO.
         // Vou usar NAO_INICIADO e verificar se precisa de transição.
-        
+
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        
+
         // E automaticamente iniciar o diagnóstico?
         // Para Mapeamento e Revisão, fica NAO_INICIADO até alguém abrir.
         // Mas se o Processo já está iniciado...
         // O código de 'iniciarProcessoMapeamento' seta situacao NAO_INICIADO.
-        
+
         // AJUSTE: O teste espera ver "Mapeamento Setup ... - Finalizado".
         // O novo processo é "Diagnostico Teste ... - Em andamento".
         // Se o subprocesso estiver NAO_INICIADO, o card pode aparecer diferente.
-        
+
         // Vamos ver SituacaoSubprocesso disponíveis.
-        
+
         movimentacaoRepo.save(
                 new Movimentacao(
                         subprocessoSalvo, null, unidade, "Processo de diagnóstico iniciado", null));
@@ -587,7 +587,7 @@ public class ProcessoService {
                                             sp.getUnidade() != null
                                                     ? sp.getUnidade().getSigla()
                                                     : String.format(
-                                                            "Subprocesso %d", sp.getCodigo());
+                                                    "Subprocesso %d", sp.getCodigo());
                                     return String.format(
                                             "%s (Situação: %s)", identificador, sp.getSituacao());
                                 })
@@ -613,28 +613,19 @@ public class ProcessoService {
                 subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade =
-                    Optional.ofNullable(subprocesso.getUnidade())
-                            .orElseThrow(
-                                    () ->
-                                            new ErroProcesso(
-                                                    "Subprocesso %d sem unidade associada."
-                                                            .formatted(subprocesso.getCodigo())));
+            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
-            Mapa mapaDoSubprocesso =
-                    Optional.ofNullable(subprocesso.getMapa())
-                            .orElseThrow(
-                                    () ->
-                                            new ErroProcesso(
-                                                    "Subprocesso %d sem mapa associado."
-                                                            .formatted(subprocesso.getCodigo())));
+            Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
+                    .orElseThrow(() -> new ErroProcesso(
+                            "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
             unidade.setMapaVigente(mapaDoSubprocesso);
             unidade.setDataVigenciaMapa(LocalDateTime.now());
             unidadeRepo.save(unidade);
 
-            log.debug(
-                    "Mapa vigente para unidade {} definido como mapa {}",
+            log.debug("Mapa vigente para unidade {} definido como mapa {}",
                     unidade.getCodigo(),
                     mapaDoSubprocesso.getCodigo());
         }
@@ -686,11 +677,11 @@ public class ProcessoService {
                 .filter(
                         sp ->
                                 sp.getSituacao()
-                                                == SituacaoSubprocesso
-                                                        .MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                                        == SituacaoSubprocesso
+                                        .MAPEAMENTO_CADASTRO_DISPONIBILIZADO
                                         || sp.getSituacao()
-                                                == SituacaoSubprocesso
-                                                        .REVISAO_CADASTRO_DISPONIBILIZADA)
+                                        == SituacaoSubprocesso
+                                        .REVISAO_CADASTRO_DISPONIBILIZADA)
                 .map(this::toSubprocessoElegivelDto)
                 .toList();
     }

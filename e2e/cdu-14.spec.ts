@@ -103,8 +103,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await homologarCadastroMapeamento(page);
 
         // Passo 5: ADMIN cria competências e disponibiliza mapa
-        await page.goto('/painel');
-        await acessarSubprocessoAdmin(page, descMapeamento, 'Seção 221');
+        // Após homologação, já está na tela de Detalhes do subprocesso
         await page.getByTestId('card-subprocesso-mapa').click();
         
         await page.getByTestId('btn-abrir-criar-competencia').click();

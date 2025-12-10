@@ -34,22 +34,21 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
             await page.waitForLoadState('networkidle');
+            
+            // Clica no processo no painel
             await page.getByText(descricaoProcesso).click();
             
-            const unitRow = page.getByRole('row', {name: /ASSESSORIA_11/});
-            const subprocessCard = page.getByTestId('card-subprocesso-atividades'); // CHEFE has edit permission
-
-            // Wait until one of them is visible
-            await expect(async () => {
-                const rowVisible = await unitRow.isVisible();
-                const cardVisible = await subprocessCard.isVisible();
-                expect(rowVisible || cardVisible).toBeTruthy();
-            }).toPass();
-
-            if (await unitRow.isVisible()) {
-                await unitRow.click();
-            }
-
+            // Aguarda estar na tela de Detalhes do processo
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+            
+            // Como CHEFE, está na tela de Detalhes do processo
+            // Deve clicar na linha da sua unidade
+            await page.getByRole('row', {name: /ASSESSORIA_11/}).click();
+            
+            // Aguarda estar na tela de Detalhes do subprocesso
+            await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+            
+            // Agora navega para atividades
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 

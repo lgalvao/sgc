@@ -98,7 +98,7 @@ onMounted(async () => {
             router.push('/painel');
         }
     } catch (error) {
-        feedbackStore.show('Erro', 'Erro ao carregar dados.', 'danger');
+        feedbackStore.show('Erro', 'Erro ao carregar dados: ' + error, 'danger');
     } finally {
         loading.value = false;
     }

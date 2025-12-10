@@ -20,7 +20,7 @@ Pré-condições:
    - Ao lado da descrição da competência, botões de ação (ícones), para editar e para excluir a competência.
    - Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas à competência em pequenos blocos internos.
    - À direita da descrição de cada atividade mostrar um badge com o número de conhecimentos da atividade. Ao passar o mouse sobre esse badge, o sistema exibirá em um tooltip a lista de conhecimentos da atividade.
-   - Botões Criar competência e Disponibilizar alinhados no canto superior direito da lista de blocos de competências
+   - Botões `Criar competência` e `Disponibilizar` alinhados no canto superior direito da lista de blocos de competências
 
 ## (Início de fluxo de criação de competências)
 

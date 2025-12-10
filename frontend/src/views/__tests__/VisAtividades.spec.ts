@@ -189,7 +189,13 @@ describe("VisAtividades.vue", () => {
     await btnConfirm.trigger("click");
 
     expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
-    expect(pushMock).toHaveBeenCalledWith("/painel");
+    expect(pushMock).toHaveBeenCalledWith({
+      name: "Subprocesso",
+      params: {
+        codProcesso: 1,
+        siglaUnidade: "TESTE",
+      },
+    });
   });
 
   it("deve validar cadastro (Aceitar) e redirecionar", async () => {
@@ -212,7 +218,7 @@ describe("VisAtividades.vue", () => {
     await btnConfirm.trigger("click");
 
     expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
-    expect(pushMock).toHaveBeenCalledWith("/painel");
+    expect(pushMock).toHaveBeenCalledWith({ name: "Painel" });
   });
 
   it("deve devolver cadastro e redirecionar", async () => {

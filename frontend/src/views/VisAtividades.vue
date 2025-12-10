@@ -328,7 +328,9 @@ async function confirmarValidacao() {
         "success",
       );
       
-      // Redirecionar para Detalhes do subprocesso (CDU-14 passo 12.4)
+      fecharModalValidar();
+      
+      // Redirecionar para Detalhes do subprocesso (CDU-13 passo 11.7 e CDU-14 passo 12.4)
       await router.push({
         name: "Subprocesso",
         params: {
@@ -352,12 +354,14 @@ async function confirmarValidacao() {
       } else {
         await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
       }
-      await router.push({name: "Painel"});
       feedbackStore.show(
         "Cadastro aceito",
         "O cadastro de atividades foi aceito com sucesso.",
         "success",
       );
+      
+      fecharModalValidar();
+      await router.push({name: "Painel"});
     } catch (error) {
       console.error(error);
       feedbackStore.show(
@@ -367,9 +371,6 @@ async function confirmarValidacao() {
       );
     }
   }
-
-  fecharModalValidar();
-  await router.push("/painel");
 }
 
 async function confirmarDevolucao() {

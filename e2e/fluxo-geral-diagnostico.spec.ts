@@ -81,10 +81,11 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         
+        // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        
         // Cria Competência no Mapa
-        await expect(page).toHaveURL(/.*\/painel/);
-        await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: /Unit Test Diag/i}).click();
+        // Já está na tela de Detalhes do subprocesso
         await page.getByTestId('card-subprocesso-mapa').click();
         
         await page.getByTestId('btn-abrir-criar-competencia').click();

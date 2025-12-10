@@ -107,14 +107,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
-        // Aguardar conclusão e redirecionamento (comportamento padrão de homologação)
-        await verificarPaginaPainel(page);
+        // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
         // 4. Admin cria competências (Mapa)
-        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
-        await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+        // Já está na tela de Detalhes do subprocesso
         // Verificar se o card de mapa EDITAVEL está visível (confirma permissão/status correto)
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await page.getByTestId('card-subprocesso-mapa').click();

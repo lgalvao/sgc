@@ -149,8 +149,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
-        // Validação: Redirecionado para o painel
-        await verificarPaginaPainel(page);
+        // Validação: Redirecionado para Detalhes do subprocesso (CDU-13 passo 11.7)
+        await verificarPaginaSubprocesso(page);
     }
 
     async function passo3_AdminAdicionaCompetenciasEDisponibilizaMapa(page: Page, descProcesso: string, timestamp: number): Promise<void> {
@@ -158,10 +158,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await fazerLogout(page);
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-        // Validação: Redirecionado para o painel
-        await verificarPaginaPainel(page);
-
-        // Navegar para o subprocesso
+        // Após homologação, já está na tela de Detalhes do subprocesso
+        // Navegar para o subprocesso (caso não esteja mais lá)
         await page.getByText(descProcesso).click();
         await page.getByRole('row', {name: 'Assessoria 21'}).click();
         await verificarPaginaSubprocesso(page);

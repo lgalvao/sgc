@@ -9,12 +9,12 @@
     </div>
 
     <BAlert variant="info" :model-value="true" :fade="false">
-      <i class="bi bi-info-circle me-2" />
+      <i class="bi bi-info-circle me-2"/>
       Identifique a situação de capacitação para as competências com Gap significativo.
     </BAlert>
 
     <div v-if="loading" class="text-center py-5">
-      <BSpinner label="Carregando..." />
+      <BSpinner label="Carregando..."/>
     </div>
 
     <div v-else>
@@ -30,30 +30,31 @@
           <div class="table-responsive">
             <table class="table table-hover mb-0">
               <thead class="table-light">
-                <tr>
-                  <th style="width: 40%">Competência</th>
-                  <th class="text-center" style="width: 10%">Imp.</th>
-                  <th class="text-center" style="width: 10%">Dom.</th>
-                  <th class="text-center" style="width: 10%">Gap</th>
-                  <th style="width: 30%">Situação Cap.</th>
-                </tr>
+              <tr>
+                <th style="width: 40%">Competência</th>
+                <th class="text-center" style="width: 10%">Imp.</th>
+                <th class="text-center" style="width: 10%">Dom.</th>
+                <th class="text-center" style="width: 10%">Gap</th>
+                <th style="width: 30%">Situação Cap.</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="gap in servidor.gaps" :key="gap.avaliacao.codigo">
-                  <td>{{ gap.avaliacao.competenciaDescricao }}</td>
-                  <td class="text-center"><span class="badge bg-secondary">{{ gap.avaliacao.importanciaLabel }}</span></td>
-                  <td class="text-center"><span class="badge bg-info">{{ gap.avaliacao.dominioLabel }}</span></td>
-                  <td class="text-center"><span class="badge bg-danger">{{ gap.avaliacao.gap }}</span></td>
-                  <td>
-                    <BFormSelect
+              <tr v-for="gap in servidor.gaps" :key="gap.avaliacao.codigo">
+                <td>{{ gap.avaliacao.competenciaDescricao }}</td>
+                <td class="text-center"><span class="badge bg-secondary">{{ gap.avaliacao.importanciaLabel }}</span>
+                </td>
+                <td class="text-center"><span class="badge bg-info">{{ gap.avaliacao.dominioLabel }}</span></td>
+                <td class="text-center"><span class="badge bg-danger">{{ gap.avaliacao.gap }}</span></td>
+                <td>
+                  <BFormSelect
                       v-model="gap.ocupacao.situacao"
                       :options="OPCOES_SITUACAO"
                       size="sm"
                       @change="salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, gap.ocupacao.situacao)"
-                    />
-                    <small v-if="gap.salvo" class="text-success ms-2"><i class="bi bi-check" /></small>
-                  </td>
-                </tr>
+                  />
+                  <small v-if="gap.salvo" class="text-success ms-2"><i class="bi bi-check"/></small>
+                </td>
+              </tr>
               </tbody>
             </table>
           </div>
@@ -77,12 +78,12 @@ import {
 } from '@/services/diagnosticoService';
 
 const OPCOES_SITUACAO = [
-  { value: null, text: 'Selecione...' },
-  { value: 'NA', text: 'Não se aplica' },
-  { value: 'AC', text: 'A capacitar' },
-  { value: 'EC', text: 'Em capacitação' },
-  { value: 'C', text: 'Capacitado' },
-  { value: 'I', text: 'Instrutor' },
+  {value: null, text: 'Selecione...'},
+  {value: 'NA', text: 'Não se aplica'},
+  {value: 'AC', text: 'A capacitar'},
+  {value: 'EC', text: 'Em capacitação'},
+  {value: 'C', text: 'Capacitado'},
+  {value: 'I', text: 'Instrutor'},
 ];
 
 const route = useRoute();
@@ -119,15 +120,15 @@ onMounted(async () => {
 
     // Processa dados para extrair Gaps >= 2
     servidoresComGap.value = diag.servidores
-      .map(servidor => ({
-        tituloEleitoral: servidor.tituloEleitoral,
-        nome: servidor.nome,
-        gaps: filtrarGaps(servidor)
-      }))
-      .filter(s => s.gaps.length > 0);
+        .map(servidor => ({
+          tituloEleitoral: servidor.tituloEleitoral,
+          nome: servidor.nome,
+          gaps: filtrarGaps(servidor)
+        }))
+        .filter(s => s.gaps.length > 0);
 
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao carregar ocupações críticas.', 'danger');
+    feedbackStore.show('Erro', 'Erro ao carregar ocupações críticas: ' + error, 'danger');
   } finally {
     loading.value = false;
   }
@@ -135,36 +136,36 @@ onMounted(async () => {
 
 function filtrarGaps(servidor: ServidorDiagnosticoDto): GapItem[] {
   return servidor.avaliacoes
-    .filter(av => (av.gap !== null && av.gap >= 2)) // Regra de negócio: Gap >= 2 (N5-N3=2)
-    .map(av => {
-      // Procura ocupação já salva
-      const ocupacaoExistente = servidor.ocupacoes.find(o => o.competenciaCodigo === av.competenciaCodigo);
-      return {
-        avaliacao: av,
-        ocupacao: { situacao: ocupacaoExistente?.situacao || null },
-        salvo: !!ocupacaoExistente
-      };
-    });
+      .filter(av => (av.gap !== null && av.gap >= 2)) // Regra de negócio: Gap >= 2 (N5-N3=2)
+      .map(av => {
+        // Procura ocupação já salva
+        const ocupacaoExistente = servidor.ocupacoes.find(o => o.competenciaCodigo === av.competenciaCodigo);
+        return {
+          avaliacao: av,
+          ocupacao: {situacao: ocupacaoExistente?.situacao || null},
+          salvo: !!ocupacaoExistente
+        };
+      });
 }
 
 async function salvar(servidorTitulo: string, competenciaCodigo: number, situacao: string) {
   if (!situacao) return;
-  
+
   try {
     const servidor = servidoresComGap.value.find(s => s.tituloEleitoral === servidorTitulo);
     const gap = servidor?.gaps.find(g => g.avaliacao.competenciaCodigo === competenciaCodigo);
     if (gap) gap.salvo = false;
 
     await diagnosticoService.salvarOcupacao(
-      codSubprocesso.value,
-      servidorTitulo,
-      competenciaCodigo,
-      situacao
+        codSubprocesso.value,
+        servidorTitulo,
+        competenciaCodigo,
+        situacao
     );
 
     if (gap) gap.salvo = true;
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao salvar ocupação.', 'danger');
+    feedbackStore.show('Erro', 'Erro ao salvar ocupação: ' + error, 'danger');
   }
 }
 </script>

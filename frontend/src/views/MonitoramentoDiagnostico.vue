@@ -135,7 +135,7 @@ onMounted(async () => {
         loading.value = true;
         diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
     } catch (error) {
-        feedbackStore.show('Erro', 'Erro ao carregar monitoramento.', 'danger');
+        feedbackStore.show('Erro', 'Erro ao carregar monitoramento: ' + error, 'danger');
     } finally {
         loading.value = false;
     }

@@ -189,11 +189,12 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await verificarPaginaPainel(page);
+        
+        // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
         // Adicionar competências e disponibilizar mapa
-        await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
+        // Já está na tela de Detalhes do subprocesso
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
         await page.getByTestId('btn-abrir-criar-competencia').click();

@@ -182,9 +182,6 @@ describe("Router", () => {
         await router.push("/diagnostico/123/autoavaliacao");
         const route = router.currentRoute.value;
         expect(route.name).toBe("AutoavaliacaoDiagnostico");
-
-        const matched = route.matched.find((m) => m.name === "AutoavaliacaoDiagnostico");
-        // props: true means params are passed as props
         expect(route.params.codSubprocesso).toBe("123");
     });
 
@@ -192,10 +189,7 @@ describe("Router", () => {
         await router.push("/diagnostico/123/ocupacoes");
         const route = router.currentRoute.value;
         expect(route.name).toBe("OcupacoesCriticasDiagnostico");
-
-        const matched = route.matched.find((m) => m.name === "OcupacoesCriticasDiagnostico");
         expect(route.params.codSubprocesso).toBe("123");
-        // OcupacoesCriticasDiagnostico route does not use siglaUnidade in path
     });
 
     it("deve resolver a rota de Unidade com breadcrumb dinâmico", async () => {
@@ -241,12 +235,6 @@ describe("Router", () => {
     });
 
     it("deve usar o nome da rota como título se meta.title não estiver definido", async () => {
-        // Simulando uma rota sem meta.title, se houvesse.
-        // Mas todas as rotas têm meta.title.
-        // Vamos adicionar uma rota dinâmica para testar isso se possível,
-        // ou apenas confiar que a lógica está coberta se houver algum branch.
-        // O código é: const titleBase = typeof meta.title === 'string' ? meta.title : (to.name as string) || 'SGC'
-
         router.addRoute({
             path: "/teste-sem-titulo",
             name: "TesteSemTitulo",

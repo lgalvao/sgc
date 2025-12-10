@@ -123,7 +123,7 @@ export async function devolverCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByText(/Devolução realizada|Cadastro devolvido|Revisão devolvida|Erro ao devolver/i).first()).toBeVisible();
+    await expect(page.getByText(/Cadastro devolvido/i)).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -161,7 +161,7 @@ export async function aceitarCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Aceite registrado|Cadastro aceito|Revisão aceita/i).first()).toBeVisible();
+    await expect(page.getByText(/Cadastro aceito/i)).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -195,10 +195,10 @@ export async function homologarCadastroMapeamento(page: Page) {
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada|Cadastro homologado|Revisão homologada/i).first()).toBeVisible();
+    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
     
-    // Sistema redireciona para o painel após homologação
-    await verificarPaginaPainel(page);
+    // Sistema redireciona para Detalhes do subprocesso após homologação (CDU-13 passo 11.7)
+    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 }
 
 /**
@@ -212,14 +212,14 @@ export async function homologarRevisaoComImpactos(page: Page) {
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada|Revisão homologada/i)).toBeVisible();
+    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
     
     // Verifica redirecionamento para tela de detalhes do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     
     // Verificar situação após homologação
     await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-        .toHaveText(/Revisão do cadastro homologada/i);
+        .toHaveText(/Revisão de Cadastro Homologada/i);
 }
 
 /**
@@ -234,7 +234,7 @@ export async function homologarRevisaoSemImpactos(page: Page) {
     await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada|Revisão homologada/i)).toBeVisible();
+    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
     
     // Verifica redirecionamento para tela de detalhes do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
@@ -260,7 +260,7 @@ export async function homologarCadastroRevisao(page: Page) {
         // Caminho SEM impactos (CDU-14 passo 12.2)
         await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await expect(page.getByText(/Homologação efetivada|Revisão homologada/i)).toBeVisible();
+        await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
         
         // Verifica redirecionamento para tela de detalhes do subprocesso
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
@@ -279,7 +279,7 @@ export async function homologarCadastroRevisao(page: Page) {
         
         // Verificar situação após homologação
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-            .toHaveText(/Revisão do cadastro homologada/i);
+            .toHaveText(/Revisão de Cadastro Homologada/i);
     }
 }
 

@@ -108,30 +108,20 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
-        await verificarPaginaPainel(page);
+        // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
     test('Preparacao 4: Admin adiciona competências e disponibiliza mapa', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        // ADMIN após login está no Painel
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         
-        // Robust navigation for Admin
-        const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first();
-
-         // Wait until one of them is visible
-         await expect(async () => {
-              const rowVisible = await unitRow.isVisible();
-              const cardVisible = await mapCard.isVisible();
-              expect(rowVisible || cardVisible).toBeTruthy();
-         }).toPass();
-
-         if (await unitRow.isVisible()) {
-             await unitRow.click();
-         }
+        // Navegar para a unidade
+        await page.getByRole('row', {name: 'Seção 221'}).click();
 
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
@@ -180,23 +170,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
+        // ADMIN após login está no Painel
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
         
-        // Robust navigation for Admin
-        const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        const mapCard = page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first();
-
-         // Wait until one of them is visible
-         await expect(async () => {
-              const rowVisible = await unitRow.isVisible();
-              const cardVisible = await mapCard.isVisible();
-              expect(rowVisible || cardVisible).toBeTruthy();
-         }).toPass();
-
-         if (await unitRow.isVisible()) {
-             await unitRow.click();
-         }
+        // Navegar para a unidade
+        await page.getByRole('row', {name: 'Seção 221'}).click();
 
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
