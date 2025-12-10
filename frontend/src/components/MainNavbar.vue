@@ -3,7 +3,7 @@
       class="navbar-expand-lg navbar-dark bg-dark border-bottom"
       toggleable="lg"
   >
-    <BContainer>
+    <div class="container">
       <BNavbarBrand to="/painel">
         SGC
       </BNavbarBrand>
@@ -64,12 +64,12 @@
           </BNavItem>
         </BNavbarNav>
       </BCollapse>
-    </BContainer>
+    </div>
   </BNavbar>
 </template>
 
 <script lang="ts" setup>
-import {BCollapse, BContainer, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem,} from "bootstrap-vue-next";
+import {BCollapse, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem,} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";

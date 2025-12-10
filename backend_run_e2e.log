@@ -1,0 +1,14 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:bootRun --args=--spring.profiles.active=e2e
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:resolveMainClassName UP-TO-DATE
+
+> Task :backend:bootRun
+INFO  sgc.Sgc.logStarting:54 - Starting Sgc using Java 21.0.8 with PID 3581 (/app/backend/build/classes/java/main started by jules in /app/backend)
+INFO  sgc.Sgc.logStartupProfileInfo:667 - The following 1 profile is active: "e2e"
+INFO  o.a.c.core.StandardService.log:168 - Starting service [Tomcat]
+INFO  o.a.c.core.StandardEngine.log:168 - Starting Servlet engine: [Apache Tomcat/11.0.14]
+INFO  s.n.NotificacaoEmailServiceMock.<init>:22 - NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados
+INFO  sgc.Sgc.logStarted:60 - Started Sgc in 8.84 seconds (process running for 9.332)
+INFO  o.a.c.c.C.[.[localhost].[/].log:168 - Initializing Spring DispatcherServlet 'dispatcherServlet'
