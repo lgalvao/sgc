@@ -416,11 +416,13 @@ describe("CadMapa.vue", () => {
         vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
+        await flushPromises();
 
         expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
             dataLimite: "2023-12-31",
             observacoes: "Obs",
         });
+        expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
     });
 
     it("deve abrir modal de impacto", async () => {
