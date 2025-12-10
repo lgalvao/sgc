@@ -1,113 +1,148 @@
 <template>
-  <div class="login-bg">
-    <div class="login-center-wrapper">
-      <BCard
-          class="login-card p-4 shadow-lg"
-          no-body
+  <BContainer class="d-flex align-items-center justify-content-center min-vh-100">
+    <BRow class="w-100 justify-content-center">
+      <BCol
+          lg="4"
+          md="6"
+          sm="12"
       >
-        <h2
-            class="mb-2 text-center"
-            data-testid="txt-login-titulo"
+        <BCard
+            class="shadow-lg p-4"
+            no-body
         >
-          SGC
-        </h2>
-        <h5
-            class="mb-4 text-center text-muted"
-            data-testid="txt-login-subtitulo"
-        >
-          Sistema de Gestão de Competências
-        </h5>
-        <BForm
-            class="p-0"
-            data-testid="form-login"
-            @submit.prevent="handleLogin"
-        >
-          <div class="mb-3">
-            <label
-                class="form-label"
-                data-testid="lbl-login-usuario"
-                for="titulo"
-            >
-              <i class="bi bi-person-circle me-2" aria-hidden="true"/>
-              Título eleitoral</label>
-            <BFormInput
-                id="titulo"
-                v-model="titulo"
-                :disabled="loginStep > 1"
-                autocomplete="username"
-                data-testid="inp-login-usuario"
-                placeholder="Digite seu título"
-                type="text"
-            />
-          </div>
-          <div class="mb-3">
-            <label
-                class="form-label"
-                data-testid="lbl-login-senha"
-                for="senha"
-            >
-              <i class="bi bi-key me-2" aria-hidden="true"/>
-              Senha</label>
-            <BFormInput
-                id="senha"
-                v-model="senha"
-                :disabled="loginStep > 1"
-                autocomplete="current-password"
-                data-testid="inp-login-senha"
-                placeholder="Digite sua senha"
-                type="password"
-            />
-          </div>
-
-          <div
-              v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
-              class="mb-3"
-              data-testid="sec-login-perfil"
+          <h2
+              class="mb-2 text-center"
+              data-testid="txt-login-titulo"
           >
-            <label
-                class="form-label"
-                data-testid="lbl-login-perfil"
-                for="par"
-            >Selecione o Perfil e a Unidade</label>
-            <BFormSelect
-                id="par"
-                v-model="parSelecionado"
-                :options="perfisUnidadesOptions"
-                data-testid="sel-login-perfil"
-                text-field="text"
-                value-field="value"
-            >
-              <template #first>
-                <BFormSelectOption
-                    :value="null"
-                    disabled
-                >
-                  -- Selecione uma opção --
-                </BFormSelectOption>
-              </template>
-            </BFormSelect>
-          </div>
-
-          <BButton
-              aria-label="Entrar"
-              class="w-100 login-btn"
-              data-testid="btn-login-entrar"
-              type="submit"
-              variant="primary"
-              :disabled="isLoading"
+            SGC
+          </h2>
+          <h5
+              class="mb-4 text-center text-muted"
+              data-testid="txt-login-subtitulo"
           >
-            <BSpinner v-if="isLoading" small class="me-2" />
-            <i v-else class="bi bi-box-arrow-in-right me-2" aria-hidden="true"/>
-            Entrar
-          </BButton>
-        </BForm>
-      </BCard>
-    </div>
-  </div>
+            Sistema de Gestão de Competências
+          </h5>
+          <BForm
+              class="p-0"
+              data-testid="form-login"
+              @submit.prevent="handleLogin"
+          >
+            <div class="mb-3">
+              <label
+                  class="form-label"
+                  data-testid="lbl-login-usuario"
+                  for="titulo"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-person-circle me-2"
+                />
+                Título eleitoral
+              </label>
+              <BFormInput
+                  id="titulo"
+                  v-model="titulo"
+                  autocomplete="username"
+                  data-testid="inp-login-usuario"
+                  :disabled="loginStep > 1"
+                  placeholder="Digite seu título"
+                  type="text"
+              />
+            </div>
+            <div class="mb-3">
+              <label
+                  class="form-label"
+                  data-testid="lbl-login-senha"
+                  for="senha"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-key me-2"
+                />
+                Senha
+              </label>
+              <BFormInput
+                  id="senha"
+                  v-model="senha"
+                  autocomplete="current-password"
+                  data-testid="inp-login-senha"
+                  :disabled="loginStep > 1"
+                  placeholder="Digite sua senha"
+                  type="password"
+              />
+            </div>
+
+            <div
+                v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
+                class="mb-3"
+                data-testid="sec-login-perfil"
+            >
+              <label
+                  class="form-label"
+                  data-testid="lbl-login-perfil"
+                  for="par"
+              >
+                Selecione o Perfil e a Unidade
+              </label>
+              <BFormSelect
+                  id="par"
+                  v-model="parSelecionado"
+                  data-testid="sel-login-perfil"
+                  :options="perfisUnidadesOptions"
+                  text-field="text"
+                  value-field="value"
+              >
+                <template #first>
+                  <BFormSelectOption
+                      disabled
+                      :value="null"
+                  >
+                    -- Selecione uma opção --
+                  </BFormSelectOption>
+                </template>
+              </BFormSelect>
+            </div>
+
+            <BButton
+                aria-label="Entrar"
+                class="w-100"
+                data-testid="btn-login-entrar"
+                :disabled="isLoading"
+                type="submit"
+                variant="primary"
+            >
+              <BSpinner
+                  v-if="isLoading"
+                  class="me-2"
+                  small
+              />
+              <i
+                  v-else
+                  aria-hidden="true"
+                  class="bi bi-box-arrow-in-right me-2"
+              />
+              Entrar
+            </BButton>
+          </BForm>
+        </BCard>
+      </BCol>
+    </BRow>
+  </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption, BSpinner} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCol,
+  BContainer,
+  BForm,
+  BFormInput,
+  BFormSelect,
+  BFormSelectOption,
+  BRow,
+  BSpinner
+} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {PerfilUnidade} from "@/mappers/sgrh";
