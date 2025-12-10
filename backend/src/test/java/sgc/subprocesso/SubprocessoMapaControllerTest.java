@@ -44,17 +44,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class SubprocessoMapaControllerTest {
 
-    @MockitoBean private SubprocessoMapaService subprocessoMapaService;
-    @MockitoBean private MapaService mapaService;
-    @MockitoBean private MapaVisualizacaoService mapaVisualizacaoService;
-    @MockitoBean private ImpactoMapaService impactoMapaService;
-    @MockitoBean private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @MockitoBean private SubprocessoConsultaService subprocessoConsultaService;
-    @MockitoBean private SgrhService sgrhService;
-    @MockitoBean private sgc.subprocesso.service.SubprocessoService subprocessoService;
+    @MockitoBean
+    private SubprocessoMapaService subprocessoMapaService;
+    @MockitoBean
+    private MapaService mapaService;
+    @MockitoBean
+    private MapaVisualizacaoService mapaVisualizacaoService;
+    @MockitoBean
+    private ImpactoMapaService impactoMapaService;
+    @MockitoBean
+    private SubprocessoDtoService subprocessoDtoService;
+    @MockitoBean
+    private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    @MockitoBean
+    private SubprocessoConsultaService subprocessoConsultaService;
+    @MockitoBean
+    private SgrhService sgrhService;
+    @MockitoBean
+    private sgc.subprocesso.service.SubprocessoService subprocessoService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
     @BeforeEach

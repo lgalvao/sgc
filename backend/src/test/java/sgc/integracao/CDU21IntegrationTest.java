@@ -54,18 +54,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-21: Finalizar Processo")
 class CDU21IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
-    @MockitoBean private ProcessoNotificacaoService processoNotificacaoService;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @MockitoBean
+    private ProcessoNotificacaoService processoNotificacaoService;
 
-    @MockitoBean private SgrhService sgrhService;
+    @MockitoBean
+    private SgrhService sgrhService;
 
-    @MockitoBean private SubprocessoNotificacaoService subprocessoNotificacaoService;
+    @MockitoBean
+    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Processo processo;
     private Unidade unidadeOperacional1;
@@ -117,48 +126,48 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                 .thenReturn(
                         Map.of(
                                 unidadeIntermediaria.getCodigo(),
-                                        new ResponsavelDto(
-                                                unidadeIntermediaria.getCodigo(),
-                                                String.valueOf(
-                                                        titularIntermediaria.getTituloEleitoral()),
-                                                "Titular Intermediaria",
-                                                null,
-                                                null),
+                                new ResponsavelDto(
+                                        unidadeIntermediaria.getCodigo(),
+                                        String.valueOf(
+                                                titularIntermediaria.getTituloEleitoral()),
+                                        "Titular Intermediaria",
+                                        null,
+                                        null),
                                 unidadeOperacional1.getCodigo(),
-                                        new ResponsavelDto(
-                                                unidadeOperacional1.getCodigo(),
-                                                String.valueOf(titularOp1.getTituloEleitoral()),
-                                                "Titular Op1",
-                                                null,
-                                                null),
+                                new ResponsavelDto(
+                                        unidadeOperacional1.getCodigo(),
+                                        String.valueOf(titularOp1.getTituloEleitoral()),
+                                        "Titular Op1",
+                                        null,
+                                        null),
                                 unidadeOperacional2.getCodigo(),
-                                        new ResponsavelDto(
-                                                unidadeOperacional2.getCodigo(),
-                                                String.valueOf(titularOp2.getTituloEleitoral()),
-                                                "Titular Op2",
-                                                null,
-                                                null)));
+                                new ResponsavelDto(
+                                        unidadeOperacional2.getCodigo(),
+                                        String.valueOf(titularOp2.getTituloEleitoral()),
+                                        "Titular Op2",
+                                        null,
+                                        null)));
         when(sgrhService.buscarUsuariosPorTitulos(anyList()))
                 .thenReturn(
                         Map.of(
                                 "1",
-                                        new UsuarioDto(
-                                                "1",
-                                                "Titular Intermediaria",
-                                                "titular.intermediaria@test.com",
-                                                "123"),
+                                new UsuarioDto(
+                                        "1",
+                                        "Titular Intermediaria",
+                                        "titular.intermediaria@test.com",
+                                        "123"),
                                 "2",
-                                        new UsuarioDto(
-                                                "2",
-                                                "Titular Op1",
-                                                "titular.op1@test.com",
-                                                "123"),
+                                new UsuarioDto(
+                                        "2",
+                                        "Titular Op1",
+                                        "titular.op1@test.com",
+                                        "123"),
                                 "3",
-                                        new UsuarioDto(
-                                                "3",
-                                                "Titular Op2",
-                                                "titular.op2@test.com",
-                                                "123")));
+                                new UsuarioDto(
+                                        "3",
+                                        "Titular Op2",
+                                        "titular.op2@test.com",
+                                        "123")));
     }
 
     @Test

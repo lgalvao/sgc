@@ -32,31 +32,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ProcessoDetalheMapperCustomTest {
 
-    @Mock private ProcessoDetalheMapper delegate;
+    @Mock
+    private ProcessoDetalheMapper delegate;
 
-    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
-    @InjectMocks private ProcessoDetalheMapperCustomImpl mapper;
-
-    // Concrete implementation for testing
-    static class ProcessoDetalheMapperCustomImpl extends ProcessoDetalheMapperCustom {
-        @Override
-        public ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(
-                Unidade unidade) {
-            return null;
-        }
-
-        @Override
-        public ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso) {
-            return null;
-        }
-
-        @Override
-        public ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(
-                Subprocesso subprocesso) {
-            return null;
-        }
-    }
+    @InjectMocks
+    private ProcessoDetalheMapperCustomImpl mapper;
 
     @BeforeEach
     void setup() {
@@ -125,5 +108,25 @@ class ProcessoDetalheMapperCustomTest {
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().get(0).getCodUnidade()).isEqualTo(1L);
         assertThat(dto.getUnidades().get(0).getFilhos()).hasSize(1);
+    }
+
+    // Concrete implementation for testing
+    static class ProcessoDetalheMapperCustomImpl extends ProcessoDetalheMapperCustom {
+        @Override
+        public ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(
+                Unidade unidade) {
+            return null;
+        }
+
+        @Override
+        public ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso) {
+            return null;
+        }
+
+        @Override
+        public ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(
+                Subprocesso subprocesso) {
+            return null;
+        }
     }
 }

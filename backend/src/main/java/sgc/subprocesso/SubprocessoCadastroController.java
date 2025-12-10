@@ -147,7 +147,7 @@ public class SubprocessoCadastroController {
      * Devolve o cadastro de um subprocesso para o responsável pela unidade para que sejam feitos
      * ajustes.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
      */
     @PostMapping("/{codigo}/devolver-cadastro")
@@ -166,7 +166,7 @@ public class SubprocessoCadastroController {
     /**
      * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo de trabalho.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
      */
     @PostMapping("/{codigo}/aceitar-cadastro")
@@ -185,7 +185,7 @@ public class SubprocessoCadastroController {
     /**
      * Homologa o cadastro de um subprocesso.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
      */
     @PostMapping("/{codigo}/homologar-cadastro")
@@ -205,7 +205,7 @@ public class SubprocessoCadastroController {
      * Devolve a revisão de um cadastro de subprocesso para o responsável pela unidade para que
      * sejam feitos ajustes.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
      */
     @PostMapping("/{codigo}/devolver-revisao-cadastro")
@@ -224,7 +224,7 @@ public class SubprocessoCadastroController {
     /**
      * Aceita a revisão do cadastro de um subprocesso.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
      */
     @PostMapping("/{codigo}/aceitar-revisao-cadastro")
@@ -245,7 +245,7 @@ public class SubprocessoCadastroController {
      *
      * <p>Esta ação é restrita a usuários com o perfil 'ADMIN'.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
      */
     @PostMapping("/{codigo}/homologar-revisao-cadastro")
@@ -265,7 +265,7 @@ public class SubprocessoCadastroController {
     /**
      * Importa atividades de um subprocesso de origem para o subprocesso de destino.
      *
-     * @param codigo O código do subprocesso de destino.
+     * @param codigo  O código do subprocesso de destino.
      * @param request O DTO contendo o código do subprocesso de origem.
      * @return Um {@link Map} com uma mensagem de sucesso.
      */

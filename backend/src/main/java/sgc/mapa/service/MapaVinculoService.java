@@ -31,9 +31,9 @@ public class MapaVinculoService {
      *       atuais.
      * </ul>
      *
-     * @param codCompetencia O código da competência a ser atualizada.
+     * @param codCompetencia      O código da competência a ser atualizada.
      * @param novosCodsAtividades A lista completa de IDs de atividades que devem estar vinculadas à
-     *     competência.
+     *                            competência.
      */
     public void atualizarVinculosAtividades(Long codCompetencia, List<Long> novosCodsAtividades) {
         Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow();

@@ -3,20 +3,20 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import {defineConfig} from "vitest/config";
 
 export default defineConfig({
-  plugins: [vue(), tsconfigPaths()],
-  test: {
-    globals: true,
-      reporters: "dot",
-      environment: "jsdom",
-      include: ["src/**/*.{test,spec}.{js,ts}"],
-      exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*"],
-      setupFiles: ["./vitest.setup.ts"],
-    coverage: {
-        provider: "v8",
-        reporter: ["json", "text", "html", "lcov"],
-        reportsDirectory: "./coverage",
-        include: ["src/**/*.{js,ts,vue}"],
-        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/constants/**", "src/types/**"]
+    plugins: [vue(), tsconfigPaths()],
+    test: {
+        globals: true,
+        reporters: "dot",
+        environment: "jsdom",
+        include: ["src/**/*.{test,spec}.{js,ts}"],
+        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*"],
+        setupFiles: ["./vitest.setup.ts"],
+        coverage: {
+            provider: "v8",
+            reporter: ["json", "text", "html", "lcov"],
+            reportsDirectory: "./coverage",
+            include: ["src/**/*.{js,ts,vue}"],
+            exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/constants/**", "src/types/**"]
+        },
     },
-  },
 });

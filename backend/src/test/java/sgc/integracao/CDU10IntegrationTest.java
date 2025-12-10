@@ -45,24 +45,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WithMockChefe("333333333333")
 @Import({
-    TestSecurityConfig.class,
-    WithMockChefeSecurityContextFactory.class,
-    sgc.integracao.mocks.TestThymeleafConfig.class
+        TestSecurityConfig.class,
+        WithMockChefeSecurityContextFactory.class,
+        sgc.integracao.mocks.TestThymeleafConfig.class
 })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
 class CDU10IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private AlertaRepo alertaRepo;
-    @Autowired private AnaliseRepo analiseRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;

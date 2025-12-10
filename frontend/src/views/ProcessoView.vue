@@ -2,41 +2,41 @@
   <BContainer class="mt-4">
     <div v-if="processo">
       <ProcessoDetalhes
-        :descricao="processo.descricao"
-        :tipo="processo.tipo"
-        :situacao="processo.situacao"
+          :descricao="processo.descricao"
+          :situacao="processo.situacao"
+          :tipo="processo.tipo"
       />
 
       <TreeTable
-        :columns="colunasTabela"
-        :data="dadosFormatados"
-        title="Unidades participantes"
-        @row-click="abrirDetalhesUnidade"
+          :columns="colunasTabela"
+          :data="dadosFormatados"
+          title="Unidades participantes"
+          @row-click="abrirDetalhesUnidade"
       />
 
       <ProcessoAcoes
-        :mostrar-botoes-bloco="mostrarBotoesBloco"
-        :perfil="perfilStore.perfilSelecionado"
-        :situacao-processo="processo.situacao"
-        @aceitar-bloco="abrirModalAcaoBloco('aceitar')"
-        @homologar-bloco="abrirModalAcaoBloco('homologar')"
-        @finalizar="finalizarProcesso"
+          :mostrar-botoes-bloco="mostrarBotoesBloco"
+          :perfil="perfilStore.perfilSelecionado"
+          :situacao-processo="processo.situacao"
+          @finalizar="finalizarProcesso"
+          @aceitar-bloco="abrirModalAcaoBloco('aceitar')"
+          @homologar-bloco="abrirModalAcaoBloco('homologar')"
       />
     </div>
 
     <ModalAcaoBloco
-      :mostrar="mostrarModalBloco"
-      :tipo="tipoAcaoBloco"
-      :unidades="unidadesSelecionadasBloco"
-      @fechar="fecharModalBloco"
-      @confirmar="confirmarAcaoBloco"
+        :mostrar="mostrarModalBloco"
+        :tipo="tipoAcaoBloco"
+        :unidades="unidadesSelecionadasBloco"
+        @confirmar="confirmarAcaoBloco"
+        @fechar="fecharModalBloco"
     />
 
     <ModalFinalizacao
-      :mostrar="mostrarModalFinalizacao"
-      :processo-descricao="processo?.descricao || ''"
-      @fechar="fecharModalFinalizacao"
-      @confirmar="confirmarFinalizacao"
+        :mostrar="mostrarModalFinalizacao"
+        :processo-descricao="processo?.descricao || ''"
+        @confirmar="confirmarFinalizacao"
+        @fechar="fecharModalFinalizacao"
     />
   </BContainer>
 </template>

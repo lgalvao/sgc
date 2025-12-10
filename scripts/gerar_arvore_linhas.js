@@ -1,11 +1,11 @@
-const { execSync } = require('child_process');
+const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 function getFiles() {
     try {
         // Tenta usar git ls-files para listar arquivos rastreados
-        const output = execSync('git ls-files', { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10 });
+        const output = execSync('git ls-files', {encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10});
         return output.trim().split(/\r?\n/).filter(line => line);
     } catch (e) {
         console.log("Git não encontrado ou erro ao executar. Tentando varredura manual...");
@@ -17,7 +17,7 @@ function walkDir(dir, fileList = []) {
     const files = fs.readdirSync(dir);
     for (const file of files) {
         if (file === '.git' || file === 'node_modules' || file === 'dist' || file === 'build' || file === '.gradle') continue;
-        
+
         const filePath = path.join(dir, file);
         try {
             const stat = fs.statSync(filePath);
@@ -46,19 +46,19 @@ function countLines(filePath) {
 }
 
 function buildTree(fileList) {
-    const root = { name: '.', count: 0, children: {}, isDir: true };
+    const root = {name: '.', count: 0, children: {}, isDir: true};
 
     fileList.forEach(filePath => {
         // Normaliza separadores
         const normalizedPath = filePath.replace(/\\/g, '/');
         const count = countLines(normalizedPath);
-        
+
         const parts = normalizedPath.split('/');
         let current = root;
 
         parts.forEach((part, index) => {
             const isLast = index === parts.length - 1;
-            
+
             if (!current.children[part]) {
                 current.children[part] = {
                     name: part,
@@ -68,7 +68,7 @@ function buildTree(fileList) {
                 };
             }
             current = current.children[part];
-            
+
             if (isLast) {
                 current.count = count;
             }
@@ -92,12 +92,12 @@ function calculateTotals(node) {
 }
 
 function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
-    const { maxDepth } = options;
-    
+    const {maxDepth} = options;
+
     // Formatação
     const connector = isRoot ? '' : (isLast ? '└── ' : '├── ');
     const childPrefix = isRoot ? '' : (isLast ? '    ' : '│   ');
-    
+
     // Cores (ANSI escape codes)
     const reset = '\x1b[0m';
     const blue = '\x1b[34m'; // Diretórios
@@ -118,12 +118,12 @@ function printTree(node, options, prefix = '', isLast = true, isRoot = true, cur
         const childKeys = Object.keys(node.children).sort((a, b) => {
             const nodeA = node.children[a];
             const nodeB = node.children[b];
-            
+
             // Ordena por contagem (maior para menor)
             if (nodeB.count !== nodeA.count) {
                 return nodeB.count - nodeA.count;
             }
-            
+
             // Em caso de empate na contagem, ordena alfabeticamente
             return a.localeCompare(b);
         });

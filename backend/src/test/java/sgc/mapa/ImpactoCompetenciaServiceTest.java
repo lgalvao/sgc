@@ -28,11 +28,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoCompetenciaServiceTest {
-    @InjectMocks private ImpactoCompetenciaService service;
+    @InjectMocks
+    private ImpactoCompetenciaService service;
 
-    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
-    @Mock private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     private Mapa mapa;
     private Competencia competencia;
@@ -46,6 +49,31 @@ class ImpactoCompetenciaServiceTest {
         competencia.setCodigo(1L);
         competencia.setDescricao("Comp 1");
         competencia.setMapa(mapa);
+    }
+
+    @Test
+    @DisplayName("obterCompetenciasDaAtividade retorna lista de descricoes")
+    void obterCompetenciasDaAtividade() {
+        Atividade ativ = new Atividade();
+        ativ.setCodigo(1L);
+        ativ.setCompetencias(Set.of(competencia));
+
+        when(atividadeRepo.findById(1L)).thenReturn(Optional.of(ativ));
+
+        List<String> res = service.obterCompetenciasDaAtividade(1L, mapa);
+
+        assertThat(res).hasSize(1);
+        assertThat(res.getFirst()).isEqualTo("Comp 1");
+    }
+
+    @Test
+    @DisplayName("obterCompetenciasDaAtividade retorna vazio se atividade nao existe")
+    void obterCompetenciasDaAtividadeNaoEncontrada() {
+        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+
+        List<String> res = service.obterCompetenciasDaAtividade(1L, mapa);
+
+        assertThat(res).isEmpty();
     }
 
     @Nested
@@ -160,30 +188,5 @@ class ImpactoCompetenciaServiceTest {
             assertThat(result).isNotEmpty();
             assertThat(result.getFirst().getTipoImpacto().name()).isEqualTo("IMPACTO_GENERICO");
         }
-    }
-
-    @Test
-    @DisplayName("obterCompetenciasDaAtividade retorna lista de descricoes")
-    void obterCompetenciasDaAtividade() {
-        Atividade ativ = new Atividade();
-        ativ.setCodigo(1L);
-        ativ.setCompetencias(Set.of(competencia));
-
-        when(atividadeRepo.findById(1L)).thenReturn(Optional.of(ativ));
-
-        List<String> res = service.obterCompetenciasDaAtividade(1L, mapa);
-
-        assertThat(res).hasSize(1);
-        assertThat(res.getFirst()).isEqualTo("Comp 1");
-    }
-
-    @Test
-    @DisplayName("obterCompetenciasDaAtividade retorna vazio se atividade nao existe")
-    void obterCompetenciasDaAtividadeNaoEncontrada() {
-        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
-
-        List<String> res = service.obterCompetenciasDaAtividade(1L, mapa);
-
-        assertThat(res).isEmpty();
     }
 }

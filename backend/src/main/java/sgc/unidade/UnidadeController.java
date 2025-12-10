@@ -12,7 +12,9 @@ import sgc.unidade.service.UnidadeService;
 import java.util.List;
 import java.util.Map;
 
-/** Controle para operações relacionadas a unidades organizacionais */
+/**
+ * Controle para operações relacionadas a unidades organizacionais
+ */
 @RestController
 @RequestMapping("/api/unidades")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class UnidadeController {
      * Cria uma nova atribuição temporária para um servidor em uma unidade.
      *
      * @param codUnidade O Código da unidade.
-     * @param request Os dados da atribuição.
+     * @param request    Os dados da atribuição.
      * @return Resposta vazia com status 201 (Created).
      */
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
@@ -49,7 +51,7 @@ public class UnidadeController {
      * processo.
      *
      * @param tipoProcesso O tipo de processo a ser criado.
-     * @param codProcesso O código do processo (opcional, para edição).
+     * @param codProcesso  O código do processo (opcional, para edição).
      * @return A lista de unidades raiz com a árvore de filhas e a elegibilidade.
      */
     @GetMapping("/arvore-com-elegibilidade")

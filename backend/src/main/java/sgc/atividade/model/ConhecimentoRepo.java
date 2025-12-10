@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/** Repositório JPA para a entidade Conhecimento. */
+/**
+ * Repositório JPA para a entidade Conhecimento.
+ */
 @Repository
 public interface ConhecimentoRepo extends JpaRepository<Conhecimento, Long> {
     /**

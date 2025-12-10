@@ -6,7 +6,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 
 /**
  * DTO que representa o status atual de um subprocesso.
- * 
+ *
  * <p>Usado para retornar informações básicas de status sem precisar
  * carregar todo o processo ou subprocesso completo.
  */

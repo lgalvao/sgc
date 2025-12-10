@@ -79,7 +79,7 @@ describe("mapaService", () => {
 
     it("verificarMapaVigente deve retornar false em caso de 404", async () => {
         const error = new AxiosError("Not Found");
-        error.response = { status: 404 } as any;
+        error.response = {status: 404} as any;
         mockedApiClient.get.mockRejectedValue(error);
 
         const result = await mapaService.verificarMapaVigente(1);

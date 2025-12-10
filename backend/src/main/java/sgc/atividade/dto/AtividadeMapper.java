@@ -5,7 +5,9 @@ import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 import sgc.atividade.model.Atividade;
 
-/** Mapper (usando MapStruct) entre a entidade Atividade e seu DTO. */
+/**
+ * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
+ */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")

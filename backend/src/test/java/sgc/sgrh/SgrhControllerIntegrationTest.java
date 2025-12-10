@@ -34,13 +34,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Testes de Integração do SgrhController")
 class SgrhControllerIntegrationTest {
 
-    private MockMvc mockMvc;
-
-    @Autowired private WebApplicationContext context;
-
-    @Autowired private UnidadeRepo unidadeRepo;
-
     private static final String API_URL = "/api/usuarios";
+    private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
     private Unidade unidade;
 
     @BeforeEach

@@ -28,11 +28,11 @@ public class PainelController {
      * <p>A visibilidade dos processos é determinada pelo perfil do usuário e, opcionalmente, pela
      * unidade selecionada.
      *
-     * @param perfil O perfil do usuário (e.g., 'ADMIN', 'GESTOR'), que define as regras de acesso.
-     * @param unidade O código da unidade para filtrar os processos (opcional).
+     * @param perfil   O perfil do usuário (e.g., 'ADMIN', 'GESTOR'), que define as regras de acesso.
+     * @param unidade  O código da unidade para filtrar os processos (opcional).
      * @param pageable As informações de paginação.
      * @return Um {@link ResponseEntity} contendo uma página {@link Page} de {@link
-     *     ProcessoResumoDto}.
+     * ProcessoResumoDto}.
      */
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no perfil e unidade")
@@ -52,8 +52,8 @@ public class PainelController {
      * destinado a administradores ou testes).
      *
      * @param usuarioTitulo Título de eleitor do usuário para filtrar os alertas (opcional).
-     * @param unidade código da unidade para filtrar os alertas (opcional).
-     * @param pageable As informações de paginação.
+     * @param unidade       código da unidade para filtrar os alertas (opcional).
+     * @param pageable      As informações de paginação.
      * @return Um {@link ResponseEntity} contendo uma página {@link Page} de {@link AlertaDto}.
      */
     @GetMapping("/alertas")

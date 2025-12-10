@@ -20,7 +20,7 @@ export function situacaoLabel(situacao?: string | null): string {
     const backendLabels: Record<string, string> = {
         // Initial status
         NAO_INICIADO: "Não iniciado",
-        
+
         // Mapeamento statuses
         MAPEAMENTO_CADASTRO_EM_ANDAMENTO: "Cadastro em andamento",
         MAPEAMENTO_CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
@@ -30,7 +30,7 @@ export function situacaoLabel(situacao?: string | null): string {
         MAPEAMENTO_MAPA_COM_SUGESTOES: "Mapa com sugestões",
         MAPEAMENTO_MAPA_VALIDADO: "Mapa validado",
         MAPEAMENTO_MAPA_HOMOLOGADO: "Mapa homologado",
-        
+
         // Revisão statuses
         REVISAO_CADASTRO_EM_ANDAMENTO: "Revisão de cadastro em andamento",
         REVISAO_CADASTRO_DISPONIBILIZADA: "Revisão de cadastro disponibilizada",
@@ -40,7 +40,7 @@ export function situacaoLabel(situacao?: string | null): string {
         REVISAO_MAPA_COM_SUGESTOES: "Mapa com sugestões",
         REVISAO_MAPA_VALIDADO: "Mapa validado",
         REVISAO_MAPA_HOMOLOGADO: "Mapa homologado",
-        
+
         // Legacy statuses (for backward compatibility)
         MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
         MAPA_VALIDADO: "Mapa validado",
@@ -60,18 +60,18 @@ export function situacaoLabel(situacao?: string | null): string {
 export type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
 
 export const iconeTipo = (tipo: LocalTipoNotificacao): string => {
-  switch (tipo) {
-      case "success":
-          return "bi bi-check-circle-fill text-success";
-      case "error":
-          return "bi bi-exclamation-triangle-fill text-danger";
-      case "warning":
-          return "bi bi-exclamation-triangle-fill text-warning";
-      case "info":
-          return "bi bi-info-circle-fill text-info";
-      default:
-          return "bi bi-bell-fill";
-  }
+    switch (tipo) {
+        case "success":
+            return "bi bi-check-circle-fill text-success";
+        case "error":
+            return "bi bi-exclamation-triangle-fill text-danger";
+        case "warning":
+            return "bi bi-exclamation-triangle-fill text-warning";
+        case "info":
+            return "bi bi-info-circle-fill text-info";
+        default:
+            return "bi bi-bell-fill";
+    }
 };
 
 // ===== UTILITÁRIOS DE DATA =====
@@ -81,84 +81,84 @@ export function parseDate(
     if (dateInput === null || dateInput === undefined || dateInput === "")
         return null;
 
-  // Se já for Date
-  if (dateInput instanceof Date) {
-    return isNaN(dateInput.getTime()) ? null : dateInput;
-  }
+    // Se já for Date
+    if (dateInput instanceof Date) {
+        return isNaN(dateInput.getTime()) ? null : dateInput;
+    }
 
-  // Se for número (timestamp)
+    // Se for número (timestamp)
     if (typeof dateInput === "number") {
-    const d = new Date(dateInput);
-    return isNaN(d.getTime()) ? null : d;
-  }
+        const d = new Date(dateInput);
+        return isNaN(d.getTime()) ? null : d;
+    }
 
-  // Se for string
+    // Se for string
     if (typeof dateInput === "string") {
-    const s = dateInput.trim();
-    if (!s) return null;
+        const s = dateInput.trim();
+        if (!s) return null;
 
-    // Detecta ISO com tempo (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
-    // Para strings somente-data (YYYY-MM-DD) devemos construir a Date em horário local
-    // para evitar deslocamento de fuso horário que causa `getMonth()` diferente do esperado.
-    const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
-    if (isoDateWithOptionalTimeRe.test(s)) {
-      // Se for somente data (sem 'T'), construir em horário local
-        if (!s.includes("T")) {
-            const parts = s.split("-");
-        const year = Number(parts[0]);
-        const month = Number(parts[1]);
-        const day = Number(parts[2]);
-        const d = new Date(year, month - 1, day);
-        if (!isNaN(d.getTime())) return d;
-      } else {
-        const d = new Date(s);
-        if (!isNaN(d.getTime())) return d;
-      }
-    }
-
-    // Detecta timestamp numérico em string
-    const numericRe = /^\d{10,}$/;
-    if (numericRe.test(s)) {
-      const n = Number(s);
-      const d = new Date(n);
-      if (!isNaN(d.getTime())) return d;
-    }
-
-    // Detecta DD/MM/YYYY
-    const ddmmyyyy = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const m = ddmmyyyy.exec(s);
-    if (m) {
-      const day = parseInt(m[1], 10);
-      const month = parseInt(m[2], 10);
-      const year = parseInt(m[3], 10);
-      if (year >= 1000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-          const d = new Date(year, month - 1, day);
-        // Verifica componentes para evitar 31/02 etc.
-          if (
-              !isNaN(d.getTime()) &&
-              d.getUTCFullYear() === year &&
-              d.getUTCMonth() === month - 1 &&
-              d.getUTCDate() === day
-          ) {
-          return d;
+        // Detecta ISO com tempo (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
+        // Para strings somente-data (YYYY-MM-DD) devemos construir a Date em horário local
+        // para evitar deslocamento de fuso horário que causa `getMonth()` diferente do esperado.
+        const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
+        if (isoDateWithOptionalTimeRe.test(s)) {
+            // Se for somente data (sem 'T'), construir em horário local
+            if (!s.includes("T")) {
+                const parts = s.split("-");
+                const year = Number(parts[0]);
+                const month = Number(parts[1]);
+                const day = Number(parts[2]);
+                const d = new Date(year, month - 1, day);
+                if (!isNaN(d.getTime())) return d;
+            } else {
+                const d = new Date(s);
+                if (!isNaN(d.getTime())) return d;
+            }
         }
-      }
+
+        // Detecta timestamp numérico em string
+        const numericRe = /^\d{10,}$/;
+        if (numericRe.test(s)) {
+            const n = Number(s);
+            const d = new Date(n);
+            if (!isNaN(d.getTime())) return d;
+        }
+
+        // Detecta DD/MM/YYYY
+        const ddmmyyyy = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const m = ddmmyyyy.exec(s);
+        if (m) {
+            const day = parseInt(m[1], 10);
+            const month = parseInt(m[2], 10);
+            const year = parseInt(m[3], 10);
+            if (year >= 1000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                const d = new Date(year, month - 1, day);
+                // Verifica componentes para evitar 31/02 etc.
+                if (
+                    !isNaN(d.getTime()) &&
+                    d.getUTCFullYear() === year &&
+                    d.getUTCMonth() === month - 1 &&
+                    d.getUTCDate() === day
+                ) {
+                    return d;
+                }
+            }
+        }
+
+        // Falha ao parsear
+        return null;
     }
 
-    // Falha ao parsear
     return null;
-  }
-
-  return null;
 }
 
 export function formatDateBR(
-  date: Date | string | number | null | undefined,
-  options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-  },
+    date: Date | string | number | null | undefined,
+    options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    },
 ): string {
     if (!date) return "Não informado";
     const dateObj =
@@ -166,23 +166,23 @@ export function formatDateBR(
             ? parseDate(date as any)
             : date;
     if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
-  try {
-      return dateObj.toLocaleDateString("pt-BR", options);
-  } catch {
-      return "Data inválida";
-  }
+    try {
+        return dateObj.toLocaleDateString("pt-BR", options);
+    } catch {
+        return "Data inválida";
+    }
 }
 
 export function formatDateForInput(date: Date | null | undefined): string {
     if (!date || isNaN(date.getTime())) return "";
-  try {
-    const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  } catch {
-      return "";
-  }
+    try {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    } catch {
+        return "";
+    }
 }
 
 export function formatDateTimeBR(
@@ -194,41 +194,41 @@ export function formatDateTimeBR(
             ? parseDate(date as any)
             : date;
     if (!dateObj || isNaN(dateObj.getTime())) return "Data inválida";
-  return formatDateBR(dateObj, {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-  });
+    return formatDateBR(dateObj, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 }
 
 export function isDateValidAndFuture(date: Date | null | undefined): boolean {
-  if (!date) return false;
-  try {
-    const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const d =
-          typeof date === "string" || typeof date === "number"
-              ? parseDate(date as any)
-              : date;
-    if (!d) return false;
-      d.setHours(0, 0, 0, 0);
-    return d >= today;
-  } catch {
-    return false;
-  }
+    if (!date) return false;
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const d =
+            typeof date === "string" || typeof date === "number"
+                ? parseDate(date as any)
+                : date;
+        if (!d) return false;
+        d.setHours(0, 0, 0, 0);
+        return d >= today;
+    } catch {
+        return false;
+    }
 }
 
 export function diffInDays(date1: Date, date2: Date): number {
-  const diffTime = Math.abs(date2.getTime() - date1.getTime());
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 export function ensureValidDate(date: Date | null | undefined): Date | null {
-  if (!date) return null;
-  if (date instanceof Date && !isNaN(date.getTime())) {
-    return date;
-  }
-  return null;
+    if (!date) return null;
+    if (date instanceof Date && !isNaN(date.getTime())) {
+        return date;
+    }
+    return null;
 }

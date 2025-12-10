@@ -16,7 +16,7 @@ import java.util.List;
 public class CompetenciaReq {
     @NotBlank(message = "A descrição da competência é obrigatória")
     private String descricao;
-    
+
     @NotEmpty(message = "A competência deve ter pelo menos uma atividade associada")
     private List<Long> atividadesIds;
 }

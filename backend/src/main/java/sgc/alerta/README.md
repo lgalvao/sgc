@@ -1,13 +1,21 @@
 # Módulo de Alerta
+
 Última atualização: 2025-12-04 14:18:38Z
 
 ## Visão Geral
-Este pacote é responsável por criar e gerenciar **alertas internos** do sistema, que são notificações exibidas na interface do usuário. Ele funciona de maneira reativa, "escutando" eventos de domínio publicados por outros módulos (como o `processo`) e gerando os alertas correspondentes.
 
-O objetivo é notificar os usuários sobre eventos que exigem sua atenção, como o início de um novo processo ou a devolução de um mapa para ajuste.
+Este pacote é responsável por criar e gerenciar **alertas internos** do sistema, que são notificações exibidas na
+interface do usuário. Ele funciona de maneira reativa, "escutando" eventos de domínio publicados por outros módulos (
+como o `processo`) e gerando os alertas correspondentes.
+
+O objetivo é notificar os usuários sobre eventos que exigem sua atenção, como o início de um novo processo ou a
+devolução de um mapa para ajuste.
 
 ## Arquitetura e Funcionamento
-A principal característica deste módulo é seu **baixo acoplamento**. Ele não é invocado diretamente. Em vez disso, o `EventoProcessoListener` (localizado no pacote `notificacao`) ouve os eventos de domínio e invoca o `AlertaService` para criar os alertas correspondentes.
+
+A principal característica deste módulo é seu **baixo acoplamento**. Ele não é invocado diretamente. Em vez disso, o
+`EventoProcessoListener` (localizado no pacote `notificacao`) ouve os eventos de domínio e invoca o `AlertaService` para
+criar os alertas correspondentes.
 
 ```mermaid
 graph TD
@@ -44,30 +52,36 @@ graph TD
 ```
 
 ### Fluxo de Trabalho
-1.  **Publicação do Evento:** Um módulo de negócio, como o `processo`, publica um evento (ex: `ProcessoIniciadoEvento`).
-2.  **Escuta do Evento:** O `EventoProcessoListener` (do pacote `notificacao`) captura o evento.
-3.  **Criação do Alerta:** O listener invoca o `AlertaService` (deste pacote), que contém a lógica para:
-    *   Construir a mensagem de alerta apropriada.
-    *   Consultar o `SgrhService` para identificar os usuários destinatários (ex: chefe da unidade).
-    *   Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
-4.  **Interação do Usuário:** O `AlertaController` expõe uma API REST para que o frontend possa listar e marcar os alertas do usuário logado como lidos.
+
+1. **Publicação do Evento:** Um módulo de negócio, como o `processo`, publica um evento (ex: `ProcessoIniciadoEvento`).
+2. **Escuta do Evento:** O `EventoProcessoListener` (do pacote `notificacao`) captura o evento.
+3. **Criação do Alerta:** O listener invoca o `AlertaService` (deste pacote), que contém a lógica para:
+    * Construir a mensagem de alerta apropriada.
+    * Consultar o `SgrhService` para identificar os usuários destinatários (ex: chefe da unidade).
+    * Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
+4. **Interação do Usuário:** O `AlertaController` expõe uma API REST para que o frontend possa listar e marcar os
+   alertas do usuário logado como lidos.
 
 ## Componentes Principais
 
 ### Controladores e Serviços
-- **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua leitura. É invocado pelo `EventoProcessoListener` central.
-- **`AlertaController`**: Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para o frontend.
+
+- **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua
+  leitura. É invocado pelo `EventoProcessoListener` central.
+- **`AlertaController`**: Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para
+  o frontend.
 
 ### Modelo de Dados (`model`)
+
 - **`Alerta`**: Entidade JPA que representa o alerta em si (título, mensagem, data).
 - **`AlertaUsuario`**: Entidade que associa um alerta a um usuário específico, controlando se já foi lido ou não.
 - **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data.
 - **`TipoAlerta`**: Enum que define os tipos de alerta (ex: `INFORMATIVO`, `ACAO_NECESSARIA`).
 
 ### DTOs (`dto`)
+
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
 - **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
-
 
 ## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
 

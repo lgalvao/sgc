@@ -19,16 +19,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompetenciaImpactadaDto {
-    /** O código da competência. */
+    /**
+     * O código da competência.
+     */
     private Long codigo;
 
-    /** A descrição da competência. */
+    /**
+     * A descrição da competência.
+     */
     private String descricao;
 
-    /** Lista com as descrições das atividades que causaram o impacto. */
+    /**
+     * Lista com as descrições das atividades que causaram o impacto.
+     */
     private List<String> atividadesAfetadas; // Descrições das atividades que causaram impacto
 
-    /** O tipo de impacto sofrido pela competência (e.g., nova atividade associada). */
+    /**
+     * O tipo de impacto sofrido pela competência (e.g., nova atividade associada).
+     */
     private TipoImpactoCompetencia
             tipoImpacto; // NOVA_ATIVIDADE, ATIVIDADE_REMOVIDA, ATIVIDADE_ALTERADA
 }

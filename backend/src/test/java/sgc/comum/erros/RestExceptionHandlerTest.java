@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class RestExceptionHandlerTest {
 
-    @InjectMocks private RestExceptionHandler handler;
+    @InjectMocks
+    private RestExceptionHandler handler;
 
     @Test
     @DisplayName("Deve tratar ErroEntidadeNaoEncontrada com status 404")

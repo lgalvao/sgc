@@ -28,7 +28,7 @@ function scanDirectory(directory) {
                     value: match[2]
                 });
             }
-            
+
         }
     }
     return results;
@@ -38,7 +38,7 @@ console.log(`🔍 Buscando por test-ids em: ${searchDir}\n`);
 
 try {
     const findings = scanDirectory(searchDir);
-    
+
     if (findings.length === 0) {
         console.log("Nenhum test-id encontrado.");
     } else {
@@ -54,7 +54,7 @@ try {
             ids.forEach(id => console.log(`   └─ ${id}`));
             console.log(''); // Linha em branco
         }
-        
+
         console.log(`Total encontrado: ${findings.length}`);
     }
 } catch (error) {

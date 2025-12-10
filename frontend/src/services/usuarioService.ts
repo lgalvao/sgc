@@ -15,7 +15,7 @@ export async function autenticar(
         "/usuarios/autenticar",
         request,
     );
-  return response.data;
+    return response.data;
 }
 
 export async function autorizar(
@@ -38,7 +38,7 @@ export async function entrar(request: EntrarRequest): Promise<LoginResponse> {
         "/usuarios/entrar",
         request,
     );
-  return response.data;
+    return response.data;
 }
 
 export async function buscarTodosUsuarios() {

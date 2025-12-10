@@ -2,85 +2,85 @@
   <div class="login-bg">
     <div class="login-center-wrapper">
       <BCard
-        class="login-card p-4 shadow-lg"
-        no-body
+          class="login-card p-4 shadow-lg"
+          no-body
       >
         <h2
-          class="mb-2 text-center"
-          data-testid="txt-login-titulo"
+            class="mb-2 text-center"
+            data-testid="txt-login-titulo"
         >
           SGC
         </h2>
         <h5
-          class="mb-4 text-center text-muted"
-          data-testid="txt-login-subtitulo"
+            class="mb-4 text-center text-muted"
+            data-testid="txt-login-subtitulo"
         >
           Sistema de Gestão de Competências
         </h5>
         <BForm
-          class="p-0"
-          data-testid="form-login"
-          @submit.prevent="handleLogin"
+            class="p-0"
+            data-testid="form-login"
+            @submit.prevent="handleLogin"
         >
           <div class="mb-3">
             <label
-              class="form-label"
-              for="titulo"
-              data-testid="lbl-login-usuario"
+                class="form-label"
+                data-testid="lbl-login-usuario"
+                for="titulo"
             >
-              <i class="bi bi-person-circle me-2" />
+              <i class="bi bi-person-circle me-2"/>
               Título eleitoral</label>
             <BFormInput
-              id="titulo"
-              v-model="titulo"
-              :disabled="loginStep > 1"
-              autocomplete="username"
-              placeholder="Digite seu título"
-              type="text"
-              data-testid="inp-login-usuario"
+                id="titulo"
+                v-model="titulo"
+                :disabled="loginStep > 1"
+                autocomplete="username"
+                data-testid="inp-login-usuario"
+                placeholder="Digite seu título"
+                type="text"
             />
           </div>
           <div class="mb-3">
             <label
-              class="form-label"
-              for="senha"
-              data-testid="lbl-login-senha"
+                class="form-label"
+                data-testid="lbl-login-senha"
+                for="senha"
             >
-              <i class="bi bi-key me-2" />
+              <i class="bi bi-key me-2"/>
               Senha</label>
             <BFormInput
-              id="senha"
-              v-model="senha"
-              :disabled="loginStep > 1"
-              autocomplete="current-password"
-              placeholder="Digite sua senha"
-              type="password"
-              data-testid="inp-login-senha"
+                id="senha"
+                v-model="senha"
+                :disabled="loginStep > 1"
+                autocomplete="current-password"
+                data-testid="inp-login-senha"
+                placeholder="Digite sua senha"
+                type="password"
             />
           </div>
 
           <div
-            v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
-            class="mb-3"
-            data-testid="sec-login-perfil"
+              v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
+              class="mb-3"
+              data-testid="sec-login-perfil"
           >
             <label
-              class="form-label"
-              for="par"
-              data-testid="lbl-login-perfil"
+                class="form-label"
+                data-testid="lbl-login-perfil"
+                for="par"
             >Selecione o Perfil e a Unidade</label>
             <BFormSelect
-              id="par"
-              v-model="parSelecionado"
-              :options="perfisUnidadesOptions"
-              value-field="value"
-              text-field="text"
-              data-testid="sel-login-perfil"
+                id="par"
+                v-model="parSelecionado"
+                :options="perfisUnidadesOptions"
+                data-testid="sel-login-perfil"
+                text-field="text"
+                value-field="value"
             >
               <template #first>
                 <BFormSelectOption
-                  :value="null"
-                  disabled
+                    :value="null"
+                    disabled
                 >
                   -- Selecione uma opção --
                 </BFormSelectOption>
@@ -89,13 +89,13 @@
           </div>
 
           <BButton
-            variant="primary"
-            class="w-100 login-btn"
-            type="submit"
-            data-testid="btn-login-entrar"
-            aria-label="Entrar"
+              aria-label="Entrar"
+              class="w-100 login-btn"
+              data-testid="btn-login-entrar"
+              type="submit"
+              variant="primary"
           >
-            <i class="bi bi-box-arrow-in-right me-2" />
+            <i class="bi bi-box-arrow-in-right me-2"/>
             Entrar
           </BButton>
         </BForm>
@@ -168,8 +168,8 @@ const handleLogin = async () => {
     if (parSelecionado.value) {
       try {
         await perfilStore.selecionarPerfilUnidade(
-          Number(titulo.value),
-          parSelecionado.value,
+            Number(titulo.value),
+            parSelecionado.value,
         );
         await router.push("/painel");
       } catch (error) {

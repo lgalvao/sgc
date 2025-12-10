@@ -27,7 +27,7 @@ public class DiagnosticoDtoService {
             List<ServidorDiagnosticoDto> servidores,
             boolean podeSerConcluido,
             String motivoNaoPodeConcluir) {
-        
+
         return DiagnosticoDto.builder()
                 .codigo(diagnostico.getCodigo())
                 .subprocessoCodigo(diagnostico.getSubprocesso().getCodigo())

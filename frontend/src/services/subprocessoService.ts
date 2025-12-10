@@ -4,7 +4,7 @@ import type {Atividade, Competencia, MapaCompleto, SubprocessoPermissoes, Valida
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
-  codSubprocessoOrigem: number;
+    codSubprocessoOrigem: number;
 }
 
 export async function importarAtividades(
@@ -45,10 +45,10 @@ export async function buscarSubprocessoDetalhe(
     perfil: string,
     unidadeCodigo: number,
 ) {
-  const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
-    params: { perfil, unidadeUsuario: unidadeCodigo },
-  });
-  return response.data;
+    const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
+        params: {perfil, unidadeUsuario: unidadeCodigo},
+    });
+    return response.data;
 }
 
 export async function buscarSubprocessoPorProcessoEUnidade(

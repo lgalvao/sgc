@@ -20,7 +20,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlertaUsuario implements Serializable {
-    /** Chave primária composta para a entidade {@link AlertaUsuario}. */
+    @EmbeddedId
+    private Chave id;
+    @MapsId("alertaCodigo")
+    @ManyToOne
+    @JoinColumn(name = "alerta_codigo", insertable = false, updatable = false)
+    private Alerta alerta;
+    @MapsId("usuarioTituloEleitoral")
+    @ManyToOne
+    @JoinColumn(
+            name = "usuario_titulo_eleitoral",
+            referencedColumnName = "titulo_eleitoral",
+            insertable = false,
+            updatable = false)
+    private Usuario usuario;
+    @Column(name = "data_hora_leitura")
+    private LocalDateTime dataHoraLeitura;
+
+    /**
+     * Chave primária composta para a entidade {@link AlertaUsuario}.
+     */
     @Embeddable
     @Getter
     @Setter
@@ -31,23 +50,4 @@ public class AlertaUsuario implements Serializable {
         private Long alertaCodigo;
         private String usuarioTituloEleitoral;
     }
-
-    @EmbeddedId private Chave id;
-
-    @MapsId("alertaCodigo")
-    @ManyToOne
-    @JoinColumn(name = "alerta_codigo", insertable = false, updatable = false)
-    private Alerta alerta;
-
-    @MapsId("usuarioTituloEleitoral")
-    @ManyToOne
-    @JoinColumn(
-            name = "usuario_titulo_eleitoral",
-            referencedColumnName = "titulo_eleitoral",
-            insertable = false,
-            updatable = false)
-    private Usuario usuario;
-
-    @Column(name = "data_hora_leitura")
-    private LocalDateTime dataHoraLeitura;
 }

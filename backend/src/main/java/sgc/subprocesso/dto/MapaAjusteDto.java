@@ -18,9 +18,13 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class MapaAjusteDto {
-    @NotNull private final Long codMapa;
-    @NotBlank private final String unidadeNome;
-    @NotNull @Valid private final List<CompetenciaAjusteDto> competencias;
+    @NotNull
+    private final Long codMapa;
+    @NotBlank
+    private final String unidadeNome;
+    @NotNull
+    @Valid
+    private final List<CompetenciaAjusteDto> competencias;
     private final String justificativaDevolucao;
 
     public static MapaAjusteDto of(

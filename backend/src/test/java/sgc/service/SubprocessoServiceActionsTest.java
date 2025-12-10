@@ -41,27 +41,38 @@ import static org.mockito.Mockito.*;
 public class SubprocessoServiceActionsTest {
     private static final String OBSERVACOES = "Observações de teste";
 
-    @Autowired private SubprocessoWorkflowService subprocessoWorkflowService;
+    @Autowired
+    private SubprocessoWorkflowService subprocessoWorkflowService;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
-    @Autowired private AnaliseRepo analiseRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoBean private NotificacaoEmailService notificacaoEmailService;
+    @MockitoBean
+    private NotificacaoEmailService notificacaoEmailService;
 
-    @MockitoBean private ApplicationEventPublisher eventPublisher;
+    @MockitoBean
+    private ApplicationEventPublisher eventPublisher;
 
-    @MockitoBean private ImpactoMapaService impactoMapaService;
+    @MockitoBean
+    private ImpactoMapaService impactoMapaService;
 
     @MockitoBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;

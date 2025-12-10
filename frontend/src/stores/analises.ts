@@ -16,7 +16,7 @@ export const useAnalisesStore = defineStore("analises", () => {
     });
 
     async function buscarAnalisesCadastro(codSubrocesso: number) {
-        
+
         try {
             const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
             const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
@@ -32,7 +32,7 @@ export const useAnalisesStore = defineStore("analises", () => {
     }
 
     async function buscarAnalisesValidacao(codSubrocesso: number) {
-        
+
         try {
             const analises =
                 await analiseService.listarAnalisesValidacao(codSubrocesso);

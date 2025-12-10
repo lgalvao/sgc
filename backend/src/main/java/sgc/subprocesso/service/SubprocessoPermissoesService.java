@@ -65,30 +65,30 @@ public class SubprocessoPermissoesService {
         boolean isGestorUnidade =
                 spUnidadeCodigo != null
                         && usuario.getTodasAtribuicoes().stream()
-                                .anyMatch(
-                                        a ->
-                                                a.getPerfil() == Perfil.GESTOR
-                                                        && a.getUnidade() != null
-                                                        && a.getUnidade().getCodigo() != null
-                                                        && (a.getUnidade()
-                                                                        .getCodigo()
-                                                                        .equals(spUnidadeCodigo)
-                                                                || isSubordinada(
-                                                                        sp.getUnidade(),
-                                                                        a.getUnidade())));
+                        .anyMatch(
+                                a ->
+                                        a.getPerfil() == Perfil.GESTOR
+                                                && a.getUnidade() != null
+                                                && a.getUnidade().getCodigo() != null
+                                                && (a.getUnidade()
+                                                .getCodigo()
+                                                .equals(spUnidadeCodigo)
+                                                || isSubordinada(
+                                                sp.getUnidade(),
+                                                a.getUnidade())));
 
         boolean isChefeOuServidorUnidade =
                 spUnidadeCodigo != null
                         && usuario.getTodasAtribuicoes().stream()
-                                .anyMatch(
-                                        a ->
-                                                (a.getPerfil() == Perfil.CHEFE
-                                                                || a.getPerfil() == Perfil.SERVIDOR)
-                                                        && a.getUnidade() != null
-                                                        && a.getUnidade().getCodigo() != null
-                                                        && a.getUnidade()
-                                                                .getCodigo()
-                                                                .equals(spUnidadeCodigo));
+                        .anyMatch(
+                                a ->
+                                        (a.getPerfil() == Perfil.CHEFE
+                                                || a.getPerfil() == Perfil.SERVIDOR)
+                                                && a.getUnidade() != null
+                                                && a.getUnidade().getCodigo() != null
+                                                && a.getUnidade()
+                                                .getCodigo()
+                                                .equals(spUnidadeCodigo));
 
         boolean acessoEdicao = isAdmin || isGestorUnidade || isChefeOuServidorUnidade;
 
@@ -108,11 +108,11 @@ public class SubprocessoPermissoesService {
 
         boolean situacaoImpactoValida =
                 (isRevisao && sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO)
-                || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
-                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
-                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
-                || sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
+                        || sp.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                        || sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
 
         // But test "naoDevePermitirVisualizarImpactoParaNaoAdmin" failed with NPE, but implied it
         // expects FALSE.
@@ -142,7 +142,7 @@ public class SubprocessoPermissoesService {
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
 
         boolean situacaoPermiteEdicao = situacoesPermitemEdicao.contains(sp.getSituacao());
-        
+
         boolean podeEditarMapa = acessoEdicao && situacaoPermiteEdicao;
 
         return SubprocessoPermissoesDto.builder()

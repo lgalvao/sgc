@@ -30,13 +30,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     // Reset completo do banco antes de todos os testes
-    test.beforeAll(async ({ request }) => {
+    test.beforeAll(async ({request}) => {
         await resetDatabase(request);
         cleanup = useProcessoCleanup();
     });
 
     // Limpar processos criados após todos os testes
-    test.afterAll(async ({ request }) => {
+    test.afterAll(async ({request}) => {
         await cleanup.limpar(request);
     });
 
@@ -128,7 +128,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validação: Mensagem de sucesso e redirecionamento para o painel
-        await expect(page.getByRole('heading', { name: /Cadastro de atividades disponibilizado/i })).toBeVisible();
+        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
         await verificarPaginaPainel(page);
     }
 
@@ -260,13 +260,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
     test('Fase 1: Ciclo completo de Mapeamento', async ({page}) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
-        
+
         // Capturar ID do processo para cleanup
         await page.getByText(descProcMapeamento).click();
         processoMapeamentoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
         await page.goto('/painel');
-        
+
         await passo2_ChefeAdicionaAtividadesEConhecimentos(page, descProcMapeamento, timestamp);
         await passo2a_ChefeDisponibilizaCadastro(page);
         await passo2b_AdminHomologaCadastro(page, descProcMapeamento);

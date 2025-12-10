@@ -15,7 +15,9 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Serviço para gerenciar as análises de subprocessos. */
+/**
+ * Serviço para gerenciar as análises de subprocessos.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,7 +29,7 @@ public class AnaliseService {
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @param tipoAnalise O tipoAnalise de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
+     * @param tipoAnalise    O tipoAnalise de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
      * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */

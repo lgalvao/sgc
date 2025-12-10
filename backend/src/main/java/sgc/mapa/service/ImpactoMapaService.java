@@ -33,6 +33,16 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class ImpactoMapaService {
+    private static final String MSG_ERRO_CHEFE = """
+            O chefe da unidade só pode verificar os impactos com o subprocesso na situação\
+             'Revisão do cadastro em andamento'.""";
+    private static final String MSG_ERRO_GESTOR = """
+            O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do\
+             cadastro disponibilizada'.""";
+    private static final String MSG_ERRO_ADMIN = """
+            O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
+             do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
+             Ajustado'.""";
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final ImpactoAtividadeService impactoAtividadeService;
@@ -115,19 +125,6 @@ public class ImpactoMapaService {
 
         return impactos;
     }
-
-    private static final String MSG_ERRO_CHEFE = """
-            O chefe da unidade só pode verificar os impactos com o subprocesso na situação\
-             'Revisão do cadastro em andamento'.""";
-
-    private static final String MSG_ERRO_GESTOR = """
-            O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do\
-             cadastro disponibilizada'.""";
-
-    private static final String MSG_ERRO_ADMIN = """
-            O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
-             do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
-             Ajustado'.""";
 
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
         final SituacaoSubprocesso situacao = subprocesso.getSituacao();

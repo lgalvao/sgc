@@ -9,30 +9,30 @@
         <BForm @submit.prevent="criarAtribuicao">
           <div class="mb-3">
             <label
-              class="form-label"
-              for="servidor"
+                class="form-label"
+                for="servidor"
             >Servidor</label>
             <BFormSelect
-              id="servidor"
-              v-model="servidorSelecionado"
-              data-testid="select-servidor"
-              required
-              :options="servidores"
-              value-field="codigo"
-              text-field="nome"
+                id="servidor"
+                v-model="servidorSelecionado"
+                :options="servidores"
+                data-testid="select-servidor"
+                required
+                text-field="nome"
+                value-field="codigo"
             >
               <template #first>
                 <BFormSelectOption
-                  :value="null"
-                  disabled
+                    :value="null"
+                    disabled
                 >
                   Selecione um servidor
                 </BFormSelectOption>
               </template>
             </BFormSelect>
             <div
-              v-if="erroServidor"
-              class="text-danger small mt-1"
+                v-if="erroServidor"
+                class="text-danger small mt-1"
             >
               {{ erroServidor }}
             </div>
@@ -40,63 +40,63 @@
 
           <div class="mb-3">
             <label
-              class="form-label"
-              for="dataTermino"
+                class="form-label"
+                for="dataTermino"
             >Data de término</label>
             <BFormInput
-              id="dataTermino"
-              v-model="dataTermino"
-              data-testid="input-data-termino"
-              required
-              type="date"
+                id="dataTermino"
+                v-model="dataTermino"
+                data-testid="input-data-termino"
+                required
+                type="date"
             />
           </div>
 
           <div class="mb-3">
             <label
-              class="form-label"
-              for="justificativa"
+                class="form-label"
+                for="justificativa"
             >Justificativa</label>
             <BFormTextarea
-              id="justificativa"
-              v-model="justificativa"
-              data-testid="textarea-justificativa"
-              required
+                id="justificativa"
+                v-model="justificativa"
+                data-testid="textarea-justificativa"
+                required
             />
           </div>
           <BButton
-            variant="primary"
-            data-testid="cad-atribuicao__btn-criar-atribuicao"
-            type="submit"
+              data-testid="cad-atribuicao__btn-criar-atribuicao"
+              type="submit"
+              variant="primary"
           >
             Criar
           </BButton>
           <BButton
-            variant="secondary"
-            class="ms-2"
-            data-testid="btn-cancelar-atribuicao"
-            type="button"
-            @click="router.push(`/unidade/${sigla}`)"
+              class="ms-2"
+              data-testid="btn-cancelar-atribuicao"
+              type="button"
+              variant="secondary"
+              @click="router.push(`/unidade/${sigla}`)"
           >
             Cancelar
           </BButton>
         </BForm>
 
         <BAlert
-          v-if="sucesso"
-          variant="success"
-          class="mt-3"
-          :model-value="true"
-          :fade="false"
+            v-if="sucesso"
+            :fade="false"
+            :model-value="true"
+            class="mt-3"
+            variant="success"
         >
           Atribuição criada!
         </BAlert>
         <BAlert
-          v-if="erroApi"
-          variant="danger"
-          class="mt-3"
-          :model-value="true"
-          :fade="false"
+            v-if="erroApi"
+            :fade="false"
+            :model-value="true"
+            class="mt-3"
+            variant="danger"
         >
           {{ erroApi }}
         </BAlert>

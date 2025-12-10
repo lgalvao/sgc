@@ -6,7 +6,8 @@ Pré-condições:
 
 - Usuário logado com qualquer perfil
 - Processo de mapeamento ou de revisão iniciado ou finalizado, que tenha a unidade como participante
-- Subprocesso da unidade com cadastro de atividades e conhecimentos (processo de mapeamento) ou revisão do cadastro (processo de revisão) já disponibilizados.
+- Subprocesso da unidade com cadastro de atividades e conhecimentos (processo de mapeamento) ou revisão do cadastro (
+  processo de revisão) já disponibilizados.
 
 Fluxo principal:
 

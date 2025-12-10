@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/** Repositório JPA para a entidade Mapa. */
+/**
+ * Repositório JPA para a entidade Mapa.
+ */
 @Repository
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     /**

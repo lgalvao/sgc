@@ -2,14 +2,14 @@
   <BRow>
     <template v-if="tipoProcesso === TipoProcessoEnum.MAPEAMENTO || tipoProcesso === TipoProcessoEnum.REVISAO">
       <BCol
-        md="4"
-        class="mb-3"
+          class="mb-3"
+          md="4"
       >
         <BCard
-          v-if="permissoes.podeEditarMapa"
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-atividades"
-          @click="navegarPara('SubprocessoCadastro')"
+            v-if="permissoes.podeEditarMapa"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-atividades"
+            @click="navegarPara('SubprocessoCadastro')"
         >
           <BCardTitle>
             Atividades e conhecimentos
@@ -18,15 +18,15 @@
             Cadastro de atividades e conhecimentos da unidade
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
         <BCard
-          v-else-if="permissoes.podeVisualizarMapa"
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-atividades-vis"
-          @click="navegarPara('SubprocessoVisCadastro')"
+            v-else-if="permissoes.podeVisualizarMapa"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-atividades-vis"
+            @click="navegarPara('SubprocessoVisCadastro')"
         >
           <BCardTitle>
             Atividades e conhecimentos
@@ -35,22 +35,22 @@
             Visualização das atividades e conhecimentos da unidade
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
 
       <BCol
-        md="4"
-        class="mb-3"
+          class="mb-3"
+          md="4"
       >
         <BCard
-          v-if="permissoes.podeEditarMapa"
-          :class="{ 'disabled-card': !mapa }"
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-mapa"
-          @click="navegarPara('SubprocessoMapa')"
+            v-if="permissoes.podeEditarMapa"
+            :class="{ 'disabled-card': !mapa }"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-mapa"
+            @click="navegarPara('SubprocessoMapa')"
         >
           <BCardTitle>
             Mapa de Competências
@@ -59,16 +59,16 @@
             Mapa de competências técnicas da unidade
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
         <BCard
-          v-else-if="permissoes.podeVisualizarMapa"
-          :class="{ 'disabled-card': !mapa }"
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-mapa"
-          @click="navegarPara('SubprocessoVisMapa')"
+            v-else-if="permissoes.podeVisualizarMapa"
+            :class="{ 'disabled-card': !mapa }"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-mapa"
+            @click="navegarPara('SubprocessoVisMapa')"
         >
           <BCardTitle>
             Mapa de Competências
@@ -77,8 +77,8 @@
             Visualização do mapa de competências técnicas
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
@@ -86,14 +86,14 @@
 
     <template v-else-if="tipoProcesso === TipoProcessoEnum.DIAGNOSTICO">
       <BCol
-        md="4"
-        class="mb-3"
+          class="mb-3"
+          md="4"
       >
         <BCard
-          v-if="permissoes.podeVisualizarDiagnostico"
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-diagnostico"
-          @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
+            v-if="permissoes.podeVisualizarDiagnostico"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-diagnostico"
+            @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
         >
           <BCardTitle>
             Autoavaliação
@@ -102,20 +102,20 @@
             Realize sua autoavaliação de competências
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
 
       <BCol
-        md="4"
-        class="mb-3"
+          class="mb-3"
+          md="4"
       >
         <BCard
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-ocupacoes"
-          @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-ocupacoes"
+            @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
         >
           <BCardTitle>
             Ocupações Críticas
@@ -124,19 +124,19 @@
             Identificação das ocupações críticas da unidade
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
       <BCol
-        md="4"
-        class="mb-3"
+          class="mb-3"
+          md="4"
       >
         <BCard
-          class="h-100 card-actionable"
-          data-testid="card-subprocesso-monitoramento"
-          @click="navegarParaDiag('MonitoramentoDiagnostico')"
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-monitoramento"
+            @click="navegarParaDiag('MonitoramentoDiagnostico')"
         >
           <BCardTitle>
             Monitoramento
@@ -145,8 +145,8 @@
             Acompanhamento e conclusão do diagnóstico da unidade
           </BCardText>
           <span
-            :class="badgeClass(situacao)"
-            class="badge"
+              :class="badgeClass(situacao)"
+              class="badge"
           >{{ situacaoLabel(situacao) }}</span>
         </BCard>
       </BCol>
@@ -178,12 +178,12 @@ const route = router.currentRoute;
 const navegarPara = (routeName: string) => {
   const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
   const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
-  
+
   if (!codigoProcesso || !sigla) return;
-  
+
   router.push({
     name: routeName,
-    params: { 
+    params: {
       codProcesso: codigoProcesso,
       siglaUnidade: sigla
     },

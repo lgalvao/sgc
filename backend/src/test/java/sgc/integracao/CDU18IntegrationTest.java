@@ -40,19 +40,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
 class CDU18IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
-    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
 
-    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
 
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -112,46 +119,46 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.competencias.length()").value(2))
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                                + " 1')].atividades.length()")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 1')].atividades.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                                + " 1')].atividades[?(@.descricao == 'Atividade"
-                                                + " 1')].conhecimentos.length()")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 1')].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')].conhecimentos.length()")
                                 .value(2))
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                            + " 1')].atividades[?(@.descricao == 'Atividade"
-                                            + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
-                                            + " 1.1')]")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 1')].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 1.1')]")
                                 .exists())
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                            + " 1')].atividades[?(@.descricao == 'Atividade"
-                                            + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
-                                            + " 1.2')]")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 1')].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 1.2')]")
                                 .exists())
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                                + " 2')].atividades.length()")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 2')].atividades.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                                + " 2')].atividades[?(@.descricao == 'Atividade"
-                                                + " 2')].conhecimentos.length()")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 2')].atividades[?(@.descricao == 'Atividade"
+                                        + " 2')].conhecimentos.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
-                                        "$.competencias[?(@.descricao == 'Competência"
-                                            + " 2')].atividades[?(@.descricao == 'Atividade"
-                                            + " 2')].conhecimentos[?(@.descricao == 'Conhecimento"
-                                            + " 2.1')]")
+                                "$.competencias[?(@.descricao == 'Competência"
+                                        + " 2')].atividades[?(@.descricao == 'Atividade"
+                                        + " 2')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 2.1')]")
                                 .exists());
     }
 

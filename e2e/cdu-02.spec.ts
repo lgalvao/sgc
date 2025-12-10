@@ -4,23 +4,23 @@ import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-proces
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
-    test.beforeAll(async ({ request }) => await resetDatabase(request));
+    test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(async ({ page }) => await page.goto('/login'));
+    test.beforeEach(async ({page}) => await page.goto('/login'));
 
     test.describe('Como ADMIN', () => {
         let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-        test.beforeEach(async ({ page }) => {
+        test.beforeEach(async ({page}) => {
             cleanup = useProcessoCleanup();
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         });
 
-        test.afterEach(async ({ request }) => {
+        test.afterEach(async ({request}) => {
             await cleanup.limpar(request);
         });
 
-        test('Deve exibir seções de Processos e Alertas', async ({ page }) => {
+        test('Deve exibir seções de Processos e Alertas', async ({page}) => {
             await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
             await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
 
@@ -28,11 +28,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');
         });
 
-        test('Deve exibir botão "Criar processo"', async ({ page }) => {
+        test('Deve exibir botão "Criar processo"', async ({page}) => {
             await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({ page }) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({page}) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -56,7 +56,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({ page }) => {
+        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({page}) => {
             const descricaoProcesso = `Processo Criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -89,7 +89,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByText(descricaoProcesso)).not.toBeVisible();
         });
 
-        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({ page }) => {
+        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -106,7 +106,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Aguarda a animação/renderização e expande SECRETARIA_1
             const btnSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-            await btnSecretaria.waitFor({ state: 'visible' });
+            await btnSecretaria.waitFor({state: 'visible'});
             await btnSecretaria.click();
 
             // Verifica que COORD_11 (INTERMEDIARIA) está HABILITADA (novo comportamento)
@@ -145,13 +145,13 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test.beforeEach(async ({ page }) => await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha));
+        test.beforeEach(async ({page}) => await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha));
 
-        test('Não deve exibir botão "Criar processo"', async ({ page }) => {
+        test('Não deve exibir botão "Criar processo"', async ({page}) => {
             await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
         });
 
-        test('Deve exibir mensagem quando não há processos', async ({ page }) => {
+        test('Deve exibir mensagem quando não há processos', async ({page}) => {
             const tabela = page.getByTestId('tbl-processos');
             await expect(tabela).toBeVisible();
 
@@ -162,7 +162,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             }
         });
 
-        test('Deve exibir tabela de alertas vazia', async ({ page }) => {
+        test('Deve exibir tabela de alertas vazia', async ({page}) => {
             const tabelaAlertas = page.getByTestId('tbl-alertas');
             await expect(tabelaAlertas).toBeVisible();
 

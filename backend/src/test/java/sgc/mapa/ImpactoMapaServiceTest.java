@@ -35,20 +35,27 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ImpactoMapaServiceTest {
     private static final String COMPETENCIA_AFETADA = "Competência Afetada";
-    @Mock private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
 
-    @Mock private MapaRepo repositorioMapa;
+    @Mock
+    private MapaRepo repositorioMapa;
 
-    @Mock private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
-    @Mock private ImpactoAtividadeService impactoAtividadeService;
+    @Mock
+    private ImpactoAtividadeService impactoAtividadeService;
 
-    @Mock private ImpactoCompetenciaService impactoCompetenciaService;
+    @Mock
+    private ImpactoCompetenciaService impactoCompetenciaService;
 
-    @InjectMocks private ImpactoMapaService impactoMapaServico;
+    @InjectMocks
+    private ImpactoMapaService impactoMapaServico;
 
     private Subprocesso subprocesso;
-    @Mock private Usuario usuario;
+    @Mock
+    private Usuario usuario;
 
     @BeforeEach
     void setUp() {
@@ -113,16 +120,16 @@ class ImpactoMapaServiceTest {
         when(impactoAtividadeService.obterAtividadesDoMapa(mapaVigente))
                 .thenReturn(List.of(atividadeRemovida));
         when(impactoAtividadeService.detectarAtividadesInseridas(
-                        List.of(), List.of(atividadeRemovida)))
+                List.of(), List.of(atividadeRemovida)))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesRemovidas(
-                        List.of(), List.of(atividadeRemovida), mapaVigente))
+                List.of(), List.of(atividadeRemovida), mapaVigente))
                 .thenReturn(removidas);
         when(impactoAtividadeService.detectarAtividadesAlteradas(
-                        List.of(), List.of(atividadeRemovida), mapaVigente))
+                List.of(), List.of(atividadeRemovida), mapaVigente))
                 .thenReturn(List.of());
         when(impactoCompetenciaService.identificarCompetenciasImpactadas(
-                        mapaVigente, removidas, List.of()))
+                mapaVigente, removidas, List.of()))
                 .thenReturn(competenciasImpactadas);
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
@@ -153,13 +160,13 @@ class ImpactoMapaServiceTest {
         when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividade), List.of()))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesRemovidas(
-                        List.of(atividade), List.of(), mapaVigente))
+                List.of(atividade), List.of(), mapaVigente))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesAlteradas(
-                        List.of(atividade), List.of(), mapaVigente))
+                List.of(atividade), List.of(), mapaVigente))
                 .thenReturn(List.of());
         when(impactoCompetenciaService.identificarCompetenciasImpactadas(
-                        mapaVigente, List.of(), List.of()))
+                mapaVigente, List.of(), List.of()))
                 .thenReturn(List.of());
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
@@ -194,13 +201,13 @@ class ImpactoMapaServiceTest {
         when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividadeNova), List.of()))
                 .thenReturn(inseridas);
         when(impactoAtividadeService.detectarAtividadesRemovidas(
-                        List.of(atividadeNova), List.of(), mapaVigente))
+                List.of(atividadeNova), List.of(), mapaVigente))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesAlteradas(
-                        List.of(atividadeNova), List.of(), mapaVigente))
+                List.of(atividadeNova), List.of(), mapaVigente))
                 .thenReturn(List.of());
         when(impactoCompetenciaService.identificarCompetenciasImpactadas(
-                        mapaVigente, List.of(), List.of()))
+                mapaVigente, List.of(), List.of()))
                 .thenReturn(List.of());
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
@@ -257,16 +264,16 @@ class ImpactoMapaServiceTest {
                 .thenReturn(List.of(atividadeVigente));
 
         when(impactoAtividadeService.detectarAtividadesInseridas(
-                        List.of(atividadeAtual), List.of(atividadeVigente)))
+                List.of(atividadeAtual), List.of(atividadeVigente)))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesRemovidas(
-                        List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente))
+                List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente))
                 .thenReturn(List.of());
         when(impactoAtividadeService.detectarAtividadesAlteradas(
-                        List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente))
+                List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente))
                 .thenReturn(alteradas);
         when(impactoCompetenciaService.identificarCompetenciasImpactadas(
-                        mapaVigente, List.of(), alteradas))
+                mapaVigente, List.of(), alteradas))
                 .thenReturn(competenciasImpactadas);
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);

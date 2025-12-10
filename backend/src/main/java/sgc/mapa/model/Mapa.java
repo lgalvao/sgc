@@ -20,24 +20,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mapa extends EntidadeBase {
+    @Column(name = "data_hora_disponibilizado")
+    private LocalDateTime dataHoraDisponibilizado;
+    @Column(name = "observacoes_disponibilizacao", length = 1000)
+    private String observacoesDisponibilizacao;
+    @Column(name = "sugestoes", columnDefinition = "TEXT")
+    private String sugestoes;
+    @Column(name = "sugestoes_apresentadas")
+    private Boolean sugestoesApresentadas = false;
+    @Column(name = "data_hora_homologado")
+    private LocalDateTime dataHoraHomologado;
+    @ManyToOne
+    private Unidade unidade;
+
     public Mapa(Long codigo) {
         super(codigo);
     }
-
-    @Column(name = "data_hora_disponibilizado")
-    private LocalDateTime dataHoraDisponibilizado;
-
-    @Column(name = "observacoes_disponibilizacao", length = 1000)
-    private String observacoesDisponibilizacao;
-
-    @Column(name = "sugestoes", columnDefinition = "TEXT")
-    private String sugestoes;
-
-    @Column(name = "sugestoes_apresentadas")
-    private Boolean sugestoesApresentadas = false;
-
-    @Column(name = "data_hora_homologado")
-    private LocalDateTime dataHoraHomologado;
-
-    @ManyToOne private Unidade unidade;
 }

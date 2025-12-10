@@ -113,21 +113,27 @@ public class E2eController {
         jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
     }
 
-    /** Cria um processo de mapeamento via API para testes E2E. Mais rápido que criar via UI. */
+    /**
+     * Cria um processo de mapeamento via API para testes E2E. Mais rápido que criar via UI.
+     */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
     public ProcessoDto criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
         return criarProcessoFixture(request, TipoProcesso.MAPEAMENTO);
     }
 
-    /** Cria um processo de revisão via API para testes E2E. Mais rápido que criar via UI. */
+    /**
+     * Cria um processo de revisão via API para testes E2E. Mais rápido que criar via UI.
+     */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
     public ProcessoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
         return criarProcessoFixture(request, TipoProcesso.REVISAO);
     }
 
-    /** Método auxiliar para criar processos fixtures. */
+    /**
+     * Método auxiliar para criar processos fixtures.
+     */
     private ProcessoDto criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         // Validar entrada
         if (request.unidadeSigla() == null || request.unidadeSigla().isBlank()) {
@@ -192,7 +198,10 @@ public class E2eController {
         return processo;
     }
 
-    /** DTO para requisição de criação de processo fixture. */
+    /**
+     * DTO para requisição de criação de processo fixture.
+     */
     public record ProcessoFixtureRequest(
-            String descricao, String unidadeSigla, Boolean iniciar, Integer diasLimite) {}
+            String descricao, String unidadeSigla, Boolean iniciar, Integer diasLimite) {
+    }
 }

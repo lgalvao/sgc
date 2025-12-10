@@ -31,9 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CDU01IntegrationTest extends BaseIntegrationTest {
     private static final String BASE_URL = "/api/usuarios";
 
-    @Autowired private TestUtil testUtil;
+    @Autowired
+    private TestUtil testUtil;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
     private Unidade unidadeAdmin;
 

@@ -3,18 +3,18 @@
     <UnidadeTreeNode
         v-for="unidade in unidadesExibidas"
         :key="unidade.sigla"
-        :unidade="unidade"
-        :is-checked="isChecked"
         :get-estado-selecao="getEstadoSelecao"
+        :is-checked="isChecked"
         :is-expanded="isExpanded"
         :is-habilitado="isHabilitado"
         :on-toggle="toggle"
         :on-toggle-expand="toggleExpand"
+        :unidade="unidade"
     />
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref, watch} from "vue";
 import type {Unidade} from "@/types/tipos";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
@@ -36,14 +36,14 @@ const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
 // Watch para sincronizar props.modelValue -> local (apenas quando props mudam externamente)
 watch(
-  () => props.modelValue,
-  (newValue) => {
-    // Só atualiza se for diferente (evita loop)
-    if (JSON.stringify(newValue) !== JSON.stringify(unidadesSelecionadasLocal.value)) {
-      unidadesSelecionadasLocal.value = [...newValue];
-    }
-  },
-  { deep: true }
+    () => props.modelValue,
+    (newValue) => {
+      // Só atualiza se for diferente (evita loop)
+      if (JSON.stringify(newValue) !== JSON.stringify(unidadesSelecionadasLocal.value)) {
+        unidadesSelecionadasLocal.value = [...newValue];
+      }
+    },
+    {deep: true}
 );
 
 // Map to find parent of a unit
@@ -111,9 +111,9 @@ function isChecked(codigo: number): boolean {
 // Habilitado se: elegível OU tem pelo menos uma filha elegível
 function isHabilitado(unidade: Unidade): boolean {
   if (unidade.isElegivel) return true;
-  
+
   if (!unidade.filhas || unidade.filhas.length === 0) return false;
-  
+
   return unidade.filhas.some(filha => isHabilitado(filha));
 }
 
@@ -139,8 +139,8 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   }
 
   // 4. Conta quantas descendentes elegíveis estão no modelValue
-  const descendentesSelecionadas = descendentesElegiveis.filter(codigo => 
-    isChecked(codigo)
+  const descendentesSelecionadas = descendentesElegiveis.filter(codigo =>
+      isChecked(codigo)
   ).length;
 
   // 5. Todas descendentes selecionadas? → marcada
@@ -162,7 +162,7 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
     return true;
   }
-  
+
   return "indeterminate";
 }
 
@@ -233,7 +233,7 @@ watch(
 // Estado de expansão das unidades
 // Inicializa com as raízes expandidas
 const expandedUnits = ref<Set<number>>(
-  new Set(props.unidades.map(u => u.codigo))
+    new Set(props.unidades.map(u => u.codigo))
 );
 
 function isExpanded(unidade: Unidade): boolean {
@@ -250,14 +250,14 @@ function toggleExpand(unidade: Unidade) {
 
 // Watch para emitir mudanças locais para o pai
 watch(
-  unidadesSelecionadasLocal,
-  (newValue) => {
-    // Só emite se for diferente do props (evita loop)
-    if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
-      emit("update:modelValue", newValue);
-    }
-  },
-  { deep: true }
+    unidadesSelecionadasLocal,
+    (newValue) => {
+      // Só emite se for diferente do props (evita loop)
+      if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
+        emit("update:modelValue", newValue);
+      }
+    },
+    {deep: true}
 );
 </script>
 

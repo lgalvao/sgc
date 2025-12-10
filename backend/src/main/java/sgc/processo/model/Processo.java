@@ -20,6 +20,28 @@ import java.util.Set;
 @AllArgsConstructor
 @AttributeOverrides({@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))})
 public class Processo extends EntidadeBase {
+    @Column(name = "data_criacao")
+    private LocalDateTime dataCriacao;
+    @Column(name = "data_finalizacao")
+    private LocalDateTime dataFinalizacao;
+    @Column(name = "data_limite")
+    private LocalDateTime dataLimite;
+    @Column(name = "descricao")
+    private String descricao;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situacao", length = 20)
+    private SituacaoProcesso situacao;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", length = 20)
+    private TipoProcesso tipo;
+    @ManyToMany
+    @JoinTable(
+            name = "unidade_processo",
+            schema = "sgc",
+            joinColumns = @JoinColumn(name = "processo_codigo"),
+            inverseJoinColumns = @JoinColumn(name = "unidade_codigo"))
+    private Set<Unidade> participantes = new HashSet<>();
+
     public Processo(
             Long codigo,
             String descricao,
@@ -45,32 +67,4 @@ public class Processo extends EntidadeBase {
         this.dataLimite = dataLimite;
         this.dataCriacao = LocalDateTime.now();
     }
-
-    @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
-
-    @Column(name = "data_finalizacao")
-    private LocalDateTime dataFinalizacao;
-
-    @Column(name = "data_limite")
-    private LocalDateTime dataLimite;
-
-    @Column(name = "descricao")
-    private String descricao;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 20)
-    private SituacaoProcesso situacao;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", length = 20)
-    private TipoProcesso tipo;
-
-    @ManyToMany
-    @JoinTable(
-            name = "unidade_processo",
-            schema = "sgc",
-            joinColumns = @JoinColumn(name = "processo_codigo"),
-            inverseJoinColumns = @JoinColumn(name = "unidade_codigo"))
-    private Set<Unidade> participantes = new HashSet<>();
 }

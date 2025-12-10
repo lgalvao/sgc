@@ -54,7 +54,7 @@ public class MapaController {
      *
      * @param mapaDto O DTO com os dados do mapa a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa e o {@link
-     *     MapaDto} criado no corpo da resposta.
+     * MapaDto} criado no corpo da resposta.
      */
     @PostMapping
     @Operation(summary = "Cria um novo mapa")

@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * DTO de resposta para operações CRUD em atividades.
- * 
+ *
  * <p>Retorna tanto a atividade afetada quanto o status atualizado do subprocesso,
  * permitindo que o frontend atualize a UI sem precisar fazer chamadas adicionais
  * para buscar o processo completo.
@@ -18,7 +18,7 @@ public class AtividadeOperacaoResponse {
      * Pode ser null em caso de exclusão.
      */
     private AtividadeVisualizacaoDto atividade;
-    
+
     /**
      * Status atualizado do subprocesso após a operação.
      * Inclui situação, label e timestamp.

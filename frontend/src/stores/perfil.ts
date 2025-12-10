@@ -70,7 +70,7 @@ export const usePerfilStore = defineStore("perfil", () => {
             ];
             definirPerfis(listaPerfis);
 
-                        // Se houver apenas uma opção, seleciona automaticamente
+            // Se houver apenas uma opção, seleciona automaticamente
             if (responsePerfisUnidades.length === 1) {
                 const perfilUnidadeSelecionado = responsePerfisUnidades[0];
                 const loginResponse = await usuarioService.entrar({

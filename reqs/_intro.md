@@ -1,23 +1,45 @@
 # Informações gerais
 
-O Sistema de Gestão de Competências (SGC) visa gerenciar sistematicamente as competências técnicas das unidades organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica onde a SEDOC (Seção de Desenvolvimento Organizacional e Capacitação) exerce o papel de unidade raiz para todos os processos de mapeamento, de revisão e de diagnóstico de competências.
+O Sistema de Gestão de Competências (SGC) visa gerenciar sistematicamente as competências técnicas das unidades
+organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica onde a SEDOC (Seção de
+Desenvolvimento Organizacional e Capacitação) exerce o papel de unidade raiz para todos os processos de mapeamento, de
+revisão e de diagnóstico de competências.
 
-Os componentes essenciais do sistema incluem atividades, que são ações específicas desempenhadas por cada unidade no exercício de suas funções; conhecimentos, que representam o conjunto de conhecimentos técnicos necessários para executar cada atividade; competências, que são elementos sintetizantes agrupando atividades relacionadas e são definidos e mantidos apenas pela SEDOC; e mapas de competências, que constituem o conjunto consolidado de competências associadas a uma unidade, resultante do processo de mapeamento.
+Os componentes essenciais do sistema incluem atividades, que são ações específicas desempenhadas por cada unidade no
+exercício de suas funções; conhecimentos, que representam o conjunto de conhecimentos técnicos necessários para executar
+cada atividade; competências, que são elementos sintetizantes agrupando atividades relacionadas e são definidos e
+mantidos apenas pela SEDOC; e mapas de competências, que constituem o conjunto consolidado de competências associadas a
+uma unidade, resultante do processo de mapeamento.
 
-O sistema suporta três tipos principais de processos: mapeamento, que representa o processo inicial de coleta sistemática das atividades e conhecimentos necessários para cada unidade operacional; revisão, que consiste na atualização periódica dos mapas de competências vigentes considerando mudanças organizacionais; e diagnóstico, que avalia a importância e domínio das competências pelos servidores, identificando lacunas (gaps) e necessidades de capacitação.
+O sistema suporta três tipos principais de processos: mapeamento, que representa o processo inicial de coleta
+sistemática das atividades e conhecimentos necessários para cada unidade operacional; revisão, que consiste na
+atualização periódica dos mapas de competências vigentes considerando mudanças organizacionais; e diagnóstico, que
+avalia a importância e domínio das competências pelos servidores, identificando lacunas (gaps) e necessidades de
+capacitação.
 
 ## Atores e perfis
 
-O sistema de Gestão de Competências opera com os seguintes perfis de usuários, cujas atribuições e acessos são automaticamente reconhecidos com base na condição de responsabilidade ou lotação em uma unidade, de acordo com o SGRH, ou por atribuição de responsabilidade temporária realizada no próprio sistema. Caso um usuário acumule mais de um perfil ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o login.
+O sistema de Gestão de Competências opera com os seguintes perfis de usuários, cujas atribuições e acessos são
+automaticamente reconhecidos com base na condição de responsabilidade ou lotação em uma unidade, de acordo com o SGRH,
+ou por atribuição de responsabilidade temporária realizada no próprio sistema. Caso um usuário acumule mais de um perfil
+ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o login.
 
-* **ADMIN**: Administrador da SEDOC. É responsável por criar, configurar e monitorar processos, além de criar/ajustar os mapas de competências das unidades. A unidade SEDOC é tratada como unidade raiz da estrutura organizacional para efeito dos processos de mapeamento, de revisão e de diagnóstico.
-* **GESTOR**: Responsável por uma unidade intermediária (exemplo: Coordenador). Pode visualizar e validar as informações cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou devolver à unidade subordinada para realização de retificações.
-* **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Pode cadastrar as informações de sua unidade em cada processo e submeter essas informações para validação pela unidade superior.
-* **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de diagnóstico.
+* **ADMIN**: Administrador da SEDOC. É responsável por criar, configurar e monitorar processos, além de criar/ajustar os
+  mapas de competências das unidades. A unidade SEDOC é tratada como unidade raiz da estrutura organizacional para
+  efeito dos processos de mapeamento, de revisão e de diagnóstico.
+* **GESTOR**: Responsável por uma unidade intermediária (exemplo: Coordenador). Pode visualizar e validar as informações
+  cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou devolver à unidade
+  subordinada para realização de retificações.
+* **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Pode cadastrar as informações de sua unidade
+  em cada processo e submeter essas informações para validação pela unidade superior.
+* **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de
+  diagnóstico.
 
 ## Situações
 
-Os processos e subprocessos mantidos pelo sistema seguem um fluxo previsível, passando por um conjunto de situações que varia de acordo com o tipo de processo/subprocesso. Essas situações são referenciadas entre aspas simples (por exemplo, 'Não iniciado') nas especificações de casos de uso.
+Os processos e subprocessos mantidos pelo sistema seguem um fluxo previsível, passando por um conjunto de situações que
+varia de acordo com o tipo de processo/subprocesso. Essas situações são referenciadas entre aspas simples (por
+exemplo, 'Não iniciado') nas especificações de casos de uso.
 
 ### Situações de Processos
 

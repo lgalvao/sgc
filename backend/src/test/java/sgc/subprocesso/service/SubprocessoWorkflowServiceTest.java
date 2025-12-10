@@ -42,14 +42,21 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoWorkflowServiceTest {
 
-    @Mock private SubprocessoRepo repositorioSubprocesso;
-    @Mock private ApplicationEventPublisher publicadorDeEventos;
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private AnaliseService analiseService;
-    @Mock private SubprocessoService subprocessoService;
-    @Mock private ImpactoMapaService impactoMapaService;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private ApplicationEventPublisher publicadorDeEventos;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private AnaliseService analiseService;
+    @Mock
+    private SubprocessoService subprocessoService;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
 
-    @InjectMocks private SubprocessoWorkflowService service;
+    @InjectMocks
+    private SubprocessoWorkflowService service;
 
     // --- Disponibilizar Cadastro ---
 

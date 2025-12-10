@@ -8,25 +8,25 @@ import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
 import ProcessoView from "@/views/ProcessoView.vue";
 
-const { pushMock } = vi.hoisted(() => {
+const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};
 });
 
 vi.mock("vue-router", () => ({
-  useRoute: () => ({
-    params: {
-        codProcesso: "1",
-    },
-  }),
-  useRouter: () => ({
-      push: pushMock,
-  }),
-  createRouter: () => ({
-    beforeEach: vi.fn(),
-    afterEach: vi.fn(),
-      push: pushMock,
-  }),
-  createWebHistory: vi.fn(),
+    useRoute: () => ({
+        params: {
+            codProcesso: "1",
+        },
+    }),
+    useRouter: () => ({
+        push: pushMock,
+    }),
+    createRouter: () => ({
+        beforeEach: vi.fn(),
+        afterEach: vi.fn(),
+        push: pushMock,
+    }),
+    createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
 }));
 
@@ -97,7 +97,7 @@ const createWrapper = (customState = {}) => {
                 TreeTable: TreeTableStub,
                 BContainer: {template: "<div><slot /></div>"},
                 BAlert: {template: "<div><slot /></div>"},
-      },
+            },
         },
     });
 
@@ -111,46 +111,46 @@ const createWrapper = (customState = {}) => {
 describe("ProcessoView.vue", () => {
     let wrapper: ReturnType<typeof createWrapper>["wrapper"];
 
-  const mockProcesso = {
-      codigo: 1,
-      descricao: "Test Process",
-      tipo: "MAPEAMENTO",
-      situacao: "EM_ANDAMENTO",
-      unidades: [
-          {
-              codUnidade: 10,
-              sigla: "U1",
-              nome: "Unidade 1",
-              situacaoSubprocesso: "EM_ANDAMENTO",
-              dataLimite: "2023-01-01",
-              filhos: [],
-          },
-      ],
-      resumoSubprocessos: [],
-  };
+    const mockProcesso = {
+        codigo: 1,
+        descricao: "Test Process",
+        tipo: "MAPEAMENTO",
+        situacao: "EM_ANDAMENTO",
+        unidades: [
+            {
+                codUnidade: 10,
+                sigla: "U1",
+                nome: "Unidade 1",
+                situacaoSubprocesso: "EM_ANDAMENTO",
+                dataLimite: "2023-01-01",
+                filhos: [],
+            },
+        ],
+        resumoSubprocessos: [],
+    };
 
-  const mockSubprocessosElegiveis = [
-      {
-          codSubprocesso: 1,
-          unidadeNome: "Test Unit",
-          unidadeSigla: "TU",
-          situacao: "NAO_INICIADO",
-      },
-  ];
+    const mockSubprocessosElegiveis = [
+        {
+            codSubprocesso: 1,
+            unidadeNome: "Test Unit",
+            unidadeSigla: "TU",
+            situacao: "NAO_INICIADO",
+        },
+    ];
 
-  beforeEach(() => {
-      vi.clearAllMocks();
-      vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
-          mockProcesso as any,
-      );
-      vi.mocked(processoService.buscarSubprocessosElegiveis).mockResolvedValue(
-          mockSubprocessosElegiveis as any,
-      );
-  });
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
+            mockProcesso as any,
+        );
+        vi.mocked(processoService.buscarSubprocessosElegiveis).mockResolvedValue(
+            mockSubprocessosElegiveis as any,
+        );
+    });
 
-  afterEach(() => {
-      wrapper?.unmount();
-  });
+    afterEach(() => {
+        wrapper?.unmount();
+    });
 
     it("deve renderizar detalhes do processo e buscar dados no mount", async () => {
         const {wrapper: w} = createWrapper();
@@ -174,7 +174,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve lidar com dataLimite nula", async () => {
-        const mockProcessoNullDate = { ...mockProcesso };
+        const mockProcessoNullDate = {...mockProcesso};
         mockProcessoNullDate.unidades = [
             {
                 codUnidade: 10,
@@ -214,7 +214,7 @@ describe("ProcessoView.vue", () => {
             name: "Subprocesso",
             params: {codProcesso: "1", siglaUnidade: "U1"},
         });
-  });
+    });
 
     it("deve abrir modal de finalização", async () => {
         const {wrapper: w} = createWrapper();
@@ -329,8 +329,8 @@ describe("ProcessoView.vue", () => {
 
         expect(processoService.processarAcaoEmBloco).not.toHaveBeenCalled();
         expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Nenhuma unidade selecionada", 
-            expect.any(String), 
+            "Nenhuma unidade selecionada",
+            expect.any(String),
             "danger"
         );
     });
@@ -347,8 +347,8 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro ao finalizar processo", 
-            expect.any(String), 
+            "Erro ao finalizar processo",
+            expect.any(String),
             "danger"
         );
     });
@@ -365,8 +365,8 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro ao processar em bloco", 
-            expect.any(String), 
+            "Erro ao processar em bloco",
+            expect.any(String),
             "danger"
         );
     });

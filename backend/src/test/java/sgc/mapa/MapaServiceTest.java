@@ -35,15 +35,20 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MapaServiceTest {
-    @Mock private MapaRepo mapaRepo;
+    @Mock
+    private MapaRepo mapaRepo;
 
-    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
-    @Mock private MapaVinculoService mapaVinculoService;
+    @Mock
+    private MapaVinculoService mapaVinculoService;
 
-    @Mock private MapaIntegridadeService mapaIntegridadeService;
+    @Mock
+    private MapaIntegridadeService mapaIntegridadeService;
 
-    @InjectMocks private MapaService mapaService;
+    @InjectMocks
+    private MapaService mapaService;
 
     private Mapa mapa;
     private Competencia competencia;

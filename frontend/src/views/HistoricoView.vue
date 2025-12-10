@@ -4,20 +4,20 @@
       Histórico de processos
     </h2>
     <TabelaProcessos
-      :processos="processosFinalizadosOrdenadosComFormatacao"
-      :criterio-ordenacao="criterio"
-      :direcao-ordenacao-asc="asc"
-      :show-data-finalizacao="true"
-      @ordenar="ordenarPor"
-      @selecionar-processo="abrirProcesso"
+        :criterio-ordenacao="criterio"
+        :direcao-ordenacao-asc="asc"
+        :processos="processosFinalizadosOrdenadosComFormatacao"
+        :show-data-finalizacao="true"
+        @ordenar="ordenarPor"
+        @selecionar-processo="abrirProcesso"
     />
 
     <BAlert
-      v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
-      variant="info"
-      class="mt-4"
-      :model-value="true"
-      :fade="false"
+        v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
+        :fade="false"
+        :model-value="true"
+        class="mt-4"
+        variant="info"
     >
       Nenhum processo finalizado.
     </BAlert>

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/** Repositório para a entidade {@link Analise}. */
+/**
+ * Repositório para a entidade {@link Analise}.
+ */
 @Repository
 public interface AnaliseRepo extends JpaRepository<Analise, Long> {
     /**

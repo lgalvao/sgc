@@ -49,19 +49,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CDU05IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
 
-    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
 
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
 
     private Unidade unidade;
     private Mapa mapaOriginal;

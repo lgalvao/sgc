@@ -36,10 +36,10 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde aos casos de uso CDU-04 e CDU-05.
      *
-     * @param nomeUnidade O nome da unidade notificada.
+     * @param nomeUnidade  O nome da unidade notificada.
      * @param nomeProcesso O nome do processo iniciado.
      * @param tipoProcesso O tipo do processo (e.g., MAPEAMENTO, REVISAO).
-     * @param dataLimite A data limite para a conclusão da primeira etapa.
+     * @param dataLimite   A data limite para a conclusão da primeira etapa.
      * @return O conteúdo HTML do email renderizado pelo Thymeleaf.
      */
     public String criarEmailDeProcessoIniciado(
@@ -64,8 +64,8 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde aos casos de uso CDU-09 e CDU-10.
      *
-     * @param nomeUnidade O nome da unidade que disponibilizou o cadastro.
-     * @param nomeProcesso O nome do processo associado.
+     * @param nomeUnidade          O nome da unidade que disponibilizou o cadastro.
+     * @param nomeProcesso         O nome do processo associado.
      * @param quantidadeAtividades O número de atividades registradas.
      */
     public void criarEmailCadastroDisponibilizado(
@@ -85,10 +85,10 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde ao caso de uso CDU-13.
      *
-     * @param nomeUnidade O nome da unidade que receberá a notificação.
+     * @param nomeUnidade  O nome da unidade que receberá a notificação.
      * @param nomeProcesso O nome do processo associado.
-     * @param motivo O motivo da devolução.
-     * @param observacoes Detalhes ou observações adicionais.
+     * @param motivo       O motivo da devolução.
+     * @param observacoes  Detalhes ou observações adicionais.
      */
     public void criarEmailCadastroDevolvido(
             String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
@@ -108,8 +108,8 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde ao caso de uso CDU-17.
      *
-     * @param nomeUnidade O nome da unidade que disponibilizou o mapa.
-     * @param nomeProcesso O nome do processo associado.
+     * @param nomeUnidade         O nome da unidade que disponibilizou o mapa.
+     * @param nomeProcesso        O nome do processo associado.
      * @param dataLimiteValidacao A data limite para a validação do mapa.
      */
     public void criarEmailMapaDisponibilizado(
@@ -129,7 +129,7 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde ao caso de uso CDU-18.
      *
-     * @param nomeUnidade O nome da unidade que validou o mapa.
+     * @param nomeUnidade  O nome da unidade que validou o mapa.
      * @param nomeProcesso O nome do processo associado.
      */
     public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
@@ -146,7 +146,7 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde ao caso de uso CDU-21.
      *
-     * @param nomeProcesso O nome do processo finalizado.
+     * @param nomeProcesso    O nome do processo finalizado.
      * @param dataFinalizacao A data em que o processo foi finalizado.
      * @param quantidadeMapas O número de mapas que se tornaram vigentes.
      */
@@ -187,10 +187,10 @@ public class NotificacaoModelosService {
      *
      * <p>Corresponde ao caso de uso CDU-21.
      *
-     * @param siglaUnidade A sigla da unidade intermediária notificada.
-     * @param nomeProcesso O nome do processo concluído.
+     * @param siglaUnidade               A sigla da unidade intermediária notificada.
+     * @param nomeProcesso               O nome do processo concluído.
      * @param siglasUnidadesSubordinadas A lista de siglas das unidades subordinadas que
-     *     participaram do processo.
+     *                                   participaram do processo.
      * @return O conteúdo HTML do email.
      */
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(

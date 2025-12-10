@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<ruleset name="SGC Ruleset"
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         name="SGC Ruleset"
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
     <description>
@@ -28,13 +28,13 @@
         <exclude name="TooManyStaticImports"/> <!-- Common in modern Java/Tests -->
         <exclude name="UnnecessaryFullyQualifiedName"/> <!-- IDE handles this, PMD often conflicts -->
     </rule>
-    
+
     <rule ref="category/java/codestyle.xml/LongVariable">
         <properties>
             <property name="minimum" value="50"/>
         </properties>
     </rule>
-    
+
     <rule ref="category/java/codestyle.xml/ShortVariable">
         <properties>
             <property name="minimum" value="2"/> <!-- Allow single char for loops/lambdas -->
@@ -60,7 +60,8 @@
         <exclude name="CognitiveComplexity"/> <!-- Same as above -->
         <exclude name="TooManyMethods"/> <!-- Services can be large -->
         <exclude name="NPathComplexity"/>
-        <exclude name="UseObjectForClearerAPI"/> <!-- Often false positive for simple service methods with 3-4 string args -->
+        <exclude
+                name="UseObjectForClearerAPI"/> <!-- Often false positive for simple service methods with 3-4 string args -->
     </rule>
 
     <!-- Error Prone -->

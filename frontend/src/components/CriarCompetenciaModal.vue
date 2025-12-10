@@ -1,21 +1,21 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrar"
-    :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
-    size="lg"
-    centered
-    hide-footer
-    @hide="fechar"
+      :fade="false"
+      :model-value="mostrar"
+      :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
+      centered
+      hide-footer
+      size="lg"
+      @hide="fechar"
   >
     <div class="mb-4">
       <h5>Descrição</h5>
       <div class="mb-2">
         <BFormTextarea
-          v-model="novaCompetencia.descricao"
-          placeholder="Descreva a competência"
-          rows="3"
-          data-testid="input-descricao-competencia"
+            v-model="novaCompetencia.descricao"
+            data-testid="input-descricao-competencia"
+            placeholder="Descreva a competência"
+            rows="3"
         />
       </div>
     </div>
@@ -24,28 +24,28 @@
       <h5>Atividades</h5>
       <div class="d-flex flex-wrap gap-2">
         <BCard
-          v-for="atividade in atividades"
-          :key="atividade.codigo"
-          :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
-          no-body
+            v-for="atividade in atividades"
+            :key="atividade.codigo"
+            :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
+            no-body
         >
           <BCardBody class="d-flex align-items-center py-2">
             <BFormCheckbox
-              :id="`atv-${atividade.codigo}`"
-              v-model="atividadesSelecionadas"
-              :value="atividade.codigo"
-              class="form-check-input me-2"
-              :data-testid="`chk-atividade-${atividade.codigo}`"
+                :id="`atv-${atividade.codigo}`"
+                v-model="atividadesSelecionadas"
+                :data-testid="`chk-atividade-${atividade.codigo}`"
+                :value="atividade.codigo"
+                class="form-check-input me-2"
             >
               {{ atividade.descricao }}
               <span
-                v-if="atividade.conhecimentos.length > 0"
-                :data-bs-html="true"
-                :data-bs-title="getConhecimentosModal(atividade)"
-                class="badge bg-secondary ms-2"
-                data-bs-custom-class="conhecimentos-tooltip"
-                data-bs-placement="right"
-                data-bs-toggle="tooltip"
+                  v-if="atividade.conhecimentos.length > 0"
+                  :data-bs-html="true"
+                  :data-bs-title="getConhecimentosModal(atividade)"
+                  class="badge bg-secondary ms-2"
+                  data-bs-custom-class="conhecimentos-tooltip"
+                  data-bs-placement="right"
+                  data-bs-toggle="tooltip"
               >
                 {{ atividade.conhecimentos.length }}
               </span>
@@ -57,19 +57,19 @@
 
     <template #footer>
       <BButton
-        variant="secondary"
-        data-testid="criar-competencia-modal__btn-modal-cancelar"
-        @click="fechar"
+          data-testid="criar-competencia-modal__btn-modal-cancelar"
+          variant="secondary"
+          @click="fechar"
       >
         Cancelar
       </BButton>
       <BButton
-        :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-        variant="primary"
-        data-testid="criar-competencia-modal__btn-modal-confirmar"
-        @click="salvar"
+          :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+          data-testid="criar-competencia-modal__btn-modal-confirmar"
+          variant="primary"
+          @click="salvar"
       >
-        <i class="bi bi-save" /> Salvar
+        <i class="bi bi-save"/> Salvar
       </BButton>
     </template>
   </BModal>

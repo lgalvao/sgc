@@ -4,42 +4,42 @@
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
-          class="display-6 mb-0"
-          data-testid="txt-painel-titulo-processos"
+            class="display-6 mb-0"
+            data-testid="txt-painel-titulo-processos"
         >
           Processos
         </div>
         <BButton
-          v-if="perfil.isAdmin"
-          :to="{ name: 'CadProcesso' }"
-          variant="outline-primary"
-          data-testid="btn-painel-criar-processo"
+            v-if="perfil.isAdmin"
+            :to="{ name: 'CadProcesso' }"
+            data-testid="btn-painel-criar-processo"
+            variant="outline-primary"
         >
-          <i class="bi bi-plus-lg" /> Criar processo
+          <i class="bi bi-plus-lg"/> Criar processo
         </BButton>
       </div>
       <TabelaProcessos
-        :processos="processosOrdenados"
-        :criterio-ordenacao="criterio"
-        :direcao-ordenacao-asc="asc"
-        @ordenar="ordenarPor"
-        @selecionar-processo="abrirDetalhesProcesso"
+          :criterio-ordenacao="criterio"
+          :direcao-ordenacao-asc="asc"
+          :processos="processosOrdenados"
+          @ordenar="ordenarPor"
+          @selecionar-processo="abrirDetalhesProcesso"
       />
     </div>
 
     <div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
-          class="mb-0 display-6"
-          data-testid="txt-painel-titulo-alertas"
+            class="mb-0 display-6"
+            data-testid="txt-painel-titulo-alertas"
         >
           Alertas
         </div>
       </div>
       <TabelaAlertas
-        :alertas="alertas"
-        @ordenar="ordenarAlertasPor"
-        @selecionar-alerta="abrirDetalhesAlerta"
+          :alertas="alertas"
+          @ordenar="ordenarAlertasPor"
+          @selecionar-alerta="abrirDetalhesAlerta"
       />
     </div>
   </BContainer>
@@ -104,11 +104,11 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     asc.value = true;
   }
   processosStore.buscarProcessosPainel(
-    perfil.perfilSelecionado!,
-    Number(perfil.unidadeSelecionada),
-    0,
-    10,
-    criterio.value,
+      perfil.perfilSelecionado!,
+      Number(perfil.unidadeSelecionada),
+      0,
+      10,
+      criterio.value,
       asc.value ? "asc" : "desc",
   );
 }
@@ -140,11 +140,11 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaAsc.value = campo !== "data";
   }
   alertasStore.buscarAlertas(
-    Number(perfil.servidorId) || 0,
-    Number(perfil.unidadeSelecionada),
-    0,
-    10,
-    alertaCriterio.value,
+      Number(perfil.servidorId) || 0,
+      Number(perfil.unidadeSelecionada),
+      0,
+      10,
+      alertaCriterio.value,
       alertaAsc.value ? "asc" : "desc",
   );
 }

@@ -64,18 +64,18 @@ class DiagnosticoServiceTest {
         mapa = new Mapa();
         mapa.setCodigo(200L);
         mapa.setUnidade(unidade);
-        
+
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
-        
+
         diagnostico = new Diagnostico(subprocesso);
         diagnostico.setCodigo(10L);
-        
+
         servidor = new Usuario();
         servidor.setTituloEleitoral("123456789012");
-        
+
         competencia = new Competencia(300L, "Competência Teste", mapa);
     }
 
@@ -101,11 +101,11 @@ class DiagnosticoServiceTest {
         when(diagnosticoRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(diagnostico));
         when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(servidor));
         when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(competencia));
-        
+
         when(avaliacaoServidorRepo.findByDiagnosticoCodigoAndServidorTituloEleitoralAndCompetenciaCodigo(
                 diagnostico.getCodigo(), "123456789012", competencia.getCodigo()))
                 .thenReturn(Optional.empty());
-                
+
         when(avaliacaoServidorRepo.save(any(AvaliacaoServidor.class))).thenAnswer(i -> {
             AvaliacaoServidor a = i.getArgument(0);
             a.setCodigo(500L);
@@ -121,30 +121,30 @@ class DiagnosticoServiceTest {
     void concluirAutoavaliacao_deveFalhar_seIncompleta() {
         when(diagnosticoRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(diagnostico));
         when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(competencia));
-        
+
         // Retorna lista vazia de avaliações
         when(avaliacaoServidorRepo.findByDiagnosticoCodigoAndServidorTituloEleitoral(
                 diagnostico.getCodigo(), "123456789012")).thenReturn(List.of());
 
-        assertThrows(IllegalStateException.class, () -> 
-            diagnosticoService.concluirAutoavaliacao(1L, "123456789012", new ConcluirAutoavaliacaoRequest(null))
+        assertThrows(IllegalStateException.class, () ->
+                diagnosticoService.concluirAutoavaliacao(1L, "123456789012", new ConcluirAutoavaliacaoRequest(null))
         );
     }
-    
+
     @Test
     void concluirAutoavaliacao_deveSucesso_seCompleta() {
         when(diagnosticoRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(diagnostico));
         when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(competencia));
-        
+
         AvaliacaoServidor av = new AvaliacaoServidor(diagnostico, servidor, competencia);
         av.setImportancia(NivelAvaliacao.N1);
         av.setDominio(NivelAvaliacao.N1);
-        
+
         when(avaliacaoServidorRepo.findByDiagnosticoCodigoAndServidorTituloEleitoral(
                 diagnostico.getCodigo(), "123456789012")).thenReturn(List.of(av));
 
         diagnosticoService.concluirAutoavaliacao(1L, "123456789012", new ConcluirAutoavaliacaoRequest(null));
-        
+
         verify(avaliacaoServidorRepo).saveAll(any());
         assertEquals(SituacaoServidorDiagnostico.AUTOAVALIACAO_CONCLUIDA, av.getSituacao());
     }

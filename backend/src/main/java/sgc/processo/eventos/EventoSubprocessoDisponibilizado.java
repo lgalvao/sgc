@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventoSubprocessoDisponibilizado {
-    /** O código do subprocesso que foi disponibilizado. */
+    /**
+     * O código do subprocesso que foi disponibilizado.
+     */
     private Long codSubprocesso;
 }

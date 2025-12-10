@@ -9,4 +9,5 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class EventoSubprocessoMapaAjustadoSubmetido extends EventoSubprocessoBase {}
+public class EventoSubprocessoMapaAjustadoSubmetido extends EventoSubprocessoBase {
+}

@@ -2,20 +2,20 @@
   <BContainer class="mt-4">
     <div class="d-flex align-items-center mb-3">
       <BButton
-        variant="link"
-        class="p-0 me-3 text-decoration-none"
-        data-testid="btn-cad-atividades-voltar"
-        @click="router.back()"
+          class="p-0 me-3 text-decoration-none"
+          data-testid="btn-cad-atividades-voltar"
+          variant="link"
+          @click="router.back()"
       >
-        <i class="bi bi-arrow-left fs-4" />
+        <i class="bi bi-arrow-left fs-4"/>
       </BButton>
       <div class="fs-5 d-flex align-items-center gap-2">
         <span>{{ siglaUnidade }} - {{ nomeUnidade }}</span>
         <span
-          v-if="subprocesso"
-          :class="badgeClass(subprocesso.situacaoSubprocesso)"
-          class="badge fs-6"
-          data-testid="cad-atividades__txt-badge-situacao"
+            v-if="subprocesso"
+            :class="badgeClass(subprocesso.situacaoSubprocesso)"
+            class="badge fs-6"
+            data-testid="cad-atividades__txt-badge-situacao"
         >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
       </div>
     </div>
@@ -27,36 +27,36 @@
 
       <div class="d-flex gap-2">
         <BButton
-          v-if="podeVerImpacto"
-          variant="outline-secondary"
-          data-testid="cad-atividades__btn-impactos-mapa"
-          @click="abrirModalImpacto"
+            v-if="podeVerImpacto"
+            data-testid="cad-atividades__btn-impactos-mapa"
+            variant="outline-secondary"
+            @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
+          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </BButton>
         <BButton
-          v-if="isChefe && historicoAnalises.length > 0"
-          variant="outline-info"
-          data-testid="btn-cad-atividades-historico"
-          @click="abrirModalHistorico"
+            v-if="isChefe && historicoAnalises.length > 0"
+            data-testid="btn-cad-atividades-historico"
+            variant="outline-info"
+            @click="abrirModalHistorico"
         >
           Histórico de análise
         </BButton>
         <BButton
-          v-if="isChefe"
-          variant="outline-primary"
-          data-testid="btn-cad-atividades-importar"
-          title="Importar"
-          @click="mostrarModalImportar = true"
+            v-if="isChefe"
+            data-testid="btn-cad-atividades-importar"
+            title="Importar"
+            variant="outline-primary"
+            @click="mostrarModalImportar = true"
         >
           Importar atividades
         </BButton>
         <BButton
-          v-if="!!permissoes?.podeDisponibilizarCadastro"
-          variant="outline-success"
-          data-testid="btn-cad-atividades-disponibilizar"
-          title="Disponibilizar"
-          @click="disponibilizarCadastro"
+            v-if="!!permissoes?.podeDisponibilizarCadastro"
+            data-testid="btn-cad-atividades-disponibilizar"
+            title="Disponibilizar"
+            variant="outline-success"
+            @click="disponibilizarCadastro"
         >
           Disponibilizar
         </BButton>
@@ -64,30 +64,30 @@
     </div>
 
     <BForm
-      class="row g-2 align-items-center mb-4"
-      data-testid="form-nova-atividade"
-      @submit.prevent="adicionarAtividade"
+        class="row g-2 align-items-center mb-4"
+        data-testid="form-nova-atividade"
+        @submit.prevent="adicionarAtividade"
     >
       <BCol>
         <BFormInput
-          v-model="novaAtividade"
-          data-testid="inp-nova-atividade"
-          placeholder="Nova atividade"
-          type="text"
-          aria-label="Nova atividade"
+            v-model="novaAtividade"
+            aria-label="Nova atividade"
+            data-testid="inp-nova-atividade"
+            placeholder="Nova atividade"
+            type="text"
         />
       </BCol>
       <BCol cols="auto">
         <BButton
-          variant="outline-primary"
-          size="sm"
-          data-testid="btn-adicionar-atividade"
-          title="Adicionar atividade"
-          type="submit"
-          :disabled="!codSubrocesso || !permissoes?.podeEditarMapa"
+            :disabled="!codSubrocesso || !permissoes?.podeEditarMapa"
+            data-testid="btn-adicionar-atividade"
+            size="sm"
+            title="Adicionar atividade"
+            type="submit"
+            variant="outline-primary"
         >
           <i
-            class="bi bi-save"
+              class="bi bi-save"
           />
         </BButton>
       </BCol>
@@ -95,36 +95,36 @@
 
     <div v-for="(atividade, idx) in atividades" :key="atividade.codigo || idx">
       <AtividadeItem
-        :atividade="atividade"
-        :pode-editar="!!permissoes?.podeEditarMapa"
-        @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
-        @remover-atividade="() => removerAtividade(idx)"
-        @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
-        @atualizar-conhecimento="(idC, desc) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
-        @remover-conhecimento="(idC) => removerConhecimento(idx, idC)"
+          :atividade="atividade"
+          :pode-editar="!!permissoes?.podeEditarMapa"
+          @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
+          @remover-atividade="() => removerAtividade(idx)"
+          @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
+          @atualizar-conhecimento="(idC, desc) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
+          @remover-conhecimento="(idC) => removerConhecimento(idx, idC)"
       />
     </div>
 
     <ImportarAtividadesModal
-      :mostrar="mostrarModalImportar"
-      :cod-subrocesso-destino="codSubrocesso"
-      @fechar="mostrarModalImportar = false"
-      @importar="handleImportAtividades"
+        :cod-subrocesso-destino="codSubrocesso"
+        :mostrar="mostrarModalImportar"
+        @fechar="mostrarModalImportar = false"
+        @importar="handleImportAtividades"
     />
 
     <ImpactoMapaModal
-      :id-processo="codProcesso"
-      :mostrar="mostrarModalImpacto"
-      :sigla-unidade="siglaUnidade"
-      @fechar="fecharModalImpacto"
+        :id-processo="codProcesso"
+        :mostrar="mostrarModalImpacto"
+        :sigla-unidade="siglaUnidade"
+        @fechar="fecharModalImpacto"
     />
 
     <BModal
-      v-model="mostrarModalConfirmacao"
-      :fade="false"
-      :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
-      centered
-      hide-footer
+        v-model="mostrarModalConfirmacao"
+        :fade="false"
+        :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
+        centered
+        hide-footer
     >
       <template #default>
         <p>
@@ -135,15 +135,15 @@
       </template>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalConfirmacao"
+            variant="secondary"
+            @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="success"
-          data-testid="btn-confirmar-disponibilizacao"
-          @click="confirmarDisponibilizacao"
+            data-testid="btn-confirmar-disponibilizacao"
+            variant="success"
+            @click="confirmarDisponibilizacao"
         >
           Confirmar
         </BButton>
@@ -151,44 +151,50 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalHistorico"
-      :fade="false"
-      title="Histórico de Análise"
-      centered
-      size="lg"
-      hide-footer
+        v-model="mostrarModalHistorico"
+        :fade="false"
+        centered
+        hide-footer
+        size="lg"
+        title="Histórico de Análise"
     >
       <div class="table-responsive">
         <table
-          class="table table-striped"
-          data-testid="cad-atividades__tbl-historico-analise"
+            class="table table-striped"
+            data-testid="cad-atividades__tbl-historico-analise"
         >
           <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Unidade</th>
-              <th>Resultado</th>
-              <th>Observações</th>
-            </tr>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Unidade</th>
+            <th>Resultado</th>
+            <th>Observações</th>
+          </tr>
           </thead>
           <tbody>
-            <tr
+          <tr
               v-for="(analise, index) in historicoAnalises"
               :key="analise.codigo"
               :data-testid="`row-historico-${index}`"
-            >
-              <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
-              <td :data-testid="`cell-unidade-${index}`">{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
-              <td :data-testid="`cell-resultado-${index}`">{{ formatarAcaoAnalise(analise.acao || analise.resultado) }}</td>
-              <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
-            </tr>
+          >
+            <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
+            <td :data-testid="`cell-unidade-${index}`">{{
+                'unidade' in analise ? analise.unidade : analise.unidadeSigla
+              }}
+            </td>
+            <td :data-testid="`cell-resultado-${index}`">{{
+                formatarAcaoAnalise(analise.acao || analise.resultado)
+              }}
+            </td>
+            <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalHistorico"
+            variant="secondary"
+            @click="fecharModalHistorico"
         >
           Fechar
         </BButton>
@@ -196,25 +202,29 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalErros"
-      title="Pendências para disponibilização"
-      centered
-      hide-footer
-      header-bg-variant="warning"
-      header-text-variant="dark"
+        v-model="mostrarModalErros"
+        centered
+        header-bg-variant="warning"
+        header-text-variant="dark"
+        hide-footer
+        title="Pendências para disponibilização"
     >
       <div v-if="errosValidacao.length > 0">
         <p class="mb-3">Corrija as seguintes pendências antes de disponibilizar:</p>
         <ul class="list-group">
-            <li v-for="(erro, index) in errosValidacao" :key="index" class="list-group-item list-group-item-warning">
-                <div class="fw-bold">{{ erro.tipo === 'ATIVIDADE_SEM_CONHECIMENTO' ? 'Atividade sem conhecimento' : erro.tipo }}</div>
-                <div v-if="erro.descricaoAtividade" class="small text-muted">{{ erro.descricaoAtividade }}</div>
-                <div>{{ erro.mensagem }}</div>
-            </li>
+          <li v-for="(erro, index) in errosValidacao" :key="index" class="list-group-item list-group-item-warning">
+            <div class="fw-bold">
+              {{ erro.tipo === 'ATIVIDADE_SEM_CONHECIMENTO' ? 'Atividade sem conhecimento' : erro.tipo }}
+            </div>
+            <div v-if="erro.descricaoAtividade" class="small text-muted">{{ erro.descricaoAtividade }}</div>
+            <div>{{ erro.mensagem }}</div>
+          </li>
         </ul>
       </div>
       <template #footer>
-        <BButton variant="secondary" data-testid="btn-fechar-modal-pendencias" @click="mostrarModalErros = false">Fechar</BButton>
+        <BButton data-testid="btn-fechar-modal-pendencias" variant="secondary" @click="mostrarModalErros = false">
+          Fechar
+        </BButton>
       </template>
     </BModal>
   </BContainer>
@@ -274,21 +284,21 @@ const unidade = computed(() => unidadesStore.unidade);
 
 const siglaUnidade = computed(() => unidade.value?.sigla || props.sigla);
 const nomeUnidade = computed(() =>
-  unidade.value?.nome ? `${unidade.value.nome}` : "",
+    unidade.value?.nome ? `${unidade.value.nome}` : "",
 );
 const novaAtividade = ref("");
 const codSubrocesso = computed(
-  () =>
-    processosStore.processoDetalhe?.unidades.find(
-      (u) => u.sigla === unidadeId.value,
-    )?.codSubprocesso,
+    () =>
+        processosStore.processoDetalhe?.unidades.find(
+            (u) => u.sigla === unidadeId.value,
+        )?.codSubprocesso,
 );
 
 const codMapa = computed(
-  () =>
-    processosStore.processoDetalhe?.unidades.find(
-      (u) => u.sigla === unidadeId.value,
-    )?.mapaCodigo,
+    () =>
+        processosStore.processoDetalhe?.unidades.find(
+            (u) => u.sigla === unidadeId.value,
+        )?.mapaCodigo,
 );
 
 const atividades = computed({
@@ -296,12 +306,13 @@ const atividades = computed({
     if (codSubrocesso.value === undefined) return [];
     return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value);
   },
-  set: () => {},
+  set: () => {
+  },
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(
-  () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
+    () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
 );
 
 const permissoes = ref<SubprocessoPermissoes | null>(null);
@@ -312,13 +323,13 @@ async function adicionarAtividade() {
       descricao: novaAtividade.value.trim(),
     };
     const status = await atividadesStore.adicionarAtividade(
-      codSubrocesso.value,
-      codMapa.value,
-      request,
+        codSubrocesso.value,
+        codMapa.value,
+        request,
     );
     novaAtividade.value = "";
     if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
     }
   }
 }
@@ -327,16 +338,16 @@ async function removerAtividade(idx: number) {
   if (!codSubrocesso.value) return;
   const atividadeRemovida = atividades.value[idx];
   if (
-    confirm(
-      "Confirma a remoção desta atividade e todos os conhecimentos associados?",
-    )
+      confirm(
+          "Confirma a remoção desta atividade e todos os conhecimentos associados?",
+      )
   ) {
     const status = await atividadesStore.removerAtividade(
-      codSubrocesso.value,
-      atividadeRemovida.codigo,
+        codSubrocesso.value,
+        atividadeRemovida.codigo,
     );
     if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
     }
   }
 }
@@ -349,12 +360,12 @@ async function adicionarConhecimento(idx: number, descricao: string) {
       descricao: descricao.trim(),
     };
     const status = await atividadesStore.adicionarConhecimento(
-      codSubrocesso.value,
-      atividade.codigo,
-      request,
+        codSubrocesso.value,
+        atividade.codigo,
+        request,
     );
     if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
     }
   }
 }
@@ -364,12 +375,12 @@ async function removerConhecimento(idx: number, idConhecimento: number) {
   const atividade = atividades.value[idx];
   if (confirm("Confirma a remoção deste conhecimento?")) {
     const status = await atividadesStore.removerConhecimento(
-      codSubrocesso.value,
-      atividade.codigo,
-      idConhecimento,
+        codSubrocesso.value,
+        atividade.codigo,
+        idConhecimento,
     );
     if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
     }
   }
 }
@@ -378,19 +389,19 @@ async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: num
   if (!codSubrocesso.value) return;
 
   if (descricao.trim()) {
-      const conhecimentoAtualizado: Conhecimento = {
-        id: conhecimentoId,
-        descricao: descricao.trim(),
-      };
-      const status = await atividadesStore.atualizarConhecimento(
+    const conhecimentoAtualizado: Conhecimento = {
+      id: conhecimentoId,
+      descricao: descricao.trim(),
+    };
+    const status = await atividadesStore.atualizarConhecimento(
         codSubrocesso.value,
         atividadeId,
         conhecimentoId,
         conhecimentoAtualizado,
-      );
-      if (status) {
-          processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
-      }
+    );
+    if (status) {
+      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+    }
   }
 }
 
@@ -403,12 +414,12 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
         descricao: descricao.trim(),
       };
       const status = await atividadesStore.atualizarAtividade(
-        codSubrocesso.value,
-        id,
-        atividadeAtualizada,
+          codSubrocesso.value,
+          id,
+          atividadeAtualizada,
       );
       if (status) {
-          processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
       }
     }
   }
@@ -422,20 +433,20 @@ async function handleImportAtividades() {
     processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
   }
   feedbackStore.show(
-    "Importação Concluída",
-    "As atividades foram importadas para o seu mapa.",
-    "success"
+      "Importação Concluída",
+      "As atividades foram importadas para o seu mapa.",
+      "success"
   );
 }
 
-const { perfilSelecionado } = usePerfil();
+const {perfilSelecionado} = usePerfil();
 
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
   return processosStore.processoDetalhe.unidades.find(
-    (u) => u.sigla === unidadeId.value,
+      (u) => u.sigla === unidadeId.value,
   );
 });
 
@@ -450,7 +461,6 @@ const mostrarModalErros = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 
 
-
 onMounted(async () => {
   await unidadesStore.buscarUnidade(props.sigla);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
@@ -460,7 +470,6 @@ onMounted(async () => {
     permissoes.value = await subprocessoService.obterPermissoes(codSubrocesso.value);
   }
 });
-
 
 
 const historicoAnalises = computed(() => {
@@ -497,14 +506,14 @@ function formatarAcaoAnalise(acao: string | undefined): string {
 async function disponibilizarCadastro() {
   const sub = subprocesso.value;
   const situacaoEsperada = isRevisao.value
-    ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-    : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
   if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
     feedbackStore.show(
-      "Ação não permitida",
-      `Ação permitida apenas na situação: "${situacaoEsperada}".`,
-      "danger"
+        "Ação não permitida",
+        `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+        "danger"
     );
     return;
   }
@@ -512,15 +521,15 @@ async function disponibilizarCadastro() {
   // Backend valida atividades sem conhecimento via SubprocessoCadastroController/DTO
   if (codSubrocesso.value) {
     try {
-        const resultado = await subprocessoService.validarCadastro(codSubrocesso.value);
-        if (resultado.valido) {
-            mostrarModalConfirmacao.value = true;
-        } else {
-            errosValidacao.value = resultado.erros;
-            mostrarModalErros.value = true;
-        }
+      const resultado = await subprocessoService.validarCadastro(codSubrocesso.value);
+      if (resultado.valido) {
+        mostrarModalConfirmacao.value = true;
+      } else {
+        errosValidacao.value = resultado.erros;
+        mostrarModalErros.value = true;
+      }
     } catch (error) {
-        feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
+      feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
     }
   }
 }

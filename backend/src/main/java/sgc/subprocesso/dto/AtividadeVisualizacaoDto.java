@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/** DTO para visualização de atividade com seus conhecimentos. */
+/**
+ * DTO para visualização de atividade com seus conhecimentos.
+ */
 @Data
 @Builder
 @AllArgsConstructor

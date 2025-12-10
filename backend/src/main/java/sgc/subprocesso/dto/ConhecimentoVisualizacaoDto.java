@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** DTO para visualização de conhecimento. */
+/**
+ * DTO para visualização de conhecimento.
+ */
 @Data
 @Builder
 @AllArgsConstructor

@@ -16,6 +16,23 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Movimentacao extends EntidadeBase {
+    @ManyToOne
+    @JoinColumn(name = "subprocesso_codigo")
+    private Subprocesso subprocesso;
+    @Column(name = "data_hora")
+    private LocalDateTime dataHora;
+    @ManyToOne
+    @JoinColumn(name = "unidade_origem_codigo")
+    private Unidade unidadeOrigem;
+    @ManyToOne
+    @JoinColumn(name = "unidade_destino_codigo")
+    private Unidade unidadeDestino;
+    @Column(name = "descricao")
+    private String descricao;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_codigo")
+    private Usuario usuario;
+
     public Movimentacao(
             Long codigo,
             Subprocesso subprocesso,
@@ -28,28 +45,6 @@ public class Movimentacao extends EntidadeBase {
         this.descricao = descricao;
         this.dataHora = dataHora;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "subprocesso_codigo")
-    private Subprocesso subprocesso;
-
-    @Column(name = "data_hora")
-    private LocalDateTime dataHora;
-
-    @ManyToOne
-    @JoinColumn(name = "unidade_origem_codigo")
-    private Unidade unidadeOrigem;
-
-    @ManyToOne
-    @JoinColumn(name = "unidade_destino_codigo")
-    private Unidade unidadeDestino;
-
-    @Column(name = "descricao")
-    private String descricao;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_codigo")
-    private Usuario usuario;
 
     /**
      * Construtor de conveniência para registrar uma nova movimentação. A data e hora são

@@ -56,11 +56,13 @@ class AnaliseControllerTest {
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
     private static final String ANALISE_DE_VALIDACAO = "Análise de validação";
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 
-    @MockitoBean private AnaliseService analiseService;
+    @MockitoBean
+    private AnaliseService analiseService;
 
     @BeforeEach
     void setup() {

@@ -18,10 +18,10 @@ import java.util.regex.Pattern;
 @Mapper(componentModel = "spring")
 public abstract class AlertaMapper {
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
-
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")

@@ -51,15 +51,15 @@
           <BNavItem
               v-if="perfilStore.perfilSelecionado === 'ADMIN'"
               class="me-2"
+              data-testid="btn-configuracoes"
               href="#"
               title="Configurações do sistema"
-              data-testid="btn-configuracoes"
               @click.prevent="navigateFromNavbar('/configuracoes')"
           >
             <i class="bi bi-gear fs-5"/>
           </BNavItem>
 
-          <BNavItem title="Sair" href="#" data-testid="btn-logout" @click.prevent="handleLogout">
+          <BNavItem data-testid="btn-logout" href="#" title="Sair" @click.prevent="handleLogout">
             <i class="bi bi-box-arrow-right fs-5"/>
           </BNavItem>
         </BNavbarNav>

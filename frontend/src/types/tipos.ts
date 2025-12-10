@@ -70,7 +70,7 @@ export interface PerfilUnidade {
  */
 export enum SituacaoSubprocesso {
     NAO_INICIADO = "NAO_INICIADO",
-    
+
     // Mapeamento statuses
     MAPEAMENTO_CADASTRO_EM_ANDAMENTO = "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
     MAPEAMENTO_CADASTRO_DISPONIBILIZADO = "MAPEAMENTO_CADASTRO_DISPONIBILIZADO",
@@ -80,7 +80,7 @@ export enum SituacaoSubprocesso {
     MAPEAMENTO_MAPA_COM_SUGESTOES = "MAPEAMENTO_MAPA_COM_SUGESTOES",
     MAPEAMENTO_MAPA_VALIDADO = "MAPEAMENTO_MAPA_VALIDADO",
     MAPEAMENTO_MAPA_HOMOLOGADO = "MAPEAMENTO_MAPA_HOMOLOGADO",
-    
+
     // Revisão statuses
     REVISAO_CADASTRO_EM_ANDAMENTO = "REVISAO_CADASTRO_EM_ANDAMENTO",
     REVISAO_CADASTRO_DISPONIBILIZADA = "REVISAO_CADASTRO_DISPONIBILIZADA",
@@ -90,7 +90,7 @@ export enum SituacaoSubprocesso {
     REVISAO_MAPA_COM_SUGESTOES = "REVISAO_MAPA_COM_SUGESTOES",
     REVISAO_MAPA_VALIDADO = "REVISAO_MAPA_VALIDADO",
     REVISAO_MAPA_HOMOLOGADO = "REVISAO_MAPA_HOMOLOGADO",
-    
+
     // Legacy statuses (deprecated, kept for backward compatibility)
     ATIVIDADES_REVISADAS = "ATIVIDADES_REVISADAS",
     CADASTRO_EM_ANDAMENTO = "CADASTRO_EM_ANDAMENTO",
@@ -436,15 +436,15 @@ export interface SubprocessoPermissoes {
 }
 
 export interface ErroValidacao {
-  tipo: string;
-  atividadeId?: number;
-  descricaoAtividade?: string;
-  mensagem: string;
+    tipo: string;
+    atividadeId?: number;
+    descricaoAtividade?: string;
+    mensagem: string;
 }
 
 export interface ValidacaoCadastro {
-  valido: boolean;
-  erros: ErroValidacao[];
+    valido: boolean;
+    erros: ErroValidacao[];
 }
 
 /**

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/** Repositório para a entidade {@link AlertaUsuario}. */
+/**
+ * Repositório para a entidade {@link AlertaUsuario}.
+ */
 @Repository
 public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUsuario.Chave> {
     /**

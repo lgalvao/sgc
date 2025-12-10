@@ -19,15 +19,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventoProcessoIniciado {
-    /** O código do processo que foi iniciado. */
+    /**
+     * O código do processo que foi iniciado.
+     */
     private Long codProcesso;
 
-    /** O tipo do processo (ex: "MAPEAMENTO", "REVISAO"). */
+    /**
+     * O tipo do processo (ex: "MAPEAMENTO", "REVISAO").
+     */
     private String tipo;
 
-    /** A data e hora exatas do início. */
+    /**
+     * A data e hora exatas do início.
+     */
     private LocalDateTime dataHoraInicio;
 
-    /** A lista de IDs das unidades que participam do processo. */
+    /**
+     * A lista de IDs das unidades que participam do processo.
+     */
     private List<Long> codUnidades;
 }

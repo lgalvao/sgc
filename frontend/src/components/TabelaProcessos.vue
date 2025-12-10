@@ -1,17 +1,17 @@
 <template>
   <div>
     <BTable
-      :items="processos"
-      :fields="fields"
-      hover
-      responsive
-      show-empty
-      data-testid="tbl-processos"
-      :tbody-tr-class="rowClass"
-      :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
-      :sort-desc="[!direcaoOrdenacaoAsc]"
-      @row-clicked="handleSelecionarProcesso"
-      @sort-changed="handleSortChange"
+        :fields="fields"
+        :items="processos"
+        :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
+        :sort-desc="[!direcaoOrdenacaoAsc]"
+        :tbody-tr-class="rowClass"
+        data-testid="tbl-processos"
+        hover
+        responsive
+        show-empty
+        @row-clicked="handleSelecionarProcesso"
+        @sort-changed="handleSortChange"
     >
       <template #empty>
         <div class="text-center text-muted">

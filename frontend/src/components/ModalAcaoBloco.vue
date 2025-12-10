@@ -1,19 +1,19 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrar"
-    :title="tipo === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
-    size="lg"
-    centered
-    hide-footer
-    @hide="emit('fechar')"
+      :fade="false"
+      :model-value="mostrar"
+      :title="tipo === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
+      centered
+      hide-footer
+      size="lg"
+      @hide="emit('fechar')"
   >
     <BAlert
-      variant="info"
-      :model-value="true"
-      :fade="false"
+        :fade="false"
+        :model-value="true"
+        variant="info"
     >
-      <i class="bi bi-info-circle" />
+      <i class="bi bi-info-circle"/>
       Selecione as unidades que terão seus cadastros {{
         tipo === 'aceitar' ? 'aceitos' : 'homologados'
       }}:
@@ -22,47 +22,47 @@
     <div class="table-responsive">
       <table class="table table-bordered">
         <thead class="table-light">
-          <tr>
-            <th>Selecionar</th>
-            <th>Sigla</th>
-            <th>Nome</th>
-            <th>Situação Atual</th>
-          </tr>
+        <tr>
+          <th>Selecionar</th>
+          <th>Sigla</th>
+          <th>Nome</th>
+          <th>Situação Atual</th>
+        </tr>
         </thead>
         <tbody>
-          <tr
+        <tr
             v-for="unidade in unidades"
             :key="unidade.sigla"
-          >
-            <td>
-              <BFormCheckbox
+        >
+          <td>
+            <BFormCheckbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
                 :data-testid="'chk-unidade-' + unidade.sigla"
-              />
-            </td>
-            <td><strong>{{ unidade.sigla }}</strong></td>
-            <td>{{ unidade.nome }}</td>
-            <td>{{ unidade.situacao }}</td>
-          </tr>
+            />
+          </td>
+          <td><strong>{{ unidade.sigla }}</strong></td>
+          <td>{{ unidade.nome }}</td>
+          <td>{{ unidade.situacao }}</td>
+        </tr>
         </tbody>
       </table>
     </div>
 
     <template #footer>
       <BButton
-        variant="secondary"
-        data-testid="modal-acao-bloco__btn-modal-cancelar"
-        @click="emit('fechar')"
+          data-testid="modal-acao-bloco__btn-modal-cancelar"
+          variant="secondary"
+          @click="emit('fechar')"
       >
-        <i class="bi bi-x-circle" /> Cancelar
+        <i class="bi bi-x-circle"/> Cancelar
       </BButton>
       <BButton
-        :variant="tipo === 'aceitar' ? 'primary' : 'success'"
-        data-testid="modal-acao-bloco__btn-confirmar-acao-bloco"
-        @click="emit('confirmar', unidades)"
+          :variant="tipo === 'aceitar' ? 'primary' : 'success'"
+          data-testid="modal-acao-bloco__btn-confirmar-acao-bloco"
+          @click="emit('confirmar', unidades)"
       >
-        <i :class="tipo === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />
+        <i :class="tipo === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"/>
         {{ tipo === 'aceitar' ? 'Aceitar' : 'Homologar' }}
       </BButton>
     </template>

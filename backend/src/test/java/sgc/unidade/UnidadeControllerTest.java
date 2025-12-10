@@ -34,9 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class UnidadeControllerTest {
 
-    @MockitoBean private UnidadeService unidadeService;
+    @MockitoBean
+    private UnidadeService unidadeService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     @DisplayName("criarAtribuicaoTemporaria deve retornar 201")
@@ -48,12 +50,12 @@ class UnidadeControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
-                                        {
-                                            "tituloEleitoralServidor":"123",
-                                            "dataTermino":"2025-12-31",
-                                            "justificativa":"teste"
-                                        }
-                                        """))
+                                                {
+                                                    "tituloEleitoralServidor":"123",
+                                                    "dataTermino":"2025-12-31",
+                                                    "justificativa":"teste"
+                                                }
+                                                """))
                 .andExpect(status().isCreated());
 
         verify(unidadeService)

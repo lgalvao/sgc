@@ -28,15 +28,20 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
-    @InjectMocks private SubprocessoService service;
+    @InjectMocks
+    private SubprocessoService service;
 
-    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
-    @Mock private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
-    @Mock private ConhecimentoRepo conhecimentoRepo;
+    @Mock
+    private ConhecimentoRepo conhecimentoRepo;
 
-    @Mock private CompetenciaRepo competenciaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
     private Subprocesso subprocesso;
 

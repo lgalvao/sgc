@@ -33,13 +33,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
 
-    @Mock private SubprocessoRepo repositorioSubprocesso;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private ConhecimentoRepo repositorioConhecimento;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private SubprocessoMapper subprocessoMapper;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private ConhecimentoRepo repositorioConhecimento;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
 
-    @InjectMocks private SubprocessoService service;
+    @InjectMocks
+    private SubprocessoService service;
 
     @Test
     @DisplayName("obterAtividadesSemConhecimento deve retornar lista vazia se todas tiverem")

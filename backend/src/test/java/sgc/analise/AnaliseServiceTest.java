@@ -27,11 +27,14 @@ import static org.mockito.Mockito.*;
 class AnaliseServiceTest {
     private static final String OBS = "Observação";
 
-    @Mock private AnaliseRepo analiseRepo;
+    @Mock
+    private AnaliseRepo analiseRepo;
 
-    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
-    @InjectMocks private AnaliseService service;
+    @InjectMocks
+    private AnaliseService service;
 
     private Subprocesso subprocesso;
 

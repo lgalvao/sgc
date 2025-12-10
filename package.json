@@ -1,14 +1,14 @@
 {
-    "name": "sgc-e2e",
-    "version": "1.0.0",
-    "scripts": {
-        "test:e2e": "playwright test",
-        "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json"
-    },
-    "devDependencies": {
-        "@playwright/test": "^1.57.0",
-        "@types/node": "^24.10.2",
-        "typescript": "^5.9.3"
-    },
-    "description": "Testes E2E"
+  "name": "sgc-e2e",
+  "version": "1.0.0",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.10.2",
+    "typescript": "^5.9.3"
+  },
+  "description": "Testes E2E"
 }

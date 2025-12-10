@@ -33,11 +33,14 @@ import static org.mockito.Mockito.when;
 public class ProcessoServiceDetalhesTest {
     private static final String DIRETORIA_X = "Diretoria X";
 
-    @Mock private ProcessoRepo processoRepo;
+    @Mock
+    private ProcessoRepo processoRepo;
 
-    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
 
-    @Mock private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    @Mock
+    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     @Test
     public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {

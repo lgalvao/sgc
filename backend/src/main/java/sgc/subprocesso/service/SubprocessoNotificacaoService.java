@@ -114,7 +114,7 @@ public class SubprocessoNotificacaoService {
      * Notifica a unidade superior sobre a disponibilização do cadastro de atividades. Corresponde
      * ao CDU-09.
      *
-     * @param sp O subprocesso cujo cadastro foi disponibilizado.
+     * @param sp             O subprocesso cujo cadastro foi disponibilizado.
      * @param unidadeDestino A unidade que realizará a análise.
      */
     public void notificarDisponibilizacaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
@@ -220,7 +220,7 @@ public class SubprocessoNotificacaoService {
     /**
      * Notifica uma unidade sobre a devolução da validação do seu mapa para ajustes.
      *
-     * @param sp O subprocesso relacionado.
+     * @param sp               O subprocesso relacionado.
      * @param unidadeDevolucao A unidade que receberá a notificação de devolução.
      */
     public void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
@@ -279,9 +279,9 @@ public class SubprocessoNotificacaoService {
     /**
      * Notifica a unidade responsável sobre a devolução do seu cadastro de atividades para ajustes.
      *
-     * @param sp O subprocesso cujo cadastro foi devolvido.
+     * @param sp               O subprocesso cujo cadastro foi devolvido.
      * @param unidadeDevolucao A unidade que receberá a notificação.
-     * @param motivo O motivo da devolução.
+     * @param motivo           O motivo da devolução.
      */
     public void notificarDevolucaoCadastro(
             Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
@@ -314,7 +314,7 @@ public class SubprocessoNotificacaoService {
      *
      * <p>Corresponde aos itens 10.7 e 10.8 do CDU-13.
      *
-     * @param sp O subprocesso cujo cadastro foi aceito.
+     * @param sp             O subprocesso cujo cadastro foi aceito.
      * @param unidadeDestino A unidade que realizará a próxima análise.
      */
     public void notificarAceiteCadastro(Subprocesso sp, Unidade unidadeDestino) {
@@ -351,7 +351,7 @@ public class SubprocessoNotificacaoService {
      *
      * <p>Corresponde ao CDU-10.
      *
-     * @param sp O subprocesso cuja revisão de cadastro foi disponibilizada.
+     * @param sp             O subprocesso cuja revisão de cadastro foi disponibilizada.
      * @param unidadeDestino A unidade que realizará a análise.
      */
     public void notificarDisponibilizacaoRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
@@ -392,8 +392,8 @@ public class SubprocessoNotificacaoService {
      *
      * <p>Corresponde aos itens 10.9 e 10.10 do CDU-14.
      *
-     * @param sp O subprocesso cuja revisão foi devolvida.
-     * @param unidadeAnalise A unidade que realizou a análise e devolução.
+     * @param sp               O subprocesso cuja revisão foi devolvida.
+     * @param unidadeAnalise   A unidade que realizou a análise e devolução.
      * @param unidadeDevolucao A unidade que receberá a notificação para ajustar o cadastro.
      */
     public void notificarDevolucaoRevisaoCadastro(
@@ -430,7 +430,7 @@ public class SubprocessoNotificacaoService {
      *
      * <p>Corresponde aos itens 11.7 e 11.8 do CDU-14.
      *
-     * @param sp O subprocesso cuja revisão de cadastro foi aceita.
+     * @param sp             O subprocesso cuja revisão de cadastro foi aceita.
      * @param unidadeDestino A unidade que realizará a próxima análise.
      */
     public void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {

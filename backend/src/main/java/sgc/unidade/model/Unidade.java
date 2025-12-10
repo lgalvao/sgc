@@ -20,6 +20,31 @@ import java.util.Set;
 @Builder
 @AttributeOverrides({@AttributeOverride(name = "codigo", column = @Column(name = "codigo"))})
 public class Unidade extends EntidadeBase {
+    @Column(name = "nome")
+    private String nome;
+    @Column(name = "sigla", length = 20)
+    private String sigla;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "titular_titulo")
+    private Usuario titular;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", length = 20)
+    private TipoUnidade tipo;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situacao", length = 20)
+    private SituacaoUnidade situacao;
+    @ManyToOne
+    @JoinColumn(name = "unidade_superior_codigo")
+    private Unidade unidadeSuperior;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mapa_vigente_codigo")
+    private Mapa mapaVigente;
+    @Column(name = "data_vigencia_mapa_atual")
+    private LocalDateTime dataVigenciaMapa;
+    @ManyToMany(mappedBy = "participantes")
+    @Builder.Default
+    private Set<Processo> processos = new HashSet<>();
+
     public Unidade(String nome, String sigla) {
         super();
         this.nome = nome;
@@ -27,37 +52,4 @@ public class Unidade extends EntidadeBase {
         this.situacao = SituacaoUnidade.ATIVA;
         this.tipo = TipoUnidade.OPERACIONAL;
     }
-
-    @Column(name = "nome")
-    private String nome;
-
-    @Column(name = "sigla", length = 20)
-    private String sigla;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "titular_titulo")
-    private Usuario titular;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", length = 20)
-    private TipoUnidade tipo;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 20)
-    private SituacaoUnidade situacao;
-
-    @ManyToOne
-    @JoinColumn(name = "unidade_superior_codigo")
-    private Unidade unidadeSuperior;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mapa_vigente_codigo")
-    private Mapa mapaVigente;
-
-    @Column(name = "data_vigencia_mapa_atual")
-    private LocalDateTime dataVigenciaMapa;
-
-    @ManyToMany(mappedBy = "participantes")
-    @Builder.Default
-    private Set<Processo> processos = new HashSet<>();
 }

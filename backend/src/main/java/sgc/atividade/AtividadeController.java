@@ -22,7 +22,9 @@ import sgc.subprocesso.service.SubprocessoService;
 import java.net.URI;
 import java.util.List;
 
-/** Controlador REST para gerenciar Atividades e seus Conhecimentos associados. */
+/**
+ * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
+ */
 @RestController
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade a ser buscada.
      * @return Um {@link ResponseEntity} contendo a {@link AtividadeDto} correspondente ou um status
-     *     404 Not Found se a atividade não for encontrada.
+     * 404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
     @Operation(summary = "Obtém uma atividade pelo código")
@@ -66,7 +68,7 @@ public class AtividadeController {
      *
      * @param atividadeDto O DTO contendo os dados da atividade a ser criada.
      * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
-     *     contendo a atividade criada e o status do subprocesso.
+     * contendo a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @Operation(summary = "Cria uma atividade")
@@ -77,7 +79,7 @@ public class AtividadeController {
             throw new ErroAccessoNegado("Usuário não autenticado.");
         }
         var salvo = atividadeService.criar(atividadeDto, tituloUsuario);
-        
+
         // Buscar subprocesso e status
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividadeDto.getMapaCodigo());
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
@@ -86,12 +88,12 @@ public class AtividadeController {
                 .filter(a -> a.getCodigo().equals(salvo.getCodigo()))
                 .findFirst()
                 .orElse(null);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(status)
                 .build();
-        
+
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(response);
     }
@@ -101,14 +103,14 @@ public class AtividadeController {
      *
      * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     *     a atividade atualizada e o status do subprocesso.
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(
             @PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
         var atualizado = atividadeService.atualizar(codigo, atividadeDto);
-        
+
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codigo);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
@@ -118,12 +120,12 @@ public class AtividadeController {
                 .filter(a -> a.getCodigo().equals(codigo))
                 .findFirst()
                 .orElse(null);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(status)
                 .build();
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -135,7 +137,7 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade a ser excluída.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     *     o status atualizado do subprocesso (atividade será null).
+     * o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
     @Operation(summary = "Exclui uma atividade")
@@ -143,17 +145,17 @@ public class AtividadeController {
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codMapa = atividade.getMapa().getCodigo();
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(codMapa);
-        
+
         atividadeService.excluir(codAtividade);
-        
+
         // Buscar status atualizado após exclusão
         SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(null) // Atividade foi excluída
                 .subprocesso(status)
                 .build();
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -173,17 +175,17 @@ public class AtividadeController {
     /**
      * Adiciona um novo conhecimento a uma atividade existente.
      *
-     * @param codAtividade O código da atividade à qual o conhecimento será associado.
+     * @param codAtividade    O código da atividade à qual o conhecimento será associado.
      * @param conhecimentoDto O DTO com os dados do conhecimento a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
-     *     contendo a atividade atualizada com o novo conhecimento e o status do subprocesso.
+     * contendo a atividade atualizada com o novo conhecimento e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criarConhecimento(
             @PathVariable Long codAtividade, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
-        
+
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
@@ -193,12 +195,12 @@ public class AtividadeController {
                 .filter(a -> a.getCodigo().equals(codAtividade))
                 .findFirst()
                 .orElse(null);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(status)
                 .build();
-        
+
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.getCodigo()));
         return ResponseEntity.created(uri).body(response);
     }
@@ -206,11 +208,11 @@ public class AtividadeController {
     /**
      * Atualiza um conhecimento existente dentro de uma atividade.
      *
-     * @param codAtividade O código da atividade pai.
+     * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     *     a atividade atualizada e o status do subprocesso.
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
@@ -219,7 +221,7 @@ public class AtividadeController {
             @PathVariable Long codConhecimento,
             @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto);
-        
+
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
@@ -229,29 +231,29 @@ public class AtividadeController {
                 .filter(a -> a.getCodigo().equals(codAtividade))
                 .findFirst()
                 .orElse(null);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(status)
                 .build();
-        
+
         return ResponseEntity.ok(response);
     }
 
     /**
      * Exclui um conhecimento de uma atividade.
      *
-     * @param codAtividade O código da atividade pai.
+     * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo
-     *     a atividade atualizada e o status do subprocesso.
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(
             @PathVariable Long codAtividade, @PathVariable Long codConhecimento) {
         atividadeService.excluirConhecimento(codAtividade, codConhecimento);
-        
+
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
@@ -261,12 +263,12 @@ public class AtividadeController {
                 .filter(a -> a.getCodigo().equals(codAtividade))
                 .findFirst()
                 .orElse(null);
-        
+
         AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(status)
                 .build();
-        
+
         return ResponseEntity.ok(response);
     }
 

@@ -40,67 +40,67 @@ vi.mock("@/composables/useApi", () => ({
     }),
 }));
 vi.mock("@/stores/processos", () => ({
-  useProcessosStore: () => ({
-    processosPainel: mockProcessos,
-    processoDetalhe: mockProcessoDetalhe,
-    buscarProcessosPainel: vi.fn(),
-    buscarProcessoDetalhe: vi.fn(),
-  }),
+    useProcessosStore: () => ({
+        processosPainel: mockProcessos,
+        processoDetalhe: mockProcessoDetalhe,
+        buscarProcessosPainel: vi.fn(),
+        buscarProcessoDetalhe: vi.fn(),
+    }),
 }));
 vi.mock("@/stores/atividades", () => ({
-  useAtividadesStore: () => ({
-    obterAtividadesPorSubprocesso: () => mockAtividades,
-    buscarAtividadesParaSubprocesso: vi.fn(),
-    importarAtividades: vi.fn(),
-  }),
+    useAtividadesStore: () => ({
+        obterAtividadesPorSubprocesso: () => mockAtividades,
+        buscarAtividadesParaSubprocesso: vi.fn(),
+        importarAtividades: vi.fn(),
+    }),
 }));
 
 describe("ImportarAtividadesModal", () => {
-  let wrapper: VueWrapper<ImportarAtividadesModalVM>;
+    let wrapper: VueWrapper<ImportarAtividadesModalVM>;
 
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    vi.clearAllMocks();
-    wrapper = mount(ImportarAtividadesModal, {
-      props: { mostrar: true, codSubrocessoDestino: 999 },
+    beforeEach(() => {
+        setActivePinia(createPinia());
+        vi.clearAllMocks();
+        wrapper = mount(ImportarAtividadesModal, {
+            props: {mostrar: true, codSubrocessoDestino: 999},
+        });
     });
-  });
 
-  it('deve emitir "fechar" ao clicar em Cancelar', async () => {
-      await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
-      expect(wrapper.emitted("fechar")).toBeTruthy();
-  });
+    it('deve emitir "fechar" ao clicar em Cancelar', async () => {
+        await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
+        expect(wrapper.emitted("fechar")).toBeTruthy();
+    });
 
     it("deve habilitar o botão de importação e chamar a API ao importar", async () => {
-    const importButton = wrapper.find('[data-testid="btn-importar"]');
-    expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
+        const importButton = wrapper.find('[data-testid="btn-importar"]');
+        expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
-    // Simulate user selecting a process and unit
-    const selects = wrapper.findAllComponents(BFormSelect as any);
+        // Simulate user selecting a process and unit
+        const selects = wrapper.findAllComponents(BFormSelect as any);
         await selects[0].setValue("1");
-    await flushPromises();
+        await flushPromises();
         await selects[1].setValue("10");
-    await flushPromises();
+        await flushPromises();
 
-    // Find and check the checkbox for the activity
-    await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
+        // Find and check the checkbox for the activity
+        await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
 
-    // Now, the button should be enabled
-    expect((importButton.element as HTMLButtonElement).disabled).toBe(false);
+        // Now, the button should be enabled
+        expect((importButton.element as HTMLButtonElement).disabled).toBe(false);
 
-    // Simulate the import click
-    mockExecute.mockResolvedValue(true);
+        // Simulate the import click
+        mockExecute.mockResolvedValue(true);
         await importButton.trigger("click");
 
-    // Verify the API call and emitted events
-    expect(mockExecute).toHaveBeenCalledWith(
-      999,
-      mockProcessoDetalhe.unidades[0].codSubprocesso,
-        [mockAtividades[0].codigo],
-    );
+        // Verify the API call and emitted events
+        expect(mockExecute).toHaveBeenCalledWith(
+            999,
+            mockProcessoDetalhe.unidades[0].codSubprocesso,
+            [mockAtividades[0].codigo],
+        );
         expect(wrapper.emitted("importar")).toBeTruthy();
         expect(wrapper.emitted("fechar")).toBeTruthy();
-  });
+    });
 
     it("deve resetar o modal quando a prop 'mostrar' mudar para true", async () => {
         // Simulate selecting something first

@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class SgrhServiceTest {
 
-    @Autowired private SgrhService sgrhService;
-
     // Data from e2e/setup/seed.sql which seems to be the one actually loaded
     private static final String TITULO_ADMIN = "111111";
     private static final String EMAIL_ADMIN = "admin_sedoc_e_chefe_sedoc@tre-pe.jus.br";
@@ -31,6 +29,8 @@ class SgrhServiceTest {
     private static final Long COD_UNIT_SEC1 = 2L;
     private static final String NOME_UNIT_SEC1 = "Secretaria 1";
     private static final String TITULO_JOHN_LENNON = "202020";
+    @Autowired
+    private SgrhService sgrhService;
 
     @Test
     void testBuscarUsuarioPorTitulo() {

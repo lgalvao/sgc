@@ -6,68 +6,68 @@
       </div>
       <div class="d-flex gap-2">
         <BButton
-          v-if="podeValidar"
-          variant="outline-warning"
-          title="Apresentar sugestões"
-          data-testid="btn-mapa-sugestoes"
-          @click="abrirModalSugestoes"
+            v-if="podeValidar"
+            data-testid="btn-mapa-sugestoes"
+            title="Apresentar sugestões"
+            variant="outline-warning"
+            @click="abrirModalSugestoes"
         >
           Apresentar sugestões
         </BButton>
         <BButton
-          v-if="podeValidar"
-          variant="outline-success"
-          title="Validar mapa"
-          data-testid="btn-mapa-validar"
-          @click="abrirModalValidar"
+            v-if="podeValidar"
+            data-testid="btn-mapa-validar"
+            title="Validar mapa"
+            variant="outline-success"
+            @click="abrirModalValidar"
         >
           Validar
         </BButton>
 
         <BButton
-          v-if="podeValidar && temHistoricoAnalise"
-          variant="outline-secondary"
-          title="Histórico de análise"
-          data-testid="btn-mapa-historico"
-          @click="verHistorico"
+            v-if="podeValidar && temHistoricoAnalise"
+            data-testid="btn-mapa-historico"
+            title="Histórico de análise"
+            variant="outline-secondary"
+            @click="verHistorico"
         >
           Histórico de análise
         </BButton>
 
         <BButton
-          v-if="podeAnalisar"
-          v-show="podeVerSugestoes"
-          variant="outline-info"
-          title="Ver sugestões"
-          data-testid="btn-mapa-ver-sugestoes"
-          @click="verSugestoes"
+            v-if="podeAnalisar"
+            v-show="podeVerSugestoes"
+            data-testid="btn-mapa-ver-sugestoes"
+            title="Ver sugestões"
+            variant="outline-info"
+            @click="verSugestoes"
         >
           Ver sugestões
         </BButton>
         <BButton
-          v-if="podeAnalisar"
-          variant="outline-secondary"
-          title="Histórico de análise"
-          data-testid="btn-mapa-historico-gestor"
-          @click="verHistorico"
+            v-if="podeAnalisar"
+            data-testid="btn-mapa-historico-gestor"
+            title="Histórico de análise"
+            variant="outline-secondary"
+            @click="verHistorico"
         >
           Histórico de análise
         </BButton>
         <BButton
-          v-if="podeAnalisar"
-          variant="outline-danger"
-          title="Devolver para ajustes"
-          data-testid="btn-mapa-devolver"
-          @click="abrirModalDevolucao"
+            v-if="podeAnalisar"
+            data-testid="btn-mapa-devolver"
+            title="Devolver para ajustes"
+            variant="outline-danger"
+            @click="abrirModalDevolucao"
         >
           Devolver para ajustes
         </BButton>
         <BButton
-          v-if="podeAnalisar"
-          variant="outline-success"
-          data-testid="btn-mapa-homologar-aceite"
-          title="Aceitar"
-          @click="abrirModalAceitar"
+            v-if="podeAnalisar"
+            data-testid="btn-mapa-homologar-aceite"
+            title="Aceitar"
+            variant="outline-success"
+            @click="abrirModalAceitar"
         >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
@@ -77,8 +77,8 @@
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
         <div
-          class="fs-5"
-          data-testid="txt-header-unidade"
+            class="fs-5"
+            data-testid="txt-header-unidade"
         >
           {{ unidade.sigla }} - {{ unidade.nome }}
         </div>
@@ -89,40 +89,40 @@
           Nenhuma competência cadastrada.
         </div>
         <BCard
-          v-for="comp in mapa?.competencias"
-          :key="comp.codigo"
-          class="mb-3 competencia-card"
-          data-testid="vis-mapa__card-competencia"
-          no-body
+            v-for="comp in mapa?.competencias"
+            :key="comp.codigo"
+            class="mb-3 competencia-card"
+            data-testid="vis-mapa__card-competencia"
+            no-body
         >
           <BCardBody class="py-2">
             <div
-              class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
+                class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
             >
               <strong
-                class="competencia-descricao"
-                data-testid="vis-mapa__txt-competencia-descricao"
+                  class="competencia-descricao"
+                  data-testid="vis-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
               <div
-                v-for="atv in comp.atividades"
-                :key="atv.codigo"
+                  v-for="atv in comp.atividades"
+                  :key="atv.codigo"
               >
                 <BCard
-                  class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
-                  data-testid="card-atividade-associada"
-                  no-body
+                    class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
+                    data-testid="card-atividade-associada"
+                    no-body
                 >
                   <BCardBody class="d-flex align-items-center py-1 px-2">
                     <span class="atividade-associada-descricao me-2">{{ atv.descricao }}</span>
                   </BCardBody>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
-                      v-for="conhecimento in atv.conhecimentos"
-                      :key="conhecimento.descricao"
-                      class="me-3 mb-1"
-                      data-testid="txt-conhecimento-item"
+                        v-for="conhecimento in atv.conhecimentos"
+                        :key="conhecimento.descricao"
+                        class="me-3 mb-1"
+                        data-testid="txt-conhecimento-item"
                     >
                       {{ conhecimento.descricao }}
                     </span>
@@ -139,44 +139,44 @@
     </div>
 
     <AceitarMapaModal
-      :mostrar-modal="mostrarModalAceitar"
-      :perfil="perfilSelecionado || undefined"
-      @fechar-modal="fecharModalAceitar"
-      @confirmar-aceitacao="confirmarAceitacao"
+        :mostrar-modal="mostrarModalAceitar"
+        :perfil="perfilSelecionado || undefined"
+        @fechar-modal="fecharModalAceitar"
+        @confirmar-aceitacao="confirmarAceitacao"
     />
 
     <BModal
-      v-model="mostrarModalSugestoes"
-      :fade="false"
-      title="Apresentar Sugestões"
-      centered
-      hide-footer
+        v-model="mostrarModalSugestoes"
+        :fade="false"
+        centered
+        hide-footer
+        title="Apresentar Sugestões"
     >
       <div class="mb-3">
         <label
-          for="sugestoesTextarea"
-          class="form-label"
+            class="form-label"
+            for="sugestoesTextarea"
         >Sugestões para o mapa de competências:</label>
         <BFormTextarea
-          id="sugestoesTextarea"
-          v-model="sugestoes"
-          rows="5"
-          placeholder="Digite suas sugestões para o mapa de competências..."
-          data-testid="inp-sugestoes-mapa-texto"
+            id="sugestoesTextarea"
+            v-model="sugestoes"
+            data-testid="inp-sugestoes-mapa-texto"
+            placeholder="Digite suas sugestões para o mapa de competências..."
+            rows="5"
         />
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-sugestoes-mapa-cancelar"
-          @click="fecharModalSugestoes"
+            data-testid="btn-sugestoes-mapa-cancelar"
+            variant="secondary"
+            @click="fecharModalSugestoes"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="primary"
-          data-testid="btn-sugestoes-mapa-confirmar"
-          @click="confirmarSugestoes"
+            data-testid="btn-sugestoes-mapa-confirmar"
+            variant="primary"
+            @click="confirmarSugestoes"
         >
           Confirmar
         </BButton>
@@ -184,26 +184,26 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalVerSugestoes"
-      :fade="false"
-      title="Sugestões"
-      centered
-      hide-footer
+        v-model="mostrarModalVerSugestoes"
+        :fade="false"
+        centered
+        hide-footer
+        title="Sugestões"
     >
       <div class="mb-3">
         <label class="form-label">Sugestões registradas para o mapa de competências:</label>
         <BFormTextarea
-          v-model="sugestoesVisualizacao"
-          rows="5"
-          readonly
-          data-testid="txt-ver-sugestoes-mapa"
+            v-model="sugestoesVisualizacao"
+            data-testid="txt-ver-sugestoes-mapa"
+            readonly
+            rows="5"
         />
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-ver-sugestoes-mapa-fechar"
-          @click="fecharModalVerSugestoes"
+            data-testid="btn-ver-sugestoes-mapa-fechar"
+            variant="secondary"
+            @click="fecharModalVerSugestoes"
         >
           Fechar
         </BButton>
@@ -211,25 +211,25 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalValidar"
-      :fade="false"
-      title="Validar Mapa de Competências"
-      centered
-      hide-footer
+        v-model="mostrarModalValidar"
+        :fade="false"
+        centered
+        hide-footer
+        title="Validar Mapa de Competências"
     >
       <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-validar-mapa-cancelar"
-          @click="fecharModalValidar"
+            data-testid="btn-validar-mapa-cancelar"
+            variant="secondary"
+            @click="fecharModalValidar"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="success"
-          data-testid="btn-validar-mapa-confirmar"
-          @click="confirmarValidacao"
+            data-testid="btn-validar-mapa-confirmar"
+            variant="success"
+            @click="confirmarValidacao"
         >
           Validar
         </BButton>
@@ -237,38 +237,38 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalDevolucao"
-      :fade="false"
-      title="Devolução"
-      centered
-      hide-footer
+        v-model="mostrarModalDevolucao"
+        :fade="false"
+        centered
+        hide-footer
+        title="Devolução"
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
       <div class="mb-3">
         <label
-          for="observacaoDevolucao"
-          class="form-label"
+            class="form-label"
+            for="observacaoDevolucao"
         >Observação:</label>
         <BFormTextarea
-          id="observacaoDevolucao"
-          v-model="observacaoDevolucao"
-          rows="3"
-          placeholder="Digite observações sobre a devolução..."
-          data-testid="inp-devolucao-mapa-obs"
+            id="observacaoDevolucao"
+            v-model="observacaoDevolucao"
+            data-testid="inp-devolucao-mapa-obs"
+            placeholder="Digite observações sobre a devolução..."
+            rows="3"
         />
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-devolucao-mapa-cancelar"
-          @click="fecharModalDevolucao"
+            data-testid="btn-devolucao-mapa-cancelar"
+            variant="secondary"
+            @click="fecharModalDevolucao"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="danger"
-          data-testid="btn-devolucao-mapa-confirmar"
-          @click="confirmarDevolucao"
+            data-testid="btn-devolucao-mapa-confirmar"
+            variant="danger"
+            @click="confirmarDevolucao"
         >
           Confirmar
         </BButton>
@@ -276,43 +276,43 @@
     </BModal>
 
     <BModal
-      v-model="mostrarModalHistorico"
-      :fade="false"
-      title="Histórico de Análise"
-      centered
-      size="lg"
-      hide-footer
+        v-model="mostrarModalHistorico"
+        :fade="false"
+        centered
+        hide-footer
+        size="lg"
+        title="Histórico de Análise"
     >
       <table
-        class="table table-striped"
-        data-testid="tbl-historico-analise"
+          class="table table-striped"
+          data-testid="tbl-historico-analise"
       >
         <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Unidade</th>
-            <th>Resultado</th>
-            <th>Observações</th>
-          </tr>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Unidade</th>
+          <th>Resultado</th>
+          <th>Observações</th>
+        </tr>
         </thead>
         <tbody>
-          <tr
+        <tr
             v-for="item in historicoAnalise"
             :key="item.codigo"
             data-testid="row-historico"
-          >
-            <td>{{ item.data }}</td>
-            <td>{{ item.unidade }}</td>
-            <td>{{ item.resultado }}</td>
-            <td>{{ item.observacoes }}</td>
-          </tr>
+        >
+          <td>{{ item.data }}</td>
+          <td>{{ item.unidade }}</td>
+          <td>{{ item.resultado }}</td>
+          <td>{{ item.observacoes }}</td>
+        </tr>
         </tbody>
       </table>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-historico-analise-fechar"
-          @click="fecharModalHistorico"
+            data-testid="btn-historico-analise-fechar"
+            variant="secondary"
+            @click="fecharModalHistorico"
         >
           Fechar
         </BButton>
@@ -386,23 +386,23 @@ const podeValidar = computed(() => {
   return (
       perfilSelecionado.value === "CHEFE" &&
       (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_DISPONIBILIZADO ||
-       subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-       subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
+          subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
+          subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
   );
 });
 
 const podeAnalisar = computed(() => {
   const situacao = subprocesso.value?.situacaoSubprocesso;
   const isGestorOrAdmin = perfilSelecionado.value === "GESTOR" || perfilSelecionado.value === "ADMIN";
-  const isValidado = 
+  const isValidado =
       situacao === SituacaoSubprocesso.MAPA_VALIDADO ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
-  const isComSugestoes = 
+  const isComSugestoes =
       situacao === SituacaoSubprocesso.MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-      
+
   return isGestorOrAdmin && (isValidado || isComSugestoes);
 });
 
@@ -503,9 +503,9 @@ async function confirmarSugestoes() {
     fecharModalSugestoes();
 
     feedbackStore.show(
-      "Sugestões apresentadas",
-      "Sugestões submetidas para análise da unidade superior",
-      "success"
+        "Sugestões apresentadas",
+        "Sugestões submetidas para análise da unidade superior",
+        "success"
     );
 
     await router.push({
@@ -514,9 +514,9 @@ async function confirmarSugestoes() {
     });
   } catch {
     feedbackStore.show(
-      "Erro ao apresentar sugestões",
-      "Ocorreu um erro. Tente novamente.",
-      "danger"
+        "Erro ao apresentar sugestões",
+        "Ocorreu um erro. Tente novamente.",
+        "danger"
     );
   }
 }
@@ -529,9 +529,9 @@ async function confirmarValidacao() {
     fecharModalValidar();
 
     feedbackStore.show(
-      "Mapa validado",
-      "Mapa validado e submetido para análise da unidade superior",
-      "success"
+        "Mapa validado",
+        "Mapa validado e submetido para análise da unidade superior",
+        "success"
     );
 
     await router.push({
@@ -540,9 +540,9 @@ async function confirmarValidacao() {
     });
   } catch {
     feedbackStore.show(
-      "Erro ao validar mapa",
-      "Ocorreu um erro. Tente novamente.",
-      "danger"
+        "Erro ao validar mapa",
+        "Ocorreu um erro. Tente novamente.",
+        "danger"
     );
   }
 }
@@ -571,7 +571,7 @@ async function confirmarAceitacao(observacoes?: string) {
   fecharModalAceitar();
   await router.push({
     name: "Subprocesso",
-    params: { codProcesso: codProcesso.value, siglaUnidade: sigla.value },
+    params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
   });
 }
 

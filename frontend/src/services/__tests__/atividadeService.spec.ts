@@ -19,24 +19,24 @@ vi.mock("@/axios-setup", () => {
 const mockApi = apiClient as any;
 
 vi.mock("@/mappers/atividades", () => ({
-  mapAtividadeDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
-  mapConhecimentoDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
-  mapCriarAtividadeRequestToDto: vi.fn((req) => ({ ...req, mapped: true })),
-  mapCriarConhecimentoRequestToDto: vi.fn((req) => ({ ...req, mapped: true })),
+    mapAtividadeDtoToModel: vi.fn((dto) => ({...dto, mapped: true})),
+    mapConhecimentoDtoToModel: vi.fn((dto) => ({...dto, mapped: true})),
+    mapCriarAtividadeRequestToDto: vi.fn((req) => ({...req, mapped: true})),
+    mapCriarConhecimentoRequestToDto: vi.fn((req) => ({...req, mapped: true})),
 }));
 
 describe("atividadeService", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-  });
+    beforeEach(() => {
+        setActivePinia(createPinia());
+    });
 
-  afterEach(() => {
-      vi.clearAllMocks();
-      mockApi.get.mockClear();
-      mockApi.post.mockClear();
-      mockApi.put.mockClear();
-      mockApi.delete.mockClear();
-  });
+    afterEach(() => {
+        vi.clearAllMocks();
+        mockApi.get.mockClear();
+        mockApi.post.mockClear();
+        mockApi.put.mockClear();
+        mockApi.delete.mockClear();
+    });
 
     it("listarAtividades should fetch and map atividades", async () => {
         const dtoList = [{id: 1, descricao: "Atividade DTO"}];

@@ -9,12 +9,18 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/** Request para salvar ajustes no mapa de competências. CDU-16 item 5 */
+/**
+ * Request para salvar ajustes no mapa de competências. CDU-16 item 5
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalvarAjustesReq {
-    /** A lista de competências com os ajustes a serem salvos. */
-    @NotNull @Valid private List<CompetenciaAjusteDto> competencias;
+    /**
+     * A lista de competências com os ajustes a serem salvos.
+     */
+    @NotNull
+    @Valid
+    private List<CompetenciaAjusteDto> competencias;
 }

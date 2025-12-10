@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-      v-if="title"
-      class="d-flex justify-content-between align-items-center mb-3"
+        v-if="title"
+        class="d-flex justify-content-between align-items-center mb-3"
     >
       <h4 class="mb-0">
         {{ title }}
@@ -10,50 +10,50 @@
 
       <div>
         <BButton
-          variant="outline-primary"
-          size="sm"
-          class="me-2"
-          data-testid="btn-expandir-todas"
-          @click="expandAll"
+            class="me-2"
+            data-testid="btn-expandir-todas"
+            size="sm"
+            variant="outline-primary"
+            @click="expandAll"
         >
-          <i class="bi bi-arrows-expand" />
+          <i class="bi bi-arrows-expand"/>
         </BButton>
         <BButton
-          variant="outline-secondary"
-          size="sm"
-          @click="collapseAll"
+            size="sm"
+            variant="outline-secondary"
+            @click="collapseAll"
         >
-          <i class="bi bi-arrows-collapse" />
+          <i class="bi bi-arrows-collapse"/>
         </BButton>
       </div>
     </div>
 
     <div class="table-responsive w-100">
       <table
-        class="table table-striped table-hover m-0"
-        data-testid="tbl-tree"
+          class="table table-striped table-hover m-0"
+          data-testid="tbl-tree"
       >
         <colgroup>
           <col
-            v-for="(column) in columns"
-            :key="column.key"
-            :style="{ width: column.width || (100 / columns.length) + '%' }"
+              v-for="(column) in columns"
+              :key="column.key"
+              :style="{ width: column.width || (100 / columns.length) + '%' }"
           >
         </colgroup>
 
         <thead v-if="!hideHeaders">
-          <tr>
-            <th
+        <tr>
+          <th
               v-for="column in columns"
               :key="column.key"
               role="columnheader"
-            >
-              {{ column.label }}
-            </th>
-          </tr>
+          >
+            {{ column.label }}
+          </th>
+        </tr>
         </thead>
         <tbody>
-          <TreeRowItem
+        <TreeRowItem
             v-for="item in flattenedData"
             :key="item.id"
             :columns="columns"
@@ -61,7 +61,7 @@
             :level="item.level"
             @toggle="toggleExpand"
             @row-click="handleTreeRowClick"
-          />
+        />
         </tbody>
       </table>
     </div>

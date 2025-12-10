@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** DTO para perfil de usuário em uma unidade. */
+/**
+ * DTO para perfil de usuário em uma unidade.
+ */
 @Data
 @Builder
 @NoArgsConstructor

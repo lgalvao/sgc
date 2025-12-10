@@ -43,15 +43,19 @@ public class ProcessoControllerTest {
     private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
     private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
 
-    @MockitoBean private ProcessoService processoService;
+    @MockitoBean
+    private ProcessoService processoService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 
-    @org.mockito.Captor private org.mockito.ArgumentCaptor<CriarProcessoReq> criarCaptor;
+    @org.mockito.Captor
+    private org.mockito.ArgumentCaptor<CriarProcessoReq> criarCaptor;
 
-    @org.mockito.Captor private org.mockito.ArgumentCaptor<AtualizarProcessoReq> atualizarCaptor;
+    @org.mockito.Captor
+    private org.mockito.ArgumentCaptor<AtualizarProcessoReq> atualizarCaptor;
 
     @BeforeEach
     void setUp() {

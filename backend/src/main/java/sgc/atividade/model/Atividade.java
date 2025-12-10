@@ -25,34 +25,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Atividade extends EntidadeBase {
-    public Atividade(Long codigo, String descricao, sgc.mapa.model.Mapa mapa) {
-        super(codigo);
-        this.descricao = descricao;
-        this.mapa = mapa;
-    }
-
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;
-
     @Column(name = "descricao")
     private String descricao;
-
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conhecimento> conhecimentos = new ArrayList<>();
-
-    /**
-     * Construtor para criar uma nova atividade.
-     *
-     * @param mapa O mapa ao qual a atividade pertence.
-     * @param descricao A descrição da atividade.
-     */
-    public Atividade(Mapa mapa, String descricao) {
-        super();
-        this.mapa = mapa;
-        this.descricao = descricao;
-    }
-
     @ManyToMany
     @JoinTable(
             name = "competencia_atividade",
@@ -60,4 +39,22 @@ public class Atividade extends EntidadeBase {
             joinColumns = @JoinColumn(name = "atividade_codigo"),
             inverseJoinColumns = @JoinColumn(name = "competencia_codigo"))
     private Set<Competencia> competencias = new HashSet<>();
+
+    public Atividade(Long codigo, String descricao, sgc.mapa.model.Mapa mapa) {
+        super(codigo);
+        this.descricao = descricao;
+        this.mapa = mapa;
+    }
+
+    /**
+     * Construtor para criar uma nova atividade.
+     *
+     * @param mapa      O mapa ao qual a atividade pertence.
+     * @param descricao A descrição da atividade.
+     */
+    public Atividade(Mapa mapa, String descricao) {
+        super();
+        this.mapa = mapa;
+        this.descricao = descricao;
+    }
 }

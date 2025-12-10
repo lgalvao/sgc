@@ -7,13 +7,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** DTO para conhecimento no contexto de ajustes do mapa. CDU-16 item 4 e 5 */
+/**
+ * DTO para conhecimento no contexto de ajustes do mapa. CDU-16 item 4 e 5
+ */
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class ConhecimentoAjusteDto {
-    @NotNull private final Long conhecimentoId;
-    @NotBlank private final String nome;
-    @NotNull private final boolean incluido;
+    @NotNull
+    private final Long conhecimentoId;
+    @NotBlank
+    private final String nome;
+    @NotNull
+    private final boolean incluido;
 }

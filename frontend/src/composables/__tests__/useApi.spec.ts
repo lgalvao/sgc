@@ -6,57 +6,57 @@ describe("useApi", () => {
         const apiCall = vi.fn(
             () => new Promise((resolve) => setTimeout(() => resolve("data"), 10)),
         );
-    const { execute, isLoading } = useApi(apiCall);
+        const {execute, isLoading} = useApi(apiCall);
 
-    const promise = execute();
+        const promise = execute();
 
-    expect(isLoading.value).toBe(true);
+        expect(isLoading.value).toBe(true);
 
-    await promise;
+        await promise;
 
-    expect(isLoading.value).toBe(false);
-  });
+        expect(isLoading.value).toBe(false);
+    });
 
     it("should set data on successful api call", async () => {
         const apiCall = vi.fn(() => Promise.resolve("data"));
-    const { execute, data } = useApi(apiCall);
+        const {execute, data} = useApi(apiCall);
 
-    await execute();
+        await execute();
 
         expect(data.value).toBe("data");
-  });
+    });
 
     it("should set error on failed api call", async () => {
         const apiCall = vi.fn(() =>
             Promise.reject({response: {data: {message: "error"}}}),
         );
-    const { execute, error } = useApi(apiCall);
+        const {execute, error} = useApi(apiCall);
 
-    try {
-      await execute();
-    } catch {
-      // a
-    }
+        try {
+            await execute();
+        } catch {
+            // a
+        }
 
         expect(error.value).toBe("error");
-  });
+    });
 
     it("should clear error when clearError is called", async () => {
         const apiCall = vi.fn(() =>
             Promise.reject({response: {data: {message: "error"}}}),
         );
-    const { execute, error, clearError } = useApi(apiCall);
+        const {execute, error, clearError} = useApi(apiCall);
 
-    try {
-      await execute();
-    } catch {
-      // a
-    }
+        try {
+            await execute();
+        } catch {
+            // a
+        }
 
         expect(error.value).toBe("error");
 
-    clearError();
+        clearError();
 
-    expect(error.value).toBe(null);
-  });
+        expect(error.value).toBe(null);
+    });
 });

@@ -14,15 +14,14 @@ import java.util.Map;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErroApi {
-    private int status;
-    private String message;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private final LocalDateTime timestamp;
-
+    private int status;
+    private String message;
     private List<ErroSubApi> subErrors;
 
-    @Setter private Map<String, ?> details;
+    @Setter
+    private Map<String, ?> details;
 
     private ErroApi() {
         this.timestamp = LocalDateTime.now();

@@ -40,7 +40,8 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{codigo}";
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private CriarProcessoReq criarCriarProcessoReq(
             String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
@@ -170,7 +171,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
                         // Tipo não pode ser alterado na edição, mas é enviado no DTO
                         unidadesEditadas,
                         LocalDateTime.now().plusDays(40) // Nova data limite
-                        );
+                );
 
         mockMvc.perform(
                         post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
@@ -196,8 +197,8 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                        API_PROCESSOS + "/{codProcesso}/atualizar",
-                                        999L) // código que não existe
+                                API_PROCESSOS + "/{codProcesso}/atualizar",
+                                999L) // código que não existe
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(editarRequestDTO)))
@@ -242,8 +243,8 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
         mockMvc.perform(
                         post(
-                                        API_PROCESSOS + "/{codProcesso}/excluir",
-                                        999L) // código que não existe
+                                API_PROCESSOS + "/{codProcesso}/excluir",
+                                999L) // código que não existe
                                 .with(csrf()))
                 .andExpect(status().isNotFound());
     }

@@ -12,33 +12,33 @@
       </h2>
       <div class="d-flex gap-2">
         <BButton
-          v-if="podeVerImpacto"
-          variant="outline-secondary"
-          data-testid="cad-atividades__btn-impactos-mapa"
-          @click="abrirModalImpacto"
+            v-if="podeVerImpacto"
+            data-testid="cad-atividades__btn-impactos-mapa"
+            variant="outline-secondary"
+            @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
+          <i class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </BButton>
         <BButton
-          variant="outline-info"
-          data-testid="btn-vis-atividades-historico"
-          @click="abrirModalHistoricoAnalise"
+            data-testid="btn-vis-atividades-historico"
+            variant="outline-info"
+            @click="abrirModalHistoricoAnalise"
         >
           Histórico de análise
         </BButton>
         <BButton
-          variant="secondary"
-          data-testid="btn-acao-devolver"
-          title="Devolver para ajustes"
-          @click="devolverCadastro"
+            data-testid="btn-acao-devolver"
+            title="Devolver para ajustes"
+            variant="secondary"
+            @click="devolverCadastro"
         >
           Devolver para ajustes
         </BButton>
         <BButton
-          variant="success"
-          data-testid="btn-acao-analisar-principal"
-          title="Validar"
-          @click="validarCadastro"
+            data-testid="btn-acao-analisar-principal"
+            title="Validar"
+            variant="success"
+            @click="validarCadastro"
         >
           {{ perfilSelecionado === Perfil.ADMIN ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
@@ -47,27 +47,27 @@
 
     <!-- Lista de atividades -->
     <BCard
-      v-for="(atividade) in atividades"
-      :key="atividade.codigo"
-      class="mb-3 atividade-card"
-      no-body
+        v-for="(atividade) in atividades"
+        :key="atividade.codigo"
+        class="mb-3 atividade-card"
+        no-body
     >
       <BCardBody class="py-2">
         <div
-          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
           <strong
-            class="atividade-descricao"
-            data-testid="txt-atividade-descricao"
+              class="atividade-descricao"
+              data-testid="txt-atividade-descricao"
           >{{ atividade.descricao }}</strong>
         </div>
 
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
           <div
-            v-for="(conhecimento) in atividade.conhecimentos"
-            :key="conhecimento.id"
-            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+              v-for="(conhecimento) in atividade.conhecimentos"
+              :key="conhecimento.id"
+              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
@@ -77,54 +77,56 @@
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
-      :id-processo="codProcesso"
-      :mostrar="mostrarModalImpacto"
-      :sigla-unidade="siglaUnidade"
-      @fechar="fecharModalImpacto"
+        :id-processo="codProcesso"
+        :mostrar="mostrarModalImpacto"
+        :sigla-unidade="siglaUnidade"
+        @fechar="fecharModalImpacto"
     />
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-      :cod-subrocesso="codSubrocesso"
-      :mostrar="mostrarModalHistoricoAnalise"
-      @fechar="fecharModalHistoricoAnalise"
+        :cod-subrocesso="codSubrocesso"
+        :mostrar="mostrarModalHistoricoAnalise"
+        @fechar="fecharModalHistoricoAnalise"
     />
 
     <!-- Modal de Validação -->
     <BModal
-      v-model="mostrarModalValidar"
-      :fade="false"
-      :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
-      centered
-      hide-footer
+        v-model="mostrarModalValidar"
+        :fade="false"
+        :title="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+        centered
+        hide-footer
     >
-      <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
+      <p>{{
+          isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
+        }}</p>
       <div
-        v-if="!isHomologacao"
-        class="mb-3"
+          v-if="!isHomologacao"
+          class="mb-3"
       >
         <label
-          class="form-label"
-          for="observacaoValidacao"
+            class="form-label"
+            for="observacaoValidacao"
         >Observação</label>
         <BFormTextarea
-          id="observacaoValidacao"
-          v-model="observacaoValidacao"
-          data-testid="inp-aceite-cadastro-obs"
-          rows="3"
+            id="observacaoValidacao"
+            v-model="observacaoValidacao"
+            data-testid="inp-aceite-cadastro-obs"
+            rows="3"
         />
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalValidar"
+            variant="secondary"
+            @click="fecharModalValidar"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="success"
-          data-testid="btn-aceite-cadastro-confirmar"
-          @click="confirmarValidacao"
+            data-testid="btn-aceite-cadastro-confirmar"
+            variant="success"
+            @click="confirmarValidacao"
         >
           Confirmar
         </BButton>
@@ -133,36 +135,38 @@
 
     <!-- Modal de Devolução -->
     <BModal
-      v-model="mostrarModalDevolver"
-      :fade="false"
-      :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
-      centered
-      hide-footer
+        v-model="mostrarModalDevolver"
+        :fade="false"
+        :title="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
+        centered
+        hide-footer
     >
-      <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
+      <p>{{
+          isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
+        }}</p>
       <div class="mb-3">
         <label
-          class="form-label"
-          for="observacaoDevolucao"
+            class="form-label"
+            for="observacaoDevolucao"
         >Observação</label>
         <BFormTextarea
-          id="observacaoDevolucao"
-          v-model="observacaoDevolucao"
-          data-testid="inp-devolucao-cadastro-obs"
-          rows="3"
+            id="observacaoDevolucao"
+            v-model="observacaoDevolucao"
+            data-testid="inp-devolucao-cadastro-obs"
+            rows="3"
         />
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalDevolver"
+            variant="secondary"
+            @click="fecharModalDevolver"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="danger"
-          data-testid="btn-devolucao-cadastro-confirmar"
-          @click="confirmarDevolucao"
+            data-testid="btn-devolucao-cadastro-confirmar"
+            variant="danger"
+            @click="confirmarDevolucao"
         >
           Confirmar
         </BButton>
@@ -253,11 +257,11 @@ const isHomologacao = computed(() => {
   return (
       perfilSelecionado.value === Perfil.ADMIN &&
       (situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
-       situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO ||
-       situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-       situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
-       situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-       situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
+          situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO ||
+          situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+          situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
+          situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+          situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
   );
 });
 
@@ -305,7 +309,7 @@ async function confirmarValidacao() {
   const commonRequest = {
     observacoes: observacaoValidacao.value,
   };
-  
+
   // Re-declare store removed
 
   if (isHomologacao.value) {
@@ -321,15 +325,15 @@ async function confirmarValidacao() {
       } else {
         await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
       }
-      
+
       feedbackStore.show(
-        "Homologação efetivada",
-        "O cadastro foi homologado com sucesso.",
-        "success",
+          "Homologação efetivada",
+          "O cadastro foi homologado com sucesso.",
+          "success",
       );
-      
+
       fecharModalValidar();
-      
+
       // Redirecionar para Detalhes do subprocesso (CDU-13 passo 11.7 e CDU-14 passo 12.4)
       await router.push({
         name: "Subprocesso",
@@ -341,9 +345,9 @@ async function confirmarValidacao() {
     } catch (error) {
       console.error(error);
       feedbackStore.show(
-        "Erro ao homologar cadastro",
-        "Não foi possível homologar o cadastro.",
-        "danger",
+          "Erro ao homologar cadastro",
+          "Não foi possível homologar o cadastro.",
+          "danger",
       );
     }
   } else {
@@ -354,15 +358,15 @@ async function confirmarValidacao() {
       } else {
         await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
       }
-      
+
       fecharModalValidar();
       await router.push({name: "Painel"});
     } catch (error) {
       console.error(error);
       feedbackStore.show(
-        "Erro ao aceitar cadastro",
-        "Não foi possível aceitar o cadastro.",
-        "danger",
+          "Erro ao aceitar cadastro",
+          "Não foi possível aceitar o cadastro.",
+          "danger",
       );
     }
   }

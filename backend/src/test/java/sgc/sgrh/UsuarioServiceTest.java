@@ -27,9 +27,11 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes para UsuarioService")
 class UsuarioServiceTest {
 
-    @Mock private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
 
-    @InjectMocks private UsuarioService usuarioService;
+    @InjectMocks
+    private UsuarioService usuarioService;
 
     private Unidade unidadeMock;
     private Usuario usuarioMock;

@@ -9,14 +9,14 @@ export async function selecionarProcessoEUnidade(
     unidadeId = 1,
 ) {
     const processoSelect = wrapper.find("select#processo-select");
-  await processoSelect.setValue(processoId);
-  await wrapper.vm.$nextTick();
+    await processoSelect.setValue(processoId);
+    await wrapper.vm.$nextTick();
 
     const unidadeSelect = wrapper.find("select#unidade-select");
-  await unidadeSelect.setValue(unidadeId);
-  await wrapper.vm.$nextTick();
+    await unidadeSelect.setValue(unidadeId);
+    await wrapper.vm.$nextTick();
 
-  return wrapper;
+    return wrapper;
 }
 
 /**
@@ -36,11 +36,11 @@ export function expectImportButtonEnabled(wrapper: any) {
  * Seleciona a primeira checkbox de atividade
  */
 export async function selectFirstCheckbox(wrapper: any) {
-  const checkboxes = wrapper.findAll('.form-check-input[type="checkbox"]');
-  if (checkboxes.length > 0) {
-    await checkboxes[0].setValue(true);
-    await wrapper.vm.$nextTick();
-  }
+    const checkboxes = wrapper.findAll('.form-check-input[type="checkbox"]');
+    if (checkboxes.length > 0) {
+        await checkboxes[0].setValue(true);
+        await wrapper.vm.$nextTick();
+    }
 }
 
 /**
@@ -52,11 +52,11 @@ export function assertUnidadeOptions(wrapper: any, labels: string[]) {
     expect(unidadeSelect.attributes("disabled")).toBeUndefined();
 
     const options = wrapper.findAll("select#unidade-select option");
-  // 1 disabled + labels.length
-  expect(options).toHaveLength(1 + labels.length);
-  for (let i = 0; i < labels.length; i++) {
-    expect(options[i + 1].text()).toBe(labels[i]);
-  }
+    // 1 disabled + labels.length
+    expect(options).toHaveLength(1 + labels.length);
+    for (let i = 0; i < labels.length; i++) {
+        expect(options[i + 1].text()).toBe(labels[i]);
+    }
 }
 
 /**
@@ -69,15 +69,15 @@ export async function navigateAndAssertBreadcrumbs(
     path: string,
     expectedLabels: string[],
 ) {
-  router.push(path);
-  const wrapper = await mountFn();
-  const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+    router.push(path);
+    const wrapper = await mountFn();
+    const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
 
     // Home + expectedLabels
-  expect(breadcrumbItems.length).toBe(1 + expectedLabels.length);
-  for (let i = 0; i < expectedLabels.length; i++) {
-    expect(breadcrumbItems[i + 1].text()).toBe(expectedLabels[i]);
-  }
+    expect(breadcrumbItems.length).toBe(1 + expectedLabels.length);
+    for (let i = 0; i < expectedLabels.length; i++) {
+        expect(breadcrumbItems[i + 1].text()).toBe(expectedLabels[i]);
+    }
 }
 
 /**
@@ -85,7 +85,7 @@ export async function navigateAndAssertBreadcrumbs(
  * Útil para reduzir múltiplas chamadas repetitivas a expect(array).toContain(...)
  */
 export function expectContainsAll(array: any[], items: string[]) {
-  for (const item of items) {
-    expect(array).toContain(item);
-  }
+    for (const item of items) {
+        expect(array).toContain(item);
+    }
 }

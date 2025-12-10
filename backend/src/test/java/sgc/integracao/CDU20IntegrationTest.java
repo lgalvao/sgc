@@ -45,21 +45,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired ProcessoRepo processoRepo;
+    @Autowired
+    ProcessoRepo processoRepo;
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private AlertaRepo alertaRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
 
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoSpyBean private SubprocessoNotificacaoService subprocessoNotificacaoService;
+    @MockitoSpyBean
+    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    @MockitoSpyBean private NotificacaoEmailService notificacaoEmailService;
+    @MockitoSpyBean
+    private NotificacaoEmailService notificacaoEmailService;
 
     private Subprocesso subprocesso;
     private Unidade unidadeSuperior;
@@ -109,15 +117,16 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         String responseDevolucao =
                 mockMvc.perform(
                                 get(
-                                                "/api/subprocessos/{id}/historico-validacao",
-                                                subprocesso.getCodigo())
+                                        "/api/subprocessos/{id}/historico-validacao",
+                                        subprocesso.getCodigo())
                                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
         List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao =
-                objectMapper.readValue(responseDevolucao, new TypeReference<>() {});
+                objectMapper.readValue(responseDevolucao, new TypeReference<>() {
+                });
 
         assertThat(historicoDevolucao).hasSize(1);
         assertThat(historicoDevolucao.getFirst().getAcao())
@@ -164,15 +173,16 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         String responseAceite =
                 mockMvc.perform(
                                 get(
-                                                "/api/subprocessos/{id}/historico-validacao",
-                                                subprocesso.getCodigo())
+                                        "/api/subprocessos/{id}/historico-validacao",
+                                        subprocesso.getCodigo())
                                         .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
         List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite =
-                objectMapper.readValue(responseAceite, new TypeReference<>() {});
+                objectMapper.readValue(responseAceite, new TypeReference<>() {
+                });
 
         assertThat(historicoAceite).hasSize(2);
         assertThat(historicoAceite.getFirst().getAcao())

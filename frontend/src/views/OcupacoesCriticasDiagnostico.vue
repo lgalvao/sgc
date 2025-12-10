@@ -5,10 +5,10 @@
         <h2 class="mb-0">Ocupações Críticas</h2>
         <small class="text-muted">{{ unidade?.sigla }} - {{ unidade?.nome }}</small>
       </div>
-      <BButton variant="primary" to="/painel">Voltar</BButton>
+      <BButton to="/painel" variant="primary">Voltar</BButton>
     </div>
 
-    <BAlert variant="info" :model-value="true" :fade="false">
+    <BAlert :fade="false" :model-value="true" variant="info">
       <i class="bi bi-info-circle me-2"/>
       Identifique a situação de capacitação para as competências com Gap significativo.
     </BAlert>

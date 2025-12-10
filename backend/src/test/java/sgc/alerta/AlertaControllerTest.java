@@ -25,9 +25,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class AlertaControllerTest {
 
-    @MockitoBean private AlertaService alertaService;
+    @MockitoBean
+    private AlertaService alertaService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     @DisplayName("marcarComoLido_quandoSucesso_deveRetornarOk")

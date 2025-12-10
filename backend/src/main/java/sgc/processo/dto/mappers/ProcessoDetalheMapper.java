@@ -26,7 +26,7 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataFinalizacaoFormatada", ignore = true)
     @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "tipoLabel", ignore = true)
-    // Mapeamento customizado
+        // Mapeamento customizado
     ProcessoDetalheDto toDetailDTO(Processo processo);
 
     // Mapeamento de entidade para DTO de participante

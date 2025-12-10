@@ -27,7 +27,8 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoPermissoesServiceTest {
 
-    @InjectMocks private SubprocessoPermissoesService service;
+    @InjectMocks
+    private SubprocessoPermissoesService service;
 
     @Test
     void devePermitirVisualizarImpactoParaAdminEmSituacaoCorreta() {

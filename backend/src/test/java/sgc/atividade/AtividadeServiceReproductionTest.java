@@ -25,12 +25,17 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceReproductionTest {
 
-    @InjectMocks private AtividadeService atividadeService;
+    @InjectMocks
+    private AtividadeService atividadeService;
 
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private AtividadeMapper atividadeMapper;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private UsuarioRepo usuarioRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeMapper atividadeMapper;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
 
     @Test
     @DisplayName("REPRODUÇÃO: criar falha com NPE se unidade do subprocesso for nula")

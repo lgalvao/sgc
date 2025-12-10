@@ -44,10 +44,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_BUSCAR = "/api/subprocessos/buscar";
 
-    @Autowired private ProcessoService processoService;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private SubprocessoDtoService subprocessoDtoService;
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private ProcessoService processoService;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoDtoService subprocessoDtoService;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
     private Unidade unidadeSENIC;
     private Long codProcesso;

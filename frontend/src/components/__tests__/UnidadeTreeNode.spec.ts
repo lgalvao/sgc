@@ -35,7 +35,7 @@ describe("UnidadeTreeNode.vue", () => {
         onToggle: vi.fn(),
         onToggleExpand: vi.fn(),
     };
-    
+
     const mountOptions = {
         global: {
             stubs: {
@@ -60,7 +60,7 @@ describe("UnidadeTreeNode.vue", () => {
         const checkbox = wrapper.find('.b-form-checkbox-stub input');
         expect((checkbox.element as HTMLInputElement).checked).toBe(false);
     });
-    
+
     it("deve renderizar checkbox marcado quando getEstadoSelecao retorna true", () => {
         const wrapper = mount(UnidadeTreeNode, {
             props: {
@@ -74,7 +74,7 @@ describe("UnidadeTreeNode.vue", () => {
     });
 
     it("deve renderizar checkbox indeterminado quando getEstadoSelecao retorna 'indeterminate'", () => {
-         const wrapper = mount(UnidadeTreeNode, {
+        const wrapper = mount(UnidadeTreeNode, {
             props: {
                 ...defaultProps,
                 getEstadoSelecao: vi.fn().mockReturnValue("indeterminate")
@@ -96,15 +96,15 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         const checkbox = wrapper.find('.b-form-checkbox-stub input');
         await checkbox.setValue(true);
 
         expect(onToggle).toHaveBeenCalledWith(mockUnidade, true);
     });
-    
+
     it("deve renderizar expansor se tiver filhas", () => {
-        const unidadeComFilhas = { ...mockUnidade, filhas: [{ codigo: 2, sigla: "FILHA", nome: "Filha", filhas: [] }] };
+        const unidadeComFilhas = {...mockUnidade, filhas: [{codigo: 2, sigla: "FILHA", nome: "Filha", filhas: []}]};
         const wrapper = mount(UnidadeTreeNode, {
             props: {
                 ...defaultProps,
@@ -112,10 +112,10 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         expect(wrapper.find('.expansor').exists()).toBe(true);
     });
-    
+
     it("não deve renderizar expansor se não tiver filhas", () => {
         const wrapper = mount(UnidadeTreeNode, {
             props: defaultProps,
@@ -124,9 +124,9 @@ describe("UnidadeTreeNode.vue", () => {
         expect(wrapper.find('.expansor').exists()).toBe(false);
         expect(wrapper.find('.expansor-placeholder').exists()).toBe(true);
     });
-    
+
     it("deve chamar onToggleExpand ao clicar no expansor", async () => {
-        const unidadeComFilhas = { ...mockUnidade, filhas: [{ codigo: 2, sigla: "FILHA", nome: "Filha", filhas: [] }] };
+        const unidadeComFilhas = {...mockUnidade, filhas: [{codigo: 2, sigla: "FILHA", nome: "Filha", filhas: []}]};
         const onToggleExpand = vi.fn();
         const wrapper = mount(UnidadeTreeNode, {
             props: {
@@ -136,13 +136,16 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         await wrapper.find('.expansor').trigger('click');
         expect(onToggleExpand).toHaveBeenCalledWith(unidadeComFilhas);
     });
 
     it("deve renderizar filhos recursivamente quando expandido", () => {
-        const unidadeComFilhas = { ...mockUnidade, filhas: [{ codigo: 2, sigla: "FILHA_TESTE", nome: "Filha", filhas: [] }] };
+        const unidadeComFilhas = {
+            ...mockUnidade,
+            filhas: [{codigo: 2, sigla: "FILHA_TESTE", nome: "Filha", filhas: []}]
+        };
         const wrapper = mount(UnidadeTreeNode, {
             props: {
                 ...defaultProps,
@@ -151,14 +154,17 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         expect(wrapper.text()).toContain("FILHA_TESTE");
         const children = wrapper.findAllComponents(UnidadeTreeNode);
         expect(children.length).toBe(1);
     });
-    
+
     it("não deve renderizar filhos quando não expandido", () => {
-        const unidadeComFilhas = { ...mockUnidade, filhas: [{ codigo: 2, sigla: "FILHA_TESTE", nome: "Filha", filhas: [] }] };
+        const unidadeComFilhas = {
+            ...mockUnidade,
+            filhas: [{codigo: 2, sigla: "FILHA_TESTE", nome: "Filha", filhas: []}]
+        };
         const wrapper = mount(UnidadeTreeNode, {
             props: {
                 ...defaultProps,
@@ -167,10 +173,10 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         expect(wrapper.text()).not.toContain("FILHA_TESTE");
     });
-    
+
     it("deve estar desabilitado se isHabilitado retornar false", () => {
         const wrapper = mount(UnidadeTreeNode, {
             props: {
@@ -179,7 +185,7 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        
+
         // Check prop on stub
         expect(wrapper.findComponent(BFormCheckboxStub).props('disabled')).toBe(true);
         expect(wrapper.find('.unidade-label').classes()).toContain('text-muted');

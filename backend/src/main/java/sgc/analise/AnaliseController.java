@@ -48,8 +48,8 @@ public class AnaliseController {
      * associada ao subprocesso identificado pelo código na URL.
      *
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param corpo Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *     'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
+     * @param corpo          Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
+     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-cadastro")
@@ -81,8 +81,8 @@ public class AnaliseController {
      * corpo flexível e a associa ao subprocesso correspondente.
      *
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param corpo Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *     'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
+     * @param corpo          Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
+     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-validacao")

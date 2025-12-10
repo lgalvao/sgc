@@ -12,324 +12,324 @@ import {useUnidadesStore} from "@/stores/unidades";
 const pushMock = vi.fn();
 
 vi.mock("vue-router", () => ({
-  useRouter: () => ({
-    push: pushMock,
-  }),
-  createRouter: () => ({
-    beforeEach: vi.fn(),
-    afterEach: vi.fn(),
-  }),
-  createWebHistory: () => ({}),
+    useRouter: () => ({
+        push: pushMock,
+    }),
+    createRouter: () => ({
+        beforeEach: vi.fn(),
+        afterEach: vi.fn(),
+    }),
+    createWebHistory: () => ({}),
 }));
 
 vi.mock("@/services/mapaService", () => ({
-  obterMapaVisualizacao: vi.fn(),
+    obterMapaVisualizacao: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
-  obterDetalhesProcesso: vi.fn(),
+    obterDetalhesProcesso: vi.fn(),
 }));
 
 vi.mock("@/services/unidadesService", () => ({
-  buscarUnidadePorSigla: vi.fn(),
+    buscarUnidadePorSigla: vi.fn(),
 }));
 
 vi.mock("@/services/analiseService", () => ({
-  listarAnalisesCadastro: vi.fn(),
+    listarAnalisesCadastro: vi.fn(),
 }));
 
 describe("VisAtividades.vue", () => {
-  let wrapper: any;
+    let wrapper: any;
 
-  function createWrapper(
-    perfil: Perfil,
-    situacao: SituacaoSubprocesso,
-    tipoProcesso: TipoProcesso = TipoProcesso.REVISAO,
-  ) {
-    const wrapper = mount(VisAtividades, {
-      props: {
-        codProcesso: 1,
-        sigla: "TESTE",
-      },
-      global: {
-        plugins: [
-          createTestingPinia({
-            stubActions: true,
-            initialState: {
-              processos: {
-                processoDetalhe: {
-                  codigo: 1,
-                  tipo: tipoProcesso,
-                  unidades: [
-                    {
-                      codUnidade: 123,
-                      codSubprocesso: 123,
-                      sigla: "TESTE",
-                      situacaoSubprocesso: situacao,
-                    },
-                  ],
-                },
-              },
-              unidades: {
-                unidade: {
-                  codigo: 1,
-                  nome: "Unidade de Teste",
-                  sigla: "TESTE",
-                },
-              },
+    function createWrapper(
+        perfil: Perfil,
+        situacao: SituacaoSubprocesso,
+        tipoProcesso: TipoProcesso = TipoProcesso.REVISAO,
+    ) {
+        const wrapper = mount(VisAtividades, {
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE",
             },
-          }),
-        ],
-      },
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        stubActions: true,
+                        initialState: {
+                            processos: {
+                                processoDetalhe: {
+                                    codigo: 1,
+                                    tipo: tipoProcesso,
+                                    unidades: [
+                                        {
+                                            codUnidade: 123,
+                                            codSubprocesso: 123,
+                                            sigla: "TESTE",
+                                            situacaoSubprocesso: situacao,
+                                        },
+                                    ],
+                                },
+                            },
+                            unidades: {
+                                unidade: {
+                                    codigo: 1,
+                                    nome: "Unidade de Teste",
+                                    sigla: "TESTE",
+                                },
+                            },
+                        },
+                    }),
+                ],
+            },
+        });
+
+        const perfilStore = usePerfilStore();
+        perfilStore.perfilSelecionado = perfil;
+
+        return {wrapper};
+    }
+
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    const perfilStore = usePerfilStore();
-    perfilStore.perfilSelecionado = perfil;
-
-    return { wrapper };
-  }
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    wrapper?.unmount();
-  });
-
-  it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
-    const { wrapper: w } = createWrapper(
-      Perfil.GESTOR,
-      SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-    );
-    wrapper = w;
-    await flushPromises();
-    await nextTick();
-
-    expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
-  });
-
-  it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
-    const { wrapper: w } = createWrapper(
-      Perfil.ADMIN,
-      SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-    );
-    wrapper = w;
-    await flushPromises();
-
-    expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
-  });
-
-  it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
-    const { wrapper: w } = createWrapper(
-      Perfil.GESTOR,
-      SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-    );
-    wrapper = w;
-    await flushPromises();
-
-    expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(false);
-  });
-
-  it("deve listar atividades e conhecimentos", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-    );
-    wrapper = w;
-    const atividadesStore = useAtividadesStore();
-    atividadesStore.atividadesPorSubprocesso.set(123, [
-      {
-        codigo: 1,
-        descricao: "Atividade 1",
-        conhecimentos: [{ id: 10, descricao: "Conhecimento 1" }],
-      },
-    ]);
-
-    await flushPromises();
-    // Force re-compute
-    wrapper.vm.$forceUpdate();
-    await nextTick();
-
-    expect(wrapper.text()).toContain("Atividade 1");
-    expect(wrapper.text()).toContain("Conhecimento 1");
-  });
-
-  it("deve abrir e fechar modal de historico", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-    );
-    wrapper = w;
-    await flushPromises();
-
-    const btn = wrapper.findAll("button").find((b: any) => b.text() === "Histórico de análise");
-    await btn.trigger("click");
-    expect(wrapper.vm.mostrarModalHistoricoAnalise).toBe(true);
-  });
-
-  it("deve validar cadastro (Homologar) e redirecionar", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.ADMIN,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.homologarRevisaoCadastro = vi.fn();
-
-    await flushPromises();
-
-    // Click validate button
-    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-    await btn.trigger("click");
-    expect(wrapper.vm.mostrarModalValidar).toBe(true);
-
-    // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
-    await btnConfirm.trigger("click");
-
-    expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
-    expect(pushMock).toHaveBeenCalledWith({
-      name: "Subprocesso",
-      params: {
-        codProcesso: 1,
-        siglaUnidade: "TESTE",
-      },
+    afterEach(() => {
+        wrapper?.unmount();
     });
-  });
 
-  it("deve validar cadastro (Aceitar) e redirecionar", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.aceitarRevisaoCadastro = vi.fn();
+    it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        );
+        wrapper = w;
+        await flushPromises();
+        await nextTick();
 
-    await flushPromises();
-
-    // Click validate button
-    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-    await btn.trigger("click");
-
-    // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
-    await btnConfirm.trigger("click");
-
-    expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
-    expect(pushMock).toHaveBeenCalledWith({ name: "Painel" });
-  });
-
-  it("deve devolver cadastro e redirecionar", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.devolverRevisaoCadastro = vi.fn();
-
-    await flushPromises();
-
-    // Click return button
-    const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
-    await btn.trigger("click");
-    expect(wrapper.vm.mostrarModalDevolver).toBe(true);
-
-    // Fill observation
-    const textarea = wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]');
-    await textarea.setValue("Devolvendo");
-
-    // Confirm
-    const btnConfirm = wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]');
-    await btnConfirm.trigger("click");
-
-    expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalledWith(123, {
-      observacoes: "Devolvendo",
+        expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
     });
-    expect(pushMock).toHaveBeenCalledWith("/painel");
-  });
 
-  it("deve chamar aceitarCadastro se não for revisao", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        TipoProcesso.MAPEAMENTO,
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.aceitarCadastro = vi.fn();
+    it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.ADMIN,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        );
+        wrapper = w;
+        await flushPromises();
 
-    await flushPromises();
+        expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
+    });
 
-    // Click validate button
-    await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
-    // Confirm
-    await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+    it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+        );
+        wrapper = w;
+        await flushPromises();
 
-    expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
-  });
+        expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(false);
+    });
 
-  it("deve encontrar unidade em hierarquia complexa", async () => {
-      // Setup store with nested units
-      const { wrapper: w } = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-      wrapper = w;
-      const unidadesStore = useUnidadesStore();
-      unidadesStore.unidades = [{
-          codigo: 99,
-          sigla: "ROOT",
-          nome: "Root",
-          filhas: [{
-              codigo: 1,
-              sigla: "TESTE",
-              nome: "Unidade de Teste",
-              filhas: []
-          }]
-      }] as any;
+    it("deve listar atividades e conhecimentos", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        );
+        wrapper = w;
+        const atividadesStore = useAtividadesStore();
+        atividadesStore.atividadesPorSubprocesso.set(123, [
+            {
+                codigo: 1,
+                descricao: "Atividade 1",
+                conhecimentos: [{id: 10, descricao: "Conhecimento 1"}],
+            },
+        ]);
 
-      // Force update or wait for computed
-      await flushPromises();
-      await nextTick();
-      expect(w.text()).toContain("Unidade de Teste");
-  });
+        await flushPromises();
+        // Force re-compute
+        wrapper.vm.$forceUpdate();
+        await nextTick();
 
-  it("deve validar cadastro (Homologar Mapeamento)", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.ADMIN,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        TipoProcesso.MAPEAMENTO
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.homologarCadastro = vi.fn();
+        expect(wrapper.text()).toContain("Atividade 1");
+        expect(wrapper.text()).toContain("Conhecimento 1");
+    });
 
-    await flushPromises();
+    it("deve abrir e fechar modal de historico", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        );
+        wrapper = w;
+        await flushPromises();
 
-    const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
-    await btn.trigger("click");
-    await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+        const btn = wrapper.findAll("button").find((b: any) => b.text() === "Histórico de análise");
+        await btn.trigger("click");
+        expect(wrapper.vm.mostrarModalHistoricoAnalise).toBe(true);
+    });
 
-    expect(subprocessosStore.homologarCadastro).toHaveBeenCalled();
-  });
+    it("deve validar cadastro (Homologar) e redirecionar", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.ADMIN,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.homologarRevisaoCadastro = vi.fn();
 
-  it("deve devolver cadastro (Mapeamento)", async () => {
-    const { wrapper: w } = createWrapper(
-        Perfil.GESTOR,
-        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        TipoProcesso.MAPEAMENTO
-    );
-    wrapper = w;
-    const subprocessosStore = useSubprocessosStore();
-    subprocessosStore.devolverCadastro = vi.fn();
+        await flushPromises();
 
-    await flushPromises();
+        // Click validate button
+        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
+        await btn.trigger("click");
+        expect(wrapper.vm.mostrarModalValidar).toBe(true);
 
-    const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
-    await btn.trigger("click");
-    await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Obs");
-    await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+        // Confirm
+        const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
+        await btnConfirm.trigger("click");
 
-    expect(subprocessosStore.devolverCadastro).toHaveBeenCalled();
-  });
+        expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
+        expect(pushMock).toHaveBeenCalledWith({
+            name: "Subprocesso",
+            params: {
+                codProcesso: 1,
+                siglaUnidade: "TESTE",
+            },
+        });
+    });
+
+    it("deve validar cadastro (Aceitar) e redirecionar", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.aceitarRevisaoCadastro = vi.fn();
+
+        await flushPromises();
+
+        // Click validate button
+        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
+        await btn.trigger("click");
+
+        // Confirm
+        const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
+        await btnConfirm.trigger("click");
+
+        expect(subprocessosStore.aceitarRevisaoCadastro).toHaveBeenCalled();
+        expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
+    });
+
+    it("deve devolver cadastro e redirecionar", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.devolverRevisaoCadastro = vi.fn();
+
+        await flushPromises();
+
+        // Click return button
+        const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
+        await btn.trigger("click");
+        expect(wrapper.vm.mostrarModalDevolver).toBe(true);
+
+        // Fill observation
+        const textarea = wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]');
+        await textarea.setValue("Devolvendo");
+
+        // Confirm
+        const btnConfirm = wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]');
+        await btnConfirm.trigger("click");
+
+        expect(subprocessosStore.devolverRevisaoCadastro).toHaveBeenCalledWith(123, {
+            observacoes: "Devolvendo",
+        });
+        expect(pushMock).toHaveBeenCalledWith("/painel");
+    });
+
+    it("deve chamar aceitarCadastro se não for revisao", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            TipoProcesso.MAPEAMENTO,
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.aceitarCadastro = vi.fn();
+
+        await flushPromises();
+
+        // Click validate button
+        await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
+        // Confirm
+        await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+
+        expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
+    });
+
+    it("deve encontrar unidade em hierarquia complexa", async () => {
+        // Setup store with nested units
+        const {wrapper: w} = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        wrapper = w;
+        const unidadesStore = useUnidadesStore();
+        unidadesStore.unidades = [{
+            codigo: 99,
+            sigla: "ROOT",
+            nome: "Root",
+            filhas: [{
+                codigo: 1,
+                sigla: "TESTE",
+                nome: "Unidade de Teste",
+                filhas: []
+            }]
+        }] as any;
+
+        // Force update or wait for computed
+        await flushPromises();
+        await nextTick();
+        expect(w.text()).toContain("Unidade de Teste");
+    });
+
+    it("deve validar cadastro (Homologar Mapeamento)", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.ADMIN,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            TipoProcesso.MAPEAMENTO
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.homologarCadastro = vi.fn();
+
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
+        await btn.trigger("click");
+        await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
+
+        expect(subprocessosStore.homologarCadastro).toHaveBeenCalled();
+    });
+
+    it("deve devolver cadastro (Mapeamento)", async () => {
+        const {wrapper: w} = createWrapper(
+            Perfil.GESTOR,
+            SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            TipoProcesso.MAPEAMENTO
+        );
+        wrapper = w;
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.devolverCadastro = vi.fn();
+
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
+        await btn.trigger("click");
+        await wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]').setValue("Obs");
+        await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
+
+        expect(subprocessosStore.devolverCadastro).toHaveBeenCalled();
+    });
 });

@@ -18,40 +18,40 @@ export function mapConhecimentoVisualizacaoToModel(dto: any): Conhecimento {
 }
 
 export function mapAtividadeDtoToModel(dto: any): Atividade {
-  if (!dto) return null as any;
-  return {
-    codigo: dto.codigo,
-    descricao: dto.descricao,
-    conhecimentos: dto.conhecimentos
-      ? dto.conhecimentos.map(mapConhecimentoDtoToModel).filter((c: any) => c !== null)
-      : [],
-  };
+    if (!dto) return null as any;
+    return {
+        codigo: dto.codigo,
+        descricao: dto.descricao,
+        conhecimentos: dto.conhecimentos
+            ? dto.conhecimentos.map(mapConhecimentoDtoToModel).filter((c: any) => c !== null)
+            : [],
+    };
 }
 
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
-  if (!dto) return null as any;
-  return {
-    id: dto.id || dto.codigo,
-    descricao: dto.descricao,
-  };
+    if (!dto) return null as any;
+    return {
+        id: dto.id || dto.codigo,
+        descricao: dto.descricao,
+    };
 }
 
 export function mapCriarAtividadeRequestToDto(
-  request: any,
-  codMapa: number,
+    request: any,
+    codMapa: number,
 ): any {
-  return {
-    ...request,
-    mapaCodigo: codMapa,
-  };
+    return {
+        ...request,
+        mapaCodigo: codMapa,
+    };
 }
 
 export function mapCriarConhecimentoRequestToDto(
-  request: CriarConhecimentoRequest,
-  atividadeCodigo: number,
+    request: CriarConhecimentoRequest,
+    atividadeCodigo: number,
 ): any {
-  return {
-    descricao: request.descricao,
-    atividadeCodigo,
-  };
+    return {
+        descricao: request.descricao,
+        atividadeCodigo,
+    };
 }

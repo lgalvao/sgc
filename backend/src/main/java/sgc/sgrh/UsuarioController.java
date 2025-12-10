@@ -44,7 +44,7 @@ public class UsuarioController {
      *
      * @param request O DTO contendo o título de eleitor e a senha.
      * @return Um {@link ResponseEntity} com {@code true} se a autenticação for bem-sucedida, {@code
-     *     false} caso contrário.
+     * false} caso contrário.
      */
     @PostMapping("/autenticar")
     public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request) {

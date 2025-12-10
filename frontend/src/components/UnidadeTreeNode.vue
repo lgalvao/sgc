@@ -4,8 +4,8 @@
       <!-- Expansor ANTES do checkbox -->
       <span
           v-if="unidade.filhas && unidade.filhas.length > 0"
-          class="expansor"
           :data-testid="`btn-arvore-expand-${unidade.sigla}`"
+          class="expansor"
           @click="onToggleExpand(unidade)"
       >
         {{ isExpanded(unidade) ? '▼' : '▶' }}
@@ -15,17 +15,17 @@
       <!-- Checkbox com label -->
       <BFormCheckbox
           :id="`chk-${unidade.sigla}`"
-          :model-value="getEstadoSelecao(unidade) === true"
-          :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-          :disabled="!isHabilitado(unidade)"
           :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
+          :disabled="!isHabilitado(unidade)"
+          :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
+          :model-value="getEstadoSelecao(unidade) === true"
           class="unidade-checkbox"
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
       >
         <label
+            :class="{ 'text-muted': !isHabilitado(unidade) }"
             :for="`chk-${unidade.sigla}`"
             class="unidade-label"
-            :class="{ 'text-muted': !isHabilitado(unidade) }"
         >
           {{ unidade.sigla }}
         </label>
@@ -40,20 +40,20 @@
       <UnidadeTreeNode
           v-for="filha in unidade.filhas"
           :key="filha.sigla"
-          :unidade="filha"
           :depth="depth + 1"
-          :is-checked="isChecked"
           :get-estado-selecao="getEstadoSelecao"
+          :is-checked="isChecked"
           :is-expanded="isExpanded"
           :is-habilitado="isHabilitado"
           :on-toggle="onToggle"
           :on-toggle-expand="onToggleExpand"
+          :unidade="filha"
       />
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BFormCheckbox} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 
@@ -73,7 +73,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // Desestruturar para uso no template
-const { isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggleExpand } = props;
+const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggleExpand} = props;
 </script>
 
 <style scoped>

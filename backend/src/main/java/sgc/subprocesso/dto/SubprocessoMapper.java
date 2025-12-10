@@ -12,16 +12,21 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-/** Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO. */
+/**
+ * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.
+ */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class SubprocessoMapper {
-    @Autowired protected ProcessoRepo processoRepo;
+    @Autowired
+    protected ProcessoRepo processoRepo;
 
-    @Autowired protected UnidadeRepo unidadeRepo;
+    @Autowired
+    protected UnidadeRepo unidadeRepo;
 
-    @Autowired protected MapaRepo mapaRepo;
+    @Autowired
+    protected MapaRepo mapaRepo;
 
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidade.codigo", target = "codUnidade")

@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07). */
+/**
+ * DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07).
+ */
 @Getter
 @Builder
 public class SubprocessoDetalheDto {

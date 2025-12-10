@@ -32,7 +32,7 @@ public class ProcessoNotificacaoService {
      * serviço SGRH. Em seguida, itera sobre as unidades participantes, determinando o tipo de email
      * a ser enviado com base no tipo da unidade (OPERACIONAL, INTERMEDIARIA, etc.).
      *
-     * @param processo O processo que foi finalizado.
+     * @param processo              O processo que foi finalizado.
      * @param unidadesParticipantes A lista de unidades que participaram do processo.
      */
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
@@ -126,8 +126,8 @@ public class ProcessoNotificacaoService {
                                 u ->
                                         u.getUnidadeSuperior() != null
                                                 && u.getUnidadeSuperior()
-                                                        .getCodigo()
-                                                        .equals(unidadeIntermediaria.getCodigo()))
+                                                .getCodigo()
+                                                .equals(unidadeIntermediaria.getCodigo()))
                         .map(Unidade::getSigla)
                         .sorted()
                         .toList();

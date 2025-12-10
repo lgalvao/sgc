@@ -8,7 +8,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test.beforeAll(async ({ request }) => {
+    test.beforeAll(async ({request}) => {
         const response = await request.post('http://localhost:10000/e2e/reset-database');
         expect(response.ok()).toBeTruthy();
     });
@@ -34,13 +34,13 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
             await page.waitForLoadState('networkidle');
-            
+
             // Clica no processo no painel
             await page.getByText(descricaoProcesso).click();
-            
+
             // CHEFE tem acesso direto apenas à sua unidade, então vai direto para Detalhes do subprocesso
             await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-            
+
             // Agora navega para atividades
             await AtividadeHelpers.navegarParaAtividades(page);
         });

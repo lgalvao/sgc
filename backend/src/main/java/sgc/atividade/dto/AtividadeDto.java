@@ -16,13 +16,19 @@ import sgc.comum.json.SanitizarHtml;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtividadeDto {
-    /** O código da atividade. */
+    /**
+     * O código da atividade.
+     */
     private Long codigo;
 
-    /** O código do mapa ao qual a atividade pertence. */
+    /**
+     * O código do mapa ao qual a atividade pertence.
+     */
     private Long mapaCodigo;
 
-    /** A descrição da atividade. */
+    /**
+     * A descrição da atividade.
+     */
     @NotBlank(message = "Descrição não pode ser vazia")
     @SanitizarHtml
     private String descricao;

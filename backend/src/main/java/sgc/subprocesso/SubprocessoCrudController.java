@@ -63,8 +63,8 @@ public class SubprocessoCrudController {
     /**
      * Obtém os detalhes de um subprocesso específico.
      *
-     * @param codigo O código do subprocesso.
-     * @param perfil O perfil do usuário que faz a requisição (opcional).
+     * @param codigo         O código do subprocesso.
+     * @param perfil         O perfil do usuário que faz a requisição (opcional).
      * @param unidadeUsuario O código da unidade do usuário (opcional).
      * @return Um {@link SubprocessoDetalheDto} com os detalhes do subprocesso.
      */
@@ -79,7 +79,7 @@ public class SubprocessoCrudController {
     /**
      * Busca um subprocesso por código do processo e sigla da unidade.
      *
-     * @param codProcesso O código do processo.
+     * @param codProcesso  O código do processo.
      * @param siglaUnidade A sigla da unidade.
      * @return O {@link SubprocessoDto} encontrado.
      */
@@ -97,7 +97,7 @@ public class SubprocessoCrudController {
      *
      * @param subprocessoDto O DTO com os dados do subprocesso a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo subprocesso e o
-     *     {@link SubprocessoDto} criado no corpo da resposta.
+     * {@link SubprocessoDto} criado no corpo da resposta.
      */
     @PostMapping
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
@@ -109,7 +109,7 @@ public class SubprocessoCrudController {
     /**
      * Atualiza um subprocesso existente.
      *
-     * @param codigo O código do subprocesso a ser atualizado.
+     * @param codigo         O código do subprocesso a ser atualizado.
      * @param subprocessoDto O DTO com os novos dados do subprocesso.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
      */

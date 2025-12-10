@@ -6,17 +6,17 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => await resetDatabase(request));
+    test.beforeAll(async ({request}) => await resetDatabase(request));
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         cleanup = useProcessoCleanup();
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
     });
 
-    test.afterEach(async ({ request }) => await cleanup.limpar(request));
+    test.afterEach(async ({request}) => await cleanup.limpar(request));
 
-    test('Deve iniciar um processo com sucesso', async ({ page }) => {
+    test('Deve iniciar um processo com sucesso', async ({page}) => {
         const descricao = `Processo para Iniciar - ${Date.now()}`;
 
         // 1. Cria processo em estado 'Criado'
@@ -31,7 +31,7 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         // 2. Entra na edição
         await page.getByText(descricao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        
+
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);

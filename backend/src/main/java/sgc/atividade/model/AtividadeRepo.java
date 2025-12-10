@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/** Repositório JPA para a entidade Atividade. */
+/**
+ * Repositório JPA para a entidade Atividade.
+ */
 @Repository
 public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
     /**

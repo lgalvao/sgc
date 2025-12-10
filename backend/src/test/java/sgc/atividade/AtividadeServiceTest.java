@@ -38,14 +38,21 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceTest {
 
-    @InjectMocks private AtividadeService atividadeService;
+    @InjectMocks
+    private AtividadeService atividadeService;
 
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private AtividadeMapper atividadeMapper;
-    @Mock private ConhecimentoRepo conhecimentoRepo;
-    @Mock private ConhecimentoMapper conhecimentoMapper;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private UsuarioRepo usuarioRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeMapper atividadeMapper;
+    @Mock
+    private ConhecimentoRepo conhecimentoRepo;
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
 
     @Test
     @DisplayName("listar deve retornar todas atividades")
@@ -387,9 +394,9 @@ class AtividadeServiceTest {
         when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
         assertThatThrownBy(
-                        () ->
-                                atividadeService.atualizarConhecimento(
-                                        ativId, conId, new ConhecimentoDto()))
+                () ->
+                        atividadeService.atualizarConhecimento(
+                                ativId, conId, new ConhecimentoDto()))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

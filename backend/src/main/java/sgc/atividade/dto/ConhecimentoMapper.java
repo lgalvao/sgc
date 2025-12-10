@@ -13,7 +13,8 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 @Component
 @Mapper(componentModel = "spring")
 public abstract class ConhecimentoMapper {
-    @Autowired protected AtividadeRepo atividadeRepo;
+    @Autowired
+    protected AtividadeRepo atividadeRepo;
 
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
     public abstract ConhecimentoDto toDto(Conhecimento conhecimento);
@@ -24,11 +25,11 @@ public abstract class ConhecimentoMapper {
     public Atividade map(Long codigo) {
         return codigo != null
                 ? atividadeRepo
-                        .findById(codigo)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Atividade não encontrada com o código", codigo))
+                .findById(codigo)
+                .orElseThrow(
+                        () ->
+                                new ErroEntidadeNaoEncontrada(
+                                        "Atividade não encontrada com o código", codigo))
                 : null;
     }
 }

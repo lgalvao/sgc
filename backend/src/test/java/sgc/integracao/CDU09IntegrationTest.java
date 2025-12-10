@@ -46,24 +46,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WithMockChefe("333333333333")
 @Import({
-    TestSecurityConfig.class,
-    WithMockChefeSecurityContextFactory.class,
-    TestThymeleafConfig.class
+        TestSecurityConfig.class,
+        WithMockChefeSecurityContextFactory.class,
+        TestThymeleafConfig.class
 })
 @Transactional
 @DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
 class CDU09IntegrationTest extends BaseIntegrationTest {
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private AlertaRepo alertaRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
 
-    @MockitoSpyBean private SubprocessoNotificacaoService subprocessoNotificacaoService;
+    @MockitoSpyBean
+    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
@@ -113,8 +123,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/cadastro/disponibilizar",
-                                            subprocessoMapeamento.getCodigo())
+                                    "/api/subprocessos/{id}/cadastro/disponibilizar",
+                                    subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Cadastro de atividades disponibilizado")));
@@ -162,8 +172,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/cadastro/disponibilizar",
-                                            subprocessoMapeamento.getCodigo())
+                                    "/api/subprocessos/{id}/cadastro/disponibilizar",
+                                    subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(
@@ -191,8 +201,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/cadastro/disponibilizar",
-                                            subprocessoMapeamento.getCodigo())
+                                    "/api/subprocessos/{id}/cadastro/disponibilizar",
+                                    subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
                     .andExpect(status().isForbidden());
         }

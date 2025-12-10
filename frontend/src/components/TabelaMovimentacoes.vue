@@ -2,19 +2,19 @@
   <div class="mt-4">
     <h4>Movimentações do Processo</h4>
     <div
-      v-if="movimentacoes.length === 0"
-      class="alert alert-info"
+        v-if="movimentacoes.length === 0"
+        class="alert alert-info"
     >
       Nenhuma movimentação registrada para este subprocesso.
     </div>
     <BTable
-      v-else
-      striped
-      :items="movimentacoes"
-      :fields="fields"
-      primary-key="codigo"
-      data-testid="tbl-movimentacoes"
-      :tbody-tr-attr="rowAttr"
+        v-else
+        :fields="fields"
+        :items="movimentacoes"
+        :tbody-tr-attr="rowAttr"
+        data-testid="tbl-movimentacoes"
+        primary-key="codigo"
+        striped
     >
       <template #cell(dataHora)="data">
         {{ formatDateTimeBR(data.item.dataHora) }}
@@ -42,7 +42,7 @@ const fields = ref([
 
 const rowAttr = (item: Movimentacao | null, type: string) => {
   if (item && type === 'row') {
-    return { 'data-testid': `row-movimentacao-${item.codigo}` };
+    return {'data-testid': `row-movimentacao-${item.codigo}`};
   }
   return {};
 };

@@ -1,21 +1,21 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrarModal"
-    title="Alterar data limite"
-    centered
-    hide-footer
-    @hide="$emit('fecharModal')"
+      :fade="false"
+      :model-value="mostrarModal"
+      centered
+      hide-footer
+      title="Alterar data limite"
+      @hide="$emit('fecharModal')"
   >
     <BFormGroup
-      label="Nova data limite"
-      description="Selecione uma data futura"
+        description="Selecione uma data futura"
+        label="Nova data limite"
     >
       <BFormInput
-        v-model="novaDataLimite"
-        type="date"
-        :min="dataLimiteMinima"
-        data-testid="input-nova-data-limite"
+          v-model="novaDataLimite"
+          :min="dataLimiteMinima"
+          data-testid="input-nova-data-limite"
+          type="date"
       />
       <template #description>
         Data limite atual: {{ dataLimiteAtualFormatada }}
@@ -24,20 +24,20 @@
 
     <template #footer>
       <BButton
-        variant="secondary"
-        data-testid="subprocesso-modal__btn-modal-cancelar"
-        @click="$emit('fecharModal')"
+          data-testid="subprocesso-modal__btn-modal-cancelar"
+          variant="secondary"
+          @click="$emit('fecharModal')"
       >
-        <i class="bi bi-x-circle me-1" />
+        <i class="bi bi-x-circle me-1"/>
         Cancelar
       </BButton>
       <BButton
-        variant="primary"
-        :disabled="!novaDataLimite || !isDataValida"
-        data-testid="btn-modal-confirmar"
-        @click="$emit('confirmarAlteracao', novaDataLimite)"
+          :disabled="!novaDataLimite || !isDataValida"
+          data-testid="btn-modal-confirmar"
+          variant="primary"
+          @click="$emit('confirmarAlteracao', novaDataLimite)"
       >
-        <i class="bi bi-check-circle me-1" />
+        <i class="bi bi-check-circle me-1"/>
         Confirmar
       </BButton>
     </template>

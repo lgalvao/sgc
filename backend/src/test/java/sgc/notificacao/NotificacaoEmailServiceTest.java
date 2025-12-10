@@ -24,11 +24,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
-    @Mock private JavaMailSender enviadorDeEmail;
+    @Mock
+    private JavaMailSender enviadorDeEmail;
 
-    @Mock private NotificacaoRepo repositorioNotificacao;
+    @Mock
+    private NotificacaoRepo repositorioNotificacao;
 
-    @InjectMocks private NotificacaoEmailService notificacaoServico;
+    @InjectMocks
+    private NotificacaoEmailService notificacaoServico;
 
     private MimeMessage mimeMessageReal;
 

@@ -1,13 +1,18 @@
 # Mappers (Mapeadores de Dados)
+
 Última atualização: 2025-12-04 14:18:38Z
 
-Este diretório contém funções puras responsáveis por transformar dados entre o formato da API (DTOs do Backend) e o formato utilizado internamente pelo Frontend (Interfaces TypeScript e Stores).
+Este diretório contém funções puras responsáveis por transformar dados entre o formato da API (DTOs do Backend) e o
+formato utilizado internamente pelo Frontend (Interfaces TypeScript e Stores).
 
 ## Por que usar Mappers?
 
-1.  **Desacoplamento:** Isola o frontend de mudanças na estrutura da API. Se o backend mudar o nome de um campo, basta ajustar o mapper, sem precisar caçar todas as referências nos componentes.
-2.  **Formatação:** Permite formatar dados (como datas e moedas) logo na entrada, garantindo que os componentes recebam dados prontos para exibição.
-3.  **Tipagem:** Garante que os objetos manipulados no frontend estejam estritamente tipados de acordo com as interfaces do TypeScript.
+1. **Desacoplamento:** Isola o frontend de mudanças na estrutura da API. Se o backend mudar o nome de um campo, basta
+   ajustar o mapper, sem precisar caçar todas as referências nos componentes.
+2. **Formatação:** Permite formatar dados (como datas e moedas) logo na entrada, garantindo que os componentes recebam
+   dados prontos para exibição.
+3. **Tipagem:** Garante que os objetos manipulados no frontend estejam estritamente tipados de acordo com as interfaces
+   do TypeScript.
 
 ## Arquivos Disponíveis
 

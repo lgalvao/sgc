@@ -20,8 +20,8 @@ async function verificarPaginaSubprocesso(page: Page) {
 async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
     // Se cair na lista de unidades, clica na unidade do Chefe
-    if (await page.getByRole('heading', { name: /Unidades participantes/i }).isVisible()) {
-         await page.getByRole('row', {name: 'Seção 221'}).click();
+    if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
+        await page.getByRole('row', {name: 'Seção 221'}).click();
     }
 }
 
@@ -35,12 +35,12 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     let processoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
+    test.beforeAll(async ({request}) => {
         await resetDatabase(request);
         cleanup = useProcessoCleanup();
     });
 
-    test.afterAll(async ({ request }) => await cleanup.limpar(request));
+    test.afterAll(async ({request}) => await cleanup.limpar(request));
 
     test('Preparacao: Admin cria e inicia processo', async ({page}) => {
         await page.goto('/login');
@@ -61,7 +61,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Wait for data to load to avoid race condition where fields are empty
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        
+
         // Capturar ID do processo para cleanup
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanup.registrar(processoId);
@@ -92,7 +92,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
         // Verificar que modal de pendências ABRE (validação no backend retornou erro)
-        const modalPendencias = page.locator('.modal-content').filter({ hasText: 'Pendências para disponibilização' });
+        const modalPendencias = page.locator('.modal-content').filter({hasText: 'Pendências para disponibilização'});
         await expect(modalPendencias).toBeVisible();
         await expect(modalPendencias.getByText(/Corrija as seguintes pendências/i)).toBeVisible();
         await expect(modalPendencias.getByText(/Atividade sem conhecimento/i)).toBeVisible();
@@ -178,9 +178,9 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-cad-atividades-historico').click();
 
         // Verificar conteúdo do modal
-        const modal = page.locator('.modal-content').filter({ hasText: 'Histórico de Análise' });
+        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
         await expect(modal).toBeVisible();
-        
+
         // Assumindo que é a primeira linha ou única
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Faltou detalhar melhor os conhecimentos técnicos.');

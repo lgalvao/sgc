@@ -32,11 +32,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
 
-    @MockitoBean private SubprocessoService subprocessoService;
-    @MockitoBean private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean private UnidadeService unidadeService;
+    @MockitoBean
+    private SubprocessoService subprocessoService;
+    @MockitoBean
+    private SubprocessoDtoService subprocessoDtoService;
+    @MockitoBean
+    private UnidadeService unidadeService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     @DisplayName("listar deve retornar lista de subprocessos")

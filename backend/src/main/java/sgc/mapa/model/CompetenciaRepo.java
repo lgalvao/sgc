@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/** Repositório JPA para a entidade Competencia. */
+/**
+ * Repositório JPA para a entidade Competencia.
+ */
 @Repository
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
     /**

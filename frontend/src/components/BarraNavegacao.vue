@@ -1,30 +1,30 @@
 <template>
   <div class="d-flex align-items-center gap-3">
     <BButton
-      v-if="shouldShowBackButton"
-      class="btn btn-outline-secondary btn-sm"
-      data-testid="btn-nav-voltar"
-      @click="goBack"
+        v-if="shouldShowBackButton"
+        class="btn btn-outline-secondary btn-sm"
+        data-testid="btn-nav-voltar"
+        @click="goBack"
     >
-      <i class="bi bi-arrow-left" /> Voltar
+      <i class="bi bi-arrow-left"/> Voltar
     </BButton>
 
     <BBreadcrumb
-      v-if="shouldShowBreadcrumbs"
-      class="mb-0"
-      data-testid="nav-breadcrumbs"
+        v-if="shouldShowBreadcrumbs"
+        class="mb-0"
+        data-testid="nav-breadcrumbs"
     >
       <BBreadcrumbItem
-        v-for="(crumb, index) in crumbs"
-        :key="index"
-        :active="index === crumbs.length - 1"
-        :to="crumb.to"
+          v-for="(crumb, index) in crumbs"
+          :key="index"
+          :active="index === crumbs.length - 1"
+          :to="crumb.to"
       >
         <i
-          v-if="crumb.isHome"
-          aria-label="Início"
-          class="bi bi-house-door"
-          data-testid="btn-nav-home"
+            v-if="crumb.isHome"
+            aria-label="Início"
+            class="bi bi-house-door"
+            data-testid="btn-nav-home"
         />
         <span v-else>{{ crumb.label }}</span>
       </BBreadcrumbItem>
@@ -113,9 +113,11 @@ const crumbs = computed((): Breadcrumb[] => {
 .breadcrumb {
   --bs-breadcrumb-divider: '›';
 }
+
 .breadcrumb-item a {
   text-decoration: none;
 }
+
 .breadcrumb-item.active {
   font-weight: bold;
 }

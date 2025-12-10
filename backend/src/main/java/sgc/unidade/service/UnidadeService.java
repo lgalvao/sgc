@@ -165,7 +165,7 @@ public class UnidadeService {
                             u.getTipo().name(),
                             new ArrayList<>(),
                             true // isElegivel: Set to true by default for now
-                            );
+                    );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
         }

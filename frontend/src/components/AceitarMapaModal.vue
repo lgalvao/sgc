@@ -1,34 +1,34 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrarModal"
-    :title="tituloModal"
-    :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
-    header-text-variant="white"
-    centered
-    hide-footer
-    @hide="$emit('fecharModal')"
+      :fade="false"
+      :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
+      :model-value="mostrarModal"
+      :title="tituloModal"
+      centered
+      header-text-variant="white"
+      hide-footer
+      @hide="$emit('fecharModal')"
   >
     <div data-testid="body-aceite-mapa">
       <p v-if="perfil === 'ADMIN'">
         {{ corpoModal }}
       </p>
       <div
-        v-else
-        class="mb-3"
+          v-else
+          class="mb-3"
       >
         <label
-          for="observacao-textarea"
-          class="form-label"
+            class="form-label"
+            for="observacao-textarea"
         >
           Observações <span class="text-muted small">(opcional)</span>
         </label>
         <BFormTextarea
-          id="observacao-textarea"
-          v-model="observacao"
-          rows="4"
-          placeholder="Digite suas observações sobre o mapa..."
-          data-testid="inp-aceite-mapa-obs"
+            id="observacao-textarea"
+            v-model="observacao"
+            data-testid="inp-aceite-mapa-obs"
+            placeholder="Digite suas observações sobre o mapa..."
+            rows="4"
         />
         <div class="form-text">
           As observações serão registradas junto com a validação do mapa.
@@ -38,19 +38,19 @@
 
     <template #footer>
       <BButton
-        variant="secondary"
-        data-testid="btn-aceite-mapa-cancelar"
-        @click="$emit('fecharModal')"
+          data-testid="btn-aceite-mapa-cancelar"
+          variant="secondary"
+          @click="$emit('fecharModal')"
       >
-        <i class="bi bi-x-circle me-1" />
+        <i class="bi bi-x-circle me-1"/>
         Cancelar
       </BButton>
       <BButton
-        variant="success"
-        data-testid="btn-aceite-mapa-confirmar"
-        @click="$emit('confirmarAceitacao', observacao)"
+          data-testid="btn-aceite-mapa-confirmar"
+          variant="success"
+          @click="$emit('confirmarAceitacao', observacao)"
       >
-        <i class="bi bi-check-circle me-1" />
+        <i class="bi bi-check-circle me-1"/>
         Aceitar
       </BButton>
     </template>

@@ -49,16 +49,25 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String OBS_LITERAL = "Obs";
     private static final String SEDOC_LITERAL = "SEDOC";
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private AlertaRepo alertaRepo;
-    @Autowired private AnaliseRepo analiseRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
     private Unidade unidade;
     private Subprocesso subprocesso;

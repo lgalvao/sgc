@@ -48,6 +48,19 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
     private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new java.util.HashSet<>();
 
+    public Usuario(
+            String tituloEleitoral,
+            String nome,
+            String email,
+            String ramal,
+            Unidade unidadeLotacao) {
+        this.tituloEleitoral = tituloEleitoral;
+        this.nome = nome;
+        this.email = email;
+        this.ramal = ramal;
+        this.unidadeLotacao = unidadeLotacao;
+    }
+
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
         Set<UsuarioPerfil> todas = new java.util.HashSet<>(atribuicoes);
         LocalDateTime now = LocalDateTime.now();
@@ -55,7 +68,7 @@ public class Usuario implements UserDetails {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                 if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now))
                         && (temp.getDataTermino() == null
-                                || !temp.getDataTermino().isBefore(now))) {
+                        || !temp.getDataTermino().isBefore(now))) {
                     todas.add(new UsuarioPerfil(null, this, temp.getUnidade(), temp.getPerfil()));
                 }
             }
@@ -92,19 +105,6 @@ public class Usuario implements UserDetails {
     @Override
     public String getUsername() {
         return tituloEleitoral;
-    }
-
-    public Usuario(
-            String tituloEleitoral,
-            String nome,
-            String email,
-            String ramal,
-            Unidade unidadeLotacao) {
-        this.tituloEleitoral = tituloEleitoral;
-        this.nome = nome;
-        this.email = email;
-        this.ramal = ramal;
-        this.unidadeLotacao = unidadeLotacao;
     }
 
     @Override

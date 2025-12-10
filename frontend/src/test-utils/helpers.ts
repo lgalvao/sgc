@@ -41,7 +41,7 @@ export async function prepareFreshAtividadesStore() {
     const {useAtividadesStore: useAtividadesStoreActual} =
         (await vi.importActual("../stores/atividades")) as {
             useAtividadesStore: () => any;
-    };
+        };
     const store = useAtividadesStoreActual();
     const initialAtividades = getMockAtividadesData();
     store.atividades = initialAtividades.map((a: Atividade) => ({

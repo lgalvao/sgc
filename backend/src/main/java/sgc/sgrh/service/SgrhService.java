@@ -139,8 +139,8 @@ public class SgrhService {
                                                         a ->
                                                                 a.getPerfil() == Perfil.CHEFE
                                                                         && unidadesCodigos.contains(
-                                                                                a.getUnidade()
-                                                                                        .getCodigo()))
+                                                                        a.getUnidade()
+                                                                                .getCodigo()))
                                                 .map(
                                                         a ->
                                                                 new AbstractMap.SimpleEntry<>(
@@ -189,8 +189,8 @@ public class SgrhService {
                                                 a ->
                                                         a.getPerfil().name().equals(perfil)
                                                                 && a.getUnidade()
-                                                                        .getCodigo()
-                                                                        .equals(unidadeCodigo)))
+                                                                .getCodigo()
+                                                                .equals(unidadeCodigo)))
                 .orElse(false);
     }
 

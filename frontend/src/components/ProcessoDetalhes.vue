@@ -1,15 +1,15 @@
 <template>
   <div>
     <BBadge
-      variant="secondary"
-      class="mb-2"
-      style="border-radius: 0"
+        class="mb-2"
+        style="border-radius: 0"
+        variant="secondary"
     >
       Detalhes do processo
     </BBadge>
     <h2
-      class="display-6"
-      data-testid="processo-info"
+        class="display-6"
+        data-testid="processo-info"
     >
       {{ descricao }}
     </h2>

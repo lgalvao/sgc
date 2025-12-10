@@ -41,14 +41,21 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubprocessoMapaWorkflowServiceTest {
 
-    @Mock private SubprocessoRepo repositorioSubprocesso;
-    @Mock private CompetenciaRepo repositorioCompetencia;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private MapaService mapaService;
-    @Mock private CompetenciaService competenciaService;
-    @Mock private ApplicationEventPublisher publicadorDeEventos;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private CompetenciaRepo repositorioCompetencia;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private MapaService mapaService;
+    @Mock
+    private CompetenciaService competenciaService;
+    @Mock
+    private ApplicationEventPublisher publicadorDeEventos;
 
-    @InjectMocks private SubprocessoMapaWorkflowService service;
+    @InjectMocks
+    private SubprocessoMapaWorkflowService service;
 
     @Test
     @DisplayName("salvarMapaSubprocesso sucesso transição estado")
@@ -153,9 +160,9 @@ class SubprocessoMapaWorkflowServiceTest {
         when(repositorioCompetencia.findByMapaCodigo(10L)).thenReturn(List.of(comp));
 
         assertThatThrownBy(
-                        () ->
-                                service.disponibilizarMapa(
-                                        id, new DisponibilizarMapaRequest(), new Usuario()))
+                () ->
+                        service.disponibilizarMapa(
+                                id, new DisponibilizarMapaRequest(), new Usuario()))
                 .isInstanceOf(ErroValidacao.class);
     }
 }

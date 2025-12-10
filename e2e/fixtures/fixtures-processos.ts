@@ -28,15 +28,15 @@ export interface ProcessoFixtureOptions {
 
 /**
  * Cria um processo de mapeamento via API E2E (mais rápido que navegação UI).
- * 
+ *
  * NOTA: Esta função requer que o endpoint `/e2e/fixtures/processo-mapeamento`
  * esteja implementado no backend. Se o endpoint não existir, use a criação
  * via UI com `criarProcesso()` do helpers-processos.ts.
- * 
+ *
  * @param request - Contexto de requisição do Playwright
  * @param options - Opções de configuração do processo
  * @returns Dados do processo criado
- * 
+ *
  * @example
  * ```typescript
  * test('Deve exibir processo iniciado', async ({ page, request }) => {
@@ -45,10 +45,10 @@ export interface ProcessoFixtureOptions {
  *         unidade: 'ASSESSORIA_11',
  *         iniciar: true
  *     });
- *     
+ *
  *     // Navegar diretamente para a tela
  *     await page.goto(`/processo/${processo.codigo}`);
- *     
+ *
  *     // Validar
  *     await expect(page.getByText('Em andamento')).toBeVisible();
  * });
@@ -59,10 +59,10 @@ export async function criarProcessoFixture(
     options: ProcessoFixtureOptions
 ): Promise<ProcessoFixture> {
     const tipo = options.tipo ?? 'MAPEAMENTO';
-    const endpoint = tipo === 'MAPEAMENTO' 
+    const endpoint = tipo === 'MAPEAMENTO'
         ? '/e2e/fixtures/processo-mapeamento'
         : '/e2e/fixtures/processo-revisao';
-    
+
     const response = await request.post(`http://localhost:10000${endpoint}`, {
         data: {
             unidadeSigla: options.unidade,
@@ -71,21 +71,21 @@ export async function criarProcessoFixture(
             diasLimite: options.diasLimite ?? 30
         }
     });
-    
+
     if (!response.ok()) {
         throw new Error(
             `Falha ao criar processo fixture: ${response.status()} ${response.statusText()}\n` +
             `Endpoint ${endpoint} pode não estar implementado no backend.`
         );
     }
-    
+
     return await response.json();
 }
 
 /**
  * Cria múltiplos processos de uma vez.
  * Útil para testes que precisam de vários processos.
- * 
+ *
  * @example
  * ```typescript
  * const processos = await criarProcessosEmLote(request, [
@@ -106,7 +106,7 @@ export async function criarProcessosEmLote(
 
 /**
  * Remove um processo via API E2E (cleanup).
- * 
+ *
  * @example
  * ```typescript
  * test.afterEach(async ({ request }) => {
@@ -123,7 +123,7 @@ export async function removerProcesso(
     const response = await request.post(
         `http://localhost:10000/e2e/processo/${codigo}/limpar`
     );
-    
+
     if (!response.ok()) {
         console.warn(`Falha ao remover processo ${codigo}: ${response.status()}`);
     }

@@ -1,34 +1,34 @@
 <template>
   <div>
     <div
-      v-if="mostrarBotoesBloco"
-      class="mt-3 d-flex gap-2"
+        v-if="mostrarBotoesBloco"
+        class="mt-3 d-flex gap-2"
     >
       <BButton
-        v-if="perfil === 'GESTOR'"
-        variant="outline-primary"
-        data-testid="btn-acao-bloco-aceitar"
-        @click="emit('aceitarBloco')"
+          v-if="perfil === 'GESTOR'"
+          data-testid="btn-acao-bloco-aceitar"
+          variant="outline-primary"
+          @click="emit('aceitarBloco')"
       >
-        <i class="bi bi-check-circle me-1" />
+        <i class="bi bi-check-circle me-1"/>
         Aceitar em bloco
       </BButton>
       <BButton
-        v-if="perfil === 'ADMIN'"
-        variant="outline-success"
-        data-testid="btn-acao-bloco-homologar"
-        @click="emit('homologarBloco')"
+          v-if="perfil === 'ADMIN'"
+          data-testid="btn-acao-bloco-homologar"
+          variant="outline-success"
+          @click="emit('homologarBloco')"
       >
-        <i class="bi bi-check-all me-1" />
+        <i class="bi bi-check-all me-1"/>
         Homologar em bloco
       </BButton>
     </div>
     <BButton
-      v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
-      variant="danger"
-      class="mt-3"
-      data-testid="btn-processo-finalizar"
-      @click="emit('finalizar')"
+        v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
+        class="mt-3"
+        data-testid="btn-processo-finalizar"
+        variant="danger"
+        @click="emit('finalizar')"
     >
       Finalizar processo
     </BButton>

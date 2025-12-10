@@ -53,7 +53,7 @@ public class SubprocessoMapaWorkflowService {
         if (eraVazio
                 && temNovasCompetencias
                 && subprocesso.getSituacao()
-                        == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+                == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             repositorioSubprocesso.save(subprocesso);
             log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", codSubprocesso);

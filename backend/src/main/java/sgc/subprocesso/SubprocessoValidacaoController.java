@@ -38,7 +38,7 @@ public class SubprocessoValidacaoController {
      *
      * <p>Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo observações e a data limite para a etapa.
      * @param usuario O usuário autenticado (administrador) que realiza a ação.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
@@ -58,7 +58,7 @@ public class SubprocessoValidacaoController {
     /**
      * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o texto das sugestões.
      * @param usuario O usuário autenticado que está enviando as sugestões.
      */
@@ -75,7 +75,7 @@ public class SubprocessoValidacaoController {
     /**
      * Registra a validação de um mapa de competências pelo responsável da unidade.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado (chefe da unidade) que está validando.
      */
     @PostMapping("/{codigo}/validar-mapa")
@@ -112,7 +112,7 @@ public class SubprocessoValidacaoController {
      * Devolve a validação de um mapa para a unidade de negócio responsável para que sejam feitos
      * ajustes.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo a justificativa da devolução.
      * @param usuario O usuário autenticado que está realizando a devolução.
      */
@@ -129,7 +129,7 @@ public class SubprocessoValidacaoController {
      * Aceita a validação de um mapa, movendo o subprocesso para a próxima etapa de análise
      * hierárquica.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado que está aceitando a validação.
      */
     @PostMapping("/{codigo}/aceitar-validacao")
@@ -144,7 +144,7 @@ public class SubprocessoValidacaoController {
      *
      * <p>Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado (administrador) que realiza a homologação.
      */
     @PostMapping("/{codigo}/homologar-validacao")
@@ -158,7 +158,7 @@ public class SubprocessoValidacaoController {
     /**
      * Submete a versão ajustada de um mapa para uma nova rodada de validação.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações e a nova data limite da etapa.
      * @param usuario O usuário autenticado que está submetendo os ajustes.
      */

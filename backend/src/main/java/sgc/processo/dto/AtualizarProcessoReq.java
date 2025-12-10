@@ -14,7 +14,9 @@ import sgc.processo.model.TipoProcesso;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** DTO usado para atualizar um processo existente. */
+/**
+ * DTO usado para atualizar um processo existente.
+ */
 @Data
 @Builder
 @NoArgsConstructor

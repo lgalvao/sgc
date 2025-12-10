@@ -51,19 +51,26 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSO_MAPA_AJUSTE =
             "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
-    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
 
-    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -111,8 +118,8 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                        "/api/subprocessos/{id}/submeter-mapa-ajustado",
-                                        subprocesso.getCodigo())
+                                "/api/subprocessos/{id}/submeter-mapa-ajustado",
+                                subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

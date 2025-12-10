@@ -1,9 +1,10 @@
 param(
-    [Parameter(Position=0)]
+    [Parameter(Position = 0)]
     [string]$Action
 )
 
-function Show-Help {
+function Show-Help
+{
     Write-Output "Usage: .\quality-check.ps1 [OPTION]"
     Write-Output "Options:"
     Write-Output "  all       Run all quality checks (Backend + Frontend)"
@@ -13,19 +14,22 @@ function Show-Help {
     Write-Output "  help      Show this help message"
 }
 
-if ([string]::IsNullOrWhiteSpace($Action)) {
+if ( [string]::IsNullOrWhiteSpace($Action))
+{
     Show-Help
     exit 1
 }
 
 $gradlew = ".\gradlew.bat"
 
-if (-not (Test-Path $gradlew)) {
+if (-not (Test-Path $gradlew))
+{
     Write-Error "Error: $gradlew not found in the current directory."
     exit 1
 }
 
-switch ($Action) {
+switch ($Action)
+{
     "all" {
         Write-Output "Running all quality checks..."
         & $gradlew qualityCheckAll

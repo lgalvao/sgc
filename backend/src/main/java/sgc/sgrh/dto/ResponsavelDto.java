@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** DTO para dados de responsável (titular/substituto) de uma unidade. */
+/**
+ * DTO para dados de responsável (titular/substituto) de uma unidade.
+ */
 @Data
 @Builder
 @NoArgsConstructor

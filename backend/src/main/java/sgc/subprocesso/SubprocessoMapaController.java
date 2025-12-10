@@ -100,15 +100,15 @@ public class SubprocessoMapaController {
     @Operation(summary = "Lista todas as atividades de um subprocesso")
     public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
-        List<AtividadeVisualizacaoDto> atividades = 
-            subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso);
+        List<AtividadeVisualizacaoDto> atividades =
+                subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso);
         return ResponseEntity.ok(atividades);
     }
 
     /**
      * Salva as alterações feitas no mapa de um subprocesso.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as alterações do mapa.
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
@@ -136,7 +136,7 @@ public class SubprocessoMapaController {
     /**
      * Salva os ajustes realizados em um mapa após a fase de validação.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as competências ajustadas.
      */
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
@@ -173,7 +173,7 @@ public class SubprocessoMapaController {
      *
      * <p>Corresponde ao CDU-15.
      *
-     * @param codigo O código do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO com a estrutura completa do mapa a ser salvo.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
@@ -229,9 +229,6 @@ public class SubprocessoMapaController {
                         codigo, codCompetencia, extractTituloUsuario(principal));
         return ResponseEntity.ok(mapa);
     }
-
-
-
 
 
     private String extractTituloUsuario(Object principal) {

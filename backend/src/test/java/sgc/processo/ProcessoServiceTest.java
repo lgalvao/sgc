@@ -55,19 +55,31 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ProcessoServiceTest {
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private ApplicationEventPublisher publicadorEventos;
-    @Mock private ProcessoMapper processoMapper;
-    @Mock private ProcessoDetalheMapper processoDetalheMapper;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock private CopiaMapaService servicoDeCopiaDeMapa;
-    @Mock private ProcessoNotificacaoService processoNotificacaoService;
-    @Mock private SgrhService sgrhService;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private ApplicationEventPublisher publicadorEventos;
+    @Mock
+    private ProcessoMapper processoMapper;
+    @Mock
+    private ProcessoDetalheMapper processoDetalheMapper;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private CopiaMapaService servicoDeCopiaDeMapa;
+    @Mock
+    private ProcessoNotificacaoService processoNotificacaoService;
+    @Mock
+    private SgrhService sgrhService;
 
-    @InjectMocks private ProcessoService processoService;
+    @InjectMocks
+    private ProcessoService processoService;
 
     @Test
     @DisplayName("Criar processo deve persistir e publicar evento")

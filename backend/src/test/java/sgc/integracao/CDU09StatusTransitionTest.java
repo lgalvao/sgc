@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration test to isolate and verify the status transition bug:
  * When an activity is added to a subprocess in NAO_INICIADO state,
  * it should automatically transition to MAPEAMENTO_CADASTRO_EM_ANDAMENTO.
- * 
+ * <p>
  * This reproduces the issue from E2E test cdu-09.spec.ts.
  */
 @DisplayName("CDU-09 Status Transition Bug Test")
@@ -36,7 +36,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessoService processoService;
-    
+
     @Autowired
     private AtividadeService atividadeService;
 
@@ -47,42 +47,42 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
         // Using SESEL (unit 10) which has titular 333333333333 from data.sql
         Long unitCodigo = 10L;
         String titularTitulo = "333333333333";
-        
+
         Unidade unidade = unidadeRepo.findById(unitCodigo)
-            .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
-        
+                .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
+
         assertThat(unidade.getTitular()).isNotNull();
         assertThat(unidade.getTitular().getTituloEleitoral()).isEqualTo(titularTitulo);
-        
+
         // GIVEN: A MAPEAMENTO process is created and started for this unit
         Processo processo = new Processo()
-            .setDescricao("Test Process for Status Transition")
-            .setTipo(TipoProcesso.MAPEAMENTO)
-            .setSituacao(SituacaoProcesso.CRIADO)
-            .setDataCriacao(LocalDateTime.now())
-            .setDataLimite(LocalDateTime.now().plusDays(30))
-            .setParticipantes(Set.of(unidade));
-        
+                .setDescricao("Test Process for Status Transition")
+                .setTipo(TipoProcesso.MAPEAMENTO)
+                .setSituacao(SituacaoProcesso.CRIADO)
+                .setDataCriacao(LocalDateTime.now())
+                .setDataLimite(LocalDateTime.now().plusDays(30))
+                .setParticipantes(Set.of(unidade));
+
         Processo savedProcesso = processoRepo.saveAndFlush(processo);
-        
+
         // Start the process - this creates subprocesses
         processoService.iniciarProcessoMapeamento(savedProcesso.getCodigo(), List.of(unitCodigo));
-        
+
         // VERIFY: Subprocess exists with NAO_INICIADO status
         Subprocesso subprocesso = subprocessoRepo.findByProcessoCodigoWithUnidade(savedProcesso.getCodigo())
-            .stream()
-            .filter(sp -> sp.getUnidade().getCodigo().equals(unitCodigo))
-            .findFirst()
-            .orElseThrow(() -> new AssertionError("Subprocess not found for unit: " + unitCodigo));
-        
+                .stream()
+                .filter(sp -> sp.getUnidade().getCodigo().equals(unitCodigo))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Subprocess not found for unit: " + unitCodigo));
+
         assertThat(subprocesso.getSituacao())
-            .as("Initial subprocess status should be NAO_INICIADO")
-            .isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
-        
+                .as("Initial subprocess status should be NAO_INICIADO")
+                .isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+
         assertThat(subprocesso.getMapa())
-            .as("Subprocess should have a mapa associated")
-            .isNotNull();
-        
+                .as("Subprocess should have a mapa associated")
+                .isNotNull();
+
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
         System.out.println("=== TEST INFO ===");
         System.out.println("Subprocess ID: " + subprocesso.getCodigo());
@@ -90,81 +90,81 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
         System.out.println("Initial Status: " + subprocesso.getSituacao());
         System.out.println("Titular: " + titularTitulo);
         System.out.println("=================");
-        
+
         // WHEN: The titular creates an activity
         AtividadeDto novaAtividade = new AtividadeDto();
         novaAtividade.setDescricao("Test Activity for Status Transition");
         novaAtividade.setMapaCodigo(mapaCodigo);
-        
+
         AtividadeDto atividadeCriada = atividadeService.criar(novaAtividade, titularTitulo);
-        
+
         assertThat(atividadeCriada).isNotNull();
         assertThat(atividadeCriada.getCodigo()).isNotNull();
         System.out.println("Created Activity ID: " + atividadeCriada.getCodigo());
-        
+
         // THEN: Subprocess status should have changed to MAPEAMENTO_CADASTRO_EM_ANDAMENTO
         // Re-fetch the subprocess to get updated status
         Subprocesso updatedSubprocesso = subprocessoRepo.findById(subprocesso.getCodigo())
-            .orElseThrow(() -> new AssertionError("Subprocess not found after activity creation"));
-        
+                .orElseThrow(() -> new AssertionError("Subprocess not found after activity creation"));
+
         System.out.println("Updated Status: " + updatedSubprocesso.getSituacao());
-        
+
         assertThat(updatedSubprocesso.getSituacao())
-            .as("Status should transition to MAPEAMENTO_CADASTRO_EM_ANDAMENTO after activity is added")
-            .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                .as("Status should transition to MAPEAMENTO_CADASTRO_EM_ANDAMENTO after activity is added")
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
-    
+
     @Test
     @DisplayName("Adding activity via API endpoint should also transition status")
     void shouldTransitionStatusWhenActivityIsAddedViaApi() throws Exception {
         // GIVEN: Same setup as above
         Long unitCodigo = 10L;
 
-        
+
         Unidade unidade = unidadeRepo.findById(unitCodigo)
-            .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
-        
+                .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
+
         // Create and start process
         Processo processo = new Processo()
-            .setDescricao("Test API Process for Status Transition")
-            .setTipo(TipoProcesso.MAPEAMENTO)
-            .setSituacao(SituacaoProcesso.CRIADO)
-            .setDataCriacao(LocalDateTime.now())
-            .setDataLimite(LocalDateTime.now().plusDays(30))
-            .setParticipantes(Set.of(unidade));
-        
+                .setDescricao("Test API Process for Status Transition")
+                .setTipo(TipoProcesso.MAPEAMENTO)
+                .setSituacao(SituacaoProcesso.CRIADO)
+                .setDataCriacao(LocalDateTime.now())
+                .setDataLimite(LocalDateTime.now().plusDays(30))
+                .setParticipantes(Set.of(unidade));
+
         Processo savedProcesso = processoRepo.saveAndFlush(processo);
         processoService.iniciarProcessoMapeamento(savedProcesso.getCodigo(), List.of(unitCodigo));
-        
+
         Subprocesso subprocesso = subprocessoRepo.findByProcessoCodigoWithUnidade(savedProcesso.getCodigo())
-            .stream()
-            .filter(sp -> sp.getUnidade().getCodigo().equals(unitCodigo))
-            .findFirst()
-            .orElseThrow();
-        
+                .stream()
+                .filter(sp -> sp.getUnidade().getCodigo().equals(unitCodigo))
+                .findFirst()
+                .orElseThrow();
+
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
-        
+
         // WHEN: Activity is created via API
         String requestBody = """
-            {
-                "descricao": "API Test Activity",
-                "mapaCodigo": %d
-            }
-            """.formatted(mapaCodigo);
-        
+                {
+                    "descricao": "API Test Activity",
+                    "mapaCodigo": %d
+                }
+                """.formatted(mapaCodigo);
+
         Usuario titular = unidade.getTitular();
-        
+
         mockMvc.perform(post("/api/atividades")
-                .with(user(titular))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-            .andExpect(status().isCreated());
-        
+                        .with(user(titular))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated());
+
         // THEN: Status should have transitioned
         Subprocesso updatedSubprocesso = subprocessoRepo.findById(subprocesso.getCodigo())
-            .orElseThrow();
-        
+                .orElseThrow();
+
         assertThat(updatedSubprocesso.getSituacao())
-            .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 }

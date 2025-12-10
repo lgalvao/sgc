@@ -2,7 +2,7 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,39 +12,47 @@
             padding: 0;
             background-color: #f4f4f4;
         }
+
         .container {
             max-width: 600px;
             margin: 20px auto;
             background-color: #ffffff;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             background-color: #00aa00;
             color: white;
             padding: 30px 20px;
             text-align: center;
         }
+
         .header h1 {
             margin: 0;
             font-size: 24px;
             font-weight: normal;
         }
+
         .content {
             padding: 30px 20px;
             background-color: #ffffff;
         }
+
         .content p {
             margin: 10px 0;
         }
+
         .content ul, .content ol {
             margin: 10px 0;
             padding-left: 25px;
         }
+
         .content li {
             margin: 5px 0;
         }
+
         .footer {
             padding: 20px;
             font-size: 12px;
@@ -53,49 +61,52 @@
             border-top: 1px solid #e0e0e0;
             text-align: center;
         }
+
         .footer p {
             margin: 5px 0;
         }
+
         a {
             color: #00aa00;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 th:text="${titulo}">Processo Finalizado - Mapas Vigentes</h1>
-        </div>
-        <div class="content">
-            <p>O processo de mapeamento de competências foi finalizado com sucesso!</p>
-            <div style="background-color: #f0fff0; padding: 15px; margin: 15px 0; border-left: 4px solid #00aa00;">
-                <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
-                <p style="margin: 5px 0;"><strong>Data de finalização:</strong> <span th:text="${dataFinalizacao}"></span></p>
-                <p style="margin: 5px 0;"><strong>Mapas vigentes:</strong> <span th:text="${quantidadeMapas}"></span></p>
-            </div>
-            <p>Os Mapas de Competências estão agora oficialmente vigentes e disponíveis para consulta.</p>
-            <p><strong>Benefícios dos mapas:</strong></p>
-            <ul>
-                <li>Identificação clara das competências necessárias</li>
-                <li>Base para planejamento de capacitação</li>
-                <li>Apoio à gestão de pessoas</li>
-                <li>Diagnóstico de lacunas de competências</li>
-            </ul>
-            <p style="margin-top: 20px;">
-                <a href="https://sgc.tre-pe.jus.br"
-                   style="background-color: #00aa00; color: white; padding: 10px 20px;
-                          text-decoration: none; border-radius: 5px; display: inline-block;">
-                    Acessar Mapas
-                </a>
-            </p>
-        </div>
-        <div class="footer">
-            <p><strong>Sistema de Gestão de Competências - SGC</strong></p>
-            <p>TRE-PE - Tribunal Regional Eleitoral de Pernambuco</p>
-            <p style="margin-top: 10px; font-style: italic;">
-                Este é um e-mail automático. Por favor, não responda.
-            </p>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${titulo}">Processo Finalizado - Mapas Vigentes</h1>
     </div>
+    <div class="content">
+        <p>O processo de mapeamento de competências foi finalizado com sucesso!</p>
+        <div style="background-color: #f0fff0; padding: 15px; margin: 15px 0; border-left: 4px solid #00aa00;">
+            <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
+            <p style="margin: 5px 0;"><strong>Data de finalização:</strong> <span th:text="${dataFinalizacao}"></span>
+            </p>
+            <p style="margin: 5px 0;"><strong>Mapas vigentes:</strong> <span th:text="${quantidadeMapas}"></span></p>
+        </div>
+        <p>Os Mapas de Competências estão agora oficialmente vigentes e disponíveis para consulta.</p>
+        <p><strong>Benefícios dos mapas:</strong></p>
+        <ul>
+            <li>Identificação clara das competências necessárias</li>
+            <li>Base para planejamento de capacitação</li>
+            <li>Apoio à gestão de pessoas</li>
+            <li>Diagnóstico de lacunas de competências</li>
+        </ul>
+        <p style="margin-top: 20px;">
+            <a href="https://sgc.tre-pe.jus.br"
+               style="background-color: #00aa00; color: white; padding: 10px 20px;
+                          text-decoration: none; border-radius: 5px; display: inline-block;">
+                Acessar Mapas
+            </a>
+        </p>
+    </div>
+    <div class="footer">
+        <p><strong>Sistema de Gestão de Competências - SGC</strong></p>
+        <p>TRE-PE - Tribunal Regional Eleitoral de Pernambuco</p>
+        <p style="margin-top: 10px; font-style: italic;">
+            Este é um e-mail automático. Por favor, não responda.
+        </p>
+    </div>
+</div>
 </body>
 </html>

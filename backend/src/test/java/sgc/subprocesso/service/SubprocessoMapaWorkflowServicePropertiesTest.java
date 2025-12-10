@@ -31,15 +31,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubprocessoMapaWorkflowServicePropertiesTest {
 
-    record ServiceAndMocks(
-            SubprocessoMapaWorkflowService service,
-            SubprocessoRepo subprocessoRepo,
-            CompetenciaRepo competenciaRepo,
-            AtividadeRepo atividadeRepo,
-            MapaService mapaService,
-            CompetenciaService competenciaService,
-            ApplicationEventPublisher publisher) {}
-
     private ServiceAndMocks createService() {
         SubprocessoRepo subprocessoRepo = mock(SubprocessoRepo.class);
         CompetenciaRepo competenciaRepo = mock(CompetenciaRepo.class);
@@ -66,15 +57,6 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                 publisher);
     }
 
-    record MapaCenario(
-            Subprocesso subprocesso, List<Atividade> atividades, List<Competencia> competencias) {
-        @Override
-        public String toString() {
-            return String.format(
-                    "Atividades: %d, Competencias: %d", atividades.size(), competencias.size());
-        }
-    }
-
     @Property
     void deveAceitarMapaCompleto(@ForAll("cenarioValido") MapaCenario cenario) {
         var mocks = createService();
@@ -87,16 +69,16 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                 .thenReturn(cenario.atividades);
 
         assertThatCode(
-                        () ->
-                                mocks.service.disponibilizarMapa(
-                                        cenario.subprocesso.getCodigo(),
-                                        new DisponibilizarMapaRequest() {
-                                            {
-                                                setDataLimite(
-                                                        java.time.LocalDate.now().plusDays(1));
-                                            }
-                                        },
-                                        new Usuario()))
+                () ->
+                        mocks.service.disponibilizarMapa(
+                                cenario.subprocesso.getCodigo(),
+                                new DisponibilizarMapaRequest() {
+                                    {
+                                        setDataLimite(
+                                                java.time.LocalDate.now().plusDays(1));
+                                    }
+                                },
+                                new Usuario()))
                 .doesNotThrowAnyException();
     }
 
@@ -113,16 +95,16 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                 .thenReturn(cenario.atividades);
 
         assertThatThrownBy(
-                        () ->
-                                mocks.service.disponibilizarMapa(
-                                        cenario.subprocesso.getCodigo(),
-                                        new DisponibilizarMapaRequest() {
-                                            {
-                                                setDataLimite(
-                                                        java.time.LocalDate.now().plusDays(1));
-                                            }
-                                        },
-                                        new Usuario()))
+                () ->
+                        mocks.service.disponibilizarMapa(
+                                cenario.subprocesso.getCodigo(),
+                                new DisponibilizarMapaRequest() {
+                                    {
+                                        setDataLimite(
+                                                java.time.LocalDate.now().plusDays(1));
+                                    }
+                                },
+                                new Usuario()))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Todas as atividades devem estar associadas");
     }
@@ -138,16 +120,14 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                 .thenReturn(cenario.competencias);
 
         assertThatThrownBy(
-                        () ->
-                                mocks.service.disponibilizarMapa(
-                                        cenario.subprocesso.getCodigo(),
-                                        new DisponibilizarMapaRequest(),
-                                        new Usuario()))
+                () ->
+                        mocks.service.disponibilizarMapa(
+                                cenario.subprocesso.getCodigo(),
+                                new DisponibilizarMapaRequest(),
+                                new Usuario()))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Todas as competências devem estar associadas");
     }
-
-    // --- Geradores ---
 
     @Provide
     Arbitrary<MapaCenario> cenarioValido() {
@@ -180,6 +160,8 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
                                             });
                         });
     }
+
+    // --- Geradores ---
 
     @Provide
     Arbitrary<MapaCenario> cenarioComCompetenciaVazia() {
@@ -296,5 +278,24 @@ class SubprocessoMapaWorkflowServicePropertiesTest {
         sp.getMapa().setCodigo(10L);
         sp.setUnidade(new Unidade());
         return sp;
+    }
+
+    record ServiceAndMocks(
+            SubprocessoMapaWorkflowService service,
+            SubprocessoRepo subprocessoRepo,
+            CompetenciaRepo competenciaRepo,
+            AtividadeRepo atividadeRepo,
+            MapaService mapaService,
+            CompetenciaService competenciaService,
+            ApplicationEventPublisher publisher) {
+    }
+
+    record MapaCenario(
+            Subprocesso subprocesso, List<Atividade> atividades, List<Competencia> competencias) {
+        @Override
+        public String toString() {
+            return String.format(
+                    "Atividades: %d, Competencias: %d", atividades.size(), competencias.size());
+        }
     }
 }

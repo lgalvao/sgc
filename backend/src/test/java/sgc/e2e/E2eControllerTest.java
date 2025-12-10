@@ -21,13 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @ActiveProfiles("test")
 class E2eControllerTest {
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    @Autowired private DataSource dataSource;
+    @Autowired
+    private DataSource dataSource;
 
-    @Mock private ProcessoService processoService;
+    @Mock
+    private ProcessoService processoService;
 
-    @Mock private SgrhService sgrhService;
+    @Mock
+    private SgrhService sgrhService;
 
     private E2eController controller;
 

@@ -6,10 +6,10 @@ import * as service from "../painelService";
 
 vi.mock("@/axios-setup");
 vi.mock("@/mappers/processos", () => ({
-  mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
+    mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
 }));
 vi.mock("@/mappers/alertas", () => ({
-  mapAlertaDtoToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
+    mapAlertaDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
 }));
 
 describe("painelService", () => {
@@ -17,23 +17,23 @@ describe("painelService", () => {
     const mockProcessoMappers = vi.mocked(processoMappers);
     const mockAlertaMappers = vi.mocked(alertaMappers);
 
-  afterEach(() => {
-      vi.clearAllMocks();
-  });
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
 
     describe("listarProcessos", () => {
         it("should fetch and map processos", async () => {
             const dtoList = [{id: 1, tipo: "MAPEAMENTO"}];
-      const responseData = {
-        content: dtoList,
-        totalPages: 1,
-        totalElements: 1,
-        number: 0,
-        size: 20,
-        first: true,
-        last: true,
-        empty: false,
-      };
+            const responseData = {
+                content: dtoList,
+                totalPages: 1,
+                totalElements: 1,
+                number: 0,
+                size: 20,
+                first: true,
+                last: true,
+                empty: false,
+            };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
             const result = await service.listarProcessos("CHEFE", 1);

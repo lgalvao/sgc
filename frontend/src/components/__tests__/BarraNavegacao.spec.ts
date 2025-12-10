@@ -9,29 +9,29 @@ import BarraNavegacao from "../BarraNavegacao.vue";
 
 // Mock vue-router
 const mockRouter = {
-  back: vi.fn(),
+    back: vi.fn(),
 };
 vi.mock("vue-router", () => ({
-  useRoute: vi.fn(),
-  useRouter: () => mockRouter,
-  createRouter: vi.fn(() => ({
-    beforeEach: vi.fn(),
-    afterEach: vi.fn(),
-  })),
-  createWebHistory: vi.fn(),
+    useRoute: vi.fn(),
+    useRouter: () => mockRouter,
+    createRouter: vi.fn(() => ({
+        beforeEach: vi.fn(),
+        afterEach: vi.fn(),
+    })),
+    createWebHistory: vi.fn(),
 }));
 
 // Helper to create mock routes
 const createMockRoute = (path: string, matched: any[]) => ({
-  path,
-  matched,
+    path,
+    matched,
     params: {id: "123"},
     name: "",
-  fullPath: path,
-  query: {},
+    fullPath: path,
+    query: {},
     hash: "",
-  meta: {},
-  redirectedFrom: undefined,
+    meta: {},
+    redirectedFrom: undefined,
 });
 
 const mockMatchedDefault = [
@@ -51,9 +51,9 @@ const getMountOptions = (pinia: any) => ({
 });
 
 describe("BarraNavegacao.vue", () => {
-  beforeEach(() => {
-      vi.clearAllMocks();
-  });
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
     describe("Visibilidade dos Elementos", () => {
         it("não deve exibir o botão de voltar e os breadcrumbs na página de login", () => {

@@ -1,52 +1,54 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrar"
-    title="Histórico de Análises"
-    size="lg"
-    centered
-    hide-footer
-    @hide="emit('fechar')"
+      :fade="false"
+      :model-value="mostrar"
+      centered
+      hide-footer
+      size="lg"
+      title="Histórico de Análises"
+      @hide="emit('fechar')"
   >
     <div data-testid="modal-historico-body">
       <BAlert
-        v-if="analises.length === 0"
-        variant="info"
-        :model-value="true"
-        :fade="false"
+          v-if="analises.length === 0"
+          :fade="false"
+          :model-value="true"
+          variant="info"
       >
         Nenhuma análise registrada para este subprocesso.
       </BAlert>
       <div v-else>
         <table class="table table-striped table-hover">
           <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Unidade</th>
-              <th>Resultado</th>
-              <th>Observação</th>
-            </tr>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Unidade</th>
+            <th>Resultado</th>
+            <th>Observação</th>
+          </tr>
           </thead>
           <tbody>
-            <tr
+          <tr
               v-for="(analise, index) in analises"
               :key="index"
               :data-testid="`row-historico-${index}`"
-            >
-              <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
-              <td :data-testid="`cell-unidade-${index}`">{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
-              <td :data-testid="`cell-resultado-${index}`">{{ analise.acao || analise.resultado }}</td>
-              <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
-            </tr>
+          >
+            <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
+            <td :data-testid="`cell-unidade-${index}`">
+              {{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}
+            </td>
+            <td :data-testid="`cell-resultado-${index}`">{{ analise.acao || analise.resultado }}</td>
+            <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
     </div>
     <template #footer>
       <BButton
-        variant="secondary"
-        data-testid="btn-modal-fechar"
-        @click="emit('fechar')"
+          data-testid="btn-modal-fechar"
+          variant="secondary"
+          @click="emit('fechar')"
       >
         Fechar
       </BButton>
@@ -75,16 +77,16 @@ const analisesStore = useAnalisesStore();
 const analises = ref<Analise[]>([]);
 
 watch(
-  () => props.mostrar,
+    () => props.mostrar,
     async (newVal) => {
-    if (newVal && props.codSubrocesso) {
-      await analisesStore.buscarAnalisesCadastro(props.codSubrocesso);
-      analises.value = analisesStore.obterAnalisesPorSubprocesso(
-          props.codSubrocesso,
-      );
-    }
-  },
-  { immediate: true },
+      if (newVal && props.codSubrocesso) {
+        await analisesStore.buscarAnalisesCadastro(props.codSubrocesso);
+        analises.value = analisesStore.obterAnalisesPorSubprocesso(
+            props.codSubrocesso,
+        );
+      }
+    },
+    {immediate: true},
 );
 
 function formatarData(data: string): string {

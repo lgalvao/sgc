@@ -54,12 +54,12 @@ const shouldShowNavBarExtras = computed(() => {
   <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
     <BAlert
         v-model="feedbackStore.currentFeedback.show"
-        :variant="feedbackStore.currentFeedback.variant"
-        dismissible
         :fade="false"
+        :variant="feedbackStore.currentFeedback.variant"
         class="shadow-sm"
-        style="pointer-events: auto; min-width: 300px; max-width: 600px;"
         data-testid="global-alert"
+        dismissible
+        style="pointer-events: auto; min-width: 300px; max-width: 600px;"
         @closed="feedbackStore.close()"
     >
       <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">

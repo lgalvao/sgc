@@ -116,7 +116,8 @@ npm run test:unit
 
 ## 🛡️ Verificações de Qualidade
 
-O projeto possui um sistema unificado de verificação de qualidade de código que engloba análise estática, linting e cobertura de testes para Backend e Frontend.
+O projeto possui um sistema unificado de verificação de qualidade de código que engloba análise estática, linting e
+cobertura de testes para Backend e Frontend.
 
 ### Execução Rápida (Recomendado)
 

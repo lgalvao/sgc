@@ -31,15 +31,20 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @DisplayName("Testes para ImpactoMapaService")
 class ImpactoMapaServiceTest {
-    @Autowired private ImpactoMapaService impactoMapaService;
+    @Autowired
+    private ImpactoMapaService impactoMapaService;
 
-    @MockitoBean private SubprocessoRepo subprocessoRepo;
+    @MockitoBean
+    private SubprocessoRepo subprocessoRepo;
 
-    @MockitoBean private MapaRepo mapaRepo;
+    @MockitoBean
+    private MapaRepo mapaRepo;
 
-    @MockitoBean private ImpactoAtividadeService impactoAtividadeService;
+    @MockitoBean
+    private ImpactoAtividadeService impactoAtividadeService;
 
-    @MockitoBean private ImpactoCompetenciaService impactoCompetenciaService;
+    @MockitoBean
+    private ImpactoCompetenciaService impactoCompetenciaService;
 
     private Usuario chefe;
     private Usuario gestor;

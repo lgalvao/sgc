@@ -1,17 +1,21 @@
 import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {
     abrirHistoricoAnalise,
     abrirHistoricoAnaliseVisualizacao,
+    aceitarCadastroMapeamento,
+    aceitarRevisao,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
-    aceitarCadastroMapeamento,
-    aceitarRevisao,
-    cancelarAceite,
     cancelarDevolucao,
     cancelarHomologacao,
     devolverRevisao,
@@ -52,7 +56,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0: Criar mapa vigente através de processo de mapeamento', async ({page}) => {
         const descMapeamento = `Mapeamento para CDU-14 ${timestamp}`;
-        
+
         // Passo 1: ADMIN cria e inicia processo de mapeamento
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
@@ -75,13 +79,13 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 2: CHEFE adiciona atividades e disponibiliza cadastro
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        
+
         await page.getByText(descMapeamento).click();
         await navegarParaAtividades(page);
-        
+
         await adicionarAtividade(page, `Atividade Map 1 ${timestamp}`);
         await adicionarConhecimento(page, `Atividade Map 1 ${timestamp}`, 'Conhecimento Map 1A');
-        
+
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
         await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
@@ -90,7 +94,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 3: GESTOR aceita cadastro
         await fazerLogout(page);
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
-        
+
         await acessarSubprocessoGestor(page, descMapeamento, 'Seção 221');
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
@@ -98,7 +102,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 4: ADMIN homologa cadastro
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        
+
         await acessarSubprocessoAdmin(page, descMapeamento, 'Seção 221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
@@ -106,13 +110,13 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 5: ADMIN cria competências e disponibiliza mapa
         // Após homologação, já está na tela de Detalhes do subprocesso
         await page.getByTestId('card-subprocesso-mapa').click();
-        
+
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Map ${timestamp}`);
         await page.getByText(`Atividade Map 1 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
         await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
-        
+
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
@@ -122,7 +126,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 6: CHEFE valida mapa
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        
+
         await page.getByText(descMapeamento).click();
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
@@ -132,8 +136,8 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Passo 7: ADMIN homologa mapa
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        
-        
+
+
         await acessarSubprocessoAdmin(page, descMapeamento, 'Seção 221');
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -145,7 +149,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.locator('tr').filter({has: page.getByText(descMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
-        
+
         // Verificar alert e status na tabela
         await expect(page.getByText('Processo finalizado')).toBeVisible();
         await expect(page.locator('tr', {has: page.getByText(descMapeamento)}).getByText('Finalizado')).toBeVisible();
@@ -340,10 +344,10 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         // Abrir histórico
         const modal = await abrirHistoricoAnaliseVisualizacao(page);
-        
+
         // Verificar que modal está visível
         await expect(modal).toBeVisible();
-        
+
         // Neste ponto do fluxo serial, devemos ter apenas 1 análise:
         // - Cenário 3: 1 devolução (GESTOR) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 4)
         // - Cenário 6: 1 aceite (GESTOR) → REMOVIDA quando ADMIN devolveu (Cenário 7)
@@ -352,7 +356,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         //
         // Conforme CDU-14 linha 32: "análises prévias registradas para o cadastro de atividades 
         // desde a última disponibilização"
-        
+
         // Verificar que há exatamente 1 registro
         await expect(modal.getByTestId('cell-resultado-0')).toBeVisible();
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);

@@ -11,10 +11,10 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // Remover "bootstrap/dist/js/bootstrap.bundle.min.js"; pois BootstrapVueNext gerencia o JS
 
 declare global {
-  interface Window {
-    pinia: ReturnType<typeof createPinia>;
-    __pinia__: ReturnType<typeof createPinia>;
-  }
+    interface Window {
+        pinia: ReturnType<typeof createPinia>;
+        __pinia__: ReturnType<typeof createPinia>;
+    }
 }
 
 const app = createApp(App);

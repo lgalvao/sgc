@@ -2,7 +2,9 @@
   <BContainer class="mt-4">
     <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
-      <span class="ms-3" data-testid="txt-badge-situacao">{{ subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao) }}</span>
+      <span class="ms-3" data-testid="txt-badge-situacao">{{
+          subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao)
+        }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -11,18 +13,18 @@
       </div>
       <div class="d-flex gap-2">
         <BButton
-          v-if="podeVerImpacto"
-          variant="outline-secondary"
-          data-testid="cad-mapa__btn-impactos-mapa"
-          @click="abrirModalImpacto"
+            v-if="podeVerImpacto"
+            data-testid="cad-mapa__btn-impactos-mapa"
+            variant="outline-secondary"
+            @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
+          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </BButton>
         <BButton
-          :disabled="competencias.length === 0"
-          variant="outline-success"
-          data-testid="btn-cad-mapa-disponibilizar"
-          @click="abrirModalDisponibilizar"
+            :disabled="competencias.length === 0"
+            data-testid="btn-cad-mapa-disponibilizar"
+            variant="outline-success"
+            @click="abrirModalDisponibilizar"
         >
           Disponibilizar
         </BButton>
@@ -32,83 +34,83 @@
     <div v-if="unidade">
       <div class="mb-4 mt-3">
         <BButton
-          variant="outline-primary"
-          class="mb-3"
-          data-testid="btn-abrir-criar-competencia"
-          @click="abrirModalCriarLimpo"
+            class="mb-3"
+            data-testid="btn-abrir-criar-competencia"
+            variant="outline-primary"
+            @click="abrirModalCriarLimpo"
         >
-          <i class="bi bi-plus-lg" /> Criar competência
+          <i class="bi bi-plus-lg"/> Criar competência
         </BButton>
 
         <BCard
-          v-for="comp in competencias"
-          :key="comp.codigo"
-          class="mb-2 competencia-card"
-          data-testid="cad-mapa__card-competencia"
-          no-body
+            v-for="comp in competencias"
+            :key="comp.codigo"
+            class="mb-2 competencia-card"
+            data-testid="cad-mapa__card-competencia"
+            no-body
         >
           <BCardBody>
             <div
-              class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
+                class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
             >
               <strong
-                class="competencia-descricao"
-                data-testid="cad-mapa__txt-competencia-descricao"
+                  class="competencia-descricao"
+                  data-testid="cad-mapa__txt-competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <BButton
-                  v-b-tooltip.hover
-                  variant="outline-primary"
-                  size="sm"
-                  class="botao-acao"
-                  data-testid="btn-editar-competencia"
-                  title="Editar"
-                  @click="iniciarEdicaoCompetencia(comp)"
+                    v-b-tooltip.hover
+                    class="botao-acao"
+                    data-testid="btn-editar-competencia"
+                    size="sm"
+                    title="Editar"
+                    variant="outline-primary"
+                    @click="iniciarEdicaoCompetencia(comp)"
                 >
-                  <i class="bi bi-pencil" />
+                  <i class="bi bi-pencil"/>
                 </BButton>
                 <BButton
-                  v-b-tooltip.hover
-                  variant="outline-danger"
-                  size="sm"
-                  class="botao-acao"
-                  data-testid="btn-excluir-competencia"
-                  title="Excluir"
-                  @click="excluirCompetencia(comp.codigo)"
+                    v-b-tooltip.hover
+                    class="botao-acao"
+                    data-testid="btn-excluir-competencia"
+                    size="sm"
+                    title="Excluir"
+                    variant="outline-danger"
+                    @click="excluirCompetencia(comp.codigo)"
                 >
-                  <i class="bi bi-trash" />
+                  <i class="bi bi-trash"/>
                 </BButton>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
               <BCard
-                v-for="atvId in comp.atividadesAssociadas"
-                :key="atvId"
-                class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
-                no-body
+                  v-for="atvId in comp.atividadesAssociadas"
+                  :key="atvId"
+                  class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                  no-body
               >
                 <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
-                      v-if="(getAtividadeCompleta(atvId)?.conhecimentos.length ?? 0) > 0"
-                      v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
-                      class="badge bg-secondary ms-2"
-                      data-testid="cad-mapa__txt-badge-conhecimentos-1"
+                        v-if="(getAtividadeCompleta(atvId)?.conhecimentos.length ?? 0) > 0"
+                        v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
+                        class="badge bg-secondary ms-2"
+                        data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
                   </span>
                   <BButton
-                    v-b-tooltip.hover
-                    variant="outline-secondary"
-                    size="sm"
-                    class="botao-acao-inline"
-                    data-testid="btn-remover-atividade-associada"
-                    title="Remover Atividade"
-                    @click="removerAtividadeAssociada(comp.codigo, atvId)"
+                      v-b-tooltip.hover
+                      class="botao-acao-inline"
+                      data-testid="btn-remover-atividade-associada"
+                      size="sm"
+                      title="Remover Atividade"
+                      variant="outline-secondary"
+                      @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
-                    <i class="bi bi-trash" />
+                    <i class="bi bi-trash"/>
                   </BButton>
                 </BCardBody>
               </BCard>
@@ -123,23 +125,23 @@
 
     <!-- Modal de Criar Nova Competência -->
     <BModal
-      v-model="mostrarModalCriarNovaCompetencia"
-      :fade="false"
-      :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
-      size="lg"
-      centered
-      data-testid="mdl-criar-competencia"
-      @hidden="fecharModalCriarNovaCompetencia"
+        v-model="mostrarModalCriarNovaCompetencia"
+        :fade="false"
+        :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
+        centered
+        data-testid="mdl-criar-competencia"
+        size="lg"
+        @hidden="fecharModalCriarNovaCompetencia"
     >
       <!-- Conteúdo do card movido para cá -->
       <div class="mb-4">
         <h5>Descrição</h5>
         <div class="mb-2">
           <BFormTextarea
-            v-model="novaCompetencia.descricao"
-            data-testid="inp-criar-competencia-descricao"
-            placeholder="Descreva a competência"
-            rows="3"
+              v-model="novaCompetencia.descricao"
+              data-testid="inp-criar-competencia-descricao"
+              placeholder="Descreva a competência"
+              rows="3"
           />
         </div>
       </div>
@@ -148,25 +150,25 @@
         <h5>Atividades</h5>
         <div class="d-flex flex-wrap gap-2">
           <BCard
-            v-for="atividade in atividades"
-            :key="atividade.codigo"
-            :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
-            :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
-            no-body
+              v-for="atividade in atividades"
+              :key="atividade.codigo"
+              :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
+              :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
+              no-body
           >
             <BCardBody class="d-flex align-items-center">
               <BFormCheckbox
-                :id="`atv-${atividade.codigo}`"
-                v-model="atividadesSelecionadas"
-                :value="atividade.codigo"
-                data-testid="chk-criar-competencia-atividade"
+                  :id="`atv-${atividade.codigo}`"
+                  v-model="atividadesSelecionadas"
+                  :value="atividade.codigo"
+                  data-testid="chk-criar-competencia-atividade"
               >
                 {{ atividade.descricao }}
                 <span
-                  v-if="atividade.conhecimentos.length > 0"
-                  v-b-tooltip.html.right="getConhecimentosModal(atividade)"
-                  class="badge bg-secondary ms-2"
-                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
+                    v-if="atividade.conhecimentos.length > 0"
+                    v-b-tooltip.html.right="getConhecimentosModal(atividade)"
+                    class="badge bg-secondary ms-2"
+                    data-testid="cad-mapa__txt-badge-conhecimentos-2"
                 >
                   {{ atividade.conhecimentos.length }}
                 </span>
@@ -177,81 +179,81 @@
       </div>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalCriarNovaCompetencia"
+            variant="secondary"
+            @click="fecharModalCriarNovaCompetencia"
         >
           Cancelar
         </BButton>
         <BButton
-          v-b-tooltip.hover
-          variant="primary"
-          :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-criar-competencia-salvar"
-          title="Criar Competência"
-          @click="adicionarCompetenciaEFecharModal"
+            v-b-tooltip.hover
+            :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+            data-testid="btn-criar-competencia-salvar"
+            title="Criar Competência"
+            variant="primary"
+            @click="adicionarCompetenciaEFecharModal"
         >
-          <i class="bi bi-save" /> Salvar
+          <i class="bi bi-save"/> Salvar
         </BButton>
       </template>
     </BModal>
 
     <!-- Modal de Disponibilizar -->
     <BModal
-      v-model="mostrarModalDisponibilizar"
-      :fade="false"
-      title="Disponibilização do mapa de competências"
-      data-testid="mdl-disponibilizar-mapa"
-      centered
-      @hidden="fecharModalDisponibilizar"
+        v-model="mostrarModalDisponibilizar"
+        :fade="false"
+        centered
+        data-testid="mdl-disponibilizar-mapa"
+        title="Disponibilização do mapa de competências"
+        @hidden="fecharModalDisponibilizar"
     >
       <div class="mb-3">
         <label
-          class="form-label"
-          for="dataLimite"
+            class="form-label"
+            for="dataLimite"
         >Data limite para validação</label>
         <BFormInput
-          id="dataLimite"
-          v-model="dataLimiteValidacao"
-          data-testid="inp-disponibilizar-mapa-data"
-          type="date"
+            id="dataLimite"
+            v-model="dataLimiteValidacao"
+            data-testid="inp-disponibilizar-mapa-data"
+            type="date"
         />
       </div>
       <div class="mb-3">
         <label
-          class="form-label"
-          for="observacoes"
+            class="form-label"
+            for="observacoes"
         >Observações</label>
         <BFormTextarea
-          id="observacoes"
-          v-model="observacoesDisponibilizacao"
-          data-testid="inp-disponibilizar-mapa-obs"
-          rows="3"
-          placeholder="Digite observações sobre a disponibilização..."
+            id="observacoes"
+            v-model="observacoesDisponibilizacao"
+            data-testid="inp-disponibilizar-mapa-obs"
+            placeholder="Digite observações sobre a disponibilização..."
+            rows="3"
         />
       </div>
       <BAlert
-        v-if="notificacaoDisponibilizacao"
-        variant="info"
-        class="mt-3"
-        :model-value="true"
-        :fade="false"
-        data-testid="alert-disponibilizar-mapa"
+          v-if="notificacaoDisponibilizacao"
+          :fade="false"
+          :model-value="true"
+          class="mt-3"
+          data-testid="alert-disponibilizar-mapa"
+          variant="info"
       >
         {{ notificacaoDisponibilizacao }}
       </BAlert>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-disponibilizar-mapa-cancelar"
-          @click="fecharModalDisponibilizar"
+            data-testid="btn-disponibilizar-mapa-cancelar"
+            variant="secondary"
+            @click="fecharModalDisponibilizar"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="success"
-          :disabled="!dataLimiteValidacao"
-          data-testid="btn-disponibilizar-mapa-confirmar"
-          @click="disponibilizarMapa"
+            :disabled="!dataLimiteValidacao"
+            data-testid="btn-disponibilizar-mapa-confirmar"
+            variant="success"
+            @click="disponibilizarMapa"
         >
           Disponibilizar
         </BButton>
@@ -260,25 +262,25 @@
 
     <!-- Modal de Exclusão de Competência -->
     <BModal
-      v-model="mostrarModalExcluirCompetencia"
-      :fade="false"
-      title="Exclusão de competência"
-      data-testid="mdl-excluir-competencia"
-      ok-title="Confirmar"
-      cancel-title="Cancelar"
-      ok-variant="danger"
-      centered
-      @ok="confirmarExclusaoCompetencia"
-      @hidden="fecharModalExcluirCompetencia"
+        v-model="mostrarModalExcluirCompetencia"
+        :fade="false"
+        cancel-title="Cancelar"
+        centered
+        data-testid="mdl-excluir-competencia"
+        ok-title="Confirmar"
+        ok-variant="danger"
+        title="Exclusão de competência"
+        @hidden="fecharModalExcluirCompetencia"
+        @ok="confirmarExclusaoCompetencia"
     >
       <p>Confirma a exclusão da competência "{{ competenciaParaExcluir?.descricao }}"?</p>
     </BModal>
 
     <ImpactoMapaModal
-      :id-processo="codProcesso"
-      :sigla-unidade="siglaUnidade"
-      :mostrar="mostrarModalImpacto"
-      @fechar="fecharModalImpacto"
+        :id-processo="codProcesso"
+        :mostrar="mostrarModalImpacto"
+        :sigla-unidade="siglaUnidade"
+        @fechar="fecharModalImpacto"
     />
   </BContainer>
 </template>

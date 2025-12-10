@@ -2,10 +2,10 @@
   <BModal
       :fade="false"
       :model-value="mostrar"
-      title="Impacto no Mapa de Competências"
-      size="lg"
       centered
       hide-footer
+      size="lg"
+      title="Impacto no Mapa de Competências"
       @hide="fechar">
     <div v-if="carregando" class="text-center p-4">
       <div class="spinner-border text-primary" role="status">
@@ -17,7 +17,7 @@
     </div>
 
     <div v-else-if="impacto" data-testid="modal-impacto-body">
-      <BAlert v-if="!impacto.temImpactos" variant="success" :model-value="true" :fade="false">
+      <BAlert v-if="!impacto.temImpactos" :fade="false" :model-value="true" variant="success">
         <i class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
       </BAlert>
 
@@ -66,7 +66,7 @@
           </h5>
           <ul class="list-group" data-testid="lista-atividades-alteradas">
             <li
-v-for="ativ in impacto.atividadesAlteradas"
+                v-for="ativ in impacto.atividadesAlteradas"
                 :key="ativ.codigo"
                 class="list-group-item">
               <div class="d-flex flex-column">
@@ -120,18 +120,18 @@ v-for="ativ in impacto.atividadesAlteradas"
 
     <BAlert
         v-else
-        variant="danger"
-        :model-value="true"
         :fade="false"
+        :model-value="true"
+        variant="danger"
     >
       Não foi possível carregar os dados de impacto.
     </BAlert>
 
     <template #footer>
       <BButton
-          variant="secondary"
-          type="button"
           data-testid="btn-fechar-impacto"
+          type="button"
+          variant="secondary"
           @click="fechar"
       >
         Fechar

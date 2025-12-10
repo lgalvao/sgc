@@ -41,30 +41,30 @@ public class ConfigSeguranca {
      * @throws Exception se ocorrer um erro durante a configuração.
      */
     @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth ->
-                                auth.requestMatchers(
-                                                "/api/usuarios/autenticar",
-                                                "/api/usuarios/autorizar",
-                                                "/api/usuarios/entrar",
-                                                "/actuator/**")
-                                        .permitAll()
-                                        .requestMatchers("/api/**")
-                                        .authenticated()
-                                        .anyRequest()
-                                        .permitAll())
+                        auth.requestMatchers(
+                                        "/api/usuarios/autenticar",
+                                        "/api/usuarios/autorizar",
+                                        "/api/usuarios/entrar",
+                                        "/actuator/**")
+                                .permitAll()
+                                .requestMatchers("/api/**")
+                                .authenticated()
+                                .anyRequest()
+                                .permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
-                                            CorsConfiguration config = new CorsConfiguration();
-                                            config.setAllowedOrigins(List.of("http://localhost:5173"));
-                                            config.setAllowedMethods(List.of("GET", "POST"));
-                                            config.setAllowedHeaders(List.of("*"));
-                                            config.setAllowCredentials(true);
-                                            return config;
-                                        }))
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:5173"));
+                    config.setAllowedMethods(List.of("GET", "POST"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .addFilterBefore(filtroAutenticacaoSimulado, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

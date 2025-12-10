@@ -32,8 +32,8 @@ describe("test-utils/helpers", () => {
 });
 
 describe("test-utils/uiHelpers", () => {
-  const TestComponent = {
-    template: `
+    const TestComponent = {
+        template: `
       <div>
         <select id="processo-select">
             <option value="1">Processo 1</option>
@@ -48,10 +48,10 @@ describe("test-utils/uiHelpers", () => {
         <div data-testid="breadcrumb-item">Page</div>
       </div>
     `,
-    props: {
-      disabled: Boolean,
-    },
-  };
+        props: {
+            disabled: Boolean,
+        },
+    };
 
     it("selecionarProcessoEUnidade should set select values", async () => {
         const wrapper = mount(TestComponent);

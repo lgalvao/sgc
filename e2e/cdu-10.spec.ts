@@ -31,12 +31,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     let processoRevisaoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({ request }) => {
+    test.beforeAll(async ({request}) => {
         await resetDatabase(request);
         cleanup = useProcessoCleanup();
     });
 
-    test.afterAll(async ({ request }) => {
+    test.afterAll(async ({request}) => {
         await cleanup.limpar(request);
     });
 
@@ -62,7 +62,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        
+
         // Capturar ID do processo para cleanup
         processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
@@ -85,7 +85,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Adicionar atividades e conhecimentos
         await adicionarAtividade(page, `Atividade Mapeamento 1 ${timestamp}`);
         await adicionarConhecimento(page, `Atividade Mapeamento 1 ${timestamp}`, 'Conhecimento 1');
-        
+
         await adicionarAtividade(page, `Atividade Mapeamento 2 ${timestamp}`);
         await adicionarConhecimento(page, `Atividade Mapeamento 2 ${timestamp}`, 'Conhecimento 2');
 
@@ -119,7 +119,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // ADMIN após login está no Painel
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-        
+
         // Navegar para a unidade
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
@@ -173,7 +173,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // ADMIN após login está no Painel
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-        
+
         // Navegar para a unidade
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
@@ -208,7 +208,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await linhaProcesso.click();
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoRevisao);
-        
+
         // Capturar ID do processo para cleanup
         processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
@@ -225,9 +225,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Navegar pelo painel para o processo de revisão (Chefe vai direto)
         await page.getByText(descProcessoRevisao).click();
-        
+
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
-        
+
         // Verificar situação inicial - deve ser "Não Iniciado" (antes de qualquer alteração)
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Não Iniciado/i);
 
@@ -240,10 +240,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Adicionar uma nova atividade na revisão - isso deve mudar a situação
         await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
         await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
-        
+
         // Voltar para a tela do subprocesso para verificar mudança de situação
         await page.getByTestId('btn-cad-atividades-voltar').click();
-        
+
         // Agora a situação deve ser "Revisão do cadastro em andamento"
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
     });
@@ -364,13 +364,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-cad-atividades-historico').click();
 
         // Verificar conteúdo do modal de histórico
-        const modal = page.locator('.modal-content').filter({ hasText: 'Histórico de Análise' });
+        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
         await expect(modal).toBeVisible();
-        
+
         // Verificar dados da análise (CDU-10 passo 5.1)
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText(motivoDevolucao);
-        
+
         // Verificar que tem data/hora e sigla da unidade
         await expect(modal.getByTestId('cell-unidade-0')).toBeVisible();
         await expect(modal.getByTestId('cell-data-0')).toBeVisible();
@@ -445,14 +445,14 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Disponibilizar novamente
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        
+
         await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
         await verificarPaginaPainel(page);
-        
+
         // Agora Admin devolve mais uma vez (terceira devolução)
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        
+
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByText(descProcessoRevisao).click();
 
@@ -468,7 +468,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
-        
+
         // Chefe verifica que histórico só tem a última análise (CDU-10 passo 15)
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
@@ -479,13 +479,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-historico').click();
 
-        const modal = page.locator('.modal-content').filter({ hasText: 'Histórico de Análise' });
+        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
         await expect(modal).toBeVisible();
 
         // Deve ter apenas uma linha (a última devolução, após a disponibilização que excluiu o histórico anterior)
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
-        
+
         // Não deve ter segunda linha (histórico anterior foi excluído pela disponibilização)
         await expect(modal.getByTestId('cell-resultado-1')).toBeHidden();
     });

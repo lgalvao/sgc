@@ -34,7 +34,7 @@ public class SubprocessoConsultaService {
      * @param codigo O código do subprocesso.
      * @return A entidade {@link Subprocesso} correspondente.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado ou se não possuir um
-     *     mapa associado.
+     *                                   mapa associado.
      */
     public Subprocesso getSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = getSubprocesso(codigo);

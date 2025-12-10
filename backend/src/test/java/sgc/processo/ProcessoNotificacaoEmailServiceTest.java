@@ -26,13 +26,17 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoNotificacaoEmailServiceTest {
-    @InjectMocks private ProcessoNotificacaoService service;
+    @InjectMocks
+    private ProcessoNotificacaoService service;
 
-    @Mock private NotificacaoEmailService notificacaoEmailService;
+    @Mock
+    private NotificacaoEmailService notificacaoEmailService;
 
-    @Mock private NotificacaoModelosService notificacaoModelosService;
+    @Mock
+    private NotificacaoModelosService notificacaoModelosService;
 
-    @Mock private SgrhService sgrhService;
+    @Mock
+    private SgrhService sgrhService;
 
     private Processo processo;
     private Unidade unidade;
@@ -91,7 +95,7 @@ class ProcessoNotificacaoEmailServiceTest {
                                     new UsuarioDto(
                                             "123", "Nome", "email@test.com", "mat")));
             when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-                            any(), any(), any()))
+                    any(), any(), any()))
                     .thenReturn("html");
 
             service.enviarNotificacoesDeFinalizacao(processo, List.of(unidade, subordinada));

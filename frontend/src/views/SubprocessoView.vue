@@ -1,45 +1,45 @@
 <template>
   <BContainer class="mt-4">
     <SubprocessoHeader
-      v-if="subprocesso"
-      :processo-descricao="subprocesso.processoDescricao || ''"
-      :unidade-sigla="subprocesso.unidade.sigla"
-      :unidade-nome="subprocesso.unidade.nome"
-      :situacao="subprocesso.situacaoLabel"
-      :titular-nome="subprocesso.titular?.nome || ''"
-      :titular-ramal="subprocesso.titular?.ramal || ''"
-      :titular-email="subprocesso.titular?.email || ''"
-      :responsavel-nome="subprocesso.responsavel?.nome || ''"
-      :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
-      :responsavel-email="subprocesso.responsavel?.email || ''"
-      :unidade-atual="subprocesso.unidade.sigla"
-      :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
-      @alterar-data-limite="abrirModalAlterarDataLimite"
+        v-if="subprocesso"
+        :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
+        :processo-descricao="subprocesso.processoDescricao || ''"
+        :responsavel-email="subprocesso.responsavel?.email || ''"
+        :responsavel-nome="subprocesso.responsavel?.nome || ''"
+        :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
+        :situacao="subprocesso.situacaoLabel"
+        :titular-email="subprocesso.titular?.email || ''"
+        :titular-nome="subprocesso.titular?.nome || ''"
+        :titular-ramal="subprocesso.titular?.ramal || ''"
+        :unidade-atual="subprocesso.unidade.sigla"
+        :unidade-nome="subprocesso.unidade.nome"
+        :unidade-sigla="subprocesso.unidade.sigla"
+        @alterar-data-limite="abrirModalAlterarDataLimite"
     />
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
     <SubprocessoCards
-      v-if="subprocesso"
-      :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
-      :mapa="mapa"
-      :situacao="subprocesso.situacao"
-      :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false }"
-      :cod-subprocesso="codSubprocesso"
-      :cod-processo="props.codProcesso"
-      :sigla-unidade="props.siglaUnidade"
+        v-if="subprocesso"
+        :cod-processo="props.codProcesso"
+        :cod-subprocesso="codSubprocesso"
+        :mapa="mapa"
+        :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false }"
+        :sigla-unidade="props.siglaUnidade"
+        :situacao="subprocesso.situacao"
+        :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
     />
 
-    <TabelaMovimentacoes :movimentacoes="movimentacoes" />
+    <TabelaMovimentacoes :movimentacoes="movimentacoes"/>
   </BContainer>
 
   <SubprocessoModal
-    :mostrar-modal="mostrarModalAlterarDataLimite"
-    :data-limite-atual="dataLimite"
-    :etapa-atual="subprocesso?.etapaAtual || null"
-    @fechar-modal="fecharModalAlterarDataLimite"
-    @confirmar-alteracao="confirmarAlteracaoDataLimite"
+      :data-limite-atual="dataLimite"
+      :etapa-atual="subprocesso?.etapaAtual || null"
+      :mostrar-modal="mostrarModalAlterarDataLimite"
+      @fechar-modal="fecharModalAlterarDataLimite"
+      @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
 </template>
 

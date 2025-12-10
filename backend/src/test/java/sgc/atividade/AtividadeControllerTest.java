@@ -47,14 +47,19 @@ class AtividadeControllerTest {
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
     private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 
-    @MockitoBean private AtividadeService atividadeService;
-    @MockitoBean private SubprocessoService subprocessoService;
-    @MockitoBean private AtividadeMapper atividadeMapper;
-    @MockitoBean private ConhecimentoMapper conhecimentoMapper;
+    @MockitoBean
+    private AtividadeService atividadeService;
+    @MockitoBean
+    private SubprocessoService subprocessoService;
+    @MockitoBean
+    private AtividadeMapper atividadeMapper;
+    @MockitoBean
+    private ConhecimentoMapper conhecimentoMapper;
 
     @BeforeEach
     void setup() {
@@ -67,18 +72,18 @@ class AtividadeControllerTest {
 
         // Mock para SubprocessoService.obterStatus
         SubprocessoStatusDto statusDtoMock = SubprocessoStatusDto.builder()
-            .codigo(100L)
-            .situacao(null) // ou um valor apropriado, se necessário
-            .situacaoLabel(null) // ou um valor apropriado, se necessário
-            .build();
+                .codigo(100L)
+                .situacao(null) // ou um valor apropriado, se necessário
+                .situacaoLabel(null) // ou um valor apropriado, se necessário
+                .build();
         when(subprocessoService.obterStatus(anyLong())).thenReturn(statusDtoMock);
 
         // Mock para SubprocessoService.listarAtividadesPorSubprocesso
         AtividadeVisualizacaoDto atividadeVisualizacaoDtoMock = AtividadeVisualizacaoDto.builder()
-            .codigo(1L)
-            .descricao(ATIVIDADE_TESTE)
-            .conhecimentos(Collections.emptyList())
-            .build();
+                .codigo(1L)
+                .descricao(ATIVIDADE_TESTE)
+                .conhecimentos(Collections.emptyList())
+                .build();
         when(subprocessoService.listarAtividadesPorSubprocesso(anyLong())).thenReturn(List.of(atividadeVisualizacaoDtoMock));
     }
 

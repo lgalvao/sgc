@@ -26,17 +26,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AlertaMapperTest {
 
-    @Mock private SubprocessoRepo subprocessoRepo;
-
-    // Subclass to test protected methods and inject mocks
-    static class AlertaMapperImpl extends AlertaMapper {
-        @Override
-        public AlertaDto toDto(Alerta alerta) {
-            return null;
-        }
-    }
-
-    @InjectMocks private AlertaMapperImpl mapper;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @InjectMocks
+    private AlertaMapperImpl mapper;
 
     @Test
     @DisplayName("formatDataHora returns formatted string")
@@ -109,5 +102,13 @@ class AlertaMapperTest {
     void buildLinkDestinoMissingInfo() {
         Alerta alerta = new Alerta();
         assertThat(mapper.buildLinkDestino(alerta)).isNull();
+    }
+
+    // Subclass to test protected methods and inject mocks
+    static class AlertaMapperImpl extends AlertaMapper {
+        @Override
+        public AlertaDto toDto(Alerta alerta) {
+            return null;
+        }
     }
 }

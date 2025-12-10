@@ -28,9 +28,9 @@ Fluxo principal:
 
 5. O sistema mostra a tela Visualização de mapa, com as seguintes informações:
 
-   - Título "Mapa de competências técnicas"
-   - Identificação da unidade (sigla e nome).
-   - Conjunto de competências, com cada competência mostrada em um bloco individual, contendo:
-      - Descrição da competência como título.
-      - Conjunto das atividades associadas àquela competência.
-      - Para cada atividade, conjunto de conhecimentos da atividade.
+    - Título "Mapa de competências técnicas"
+    - Identificação da unidade (sigla e nome).
+    - Conjunto de competências, com cada competência mostrada em um bloco individual, contendo:
+        - Descrição da competência como título.
+        - Conjunto das atividades associadas àquela competência.
+        - Para cada atividade, conjunto de conhecimentos da atividade.

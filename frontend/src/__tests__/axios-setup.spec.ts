@@ -4,20 +4,20 @@ import router from "@/router";
 import {useFeedbackStore} from "@/stores/feedback";
 
 // Hoist mock instance so it's shared between module and test
-const { mockInstance } = vi.hoisted(() => {
-  return {
-    mockInstance: {
-        interceptors: {
-            request: {use: vi.fn()},
-            response: {use: vi.fn()},
+const {mockInstance} = vi.hoisted(() => {
+    return {
+        mockInstance: {
+            interceptors: {
+                request: {use: vi.fn()},
+                response: {use: vi.fn()},
+            },
+            defaults: {headers: {common: {}}},
+            get: vi.fn(),
+            post: vi.fn(),
+            put: vi.fn(),
+            delete: vi.fn(),
         },
-        defaults: {headers: {common: {}}},
-        get: vi.fn(),
-        post: vi.fn(),
-        put: vi.fn(),
-        delete: vi.fn(),
-    },
-  };
+    };
 });
 
 // Mock router
@@ -159,17 +159,20 @@ describe("axios-setup", () => {
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Generic failure", "danger");
     });
-    
+
     it("response error interceptor should handle store errors gracefully", async () => {
         const feedbackStore = useFeedbackStore();
         // Force an error in store.show
-        vi.spyOn(feedbackStore, "show").mockImplementation(() => { throw new Error("Store error"); });
-        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        vi.spyOn(feedbackStore, "show").mockImplementation(() => {
+            throw new Error("Store error");
+        });
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {
+        });
 
         const error = {message: "Generic failure"};
-        
+
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        
+
         expect(consoleSpy).toHaveBeenCalledWith("Erro ao exibir notificação:", expect.any(Error));
     });
 });

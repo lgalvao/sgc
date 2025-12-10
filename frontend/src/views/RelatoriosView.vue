@@ -8,43 +8,43 @@
     <div class="row mb-4">
       <div class="col-md-4">
         <label
-          for="filtroTipo"
-          class="form-label"
+            class="form-label"
+            for="filtroTipo"
         >Tipo de Processo</label>
         <BFormSelect
-          id="filtroTipo"
-          v-model="filtroTipo"
-          data-testid="sel-filtro-tipo"
-          :options="[
+            id="filtroTipo"
+            v-model="filtroTipo"
+            :options="[
             { value: '', text: 'Todos' },
             { value: 'Mapeamento', text: 'Mapeamento' },
             { value: 'Revisão', text: 'Revisão' },
             { value: 'Diagnóstico', text: 'Diagnóstico' },
           ]"
+            data-testid="sel-filtro-tipo"
         />
       </div>
       <div class="col-md-4">
         <label
-          for="filtroDataInicio"
-          class="form-label"
+            class="form-label"
+            for="filtroDataInicio"
         >Data Início</label>
         <BFormInput
-          id="filtroDataInicio"
-          v-model="filtroDataInicio"
-          type="date"
-          data-testid="inp-filtro-data-inicio"
+            id="filtroDataInicio"
+            v-model="filtroDataInicio"
+            data-testid="inp-filtro-data-inicio"
+            type="date"
         />
       </div>
       <div class="col-md-4">
         <label
-          for="filtroDataFim"
-          class="form-label"
+            class="form-label"
+            for="filtroDataFim"
         >Data Fim</label>
         <BFormInput
-          id="filtroDataFim"
-          v-model="filtroDataFim"
-          type="date"
-          data-testid="inp-filtro-data-fim"
+            id="filtroDataFim"
+            v-model="filtroDataFim"
+            data-testid="inp-filtro-data-fim"
+            type="date"
         />
       </div>
     </div>
@@ -52,10 +52,10 @@
     <div class="row">
       <div class="col-md-4 mb-4">
         <BCard
-          class="h-100"
-          style="cursor: pointer;"
-          data-testid="card-relatorio-mapas"
-          @click="abrirModalMapasVigentes"
+            class="h-100"
+            data-testid="card-relatorio-mapas"
+            style="cursor: pointer;"
+            @click="abrirModalMapasVigentes"
         >
           <h5 class="card-title">
             Mapas Vigentes
@@ -68,10 +68,10 @@
       </div>
       <div class="col-md-4 mb-4">
         <BCard
-          class="h-100"
-          style="cursor: pointer;"
-          data-testid="card-relatorio-gaps"
-          @click="abrirModalDiagnosticosGaps"
+            class="h-100"
+            data-testid="card-relatorio-gaps"
+            style="cursor: pointer;"
+            @click="abrirModalDiagnosticosGaps"
         >
           <h5 class="card-title">
             Diagnósticos de Gaps
@@ -84,10 +84,10 @@
       </div>
       <div class="col-md-4 mb-4">
         <BCard
-          class="h-100"
-          style="cursor: pointer;"
-          data-testid="card-relatorio-andamento"
-          @click="abrirModalAndamentoGeral"
+            class="h-100"
+            data-testid="card-relatorio-andamento"
+            style="cursor: pointer;"
+            @click="abrirModalAndamentoGeral"
         >
           <h5 class="card-title">
             Andamento Geral
@@ -102,38 +102,38 @@
 
     <!-- Modal Mapas Vigentes -->
     <BModal
-      v-model="mostrarModalMapasVigentes"
-      :fade="false"
-      title="Mapas Vigentes"
-      size="xl"
-      hide-footer
+        v-model="mostrarModalMapasVigentes"
+        :fade="false"
+        hide-footer
+        size="xl"
+        title="Mapas Vigentes"
     >
       <div class="mb-3">
         <BButton
-          variant="outline-primary"
-          size="sm"
-          data-testid="export-csv-mapas"
-          @click="exportarMapasVigentes"
+            data-testid="export-csv-mapas"
+            size="sm"
+            variant="outline-primary"
+            @click="exportarMapasVigentes"
         >
-          <i class="bi bi-download" /> Exportar CSV
+          <i class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
-            <tr>
-              <th>Unidade</th>
-              <th>Competências</th>
-            </tr>
+          <tr>
+            <th>Unidade</th>
+            <th>Competências</th>
+          </tr>
           </thead>
           <tbody>
-            <tr
+          <tr
               v-for="mapa in mapasVigentes"
               :key="mapa.id"
-            >
-              <td>{{ mapa.unidade }}</td>
-              <td>{{ mapa.competencias?.length || 0 }}</td>
-            </tr>
+          >
+            <td>{{ mapa.unidade }}</td>
+            <td>{{ mapa.competencias?.length || 0 }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -141,58 +141,58 @@
 
     <!-- Modal Diagnósticos de Gaps -->
     <BModal
-      v-model="mostrarModalDiagnosticosGaps"
-      :fade="false"
-      title="Diagnósticos de Gaps"
-      size="xl"
-      hide-footer
+        v-model="mostrarModalDiagnosticosGaps"
+        :fade="false"
+        hide-footer
+        size="xl"
+        title="Diagnósticos de Gaps"
     >
       <div class="mb-3">
         <BButton
-          variant="outline-primary"
-          size="sm"
-          data-testid="export-csv-diagnosticos"
-          @click="exportarDiagnosticosGaps"
+            data-testid="export-csv-diagnosticos"
+            size="sm"
+            variant="outline-primary"
+            @click="exportarDiagnosticosGaps"
         >
-          <i class="bi bi-download" /> Exportar CSV
+          <i class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
-            <tr>
-              <th>Processo</th>
-              <th>Unidade</th>
-              <th>Gaps Identificados</th>
-              <th>Importância Média</th>
-              <th>Dominio Médio</th>
-              <th>Competências Críticas</th>
-              <th>Status</th>
-              <th>Data Diagnóstico</th>
-            </tr>
+          <tr>
+            <th>Processo</th>
+            <th>Unidade</th>
+            <th>Gaps Identificados</th>
+            <th>Importância Média</th>
+            <th>Dominio Médio</th>
+            <th>Competências Críticas</th>
+            <th>Status</th>
+            <th>Data Diagnóstico</th>
+          </tr>
           </thead>
           <tbody>
-            <tr
+          <tr
               v-for="diagnostico in diagnosticosGapsFiltrados"
               :key="diagnostico.id"
-            >
-              <td>{{ diagnostico.processo }}</td>
-              <td>{{ diagnostico.unidade }}</td>
-              <td>{{ diagnostico.gaps }}</td>
-              <td>{{ diagnostico.importanciaMedia }}/5</td>
-              <td>{{ diagnostico.dominioMedio }}/5</td>
-              <td>
-                <small class="text-muted">
-                  {{ diagnostico.competenciasCriticas.join(', ') }}
-                </small>
-              </td>
-              <td>
+          >
+            <td>{{ diagnostico.processo }}</td>
+            <td>{{ diagnostico.unidade }}</td>
+            <td>{{ diagnostico.gaps }}</td>
+            <td>{{ diagnostico.importanciaMedia }}/5</td>
+            <td>{{ diagnostico.dominioMedio }}/5</td>
+            <td>
+              <small class="text-muted">
+                {{ diagnostico.competenciasCriticas.join(', ') }}
+              </small>
+            </td>
+            <td>
                 <span :class="getClasseStatus(diagnostico.status)">
                   {{ diagnostico.status }}
                 </span>
-              </td>
-              <td>{{ formatarData(diagnostico.data) }}</td>
-            </tr>
+            </td>
+            <td>{{ formatarData(diagnostico.data) }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -200,46 +200,46 @@
 
     <!-- Modal Andamento Geral -->
     <BModal
-      v-model="mostrarModalAndamentoGeral"
-      :fade="false"
-      title="Andamento Geral dos Processos"
-      size="xl"
-      hide-footer
+        v-model="mostrarModalAndamentoGeral"
+        :fade="false"
+        hide-footer
+        size="xl"
+        title="Andamento Geral dos Processos"
     >
       <div class="mb-3">
         <BButton
-          variant="outline-primary"
-          size="sm"
-          data-testid="export-csv-andamento"
-          @click="exportarAndamentoGeral"
+            data-testid="export-csv-andamento"
+            size="sm"
+            variant="outline-primary"
+            @click="exportarAndamentoGeral"
         >
-          <i class="bi bi-download" /> Exportar CSV
+          <i class="bi bi-download"/> Exportar CSV
         </BButton>
       </div>
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Tipo</th>
-              <th>Situação</th>
-              <th>Data Limite</th>
-              <th>Unidade</th>
-              <th>% Concluído</th>
-            </tr>
+          <tr>
+            <th>Descrição</th>
+            <th>Tipo</th>
+            <th>Situação</th>
+            <th>Data Limite</th>
+            <th>Unidade</th>
+            <th>% Concluído</th>
+          </tr>
           </thead>
           <tbody>
-            <tr
+          <tr
               v-for="processo in processosFiltrados"
               :key="processo.codigo"
-            >
-              <td>{{ processo.descricao }}</td>
-              <td>{{ processo.tipo }}</td>
-              <td>{{ processo.situacao }}</td>
-              <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
-              <td>{{ processo.unidadeNome }}</td>
-              <td>{{ calcularPercentualConcluido }}%</td>
-            </tr>
+          >
+            <td>{{ processo.descricao }}</td>
+            <td>{{ processo.tipo }}</td>
+            <td>{{ processo.situacao }}</td>
+            <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+            <td>{{ processo.unidadeNome }}</td>
+            <td>{{ calcularPercentualConcluido }}%</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -247,7 +247,7 @@
   </BContainer>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton, BCard, BContainer, BFormInput, BFormSelect, BModal,} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 import {useMapasStore} from "@/stores/mapas";

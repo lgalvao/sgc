@@ -19,7 +19,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
             const response = await buscarTodosUsuarios();
             usuarios.value = (response as any).map((u: any) => ({
                 ...u,
-                unidade: { sigla: u.unidade },
+                unidade: {sigla: u.unidade},
             })) as Usuario[];
         } catch (err: any) {
             error.value = "Falha ao carregar usuários: " + err.message;

@@ -79,7 +79,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
     implementation("ch.qos.logback:logback-classic:1.5.21")
     implementation("ch.qos.logback:logback-core:1.5.21")
-    
+
     // Quality Check Dependencies (SpotBugs)
     spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 }
@@ -177,7 +177,7 @@ tasks.named("pmdTest") {
 tasks.register("qualityCheck") {
     group = "quality"
     description = "Runs all quality checks (tests, coverage, SpotBugs, Checkstyle, PMD)"
-    
+
     dependsOn(tasks.test)
     dependsOn(tasks.jacocoTestReport)
     dependsOn(tasks.jacocoTestCoverageVerification)
@@ -187,9 +187,9 @@ tasks.register("qualityCheck") {
     dependsOn(tasks.pmdTest)
     dependsOn(tasks.spotbugsMain)
     dependsOn(tasks.spotbugsTest)
-    
+
     val buildDir = layout.buildDirectory.get().asFile.absolutePath
-    
+
     doLast {
         println("\n=== Quality Check Summary ===")
         println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
@@ -205,13 +205,13 @@ tasks.register("qualityCheck") {
 tasks.register("qualityCheckFast") {
     group = "quality"
     description = "Runs only tests and coverage"
-    
+
     dependsOn(tasks.test)
     dependsOn(tasks.jacocoTestReport)
     dependsOn(tasks.jacocoTestCoverageVerification)
-    
+
     val buildDir = layout.buildDirectory.get().asFile.absolutePath
-    
+
     doLast {
         println("\n=== Quality Check Fast Summary ===")
         println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
@@ -220,13 +220,13 @@ tasks.register("qualityCheckFast") {
 
 // Ensure quality checks don't run on normal 'check'
 tasks.named("check") {
-    setDependsOn(dependsOn.filter { 
-        it != tasks.checkstyleMain && 
-        it != tasks.checkstyleTest && 
-        it != tasks.pmdMain && 
-        it != tasks.pmdTest && 
-        it != tasks.spotbugsMain && 
-        it != tasks.spotbugsTest 
+    setDependsOn(dependsOn.filter {
+        it != tasks.checkstyleMain &&
+                it != tasks.checkstyleTest &&
+                it != tasks.pmdMain &&
+                it != tasks.pmdTest &&
+                it != tasks.spotbugsMain &&
+                it != tasks.spotbugsTest
     })
 }
 

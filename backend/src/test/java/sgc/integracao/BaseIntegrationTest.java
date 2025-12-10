@@ -25,23 +25,23 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @AutoConfigureMockMvc
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
-
-    @Autowired private WebApplicationContext context;
+    @Autowired
+    protected ObjectMapper objectMapper;
+    @Autowired
+    protected ProcessoRepo processoRepo;
+    @Autowired
+    protected SubprocessoRepo subprocessoRepo;
+    @Autowired
+    protected UnidadeRepo unidadeRepo;
+    @Autowired
+    protected AtividadeRepo atividadeRepo;
+    @Autowired
+    protected MapaRepo mapaRepo;
+    @Autowired
+    private WebApplicationContext context;
 
     @BeforeEach
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     }
-
-    @Autowired protected ObjectMapper objectMapper;
-
-    @Autowired protected ProcessoRepo processoRepo;
-
-    @Autowired protected SubprocessoRepo subprocessoRepo;
-
-    @Autowired protected UnidadeRepo unidadeRepo;
-
-    @Autowired protected AtividadeRepo atividadeRepo;
-
-    @Autowired protected MapaRepo mapaRepo;
 }

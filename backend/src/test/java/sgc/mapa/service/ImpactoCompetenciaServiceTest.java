@@ -14,5 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para ImpactoCompetenciaService")
 class ImpactoCompetenciaServiceTest {
-    @InjectMocks private ImpactoCompetenciaService impactoCompetenciaService;
+    @InjectMocks
+    private ImpactoCompetenciaService impactoCompetenciaService;
 }

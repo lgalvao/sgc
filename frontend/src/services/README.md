@@ -1,13 +1,17 @@
 # Services (Camada de Serviço)
+
 Última atualização: 2025-12-04 14:18:38Z
 
 Este diretório contém os módulos responsáveis pela **comunicação com o Backend**.
 
-Os serviços atuam como uma camada de abstração sobre o protocolo HTTP. Os componentes e stores nunca devem chamar `axios.get` ou `axios.post` diretamente; eles devem invocar métodos semânticos nos serviços (ex: `processoService.criar(...)`).
+Os serviços atuam como uma camada de abstração sobre o protocolo HTTP. Os componentes e stores nunca devem chamar
+`axios.get` ou `axios.post` diretamente; eles devem invocar métodos semânticos nos serviços (ex:
+`processoService.criar(...)`).
 
 ## Padrão de Implementação
 
-Cada arquivo de serviço exporta um objeto ou classe contendo métodos que correspondem aos endpoints da API. Eles utilizam a instância configurada do Axios (`apiClient` de `src/axios-setup.ts`) para fazer as requisições.
+Cada arquivo de serviço exporta um objeto ou classe contendo métodos que correspondem aos endpoints da API. Eles
+utilizam a instância configurada do Axios (`apiClient` de `src/axios-setup.ts`) para fazer as requisições.
 
 ### Arquivos Disponíveis
 
@@ -24,8 +28,9 @@ Cada arquivo de serviço exporta um objeto ou classe contendo métodos que corre
 - **`usuarioService.ts`**: Autenticação e gestão de usuários (`/api/usuarios`).
 
 ## Tratamento de Erros
-Os serviços devem repassar os erros do Axios para que possam ser tratados pelas camadas superiores (Stores ou Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, etc.).
 
+Os serviços devem repassar os erros do Axios para que possam ser tratados pelas camadas superiores (Stores ou
+Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, etc.).
 
 ## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
 

@@ -23,11 +23,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class MovimentacaoListenerTest {
 
-    @Mock private SubprocessoMovimentacaoRepo movimentacaoRepo;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private SubprocessoNotificacaoService notificacaoService;
+    @Mock
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoNotificacaoService notificacaoService;
 
-    @InjectMocks private MovimentacaoListener listener;
+    @InjectMocks
+    private MovimentacaoListener listener;
 
     private Subprocesso mockSubprocesso(Long id) {
         Subprocesso sp = new Subprocesso();

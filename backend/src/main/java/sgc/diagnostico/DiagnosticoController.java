@@ -29,10 +29,10 @@ public class DiagnosticoController {
             @PathVariable Long subprocessoId,
             @RequestBody @Valid SalvarAvaliacaoRequest request,
             @RequestHeader(value = "X-Usuario-Simulado", required = false) String usuarioSimulado) {
-        
+
         // Em produção usaria o usuário do contexto de segurança
-        String servidorTitulo = usuarioSimulado != null ? usuarioSimulado : "123456789012"; 
-        
+        String servidorTitulo = usuarioSimulado != null ? usuarioSimulado : "123456789012";
+
         return ResponseEntity.ok(diagnosticoService.salvarAvaliacao(subprocessoId, servidorTitulo, request));
     }
 
@@ -40,7 +40,7 @@ public class DiagnosticoController {
     public ResponseEntity<List<AvaliacaoServidorDto>> buscarMinhasAvaliacoes(
             @PathVariable Long subprocessoId,
             @RequestParam(required = false) String servidorTitulo) { // Opcional se usar header/security
-            
+
         String titulo = servidorTitulo != null ? servidorTitulo : "123456789012";
         return ResponseEntity.ok(diagnosticoService.buscarMinhasAvaliacoes(subprocessoId, titulo));
     }
@@ -53,7 +53,7 @@ public class DiagnosticoController {
 
         String servidorTitulo = usuarioSimulado != null ? usuarioSimulado : "123456789012";
         if (request == null) request = new ConcluirAutoavaliacaoRequest(null);
-        
+
         diagnosticoService.concluirAutoavaliacao(subprocessoId, servidorTitulo, request);
         return ResponseEntity.ok().build();
     }
@@ -75,10 +75,10 @@ public class DiagnosticoController {
     public ResponseEntity<DiagnosticoDto> concluirDiagnostico(
             @PathVariable Long subprocessoId,
             @RequestBody(required = false) ConcluirDiagnosticoRequest request) {
-        
+
         if (request == null) request = new ConcluirDiagnosticoRequest(null);
         diagnosticoService.concluirDiagnostico(subprocessoId, request);
-        
+
         return ResponseEntity.ok(diagnosticoService.buscarDiagnosticoCompleto(subprocessoId));
     }
 }

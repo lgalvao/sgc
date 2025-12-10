@@ -22,7 +22,8 @@ import static org.mockito.Mockito.when;
 class ConhecimentoMapperTest {
     private static final String DESC = "Test Description";
 
-    @Mock private AtividadeRepo atividadeRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     private ConhecimentoMapper mapper;
 

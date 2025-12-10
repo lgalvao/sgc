@@ -38,10 +38,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @Import({
-    TestSecurityConfig.class,
-    WithMockChefeSecurityContextFactory.class,
-    WithMockAdminSecurityContextFactory.class,
-    WithMockGestorSecurityContextFactory.class
+        TestSecurityConfig.class,
+        WithMockChefeSecurityContextFactory.class,
+        WithMockAdminSecurityContextFactory.class,
+        WithMockGestorSecurityContextFactory.class
 })
 @DisplayName("CDU-12: Verificar impactos no mapa de competências")
 class CDU12IntegrationTest extends BaseIntegrationTest {
@@ -54,12 +54,18 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
 
     // Repositories
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;

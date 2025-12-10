@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/** DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades. */
+/**
+ * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,7 +26,9 @@ public class UnidadeDto {
     @JsonProperty("isElegivel")
     private boolean isElegivel;
 
-    /** Construtor sem subunidades. */
+    /**
+     * Construtor sem subunidades.
+     */
     public UnidadeDto(
             Long codigo,
             String nome,

@@ -1,49 +1,49 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrar"
-    title="Importação de atividades"
-    size="lg"
-    centered
-    hide-footer
-    @hide="fechar"
+      :fade="false"
+      :model-value="mostrar"
+      centered
+      hide-footer
+      size="lg"
+      title="Importação de atividades"
+      @hide="fechar"
   >
     <BAlert
-      v-if="erroImportacao"
-      variant="danger"
-      dismissible
-      :model-value="true"
-      :fade="false"
-      @dismissed="limparErroImportacao"
+        v-if="erroImportacao"
+        :fade="false"
+        :model-value="true"
+        dismissible
+        variant="danger"
+        @dismissed="limparErroImportacao"
     >
       {{ erroImportacao }}
     </BAlert>
     <fieldset :disabled="importando">
       <div class="mb-3">
         <label
-          class="form-label"
-          for="processo-select"
+            class="form-label"
+            for="processo-select"
         >Processo</label>
         <BFormSelect
-          id="processo-select"
-          v-model="processoSelecionadoId"
-          data-testid="select-processo"
-          :options="processosDisponiveis"
-          value-field="codigo"
-          text-field="descricao"
+            id="processo-select"
+            v-model="processoSelecionadoId"
+            :options="processosDisponiveis"
+            data-testid="select-processo"
+            text-field="descricao"
+            value-field="codigo"
         >
           <template #first>
             <BFormSelectOption
-              disabled
-              value=""
+                disabled
+                value=""
             >
               Selecione
             </BFormSelectOption>
           </template>
         </BFormSelect>
         <div
-          v-if="!processosDisponiveis.length"
-          class="text-center text-muted mt-3"
+            v-if="!processosDisponiveis.length"
+            class="text-center text-muted mt-3"
         >
           Nenhum processo disponível para importação.
         </div>
@@ -51,22 +51,22 @@
 
       <div class="mb-3">
         <label
-          class="form-label"
-          for="unidade-select"
+            class="form-label"
+            for="unidade-select"
         >Unidade</label>
         <BFormSelect
-          id="unidade-select"
-          v-model="unidadeSelecionadaId"
-          :disabled="!processoSelecionado"
-          data-testid="select-unidade"
-          :options="unidadesParticipantes"
-          value-field="codUnidade"
-          text-field="sigla"
+            id="unidade-select"
+            v-model="unidadeSelecionadaId"
+            :disabled="!processoSelecionado"
+            :options="unidadesParticipantes"
+            data-testid="select-unidade"
+            text-field="sigla"
+            value-field="codUnidade"
         >
           <template #first>
             <BFormSelectOption
-              disabled
-              value=""
+                disabled
+                value=""
             >
               Selecione
             </BFormSelectOption>
@@ -77,27 +77,27 @@
       <div v-if="unidadeSelecionada">
         <h6>Atividades para importar</h6>
         <div
-          v-if="atividadesParaImportar.length"
-          class="atividades-container border rounded p-2"
+            v-if="atividadesParaImportar.length"
+            class="atividades-container border rounded p-2"
         >
           <div
-            v-for="ativ in atividadesParaImportar"
-            :key="ativ.codigo"
-            class="form-check"
+              v-for="ativ in atividadesParaImportar"
+              :key="ativ.codigo"
+              class="form-check"
           >
             <BFormCheckbox
-              :id="`ativ-check-${ativ.codigo}`"
-              v-model="atividadesSelecionadas"
-              :value="ativ"
-              :data-testid="`checkbox-atividade-${ativ.codigo}`"
+                :id="`ativ-check-${ativ.codigo}`"
+                v-model="atividadesSelecionadas"
+                :data-testid="`checkbox-atividade-${ativ.codigo}`"
+                :value="ativ"
             >
               {{ ativ.descricao }}
             </BFormCheckbox>
           </div>
         </div>
         <div
-          v-else
-          class="text-center text-muted mt-3"
+            v-else
+            class="text-center text-muted mt-3"
         >
           Nenhuma atividade encontrada para esta unidade/processo.
         </div>
@@ -105,25 +105,25 @@
     </fieldset>
     <template #footer>
       <BButton
-        variant="outline-secondary"
-        type="button"
-        data-testid="importar-atividades-modal__btn-modal-cancelar"
-        @click="fechar"
+          data-testid="importar-atividades-modal__btn-modal-cancelar"
+          type="button"
+          variant="outline-secondary"
+          @click="fechar"
       >
         Cancelar
       </BButton>
       <BButton
-        :disabled="!atividadesSelecionadas.length || importando"
-        variant="outline-primary"
-        type="button"
-        data-testid="btn-importar"
-        @click="importar"
+          :disabled="!atividadesSelecionadas.length || importando"
+          data-testid="btn-importar"
+          type="button"
+          variant="outline-primary"
+          @click="importar"
       >
         <span
-          v-if="importando"
-          class="spinner-border spinner-border-sm"
-          role="status"
-          aria-hidden="true"
+            v-if="importando"
+            aria-hidden="true"
+            class="spinner-border spinner-border-sm"
+            role="status"
         />
         {{ importando ? 'Importando...' : 'Importar' }}
       </BButton>

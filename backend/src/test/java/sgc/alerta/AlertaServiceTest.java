@@ -32,14 +32,21 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AlertaServiceTest {
 
-    @Mock private AlertaRepo alertaRepo;
-    @Mock private AlertaUsuarioRepo alertaUsuarioRepo;
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private SgrhService sgrhService;
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private AlertaMapper alertaMapper;
+    @Mock
+    private AlertaRepo alertaRepo;
+    @Mock
+    private AlertaUsuarioRepo alertaUsuarioRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private SgrhService sgrhService;
+    @Mock
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private AlertaMapper alertaMapper;
 
-    @InjectMocks private AlertaService service;
+    @InjectMocks
+    private AlertaService service;
 
     @Test
     @DisplayName("criarAlerta sucesso")
@@ -185,9 +192,9 @@ class AlertaServiceTest {
                 .thenThrow(new RuntimeException("Erro SGRH"));
 
         assertThatThrownBy(
-                        () ->
-                                service.criarAlertasProcessoIniciado(
-                                        p, List.of(unidadeId), List.of()))
+                () ->
+                        service.criarAlertasProcessoIniciado(
+                                p, List.of(unidadeId), List.of()))
                 .isInstanceOf(ErroAlerta.class);
     }
 

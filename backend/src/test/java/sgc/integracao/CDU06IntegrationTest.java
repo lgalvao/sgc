@@ -48,13 +48,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @MockitoBean private SgrhService sgrhService;
+    @MockitoBean
+    private SgrhService sgrhService;
 
     private Processo processo;
 

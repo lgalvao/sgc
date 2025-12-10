@@ -25,9 +25,9 @@ describe("analiseService", () => {
 
             const result = await listarAnalisesCadastro(subprocessoId);
 
-      expect(api.get).toHaveBeenCalledWith(
-          `/subprocessos/${subprocessoId}/historico-cadastro`,
-      );
+            expect(api.get).toHaveBeenCalledWith(
+                `/subprocessos/${subprocessoId}/historico-cadastro`,
+            );
             expect(result).toEqual(responseData);
         });
 
@@ -59,9 +59,9 @@ describe("analiseService", () => {
 
             const result = await listarAnalisesValidacao(subprocessoId);
 
-      expect(api.get).toHaveBeenCalledWith(
-          `/subprocessos/${subprocessoId}/historico-validacao`,
-      );
+            expect(api.get).toHaveBeenCalledWith(
+                `/subprocessos/${subprocessoId}/historico-validacao`,
+            );
             expect(result).toEqual(responseData);
         });
 

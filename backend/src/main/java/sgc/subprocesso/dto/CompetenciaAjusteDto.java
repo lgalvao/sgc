@@ -10,15 +10,21 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/** DTO para competência no contexto de ajustes do mapa. */
+/**
+ * DTO para competência no contexto de ajustes do mapa.
+ */
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class CompetenciaAjusteDto {
-    @NotNull private final Long codCompetencia;
+    @NotNull
+    private final Long codCompetencia;
 
-    @NotBlank private final String nome;
+    @NotBlank
+    private final String nome;
 
-    @NotNull @Valid private final List<AtividadeAjusteDto> atividades;
+    @NotNull
+    @Valid
+    private final List<AtividadeAjusteDto> atividades;
 }

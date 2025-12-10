@@ -52,23 +52,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Import({
-    TestSecurityConfig.class,
-    sgc.integracao.mocks.TestThymeleafConfig.class,
-    sgc.integracao.mocks.TestEventConfig.class
+        TestSecurityConfig.class,
+        sgc.integracao.mocks.TestThymeleafConfig.class,
+        sgc.integracao.mocks.TestEventConfig.class
 })
 @org.springframework.transaction.annotation.Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
-    @Autowired private AlertaRepo alertaRepo;
-    @Autowired private AnaliseRepo analiseRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private jakarta.persistence.EntityManager entityManager;
-    @MockitoBean private SgrhService sgrhService;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
+    @MockitoBean
+    private SgrhService sgrhService;
 
     private Unidade unidade;
     private Usuario chefe;
@@ -134,6 +145,61 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(sp);
         return sp.getCodigo();
+    }
+
+    private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
+        Map<String, Object> criarReqMap =
+                Map.of(
+                        "descricao",
+                        "Processo Revisão",
+                        "tipo",
+                        "REVISAO",
+                        "dataLimiteEtapa1",
+                        LocalDateTime.now()
+                                .plusDays(10)
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
+                        "unidades",
+                        List.of(unidade.getCodigo()));
+        String reqJson = objectMapper.writeValueAsString(criarReqMap);
+
+        String resJson =
+                mockMvc.perform(
+                                post("/api/processos")
+                                        .with(csrf())
+                                        .with(user(gestor))
+                                        .contentType("application/json")
+                                        .content(reqJson))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
+
+        Map<String, Object> iniciarReqMap =
+                Map.of("tipo", "REVISAO", "unidades", List.of(unidade.getCodigo()));
+        String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
+
+        mockMvc.perform(
+                        post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
+                                .with(csrf())
+                                .with(user(gestor))
+                                .contentType("application/json")
+                                .content(iniciarReqJson))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Subprocesso sp =
+                subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream()
+                        .findFirst()
+                        .orElseThrow();
+        Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
+        sp.setMapa(mapaRevisao);
+        subprocessoRepo.save(sp);
+
+        return processoDto;
     }
 
     @Nested
@@ -363,60 +429,5 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                     .content("{\"observacoes\": \"Homologado fora de hora\"}"))
                     .andExpect(status().isConflict());
         }
-    }
-
-    private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
-        Map<String, Object> criarReqMap =
-                Map.of(
-                        "descricao",
-                        "Processo Revisão",
-                        "tipo",
-                        "REVISAO",
-                        "dataLimiteEtapa1",
-                        LocalDateTime.now()
-                                .plusDays(10)
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
-                        "unidades",
-                        List.of(unidade.getCodigo()));
-        String reqJson = objectMapper.writeValueAsString(criarReqMap);
-
-        String resJson =
-                mockMvc.perform(
-                                post("/api/processos")
-                                        .with(csrf())
-                                        .with(user(gestor))
-                                        .contentType("application/json")
-                                        .content(reqJson))
-                        .andExpect(status().isCreated())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
-
-        ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
-
-        Map<String, Object> iniciarReqMap =
-                Map.of("tipo", "REVISAO", "unidades", List.of(unidade.getCodigo()));
-        String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
-
-        mockMvc.perform(
-                        post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
-                                .with(csrf())
-                                .with(user(gestor))
-                                .contentType("application/json")
-                                .content(iniciarReqJson))
-                .andExpect(status().isOk());
-
-        entityManager.flush();
-        entityManager.clear();
-
-        Subprocesso sp =
-                subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream()
-                        .findFirst()
-                        .orElseThrow();
-        Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
-        sp.setMapa(mapaRevisao);
-        subprocessoRepo.save(sp);
-
-        return processoDto;
     }
 }

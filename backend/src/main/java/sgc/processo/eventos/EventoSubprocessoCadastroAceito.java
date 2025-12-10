@@ -9,4 +9,5 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class EventoSubprocessoCadastroAceito extends EventoSubprocessoBase {}
+public class EventoSubprocessoCadastroAceito extends EventoSubprocessoBase {
+}

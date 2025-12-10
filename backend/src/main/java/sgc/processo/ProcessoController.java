@@ -34,7 +34,7 @@ public class ProcessoController {
      *
      * @param requisicao O DTO com os dados para a criação do processo.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo processo e o {@link
-     *     ProcessoDto} criado no corpo da resposta.
+     * ProcessoDto} criado no corpo da resposta.
      */
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
@@ -47,7 +47,7 @@ public class ProcessoController {
      * Retorna códigos de unidades que já participam de processos ativos do tipo especificado ou de
      * um processo específico, útil para desabilitar checkboxes no frontend.
      *
-     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
      * @param codProcesso Código opcional do processo a ser considerado
      * @return Objeto contendo lista de unidades desabilitadas
      */
@@ -76,7 +76,7 @@ public class ProcessoController {
     /**
      * Atualiza um processo existente.
      *
-     * @param codigo O código do processo a ser atualizado.
+     * @param codigo     O código do processo a ser atualizado.
      * @param requisicao O DTO com os novos dados do processo.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
      */

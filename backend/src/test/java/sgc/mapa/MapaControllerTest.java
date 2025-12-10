@@ -36,10 +36,13 @@ class MapaControllerTest {
     private static final String API_MAPAS_1_EXCLUIR = "/api/mapas/1/excluir";
     private static final String CODIGO_JSON_PATH = "$.codigo";
 
-    @MockitoBean private MapaService mapaService;
-    @MockitoBean private MapaMapper mapaMapper;
+    @MockitoBean
+    private MapaService mapaService;
+    @MockitoBean
+    private MapaMapper mapaMapper;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 

@@ -28,31 +28,27 @@ import java.util.regex.Pattern;
 @Slf4j
 @Profile("!test & !e2e")
 public class NotificacaoEmailService {
-    private final JavaMailSender enviadorDeEmail;
-    private final NotificacaoRepo repositorioNotificacao;
-
-    @Value("${aplicacao.email.remetente}")
-    private String remetente;
-
-    @Value("${aplicacao.email.remetente-nome}")
-    private String nomeRemetente;
-
-    @Value("${aplicacao.email.assunto-prefixo}")
-    private String prefixoAssunto;
-
     private static final Pattern PADRAO_EMAIL =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
+    private final JavaMailSender enviadorDeEmail;
+    private final NotificacaoRepo repositorioNotificacao;
+    @Value("${aplicacao.email.remetente}")
+    private String remetente;
+    @Value("${aplicacao.email.remetente-nome}")
+    private String nomeRemetente;
+    @Value("${aplicacao.email.assunto-prefixo}")
+    private String prefixoAssunto;
 
     /**
      * Envia um email de texto simples.
      *
      * <p>O processo de envio é assíncrono e inclui retentativas.
      *
-     * @param para O endereço de email do destinatário.
+     * @param para    O endereço de email do destinatário.
      * @param assunto O assunto do email.
-     * @param corpo O corpo do email em texto simples.
+     * @param corpo   O corpo do email em texto simples.
      */
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
@@ -64,8 +60,8 @@ public class NotificacaoEmailService {
      *
      * <p>O processo de envio é assíncrono e inclui retentativas.
      *
-     * @param para O endereço de email do destinatário.
-     * @param assunto O assunto do email.
+     * @param para      O endereço de email do destinatário.
+     * @param assunto   O assunto do email.
      * @param corpoHtml O corpo do email em formato HTML.
      */
     @Transactional
@@ -127,7 +123,7 @@ public class NotificacaoEmailService {
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o email for
-     *     enviado, ou {@code false} caso contrário.
+     * enviado, ou {@code false} caso contrário.
      */
     @Async
     @SuppressWarnings("PMD.AvoidCatchingGenericException")

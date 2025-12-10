@@ -3,10 +3,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <BButton
-          v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-          variant="outline-primary"
-          data-testid="unidade-view__btn-criar-atribuicao"
-          @click="irParaCriarAtribuicao"
+            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            data-testid="unidade-view__btn-criar-atribuicao"
+            variant="outline-primary"
+            @click="irParaCriarAtribuicao"
         >
           Criar atribuição
         </BButton>
@@ -14,8 +14,8 @@
     </div>
 
     <BCard
-      v-if="unidadeComResponsavelDinamico"
-      class="mb-4"
+        v-if="unidadeComResponsavelDinamico"
+        class="mb-4"
     >
       <BCardBody>
         <h2 class="display-6 mb-3">
@@ -25,28 +25,28 @@
         </h2>
         <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
         <p class="ms-3">
-          <i class="bi bi-telephone-fill me-2" />{{ titularDetalhes?.ramal }}
-          <i class="bi bi-envelope-fill ms-3 me-2" />{{ titularDetalhes?.email }}
+          <i class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
+          <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
         </p>
         <template
-          v-if="unidadeComResponsavelDinamico.responsavel &&
+            v-if="unidadeComResponsavelDinamico.responsavel &&
             unidadeComResponsavelDinamico.responsavel.codigo &&
             unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.idServidorTitular"
         >
           <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
           <p class="ms-3">
-            <i class="bi bi-telephone-fill me-2" />{{ responsavelDetalhes?.ramal }}
-            <i class="bi bi-envelope-fill ms-3 me-2" />{{ responsavelDetalhes?.email }}
+            <i class="bi bi-telephone-fill me-2"/>{{ responsavelDetalhes?.ramal }}
+            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelDetalhes?.email }}
           </p>
         </template>
         <BButton
-          v-if="mapaVigente"
-          variant="outline-success"
-          data-testid="btn-mapa-vigente"
-          @click="visualizarMapa"
+            v-if="mapaVigente"
+            data-testid="btn-mapa-vigente"
+            variant="outline-success"
+            @click="visualizarMapa"
         >
           <i
-            class="bi bi-file-earmark-spreadsheet me-2"
+              class="bi bi-file-earmark-spreadsheet me-2"
           />Mapa vigente
         </BButton>
       </BCardBody>
@@ -56,15 +56,15 @@
     </div>
 
     <div
-      v-if="unidadeComResponsavelDinamico && unidadeComResponsavelDinamico.filhas && unidadeComResponsavelDinamico.filhas.length > 0"
-      class="mt-5"
+        v-if="unidadeComResponsavelDinamico && unidadeComResponsavelDinamico.filhas && unidadeComResponsavelDinamico.filhas.length > 0"
+        class="mt-5"
     >
       <TreeTable
-        :columns="colunasTabela"
-        :data="dadosFormatadosSubordinadas"
-        :hide-headers="true"
-        title="Unidades Subordinadas"
-        @row-click="navegarParaUnidadeSubordinada"
+          :columns="colunasTabela"
+          :data="dadosFormatadosSubordinadas"
+          :hide-headers="true"
+          title="Unidades Subordinadas"
+          @row-click="navegarParaUnidadeSubordinada"
       />
     </div>
   </BContainer>

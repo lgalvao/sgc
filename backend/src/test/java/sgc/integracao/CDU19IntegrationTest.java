@@ -39,17 +39,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
-    @Autowired private AlertaRepo alertaRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -94,8 +100,8 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/apresentar-sugestoes",
-                                            subprocesso.getCodigo())
+                                    "/api/subprocessos/{id}/apresentar-sugestoes",
+                                    subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType("application/json")
                                     .content("{\"sugestoes\": \"" + sugestoes + "\"}"))

@@ -6,7 +6,8 @@ Pré-condições:
 
 - Usuário logado com perfil GESTOR ou ADMIN
 - Processo de mapeamento iniciado que tenha a unidade como participante
-- Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do usuário.
+- Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
+  usuário.
 
 Fluxo principal:
 
@@ -25,7 +26,10 @@ Fluxo principal:
     - Devolver para ajustes
     - Registrar aceite, caso o perfil seja GESTOR ou Homologar, caso o perfil seja ADMIN.
 
-7. Se o usuário clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises prévias registradas para o cadastro de atividades desde a última disponibilização. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
+7. Se o usuário clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises prévias
+   registradas para o cadastro de atividades desde a última disponibilização. As análises deverão ser apresentadas em
+   uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas
+   informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
 
 8. O usuário analisa as informações e opta por aceitar/homologar ou devolver o cadastro para ajustes.
 
@@ -33,9 +37,11 @@ Fluxo principal:
 
    9.1. Usuário clica em Devolver para ajustes.
 
-   9.2. O sistema abre tela modal (título Devolução) com a pergunta 'Confirma a devolução do cadastro para ajustes?', um campo para preenchimento de uma observação (opcional) e os botões Confirmar ou Cancelar.
+   9.2. O sistema abre tela modal (título Devolução) com a pergunta 'Confirma a devolução do cadastro para ajustes?', um
+   campo para preenchimento de uma observação (opcional) e os botões Confirmar ou Cancelar.
 
-   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de devolução do cadastro, permanecendo na mesma tela.
+   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de devolução do cadastro, permanecendo
+   na mesma tela.
 
    9.4. O usuário opcionalmente informa a observação e escolhe Confirmar.
 
@@ -57,7 +63,8 @@ Fluxo principal:
 
    9.7.4. Descrição: 'Devolução do cadastro de atividades e conhecimentos para ajustes'
 
-   9.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para 'Cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
+   9.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
+   para 'Cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
 
    9.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
@@ -74,11 +81,11 @@ Fluxo principal:
 
    9.10. O sistema cria internamente um alerta:
 
-   - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
-   - Processo: [DESCRICAO_PROCESSO]
-   - Data/hora: Data/hora atual
-   - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-   - Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
+    - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+    - Processo: [DESCRICAO_PROCESSO]
+    - Data/hora: Data/hora atual
+    - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+    - Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
 
    9.11. O sistema mostra a mensagem "Devolução realizada" e redireciona para o Painel.
 

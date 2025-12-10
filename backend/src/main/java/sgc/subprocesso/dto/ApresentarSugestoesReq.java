@@ -16,7 +16,9 @@ import sgc.comum.json.SanitizarHtml;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApresentarSugestoesReq {
-    /** Texto com as sugestões do CHEFE (obrigatório). */
+    /**
+     * Texto com as sugestões do CHEFE (obrigatório).
+     */
     @NotBlank(message = "As sugestões são obrigatórias")
     @SanitizarHtml
     private String sugestoes;

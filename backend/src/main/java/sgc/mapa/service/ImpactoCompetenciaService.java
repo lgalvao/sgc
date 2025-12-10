@@ -126,7 +126,8 @@ public class ImpactoCompetenciaService {
     private static class CompetenciaImpactoAcumulador {
         private Long codigo;
         private String descricao;
-        @Builder.Default private Set<String> atividadesAfetadas = new LinkedHashSet<>();
+        @Builder.Default
+        private Set<String> atividadesAfetadas = new LinkedHashSet<>();
 
         /* default */ void adicionarImpacto(String descricaoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);

@@ -39,9 +39,9 @@ public class PainelService {
      * processos são filtrados pela unidade do usuário e suas subordinadas. Processos no estado
      * 'CRIADO' são omitidos.
      *
-     * @param perfil O perfil do usuário (obrigatório).
+     * @param perfil        O perfil do usuário (obrigatório).
      * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
-     * @param pageable As informações de paginação.
+     * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
@@ -75,7 +75,7 @@ public class PainelService {
      *
      * @param usuarioTitulo Título de eleitor do usuário.
      * @param codigoUnidade Código da unidade.
-     * @param pageable As informações de paginação.
+     * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link AlertaDto}.
      */
     public Page<AlertaDto> listarAlertas(

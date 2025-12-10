@@ -49,21 +49,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
 class CDU08IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private MapaRepo mapaRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
 
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
 
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
@@ -127,8 +135,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -183,8 +191,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -207,8 +215,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -222,8 +230,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -243,8 +251,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -267,8 +275,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/importar-atividades",
-                                            subprocessoDestino.getCodigo())
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))

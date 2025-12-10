@@ -23,13 +23,17 @@ import static org.mockito.Mockito.when;
 class NotificacaoModelosServiceTest {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Mock private SpringTemplateEngine templateEngine;
+    @Mock
+    private SpringTemplateEngine templateEngine;
 
-    @InjectMocks private NotificacaoModelosService notificacaoModelosService;
+    @InjectMocks
+    private NotificacaoModelosService notificacaoModelosService;
 
-    @Captor private ArgumentCaptor<Context> contextCaptor;
+    @Captor
+    private ArgumentCaptor<Context> contextCaptor;
 
-    @Captor private ArgumentCaptor<String> templateNameCaptor;
+    @Captor
+    private ArgumentCaptor<String> templateNameCaptor;
 
     @BeforeEach
     void setUp() {

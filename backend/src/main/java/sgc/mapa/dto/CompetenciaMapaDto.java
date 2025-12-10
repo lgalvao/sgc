@@ -17,14 +17,20 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 public class CompetenciaMapaDto {
-    /** O código da competência (pode ser nulo para novas competências). */
+    /**
+     * O código da competência (pode ser nulo para novas competências).
+     */
     private Long codigo;
 
-    /** A descrição da competência. */
+    /**
+     * A descrição da competência.
+     */
     @NotBlank(message = "Descrição da competência é obrigatória")
     private String descricao;
 
-    /** Lista com os códigos das atividades vinculadas à competência. */
+    /**
+     * Lista com os códigos das atividades vinculadas à competência.
+     */
     @NotNull(message = "Lista de atividades não pode ser nula")
     private List<Long> atividadesCodigos;
 
@@ -35,12 +41,12 @@ public class CompetenciaMapaDto {
                 (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
     }
 
+    public List<Long> getAtividadesCodigos() {
+        return (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
+    }
+
     public void setAtividadesCodigos(List<Long> atividadesCodigos) {
         this.atividadesCodigos =
                 (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
-    }
-
-    public List<Long> getAtividadesCodigos() {
-        return (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
     }
 }

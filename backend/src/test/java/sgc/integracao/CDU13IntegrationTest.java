@@ -49,21 +49,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
-    @Autowired private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
-    @Autowired private AnaliseRepo analiseRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
 
-    @Autowired private EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -106,7 +114,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
         @WithMockGestor("666666666666")
-        // Simula um usuário com perfil de gestor
+            // Simula um usuário com perfil de gestor
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             String observacoes = "Favor revisar a atividade X e Y.";
@@ -115,8 +123,8 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             // When
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/devolver-cadastro",
-                                            subprocesso.getCodigo())
+                                    "/api/subprocessos/{id}/devolver-cadastro",
+                                    subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(requestBody)))
@@ -211,7 +219,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
         @WithMockAdmin
-        // Simula um usuário com perfil de ADMIN
+            // Simula um usuário com perfil de ADMIN
         void homologarCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             HomologarCadastroReq requestBody = new HomologarCadastroReq("Homologado via teste.");
@@ -219,8 +227,8 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             // When
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/homologar-cadastro",
-                                            subprocesso.getCodigo())
+                                    "/api/subprocessos/{id}/homologar-cadastro",
+                                    subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(requestBody)))
@@ -263,8 +271,8 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                            "/api/subprocessos/{id}/devolver-cadastro",
-                                            subprocesso.getCodigo())
+                                    "/api/subprocessos/{id}/devolver-cadastro",
+                                    subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(devolverReq)))
@@ -287,8 +295,8 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             String jsonResponse =
                     mockMvc.perform(
                                     get(
-                                                    "/api/subprocessos/{id}/historico-cadastro",
-                                                    subprocesso.getCodigo())
+                                            "/api/subprocessos/{id}/historico-cadastro",
+                                            subprocesso.getCodigo())
                                             .accept(MediaType.APPLICATION_JSON))
                             .andExpect(status().isOk())
                             .andReturn()
@@ -297,7 +305,8 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
 
             // Then
             List<sgc.analise.dto.AnaliseHistoricoDto> historico =
-                    objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+                    objectMapper.readValue(jsonResponse, new TypeReference<>() {
+                    });
 
             assertThat(historico).hasSize(2);
 

@@ -7,26 +7,26 @@
         <template v-if="emEdicao">
           <BFormInput
               v-model="atividadeEditada"
+              aria-label="Editar atividade"
               class="me-2 atividade-edicao-input"
               data-testid="inp-editar-atividade"
-              aria-label="Editar atividade"
           />
           <BButton
-              variant="outline-success"
-              size="sm"
               class="me-1 botao-acao"
               data-testid="btn-salvar-edicao-atividade"
+              size="sm"
               title="Salvar"
+              variant="outline-success"
               @click="salvarEdicaoAtividade"
           >
             <i class="bi bi-save"/>
           </BButton>
           <BButton
-              variant="outline-secondary"
-              size="sm"
               class="botao-acao"
               data-testid="btn-cancelar-edicao-atividade"
+              size="sm"
               title="Cancelar"
+              variant="outline-secondary"
               @click="cancelarEdicaoAtividade"
           >
             <i class="bi bi-x"/>
@@ -43,21 +43,21 @@
               class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
           >
             <BButton
-                variant="outline-primary"
-                size="sm"
                 class="botao-acao"
                 data-testid="btn-editar-atividade"
+                size="sm"
                 title="Editar"
+                variant="outline-primary"
                 @click="iniciarEdicaoAtividade"
             >
               <i class="bi bi-pencil"/>
             </BButton>
             <BButton
-                variant="outline-danger"
-                size="sm"
                 class="botao-acao"
                 data-testid="btn-remover-atividade"
+                size="sm"
                 title="Remover"
+                variant="outline-danger"
                 @click="$emit('remover-atividade')"
             >
               <i class="bi bi-trash"/>
@@ -68,34 +68,34 @@
 
       <div class="mt-3 ms-3">
         <div
-          v-for="conhecimento in atividade.conhecimentos"
+            v-for="conhecimento in atividade.conhecimentos"
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >
           <template v-if="conhecimentoEmEdicao === conhecimento.id">
             <BFormInput
                 v-model="conhecimentoEditadoDescricao"
-                class="me-2"
-                size="sm"
-                data-testid="inp-editar-conhecimento"
                 aria-label="Editar conhecimento"
+                class="me-2"
+                data-testid="inp-editar-conhecimento"
+                size="sm"
             />
             <BButton
-                variant="outline-success"
-                size="sm"
                 class="me-1 botao-acao"
                 data-testid="btn-salvar-edicao-conhecimento"
+                size="sm"
                 title="Salvar"
+                variant="outline-success"
                 @click="salvarEdicaoConhecimento(conhecimento.id)"
             >
               <i class="bi bi-save"/>
             </BButton>
             <BButton
-                variant="outline-secondary"
-                size="sm"
                 class="botao-acao"
                 data-testid="btn-cancelar-edicao-conhecimento"
+                size="sm"
                 title="Cancelar"
+                variant="outline-secondary"
                 @click="cancelarEdicaoConhecimento"
             >
               <i class="bi bi-x"/>
@@ -108,21 +108,21 @@
                 class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
             >
               <BButton
-                  variant="outline-primary"
-                  size="sm"
                   class="botao-acao"
                   data-testid="btn-editar-conhecimento"
+                  size="sm"
                   title="Editar"
+                  variant="outline-primary"
                   @click="iniciarEdicaoConhecimento(conhecimento)"
               >
                 <i class="bi bi-pencil"/>
               </BButton>
               <BButton
-                  variant="outline-danger"
-                  size="sm"
                   class="botao-acao"
                   data-testid="btn-remover-conhecimento"
+                  size="sm"
                   title="Remover"
+                  variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.id)"
               >
                 <i class="bi bi-trash"/>
@@ -139,20 +139,20 @@
           <BCol>
             <BFormInput
                 v-model="novoConhecimento"
-                size="sm"
+                aria-label="Novo conhecimento"
                 data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
+                size="sm"
                 type="text"
-                aria-label="Novo conhecimento"
             />
           </BCol>
           <BCol cols="auto">
             <BButton
-                variant="outline-secondary"
-                size="sm"
                 data-testid="btn-adicionar-conhecimento"
+                size="sm"
                 title="Adicionar Conhecimento"
                 type="submit"
+                variant="outline-secondary"
             >
               <i class="bi bi-save"/>
             </BButton>

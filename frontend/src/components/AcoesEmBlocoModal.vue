@@ -1,64 +1,64 @@
 <template>
   <BModal
-    :fade="false"
-    :model-value="mostrar"
-    :title="tipoAcao === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
-    size="lg"
-    centered
-    hide-footer
-    @hide="fechar"
+      :fade="false"
+      :model-value="mostrar"
+      :title="tipoAcao === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco'"
+      centered
+      hide-footer
+      size="lg"
+      @hide="fechar"
   >
     <div class="alert alert-info">
-      <i class="bi bi-info-circle" />
+      <i class="bi bi-info-circle"/>
       Selecione as unidades que terão seus cadastros {{ tipoAcao === 'aceitar' ? 'aceitos' : 'homologados' }}:
     </div>
 
     <div class="table-responsive">
       <table class="table table-bordered">
         <thead class="table-light">
-          <tr>
-            <th>Selecionar</th>
-            <th>Sigla</th>
-            <th>Nome</th>
-            <th>Situação Atual</th>
-          </tr>
+        <tr>
+          <th>Selecionar</th>
+          <th>Sigla</th>
+          <th>Nome</th>
+          <th>Situação Atual</th>
+        </tr>
         </thead>
         <tbody>
-          <tr
+        <tr
             v-for="unidade in unidades"
             :key="unidade.sigla"
-          >
-            <td>
-              <BFormCheckbox
+        >
+          <td>
+            <BFormCheckbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
                 :data-testid="'chk-unidade-' + unidade.sigla"
-              />
-            </td>
-            <td><strong>{{ unidade.sigla }}</strong></td>
-            <td>{{ unidade.nome }}</td>
-            <td>{{ unidade.situacao }}</td>
-          </tr>
+            />
+          </td>
+          <td><strong>{{ unidade.sigla }}</strong></td>
+          <td>{{ unidade.nome }}</td>
+          <td>{{ unidade.situacao }}</td>
+        </tr>
         </tbody>
       </table>
     </div>
     <template #footer>
       <button
-        type="button"
-        class="btn btn-secondary"
-        data-testid="acoes-em-bloco-modal__btn-modal-cancelar"
-        @click="fechar"
+          class="btn btn-secondary"
+          data-testid="acoes-em-bloco-modal__btn-modal-cancelar"
+          type="button"
+          @click="fechar"
       >
-        <i class="bi bi-x-circle" /> Cancelar
+        <i class="bi bi-x-circle"/> Cancelar
       </button>
       <button
-        type="button"
-        class="btn"
-        :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
-        data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"
-        @click="confirmar"
+          :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
+          class="btn"
+          data-testid="acoes-em-bloco-modal__btn-confirmar-acao-bloco"
+          type="button"
+          @click="confirmar"
       >
-        <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />
+        <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"/>
         {{ tipoAcao === 'aceitar' ? 'Aceitar' : 'Homologar' }}
       </button>
     </template>

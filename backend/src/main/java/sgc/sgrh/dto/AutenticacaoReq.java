@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Value;
 
-/** DTO para a requisição de autenticação de um usuário. */
+/**
+ * DTO para a requisição de autenticação de um usuário.
+ */
 @Value
 @Builder
 public class AutenticacaoReq {

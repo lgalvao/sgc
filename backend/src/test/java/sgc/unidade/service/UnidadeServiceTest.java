@@ -29,15 +29,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UnidadeServiceTest {
 
-    @InjectMocks private UnidadeService unidadeService;
+    @InjectMocks
+    private UnidadeService unidadeService;
 
-    @Mock private UnidadeRepo unidadeRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
-    @Mock private MapaRepo mapaRepo;
+    @Mock
+    private MapaRepo mapaRepo;
 
-    @Mock private UsuarioRepo usuarioRepo;
+    @Mock
+    private UsuarioRepo usuarioRepo;
 
-    @Mock private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
+    @Mock
+    private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
 
     @Test
     @DisplayName("buscarTodasUnidades deve retornar hierarquia correta")

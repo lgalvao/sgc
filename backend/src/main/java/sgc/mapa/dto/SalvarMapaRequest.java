@@ -18,10 +18,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalvarMapaRequest {
-    /** Observações gerais sobre o mapa. */
+    /**
+     * Observações gerais sobre o mapa.
+     */
     private String observacoes;
 
-    /** Lista de competências do mapa. */
+    /**
+     * Lista de competências do mapa.
+     */
     @NotNull(message = "Lista de competências não pode ser nula")
     @Valid
     private List<CompetenciaMapaDto> competencias;

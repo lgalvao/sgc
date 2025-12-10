@@ -52,20 +52,33 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class SubprocessoDtoServiceTest {
 
-    @Mock private SubprocessoRepo repositorioSubprocesso;
-    @Mock private MovimentacaoRepo repositorioMovimentacao;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private ConhecimentoRepo repositorioConhecimento;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AnaliseService analiseService;
-    @Mock private AtividadeMapper atividadeMapper;
-    @Mock private ConhecimentoMapper conhecimentoMapper;
-    @Mock private MovimentacaoMapper movimentacaoMapper;
-    @Mock private SubprocessoMapper subprocessoMapper;
-    @Mock private SubprocessoPermissoesService subprocessoPermissoesService;
-    @Mock private SgrhService sgrhService;
+    @Mock
+    private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private MovimentacaoRepo repositorioMovimentacao;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private ConhecimentoRepo repositorioConhecimento;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private AnaliseService analiseService;
+    @Mock
+    private AtividadeMapper atividadeMapper;
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
+    @Mock
+    private MovimentacaoMapper movimentacaoMapper;
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
+    @Mock
+    private SubprocessoPermissoesService subprocessoPermissoesService;
+    @Mock
+    private SgrhService sgrhService;
 
-    @InjectMocks private SubprocessoDtoService service;
+    @InjectMocks
+    private SubprocessoDtoService service;
 
     private MockedStatic<SecurityContextHolder> securityMock;
 

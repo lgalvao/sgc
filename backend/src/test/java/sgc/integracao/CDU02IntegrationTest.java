@@ -37,8 +37,10 @@ public class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
 
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     // Unidades
     private Unidade unidadeRaiz;

@@ -6,19 +6,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sgc.subprocesso.model.Subprocesso;
 
-/** DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5). */
+/**
+ * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SugestoesDto {
-    /** O texto das sugestões. */
+    /**
+     * O texto das sugestões.
+     */
     private String sugestoes;
 
-    /** Indica se foram apresentadas sugestões. */
+    /**
+     * Indica se foram apresentadas sugestões.
+     */
     private boolean sugestoesApresentadas;
 
-    /** O nome da unidade que apresentou as sugestões. */
+    /**
+     * O nome da unidade que apresentou as sugestões.
+     */
     private String unidadeNome;
 
     public static SugestoesDto of(Subprocesso subprocesso) {

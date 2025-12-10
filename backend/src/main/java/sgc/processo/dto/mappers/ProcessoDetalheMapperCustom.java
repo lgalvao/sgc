@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
-    @Autowired private ProcessoDetalheMapper delegate;
+    @Autowired
+    private ProcessoDetalheMapper delegate;
 
-    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
     @Override
     public ProcessoDetalheDto toDetailDTO(Processo processo) {

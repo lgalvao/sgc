@@ -44,15 +44,23 @@ class EventoProcessoListenerTest {
     private static final String RAMAL_SUBSTITUTO = "67890";
     private static final String TECNICO = "Tecnico";
 
-    @Mock private AlertaService alertaService;
-    @Mock private NotificacaoEmailService notificacaoEmailService;
-    @Mock private NotificacaoModelosService notificacaoModelosService;
-    @Mock private SgrhService sgrhService;
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private Environment environment;
+    @Mock
+    private AlertaService alertaService;
+    @Mock
+    private NotificacaoEmailService notificacaoEmailService;
+    @Mock
+    private NotificacaoModelosService notificacaoModelosService;
+    @Mock
+    private SgrhService sgrhService;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private Environment environment;
 
-    @InjectMocks private EventoProcessoListener ouvinteDeEvento;
+    @InjectMocks
+    private EventoProcessoListener ouvinteDeEvento;
 
     private Processo processo;
     private Subprocesso subprocessoOperacional;

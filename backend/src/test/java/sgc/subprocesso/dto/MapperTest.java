@@ -26,15 +26,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
-
-    @Mock private ProcessoRepo processoRepo;
-
-    @Mock private UnidadeRepo unidadeRepo;
-
-    @Mock private MapaRepo mapaRepo;
-
     private final MovimentacaoMapper movimentacaoMapper =
             Mappers.getMapper(MovimentacaoMapper.class);
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private MapaRepo mapaRepo;
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {

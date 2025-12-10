@@ -3,32 +3,32 @@
   <div>
     <div class="form-check">
       <input
-        :id="`chk-${unidade.sigla}`"
-        :checked="isChecked(unidade.sigla)"
-        class="form-check-input"
-        type="checkbox"
-        :data-testid="`chk-unidade-tree-${unidade.sigla}`"
-        :indeterminate.prop="isIndeterminate(unidade) !== false"
-        @change="() => toggleUnidade(unidade)"
+          :id="`chk-${unidade.sigla}`"
+          :checked="isChecked(unidade.sigla)"
+          :data-testid="`chk-unidade-tree-${unidade.sigla}`"
+          :indeterminate.prop="isIndeterminate(unidade) !== false"
+          class="form-check-input"
+          type="checkbox"
+          @change="() => toggleUnidade(unidade)"
       >
       <label
-        :for="`chk-${unidade.sigla}`"
-        class="form-check-label ms-2"
+          :for="`chk-${unidade.sigla}`"
+          class="form-check-label ms-2"
       >
         <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
       </label>
     </div>
     <div
-      v-if="unidade.filhas && unidade.filhas.length"
-      class="ms-4"
+        v-if="unidade.filhas && unidade.filhas.length"
+        class="ms-4"
     >
       <UnidadeTreeItem
-        v-for="filha in unidade.filhas"
-        :key="filha.sigla"
-        :unidade="filha"
-        :is-checked="isChecked"
-        :toggle-unidade="toggleUnidade"
-        :is-indeterminate="isIndeterminate"
+          v-for="filha in unidade.filhas"
+          :key="filha.sigla"
+          :is-checked="isChecked"
+          :is-indeterminate="isIndeterminate"
+          :toggle-unidade="toggleUnidade"
+          :unidade="filha"
       />
     </div>
   </div>

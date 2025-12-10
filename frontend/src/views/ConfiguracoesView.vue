@@ -4,16 +4,16 @@
     <BForm @submit.prevent="salvarConfiguracoes">
       <div class="mb-3">
         <label
-          class="form-label"
-          for="diasInativacaoProcesso"
+            class="form-label"
+            for="diasInativacaoProcesso"
         >Dias para inativação de processos:</label>
         <BFormInput
-          id="diasInativacaoProcesso"
-          v-model.number="configuracoesStore.diasInativacaoProcesso"
-          min="1"
-          required
-          type="number"
-          data-testid="inp-config-dias-inativacao"
+            id="diasInativacaoProcesso"
+            v-model.number="configuracoesStore.diasInativacaoProcesso"
+            data-testid="inp-config-dias-inativacao"
+            min="1"
+            required
+            type="number"
         />
         <div class="form-text">
           Dias depois da finalização de um processo para que seja considerado inativo.
@@ -22,16 +22,16 @@
 
       <div class="mb-3">
         <label
-          class="form-label"
-          for="diasAlertaNovo"
+            class="form-label"
+            for="diasAlertaNovo"
         >Dias para indicação de alerta como novo:</label>
         <BFormInput
-          id="diasAlertaNovo"
-          v-model.number="configuracoesStore.diasAlertaNovo"
-          min="1"
-          required
-          type="number"
-          data-testid="inp-config-dias-alerta"
+            id="diasAlertaNovo"
+            v-model.number="configuracoesStore.diasAlertaNovo"
+            data-testid="inp-config-dias-alerta"
+            min="1"
+            required
+            type="number"
         />
         <div class="form-text">
           Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.
@@ -39,19 +39,19 @@
       </div>
 
       <BButton
-        variant="primary"
-        type="submit"
-        data-testid="btn-config-salvar"
+          data-testid="btn-config-salvar"
+          type="submit"
+          variant="primary"
       >
         Salvar
       </BButton>
     </BForm>
     <BAlert
-      v-if="mensagemSucesso"
-      variant="success"
-      class="mt-3"
-      :model-value="true"
-      :fade="false"
+        v-if="mensagemSucesso"
+        :fade="false"
+        :model-value="true"
+        class="mt-3"
+        variant="success"
     >
       {{ mensagemSucesso }}
     </BAlert>

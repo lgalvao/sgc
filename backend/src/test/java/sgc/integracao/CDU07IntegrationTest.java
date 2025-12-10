@@ -45,12 +45,18 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL";
     private static final String OUTRO_CHEFE_TITULO = "333333333333";
 
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private SubprocessoDtoService subprocessoDtoService;
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private SubprocessoDtoService subprocessoDtoService;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
     private Unidade unidade;

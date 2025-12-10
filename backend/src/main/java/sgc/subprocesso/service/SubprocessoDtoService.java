@@ -246,6 +246,7 @@ public class SubprocessoDtoService {
                                                         .formatted(codProcesso, codUnidade)));
         return subprocessoMapper.toDTO(sp);
     }
+
     @Transactional(readOnly = true)
     public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso) {
         Subprocesso sp =
@@ -267,33 +268,33 @@ public class SubprocessoDtoService {
         List<ErroValidacaoDto> erros = new ArrayList<>();
 
         if (sp.getMapa() == null) {
-             // Teoricamente impossível chegar aqui em estágios avançados sem mapa, mas é bom prevenir
-             return ValidacaoCadastroDto.builder().valido(false).erros(List.of(
-                     ErroValidacaoDto.builder()
-                         .tipo("MAPA_INEXISTENTE")
-                         .mensagem("O subprocesso não possui um mapa associado.")
-                         .build()
-             )).build();
+            // Teoricamente impossível chegar aqui em estágios avançados sem mapa, mas é bom prevenir
+            return ValidacaoCadastroDto.builder().valido(false).erros(List.of(
+                    ErroValidacaoDto.builder()
+                            .tipo("MAPA_INEXISTENTE")
+                            .mensagem("O subprocesso não possui um mapa associado.")
+                            .build()
+            )).build();
         }
 
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
 
         if (atividades == null || atividades.isEmpty()) {
             erros.add(ErroValidacaoDto.builder()
-                .tipo("SEM_ATIVIDADES")
-                .mensagem("O mapa não possui atividades cadastradas.")
-                .build());
+                    .tipo("SEM_ATIVIDADES")
+                    .mensagem("O mapa não possui atividades cadastradas.")
+                    .build());
         } else {
             for (Atividade atividade : atividades) {
                 // Valida se tem conhecimentos
                 long qtdConhecimentos = repositorioConhecimento.countByAtividadeCodigo(atividade.getCodigo());
                 if (qtdConhecimentos == 0) {
-                     erros.add(ErroValidacaoDto.builder()
-                         .tipo("ATIVIDADE_SEM_CONHECIMENTO")
-                         .atividadeId(atividade.getCodigo())
-                         .descricaoAtividade(atividade.getDescricao())
-                         .mensagem("A atividade '" + atividade.getDescricao() + "' não possui conhecimentos associados.")
-                         .build());
+                    erros.add(ErroValidacaoDto.builder()
+                            .tipo("ATIVIDADE_SEM_CONHECIMENTO")
+                            .atividadeId(atividade.getCodigo())
+                            .descricaoAtividade(atividade.getDescricao())
+                            .mensagem("A atividade '" + atividade.getDescricao() + "' não possui conhecimentos associados.")
+                            .build());
                 }
             }
         }
@@ -301,9 +302,9 @@ public class SubprocessoDtoService {
         // Adicionar outras validações aqui se necessário (ex: competências)
 
         return ValidacaoCadastroDto.builder()
-            .valido(erros.isEmpty())
-            .erros(erros)
-            .build();
+                .valido(erros.isEmpty())
+                .erros(erros)
+                .build();
     }
 
     @Transactional(readOnly = true)

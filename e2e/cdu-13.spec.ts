@@ -1,16 +1,20 @@
 import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {
     abrirHistoricoAnalise,
     abrirHistoricoAnaliseVisualizacao,
+    aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
-    aceitarCadastroMapeamento,
-    cancelarAceite,
     cancelarDevolucao,
     cancelarHomologacao,
     devolverCadastroMapeamento,
@@ -223,10 +227,10 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         // Abrir histórico
         const modal = await abrirHistoricoAnaliseVisualizacao(page);
-        
+
         // Verificar que modal está visível
         await expect(modal).toBeVisible();
-        
+
         // Neste ponto do fluxo serial, devemos ter apenas 1 análise:
         // - Cenário 2: 1 devolução (GESTOR) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 3)
         // - Cenário 5: 1 aceite (GESTOR) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 6)
@@ -235,7 +239,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         //
         // Conforme CDU-13 linha 28: "análises prévias registradas para o cadastro de atividades 
         // desde a última disponibilização"
-        
+
         // Verificar que há exatamente 1 registro
         await expect(modal.getByTestId('cell-resultado-0')).toBeVisible();
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_MAPEAMENTO/i);

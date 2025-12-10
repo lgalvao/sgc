@@ -1,15 +1,15 @@
 <template>
   <BTable
-    :items="alertas"
-    :fields="fields"
-    hover
-    striped
-    responsive
-    data-testid="tbl-alertas"
-    :tbody-tr-class="rowClass"
-    :tbody-tr-attr="rowAttr"
-    @row-clicked="emit('selecionar-alerta', $event)"
-    @sort-changed="handleSortChange"
+      :fields="fields"
+      :items="alertas"
+      :tbody-tr-attr="rowAttr"
+      :tbody-tr-class="rowClass"
+      data-testid="tbl-alertas"
+      hover
+      responsive
+      striped
+      @row-clicked="emit('selecionar-alerta', $event)"
+      @sort-changed="handleSortChange"
   >
     <template #empty>
       <div class="text-center text-muted">
@@ -53,7 +53,7 @@ const handleSortChange = (ctx: any) => {
 
 const rowAttr = (item: Alerta | null, type: string) => {
   if (item && type === 'row') {
-    return { 'data-testid': `row-alerta-${item.codigo}` };
+    return {'data-testid': `row-alerta-${item.codigo}`};
   }
   return {};
 };

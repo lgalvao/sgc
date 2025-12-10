@@ -3,11 +3,11 @@
     <h2>Cadastro de processo</h2>
 
     <BAlert
-      v-model="alertState.show"
-      :variant="alertState.variant"
-      dismissible
-      :fade="false"
-      class="mt-3"
+        v-model="alertState.show"
+        :fade="false"
+        :variant="alertState.variant"
+        class="mt-3"
+        dismissible
     >
       <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
       <p class="mb-0">{{ alertState.body }}</p>
@@ -15,94 +15,94 @@
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <BFormGroup
-        label="Descrição"
-        label-for="descricao"
-        class="mb-3"
+          class="mb-3"
+          label="Descrição"
+          label-for="descricao"
       >
         <BFormInput
-          id="descricao"
-          v-model="descricao"
-          placeholder="Descreva o processo"
-          type="text"
-          data-testid="inp-processo-descricao"
+            id="descricao"
+            v-model="descricao"
+            data-testid="inp-processo-descricao"
+            placeholder="Descreva o processo"
+            type="text"
         />
       </BFormGroup>
 
       <BFormGroup
-        label="Tipo"
-        label-for="tipo"
-        class="mb-3"
+          class="mb-3"
+          label="Tipo"
+          label-for="tipo"
       >
         <BFormSelect
-          id="tipo"
-          v-model="tipo"
-          data-testid="sel-processo-tipo"
-          :options="Object.values(TipoProcessoEnum)"
+            id="tipo"
+            v-model="tipo"
+            :options="Object.values(TipoProcessoEnum)"
+            data-testid="sel-processo-tipo"
         />
       </BFormGroup>
 
       <BFormGroup
-        label="Unidades participantes"
-        class="mb-3"
+          class="mb-3"
+          label="Unidades participantes"
       >
         <div class="border rounded p-3">
           <ArvoreUnidades
-            v-if="!unidadesStore.isLoading"
-            v-model="unidadesSelecionadas"
-            :unidades="unidadesStore.unidades"
+              v-if="!unidadesStore.isLoading"
+              v-model="unidadesSelecionadas"
+              :unidades="unidadesStore.unidades"
           />
           <div
-            v-else
-            class="text-center py-3"
+              v-else
+              class="text-center py-3"
           >
-            <span class="spinner-border spinner-border-sm me-2" />
+            <span class="spinner-border spinner-border-sm me-2"/>
             Carregando unidades...
           </div>
         </div>
       </BFormGroup>
 
       <BFormGroup
-        label="Data limite"
-        label-for="dataLimite"
-        class="mb-3"
+          class="mb-3"
+          label="Data limite"
+          label-for="dataLimite"
       >
         <BFormInput
-          id="dataLimite"
-          v-model="dataLimite"
-          type="date"
-          data-testid="inp-processo-data-limite"
+            id="dataLimite"
+            v-model="dataLimite"
+            data-testid="inp-processo-data-limite"
+            type="date"
         />
       </BFormGroup>
 
       <BButton
-        variant="primary"
-        type="button"
-        data-testid="btn-processo-salvar"
-        @click="salvarProcesso"
+          data-testid="btn-processo-salvar"
+          type="button"
+          variant="primary"
+          @click="salvarProcesso"
       >
         Salvar
       </BButton>
       <BButton
-        variant="success"
-        class="ms-2"
-        data-testid="btn-processo-iniciar"
-        @click="abrirModalConfirmacao"
+          class="ms-2"
+          data-testid="btn-processo-iniciar"
+          variant="success"
+          @click="abrirModalConfirmacao"
       >
         Iniciar processo
       </BButton>
       <BButton
-        v-if="processoEditando"
-        variant="danger"
-        class="ms-2"
-        data-testid="btn-processo-remover"
-        @click="abrirModalRemocao"
+          v-if="processoEditando"
+          class="ms-2"
+          data-testid="btn-processo-remover"
+          variant="danger"
+          @click="abrirModalRemocao"
       >
         Remover
       </BButton>
       <BButton
-        variant="secondary"
-        class="ms-2"
-        to="/painel"
+          class="ms-2"
+          to="/painel"
+          variant="secondary"
       >
         Cancelar
       </BButton>
@@ -110,11 +110,11 @@
 
     <!-- Modal de confirmação CDU-05 -->
     <BModal
-      v-model="mostrarModalConfirmacao"
-      :fade="false"
-      title="Iniciar processo"
-      centered
-      hide-footer
+        v-model="mostrarModalConfirmacao"
+        :fade="false"
+        centered
+        hide-footer
+        title="Iniciar processo"
     >
       <template #default>
         <p><strong>Descrição:</strong> {{ descricao }}</p>
@@ -128,16 +128,16 @@
       </template>
       <template #footer>
         <BButton
-          variant="secondary"
-          data-testid="btn-iniciar-processo-cancelar"
-          @click="fecharModalConfirmacao"
+            data-testid="btn-iniciar-processo-cancelar"
+            variant="secondary"
+            @click="fecharModalConfirmacao"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="primary"
-          data-testid="btn-iniciar-processo-confirmar"
-          @click="confirmarIniciarProcesso"
+            data-testid="btn-iniciar-processo-confirmar"
+            variant="primary"
+            @click="confirmarIniciarProcesso"
         >
           Confirmar
         </BButton>
@@ -146,25 +146,25 @@
 
     <!-- Modal de confirmação de remoção -->
     <BModal
-      v-model="mostrarModalRemocao"
-      :fade="false"
-      title="Remover processo"
-      centered
-      hide-footer
+        v-model="mostrarModalRemocao"
+        :fade="false"
+        centered
+        hide-footer
+        title="Remover processo"
     >
       <template #default>
         <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
       </template>
       <template #footer>
         <BButton
-          variant="secondary"
-          @click="fecharModalRemocao"
+            variant="secondary"
+            @click="fecharModalRemocao"
         >
           Cancelar
         </BButton>
         <BButton
-          variant="danger"
-          @click="confirmarRemocao"
+            variant="danger"
+            @click="confirmarRemocao"
         >
           Remover
         </BButton>
@@ -245,8 +245,8 @@ onMounted(async () => {
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
         await unidadesStore.buscarUnidadesParaProcesso(
-          processo.tipo,
-          processo.codigo,
+            processo.tipo,
+            processo.codigo,
         );
         await nextTick();
       }
@@ -261,8 +261,8 @@ onMounted(async () => {
 
 watch(tipo, async (novoTipo) => {
   const codProcesso = processoEditando.value
-    ? processoEditando.value.codigo
-    : undefined;
+      ? processoEditando.value.codigo
+      : undefined;
   await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
 });
 
@@ -285,8 +285,8 @@ async function salvarProcesso() {
         unidades: unidadesSelecionadas.value, // Backend valida elegibilidade
       };
       await processosStore.atualizarProcesso(
-        processoEditando.value.codigo,
-        request,
+          processoEditando.value.codigo,
+          request,
       );
       await router.push("/painel");
     } else {
@@ -353,9 +353,9 @@ async function confirmarIniciarProcesso() {
 
   try {
     await processosStore.iniciarProcesso(
-      codigoProcesso,
-      tipo.value as TipoProcesso,
-      unidadesSelecionadas.value,
+        codigoProcesso,
+        tipo.value as TipoProcesso,
+        unidadesSelecionadas.value,
     );
     await router.push("/painel");
     limparCampos();

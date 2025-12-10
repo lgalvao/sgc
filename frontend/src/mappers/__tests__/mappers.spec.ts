@@ -254,69 +254,69 @@ describe("mappers/servidores", () => {
             email: "f@t.br",
             ramal: "123",
         };
-    const s = mapVWUsuarioToServidor(vw);
-    expect(s.codigo).toBe(42);
+        const s = mapVWUsuarioToServidor(vw);
+        expect(s.codigo).toBe(42);
         expect(s.nome).toBe("Fulano");
         expect(s.unidade).toBe("SESEL");
         expect(s.email).toBe("f@t.br");
         expect(s.ramal).toBe("123");
-  });
+    });
 
     it("mapVWUsuarioToServidor uses codigo when provided and defaults missing fields", () => {
         const vw = {codigo: 7, nome: "Beltrano"};
-    const s = mapVWUsuarioToServidor(vw);
-    expect(s.codigo).toBe(7);
+        const s = mapVWUsuarioToServidor(vw);
+        expect(s.codigo).toBe(7);
         expect(s.nome).toBe("Beltrano");
         expect(s.unidade).toBe("");
-  });
+    });
 
     it("mapVWUsuariosArray maps array", () => {
         const arr = [
             {codigo: 1, nome: "A"},
             {titulo: "2", nome: "B"},
         ];
-    const res = mapVWUsuariosArray(arr);
-    expect(res.length).toBe(2);
-    expect(res[0].codigo).toBe(1);
-    expect(res[1].codigo).toBe(2);
-  });
+        const res = mapVWUsuariosArray(arr);
+        expect(res.length).toBe(2);
+        expect(res[0].codigo).toBe(1);
+        expect(res[1].codigo).toBe(2);
+    });
 });
 
 describe("mappers/unidades", () => {
     it("mapUnidade maps fields and responsavel, and recursive filhas", () => {
-    const u = {
-      codigo: 10,
-        sigla: "SETEST",
-        nome: "Seção Teste",
-        tipo: "OPERACIONAL",
-      idServidorTitular: 99,
-      responsavel: {
-        idServidorResponsavel: 100,
-          tipo: "Substituição",
-          dataInicio: "2025-01-01",
-          dataFim: null,
-      },
-      filhas: [
-          {
-              codigo: 11,
-              sigla: "FILHA",
-              nome: "Filha",
-              tipo: "OPERACIONAL",
-              filhas: [],
-          },
-      ],
-    };
+        const u = {
+            codigo: 10,
+            sigla: "SETEST",
+            nome: "Seção Teste",
+            tipo: "OPERACIONAL",
+            idServidorTitular: 99,
+            responsavel: {
+                idServidorResponsavel: 100,
+                tipo: "Substituição",
+                dataInicio: "2025-01-01",
+                dataFim: null,
+            },
+            filhas: [
+                {
+                    codigo: 11,
+                    sigla: "FILHA",
+                    nome: "Filha",
+                    tipo: "OPERACIONAL",
+                    filhas: [],
+                },
+            ],
+        };
 
-    const mapped = mapUnidade(u);
-    expect(mapped.codigo).toBe(10);
+        const mapped = mapUnidade(u);
+        expect(mapped.codigo).toBe(10);
         expect(mapped.sigla).toBe("SETEST");
         expect(mapped.nome).toBe("Seção Teste");
-    expect(mapped.idServidorTitular).toBe(99);
-    expect(mapped.responsavel).not.toBeNull();
-    expect((mapped.responsavel as any)!.idServidor).toBe(100);
-    expect(Array.isArray(mapped.filhas)).toBe(true);
-    expect(mapped.filhas[0].codigo).toBe(11);
-  });
+        expect(mapped.idServidorTitular).toBe(99);
+        expect(mapped.responsavel).not.toBeNull();
+        expect((mapped.responsavel as any)!.idServidor).toBe(100);
+        expect(Array.isArray(mapped.filhas)).toBe(true);
+        expect(mapped.filhas[0].codigo).toBe(11);
+    });
 
     it("mapUnidadeSnapshot maps simple snapshot structure recursively", () => {
         const s = {
@@ -324,19 +324,19 @@ describe("mappers/unidades", () => {
             tipo: "OPERACIONAL",
             filhas: [{sigla: "C1", tipo: "OPERACIONAL", filhas: []}],
         };
-    const snap = mapUnidadeSnapshot(s);
+        const snap = mapUnidadeSnapshot(s);
         expect(snap.sigla).toBe("ROOT");
-    expect(snap.filhas.length).toBe(1);
+        expect(snap.filhas.length).toBe(1);
         expect(snap.filhas[0].sigla).toBe("C1");
-  });
+    });
 
     it("mapUnidadesArray maps arrays", () => {
         const arr = [
             {codigo: 1, sigla: "A"},
             {codigo: 2, sigla: "B"},
         ];
-    const res = mapUnidadesArray(arr);
-    expect(res.length).toBe(2);
+        const res = mapUnidadesArray(arr);
+        expect(res.length).toBe(2);
         expect(res[0].sigla).toBe("A");
-  });
+    });
 });

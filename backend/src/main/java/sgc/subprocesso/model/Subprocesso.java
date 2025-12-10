@@ -19,6 +19,27 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Subprocesso extends EntidadeBase {
+    @ManyToOne
+    @JoinColumn(name = "processo_codigo")
+    private Processo processo;
+    @ManyToOne
+    @JoinColumn(name = "unidade_codigo")
+    private Unidade unidade;
+    @ManyToOne
+    @JoinColumn(name = "mapa_codigo")
+    private Mapa mapa;
+    @Column(name = "data_limite_etapa1")
+    private LocalDateTime dataLimiteEtapa1;
+    @Column(name = "data_fim_etapa1")
+    private LocalDateTime dataFimEtapa1;
+    @Column(name = "data_limite_etapa2")
+    private LocalDateTime dataLimiteEtapa2;
+    @Column(name = "data_fim_etapa2")
+    private LocalDateTime dataFimEtapa2;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situacao_id", length = 50)
+    private SituacaoSubprocesso situacao;
+
     public Subprocesso(
             Long codigo,
             sgc.processo.model.Processo processo,
@@ -34,35 +55,9 @@ public class Subprocesso extends EntidadeBase {
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "processo_codigo")
-    private Processo processo;
-
-    @ManyToOne
-    @JoinColumn(name = "unidade_codigo")
-    private Unidade unidade;
-
-    @ManyToOne
-    @JoinColumn(name = "mapa_codigo")
-    private Mapa mapa;
-
-    @Column(name = "data_limite_etapa1")
-    private LocalDateTime dataLimiteEtapa1;
-
-    @Column(name = "data_fim_etapa1")
-    private LocalDateTime dataFimEtapa1;
-
-    @Column(name = "data_limite_etapa2")
-    private LocalDateTime dataLimiteEtapa2;
-
-    @Column(name = "data_fim_etapa2")
-    private LocalDateTime dataFimEtapa2;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "situacao_id", length = 50)
-    private SituacaoSubprocesso situacao;
-
-    /** Construtor de conveniência para criar um novo subprocesso no início de um processo. */
+    /**
+     * Construtor de conveniência para criar um novo subprocesso no início de um processo.
+     */
     public Subprocesso(
             Processo processo,
             Unidade unidade,

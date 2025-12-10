@@ -25,12 +25,17 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MapaServiceTest {
 
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private MapaIntegridadeService mapaIntegridadeService;
-    @Mock private MapaVinculoService mapaVinculoService;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private MapaIntegridadeService mapaIntegridadeService;
+    @Mock
+    private MapaVinculoService mapaVinculoService;
 
-    @InjectMocks private MapaService service;
+    @InjectMocks
+    private MapaService service;
 
     @Test
     @DisplayName("obterMapaCompleto sucesso")

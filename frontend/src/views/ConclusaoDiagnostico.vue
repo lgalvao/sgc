@@ -2,35 +2,35 @@
   <BContainer class="mt-4">
     <div class="row justify-content-center">
       <div class="col-md-8">
-        <BCard title="Conclusão do Diagnóstico" class="shadow-sm">
+        <BCard class="shadow-sm" title="Conclusão do Diagnóstico">
           <div v-if="loading" class="text-center py-5">
-            <BSpinner label="Carregando..." />
+            <BSpinner label="Carregando..."/>
           </div>
-          
+
           <div v-else>
             <div v-if="!diagnostico?.podeSerConcluido" class="alert alert-danger mb-4">
-              <i class="bi bi-exclamation-triangle-fill me-2" />
+              <i class="bi bi-exclamation-triangle-fill me-2"/>
               {{ diagnostico?.motivoNaoPodeConcluir }}
               <hr>
               <p class="mb-0">Para concluir com pendências, é obrigatório fornecer uma justificativa abaixo.</p>
             </div>
 
             <div v-else class="alert alert-success mb-4">
-              <i class="bi bi-check-circle-fill me-2" />
+              <i class="bi bi-check-circle-fill me-2"/>
               O diagnóstico está completo e pronto para ser concluído.
             </div>
 
-            <BFormGroup 
-              label="Justificativa / Comentários Finais:" 
-              label-for="justificativa"
-              class="mb-4"
+            <BFormGroup
+                class="mb-4"
+                label="Justificativa / Comentários Finais:"
+                label-for="justificativa"
             >
               <BFormTextarea
-                id="justificativa"
-                v-model="justificativa"
-                rows="4"
-                :state="justificativaValida"
-                placeholder="Insira observações relevantes para a validação superior..."
+                  id="justificativa"
+                  v-model="justificativa"
+                  :state="justificativaValida"
+                  placeholder="Insira observações relevantes para a validação superior..."
+                  rows="4"
               />
               <BFormInvalidFeedback>
                 A justificativa é obrigatória quando existem pendências.
@@ -38,15 +38,15 @@
             </BFormGroup>
 
             <div class="d-flex justify-content-end gap-2">
-                <BButton variant="outline-secondary" to="/painel">Cancelar</BButton>
-                <BButton 
-                    variant="success" 
-                    :disabled="!botaoHabilitado"
-                    data-testid="btn-confirmar-conclusao"
-                    @click="concluir"
-                >
-                    Confirmar Conclusão
-                </BButton>
+              <BButton to="/painel" variant="outline-secondary">Cancelar</BButton>
+              <BButton
+                  :disabled="!botaoHabilitado"
+                  data-testid="btn-confirmar-conclusao"
+                  variant="success"
+                  @click="concluir"
+              >
+                Confirmar Conclusão
+              </BButton>
             </div>
           </div>
         </BCard>
@@ -80,37 +80,37 @@ const diagnostico = ref<DiagnosticoDto | null>(null);
 const justificativa = ref('');
 
 const justificativaValida = computed(() => {
-    if (diagnostico.value?.podeSerConcluido) return null; // Não valida se opcional
-    return justificativa.value.trim().length > 10;
+  if (diagnostico.value?.podeSerConcluido) return null; // Não valida se opcional
+  return justificativa.value.trim().length > 10;
 });
 
 const botaoHabilitado = computed(() => {
-    if (diagnostico.value?.podeSerConcluido) return true;
-    return justificativaValida.value === true;
+  if (diagnostico.value?.podeSerConcluido) return true;
+  return justificativaValida.value === true;
 });
 
 onMounted(async () => {
-    try {
-        loading.value = true;
-        diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
-        if (diagnostico.value.situacao === 'CONCLUIDO') {
-            feedbackStore.show('Aviso', 'Este diagnóstico já foi concluído.', 'warning');
-            router.push('/painel');
-        }
-    } catch (error) {
-        feedbackStore.show('Erro', 'Erro ao carregar dados: ' + error, 'danger');
-    } finally {
-        loading.value = false;
+  try {
+    loading.value = true;
+    diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
+    if (diagnostico.value.situacao === 'CONCLUIDO') {
+      feedbackStore.show('Aviso', 'Este diagnóstico já foi concluído.', 'warning');
+      router.push('/painel');
     }
+  } catch (error) {
+    feedbackStore.show('Erro', 'Erro ao carregar dados: ' + error, 'danger');
+  } finally {
+    loading.value = false;
+  }
 });
 
 async function concluir() {
-    try {
-        await diagnosticoService.concluirDiagnostico(codSubprocesso.value, justificativa.value);
-        feedbackStore.show('Sucesso', 'Diagnóstico da unidade concluído com sucesso!', 'success');
-        router.push('/painel');
-    } catch (error: any) {
-        feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
-    }
+  try {
+    await diagnosticoService.concluirDiagnostico(codSubprocesso.value, justificativa.value);
+    feedbackStore.show('Sucesso', 'Diagnóstico da unidade concluído com sucesso!', 'success');
+    router.push('/painel');
+  } catch (error: any) {
+    feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
+  }
 }
 </script>
