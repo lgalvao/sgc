@@ -28,7 +28,7 @@
                 data-testid="lbl-login-usuario"
                 for="titulo"
             >
-              <i class="bi bi-person-circle me-2"/>
+              <i class="bi bi-person-circle me-2" aria-hidden="true"/>
               Título eleitoral</label>
             <BFormInput
                 id="titulo"
@@ -46,7 +46,7 @@
                 data-testid="lbl-login-senha"
                 for="senha"
             >
-              <i class="bi bi-key me-2"/>
+              <i class="bi bi-key me-2" aria-hidden="true"/>
               Senha</label>
             <BFormInput
                 id="senha"
@@ -94,8 +94,10 @@
               data-testid="btn-login-entrar"
               type="submit"
               variant="primary"
+              :disabled="isLoading"
           >
-            <i class="bi bi-box-arrow-in-right me-2"/>
+            <BSpinner v-if="isLoading" small class="me-2" />
+            <i v-else class="bi bi-box-arrow-in-right me-2" aria-hidden="true"/>
             Entrar
           </BButton>
         </BForm>
@@ -105,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
+import {BButton, BCard, BForm, BFormInput, BFormSelect, BFormSelectOption, BSpinner} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {PerfilUnidade} from "@/mappers/sgrh";
@@ -121,6 +123,7 @@ const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");
 const loginStep = ref(1);
 const parSelecionado = ref<PerfilUnidade | null>(null);
+const isLoading = ref(false);
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
@@ -144,6 +147,7 @@ const handleLogin = async () => {
       return;
     }
 
+    isLoading.value = true;
     try {
       const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
@@ -162,10 +166,13 @@ const handleLogin = async () => {
     } catch (error) {
       console.error("Erro no login:", error);
       feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
+    } finally {
+      isLoading.value = false;
     }
   } else if (loginStep.value === 2) {
     // Step 2: Profile Selection
     if (parSelecionado.value) {
+      isLoading.value = true;
       try {
         await perfilStore.selecionarPerfilUnidade(
             Number(titulo.value),
@@ -175,6 +182,8 @@ const handleLogin = async () => {
       } catch (error) {
         console.error("Erro ao selecionar perfil:", error);
         feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
+      } finally {
+        isLoading.value = false;
       }
     } else {
       feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
