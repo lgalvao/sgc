@@ -106,14 +106,11 @@ public class ProcessoService {
                             .orElseThrow(
                                     () -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
-            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de
-            // processos
+            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de processos
             if (unidade.getTipo() == INTERMEDIARIA) {
-                log.error(
-                        "ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}",
+                log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}",
                         unidade.getSigla());
-                throw new IllegalStateException(
-                        "Erro interno: unidade não elegível foi enviada ao backend");
+                throw new IllegalStateException("Erro interno: unidade não elegível foi enviada ao backend");
             }
             participantes.add(unidade);
         }
@@ -122,20 +119,18 @@ public class ProcessoService {
 
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
             getMensagemErroUnidadesSemMapa(new ArrayList<>(req.getUnidades()))
-                    .ifPresent(
-                            msg -> {
-                                throw new ErroProcesso(msg);
-                            });
+                    .ifPresent(msg -> {
+                        throw new ErroProcesso(msg);
+                    });
         }
 
-        Processo processo =
-                new Processo()
-                        .setDescricao(req.getDescricao())
-                        .setTipo(tipoProcesso)
-                        .setDataLimite(req.getDataLimiteEtapa1())
-                        .setSituacao(CRIADO)
-                        .setDataCriacao(LocalDateTime.now())
-                        .setParticipantes(participantes);
+        Processo processo = new Processo()
+                .setDescricao(req.getDescricao())
+                .setTipo(tipoProcesso)
+                .setDataLimite(req.getDataLimiteEtapa1())
+                .setSituacao(CRIADO)
+                .setDataCriacao(LocalDateTime.now())
+                .setParticipantes(participantes);
 
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 

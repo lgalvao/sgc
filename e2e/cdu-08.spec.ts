@@ -38,14 +38,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             // Clica no processo no painel
             await page.getByText(descricaoProcesso).click();
             
-            // Aguarda estar na tela de Detalhes do processo
-            await expect(page).toHaveURL(/\/processo\/\d+$/);
-            
-            // Como CHEFE, está na tela de Detalhes do processo
-            // Deve clicar na linha da sua unidade
-            await page.getByRole('row', {name: /ASSESSORIA_11/}).click();
-            
-            // Aguarda estar na tela de Detalhes do subprocesso
+            // CHEFE tem acesso direto apenas à sua unidade, então vai direto para Detalhes do subprocesso
             await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
             
             // Agora navega para atividades

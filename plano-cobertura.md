@@ -39,16 +39,16 @@ Estes arquivos não possuem nenhum teste que exercite seu código. A meta é cri
     *   `src/components/TabelaMovimentacoes.vue` - **CONCLUÍDO**
     *   `src/components/TabelaAlertas.vue` - **CONCLUÍDO**
     *   `src/App.vue` - **CONCLUÍDO**
-    *   `src/views/LoginView.vue`
-    *   `src/views/PainelView.vue`
-    *   `src/views/HistoricoView.vue`
-    *   `src/views/ConfiguracoesView.vue`
+    *   `src/views/LoginView.vue` - **CONCLUÍDO**
+    *   `src/views/PainelView.vue` - **CONCLUÍDO**
+    *   `src/views/HistoricoView.vue` - **CONCLUÍDO**
+    *   `src/views/ConfiguracoesView.vue` - **CONCLUÍDO**
     *   ... (outros views)
 *   **Ação:**
     *   **Componentes:** Testes de unidade/componente para as `props`, eventos emitidos (`emits`), slots, e a lógica interna do script setup.
     *   **Views:** Focar em testes de integração (montar o componente e interagir como um usuário) usando `vue-test-utils`.
 
-**Utilitários/Mocks (`src/test-utils/mocks/index.ts`, `src/utils/logger.ts`)**
+**Utilitários/Mocks (`src/test-utils/mocks/index.ts`, `src/utils/logger.ts`)** - **CONCLUÍDO**
 *   **Arquivos:**
     *   `src/test-utils/mocks/index.ts`
     *   `src/utils/logger.ts`
@@ -58,9 +58,9 @@ Estes arquivos não possuem nenhum teste que exercite seu código. A meta é cri
 
 Estes arquivos já possuem algum nível de cobertura, mas ainda há código não testado. O objetivo é complementar os testes existentes para cobrir as lacunas.
 
-*   `src/components/UnidadeTreeItem.vue` (Cobertura Média: 33.33%)
+*   `src/components/UnidadeTreeItem.vue` (Cobertura Média: 33.33%) - **CONCLUÍDO**
     *   **Ação:** Analisar `statementMap` e `branchMap` para identificar linhas e branches não cobertos. Criar testes que exercitem esses caminhos de código, especialmente as condições de ramificação.
-*   `src/mappers/atividades.ts` (Cobertura Média: 54.46%)
+*   `src/mappers/atividades.ts` (Cobertura Média: 54.46%) - **CONCLUÍDO**
     *   **Ação:** Garantir que todas as funções de mapeamento estejam cobertas com diferentes cenários de entrada e saída, incluindo casos de erro ou dados incompletos.
 *   `src/components/ImpactoMapaModal.vue` (Cobertura Média: 54.65%)
     *   **Ação:** Focar nos fluxos de interação do modal, validação de entrada, e a lógica de processamento do impacto.

@@ -9,11 +9,11 @@ import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
-    aceitarCadastro,
+    aceitarCadastroMapeamento,
     cancelarAceite,
     cancelarDevolucao,
     cancelarHomologacao,
-    devolverCadastro,
+    devolverCadastroMapeamento,
     fazerLogout,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
@@ -127,7 +127,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await navegarParaAtividadesVisualizacao(page);
 
         // Devolver com observação
-        await devolverCadastro(page, 'Favor incluir mais detalhes nos conhecimentos');
+        await devolverCadastroMapeamento(page, 'Favor incluir mais detalhes nos conhecimentos');
     });
 
     test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page}) => {
@@ -178,7 +178,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar com observação
-        await aceitarCadastro(page, 'Cadastro aprovado conforme análise');
+        await aceitarCadastroMapeamento(page, 'Cadastro aprovado conforme análise');
     });
 
     test('Cenario 6: ADMIN devolve para nova rodada de aceite', async ({page}) => {
@@ -189,7 +189,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
-        await devolverCadastro(page, 'Pequeno ajuste necessário');
+        await devolverCadastroMapeamento(page, 'Pequeno ajuste necessário');
 
         // CHEFE disponibiliza novamente
         await fazerLogout(page);
@@ -211,7 +211,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar sem observação
-        await aceitarCadastro(page);
+        await aceitarCadastroMapeamento(page);
     });
 
     test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {

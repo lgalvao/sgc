@@ -34,6 +34,10 @@ export async function verificarPaginaSubprocesso(page: Page, unidade: string) {
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
+    // Garantir que estamos no painel e que carregou
+    await expect(page).toHaveURL(/\/painel$/);
+    await page.waitForLoadState('networkidle');
+    
     await page.getByText(descricaoProcesso).click();
     
     // GESTOR sempre vê lista de unidades participantes
@@ -109,9 +113,9 @@ export async function fecharHistoricoAnalise(page: Page) {
 // ============================================================================
 
 /**
- * Devolve cadastro para ajustes
+ * Devolve cadastro de mapeamento para ajustes (CDU-13)
  */
-export async function devolverCadastro(page: Page, observacao?: string) {
+export async function devolverCadastroMapeamento(page: Page, observacao?: string) {
     await page.getByTestId('btn-acao-devolver').click();
     
     // Verificar modal de devolução
@@ -123,7 +127,26 @@ export async function devolverCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByText(/Cadastro devolvido/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Cadastro devolvido/i })).toBeVisible();
+    await verificarPaginaPainel(page);
+}
+
+/**
+ * Devolve revisão para ajustes (CDU-14)
+ */
+export async function devolverRevisao(page: Page, observacao?: string) {
+    await page.getByTestId('btn-acao-devolver').click();
+    
+    // Verificar modal de devolução
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
+    
+    if (observacao) {
+        await page.getByTestId('inp-devolucao-cadastro-obs').fill(observacao);
+    }
+    
+    await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+    await expect(page.getByRole('heading', { name: /Revisão devolvida/i })).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -147,9 +170,9 @@ export async function cancelarDevolucao(page: Page) {
 // ============================================================================
 
 /**
- * Aceita cadastro (GESTOR)
+ * Aceita cadastro de mapeamento (GESTOR - CDU-13)
  */
-export async function aceitarCadastro(page: Page, observacao?: string) {
+export async function aceitarCadastroMapeamento(page: Page, observacao?: string) {
     await page.getByTestId('btn-acao-analisar-principal').click();
     
     // Verificar modal de aceite
@@ -161,7 +184,26 @@ export async function aceitarCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Cadastro aceito/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Cadastro aceito/i })).toBeVisible();
+    await verificarPaginaPainel(page);
+}
+
+/**
+ * Aceita revisão (GESTOR - CDU-14)
+ */
+export async function aceitarRevisao(page: Page, observacao?: string) {
+    await page.getByTestId('btn-acao-analisar-principal').click();
+    
+    // Verificar modal de aceite
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
+    
+    if (observacao) {
+        await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
+    }
+    
+    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+    await expect(page.getByRole('heading', { name: /Revisão aceita/i })).toBeVisible();
     await verificarPaginaPainel(page);
 }
 

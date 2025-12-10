@@ -9,11 +9,12 @@ import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
-    aceitarCadastro,
+    aceitarCadastroMapeamento,
+    aceitarRevisao,
     cancelarAceite,
     cancelarDevolucao,
     cancelarHomologacao,
-    devolverCadastro,
+    devolverRevisao,
     fazerLogout,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
@@ -92,7 +93,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         
         await acessarSubprocessoGestor(page, descMapeamento, 'Seção 221');
         await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastro(page);
+        await aceitarCadastroMapeamento(page);
 
         // Passo 4: ADMIN homologa cadastro
         await fazerLogout(page);
@@ -243,7 +244,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaAtividadesVisualizacao(page);
 
         // Devolver com observação
-        await devolverCadastro(page, 'Favor revisar as competências associadas');
+        await devolverRevisao(page, 'Favor revisar as competências associadas');
     });
 
     test('Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page}) => {
@@ -294,7 +295,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar com observação
-        await aceitarCadastro(page, 'Revisão aprovada conforme análise');
+        await aceitarRevisao(page, 'Revisão aprovada conforme análise');
     });
 
     test('Cenario 7: ADMIN devolve para nova rodada de aceite', async ({page}) => {
@@ -305,7 +306,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
-        await devolverCadastro(page, 'Pequeno ajuste necessário na revisão');
+        await devolverRevisao(page, 'Pequeno ajuste necessário na revisão');
 
         // CHEFE disponibiliza novamente
         await fazerLogout(page);
@@ -327,7 +328,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar sem observação
-        await aceitarCadastro(page);
+        await aceitarRevisao(page);
     });
 
     test('Cenario 9: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {
