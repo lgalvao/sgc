@@ -10,6 +10,5 @@
         "@types/node": "^24.10.2",
         "typescript": "^5.9.3"
     },
-    "description": "E2E tests for SGC",
-    "license": "ISC"
+    "description": "Testes E2E"
 }

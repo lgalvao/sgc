@@ -1,0 +1,257 @@
+import {expect, test} from '@playwright/test';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {criarProcesso} from './helpers/helpers-processos';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import {
+    abrirHistoricoAnalise,
+    acessarSubprocessoAdmin,
+    acessarSubprocessoChefe,
+    acessarSubprocessoGestor,
+    aceitarCadastro,
+    cancelarAceite,
+    cancelarDevolucao,
+    cancelarHomologacao,
+    devolverCadastro,
+    fazerLogout,
+    fecharHistoricoAnalise,
+    homologarCadastroMapeamento,
+    verificarPaginaPainel
+} from './helpers/helpers-analise';
+
+test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
+    const UNIDADE_ALVO = 'SECAO_221';
+    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
+    const USUARIO_GESTOR = USUARIOS.GESTOR_COORD_22.titulo;
+    const SENHA_GESTOR = USUARIOS.GESTOR_COORD_22.senha;
+    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
+    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
+
+    const timestamp = Date.now();
+    const descProcesso = `Processo CDU-13 ${timestamp}`;
+    let processoId: number;
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    test.beforeAll(async ({request}) => {
+        await resetDatabase(request);
+        cleanup = useProcessoCleanup();
+    });
+
+    test.afterAll(async ({request}) => {
+        await cleanup.limpar(request);
+    });
+
+    // ========================================================================
+    // PREPARAÇÃO
+    // ========================================================================
+
+    test('Preparacao 1: ADMIN cria e inicia processo de mapeamento', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await criarProcesso(page, {
+            descricao: descProcesso,
+            tipo: 'MAPEAMENTO',
+            diasLimite: 30,
+            unidade: UNIDADE_ALVO,
+            expandir: ['SECRETARIA_2', 'COORD_22']
+        });
+
+        // Iniciar processo
+        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
+        await linhaProcesso.click();
+
+        // Capturar ID do processo para cleanup
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoId > 0) cleanup.registrar(processoId);
+
+        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 2: CHEFE preenche atividades e disponibiliza', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+
+        await acessarSubprocessoChefe(page, descProcesso);
+        await navegarParaAtividades(page);
+
+        // Adicionar 3 atividades com conhecimentos
+        await adicionarAtividade(page, `Atividade 1 ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade 1 ${timestamp}`, 'Conhecimento 1A');
+
+        await adicionarAtividade(page, `Atividade 2 ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade 2 ${timestamp}`, 'Conhecimento 2A');
+
+        await adicionarAtividade(page, `Atividade 3 ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade 3 ${timestamp}`, 'Conhecimento 3A');
+
+        // Disponibilizar cadastro
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+
+        // Verificar mensagem de sucesso
+        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await verificarPaginaPainel(page);
+    });
+
+    // ========================================================================
+    // CENÁRIOS DE TESTE
+    // ========================================================================
+
+    test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+
+        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Abrir histórico
+        const modal = await abrirHistoricoAnalise(page);
+
+        // Verificar que não há registros (ou mensagem apropriada)
+        // O modal deve estar vazio ou mostrar mensagem de "nenhum registro"
+        await expect(modal).toBeVisible();
+
+        await fecharHistoricoAnalise(page);
+    });
+
+    test('Cenario 2: GESTOR devolve cadastro para ajustes COM observação', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+
+        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Devolver com observação
+        await devolverCadastro(page, 'Favor incluir mais detalhes nos conhecimentos');
+    });
+
+    test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+
+        await acessarSubprocessoChefe(page, descProcesso);
+
+        // Verificar situação
+        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+            .toHaveText(/Cadastro em andamento/i);
+
+        await navegarParaAtividades(page);
+
+        // Abrir histórico e verificar devolução
+        const modal = await abrirHistoricoAnalise(page);
+        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
+        await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Favor incluir mais detalhes nos conhecimentos');
+        await fecharHistoricoAnalise(page);
+
+        // Disponibilizar novamente
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+
+        await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Cenario 4: GESTOR cancela devolução', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+
+        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Cancelar devolução
+        await cancelarDevolucao(page);
+
+        // Verificar que permanece na mesma tela
+        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+    });
+
+    test('Cenario 5: GESTOR registra aceite COM observação', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+
+        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Aceitar com observação
+        await aceitarCadastro(page, 'Cadastro aprovado conforme análise');
+    });
+
+    test('Cenario 6: ADMIN devolve para nova rodada de aceite', async ({page}) => {
+        // Devolver para permitir novo aceite sem observação
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        await devolverCadastro(page, 'Pequeno ajuste necessário');
+
+        // CHEFE disponibiliza novamente
+        await fazerLogout(page);
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+
+        await acessarSubprocessoChefe(page, descProcesso);
+        await navegarParaAtividades(page);
+
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Cenario 7: GESTOR registra aceite SEM observação', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_GESTOR, SENHA_GESTOR);
+
+        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Aceitar sem observação
+        await aceitarCadastro(page);
+    });
+
+    test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        // Abrir histórico
+        const modal = await abrirHistoricoAnalise(page);
+
+        // Verificar múltiplos registros (devoluções e aceites)
+        await expect(modal.getByTestId('cell-resultado-0')).toBeVisible();
+        await expect(modal.getByTestId('cell-resultado-1')).toBeVisible();
+
+        await fecharHistoricoAnalise(page);
+    });
+
+    test('Cenario 9: ADMIN cancela homologação', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        // Cancelar homologação
+        await cancelarHomologacao(page);
+
+        // Verificar que permanece na mesma tela
+        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+    });
+
+    test('Cenario 10: ADMIN homologa cadastro', async ({page}) => {
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
+        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+        // Homologar
+        await homologarCadastroMapeamento(page);
+    });
+});

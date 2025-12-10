@@ -103,14 +103,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-
-        // Robust navigation for Admin
-        const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        // Ensure unit row is visible before clicking (Admin flow always sees unit list)
-        await expect(unitRow).toBeVisible();
-        await unitRow.click();
-        
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByRole('row', {name: 'Seção 221'}).click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -363,7 +357,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Entrar na visualização de atividades
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Devolver
         await page.getByTestId('btn-acao-devolver').click();
@@ -425,7 +419,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Primeira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -455,9 +449,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
 
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -488,9 +482,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
 
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();

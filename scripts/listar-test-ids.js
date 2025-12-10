@@ -28,6 +28,7 @@ function scanDirectory(directory) {
                     value: match[2]
                 });
             }
+            
         }
     }
     return results;

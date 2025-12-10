@@ -103,7 +103,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -299,7 +299,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Acessar visualização
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Verificar botão de impacto
         await verificarBotaoImpacto(page, true);

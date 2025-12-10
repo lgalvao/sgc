@@ -80,6 +80,11 @@ const dataLimite = computed(() =>
 );
 
 onMounted(async () => {
+  // Limpar estado anterior para evitar flicker de dados antigos
+  subprocessosStore.subprocessoDetalhe = null;
+  mapaStore.mapaCompleto = null;
+  codSubprocesso.value = null;
+
   const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,

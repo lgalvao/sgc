@@ -15,11 +15,13 @@ Este documento define o plano completo para implementação dos testes E2E (End-
 **Atores:** GESTOR e ADMIN
 
 **Pré-condições:**
+
 - Usuário logado com perfil GESTOR ou ADMIN
 - Processo de mapeamento iniciado que tenha a unidade como participante
 - Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, com localização atual na unidade do usuário
 
 **Fluxos principais:**
+
 1. Navegação até a tela de atividades e conhecimentos
 2. Visualização do histórico de análise
 3. Devolução do cadastro para ajustes (com observações opcionais)
@@ -33,11 +35,13 @@ Este documento define o plano completo para implementação dos testes E2E (End-
 **Atores:** GESTOR e ADMIN
 
 **Pré-condições:**
+
 - Usuário logado com perfil GESTOR ou ADMIN
 - Processo de revisão iniciado que tenha a unidade como participante
 - Subprocesso com revisão do cadastro de atividades e conhecimentos já disponibilizada, com localização atual na unidade do usuário
 
 **Fluxos principais:**
+
 1. Navegação até a tela de atividades e conhecimentos
 2. Verificação de impactos no mapa de competências
 3. Visualização do histórico de análise
@@ -49,17 +53,18 @@ Este documento define o plano completo para implementação dos testes E2E (End-
 
 ## 2. Estrutura dos Arquivos de Teste
 
-### Arquivos a serem criados:
+### Arquivos a serem criados
 
-```
+```text
 e2e/
 ├── cdu-13.spec.ts    # Testes para análise de cadastro (Mapeamento)
 └── cdu-14.spec.ts    # Testes para análise de revisão (Revisão)
 ```
 
-### Padrão de organização:
+### Padrão de organização
 
 Os testes devem seguir a estrutura observada nos arquivos existentes:
+
 - Usar `test.describe.serial()` para cenários que dependem de estado compartilhado
 - Incluir testes de preparação para criar o contexto necessário
 - Separar cenários por funcionalidade específica
@@ -79,12 +84,14 @@ Conforme definido em `e2e/helpers/helpers-auth.ts`:
 | CHEFE_SECAO_211 | 101010 | senha | CHEFE - SECAO_211 | SECAO_211 |
 
 **Escolha recomendada para os testes:**
+
 - **ADMIN:** ADMIN_1_PERFIL (191919)
 - **GESTOR:** GESTOR_COORD (222222) - coordenação que supervisiona seções
 - **CHEFE (Unidade subordinada):** CHEFE_SECAO_221 (141414) - Seção subordinada à COORD_22
 
 **Hierarquia das unidades:**
-```
+
+```text
 SEDOC (ADMIN)
 └── SECRETARIA_2
     └── COORD_22 (GESTOR)
@@ -224,12 +231,14 @@ cleanup.registrar(processoId);
 #### Modal de Homologação (ADMIN)
 
 **Para Mapeamento (CDU-13):**
+
 | Elemento | TestId |
 |----------|--------|
 | Botão Confirmar | `btn-aceite-cadastro-confirmar` |
 | Botão Cancelar | Usar `getByRole('button', {name: 'Cancelar'})` |
 
 **Para Revisão (CDU-14):**
+
 | Elemento | TestId | Contexto |
 |----------|--------|----------|
 | Botão Confirmar (Sem impactos) | `btn-aceite-cadastro-confirmar` | Modal pergunta sobre manutenção do mapa |
@@ -289,13 +298,15 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
 #### 6.2. Testes de Preparação
 
-**Preparacao 1: ADMIN cria e inicia processo de mapeamento**
+##### Preparacao 1: ADMIN cria e inicia processo de mapeamento**
+
 - Login como ADMIN
 - Criar processo de mapeamento para SECAO_221
 - Iniciar processo
 - Registrar processoId para cleanup
 
-**Preparacao 2: CHEFE preenche atividades e disponibiliza**
+##### Preparacao 2: CHEFE preenche atividades e disponibiliza
+
 - Login como CHEFE
 - Navegar para atividades
 - Adicionar 2-3 atividades com conhecimentos
@@ -304,7 +315,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
 #### 6.3. Cenários de Teste
 
-**Cenário 1: GESTOR visualiza histórico de análise (vazio inicialmente)**
+##### Cenário 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+
 - Login como GESTOR
 - Acessar processo e subprocesso da unidade subordinada (SECAO_221)
 - Navegar para atividades
@@ -312,7 +324,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Verificar que modal abre mas não tem registros (ou mensagem apropriada)
 - Fechar modal
 
-**Cenário 2: GESTOR devolve cadastro para ajustes COM observação**
+##### Cenário 2: GESTOR devolve cadastro para ajustes COM observação
+
 - Login como GESTOR
 - Acessar atividades do subprocesso
 - Clicar em "Devolver para ajustes"
@@ -322,6 +335,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Verificar redirecionamento para painel
 
 **Cenário 3: CHEFE visualiza histórico após devolução e corrige**
+
 - Login como CHEFE
 - Acessar subprocesso
 - Verificar situação: "Cadastro em andamento"
@@ -335,7 +349,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - (Opcional) Adicionar mais conhecimentos
 - Disponibilizar novamente
 
-**Cenário 4: GESTOR cancela devolução**
+##### Cenário 4: GESTOR cancela devolução
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Devolver para ajustes"
@@ -343,7 +358,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Clicar em "Cancelar"
 - Verificar que permanece na mesma tela (modal fechado)
 
-**Cenário 5: GESTOR registra aceite SEM observação**
+##### Cenário 5: GESTOR registra aceite SEM observação
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Registrar aceite"
@@ -352,7 +368,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Verificar mensagem: "Aceite registrado"
 - Verificar redirecionamento para painel
 
-**Cenário 6: GESTOR registra aceite COM observação**
+##### Cenário 6: GESTOR registra aceite COM observação
+
 - Requer nova devolução e disponibilização
 - Login como GESTOR
 - Acessar atividades
@@ -361,7 +378,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Confirmar aceite
 - Verificar mensagem: "Aceite registrado"
 
-**Cenário 7: ADMIN visualiza histórico com múltiplas análises**
+##### Cenário 7: ADMIN visualiza histórico com múltiplas análises
+
 - Login como ADMIN
 - Acessar atividades da unidade
 - Clicar em "Histórico de Análise"
@@ -370,7 +388,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
   - Aceite (GESTOR)
 - Fechar modal
 
-**Cenário 8: ADMIN cancela homologação**
+##### Cenário 8: ADMIN cancela homologação**
+
 - Login como ADMIN
 - Acessar atividades
 - Clicar em "Homologar"
@@ -379,7 +398,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 - Clicar em "Cancelar"
 - Verificar que permanece na mesma tela
 
-**Cenário 9: ADMIN homologa cadastro**
+##### Cenário 9: ADMIN homologa cadastro
+
 - Login como ADMIN
 - Acessar atividades
 - Clicar em "Homologar"
@@ -431,7 +451,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
 #### 7.2. Testes de Preparação (Mais extensos que CDU-13)
 
-**Preparacao 1: Criar e finalizar processo de mapeamento**
+##### Preparacao 1: Criar e finalizar processo de mapeamento
 
 Este passo é necessário para ter um mapa vigente antes da revisão. Pode seguir o padrão do CDU-12:
 
@@ -443,13 +463,15 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 6. ADMIN homologa mapa
 7. ADMIN finaliza processo de mapeamento
 
-**Preparacao 2: ADMIN cria e inicia processo de revisão**
+##### Preparacao 2: ADMIN cria e inicia processo de revisão
+
 - Login como ADMIN
 - Criar processo de REVISAO para SECAO_221
 - Iniciar processo
 - Registrar processoId para cleanup
 
-**Preparacao 3: CHEFE revisa atividades e disponibiliza**
+##### Preparacao 3: CHEFE revisa atividades e disponibiliza
+
 - Login como CHEFE
 - Navegar para atividades (deve carregar atividades do mapeamento)
 - Adicionar uma nova atividade (gera impacto)
@@ -460,7 +482,8 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 
 #### 7.3. Cenários de Teste
 
-**Cenário 1: GESTOR visualiza impactos no mapa**
+##### Cenário 1: GESTOR visualiza impactos no mapa
+
 - Login como GESTOR
 - Acessar atividades do subprocesso
 - Clicar em "Impactos no mapa"
@@ -471,14 +494,16 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
   - "Atividades removidas" (se houver)
 - Fechar modal
 
-**Cenário 2: GESTOR visualiza histórico de análise (vazio inicialmente)**
+##### Cenário 2: GESTOR visualiza histórico de análise (vazio inicialmente)
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Histórico de Análise"
 - Verificar que modal abre (sem registros ou mensagem apropriada)
 - Fechar modal
 
-**Cenário 3: GESTOR devolve revisão para ajustes COM observação**
+##### Cenário 3: GESTOR devolve revisão para ajustes COM observação
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Devolver para ajustes"
@@ -487,7 +512,8 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Verificar mensagem: "Devolução realizada"
 - Verificar redirecionamento para painel
 
-**Cenário 4: CHEFE visualiza histórico após devolução e disponibiliza novamente**
+##### Cenário 4: CHEFE visualiza histórico após devolução e disponibiliza novamente
+
 - Login como CHEFE
 - Acessar subprocesso
 - Verificar situação: "Revisão do cadastro em andamento"
@@ -498,6 +524,7 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Disponibilizar novamente
 
 **Cenário 5: GESTOR cancela aceite**
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Registrar aceite"
@@ -506,6 +533,7 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Verificar que permanece na mesma tela
 
 **Cenário 6: GESTOR registra aceite da revisão**
+
 - Login como GESTOR
 - Acessar atividades
 - Clicar em "Registrar aceite"
@@ -516,6 +544,7 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Verificar redirecionamento para painel
 
 **Cenário 7: ADMIN visualiza histórico com múltiplas análises**
+
 - Login como ADMIN
 - Acessar atividades
 - Clicar em "Histórico de Análise"
@@ -523,6 +552,7 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Fechar modal
 
 **Cenário 8: ADMIN visualiza impactos antes de homologar**
+
 - Login como ADMIN
 - Acessar atividades
 - Clicar em "Impactos no mapa"
@@ -530,6 +560,7 @@ Este passo é necessário para ter um mapa vigente antes da revisão. Pode segui
 - Fechar modal
 
 **Cenário 9: ADMIN cancela homologação**
+
 - Login como ADMIN
 - Acessar atividades
 - Clicar em "Homologar"
@@ -555,6 +586,7 @@ Este cenário requer preparação especial onde a revisão não gera impactos:
 - Verificar redirecionamento para tela de detalhes do subprocesso
 
 **Cenário 11: ADMIN homologa revisão COM impactos no mapa**
+
 - Login como ADMIN
 - Acessar atividades (com impactos detectados)
 - Clicar em "Homologar"
@@ -722,11 +754,13 @@ async function homologarRevisaoSemImpactos(page: Page) {
 ### 9.2. Situações do Subprocesso
 
 **CDU-13 (Mapeamento):**
+
 - Após devolução para a própria unidade: "Cadastro em andamento"
 - Após disponibilização: "Cadastro disponibilizado"
 - Após homologação: "Cadastro homologado"
 
 **CDU-14 (Revisão):**
+
 - Após devolução para a própria unidade: "Revisão do cadastro em andamento"
 - Após disponibilização: "Revisão do cadastro disponibilizada"
 - Após homologação (com impactos): "Revisão do cadastro homologada"
@@ -772,10 +806,12 @@ async function homologarRevisaoSemImpactos(page: Page) {
 ### 10.4. Navegação entre Perfis
 
 **ADMIN e GESTOR:**
+
 - Sempre veem lista de unidades participantes após clicar no processo
 - Devem clicar na linha da unidade desejada para acessar o subprocesso
 
 **CHEFE:**
+
 - Se o processo tem apenas a unidade dele, vai direto para o subprocesso
 - Se o processo tem múltiplas unidades (raro), vê lista e deve clicar
 
@@ -883,20 +919,24 @@ test('Cenario 2: GESTOR devolve cadastro para ajustes COM observação', async (
 ## 13. Referências
 
 ### Especificações
+
 - `/home/runner/work/sgc/sgc/reqs/cdu-13.md`
 - `/home/runner/work/sgc/sgc/reqs/cdu-14.md`
 
 ### Testes de Referência
+
 - `/home/runner/work/sgc/sgc/e2e/cdu-09.spec.ts` - Disponibilização e devolução em Mapeamento
 - `/home/runner/work/sgc/sgc/e2e/cdu-10.spec.ts` - Disponibilização em Revisão
 - `/home/runner/work/sgc/sgc/e2e/cdu-12.spec.ts` - Impactos no mapa e preparação completa
 
 ### Helpers
+
 - `/home/runner/work/sgc/sgc/e2e/helpers/helpers-auth.ts`
 - `/home/runner/work/sgc/sgc/e2e/helpers/helpers-processos.ts`
 - `/home/runner/work/sgc/sgc/e2e/helpers/helpers-atividades.ts`
 
 ### Hooks
+
 - `/home/runner/work/sgc/sgc/e2e/hooks/hooks-limpeza.ts`
 
 ---

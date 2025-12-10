@@ -7,6 +7,13 @@ export async function navegarParaAtividades(page: Page) {
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
+export async function navegarParaAtividadesVisualizacao(page: Page) {
+    const testId = 'card-subprocesso-atividades-vis';
+    await expect(page.getByTestId(testId)).toBeVisible();
+    await page.getByTestId(testId).click();
+    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+}
+
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);

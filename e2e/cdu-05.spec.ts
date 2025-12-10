@@ -143,7 +143,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaSubprocesso(page);
 
         // Entrar no cadastro de atividades (visualização)
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Homologar cadastro
         await page.getByTestId('btn-acao-analisar-principal').click();

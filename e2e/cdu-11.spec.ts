@@ -122,12 +122,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByText(descProcessoMapeamento).click();
 
         // Passo 2.2: Clicar na unidade subordinada
-        const unitRow = page.getByRole('row', {name: 'Seção 221'});
-        await expect(unitRow).toBeVisible();
-        await unitRow.click();
-
-        // Passo 4: Clicar no card Atividades e conhecimentos
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByRole('row', {name: 'Seção 221'}).click();
+        
+        // Passo 2.3: Verificar visualização
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
 
         // Passo 5 e 6: Verificar tela de atividades com dados da unidade
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
@@ -159,7 +158,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Passo 4: Clicar no card Atividades e conhecimentos
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Passo 5 e 6: Verificar tela de atividades
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
@@ -187,7 +186,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByRole('row', {name: 'Seção 221'}).click();
 
         // Aceitar cadastro
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
@@ -260,7 +259,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // O card deve estar visível para visualização em processo finalizado
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();
@@ -279,7 +278,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Visualizar atividades
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();

@@ -7,7 +7,8 @@ import {Page} from '@playwright/test';
 export const USUARIOS = {
     ADMIN_2_PERFIS: { titulo: '111111', senha: 'senha', perfil: 'ADMIN - SEDOC' },
     ADMIN_1_PERFIL: { titulo: '191919', senha: 'senha' },
-    GESTOR_COORD: { titulo: '222222', senha: 'senha' },
+    GESTOR_COORD: { titulo: '222222', senha: 'senha' }, // GESTOR_COORD_11 (COORD_11)
+    GESTOR_COORD_22: { titulo: '131313', senha: 'senha' }, // Mick Jagger (COORD_22)
     CHEFE_UNIDADE: { titulo: '777777', senha: 'senha' }, // Janis Joplin (Assessoria 21)
     CHEFE_ASSESSORIA_22: { titulo: '888888', senha: 'senha' }, // Jimi Hendrix (Assessoria 22)
     CHEFE_SECAO_211: { titulo: '101010', senha: 'senha' }, // Debbie Harry (Seção 211)

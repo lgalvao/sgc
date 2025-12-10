@@ -77,7 +77,7 @@ test.describe.serial('Fluxo Geral Diagnóstico (CDU-02 a CDU-09)', () => {
 
         await page.getByText(descProcessoMapeamento).click();
         await page.getByRole('row', {name: /Unit Test Diag/i}).click();
-        await page.getByTestId('card-subprocesso-atividades').click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         
