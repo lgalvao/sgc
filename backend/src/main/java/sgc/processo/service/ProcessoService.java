@@ -88,6 +88,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto criar(CriarProcessoReq req) {
         if (req.getDescricao() == null || req.getDescricao().isBlank()) {
             throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
@@ -141,6 +142,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoReq requisicao) {
         Processo processo =
                 processoRepo
@@ -181,6 +183,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void apagar(Long codigo) {
         Processo processo =
                 processoRepo
@@ -227,6 +230,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
         Processo processo =
                 processoRepo
@@ -274,6 +278,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         log.info(
                 "Iniciando processo de revisão para código {} com unidades {}",
@@ -325,6 +330,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
         Processo processo =
                 processoRepo
@@ -372,6 +378,7 @@ public class ProcessoService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void finalizar(Long codigo) {
         log.debug("Iniciando finalização do processo: código={}", codigo);
 
