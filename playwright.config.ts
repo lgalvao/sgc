@@ -4,13 +4,12 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
-    timeout: 20_000,
+    timeout: 15_000,
     workers: 1,
     expect: {timeout: 3_000},
     reporter: 'dot',
     use: {
         baseURL: 'http://localhost:5173',
-        trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },
     webServer: {

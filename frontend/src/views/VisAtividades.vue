@@ -3,6 +3,7 @@
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
+      <span class="text-xs text-muted">Debug: {{ codSubrocesso }} | {{ isRevisao }} | {{ perfilSelecionado }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -320,12 +321,21 @@ async function confirmarValidacao() {
       } else {
         await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
       }
-      await router.push({name: "Painel"});
+      
       feedbackStore.show(
-        "Cadastro homologado",
+        "Homologação efetivada",
         "O cadastro de atividades foi homologado com sucesso.",
         "success",
       );
+      
+      // Redirecionar para Detalhes do subprocesso (CDU-14 passo 12.4)
+      await router.push({
+        name: "Subprocesso",
+        params: {
+          codProcesso: props.codProcesso,
+          siglaUnidade: props.sigla
+        }
+      });
     } catch (error) {
       console.error(error);
       feedbackStore.show(

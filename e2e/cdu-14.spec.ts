@@ -151,8 +151,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await expect(page.locator('tr', {has: page.getByText(descMapeamento)}).getByText('Finalizado')).toBeVisible();
 
         // Agora a unidade tem mapa vigente e pode participar de processo de revisão
-        // (embora a finalização seja síncrona, a liberação da unidade pode ter atraso de propagação?)
-        // Não, em teoria é transacional. Mas vamos garantir verificarPainel.
         await verificarPaginaPainel(page);
     });
 
@@ -257,7 +255,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         // Verificar situação
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-            .toHaveText(/Revisão do cadastro em andamento/i);
+            .toHaveText(/Revisão de Cadastro em Andamento/i);
 
         await navegarParaAtividades(page);
 

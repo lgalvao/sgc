@@ -24,6 +24,7 @@ vi.mock("@/stores/analises", () => ({
     obterAnalisesPorSubprocesso: (codSubprocesso: number) => {
       return codSubprocesso === 1 ? mockAnalises : [];
     },
+    buscarAnalisesCadastro: vi.fn().mockResolvedValue(undefined), // Adicionado o mock para buscarAnalisesCadastro
   })),
 }));
 
@@ -57,16 +58,17 @@ describe("HistoricoAnaliseModal", () => {
       );
   });
 
-    it("deve renderizar a tabela com as análises", () => {
-    const wrapper = mount(HistoricoAnaliseModal, {
-      props: {
-        mostrar: true,
-        codSubrocesso: 1,
-      },
-    });
-
-        const rows = wrapper.findAll("tbody tr");
-    expect(rows.length).toBe(mockAnalises.length);
+    it("deve renderizar a tabela com as análises", async () => {
+        const wrapper = mount(HistoricoAnaliseModal, {
+          props: {
+            mostrar: true,
+            codSubrocesso: 1,
+          },
+        });
+    
+        await wrapper.vm.$nextTick(); // Aguarda a atualização do DOM
+    
+        const rows = wrapper.findAll("tbody tr");    expect(rows.length).toBe(mockAnalises.length);
     const expectedDate = formatDateBR(new Date(mockAnalises[0].dataHora));
     expect(rows[0].text()).toContain(expectedDate);
         expect(rows[0].text()).toContain("TEST");
