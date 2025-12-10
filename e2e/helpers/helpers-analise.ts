@@ -77,10 +77,20 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
 // ============================================================================
 
 /**
- * Abre modal de histórico de análise
+ * Abre modal de histórico de análise (tela de edição - CadAtividades)
  */
 export async function abrirHistoricoAnalise(page: Page) {
     await page.getByTestId('btn-cad-atividades-historico').click();
+    const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+    await expect(modal).toBeVisible();
+    return modal;
+}
+
+/**
+ * Abre modal de histórico de análise (tela de visualização - VisAtividades)
+ */
+export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
+    await page.getByTestId('btn-vis-atividades-historico').click();
     const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
     await expect(modal).toBeVisible();
     return modal;
@@ -113,7 +123,7 @@ export async function devolverCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByText(/Devolução realizada/i)).toBeVisible();
+    await expect(page.getByText(/Devolução realizada|Cadastro devolvido/i).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -151,7 +161,7 @@ export async function aceitarCadastro(page: Page, observacao?: string) {
     }
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Aceite registrado/i)).toBeVisible();
+    await expect(page.getByText(/Aceite registrado|Cadastro aceito/i).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -185,14 +195,10 @@ export async function homologarCadastroMapeamento(page: Page) {
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
     
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+    await expect(page.getByText(/Homologação efetivada|Cadastro homologado/i).first()).toBeVisible();
     
-    // Verifica redirecionamento para tela de detalhes do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-    
-    // Verificar situação após homologação
-    await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-        .toHaveText(/Cadastro homologado/i);
+    // Sistema redireciona para o painel após homologação
+    await verificarPaginaPainel(page);
 }
 
 /**

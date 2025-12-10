@@ -76,8 +76,9 @@ const analises = ref<Analise[]>([]);
 
 watch(
   () => props.mostrar,
-    (newVal) => {
+    async (newVal) => {
     if (newVal && props.codSubrocesso) {
+      await analisesStore.buscarAnalisesCadastro(props.codSubrocesso);
       analises.value = analisesStore.obterAnalisesPorSubprocesso(
           props.codSubrocesso,
       );

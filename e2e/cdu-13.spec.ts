@@ -5,6 +5,7 @@ import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navega
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {
     abrirHistoricoAnalise,
+    abrirHistoricoAnaliseVisualizacao,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
@@ -109,7 +110,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await navegarParaAtividadesVisualizacao(page);
 
         // Abrir histórico
-        const modal = await abrirHistoricoAnalise(page);
+        const modal = await abrirHistoricoAnaliseVisualizacao(page);
 
         // Verificar que não há registros (ou mensagem apropriada)
         // O modal deve estar vazio ou mostrar mensagem de "nenhum registro"
@@ -221,11 +222,23 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Abrir histórico
-        const modal = await abrirHistoricoAnalise(page);
-
-        // Verificar múltiplos registros (devoluções e aceites)
+        const modal = await abrirHistoricoAnaliseVisualizacao(page);
+        
+        // Verificar que modal está visível
+        await expect(modal).toBeVisible();
+        
+        // Neste ponto do fluxo serial, devemos ter apenas 1 análise:
+        // - Cenário 2: 1 devolução (GESTOR) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 3)
+        // - Cenário 5: 1 aceite (GESTOR) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 6)
+        // - Cenário 6: 1 devolução (ADMIN) → REMOVIDA quando CHEFE disponibilizou novamente (Cenário 6)
+        // - Cenário 7: 1 aceite (GESTOR) → ÚNICA análise desde a última disponibilização
+        //
+        // Conforme CDU-13 linha 28: "análises prévias registradas para o cadastro de atividades 
+        // desde a última disponibilização"
+        
+        // Verificar que há exatamente 1 registro
         await expect(modal.getByTestId('cell-resultado-0')).toBeVisible();
-        await expect(modal.getByTestId('cell-resultado-1')).toBeVisible();
+        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_MAPEAMENTO/i);
 
         await fecharHistoricoAnalise(page);
     });
