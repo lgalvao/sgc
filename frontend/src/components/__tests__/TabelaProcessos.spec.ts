@@ -73,7 +73,7 @@ describe("TabelaProcessos.vue", () => {
         expect(cells[0].text()).toBe("Processo Alpha");
         expect(cells[1].text()).toBe("Mapeamento");
         expect(cells[2].text()).toBe("UNID1, UNID2");
-        expect(cells[3].text()).toBe("Em Andamento");
+        expect(cells[3].text()).toBe("Em andamento");
 
         const cells2 = rows[1].findAll("td");
         expect(cells2[0].text()).toBe("Processo Beta");

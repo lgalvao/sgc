@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SituacaoProcesso {
     CRIADO("Criado"),
-    EM_ANDAMENTO("Em Andamento"),
+    EM_ANDAMENTO("Em andamento"),
     FINALIZADO("Finalizado");
 
     private final String label;

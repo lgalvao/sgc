@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -119,7 +122,7 @@ public class E2eController {
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
     public ProcessoDto criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoFixture(request, TipoProcesso.MAPEAMENTO);
+        return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
     }
 
     /**
@@ -128,7 +131,25 @@ public class E2eController {
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
     public ProcessoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoFixture(request, TipoProcesso.REVISAO);
+        return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO));
+    }
+
+    /**
+     * Executa uma operação com contexto de segurança ADMIN.
+     */
+    private <T> T executeAsAdmin(java.util.function.Supplier<T> operation) {
+        var auth = new UsernamePasswordAuthenticationToken(
+                "e2e-admin",
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        
+        var previousAuth = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            return operation.get();
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(previousAuth);
+        }
     }
 
     /**

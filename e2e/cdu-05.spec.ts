@@ -188,8 +188,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Aguardar modal fechar
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
 
-        // Validação: Mapa foi disponibilizado (verificar badge ou estado)
-        await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
+        // Validação: Redirecionado para o painel após disponibilizar
+        await verificarPaginaPainel(page);
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcesso,
+            tipo: 'Mapeamento',
+            situacao: 'Em andamento'
+        });
     }
 
     async function passo4_ChefeValidaMapa(page: Page, descProcesso: string): Promise<void> {

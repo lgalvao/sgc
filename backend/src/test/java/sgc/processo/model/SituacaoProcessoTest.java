@@ -13,7 +13,7 @@ class SituacaoProcessoTest {
 
     @Test
     void deveRetornarLabelCorretoParaEmAndamento() {
-        assertEquals("Em Andamento", SituacaoProcesso.EM_ANDAMENTO.getLabel());
+        assertEquals("Em andamento", SituacaoProcesso.EM_ANDAMENTO.getLabel());
     }
 
     @Test

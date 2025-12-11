@@ -210,6 +210,7 @@ public class SubprocessoCadastroController {
      */
     @PostMapping("/{codigo}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public void devolverRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
@@ -229,6 +230,7 @@ public class SubprocessoCadastroController {
      */
     @PostMapping("/{codigo}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,

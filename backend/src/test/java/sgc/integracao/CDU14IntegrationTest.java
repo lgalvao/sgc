@@ -166,7 +166,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 mockMvc.perform(
                                 post("/api/processos")
                                         .with(csrf())
-                                        .with(user(gestor))
+                                        .with(user(admin))
                                         .contentType("application/json")
                                         .content(reqJson))
                         .andExpect(status().isCreated())
@@ -183,7 +183,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                         post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
                                 .with(csrf())
-                                .with(user(gestor))
+                                .with(user(admin))
                                 .contentType("application/json")
                                 .content(iniciarReqJson))
                 .andExpect(status().isOk());

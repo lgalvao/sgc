@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import sgc.atividade.AtividadeService;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.processo.model.Processo;
@@ -42,6 +43,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Adding activity should transition subprocess from NAO_INICIADO to MAPEAMENTO_CADASTRO_EM_ANDAMENTO")
+    @WithMockUser(roles = "ADMIN")
     void shouldTransitionStatusWhenActivityIsAdded() throws Exception {
         // GIVEN: An OPERACIONAL unit with a CHEFE as titular
         // Using SESEL (unit 10) which has titular 333333333333 from data.sql
@@ -116,6 +118,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Adding activity via API endpoint should also transition status")
+    @WithMockUser(roles = "ADMIN")
     void shouldTransitionStatusWhenActivityIsAddedViaApi() throws Exception {
         // GIVEN: Same setup as above
         Long unitCodigo = 10L;

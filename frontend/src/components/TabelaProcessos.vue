@@ -77,7 +77,7 @@ const handleSelecionarProcesso = (processo: ProcessoResumo) => {
 
 function formatarSituacao(situacao: string): string {
   const mapa: Record<string, string> = {
-    EM_ANDAMENTO: "Em Andamento",
+    EM_ANDAMENTO: "Em andamento",
     FINALIZADO: "Finalizado",
     CRIADO: "Criado",
   };

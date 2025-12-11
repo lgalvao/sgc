@@ -87,7 +87,7 @@ Ator: ADMIN
 
 **Fluxo principal:**
 
-1. No **Painel**, o usuário clica no processo de Diagnóstico de Competências na situação ‘Em Andamento’.
+1. No **Painel**, o usuário clica no processo de Diagnóstico de Competências na situação ‘Em andamento’.
 2. O sistema mostra tela **Detalhes do subprocesso** da unidade.
 3. O usuário acessa o card **Diagnóstico** **da equipe**.
 4. O sistema mostra o **formulário com as competências da unidade** preenchida com os dados cadastrados até o momento.

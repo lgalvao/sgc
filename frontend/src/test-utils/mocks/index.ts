@@ -26,7 +26,7 @@ export const mockProcessoDetalhe: SubprocessoDetalhe = {
         unidade: {codigo: 1, nome: "Teste", sigla: "TST"},
     },
     situacao: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
-    situacaoLabel: "Em Andamento",
+    situacaoLabel: "Em andamento",
     localizacaoAtual: "Na unidade",
     processoDescricao: "Processo Teste",
     tipoProcesso: TipoProcesso.MAPEAMENTO,

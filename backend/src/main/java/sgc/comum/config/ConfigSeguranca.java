@@ -20,7 +20,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@Profile("!test")
+@Profile("!test & !e2e")
 public class ConfigSeguranca {
     private final FiltroAutenticacaoSimulado filtroAutenticacaoSimulado;
 

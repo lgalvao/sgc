@@ -8,6 +8,7 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.unidade.model.TipoUnidade;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
@@ -228,7 +229,7 @@ public class SgrhService {
                                 ? unidade.getUnidadeSuperior().getCodigo()
                                 : null)
                 .tipo(unidade.getTipo().name())
-                .isElegivel(false) // Default
+                .isElegivel(unidade.getTipo() != TipoUnidade.INTERMEDIARIA)
                 .build();
     }
 
