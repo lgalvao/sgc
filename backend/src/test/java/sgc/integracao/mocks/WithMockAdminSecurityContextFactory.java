@@ -13,6 +13,9 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 @Component
 public class WithMockAdminSecurityContextFactory
@@ -26,11 +29,9 @@ public class WithMockAdminSecurityContextFactory
         String tituloAdmin = "111111111111";
 
         Usuario principal = null;
-        boolean dbAvailable = false;
         if (usuarioRepo != null) {
             try {
                 principal = usuarioRepo.findById(tituloAdmin).orElse(null);
-                dbAvailable = true;
             } catch (Exception e) {
                 log.error("Erro ao buscar usuario admin", e);
             }
@@ -43,37 +44,27 @@ public class WithMockAdminSecurityContextFactory
             principal.setEmail("admin@example.com");
             Unidade u = new Unidade("Unidade Mock", "UM");
             principal.setUnidadeLotacao(u);
-            principal
-                    .getAtribuicoes()
-                    .add(
+
+            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            atribuicoes.add(
                             sgc.sgrh.model.UsuarioPerfil.builder()
                                     .usuario(principal)
                                     .unidade(u)
                                     .perfil(Perfil.ADMIN)
                                     .build());
-            if (dbAvailable) {
-                try {
-                    usuarioRepo.save(principal);
-                } catch (Exception e) {
-                    log.error("Erro ao salvar usuario admin", e);
-                }
-            }
+            principal.setAtribuicoes(atribuicoes);
+
         } else {
-            if (principal.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
+            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.ADMIN)) {
                 Unidade u = new Unidade("Unidade Mock", "UM");
-                principal
-                        .getAtribuicoes()
-                        .add(
+                atribuicoes.add(
                                 sgc.sgrh.model.UsuarioPerfil.builder()
                                         .usuario(principal)
                                         .unidade(u)
                                         .perfil(Perfil.ADMIN)
                                         .build());
-            }
-            try {
-                usuarioRepo.save(principal);
-            } catch (Exception e) {
-                log.error("Erro ao atualizar usuario admin", e);
+                principal.setAtribuicoes(atribuicoes);
             }
         }
 

@@ -279,7 +279,7 @@ class AlertaServiceTest {
         AlertaUsuario au = new AlertaUsuario();
         au.setAlerta(alerta);
 
-        when(alertaUsuarioRepo.findById_UsuarioTituloEleitoral(user)).thenReturn(List.of(au));
+        when(alertaUsuarioRepo.findById_UsuarioTitulo(user)).thenReturn(List.of(au));
         when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().build());
 
         var res = service.listarAlertasPorUsuario(user);

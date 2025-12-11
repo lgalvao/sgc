@@ -12,6 +12,9 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Component
 public class WithMockGestorSecurityContextFactory
         implements WithSecurityContextFactory<WithMockGestor> {
@@ -23,11 +26,9 @@ public class WithMockGestorSecurityContextFactory
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         String tituloGestor = customUser.value();
         Usuario principal = null;
-        boolean dbAvailable = false;
         if (usuarioRepo != null) {
             try {
                 principal = usuarioRepo.findById(tituloGestor).orElse(null);
-                dbAvailable = true;
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -40,39 +41,28 @@ public class WithMockGestorSecurityContextFactory
             principal.setEmail("gestor@example.com");
             Unidade u = new Unidade("Unidade Mock", "UO_SUP");
             principal.setUnidadeLotacao(u);
-            principal
-                    .getAtribuicoes()
-                    .add(
+
+            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            atribuicoes.add(
                             sgc.sgrh.model.UsuarioPerfil.builder()
                                     .usuario(principal)
                                     .unidade(u)
                                     .perfil(Perfil.GESTOR)
                                     .build());
+            principal.setAtribuicoes(atribuicoes);
 
-            if (dbAvailable) {
-                try {
-                    usuarioRepo.save(principal);
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
         } else {
-            if (principal.getAtribuicoes().stream()
+            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 Unidade u = new Unidade("Unidade Mock", "UO_SUP");
-                principal
-                        .getAtribuicoes()
-                        .add(
+                atribuicoes.add(
                                 sgc.sgrh.model.UsuarioPerfil.builder()
                                         .usuario(principal)
                                         .unidade(u)
                                         .perfil(Perfil.GESTOR)
                                         .build());
-            }
-            try {
-                usuarioRepo.save(principal);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
+                principal.setAtribuicoes(atribuicoes);
             }
         }
 

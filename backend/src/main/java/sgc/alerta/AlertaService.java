@@ -370,7 +370,7 @@ public class AlertaService {
     @Transactional(readOnly = true)
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
         List<AlertaUsuario> alertasUsuario =
-                alertaUsuarioRepo.findById_UsuarioTituloEleitoral(usuarioTitulo);
+                alertaUsuarioRepo.findById_UsuarioTitulo(usuarioTitulo);
 
         return alertasUsuario.stream().map(alertaUsuario -> {
             Alerta alerta = alertaUsuario.getAlerta();

@@ -122,8 +122,9 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         // It adds profile to transient cache.
         // If SgrhService reloads from DB, transient cache is lost.
         // So we MUST insert ADMIN profile for "111111111111" into VW_USUARIO_PERFIL_UNIDADE.
-        // jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-        //        "111111111111", 100, "ADMIN");
+        // Using MERGE to avoid duplicates
+        jdbcTemplate.update("MERGE INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) KEY(usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+               "111111111111", 100, "ADMIN");
     }
 
 

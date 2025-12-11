@@ -26,10 +26,10 @@ public class AlertaUsuario implements Serializable {
     @ManyToOne
     @JoinColumn(name = "alerta_codigo", insertable = false, updatable = false)
     private Alerta alerta;
-    @MapsId("usuarioTituloEleitoral")
+    @MapsId("usuarioTitulo")
     @ManyToOne
     @JoinColumn(
-            name = "usuario_titulo_eleitoral",
+            name = "usuario_titulo",
             referencedColumnName = "titulo",
             insertable = false,
             updatable = false)
@@ -48,6 +48,6 @@ public class AlertaUsuario implements Serializable {
     @EqualsAndHashCode
     public static class Chave implements Serializable {
         private Long alertaCodigo;
-        private String usuarioTituloEleitoral;
+        private String usuarioTitulo;
     }
 }

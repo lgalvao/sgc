@@ -1,0 +1,35 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava
+> Task :backend:classes
+
+> Task :backend:compileTestJava FAILED
+/app/backend/src/test/java/sgc/alerta/AlertaServiceTest.java:282: error: cannot find symbol
+        when(alertaUsuarioRepo.findById_UsuarioTituloEleitoral(user)).thenReturn(List.of(au));
+                              ^
+  symbol:   method findById_UsuarioTituloEleitoral(String)
+  location: variable alertaUsuarioRepo of type AlertaUsuarioRepo
+1 error
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /app/backend/src/test/java/sgc/alerta/AlertaServiceTest.java:282: error: cannot find symbol
+          when(alertaUsuarioRepo.findById_UsuarioTituloEleitoral(user)).thenReturn(List.of(au));
+                                ^
+    symbol:   method findById_UsuarioTituloEleitoral(String)
+    location: variable alertaUsuarioRepo of type AlertaUsuarioRepo
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 3s
+4 actionable tasks: 2 executed, 2 up-to-date
+Configuration cache entry reused.

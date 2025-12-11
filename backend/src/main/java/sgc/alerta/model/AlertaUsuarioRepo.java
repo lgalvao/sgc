@@ -24,10 +24,10 @@ public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUs
     /**
      * Busca todas as associações de Alerta-Usuário para um determinado usuário.
      *
-     * @param usuarioTituloEleitoral O título de eleitor do usuário.
+     * @param usuarioTitulo O título de eleitor do usuário.
      * @return Uma lista de {@link AlertaUsuario}.
      */
-    List<AlertaUsuario> findById_UsuarioTituloEleitoral(String usuarioTituloEleitoral);
+    List<AlertaUsuario> findById_UsuarioTitulo(String usuarioTitulo);
 
     /**
      * Deleta todas as associações de usuários para os alertas especificados.

@@ -17,7 +17,9 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -73,14 +75,15 @@ class AlertaMapperTest {
         Unidade uUser = new Unidade();
         uUser.setCodigo(10L);
         user.setUnidadeLotacao(uUser);
-        user.getAtribuicoes()
-                .add(
+
+        Set<sgc.sgrh.model.UsuarioPerfil> attrs = new HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(user)
                                 .unidade(uUser)
                                 .perfil(sgc.sgrh.model.Perfil.SERVIDOR)
-                                .build()); // Add a profile to avoid empty attributions logic if
-        // tested
+                                .build());
+        user.setAtribuicoes(attrs);
 
         Authentication auth = mock(Authentication.class);
         SecurityContext sc = mock(SecurityContext.class);

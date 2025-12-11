@@ -1,0 +1,238 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_VINCULACAO_UNIDADE FAILED
+    org.springframework.orm.ObjectOptimisticLockingFailureException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9903']
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:204)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:109)
+        at app//org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+        at app//org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:556)
+        at app//org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+        at app//org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+        at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy220.save(Unknown Source)
+        at app//sgc.integracao.ViewEntitiesIntegrationTest.testVinculacaoUnidadeView(ViewEntitiesIntegrationTest.java:108)
+
+        Caused by:
+        org.hibernate.StaleObjectStateException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9903']
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.entityIsDetached(DefaultMergeEventListener.java:441)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.merge(DefaultMergeEventListener.java:205)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.doMerge(DefaultMergeEventListener.java:149)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:133)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:89)
+            at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+            at app//org.hibernate.internal.SessionImpl.fireMerge(SessionImpl.java:797)
+            at app//org.hibernate.internal.SessionImpl.merge(SessionImpl.java:783)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+            at app/jdk.proxy3/jdk.proxy3.$Proxy214.merge(Unknown Source)
+            at app//org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:666)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+            at app//org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:708)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:370)
+            at app//org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+            ... 6 more
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_UNIDADE FAILED
+    org.springframework.orm.ObjectOptimisticLockingFailureException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9901']
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:204)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:109)
+        at app//org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+        at app//org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:556)
+        at app//org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+        at app//org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+        at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy220.save(Unknown Source)
+        at app//sgc.integracao.ViewEntitiesIntegrationTest.testUnidadeView(ViewEntitiesIntegrationTest.java:61)
+
+        Caused by:
+        org.hibernate.StaleObjectStateException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9901']
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.entityIsDetached(DefaultMergeEventListener.java:441)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.merge(DefaultMergeEventListener.java:205)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.doMerge(DefaultMergeEventListener.java:149)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:133)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:89)
+            at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+            at app//org.hibernate.internal.SessionImpl.fireMerge(SessionImpl.java:797)
+            at app//org.hibernate.internal.SessionImpl.merge(SessionImpl.java:783)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+            at app/jdk.proxy3/jdk.proxy3.$Proxy214.merge(Unknown Source)
+            at app//org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:666)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+            at app//org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:708)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:370)
+            at app//org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+            ... 6 more
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_USUARIO FAILED
+    org.springframework.orm.ObjectOptimisticLockingFailureException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9902']
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:204)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:109)
+        at app//org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+        at app//org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:556)
+        at app//org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+        at app//org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+        at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy220.save(Unknown Source)
+        at app//sgc.integracao.ViewEntitiesIntegrationTest.testUsuarioView(ViewEntitiesIntegrationTest.java:79)
+
+        Caused by:
+        org.hibernate.StaleObjectStateException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9902']
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.entityIsDetached(DefaultMergeEventListener.java:441)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.merge(DefaultMergeEventListener.java:205)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.doMerge(DefaultMergeEventListener.java:149)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:133)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:89)
+            at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+            at app//org.hibernate.internal.SessionImpl.fireMerge(SessionImpl.java:797)
+            at app//org.hibernate.internal.SessionImpl.merge(SessionImpl.java:783)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+            at app/jdk.proxy3/jdk.proxy3.$Proxy214.merge(Unknown Source)
+            at app//org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:666)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+            at app//org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:708)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:370)
+            at app//org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+            ... 6 more
+
+Integração: Entidades de Views (SGC) > Deve persistir e consultar VW_USUARIO_PERFIL_UNIDADE FAILED
+    org.springframework.orm.ObjectOptimisticLockingFailureException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9905']
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:204)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+        at app//org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:109)
+        at app//org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+        at app//org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:556)
+        at app//org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+        at app//org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+        at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+        at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at app//org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy220.save(Unknown Source)
+        at app//sgc.integracao.ViewEntitiesIntegrationTest.testUsuarioPerfilUnidadeView(ViewEntitiesIntegrationTest.java:136)
+
+        Caused by:
+        org.hibernate.StaleObjectStateException: Row was already updated or deleted by another transaction for entity [sgc.unidade.model.Unidade with id '9905']
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.entityIsDetached(DefaultMergeEventListener.java:441)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.merge(DefaultMergeEventListener.java:205)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.doMerge(DefaultMergeEventListener.java:149)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:133)
+            at app//org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:89)
+            at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+            at app//org.hibernate.internal.SessionImpl.fireMerge(SessionImpl.java:797)
+            at app//org.hibernate.internal.SessionImpl.merge(SessionImpl.java:783)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+            at app/jdk.proxy3/jdk.proxy3.$Proxy214.merge(Unknown Source)
+            at app//org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:666)
+            at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+            at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+            at app//org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+            at app//org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+            at app//org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+            at app//org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:708)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+            at app//org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:370)
+            at app//org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+            at app//org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+            at app//org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+            ... 6 more
+
+4 tests completed, 4 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 20s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.
