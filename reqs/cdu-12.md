@@ -6,10 +6,10 @@ Pré-condições:
 
 - Processo de Revisão
 - Uma das seguintes situações:
-    - Perfil CHEFE e subprocesso na situação 'Revisão do cadastro em andamento'.
-    - Perfil GESTOR e subprocesso na situação 'Revisão do cadastro disponibilizada' e com localização atual na unidade
+  - Perfil CHEFE e subprocesso na situação 'Revisão do cadastro em andamento'.
+  - Perfil GESTOR e subprocesso na situação 'Revisão do cadastro disponibilizada' e com localização atual na unidade
       do usuário
-    - Perfil ADMIN e subprocesso nas situações 'Revisão do cadastro disponibilizada', 'Revisão do cadastro homologada'
+  - Perfil ADMIN e subprocesso nas situações 'Revisão do cadastro disponibilizada', 'Revisão do cadastro homologada'
       ou 'Mapa Ajustado'
 
 Fluxo principal:
@@ -55,11 +55,9 @@ Fluxo principal:
 7. Se alguma divergência tiver sido detectada, sistema exibe a tela modal `Impacto no Mapa de Competências`, com as
    seguintes seções:
 
-   7.1. Atividades inseridas: Se novas atividades tiverem sido adicionadas, esta seção é exibida, enumerando, ao lado de
-   um ícone de adição, os elementos da lista montados no passo anterior. Abaixo de cada atividade, deverão ser listados
-   também os conhecimentos associados a elas.
+   7.1. `Atividades inseridas`: Se novas atividades tiverem sido adicionadas, esta seção é exibida, enumerando, ao lado de um ícone de adição, os elementos da lista montados no passo anterior. Abaixo de cada atividade, deverão ser listados também os conhecimentos associados a elas.
 
-   7.2. Competências impactadas: Se alguma competência impactada tiver sido detectada, o sistema mostra uma seção
+   7.2. `Competências impactadas`: Se alguma competência impactada tiver sido detectada, o sistema mostra uma seção
    composta por blocos com a descrição das competências identificadas. No conteúdo de cada bloco, o sistema apresenta a
    lista de impactos observados no formato:
 

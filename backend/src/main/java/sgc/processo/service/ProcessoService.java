@@ -60,6 +60,20 @@ public class ProcessoService {
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
+    /**
+     * Verifica se um usuário autenticado tem permissão para acessar um processo.
+     * 
+     * <p>Um usuário tem acesso se:
+     * <ul>
+     *   <li>For ADMIN (verificado via @PreAuthorize)</li>
+     *   <li>For GESTOR ou CHEFE e existir subprocesso para sua unidade</li>
+     *   <li>For GESTOR ou CHEFE e existir subprocesso para unidades subordinadas à sua unidade</li>
+     * </ul>
+     *
+     * @param authentication contexto de autenticação do usuário
+     * @param codProcesso código do processo a verificar
+     * @return true se o usuário tem acesso, false caso contrário
+     */
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) return false;
 
@@ -82,9 +96,53 @@ public class ProcessoService {
                         .map(sgc.sgrh.dto.PerfilDto::getUnidadeCodigo)
                         .orElse(null);
 
-        return codUnidadeUsuario != null
-                && subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(
-                codProcesso, codUnidadeUsuario);
+        if (codUnidadeUsuario == null) {
+            log.debug("checarAcesso: codUnidadeUsuario é null para usuário {}", username);
+            return false;
+        }
+
+        // Buscar todas as unidades subordinadas (incluindo a própria unidade)
+        List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
+        log.debug("checarAcesso: usuário {} (unidade {}) tem acesso a {} unidades na hierarquia: {}",
+                username, codUnidadeUsuario, codigosUnidadesHierarquia.size(), codigosUnidadesHierarquia);
+
+        if (codigosUnidadesHierarquia.isEmpty()) {
+            log.warn("checarAcesso: busca hierárquica retornou lista vazia para unidade {}", codUnidadeUsuario);
+            return false;
+        }
+
+        // Verificar se existe subprocesso para a unidade do usuário ou para qualquer subordinada
+        boolean temAcesso = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(
+                codProcesso, codigosUnidadesHierarquia);
+        log.debug("checarAcesso: usuário {} {} acesso ao processo {}",
+                username, temAcesso ? "TEM" : "NÃO TEM", codProcesso);
+        return temAcesso;
+    }
+
+    /**
+     * Busca recursivamente todos os códigos de unidades descendentes de uma unidade.
+     * Inclui a própria unidade e todas as suas subordinadas em qualquer nível da hierarquia.
+     * Implementação em Java para portabilidade entre bancos de dados.
+     *
+     * @param codUnidade código da unidade raiz
+     * @return lista de códigos incluindo a unidade raiz e todos os descendentes
+     */
+    private List<Long> buscarCodigosDescendentes(Long codUnidade) {
+        List<Long> resultado = new ArrayList<>();
+        resultado.add(codUnidade);
+        buscarDescendentesRecursivo(codUnidade, resultado);
+        return resultado;
+    }
+
+    /**
+     * Método auxiliar recursivo para buscar descendentes.
+     */
+    private void buscarDescendentesRecursivo(Long codUnidadeSuperior, List<Long> resultado) {
+        List<Unidade> filhos = unidadeRepo.findByUnidadeSuperiorCodigo(codUnidadeSuperior);
+        for (Unidade filho : filhos) {
+            resultado.add(filho.getCodigo());
+            buscarDescendentesRecursivo(filho.getCodigo(), resultado);
+        }
     }
 
     @Transactional

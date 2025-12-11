@@ -183,6 +183,7 @@ import * as processoService from "@/services/processoService";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
+import {useFeedbackStore} from "@/stores/feedback";
 import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
@@ -195,6 +196,7 @@ const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
+const feedbackStore = useFeedbackStore();
 
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
@@ -358,7 +360,7 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
     await router.push("/painel");
-    limparCampos();
+    feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
   } catch (error: any) {
     let msg = "Não foi possível iniciar o processo. Tente novamente.";
     if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {

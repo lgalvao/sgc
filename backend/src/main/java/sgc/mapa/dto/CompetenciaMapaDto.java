@@ -32,21 +32,21 @@ public class CompetenciaMapaDto {
      * Lista com os códigos das atividades vinculadas à competência.
      */
     @NotNull(message = "Lista de atividades não pode ser nula")
-    private List<Long> atividadesCodigos;
+    private List<Long> atividadesAssociadas;
 
-    public CompetenciaMapaDto(Long codigo, String descricao, List<Long> atividadesCodigos) {
+    public CompetenciaMapaDto(Long codigo, String descricao, List<Long> atividadesAssociadas) {
         this.codigo = codigo;
         this.descricao = descricao;
-        this.atividadesCodigos =
-                (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
+        this.atividadesAssociadas =
+                (atividadesAssociadas == null) ? null : new ArrayList<>(atividadesAssociadas);
     }
 
-    public List<Long> getAtividadesCodigos() {
-        return (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
+    public List<Long> getAtividadesAssociadas() {
+        return (atividadesAssociadas == null) ? null : new ArrayList<>(atividadesAssociadas);
     }
 
-    public void setAtividadesCodigos(List<Long> atividadesCodigos) {
-        this.atividadesCodigos =
-                (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
+    public void setAtividadesAssociadas(List<Long> atividadesAssociadas) {
+        this.atividadesAssociadas =
+                (atividadesAssociadas == null) ? null : new ArrayList<>(atividadesAssociadas);
     }
 }

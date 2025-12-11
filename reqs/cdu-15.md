@@ -2,7 +2,7 @@
 
 Ator: ADMIN
 
-Pré-condições:
+## Pré-condições
 
 - Processo de mapeamento com ao menos uma unidade com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
 
@@ -33,12 +33,11 @@ Pré-condições:
 
 6. O sistema abre a tela modal Edição de competência, com:
 
-    - Um campo para a descrição da competência.
-    - Uma lista das atividades cadastradas pela unidade, cada uma podendo ser selecionada para inclusão na competência.
-    - Botões Cancelar e Salvar.
+    - Campo para descrição da competência.
+    - Lista das atividades cadastradas pela unidade, cada uma podendo ser selecionada para inclusão na competência.
+    - Botões `Cancelar` e `Salvar`.
 
-7. ADMIN informa a descrição da competência que será criada e seleciona uma ou mais atividades para associar a ela e
-   clica em Salvar para confirmar as mudanças.
+7. ADMIN informa a descrição da competência que será criada e seleciona uma ou mais atividades para associar a ela e clica em Salvar para confirmar as mudanças.
 
 8. O sistema armazena internamente a competência e o vínculo desta com as atividades selecionadas
 
@@ -53,28 +52,28 @@ Pré-condições:
 
 12. Se desejar **editar** uma competência criada:
 
-12.1. ADMIN clica no botão de ação de editar no cabeçalho do bloco correspondente à competência.
+  12.1. ADMIN clica no botão de ação de editar no cabeçalho do bloco correspondente à competência.
 
-12.2. O sistema exibe a tela Edição de competência preenchida com a descrição da competência e apresenta selecionadas as
-atividades atualmente associadas à competência.
+  12.2. O sistema exibe a tela Edição de competência preenchida com a descrição da competência e apresenta selecionadas as
+  atividades atualmente associadas à competência.
 
-12.3. ADMIN altera a descrição ou a associação com as atividades e clica no botão Salvar.
+  12.3. ADMIN altera a descrição ou a associação com as atividades e clica no botão Salvar.
 
-12.4. O sistema armazena a nova descrição da competência e os vínculos com as atividades.
+  12.4. O sistema armazena a nova descrição da competência e os vínculos com as atividades.
 
-12.5. O sistema retorna para a tela Edição do mapa, exibindo o bloco da competência correspondente atualizado.
+  12.5. O sistema retorna para a tela Edição do mapa, exibindo o bloco da competência correspondente atualizado.
 
 13. Se desejar **excluir** uma competência criada:
 
-13.1. ADMIN clica no botão de ação de excluir no cabeçalho do bloco correspondente à competência.
+  13.1. ADMIN clica no botão de ação de excluir no cabeçalho do bloco correspondente à competência.
 
-13.2. O sistema mostra diálogo de confirmação: Título 'Exclusão de competência', mensagem 'Confirma a exclusão da
-competência [DESCRICAO_COMPETENCIA]?', Botões Confirmar e Cancelar.
+  13.2. O sistema mostra diálogo de confirmação: Título 'Exclusão de competência', mensagem 'Confirma a exclusão da
+  competência [DESCRICAO_COMPETENCIA]?', Botões Confirmar e Cancelar.
 
-13.3. ADMIN confirma a exclusão.
+  13.3. ADMIN confirma a exclusão.
 
-13.4. O sistema remove a competência e todos os seus vínculos com as atividades da unidade.
+  13.4. O sistema remove a competência e todos os seus vínculos com as atividades da unidade.
 
-13.5. O sistema retorna para a tela Edição do mapa, mostrando o bloco da competência correspondente atualizado.
+  13.5. O sistema retorna para a tela `Edição do mapa`, mostrando o bloco da competência correspondente atualizado.
 
-14. Se o usuário clicar em Disponibilizar, o sistema segue para o caso de uso Disponibilizar mapa de competências.
+14. Se o usuário clicar em `Disponibilizar`, o sistema segue para o caso de uso `Disponibilizar mapa de competências`.

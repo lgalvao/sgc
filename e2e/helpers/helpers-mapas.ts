@@ -16,10 +16,8 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
     await page.getByTestId('inp-criar-competencia-descricao').fill(descricao);
 
     for (const atividade of atividades) {
-        // Find the checkbox wrapper or label containing the activity description
-        await modal.getByTestId('chk-criar-competencia-atividade')
-            .filter({hasText: atividade})
-            .check();
+        // Click on the label containing the activity text to toggle the checkbox
+        await modal.locator('label').filter({hasText: atividade}).click();
     }
 
     await page.getByTestId('btn-criar-competencia-salvar').click();
@@ -46,17 +44,15 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
 
     if (removerAtividades) {
         for (const atividade of removerAtividades) {
-            await modal.getByTestId('chk-criar-competencia-atividade')
-                .filter({hasText: atividade})
-                .uncheck();
+            // Click on the label containing the activity text to toggle the checkbox
+            await modal.locator('label').filter({hasText: atividade}).click();
         }
     }
 
     if (novasAtividades) {
         for (const atividade of novasAtividades) {
-            await modal.getByTestId('chk-criar-competencia-atividade')
-                .filter({hasText: atividade})
-                .check();
+            // Click on the label containing the activity text to toggle the checkbox
+            await modal.locator('label').filter({hasText: atividade}).click();
         }
     }
 

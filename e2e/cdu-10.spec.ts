@@ -73,6 +73,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
+
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
@@ -117,8 +118,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         // ADMIN após login está no Painel
-        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
-        await page.getByText(descProcessoMapeamento).click();
+        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
+        await expect(linhaProcesso).toBeVisible();
+        await linhaProcesso.click();
 
         // Navegar para a unidade
         await page.getByRole('row', {name: 'Seção 221'}).click();
@@ -150,8 +152,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
-        await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
+        
+        // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
+        await expect(page).toHaveURL(/\/painel/);
+        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
     });
+
 
     test('Preparacao 5: Chefe valida mapa', async ({page}) => {
         await page.goto('/login');

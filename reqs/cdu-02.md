@@ -2,9 +2,11 @@
 
 Ator: Usuário (todos os perfis)
 
-Pré-condição: Usuário ter feito login (qualquer perfil)
+## Pré-condição
 
-Fluxo principal:
+- Usuário ter feito login (qualquer perfil)
+
+## Fluxo principal
 
 1. O sistema exibe a tela `Painel`, com as seções `Processos ativos` e `Alertas`.
 
@@ -14,10 +16,7 @@ Fluxo principal:
 
     - `Descrição`: Descrição dada ao processo no momento do seu cadastro
     - `Tipo`: Tipo do processo ('Mapeamento', 'Revisão' ou 'Diagnóstico')
-    - `Unidades Participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da
-      unidade raiz que possuam todas as suas unidades subordinadas participando do processo. Por exemplo, para uma
-      secretaria com duas coordenadorias A e B, se apenas as seções da coordenadoria B participarem do processo, deverá
-      aparecer apenas o nome da coordenadoria B.
+    - `Unidades Participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da unidade raiz que possuam todas as suas unidades subordinadas participando do processo. Por exemplo, para uma secretaria com duas coordenadorias A e B, se apenas as seções da coordenadoria B participarem do processo, deverá aparecer apenas o nome da coordenadoria B.
     - `Situação`: Situação do processo ('Criado', 'Em andamento' ou 'Finalizado').
 
    2.2. Regras de exibição e funcionamento:
@@ -42,8 +41,7 @@ Fluxo principal:
    3.2. Regras de exibição e funcionamento da tabela de alertas:
 
     - Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
-    - Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como
-      visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo usuário.
+    - Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo usuário.
     - Os alertas devem estar inicialmente em ordem decrescente por data/hora, podendo-se alternar a ordenação clicando no cabeçalho correspondente.
     - A ordenação deve ser feita tendo como primeiro critério a `Processo` (asc/desc) e em seguida `Data/hora` (desc).
-    - O cabeçalho da coluna Processo poderá ser clicado para alterar a ordenação dos dados da tabela.
+    - O cabeçalho da coluna `Processo` poderá ser clicado para alterar a ordenação dos dados da tabela.

@@ -526,9 +526,6 @@ async function disponibilizarMapa() {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
     });
-    // Recarregar mapa para atualizar a situacao exibida
-    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
   } catch {

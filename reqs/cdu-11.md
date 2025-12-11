@@ -2,14 +2,14 @@
 
 Ator: Usuário (todos os perfis)
 
-Pré-condições:
+## Pré-condições
 
 - Usuário logado com qualquer perfil
 - Processo de mapeamento ou de revisão iniciado ou finalizado, que tenha a unidade como participante
 - Subprocesso da unidade com cadastro de atividades e conhecimentos (processo de mapeamento) ou revisão do cadastro (
   processo de revisão) já disponibilizados.
 
-Fluxo principal:
+## Fluxo principal
 
 1. No Painel, o usuário clica no processo de mapeamento ou revisão na situação `Em andamento` ou `Finalizado`.
 

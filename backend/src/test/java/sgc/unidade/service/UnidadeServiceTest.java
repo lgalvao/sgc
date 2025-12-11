@@ -255,4 +255,59 @@ class UnidadeServiceTest {
         assertThat(resultado).hasSize(1);
         assertThat(resultado.get(0).isElegivel()).isTrue();
     }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve marcar ASSESSORIA_11 como elegivel em hierarquia completa")
+    void buscarArvoreComElegibilidadeAssessoria11() {
+        // Setup: criar hierarquia SEDOC -> SECRETARIA_1 -> ASSESSORIA_11
+        Unidade sedoc = new Unidade("SEDOC", "SEDOC");
+        sedoc.setCodigo(1L);
+        sedoc.setTipo(TipoUnidade.INTEROPERACIONAL);
+
+        Unidade secretaria = new Unidade("Secretaria 1", "SECRETARIA_1");
+        secretaria.setCodigo(2L);
+        secretaria.setTipo(TipoUnidade.INTEROPERACIONAL);
+        secretaria.setUnidadeSuperior(sedoc);
+
+        Unidade assessoria = new Unidade("Assessoria 11", "ASSESSORIA_11");
+        assessoria.setCodigo(3L);
+        assessoria.setTipo(TipoUnidade.OPERACIONAL);
+        assessoria.setUnidadeSuperior(secretaria);
+
+        when(unidadeRepo.findAll()).thenReturn(List.of(sedoc, secretaria, assessoria));
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+
+        // Act
+        List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(
+                TipoProcesso.MAPEAMENTO, null);
+
+        // Assert: encontrar ASSESSORIA_11 na hierarquia e verificar que é elegível
+        assertThat(resultado).hasSize(1);
+        UnidadeDto raiz = resultado.get(0); // SEDOC
+        assertThat(raiz.getSigla()).isEqualTo("SEDOC");
+        assertThat(raiz.getSubunidades()).hasSize(1);
+
+        UnidadeDto secretaria1 = raiz.getSubunidades().get(0); // SECRETARIA_1
+        assertThat(secretaria1.getSigla()).isEqualTo("SECRETARIA_1");
+        assertThat(secretaria1.getSubunidades()).hasSize(1);
+
+        UnidadeDto assessoria11 = secretaria1.getSubunidades().get(0);
+        assertThat(assessoria11.getSigla()).isEqualTo("ASSESSORIA_11");
+        assertThat(assessoria11.isElegivel()).isTrue();
+    }
+
+    @Test
+    @DisplayName("UnidadeDto deve serializar isElegivel corretamente para JSON")
+    void testeSerializacaoJson() throws Exception {
+        UnidadeDto dto = new UnidadeDto();
+        dto.setElegivel(true);
+        dto.setCodigo(1L);
+        dto.setNome("Teste");
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        String json = mapper.writeValueAsString(dto);
+
+        assertThat(json).contains("\"isElegivel\":true");
+    }
 }

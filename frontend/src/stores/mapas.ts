@@ -188,6 +188,11 @@ export const useMapasStore = defineStore("mapas", () => {
     ) {
         try {
             await mapaService.disponibilizarMapa(codSubrocesso, request);
+            feedbackStore.show(
+                "Mapa disponibilizado",
+                "O mapa de competências foi disponibilizado com sucesso.",
+                "success"
+            );
         } catch (error: any) {
             feedbackStore.show(
                 "Erro ao disponibilizar mapa",

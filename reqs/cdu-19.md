@@ -2,39 +2,32 @@
 
 Ator: CHEFE
 
-Pré-condições:
+## Pré-condições
 
 - Usuário logado com perfil CHEFE
 - Processo de mapeamento ou revisão com subprocesso na situação 'Mapa disponibilizado'
 
-Fluxo principal:
+## Fluxo principal
 
 1. No Painel, CHEFE escolhe um processo e, na tela Detalhes do subprocesso, clica no card Mapa de competências.
 
 2. O sistema mostra a tela Visualização de mapa com os botões Apresentar sugestões e Validar.
 
-3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão Histórico de
-   análise.
+3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão Histórico de análise.
 
-   3.1. Se CHEFE clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises do mapa
-   realizadas pelas unidades superiores à unidade do subprocesso desde a última disponibilização. As análises deverão
-   ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e
-   observações. Essas informações poderão ser usadas como subsídio para a realização da nova validação do mapa.
+   3.1. Se CHEFE clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises do mapa realizadas pelas unidades superiores à unidade do subprocesso desde a última disponibilização. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da nova validação do mapa.
 
 4. Se usuário clicar em Apresentar sugestões:
 
    4.1. O sistema abre um modal com um campo de texto formatado, para inclusão das sugestões.
 
-   4.1.1. Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido
-   com essa informação.
+   4.1.1. Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com essa informação.
 
-   4.2. Usuário fornece as sugestões e clica em Confirmar.
+   4.2. Usuário fornece as sugestões e clica em `Confirmar`.
 
-   4.3. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação deste para '
-   Mapa com sugestões'.
+   4.3. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação deste para 'Mapa com sugestões'.
 
-   4.4. O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo
-   abaixo:
+   4.4. O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:
 
    ```text
    Assunto: SGC: Sugestões apresentadas para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO]
@@ -47,11 +40,11 @@ Fluxo principal:
 
    4.5. O sistema cria internamente um alerta com:
 
-    - Descrição: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
-    - Processo: [DESCRICAO_PROCESSO]
-    - Data/hora: Data/hora atual
-    - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
-    - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+   - Descrição: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
+   - Processo: [DESCRICAO_PROCESSO]
+   - Data/hora: Data/hora atual
+   - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
+   - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
    4.6. O sistema mostra a mensagem "Mapa submetido com sugestões para análise da unidade superior".
 

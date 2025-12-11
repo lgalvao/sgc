@@ -29,4 +29,14 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
     Optional<Subprocesso> findByMapaCodigo(Long mapaCodigo);
 
     List<Subprocesso> findByUnidadeCodigo(Long unidadeCodigo);
+
+    /**
+     * Verifica se existe subprocesso para um processo e qualquer uma das unidades fornecidas.
+     * Útil para verificação hierárquica de permissões.
+     *
+     * @param processoCodigo código do processo
+     * @param unidadesCodigos lista de códigos de unidades
+     * @return true se existir pelo menos um subprocesso
+     */
+    boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long processoCodigo, List<Long> unidadesCodigos);
 }

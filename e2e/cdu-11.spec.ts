@@ -215,8 +215,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
 
-        // Wait for status update to ensure visibility for Chef
-        await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
+        // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
+        await verificarPaginaPainel(page);
+        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
 
         // Chefe valida mapa
         await fazerLogout(page);
