@@ -30,7 +30,7 @@ public class AlertaUsuario implements Serializable {
     @ManyToOne
     @JoinColumn(
             name = "usuario_titulo_eleitoral",
-            referencedColumnName = "titulo_eleitoral",
+            referencedColumnName = "titulo",
             insertable = false,
             updatable = false)
     private Usuario usuario;
