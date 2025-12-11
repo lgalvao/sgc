@@ -178,12 +178,26 @@ INSERT INTO sgc.usuario_perfil (usuario_titulo_eleitoral, perfil, unidade_codigo
 VALUES ('292929', 'SERVIDOR', 18);
 
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
-INSERT INTO sgc.mapa (codigo, data_hora_disponibilizado, data_hora_homologado, unidade_codigo, sugestoes_apresentadas)
-VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 4, false);
-UPDATE sgc.unidade
-SET mapa_vigente_codigo      = 99,
-    data_vigencia_mapa_atual = CURRENT_TIMESTAMP
-WHERE codigo = 4;
+-- Processo 99
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
+VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 99', 'FINALIZADO', 'MAPEAMENTO');
+
+-- UnidadeProcesso (Unit 4)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
+VALUES (99, 4, 'CONCLUIDA');
+
+-- Subprocesso 99
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao)
+VALUES (99, 99, 4, 'CONCLUIDO');
+
+-- Mapa (agora vinculado ao Subprocesso e sem sugestoes_apresentadas)
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (99, 99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+
+-- Vincular o mapa à unidade via tabela de associação
+INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
+VALUES (4, 99);
+
 
 -- Atualizar titulares das unidades depois da criação dos usuários
 UPDATE sgc.unidade
@@ -239,13 +253,25 @@ SET titular_titulo = '141414'
 WHERE codigo = 18;
 
 -- Dados para teste de Importação (CDU-08)
+-- Processo 200
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
+VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
+
+-- UnidadeProcesso (Unit 2)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
+VALUES (200, 2, 'CONCLUIDA');
+
+-- Subprocesso 200
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao)
+VALUES (200, 200, 2, 'CONCLUIDO');
+
 -- Mapa para SECRETARIA_1 (Unidade 2)
-INSERT INTO sgc.mapa (codigo, data_hora_disponibilizado, data_hora_homologado, unidade_codigo, sugestoes_apresentadas)
-VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 2, false);
-UPDATE sgc.unidade
-SET mapa_vigente_codigo      = 200,
-    data_vigencia_mapa_atual = CURRENT_TIMESTAMP
-WHERE codigo = 2;
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (200, 200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+
+-- Vincular o mapa à unidade
+INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
+VALUES (2, 200);
 
 -- Atividade para SECRETARIA_1
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
