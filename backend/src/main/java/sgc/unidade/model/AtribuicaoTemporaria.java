@@ -25,13 +25,11 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidade;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_titulo")
-    private Usuario usuario;
+    @Column(name = "usuario_titulo", length = 12)
+    private String usuarioTitulo;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "perfil")
-    private sgc.sgrh.model.Perfil perfil;
+    @Column(name = "usuario_matricula", length = 8)
+    private String usuarioMatricula;
 
     @Column(name = "data_inicio")
     private LocalDateTime dataInicio;
@@ -41,4 +39,19 @@ public class AtribuicaoTemporaria extends EntidadeBase {
 
     @Column(name = "justificativa", length = 500)
     private String justificativa;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false)
+    private Usuario usuario;
+
+    @Transient
+    private sgc.sgrh.model.Perfil perfil;
+
+    public sgc.sgrh.model.Perfil getPerfil() {
+        return perfil != null ? perfil : sgc.sgrh.model.Perfil.SERVIDOR;
+    }
+
+    public void setPerfil(sgc.sgrh.model.Perfil perfil) {
+        this.perfil = perfil;
+    }
 }

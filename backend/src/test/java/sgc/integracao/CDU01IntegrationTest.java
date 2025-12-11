@@ -90,8 +90,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            String tituloEleitoral =
-                    "999999999999"; // Usuario Multi Perfil from data-postgresql.sql (has ADMIN and
+            String tituloEleitoral = "999999999999";
             // GESTOR)
             String senha = "password";
             AutenticacaoReq authRequest =

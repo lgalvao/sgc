@@ -38,22 +38,22 @@ public class SubprocessoDetalheDto {
             MovimentacaoMapper movimentacaoMapper,
             SubprocessoPermissoesDto permissoes) {
         UnidadeDto unidadeDto = null;
+
         if (sp.getUnidade() != null) {
-            unidadeDto =
-                    UnidadeDto.builder()
-                            .codigo(sp.getUnidade().getCodigo())
-                            .sigla(sp.getUnidade().getSigla())
-                            .nome(sp.getUnidade().getNome())
-                            .build();
+            unidadeDto = UnidadeDto.builder()
+                    .codigo(sp.getUnidade().getCodigo())
+                    .sigla(sp.getUnidade().getSigla())
+                    .nome(sp.getUnidade().getNome())
+                    .build();
         }
 
-        Usuario titular = (sp.getUnidade() != null) ? sp.getUnidade().getTitular() : null;
+        String tituloTitular = (sp.getUnidade() != null) ? sp.getUnidade().getTituloTitular() : null;
         ResponsavelDto responsavelDto = null;
         boolean isTitularResponsavel = false;
 
         if (responsavel != null) {
             String tipo = "Substituição"; // Default
-            if (titular != null && titular.equals(responsavel)) {
+            if (tituloTitular != null && tituloTitular.equals(responsavel.getTituloEleitoral())) {
                 tipo = "Titular";
                 isTitularResponsavel = true;
             }
@@ -69,13 +69,10 @@ public class SubprocessoDetalheDto {
 
         ResponsavelDto titularDto = null;
         // Titular só é exibido se não for o responsável
-        if (titular != null && !isTitularResponsavel) {
-            titularDto =
-                    ResponsavelDto.builder()
-                            .nome(titular.getNome())
-                            .ramal(titular.getRamal())
-                            .email(titular.getEmail())
-                            .build();
+        if (tituloTitular != null && !isTitularResponsavel) {
+            // Buscar dados do titular a partir da VIEW VW_USUARIO
+            // TODO: Implementar busca do titular via título eleitoral
+            titularDto = null; // Por enquanto, não exibir titular se não for responsável
         }
 
         String localizacaoAtual = null;
@@ -106,8 +103,7 @@ public class SubprocessoDetalheDto {
                 .situacao(sp.getSituacao().name())
                 .situacaoLabel(sp.getSituacao().getDescricao())
                 .localizacaoAtual(localizacaoAtual)
-                .processoDescricao(
-                        sp.getProcesso() != null ? sp.getProcesso().getDescricao() : null)
+                .processoDescricao(sp.getProcesso() != null ? sp.getProcesso().getDescricao() : null)
                 .tipoProcesso(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)
                 .prazoEtapaAtual(prazoEtapaAtual)
                 .isEmAndamento(sp.isEmAndamento())

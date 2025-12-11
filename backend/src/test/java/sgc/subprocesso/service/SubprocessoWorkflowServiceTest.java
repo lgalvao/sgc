@@ -67,7 +67,6 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
-        u.setTitular(user);
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
@@ -97,7 +96,6 @@ class SubprocessoWorkflowServiceTest {
         Usuario titular = new Usuario();
         titular.setTituloEleitoral("2");
         Unidade u = new Unidade();
-        u.setTitular(titular);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -114,7 +112,6 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
-        u.setTitular(user);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -135,7 +132,6 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
-        u.setTitular(user);
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
@@ -615,8 +611,7 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
-        u.setTitular(user);
-        Mapa mapa = new Mapa();
+        Mapa mapa = new Mapa(); 
         mapa.setCodigo(10L);
 
         Subprocesso sp = new Subprocesso();
@@ -645,7 +640,6 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
-        u.setTitular(user);
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 

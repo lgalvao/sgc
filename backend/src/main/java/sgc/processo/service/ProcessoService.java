@@ -49,6 +49,7 @@ import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
+    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
@@ -486,9 +487,10 @@ public class ProcessoService {
             return Optional.empty();
         }
         List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
+        // Buscar mapas vigentes via UnidadeMapaRepo
         List<Long> unidadesSemMapa =
                 unidades.stream()
-                        .filter(u -> u.getMapaVigente() == null)
+                        .filter(u -> !unidadeMapaRepo.existsById(u.getCodigo()))
                         .map(Unidade::getCodigo)
                         .toList();
 
@@ -522,12 +524,12 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
-        if (unidade.getMapaVigente() == null) {
-            throw new ErroProcesso(
-                    "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
-        }
+        // Buscar mapa vigente da unidade
+        sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
+                .orElseThrow(() -> new ErroProcesso(
+                        "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla())));
 
-        Long codMapaVigente = unidade.getMapaVigente().getCodigo();
+        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Mapa mapaCopiado =
                 servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
         Subprocesso subprocesso =
@@ -549,18 +551,12 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaDiagnostico(Processo processo, Unidade unidade) {
-        if (unidade.getMapaVigente() == null) {
-            // Se não tem mapa vigente, não pode fazer diagnóstico?
-            // Regra de negócio: Diagnóstico requer mapa vigente.
-            // Mas talvez possa ser criado vazio?
-            // Por enquanto, assumo que precisa de mapa, segue lógica de Revisão.
-            // Mas o teste diz que "Passo 1: Criar e Homologar Mapa" é pré-requisito.
-            // Então DEVE ter mapa vigente.
-            throw new ErroProcesso(
-                    "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla()));
-        }
+        // Buscar mapa vigente da unidade
+        sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
+                .orElseThrow(() -> new ErroProcesso(
+                        "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla())));
 
-        Long codMapaVigente = unidade.getMapaVigente().getCodigo();
+        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         // Para diagnostico, não precisamos copiar o mapa para EDIÇÃO (revisão),
         // mas o subprocesso precisa apontar para QUAL mapa está sendo diagnosticado.
         // O modelo Subprocesso tem relacionamento com Mapa.
@@ -681,9 +677,12 @@ public class ProcessoService {
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            unidade.setMapaVigente(mapaDoSubprocesso);
-            unidade.setDataVigenciaMapa(LocalDateTime.now());
-            unidadeRepo.save(unidade);
+            // Atualizar mapa vigente via UnidadeMapa
+            sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
+                    .orElse(new sgc.unidade.model.UnidadeMapa());
+            unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
+            unidadeMapa.setMapaVigente(mapaDoSubprocesso);
+            unidadeMapaRepo.save(unidadeMapa);
 
             log.debug("Mapa vigente para unidade {} definido como mapa {}",
                     unidade.getCodigo(),

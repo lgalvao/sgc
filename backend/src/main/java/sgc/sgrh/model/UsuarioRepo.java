@@ -15,12 +15,14 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     List<Usuario> findByUnidadeLotacaoCodigo(Long codigoUnidade);
 
     @Query(
-            "SELECT u FROM Usuario u JOIN u.atribuicoes a WHERE a.unidade.codigo = :codigoUnidade"
-                    + " AND a.perfil = 'CHEFE'")
+            "SELECT DISTINCT u FROM Usuario u " +
+            "JOIN sgc.sgrh.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
+            "WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil = 'CHEFE'")
     Optional<Usuario> findChefeByUnidadeCodigo(@Param("codigoUnidade") Long codigoUnidade);
 
     @Query(
-            "SELECT u FROM Usuario u JOIN u.atribuicoes a WHERE a.unidade.codigo IN"
-                    + " :codigosUnidades AND a.perfil = 'CHEFE'")
+            "SELECT DISTINCT u FROM Usuario u " +
+            "JOIN sgc.sgrh.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
+            "WHERE up.unidadeCodigo IN :codigosUnidades AND up.perfil = 'CHEFE'")
     List<Usuario> findChefesByUnidadesCodigos(@Param("codigosUnidades") List<Long> codigosUnidades);
 }

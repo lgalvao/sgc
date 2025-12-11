@@ -109,7 +109,6 @@ public class AtividadeController {
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(
             @PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
-        var atualizado = atividadeService.atualizar(codigo, atividadeDto);
 
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codigo);

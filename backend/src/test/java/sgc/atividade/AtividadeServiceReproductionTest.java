@@ -72,7 +72,6 @@ class AtividadeServiceReproductionTest {
         Unidade unidade = new Unidade();
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
-        unidade.setTitular(usuario);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);

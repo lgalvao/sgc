@@ -3,5 +3,7 @@ package sgc.unidade.model;
 public enum TipoUnidade {
     OPERACIONAL,
     INTERMEDIARIA,
-    INTEROPERACIONAL
+    INTEROPERACIONAL,
+    SEM_EQUIPE,
+    RAIZ
 }

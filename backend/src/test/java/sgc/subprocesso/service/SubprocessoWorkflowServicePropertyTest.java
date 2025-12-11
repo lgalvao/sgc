@@ -78,7 +78,6 @@ class SubprocessoWorkflowServicePropertyTest {
         titular.setTituloEleitoral(titularId);
 
         Unidade unidade = new Unidade();
-        unidade.setTitular(titular);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codSubprocesso);

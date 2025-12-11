@@ -35,7 +35,7 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataLimite", ignore = true)
     @Mapping(target = "codUnidade", source = "codigo")
     @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
-    @Mapping(target = "mapaCodigo", source = "mapaVigente.codigo")
+    @Mapping(target = "mapaCodigo", ignore = true)
     @Mapping(target = "codSubprocesso", ignore = true)
     @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "situacaoLabel", ignore = true)

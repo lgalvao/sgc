@@ -127,10 +127,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 .thenReturn(chefe);
 
         Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        unidadeAdmin.setTitular(admin);
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
-        unidadeGestor.setTitular(gestor);
-        unidade.setTitular(chefe);
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
     }
 

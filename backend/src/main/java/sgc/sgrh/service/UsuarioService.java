@@ -20,6 +20,7 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final UnidadeRepo unidadeRepo;
+    private final sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     public boolean autenticar(String tituloEleitoral, String senha) {
         log.debug("Simulando autenticação para usuário: {}", tituloEleitoral);
@@ -33,6 +34,10 @@ public class UsuarioService {
                         .findById(tituloEleitoral)
                         .orElseThrow(
                                 () -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
+
+        // Carregar atribuições da VIEW
+        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloEleitoral);
+        usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
 
         return usuario.getTodasAtribuicoes().stream()
                 .map(

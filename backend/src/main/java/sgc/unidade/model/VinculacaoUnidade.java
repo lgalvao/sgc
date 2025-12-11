@@ -1,27 +1,29 @@
 package sgc.unidade.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.model.EntidadeBase;
+import org.hibernate.annotations.Immutable;
 
 @Entity
-@Table(name = "VINCULACAO_UNIDADE", schema = "sgc")
+@Immutable
+@Table(name = "VW_VINCULACAO_UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VinculacaoUnidade extends EntidadeBase {
-    @ManyToOne
-    @JoinColumn(name = "unidade_anterior_codigo")
-    private Unidade unidadeAnterior;
+@IdClass(VinculacaoUnidadeId.class)
+public class VinculacaoUnidade {
+    @Id
+    @Column(name = "unidade_atual_codigo")
+    private Long unidadeAtualCodigo;
 
-    @ManyToOne
-    @JoinColumn(name = "unidade_atual_codigo")
-    private Unidade unidadeAtual;
+    @Id
+    @Column(name = "unidade_anterior_codigo")
+    private Long unidadeAnteriorCodigo;
+
+    @Column(name = "demais_unidades_historicas")
+    private String demaisUnidadesHistoricas;
 }

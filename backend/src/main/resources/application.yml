@@ -2,20 +2,13 @@ spring:
   main.banner-mode: off
   jackson:
     use-jackson2-defaults: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
   test.mockmvc.print: none
   jpa:
     hibernate.ddl-auto: create-drop
     properties.hibernate.default_schema: sgc
     show-sql: false
     defer-datasource-initialization: true
-  sql:
-    init:
-      mode: always
-      platform: postgresql
+  sql.init.mode: always
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -30,11 +23,11 @@ spring:
 server:
   port: 10000
 aplicacao:
-  ambiente-testes: ${AMBIENTE_TESTES:true}
-  url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:8081/api/acesso}
-  url-acesso-prod: ${URL_ACESSO_PROD:https://acesso.tre-pe.jus.br/api}
+  ambiente-testes: true
+  url-acesso-hom: http://localhost:8081/api/acesso
+  url-acesso-prod: https://acesso.tre-pe.jus.br/api
   email:
-    remetente: ${EMAIL_REMETENTE:sgc@tre-pe.jus.br}
+    remetente: sgc@tre-pe.jus.br
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
 springdoc:

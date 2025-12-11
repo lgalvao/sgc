@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@desenvolvimentobd:1521:admdes2
+    username: sgc
+    password: dzX7_gpL4AcRV2iAxwVNynFLEiTEnh
+  jpa:
+    hibernate.ddl-auto: validate
+    properties:
+      hibernate.default_schema: sgc
+    show-sql: false
+    defer-datasource-initialization: false
+  sql:
+    init:
+      mode: never
+      platform: oracle
+
+aplicacao:
+  ambiente-testes: false
+
+logging:
+  level:
+    sgc: INFO
+    org.hibernate: WARN
+    org.springframework: WARN

@@ -1,7 +1,6 @@
 package sgc.unidade.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.MapaRepo;
@@ -30,9 +29,9 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
+    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
@@ -74,14 +73,8 @@ public class UnidadeService {
             // 3. NÃO está em outro processo ativo
             boolean isElegivel =
                     u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA
-                            && (!requerMapaVigente || u.getMapaVigente() != null)
+                            && (!requerMapaVigente || unidadeMapaRepo.existsById(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
-
-            if (u.getSigla().equals("ASSESSORIA_11")) {
-                log.info("DIAGNOSTICO: ASSESSORIA_11 - Tipo: {}, RequerMapa: {}, TemMapa: {}, EmProcesso: {}, isElegivel: {}",
-                        u.getTipo(), requerMapaVigente, u.getMapaVigente() != null,
-                        unidadesEmProcessoAtivo.contains(u.getCodigo()), isElegivel);
-            }
 
             UnidadeDto dto =
                     new UnidadeDto(

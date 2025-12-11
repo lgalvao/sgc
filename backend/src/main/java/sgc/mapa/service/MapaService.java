@@ -57,7 +57,6 @@ public class MapaService {
                             existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
                             existente.setObservacoesDisponibilizacao(
                                     mapa.getObservacoesDisponibilizacao());
-                            existente.setSugestoesApresentadas(mapa.getSugestoesApresentadas());
                             existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
                             return mapaRepo.save(existente);
                         })

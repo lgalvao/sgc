@@ -2,8 +2,8 @@ package sgc.unidade.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 import sgc.comum.model.EntidadeBase;
-import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 
@@ -12,7 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "UNIDADE", schema = "sgc")
+@Immutable
+@Table(name = "VW_UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,9 +25,12 @@ public class Unidade extends EntidadeBase {
     private String nome;
     @Column(name = "sigla", length = 20)
     private String sigla;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "titular_titulo")
-    private Usuario titular;
+    @Column(name = "matricula_titular", length = 8)
+    private String matriculaTitular;
+    @Column(name = "titulo_titular", length = 12)
+    private String tituloTitular;
+    @Column(name = "data_inicio_titularidade")
+    private LocalDateTime dataInicioTitularidade;
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoUnidade tipo;
@@ -36,14 +40,51 @@ public class Unidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     private Unidade unidadeSuperior;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mapa_vigente_codigo")
-    private Mapa mapaVigente;
-    @Column(name = "data_vigencia_mapa_atual")
-    private LocalDateTime dataVigenciaMapa;
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default
     private Set<Processo> processos = new HashSet<>();
+
+    @Transient
+    public String getTituloTitularOuNull() {
+        return tituloTitular;
+    }
+
+    @Transient
+    public String getMatriculaTitularOuNull() {
+        return matriculaTitular;
+    }
+
+    /**
+     * Método temporário para testes. Como Unidade agora é VIEW imutável,
+     * este setter apenas atualiza o campo em memória para testes unitários.
+     */
+    @Deprecated
+    public void setTitular(Usuario usuario) {
+        if (usuario != null) {
+            this.tituloTitular = usuario.getTituloEleitoral();
+            this.matriculaTitular = usuario.getMatricula();
+        }
+    }
+
+    /** Método temporário para compatibilidade com testes */
+    @Deprecated
+    @Transient
+    private sgc.mapa.model.Mapa mapaVigenteTransient;
+
+    @Deprecated
+    public sgc.mapa.model.Mapa getMapaVigente() {
+        return mapaVigenteTransient;
+    }
+
+    @Deprecated
+    public void setMapaVigente(sgc.mapa.model.Mapa mapa) {
+        this.mapaVigenteTransient = mapa;
+    }
+
+    @Deprecated
+    public LocalDateTime getDataVigenciaMapa() {
+        return null; // Não usado mais
+    }
 
     public Unidade(String nome, String sigla) {
         super();

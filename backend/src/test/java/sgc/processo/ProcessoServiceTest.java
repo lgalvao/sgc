@@ -328,7 +328,6 @@ class ProcessoServiceTest {
         u1.setCodigo(1L);
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(10L);
-        u1.setMapaVigente(mapaVigente);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
@@ -352,7 +351,6 @@ class ProcessoServiceTest {
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        u1.setMapaVigente(null);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));

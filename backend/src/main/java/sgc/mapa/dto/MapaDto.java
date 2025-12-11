@@ -26,7 +26,6 @@ public class MapaDto {
     private Long codigo;
     private LocalDateTime dataHoraDisponibilizado;
     private String observacoesDisponibilizacao;
-    private Boolean sugestoesApresentadas;
     private LocalDateTime dataHoraHomologado;
     private String sugestoes;
 }

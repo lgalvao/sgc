@@ -107,7 +107,8 @@ public class AtividadeService {
             throw new ErroEntidadeNaoEncontrada(
                     "Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
         }
-        if (!usuario.equals(subprocesso.getUnidade().getTitular())) {
+        // Verifica se o usuário é o titular da unidade
+        if (!usuario.getTituloEleitoral().equals(subprocesso.getUnidade().getTituloTitular())) {
             throw new ErroAccessoNegado(
                     "Usuário não autorizado a criar atividades para este subprocesso.");
         }

@@ -63,7 +63,6 @@ class DiagnosticoServiceTest {
 
         mapa = new Mapa();
         mapa.setCodigo(200L);
-        mapa.setUnidade(unidade);
 
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);

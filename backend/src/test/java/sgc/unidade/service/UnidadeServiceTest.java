@@ -38,6 +38,9 @@ class UnidadeServiceTest {
     private UnidadeRepo unidadeRepo;
 
     @Mock
+    private sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
+
+    @Mock
     private MapaRepo mapaRepo;
 
     @Mock
@@ -309,5 +312,60 @@ class UnidadeServiceTest {
         String json = mapper.writeValueAsString(dto);
 
         assertThat(json).contains("\"isElegivel\":true");
+    }
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve retornar ASSESSORIA_11 habilitada com dados do seed")
+    void buscarArvoreComElegibilidade_DeveRetornarAssessoria11Habilitada() {
+        // Setup: Simular dados do seed.sql
+        // 1. SEDOC (INTEROPERACIONAL)
+        Unidade sedoc = new Unidade("Seção de Desenvolvimento e Capacitação", "SEDOC");
+        sedoc.setCodigo(1L);
+        sedoc.setTipo(TipoUnidade.INTEROPERACIONAL);
+        sedoc.setSituacao(sgc.unidade.model.SituacaoUnidade.ATIVA);
+
+        // 2. SECRETARIA_1 (INTEROPERACIONAL, Pai: SEDOC)
+        Unidade secretaria1 = new Unidade("Secretaria 1", "SECRETARIA_1");
+        secretaria1.setCodigo(2L);
+        secretaria1.setTipo(TipoUnidade.INTEROPERACIONAL);
+        secretaria1.setSituacao(sgc.unidade.model.SituacaoUnidade.ATIVA);
+        secretaria1.setUnidadeSuperior(sedoc);
+
+        // 3. ASSESSORIA_11 (OPERACIONAL, Pai: SECRETARIA_1)
+        Unidade assessoria11 = new Unidade("Assessoria 11", "ASSESSORIA_11");
+        assessoria11.setCodigo(3L);
+        assessoria11.setTipo(TipoUnidade.OPERACIONAL);
+        assessoria11.setSituacao(sgc.unidade.model.SituacaoUnidade.ATIVA);
+        assessoria11.setUnidadeSuperior(secretaria1);
+
+        List<Unidade> todasUnidades = Arrays.asList(sedoc, secretaria1, assessoria11);
+
+        when(unidadeRepo.findAll()).thenReturn(todasUnidades);
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(Collections.emptyList());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(Collections.emptyList());
+
+        // Act
+        // TipoProcesso.MAPEAMENTO não requer mapa vigente
+        List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+
+        // Assert
+        // Deve encontrar a árvore e ASSESSORIA_11 deve ser elegível
+        UnidadeDto dtoSedoc = resultado.stream()
+                .filter(u -> u.getSigla().equals("SEDOC"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("SEDOC não encontrada"));
+
+        UnidadeDto dtoSecretaria1 = dtoSedoc.getSubunidades().stream()
+                .filter(u -> u.getSigla().equals("SECRETARIA_1"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("SECRETARIA_1 não encontrada"));
+
+        UnidadeDto dtoAssessoria11 = dtoSecretaria1.getSubunidades().stream()
+                .filter(u -> u.getSigla().equals("ASSESSORIA_11"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("ASSESSORIA_11 não encontrada"));
+
+        assertThat(dtoAssessoria11.isElegivel())
+                .as("ASSESSORIA_11 deve ser elegível para Mapeamento")
+                .isTrue();
     }
 }

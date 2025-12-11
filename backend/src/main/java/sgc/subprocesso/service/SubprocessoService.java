@@ -13,11 +13,9 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,22 +201,9 @@ public class SubprocessoService {
                 .findById(codigo)
                 .map(
                         subprocesso -> {
-                            if (subprocessoDto.getCodProcesso() != null) {
-                                Processo processo = new Processo();
-                                processo.setCodigo(subprocessoDto.getCodProcesso());
-                                subprocesso.setProcesso(processo);
-                            } else {
-                                subprocesso.setProcesso(null);
-                            }
-
-                            if (subprocessoDto.getCodUnidade() != null) {
-                                Unidade unidade = new Unidade();
-                                unidade.setCodigo(subprocessoDto.getCodUnidade());
-                                subprocesso.setUnidade(unidade);
-                            } else {
-                                subprocesso.setUnidade(null);
-                            }
-
+                            // NOTA: Processo e Unidade não podem ser alterados após criação
+                            // pois fazem parte da identidade do subprocesso em UNIDADE_PROCESSO
+                            
                             if (subprocessoDto.getCodMapa() != null) {
                                 Mapa mapa = new Mapa();
                                 mapa.setCodigo(subprocessoDto.getCodMapa());

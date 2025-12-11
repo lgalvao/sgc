@@ -89,7 +89,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         Mapa mapaVigente = new Mapa();
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
-        unidade.setMapaVigente(mapaVigente);
         unidadeRepo.save(unidade);
 
         atividadeVigente1 =
@@ -256,7 +255,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
-            unidade.setMapaVigente(null);
             unidadeRepo.save(unidade);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))

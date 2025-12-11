@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sgc.unidade.model.AtribuicaoTemporaria;
@@ -16,14 +17,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "USUARIO", schema = "sgc")
+@Immutable
+@Table(name = "VW_USUARIO", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 public class Usuario implements UserDetails {
     @Id
-    @Column(name = "titulo_eleitoral")
+    @Column(name = "titulo", length = 12)
     private String tituloEleitoral;
+
+    @Column(name = "matricula", length = 8)
+    private String matricula;
 
     @Column(name = "nome")
     private String nome;
@@ -35,15 +40,12 @@ public class Usuario implements UserDetails {
     private String ramal;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_codigo")
+    @JoinColumn(name = "unidade_lot_codigo")
     private Unidade unidadeLotacao;
 
-    @OneToMany(
-            mappedBy = "usuario",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER)
-    private Set<UsuarioPerfil> atribuicoes = new java.util.HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "unidade_comp_codigo")
+    private Unidade unidadeCompetencia;
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
     private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new java.util.HashSet<>();
@@ -55,21 +57,43 @@ public class Usuario implements UserDetails {
             String ramal,
             Unidade unidadeLotacao) {
         this.tituloEleitoral = tituloEleitoral;
+        this.matricula = null;
         this.nome = nome;
         this.email = email;
         this.ramal = ramal;
         this.unidadeLotacao = unidadeLotacao;
+        this.unidadeCompetencia = null;
+    }
+
+    @Transient
+    private Set<UsuarioPerfil> atribuicoesCache;
+
+    public void setAtribuicoes(Set<UsuarioPerfil> atribuicoes) {
+        this.atribuicoesCache = atribuicoes;
+    }
+
+    public Set<UsuarioPerfil> getAtribuicoes() {
+        return atribuicoesCache != null ? atribuicoesCache : new java.util.HashSet<>();
     }
 
     public Set<UsuarioPerfil> getTodasAtribuicoes() {
-        Set<UsuarioPerfil> todas = new java.util.HashSet<>(atribuicoes);
+        Set<UsuarioPerfil> todas = new java.util.HashSet<>();
+        if (atribuicoesCache != null) {
+            todas.addAll(atribuicoesCache);
+        }
         LocalDateTime now = LocalDateTime.now();
         if (atribuicoesTemporarias != null) {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                 if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now))
                         && (temp.getDataTermino() == null
-                        || !temp.getDataTermino().isBefore(now))) {
-                    todas.add(new UsuarioPerfil(null, this, temp.getUnidade(), temp.getPerfil()));
+                                || !temp.getDataTermino().isBefore(now))) {
+                    UsuarioPerfil perfil = new UsuarioPerfil();
+                    perfil.setUsuarioTitulo(this.tituloEleitoral);
+                    perfil.setUsuario(this);
+                    perfil.setUnidadeCodigo(temp.getUnidade().getCodigo());
+                    perfil.setUnidade(temp.getUnidade());
+                    perfil.setPerfil(temp.getPerfil());
+                    todas.add(perfil);
                 }
             }
         }

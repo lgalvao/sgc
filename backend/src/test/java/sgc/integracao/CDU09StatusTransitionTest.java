@@ -41,6 +41,9 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
     @Autowired
     private AtividadeService atividadeService;
 
+    @Autowired
+    private sgc.sgrh.model.UsuarioRepo usuarioRepo;
+
     @Test
     @DisplayName("Adding activity should transition subprocess from NAO_INICIADO to MAPEAMENTO_CADASTRO_EM_ANDAMENTO")
     @WithMockUser(roles = "ADMIN")
@@ -53,8 +56,8 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
         Unidade unidade = unidadeRepo.findById(unitCodigo)
                 .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
 
-        assertThat(unidade.getTitular()).isNotNull();
-        assertThat(unidade.getTitular().getTituloEleitoral()).isEqualTo(titularTitulo);
+        assertThat(unidade.getTituloTitular()).isNotNull();
+        assertThat(unidade.getTituloTitular()).isEqualTo(titularTitulo);
 
         // GIVEN: A MAPEAMENTO process is created and started for this unit
         Processo processo = new Processo()
@@ -155,7 +158,7 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
                 }
                 """.formatted(mapaCodigo);
 
-        Usuario titular = unidade.getTitular();
+        Usuario titular = usuarioRepo.findById(unidade.getTituloTitular()).orElseThrow();
 
         mockMvc.perform(post("/api/atividades")
                         .with(user(titular))

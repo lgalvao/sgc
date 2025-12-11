@@ -65,7 +65,7 @@ class SgrhControllerIntegrationTest {
     @Test
     @DisplayName("Deve autorizar e retornar perfis")
     void autorizar_deveRetornarPerfis() throws Exception {
-        long tituloEleitoral = 111111111111L; // Admin Teste user from data-postgresql.sql
+        long tituloEleitoral = 111111111111L;
 
         // When/Then
         mockMvc.perform(

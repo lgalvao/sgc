@@ -88,15 +88,15 @@ public class SubprocessoWorkflowService {
     private void validarSubprocessoParaDisponibilizacao(
             Subprocesso sp, Usuario usuario, Long codSubprocesso) {
         Unidade unidadeSubprocesso = sp.getUnidade();
-        Usuario titularUnidade = unidadeSubprocesso.getTitular();
+        String tituloTitular = unidadeSubprocesso.getTituloTitular();
 
-        if (!titularUnidade.equals(usuario)) {
+        if (tituloTitular == null || !tituloTitular.equals(usuario.getTituloEleitoral())) {
             String msg =
                     "Usuário %s não é o titular da unidade (%s). Titular é %s"
                             .formatted(
                                     usuario.getTituloEleitoral(),
                                     unidadeSubprocesso.getSigla(),
-                                    titularUnidade.getTituloEleitoral());
+                                    tituloTitular != null ? tituloTitular : "não definido");
             throw new ErroAccessoNegado(msg);
         }
 

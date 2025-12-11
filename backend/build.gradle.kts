@@ -41,7 +41,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // BD
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.oracle.database.jdbc:ojdbc11")
     implementation("com.h2database:h2")
 
     // Lombok

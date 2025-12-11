@@ -12,9 +12,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
@@ -301,14 +299,10 @@ public class AlertaService {
                                     novoUsuario.setEmail(usuarioDto.getEmail());
                                     novoUsuario.setUnidadeLotacao(unidade);
 
-                                    sgc.sgrh.model.UsuarioPerfil perfilChefe = UsuarioPerfil
-                                            .builder()
-                                            .usuario(novoUsuario)
-                                            .unidade(unidade)
-                                            .perfil(Perfil.CHEFE)
-                                            .build();
+                                    // NOTA: Usuario agora é VIEW somente-leitura
+                                    // Perfis são gerenciados via ADMINISTRADOR ou derivados automaticamente
+                                    // TODO: Revisar lógica de criação de perfis após migração
 
-                                    novoUsuario.getAtribuicoes().add(perfilChefe);
                                     return novoUsuario;
                                 }).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
                     });

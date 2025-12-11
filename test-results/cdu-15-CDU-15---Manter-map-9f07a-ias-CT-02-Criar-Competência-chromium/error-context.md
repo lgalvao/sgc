@@ -1,0 +1,79 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]:
+        - link "SGC" [ref=e6] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e7]:
+          - list [ref=e8]:
+            - listitem [ref=e9]:
+              - link " Painel" [ref=e10] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e11]: 
+                - text: Painel
+            - listitem [ref=e12]:
+              - link " Minha unidade" [ref=e13] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e14]: 
+                - text: Minha unidade
+            - listitem [ref=e15]:
+              - link " Relatórios" [ref=e16] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e17]: 
+                - text: Relatórios
+            - listitem [ref=e18]:
+              - link " Histórico" [ref=e19] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e20]: 
+                - text: Histórico
+          - list [ref=e21]:
+            - listitem [ref=e22]:
+              - link " ADMIN - SEDOC" [ref=e23] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e24]: 
+                - generic [ref=e25]: ADMIN - SEDOC
+            - listitem "Configurações do sistema" [ref=e26]:
+              - link "" [ref=e27] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e28]: 
+            - listitem "Sair" [ref=e29]:
+              - link "" [ref=e30] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e31]: 
+    - generic [ref=e34]:
+      - button " Voltar" [ref=e35] [cursor=pointer]:
+        - generic [ref=e36]: 
+        - text: Voltar
+      - navigation "breadcrumb" [ref=e37]:
+        - list [ref=e38]:
+          - listitem [ref=e39]:
+            - generic "Início" [ref=e41]: 
+    - generic [ref=e42]:
+      - generic [ref=e43]: SECAO_221 - Seção 221 Cadastro Homologado
+      - generic [ref=e44]:
+        - generic [ref=e45]: Mapa de competências técnicas
+        - generic [ref=e46]:
+          - button " Impacto no mapa" [ref=e47] [cursor=pointer]:
+            - generic [ref=e48]: 
+            - text: Impacto no mapa
+          - button "Disponibilizar" [ref=e49] [cursor=pointer]
+      - generic [ref=e51]:
+        - button " Criar competência" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: 
+          - text: Criar competência
+        - generic [ref=e56]:
+          - strong [ref=e57]: Competência 1 1765473014444
+          - generic [ref=e58]:
+            - button "" [ref=e59] [cursor=pointer]:
+              - generic [ref=e60]: 
+            - button "" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: 
+    - contentinfo [ref=e63]:
+      - generic [ref=e64]:
+        - generic [ref=e65]: Versão 1.0.0
+        - generic [ref=e66]: © SESEL/COSIS/TRE-PE
+  - text: 
+```

@@ -19,34 +19,42 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Subprocesso extends EntidadeBase {
+    
     @ManyToOne
-    @JoinColumn(name = "processo_codigo")
+    @JoinColumn(name = "processo_codigo", nullable = false)
     private Processo processo;
+    
     @ManyToOne
-    @JoinColumn(name = "unidade_codigo")
+    @JoinColumn(name = "unidade_codigo", nullable = false)
     private Unidade unidade;
+    
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;
+    
     @Column(name = "data_limite_etapa1")
     private LocalDateTime dataLimiteEtapa1;
+    
     @Column(name = "data_fim_etapa1")
     private LocalDateTime dataFimEtapa1;
+    
     @Column(name = "data_limite_etapa2")
     private LocalDateTime dataLimiteEtapa2;
+    
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
+    
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao_id", length = 50)
+    @Column(name = "situacao", length = 50)
     private SituacaoSubprocesso situacao;
 
     public Subprocesso(
             Long codigo,
-            sgc.processo.model.Processo processo,
-            sgc.unidade.model.Unidade unidade,
-            sgc.mapa.model.Mapa mapa,
+            Processo processo,
+            Unidade unidade,
+            Mapa mapa,
             SituacaoSubprocesso situacao,
-            java.time.LocalDateTime dataLimiteEtapa1) {
+            LocalDateTime dataLimiteEtapa1) {
         super(codigo);
         this.processo = processo;
         this.unidade = unidade;

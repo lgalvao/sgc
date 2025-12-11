@@ -93,8 +93,6 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         conhecimentoOriginal = new Conhecimento("Conhecimento Original", atividadeOriginal);
         conhecimentoRepo.save(conhecimentoOriginal);
 
-        // Define o mapa como vigente para a unidade
-        unidade.setMapaVigente(mapaOriginal);
         unidadeRepo.save(unidade);
     }
 

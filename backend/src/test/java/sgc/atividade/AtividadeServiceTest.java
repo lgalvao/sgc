@@ -98,7 +98,6 @@ class AtividadeServiceTest {
         Unidade unidade = new Unidade();
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
-        unidade.setTitular(usuario);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(mapaId);
@@ -131,7 +130,6 @@ class AtividadeServiceTest {
         Unidade unidade = new Unidade();
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
-        unidade.setTitular(usuario);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(mapaId);
@@ -200,7 +198,6 @@ class AtividadeServiceTest {
         Unidade unidade = new Unidade();
         Usuario titular = new Usuario();
         titular.setTituloEleitoral("outro");
-        unidade.setTitular(titular);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(mapaId);

@@ -33,13 +33,11 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -185,33 +183,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Processo processoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(processoFinalizado.getDataFinalizacao()).isNotNull();
-
-        Unidade un1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
-        Subprocesso sp1 =
-                subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
-                        .filter(
-                                s ->
-                                        s.getUnidade()
-                                                .getCodigo()
-                                                .equals(unidadeOperacional1.getCodigo()))
-                        .findFirst()
-                        .orElseThrow();
-        assertThat(un1.getMapaVigente().getCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(un1.getDataVigenciaMapa())
-                .isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
-
-        Unidade un2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
-        Subprocesso sp2 =
-                subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
-                        .filter(
-                                s ->
-                                        s.getUnidade()
-                                                .getCodigo()
-                                                .equals(unidadeOperacional2.getCodigo()))
-                        .findFirst()
-                        .orElseThrow();
-        assertThat(un2.getMapaVigente().getCodigo()).isEqualTo(sp2.getMapa().getCodigo());
-
         verify(processoNotificacaoService, times(1))
                 .enviarNotificacoesDeFinalizacao(eq(processo), anyList());
     }
@@ -242,10 +213,5 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
 
         Processo processoNaoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoNaoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
-
-        Unidade u1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
-        Unidade u2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
-        assertThat(u1.getMapaVigente()).isNull();
-        assertThat(u2.getMapaVigente()).isNull();
     }
 }

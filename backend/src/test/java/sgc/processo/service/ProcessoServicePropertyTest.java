@@ -47,11 +47,13 @@ class ProcessoServicePropertyTest {
     private ProcessoNotificacaoService processoNotificacaoService =
             mock(ProcessoNotificacaoService.class);
     private SgrhService sgrhService = mock(SgrhService.class);
+    private sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo = mock(sgc.unidade.model.UnidadeMapaRepo.class);
 
     private ProcessoService service =
             new ProcessoService(
                     processoRepo,
                     unidadeRepo,
+                    unidadeMapaRepo,
                     subprocessoRepo,
                     publicadorEventos,
                     processoMapper,
