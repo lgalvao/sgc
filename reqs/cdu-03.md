@@ -82,7 +82,8 @@
    4.1. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem
    efetuar alterações.
 
-   4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente, mostra a mensagem "Processo [Descrição do Processo] removido" e redireciona para o Painel.
+   4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente e redireciona para o Painel,
+   mostrando a mensagem "Processo [Descrição do Processo] removido".
 
 ## Fluxo alternativo
 

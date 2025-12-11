@@ -45,7 +45,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            await expect(page).toHaveURL(/processo\/cadastro\?codProcesso=\d+/);
+            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 
@@ -69,7 +70,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Capturar ID do processo para cleanup
             await page.getByText(descricaoProcesso).click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            await expect(page).toHaveURL(/processo\/cadastro\?codProcesso=\d+/);
+            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 

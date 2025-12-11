@@ -53,4 +53,4 @@ Ator: ADMIN
 
    Já é possível visualizar os mapas de competências atualizados destas unidades através do menu "Minha unidade" do Sistema de Gestão de Competências ([URL_SISTEMA]).
 
-10. O sistema mostra a mensagem "Processo finalizado" e redireciona para o Painel.
+10. O sistema redireciona para o Painel, mostrando a mensagem "Processo finalizado".

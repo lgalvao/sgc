@@ -2,12 +2,12 @@
 
 Ator: CHEFE
 
-Pré-condições:
+## Pré-condições
 
 - Usuário logado com perfil CHEFE.
 - Subprocesso de mapeamento da unidade na situação 'Cadastro em andamento'.
 
-Fluxo principal:
+## Fluxo principal
 
 1. No Painel, CHEFE clica no processo de mapeamento na situação 'Em andamento'.
 
@@ -25,7 +25,7 @@ Fluxo principal:
 
    5.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro, antes da realização de nova disponibilização.
 
-6. CHEFE clica no botão Disponibilizar.
+6. CHEFE escolhe `Disponibilizar`.
 
 7. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
 
@@ -72,4 +72,4 @@ Fluxo principal:
 
 15. O sistema exclui o histórico de análise do cadastro do subprocesso da unidade.
 
-16. O sistema mostra a mensagem: "Cadastro de atividades disponibilizado" e redireciona para o Painel.
+16. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".

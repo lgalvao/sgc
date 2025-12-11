@@ -76,4 +76,4 @@ Fluxo principal:
 
 15. O sistema exclui o histórico de análise do cadastro do subprocesso da unidade.
 
-16. O sistema mostra a mensagem: "Revisão do cadastro de atividades disponibilizada" e redireciona para o Painel.
+16. O sistema redireciona para o Painel, e mostra a mensagem "Revisão do cadastro de atividades disponibilizada".

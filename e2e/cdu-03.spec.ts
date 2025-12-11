@@ -45,7 +45,9 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         // Capturar ID do processo para cleanup
         await page.getByText(descricaoOriginal).click();
-        const processoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
+        const url = new URL(page.url());
+        const processoId = parseInt(url.searchParams.get('codProcesso') || '0');
         if (processoId > 0) cleanup.registrar(processoId);
 
         // Verifica que os dados foram carregados

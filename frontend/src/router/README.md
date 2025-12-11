@@ -12,22 +12,22 @@ funcional.
 ### Arquivos
 
 - **`index.ts`**: Ponto de entrada principal.
-    - Cria a instância do roteador (`createRouter`).
-    - Define o histórico de navegação (`createWebHistory`).
-    - Importa e combina as rotas dos submódulos.
-    - **Guards Globais:** Implementa o `beforeEach` para verificação de autenticação (redireciona para `/login` se não
+  - Cria a instância do roteador (`createRouter`).
+  - Define o histórico de navegação (`createWebHistory`).
+  - Importa e combina as rotas dos submódulos.
+  - **Guards Globais:** Implementa o `beforeEach` para verificação de autenticação (redireciona para `/login` se não
       autenticado).
 
 - **`main.routes.ts`**: Rotas gerais da aplicação, como:
-    - `/`: Redirecionamento raiz.
-    - `/login`: Página de login.
-    - `/painel`: Dashboard principal.
-    - `/404`: Página de erro não encontrado.
+  - `/`: Redirecionamento raiz.
+  - `/login`: Página de login.
+  - `/painel`: Dashboard principal.
+  - `/404`: Página de erro não encontrado.
 
 - **`processo.routes.ts`**: Rotas relacionadas à gestão de processos e subprocessos.
-    - `/processos`: Listagem.
-    - `/processos/novo`: Criação.
-    - `/subprocessos/:id`: Detalhes e execução do workflow.
+  - `/processos`: Listagem.
+  - `/processos/novo`: Criação.
+  - `/subprocessos/:id`: Detalhes e execução do workflow.
 
 - **`unidade.routes.ts`**: Rotas para visualização e gestão de unidades organizacionais.
 

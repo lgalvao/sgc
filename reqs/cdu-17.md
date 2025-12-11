@@ -22,7 +22,7 @@
 
 6. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa de competências da unidade.
 
-7. ADMIN clica no botão Disponibilizar.
+7. ADMIN clica no botão `Disponibilizar`.
 
 8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da unidade.
 
@@ -87,6 +87,6 @@
     - `Unidade de origem`: SEDOC
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
-19. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da unidade.
+19. O sistema exclui as sugestões apresentadas, assim como o histórico de análise do mapa de competência do subprocesso da unidade.
 
-20. O sistema mostra confirmação: "Revisão do cadastro de atividades disponibilizada" e redireciona para o Painel.
+20. O sistema redireciona para o Painel e mostra confirmação: "Disponibilização do mapa de competências efetuada".

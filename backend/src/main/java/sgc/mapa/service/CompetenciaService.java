@@ -12,6 +12,7 @@ import sgc.mapa.model.Mapa;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,11 @@ public class CompetenciaService {
         Competencia competencia = new Competencia(descricao, mapa);
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
+        // Explicitly save activities to ensure the relationship is persisted in the join table
+        // This is necessary because Atividade is the owning side of the relationship
+        if (competencia.getAtividades() != null) {
+            atividadeRepo.saveAll(competencia.getAtividades());
+        }
     }
 
     public void atualizarCompetencia(
@@ -37,13 +43,22 @@ public class CompetenciaService {
         competencia.setDescricao(descricao);
 
         // Remove from existing activities
-        for (Atividade atividade : competencia.getAtividades()) {
+        // We need to save the activities we are removing from to update the join table
+        Set<Atividade> atividadesAntigas = new HashSet<>(competencia.getAtividades());
+        for (Atividade atividade : atividadesAntigas) {
             atividade.getCompetencias().remove(competencia);
         }
+        atividadeRepo.saveAll(atividadesAntigas);
+
         competencia.getAtividades().clear();
 
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
+        
+        // Explicitly save new activities
+        if (competencia.getAtividades() != null) {
+            atividadeRepo.saveAll(competencia.getAtividades());
+        }
     }
 
     public void removerCompetencia(Long codCompetencia) {

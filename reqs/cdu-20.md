@@ -30,11 +30,11 @@ Ator: GESTOR e ADMIN
 
 8. Se optar por devolver para ajustes:
 
-   8.1. Usuário clica em Devolver para ajustes.
+   8.1. Usuário clica em `Devolver para ajustes`.
 
-   8.2. O sistema abre tela modal (título Devolução) com a pergunta 'Confirma a devolução da validação do mapa para ajustes?', um campo para preenchimento de uma observação (opcional) e os botões `Confirmar` ou `Cancelar`.
+   8.2. O sistema abre um modal (título "Devolução") com a pergunta "Confirma a devolução da validação do mapa para ajustes", um campo para preenchimento de uma observação (opcional) e os botões `Confirmar` ou `Cancelar`.
 
-   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na mesma tela.
+   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Visualização de mapa`.
 
    8.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 
@@ -84,7 +84,7 @@ Ator: GESTOR e ADMIN
 
    9.2. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite da validação do mapa de competências?", um campo para preenchimento de uma observação opcional e os botões `Confirmar` ou `Cancelar`.
 
-   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de aceite, permanecendo na mesma tela.
+   9.3. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de aceite, permanecendo na tela `Visualização de mapa`.
 
    9.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 

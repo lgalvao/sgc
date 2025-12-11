@@ -85,7 +85,7 @@ Atores: GESTOR e ADMIN
     - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
     - `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO].
 
-    10.11. O sistema mostra a mensagem "Devolução realizada" e redireciona para o Painel.
+    10.11. O sistema redireciona para o Painel, mostrando a mensagem "Devolução realizada".
 
 11. Se optar por aceitar (perfil GESTOR):
 
@@ -140,29 +140,29 @@ Atores: GESTOR e ADMIN
 
     12.2. Se o sistema não detectar nenhum impacto no mapa de competências da unidade:
 
-    12.2.1. O sistema abre um diálogo de confirmação (título `Homologação do mapa de competências`) com a mensagem "A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade. Confirma a manutenção do mapa de competências vigente?" e os botões `Confirmar` ou `Cancelar`.
+      12.2.1. O sistema abre um diálogo de confirmação (título `Homologação do mapa de competências`) com a mensagem "A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade. Confirma a manutenção do mapa de competências vigente?" e os botões `Confirmar` ou `Cancelar`.
 
-    12.2.2. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na tela `Atividades e conhecimentos`.
+      12.2.2. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na tela `Atividades e conhecimentos`.
 
-    12.2.3. Usuário escolhe `Confirmar`.
+      12.2.3. Usuário escolhe `Confirmar`.
 
-    12.2.4. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
+      12.2.4. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
     12.3. Caso contrário (impactos detectados):
 
-    12.3.1. O sistema abre um diálogo de confirmação (título `Homologação do cadastro de atividades e conhecimentos`) com a mensagem "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` ou `Cancelar`.
+      12.3.1. O sistema abre um diálogo de confirmação (título `Homologação do cadastro de atividades e conhecimentos`) com a mensagem "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` e `Cancelar`.
 
-    12.3.2. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendo na mesma tela.
+      12.3.2. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendo na mesma tela.
 
-    12.3.3. Usuário escolhe `Confirmar`.
+      12.3.3. Usuário escolhe `Confirmar`.
 
-    12.3.4. O sistema registra uma movimentação para o subprocesso com:
+      12.3.4. O sistema registra uma movimentação para o subprocesso com:
 
-    - `Data/hora`: Data/hora atual
-    - `Unidade origem`: 'SEDOC'
-    - `Unidade destino`: 'SEDOC'
-    - `Descrição`: 'Cadastro de atividades e conhecimentos homologado'
+      - `Data/hora`: Data/hora atual
+      - `Unidade origem`: 'SEDOC'
+      - `Unidade destino`: 'SEDOC'
+      - `Descrição`: 'Cadastro de atividades e conhecimentos homologado'
 
     12.3.5. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro homologada'.
 
-    12.4. O sistema mostra a mensagem "Homologação efetivada" e redireciona para a tela `Detalhes do subprocesso`.
+    12.4. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Homologação efetivada".
