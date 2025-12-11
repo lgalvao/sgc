@@ -18,6 +18,7 @@ import sgc.processo.eventos.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -109,8 +110,7 @@ public class SubprocessoWorkflowService {
 
         Mapa mapa = sp.getMapa();
         if (mapa == null || mapa.getCodigo() == null) {
-            // TODO usar uma execção de negócio específica
-            throw new IllegalStateException("Subprocesso sem mapa associado");
+            throw new ErroMapaNaoAssociado("Subprocesso sem mapa associado");
         }
     }
 
@@ -131,8 +131,7 @@ public class SubprocessoWorkflowService {
                             + situacaoAtual);
         }
         if (sp.getMapa() == null) {
-            // TODO usar uma execção de negócio específica
-            throw new IllegalStateException("Subprocesso sem mapa associado");
+            throw new ErroMapaNaoAssociado("Subprocesso sem mapa associado");
         }
 
         subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
