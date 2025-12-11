@@ -284,8 +284,6 @@ alter table if exists sgc.unidade_processo
 alter table if exists sgc.vw_unidade
     add constraint fk_unidade_titular foreign key (titulo_titular) references sgc.vw_usuario;
 alter table if exists sgc.vw_unidade
-    add constraint fk_unidade_mapa_vigente foreign key (mapa_vigente_codigo) references sgc.mapa;
-alter table if exists sgc.vw_unidade
     add constraint fk_unidade_superior foreign key (unidade_superior_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_usuario
     add constraint fk_usuario_unidade foreign key (unidade_codigo) references sgc.vw_unidade;

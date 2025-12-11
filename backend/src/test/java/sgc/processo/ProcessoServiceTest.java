@@ -43,6 +43,7 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.model.UnidadeMapaRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -77,6 +78,8 @@ class ProcessoServiceTest {
     private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
     private SgrhService sgrhService;
+    @Mock
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     @InjectMocks
     private ProcessoService processoService;
@@ -332,6 +335,8 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
+        when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.model.UnidadeMapa(1L, mapaVigente)));
         when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(10L, 1L)).thenReturn(new Mapa());
         when(subprocessoRepo.save(any())).thenReturn(new Subprocesso());
 
@@ -355,6 +360,7 @@ class ProcessoServiceTest {
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(u1));
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
+        when(unidadeMapaRepo.existsById(1L)).thenReturn(false);
 
         List<String> erros = processoService.iniciarProcessoRevisao(id, List.of(1L));
         assertThat(erros)
@@ -425,11 +431,12 @@ class ProcessoServiceTest {
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.model.UnidadeMapa()));
 
         processoService.finalizar(id);
 
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
-        verify(unidadeRepo).save(u); // Mapa vigente set
+        verify(unidadeMapaRepo).save(any()); // Mapa vigente alterado
         verify(publicadorEventos).publishEvent(any(EventoProcessoFinalizado.class));
     }
 
@@ -513,7 +520,11 @@ class ProcessoServiceTest {
         authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
         doReturn(authorities).when(auth).getAuthorities();
 
-        PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
+        PerfilDto perfil = PerfilDto.builder()
+                .usuarioTitulo("gestor")
+                .perfil("GESTOR")
+                .unidadeCodigo(10L)
+                .build();
         when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);

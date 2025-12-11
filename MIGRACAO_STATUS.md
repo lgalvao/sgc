@@ -1,6 +1,6 @@
-# Status da Migração para Oracle - 2025-12-11 15:20
+# Status da Migração para Oracle - 2025-12-11 18:35
 
-## ✅ CONCLUÍDO - Fase 1, 2 e Fase 3 parcial
+## ✅ CONCLUÍDO - Fase 1, 2 e Fase 3
 
 ### Modelo de Dados Atualizado
 
@@ -24,6 +24,7 @@
 - ✅ MAPA com FK `subprocesso_codigo`
 - ✅ SUBPROCESSO com FKs separadas (processo_codigo, unidade_codigo)
 - ✅ Removido campo `sugestoes_apresentadas` de MAPA
+- ✅ **Corrigido schema.sql** - removida FK inválida `fk_unidade_mapa_vigente`
 
 ### Entidades Java
 
@@ -41,24 +42,18 @@
 - ✅ ProcessoService usa UnidadeMapaRepo
 - ✅ UnidadeService usa UnidadeMapaRepo
 
-## 🔄 EM ANDAMENTO - Fase 3
+### Testes
 
-### Compilação
-
-- ⚠️ **Backend compilando** mas com avisos
-
-### Pendências
-
-- ⚠️ SubprocessoService usa `subprocesso.setUnidade()` (linha 217, 219)
-- ⚠️ Precisa ajustar código que espera `mapa.setUnidade()`
-- ⚠️ Precisa popular UNIDADE_PROCESSO via SQL quando processo é iniciado
+- ✅ **ApplicationContext carregando com sucesso**
+- ✅ ProcessoServiceTest corrigido (mocks UnidadeMapaRepo adicionados)
+- ✅ 29 de 30 testes passando em ProcessoServiceTest
+- ⚠️ 1 teste falhando: `checarAcessoParticipante` (precisa ajuste no mock)
 
 ## 🎯 PRÓXIMOS PASSOS
 
-### Fase 3 - Ajustes Finais
+### Finalizar Testes
 
-1. Corrigir SubprocessoService para não usar setUnidade() diretamente
-2. Implementar lógica para popular UNIDADE_PROCESSO (snapshot) quando processo inicia
-3. Atualizar data.sql para testes
-4. Executar testes e corrigir falhas restantes
-5. Validar com testes E2E
+1. Corrigir teste `checarAcessoParticipante` 
+2. Executar suite completa de testes
+3. Corrigir testes unitários restantes que dependem de UnidadeMapaRepo
+4. Validar com testes E2E
