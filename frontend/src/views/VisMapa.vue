@@ -484,8 +484,7 @@ function fecharModalHistorico() {
 }
 
 function verSugestoes() {
-  // TODO: Fix sugestoes access - property doesn't exist on MapaVisualizacao
-  // sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
   mostrarModalVerSugestoes.value = true;
 }
 

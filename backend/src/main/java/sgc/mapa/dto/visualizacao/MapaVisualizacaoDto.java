@@ -15,6 +15,7 @@ public class MapaVisualizacaoDto {
     private UnidadeDto unidade;
     private List<CompetenciaDto> competencias;
     private List<AtividadeDto> atividadesSemCompetencia;
+    private String sugestoes;
 
     @Data
     @Builder

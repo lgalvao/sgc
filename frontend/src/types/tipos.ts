@@ -343,6 +343,7 @@ export interface MapaVisualizacao {
     descricao: string;
     competencias: CompetenciaVisualizacao[];
     atividadesSemCompetencia?: AtividadeVisualizacao[];
+    sugestoes?: string;
 }
 
 export interface AceitarCadastroRequest {

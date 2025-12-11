@@ -14,6 +14,7 @@ import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -37,7 +38,8 @@ public class MapaVisualizacaoService {
                         .orElseThrow(
                                 () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        if (subprocesso.getMapa() == null) {
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
             throw new ErroEntidadeNaoEncontrada(
                     "Subprocesso não possui mapa associado: ", codSubprocesso);
         }
@@ -51,7 +53,7 @@ public class MapaVisualizacaoService {
                         .build();
 
         List<Competencia> competencias =
-                competenciaRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+                competenciaRepo.findByMapaCodigo(mapa.getCodigo());
 
         List<CompetenciaDto> competenciasDto =
                 competencias.stream()
@@ -75,7 +77,7 @@ public class MapaVisualizacaoService {
 
         // Buscar atividades sem competência (orphaned)
         List<Atividade> todasAtividades =
-                atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+                atividadeRepo.findByMapaCodigo(mapa.getCodigo());
         List<AtividadeDto> atividadesSemCompetencia =
                 todasAtividades.stream()
                         .filter(a -> a.getCompetencias().isEmpty())
@@ -86,6 +88,7 @@ public class MapaVisualizacaoService {
                 .unidade(unidadeDto)
                 .competencias(competenciasDto)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
+                .sugestoes(mapa.getSugestoes())
                 .build();
     }
 
