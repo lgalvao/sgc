@@ -36,11 +36,11 @@ public class Analise extends EntidadeBase {
     @Column(name = "acao", length = 20)
     private TipoAcaoAnalise acao;
 
-    @Column(name = "unidade_sigla", length = 30)
-    private String unidadeSigla;
+    @Column(name = "unidade_codigo")
+    private Long unidadeCodigo;
 
-    @Column(name = "analista_usuario_titulo", length = 50)
-    private String analistaUsuarioTitulo;
+    @Column(name = "usuario_titulo", length = 12)
+    private String usuarioTitulo;
 
     @Column(name = "motivo", length = 500)
     private String motivo;

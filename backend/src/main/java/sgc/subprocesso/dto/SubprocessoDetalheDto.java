@@ -34,6 +34,7 @@ public class SubprocessoDetalheDto {
     public static SubprocessoDetalheDto of(
             Subprocesso sp,
             Usuario responsavel,
+            Usuario titular,
             List<Movimentacao> movimentacoes,
             MovimentacaoMapper movimentacaoMapper,
             SubprocessoPermissoesDto permissoes) {
@@ -69,10 +70,15 @@ public class SubprocessoDetalheDto {
 
         ResponsavelDto titularDto = null;
         // Titular só é exibido se não for o responsável
-        if (tituloTitular != null && !isTitularResponsavel) {
-            // Buscar dados do titular a partir da VIEW VW_USUARIO
-            // TODO: Implementar busca do titular via título eleitoral
-            titularDto = null; // Por enquanto, não exibir titular se não for responsável
+        if (tituloTitular != null && !isTitularResponsavel && titular != null) {
+            titularDto =
+                    ResponsavelDto.builder()
+                            .codigo(null) // Não temos o código ID Long na View, apenas o Título
+                            .nome(titular.getNome())
+                            .tipoResponsabilidade("Titular")
+                            .ramal(titular.getRamal())
+                            .email(titular.getEmail())
+                            .build();
         }
 
         String localizacaoAtual = null;

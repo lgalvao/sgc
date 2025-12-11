@@ -27,6 +27,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 
@@ -57,6 +58,8 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
     private SubprocessoDtoService subprocessoDtoService;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -85,26 +88,17 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
 
         Usuario usuario =
                 new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade);
-        usuario.getAtribuicoes()
-                .add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(usuario)
-                                .unidade(unidade)
-                                .perfil(Perfil.SERVIDOR)
-                                .build());
-        usuarioRepo.save(usuario);
+        usuarioRepo.saveAndFlush(usuario);
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                usuario.getTituloEleitoral(), unidade.getCodigo(), Perfil.SERVIDOR.name());
+
 
         // Create a CHEFE for the unit to avoid 404 in buscarResponsavelVigente
         Usuario chefe =
                 new Usuario("888888888888", "Chefe SESEL", "chefe@test.com", "124", unidade);
-        chefe.getAtribuicoes()
-                .add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(chefe)
-                                .unidade(unidade)
-                                .perfil(Perfil.CHEFE)
-                                .build());
-        usuarioRepo.save(chefe);
+        usuarioRepo.saveAndFlush(chefe);
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                chefe.getTituloEleitoral(), unidade.getCodigo(), Perfil.CHEFE.name());
 
         Movimentacao movimentacao =
                 new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);

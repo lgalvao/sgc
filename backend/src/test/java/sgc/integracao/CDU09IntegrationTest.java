@@ -9,7 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.mail.javamail.JavaMailSender;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.Session;
 import sgc.alerta.model.AlertaRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
@@ -30,6 +34,11 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import org.springframework.jdbc.core.JdbcTemplate;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +46,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,9 +82,18 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
+    private EntityManager entityManager;
 
     @MockitoSpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoBean
+    private JavaMailSender javaMailSender;
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
@@ -81,6 +101,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
         unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
 
@@ -102,6 +124,26 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                         SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                         processoMapeamento.getDataLimite());
         subprocessoRepo.save(subprocessoMapeamento);
+
+        // Configurar perfil de CHEFE para o usuário do teste (333333333333) na unidade correta (SESEL - 10L)
+        // O usuário 333333333333 já existe em data.sql como "Chefe Teste", unidade 8.
+        // Precisamos atualizar para unidade 10 ou adicionar perfil.
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        // Insert na VIEW_USUARIO_PERFIL_UNIDADE
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                chefe.getTituloEleitoral(), unidadeChefe.getCodigo(), Perfil.CHEFE.name());
+
+        // Definir o usuário como TITULAR da unidade na VIEW VW_UNIDADE
+        jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
+                chefe.getTituloEleitoral(), unidadeChefe.getCodigo());
+
+        // Refresh na entidade Unidade para refletir a mudança no banco (já que é @Immutable, hibernate não sabe da mudança via JDBC)
+        entityManager.refresh(unidadeChefe);
+
+        // Definir titular da unidade superior (COSIS - 6) para que o envio de e-mail não falhe
+        jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
+                "666666666666", unidadeSuperior.getCodigo());
+        entityManager.refresh(unidadeSuperior);
     }
 
     @Nested
@@ -126,6 +168,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                                     "/api/subprocessos/{id}/cadastro/disponibilizar",
                                     subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
+                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Cadastro de atividades disponibilizado")));
 

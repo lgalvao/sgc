@@ -20,6 +20,8 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import jakarta.persistence.EntityManager;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -41,6 +43,10 @@ public class CDU02IntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private EntityManager entityManager;
 
     // Unidades
     private Unidade unidadeRaiz;
@@ -67,17 +73,27 @@ public class CDU02IntegrationTest extends BaseIntegrationTest {
                                                     "teste@sgc.com",
                                                     "123",
                                                     unidade);
+                                    Usuario savedUser = usuarioRepo.save(newUser);
                                     for (String perfilStr : perfis) {
-                                        newUser.getAtribuicoes()
-                                                .add(
-                                                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                                                .usuario(newUser)
-                                                                .unidade(unidade)
-                                                                .perfil(Perfil.valueOf(perfilStr))
-                                                                .build());
+                                        // Insert na VIEW_USUARIO_PERFIL_UNIDADE
+                                        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                                                savedUser.getTituloEleitoral(), unidade.getCodigo(), perfilStr);
                                     }
-                                    return usuarioRepo.save(newUser);
+                                    return savedUser;
                                 });
+
+        // Manually populate cache for the principal object because entity doesn't fetch from View automatically
+        // and we need getAuthorities() to work for Authentication, and AlertaMapper uses getTodasAtribuicoes().
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> perfisSet = new java.util.HashSet<>();
+        for (String perfilStr : perfis) {
+            perfisSet.add(sgc.sgrh.model.UsuarioPerfil.builder()
+                    .usuario(principal)
+                    .unidade(unidade)
+                    .perfil(Perfil.valueOf(perfilStr))
+                    .build());
+        }
+        principal.setAtribuicoes(perfisSet);
+
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         principal, null, principal.getAuthorities());

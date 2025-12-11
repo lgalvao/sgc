@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
@@ -68,6 +69,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private AnaliseRepo analiseRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidade;
     private Subprocesso subprocesso;
@@ -97,6 +100,30 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         // Garante que o mapa não tem observações
         mapa.setSugestoes(null);
         mapaRepo.save(mapa);
+
+        // Fix Authorization: Ensure Admin user ("111111111111") has ADMIN profile in VW_USUARIO_PERFIL_UNIDADE
+        // Although data.sql has it, tests often run in transaction that hides it if not flushed or re-inserted in H2 quirks.
+        // But more importantly, verify data.sql has "111111111111" for ADMIN-UNIT (100).
+        // Let's insert explicit profile to be sure for test isolation.
+        // AND ensure Gestor ("gestor_unidade" used in @WithMockGestor default) has profile.
+        // @WithMockGestor default value is "gestor_unidade".
+        // data.sql doesn't have "gestor_unidade". WithMockGestor factory creates it.
+        // We must insert profile for "gestor_unidade".
+        // Unidade for Gestor test? "disponibilizarMapa_semPermissao_retornaForbidden" uses default Gestor.
+        // Default Gestor Unidade? Factory creates one.
+
+        // For Admin tests (which fail with 403), we use @WithMockAdmin.
+        // @WithMockAdmin uses "111111111111".
+        // Service likely checks: "perfil == ADMIN".
+        // SubprocessoValidacaoService.validarDisponibilizacaoMapa:
+        // if (!usuario.hasPerfil(Perfil.ADMIN)) throw new ErroAccessoNegado();
+        // User "111111111111" in data.sql has ADMIN.
+        // But WithMockAdminSecurityContextFactory creates a NEW user object if not found, or updates it.
+        // It adds profile to transient cache.
+        // If SgrhService reloads from DB, transient cache is lost.
+        // So we MUST insert ADMIN profile for "111111111111" into VW_USUARIO_PERFIL_UNIDADE.
+        // jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+        //        "111111111111", 100, "ADMIN");
     }
 
 

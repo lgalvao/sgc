@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.mail.javamail.JavaMailSender;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.Session;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
@@ -30,13 +34,20 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import jakarta.persistence.EntityManager;
+import org.springframework.jdbc.core.JdbcTemplate;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,9 +84,18 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private AnaliseRepo analiseRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
+    private EntityManager entityManager;
 
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoBean
+    private JavaMailSender javaMailSender;
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
@@ -83,6 +103,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
         unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
 
@@ -103,6 +125,25 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                         SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
                         processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
+
+        // Setup para corrigir erro 403 (titular/perfil)
+        // Configurar perfil de CHEFE para o usuário do teste (333333333333) na unidade correta (SESEL - 10L)
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        // Insert na VIEW_USUARIO_PERFIL_UNIDADE
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                chefe.getTituloEleitoral(), unidadeChefe.getCodigo(), Perfil.CHEFE.name());
+
+        // Definir o usuário como TITULAR da unidade na VIEW VW_UNIDADE
+        jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
+                chefe.getTituloEleitoral(), unidadeChefe.getCodigo());
+
+        // Refresh na entidade Unidade para refletir a mudança no banco
+        entityManager.refresh(unidadeChefe);
+
+        // Definir titular da unidade superior (COSIS - 6) para que o envio de e-mail não falhe
+        jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
+                "666666666666", unidadeSuperior.getCodigo());
+        entityManager.refresh(unidadeSuperior);
     }
 
     @Nested
@@ -239,7 +280,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             // 2. Criar análise de "Aceite" manualmente (simulando GESTOR/ADMIN aceitou)
             Analise analiseAceite = new Analise();
             analiseAceite.setSubprocesso(sp);
-            analiseAceite.setUnidadeSigla(unidadeSuperior.getSigla());
+            analiseAceite.setUnidadeCodigo(unidadeSuperior.getCodigo());
             analiseAceite.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
             analiseAceite.setDataHora(LocalDateTime.now());
             analiseRepo.saveAndFlush(analiseAceite);
@@ -247,7 +288,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             // 3. Criar análise de "Devolução" manualmente (simulando segunda devolução)
             Analise analiseDevolucao = new Analise();
             analiseDevolucao.setSubprocesso(sp);
-            analiseDevolucao.setUnidadeSigla(unidadeSuperior.getSigla());
+            analiseDevolucao.setUnidadeCodigo(unidadeSuperior.getCodigo());
             analiseDevolucao.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
             analiseDevolucao.setObservacoes("Segunda devolução");
             analiseDevolucao.setDataHora(LocalDateTime.now());
