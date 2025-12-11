@@ -281,12 +281,13 @@ alter table if exists sgc.subprocesso
     add constraint fk_subprocesso_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
 alter table if exists sgc.unidade_processo
     add constraint fk_up_processo foreign key (processo_codigo) references sgc.processo;
-alter table if exists sgc.vw_unidade
-    add constraint fk_unidade_titular foreign key (titulo_titular) references sgc.vw_usuario;
+-- FKs entre VIEWs externas removidas para evitar dependência circular nos dados de teste
+-- alter table if exists sgc.vw_unidade
+--     add constraint fk_unidade_titular foreign key (titulo_titular) references sgc.vw_usuario;
 alter table if exists sgc.vw_unidade
     add constraint fk_unidade_superior foreign key (unidade_superior_codigo) references sgc.vw_unidade;
-alter table if exists sgc.vw_usuario
-    add constraint fk_usuario_unidade_lot foreign key (unidade_lot_codigo) references sgc.vw_unidade;
+-- alter table if exists sgc.vw_usuario
+--     add constraint fk_usuario_unidade_lot foreign key (unidade_lot_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_usuario_perfil_unidade
     add constraint fk_usuario_perfil_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
 alter table if exists sgc.vw_usuario_perfil_unidade
