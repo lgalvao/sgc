@@ -7,6 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.processo.service.ProcessoService;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -43,11 +45,6 @@ class E2eControllerTest {
 
     @Test
     void shouldClearProcessData_RealDelete() {
-        // ... (code omitted for brevity in overwrite, but ideally I should keep it or
-        // just comment out)
-        // Since overwrite replaces content, I must provide full content or just
-        // @Disabled
-        // I'll provide full content.
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.processo");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.subprocesso");
@@ -57,22 +54,27 @@ class E2eControllerTest {
         jdbcTemplate.execute("TRUNCATE TABLE sgc.alerta");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.alerta_usuario");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.unidade_processo");
-        jdbcTemplate.execute("TRUNCATE TABLE sgc.unidade");
-        jdbcTemplate.execute("TRUNCATE TABLE sgc.usuario");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.vw_unidade");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.vw_usuario");
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
 
         jdbcTemplate.execute(
-                "INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao) VALUES (999, 'Teste"
+                "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (999, 'Teste"
                         + " Unit', 'TESTE', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.usuario (titulo_eleitoral, nome) VALUES ('123', 'User Teste')");
+                "INSERT INTO sgc.vw_usuario (titulo, nome) VALUES ('123', 'User Teste')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (100,"
                         + " 'Processo Teste', 'CRIADO', 'MAPEAMENTO')");
-        jdbcTemplate.execute("INSERT INTO sgc.mapa (codigo, unidade_codigo) VALUES (200, 999)");
+
+        // Circular dependency handling: Subprocesso -> Mapa -> Subprocesso
         jdbcTemplate.execute(
-                "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, mapa_codigo,"
-                        + " situacao_id) VALUES (300, 100, 999, 200, 'NAO_INICIADO')");
+                "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao) VALUES (300, 100, 999, 'NAO_INICIADO')");
+
+        jdbcTemplate.execute("INSERT INTO sgc.mapa (codigo, subprocesso_codigo) VALUES (200, 300)");
+
+        jdbcTemplate.execute("UPDATE sgc.subprocesso SET mapa_codigo = 200 WHERE codigo = 300");
+
         jdbcTemplate.execute(
                 "INSERT INTO sgc.atividade (codigo, mapa_codigo, descricao) VALUES (400, 200,"
                         + " 'Atividade Teste')");
@@ -83,11 +85,11 @@ class E2eControllerTest {
                 "INSERT INTO sgc.alerta (codigo, processo_codigo, unidade_destino_codigo,"
                         + " usuario_destino_titulo) VALUES (500, 100, 999, '123')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo_eleitoral) VALUES"
+                "INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo) VALUES"
                         + " (500, '123')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.unidade_processo (codigo, processo_codigo, unidade_codigo) VALUES"
-                        + " (600, 100, 999)");
+                "INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo) VALUES"
+                        + " (100, 999)");
 
         assertCount("sgc.processo", 1);
         assertCount("sgc.subprocesso", 1);
@@ -97,6 +99,9 @@ class E2eControllerTest {
         assertCount("sgc.alerta", 1);
         assertCount("sgc.alerta_usuario", 1);
         assertCount("sgc.unidade_processo", 1);
+
+        assertCount("sgc.vw_unidade", 1);
+        assertCount("sgc.vw_usuario", 1);
 
         controller.limparProcessoComDependentes(100L);
 
@@ -109,19 +114,19 @@ class E2eControllerTest {
         assertCount("sgc.alerta_usuario", 0);
         assertCount("sgc.unidade_processo", 0);
 
-        assertCount("sgc.unidade", 1);
-        assertCount("sgc.usuario", 1);
+        assertCount("sgc.vw_unidade", 1);
+        assertCount("sgc.vw_usuario", 1);
     }
 
     @Test
     void shouldResetDatabase_TruncateTables() throws SQLException {
         jdbcTemplate.execute(
-                "INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
+                "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.processo (codigo, descricao) VALUES (888, 'Reset Proc')");
 
-        assertCount("sgc.unidade WHERE codigo=888", 1);
+        assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
 
         try {
@@ -130,7 +135,7 @@ class E2eControllerTest {
             // Ignored
         }
 
-        assertCount("sgc.unidade WHERE codigo=888", 0);
+        assertCount("sgc.vw_unidade WHERE codigo=888", 0);
         assertCount("sgc.processo WHERE codigo=888", 0);
     }
 

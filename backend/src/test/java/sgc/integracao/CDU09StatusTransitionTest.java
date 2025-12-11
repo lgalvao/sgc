@@ -49,15 +49,14 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
     @WithMockUser(roles = "ADMIN")
     void shouldTransitionStatusWhenActivityIsAdded() throws Exception {
         // GIVEN: An OPERACIONAL unit with a CHEFE as titular
-        // Using SESEL (unit 10) which has titular 333333333333 from data.sql
+        // Using SESEL (unit 10)
         Long unitCodigo = 10L;
-        String titularTitulo = "333333333333";
 
         Unidade unidade = unidadeRepo.findById(unitCodigo)
                 .orElseThrow(() -> new AssertionError("Unit not found: " + unitCodigo));
 
-        assertThat(unidade.getTituloTitular()).isNotNull();
-        assertThat(unidade.getTituloTitular()).isEqualTo(titularTitulo);
+        String titularTitulo = unidade.getTituloTitular();
+        assertThat(titularTitulo).isNotNull();
 
         // GIVEN: A MAPEAMENTO process is created and started for this unit
         Processo processo = new Processo()

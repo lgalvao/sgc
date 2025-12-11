@@ -28,6 +28,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeMapa;
+import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
@@ -54,6 +56,9 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     @Autowired
     private MapaRepo mapaRepo;
@@ -94,6 +99,8 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(conhecimentoOriginal);
 
         unidadeRepo.save(unidade);
+
+        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaOriginal));
     }
 
     private CriarProcessoReq criarCriarProcessoReq(
