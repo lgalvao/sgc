@@ -74,21 +74,25 @@ describe("usePerfilStore", () => {
         });
 
         it("definirPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
-            perfilStore.definirPerfilUnidade(Perfil.ADMIN, 123, "TEST_SIGLA"); // Fix this line
+            const unidadeCodigo = 123;
+            const unidadeSigla = "TEST_SIGLA";
+
+            perfilStore.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla);
+
             expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
-            expect(perfilStore.unidadeSelecionada).toBe(123);
-            expect(perfilStore.unidadeSelecionadaSigla).toBe("TEST_SIGLA"); // Add this
+            expect(perfilStore.unidadeSelecionada).toBe(unidadeCodigo);
+            expect(perfilStore.unidadeSelecionadaSigla).toBe(unidadeSigla); // Add this
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "perfilSelecionado",
                 Perfil.ADMIN,
             );
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "unidadeSelecionada",
-                "123",
+                unidadeCodigo.toString(),
             );
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith( // Add this
                 "unidadeSelecionadaSigla",
-                "TEST_SIGLA",
+                unidadeSigla,
             );
         });
 
