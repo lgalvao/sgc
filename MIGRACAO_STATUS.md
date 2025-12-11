@@ -1,4 +1,4 @@
-# Status da Migração para Oracle - 2025-12-11 18:35
+# Status da Migração para Oracle - 2025-12-11 18:40
 
 ## ✅ CONCLUÍDO - Fase 1, 2 e Fase 3
 
@@ -42,18 +42,24 @@
 - ✅ ProcessoService usa UnidadeMapaRepo
 - ✅ UnidadeService usa UnidadeMapaRepo
 
-### Testes
+### Compilação
 
+- ✅ **Backend compilando com sucesso** (main + test)
 - ✅ **ApplicationContext carregando com sucesso**
 - ✅ ProcessoServiceTest corrigido (mocks UnidadeMapaRepo adicionados)
 - ✅ 29 de 30 testes passando em ProcessoServiceTest
-- ⚠️ 1 teste falhando: `checarAcessoParticipante` (precisa ajuste no mock)
 
 ## 🎯 PRÓXIMOS PASSOS
 
 ### Finalizar Testes
 
-1. Corrigir teste `checarAcessoParticipante` 
-2. Executar suite completa de testes
+1. ⚠️ Corrigir teste `checarAcessoParticipante` (1 teste falhando)
+2. Executar suite completa de testes para identificar outros testes que precisam ajustes
 3. Corrigir testes unitários restantes que dependem de UnidadeMapaRepo
 4. Validar com testes E2E
+
+### Notas
+
+- O erro de compilação em `ImpactoMapaDto` foi resolvido com `gradle clean`
+- Schema de testes H2 ajustado e funcional
+- Principais mudanças arquiteturais implementadas com sucesso
