@@ -1,6 +1,7 @@
 package sgc.unidade;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.processo.model.TipoProcesso;
@@ -32,8 +33,7 @@ public class UnidadeController {
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
             @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaRequest request) {
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
-        // TODO nao pode passar nulo aqui
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
