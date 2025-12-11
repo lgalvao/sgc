@@ -9,6 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -17,9 +20,7 @@ import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,6 +45,9 @@ class UnidadeServiceTest {
 
     @Mock
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
+
+    @Mock
+    private ProcessoRepo processoRepo;
 
     @Test
     @DisplayName("buscarTodasUnidades deve retornar hierarquia correta")
@@ -167,6 +171,8 @@ class UnidadeServiceTest {
     @DisplayName("buscarArvoreComElegibilidade deve usar findAllComMapas quando requerMapaVigente")
     void buscarArvoreComElegibilidadeRevisao() {
         when(unidadeRepo.findAllComMapas()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, 1L);
 
@@ -177,9 +183,76 @@ class UnidadeServiceTest {
     @DisplayName("buscarArvoreComElegibilidade deve usar findAll quando nao requerMapaVigente")
     void buscarArvoreComElegibilidadeMapeamento() {
         when(unidadeRepo.findAll()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 1L);
 
         verify(unidadeRepo).findAll();
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve marcar unidade como nao elegivel se estiver em processo ativo")
+    void buscarArvoreComElegibilidadeComProcessoAtivo() {
+        Unidade unidade = new Unidade("Unidade Teste", "TESTE");
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
+
+        Processo processoAtivo = new Processo();
+        processoAtivo.setCodigo(99L);
+        processoAtivo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoAtivo.setParticipantes(Set.of(unidade));
+
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(processoAtivo));
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+
+        List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).isElegivel()).isFalse();
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve marcar unidade como elegivel se estiver no mesmo processo (edição)")
+    void buscarArvoreComElegibilidadeEdicaoMesmoProcesso() {
+        Unidade unidade = new Unidade("Unidade Teste", "TESTE");
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
+
+        Processo processoAtual = new Processo();
+        processoAtual.setCodigo(100L);
+        processoAtual.setSituacao(SituacaoProcesso.CRIADO);
+        processoAtual.setParticipantes(Set.of(unidade));
+
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of(processoAtual));
+
+        // Passamos o codigo do processo atual para ignorar
+        List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 100L);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).isElegivel()).isTrue();
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve marcar unidade como elegivel se nao estiver em processo ativo")
+    void buscarArvoreComElegibilidadeSemProcessoAtivo() {
+        Unidade unidade = new Unidade("Unidade Teste", "TESTE");
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
+
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+
+        List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).isElegivel()).isTrue();
     }
 }

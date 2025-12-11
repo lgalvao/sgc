@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -20,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class UnidadeService {
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
+    private final ProcessoRepo processoRepo;
 
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
@@ -46,14 +53,16 @@ public class UnidadeService {
             todasUnidades = unidadeRepo.findAll();
         }
 
-        return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente);
+        return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente, codProcesso);
     }
 
     private List<UnidadeDto> montarHierarquiaComElegibilidade(
-            List<Unidade> unidades, boolean requerMapaVigente) {
+            List<Unidade> unidades, boolean requerMapaVigente, Long codProcessoIgnorar) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
+
+        Set<Long> unidadesEmProcessoAtivo = getUnidadesEmProcessosAtivos(codProcessoIgnorar);
 
         for (Unidade u : unidades) {
             Long codigoPai =
@@ -62,10 +71,11 @@ public class UnidadeService {
             // Elegibilidade simples (não recursiva):
             // 1. NÃO é INTERMEDIARIA
             // 2. Tem mapa vigente (se requerido)
-            // 3. NÃO está em outro processo ativo (TODO: implementar verificação)
+            // 3. NÃO está em outro processo ativo
             boolean isElegivel =
                     u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA
-                            && (!requerMapaVigente || u.getMapaVigente() != null);
+                            && (!requerMapaVigente || u.getMapaVigente() != null)
+                            && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
             UnidadeDto dto =
                     new UnidadeDto(
@@ -97,6 +107,17 @@ public class UnidadeService {
         }
 
         return resultado;
+    }
+
+    private Set<Long> getUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
+        List<Processo> emAndamento = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+        List<Processo> criados = processoRepo.findBySituacao(SituacaoProcesso.CRIADO);
+
+        return Stream.concat(emAndamento.stream(), criados.stream())
+                .filter(p -> codProcessoIgnorar == null || !p.getCodigo().equals(codProcessoIgnorar))
+                .flatMap(p -> p.getParticipantes().stream())
+                .map(Unidade::getCodigo)
+                .collect(Collectors.toSet());
     }
 
     public void criarAtribuicaoTemporaria(
