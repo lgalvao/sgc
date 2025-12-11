@@ -2,7 +2,8 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@desenvolvimentobd:1521:admdes2
     username: sgc
-    password: dzX7_gpL4AcRV2iAxwVNynFLEiTEnh
+    # SENTINEL: Hardcoded password removed. Must use environment variable in production.
+    password: ${DB_PASSWORD}
   jpa:
     hibernate.ddl-auto: validate
     properties:
