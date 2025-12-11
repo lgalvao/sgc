@@ -161,7 +161,7 @@ class NotificacaoModelosServiceTest {
 
         assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
-        assertEquals("SGC: Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
+        assertEquals("Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
         assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
     }
@@ -181,7 +181,7 @@ class NotificacaoModelosServiceTest {
         assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
         assertEquals(
-                "SGC: Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
+                "Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
                 context.getVariable("titulo"));
         assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
         assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));

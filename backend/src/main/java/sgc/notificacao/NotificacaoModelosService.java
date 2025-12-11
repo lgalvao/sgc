@@ -26,8 +26,7 @@ public class NotificacaoModelosService {
             "Mapa de Competências disponibilizado";
     private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
     private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
-    // TODO esse título parece fugir do padrao com esse prefixo 'SGC'
-    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "SGC: Conclusão do processo ";
+    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Conclusão do processo ";
 
     private final SpringTemplateEngine templateEngine;
 
