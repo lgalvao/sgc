@@ -176,10 +176,12 @@ class UnidadeServiceTest {
         when(unidadeRepo.findAllComMapas()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
         when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, 1L);
 
         verify(unidadeRepo).findAllComMapas();
+        verify(unidadeMapaRepo).findAllUnidadeCodigos();
     }
 
     @Test
@@ -313,6 +315,7 @@ class UnidadeServiceTest {
 
         assertThat(json).contains("\"isElegivel\":true");
     }
+
     @Test
     @DisplayName("buscarArvoreComElegibilidade deve retornar ASSESSORIA_11 habilitada com dados do seed")
     void buscarArvoreComElegibilidade_DeveRetornarAssessoria11Habilitada() {

@@ -19,11 +19,7 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,6 +61,11 @@ public class UnidadeService {
 
         Set<Long> unidadesEmProcessoAtivo = getUnidadesEmProcessosAtivos(codProcessoIgnorar);
 
+        // Otimização: Busca em lote os IDs das unidades que possuem mapa para evitar N+1
+        Set<Long> unidadesComMapa = requerMapaVigente
+                ? new HashSet<>(unidadeMapaRepo.findAllUnidadeCodigos())
+                : Collections.emptySet();
+
         for (Unidade u : unidades) {
             Long codigoPai =
                     u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
@@ -73,7 +74,7 @@ public class UnidadeService {
             // 3. NÃO está em outro processo ativo
             boolean isElegivel =
                     u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA
-                            && (!requerMapaVigente || unidadeMapaRepo.existsById(u.getCodigo()))
+                            && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
             UnidadeDto dto =
