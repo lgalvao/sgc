@@ -32,8 +32,17 @@ public class ImpactoMapaDto {
      * @return An empty ImpactoMapaDto.
      */
     public static ImpactoMapaDto semImpacto() {
-        // TODO Usar sempre o builder, nao usar esses construtores enormes
-        return new ImpactoMapaDto(false, 0, 0, 0, 0, List.of(), List.of(), List.of(), List.of());
+        return ImpactoMapaDto.builder()
+                .temImpactos(false)
+                .totalAtividadesInseridas(0)
+                .totalAtividadesRemovidas(0)
+                .totalAtividadesAlteradas(0)
+                .totalCompetenciasImpactadas(0)
+                .atividadesInseridas(List.of())
+                .atividadesRemovidas(List.of())
+                .atividadesAlteradas(List.of())
+                .competenciasImpactadas(List.of())
+                .build();
     }
 
     public static ImpactoMapaDto comImpactos(
@@ -46,16 +55,17 @@ public class ImpactoMapaDto {
                         || !atividadesRemovidas.isEmpty()
                         || !atividadesAlteradas.isEmpty()
                         || !competenciasImpactadas.isEmpty();
-        // TODO Usar sempre o builder, nao usar esses construtores enormes
-        return new ImpactoMapaDto(
-                temImpactos,
-                atividadesInseridas.size(),
-                atividadesRemovidas.size(),
-                atividadesAlteradas.size(),
-                competenciasImpactadas.size(),
-                List.copyOf(atividadesInseridas),
-                List.copyOf(atividadesRemovidas),
-                List.copyOf(atividadesAlteradas),
-                List.copyOf(competenciasImpactadas));
+
+        return ImpactoMapaDto.builder()
+                .temImpactos(temImpactos)
+                .totalAtividadesInseridas(atividadesInseridas.size())
+                .totalAtividadesRemovidas(atividadesRemovidas.size())
+                .totalAtividadesAlteradas(atividadesAlteradas.size())
+                .totalCompetenciasImpactadas(competenciasImpactadas.size())
+                .atividadesInseridas(List.copyOf(atividadesInseridas))
+                .atividadesRemovidas(List.copyOf(atividadesRemovidas))
+                .atividadesAlteradas(List.copyOf(atividadesAlteradas))
+                .competenciasImpactadas(List.copyOf(competenciasImpactadas))
+                .build();
     }
 }
