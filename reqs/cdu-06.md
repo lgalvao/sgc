@@ -5,7 +5,7 @@ Atores: ADMIN e GESTOR
 Pré-condições:
 
 - Usuário ter feito login com os perfis ADMIN ou GESTOR
-- Ao menos um processo nas situações 'Em Andamento' ou 'Finalizado'.
+- Ao menos um processo nas situações 'Em andamento' ou 'Finalizado'.
 
 Fluxo principal:
 

@@ -5,7 +5,7 @@ Atores: CHEFE e SERVIDOR
 Pré-condições:
 
 - Usuário ter feito login (qualquer perfil).
-- Ao menos um subprocesso nas situações 'Em Andamento' ou 'Finalizado'.
+- Ao menos um subprocesso nas situações 'Em andamento' ou 'Finalizado'.
 
 Fluxo principal:
 

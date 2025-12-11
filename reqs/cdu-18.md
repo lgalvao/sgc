@@ -10,7 +10,7 @@ Pré-condições:
 
 Fluxo principal:
 
-1. No Painel, o usuário clica no processo de mapeamento ou revisão na situação 'Em Andamento' ou 'Finalizado'.
+1. No Painel, o usuário clica no processo de mapeamento ou revisão na situação 'Em andamento' ou 'Finalizado'.
 
 2. Se perfil logado for ADMIN ou GESTOR:
 

@@ -46,7 +46,7 @@ Fluxo principal:
 
    8.4. O sistema guarda o perfil e a unidade definidos
 
-10. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e
+9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e
     `Rodapé`.
 
     9.1. `A Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes
@@ -55,9 +55,9 @@ Fluxo principal:
     9.1.1. Itens principais de navegação:
     - Ícone/logotipo do sistema (abre a tela `Painel`)
     - Link `Painel`, para tela `Painel`
-    - Se ADMIN: Link `Unidades`, para tela `Unidades`, que apresenta a hierarquia de unidades do TRE-PE; se GESTOR
-      CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados da unidade do
-      usuário logado
+    - Menu das unidades, de acordo com essas regras:
+        - Se ADMIN: Link `Unidades`, para tela `Unidades`, que apresenta a hierarquia de unidades do TRE-PE
+        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para tela `Detalhe da unidade`, que apresenta os dados da unidade do usuário logado
     - Link `Relatórios`, para tela `Relatórios`
     - Link `Histórico`, para tela `Histórico de processos`
 

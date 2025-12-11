@@ -1,20 +1,24 @@
 # CDU-03 - Manter processo
 
-- Ator: ADMIN
-- Pré-condição: Login realizado com perfil ADMIN, com tela Painel aberta.
+## Ator: ADMIN
+
+## Pré-condições
+
+- Login realizado com perfil ADMIN
+- Tela Painel aberta
 
 ## Fluxo principal
 
-### Criação de processo:
+### Criação de um processo
 
-1. Se o usuário quiser criar um processo, escolhe o botão Criar processo.
+1. Se o usuário quiser criar um processo, escolhe o botão `Criar processo`.
 
-2. O sistema muda para a tela Cadastro de processo e apresenta um formulário contendo:
+2. O sistema muda para a tela `Cadastro de processo` e apresenta um formulário contendo:
     - Campo `Descrição`
     - Campo `Tipo`, com opções: 'Mapeamento', 'Revisão' e 'Diagnóstico'
     - Quadro `Unidades participantes`, contendo uma árvore de unidades com checkboxes para cada uma.
         - A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de
-          um processo ativo do tipo selecionado
+          um processo ativo do tipo selecionado em `Tipo`.
         - O comportamento de seleção das unidades participantes deve seguir estas regras:
             - Ao clicar em uma unidade intermediária na árvore, todas as unidades abaixo dela devem ser automaticamente
               selecionadas;
@@ -30,23 +34,21 @@
       processo.
     - Botões `Cancelar`, `Salvar` e `Iniciar processo`
 
-3. O usuário fornece os dados solicitados, escolhe o tipo do processo e seleciona as unidades participantes.
+3. O usuário fornece os dados solicitados e seleciona as unidades participantes, e clica em `Salvar`.
 
-4. O usuário clica em `Salvar`.
+4. O sistema faz as seguintes validações (com mensagens de falha de validação indicadas entre aspas):
 
-5. O sistema faz as seguintes validações (com mensagens de falha de validação indicadas entre aspas):
+   4.1. Descrição deve estar preenchida. Validação: "Preencha a descrição".
 
-   5.1. Descrição deve estar preenchida. Validação: "Preencha a descrição".
+   4.2. Ao menos uma unidade deve ser selecionada. Validação: "Pelo menos uma unidade participante deve ser incluída."
 
-   5.2. Ao menos uma unidade deve ser selecionada. Validação: "Pelo menos uma unidade participante deve ser incluída."
-
-   5.3. Em caso de processos dos tipos 'Revisão' ou 'Diagnóstico', só poderão ser selecionadas unidades com mapas de
+   4.3. Em caso de processos dos tipos 'Revisão' ou 'Diagnóstico', só poderão ser selecionadas unidades com mapas de
    competência vigentes. A mensagem de aviso a ser mostrada, caso contrário: "Não é possível incluir em processos de
    revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento."
 
-6. O sistema cria o processo internamente, colocando-o na situação 'Criado', e mostra a mensagem "Processo criado.".
+5. O sistema cria o processo internamente, colocando-o na situação 'Criado', e mostrando a mensagem "Processo criado.".
 
-7. O sistema redireciona para o Painel, onde já será mostrada uma linha para o processo recém-criado.
+6. O sistema redireciona para o Painel, onde já será mostrada uma linha para o processo recém-criado.
 
 ### Edição de processo
 
@@ -64,28 +66,25 @@
 
 6. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
 
-### Remoção
+### Remoçãom de processo
 
 1. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do Painel (apenas processos
    na situação 'Criado' podem ser removidos). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`, também será
-   exibido o
-   botão `Remover`.
+   exibido o botão `Remover`.
 
-2. O sistema abre a tela Cadastro de processo preenchida com os dados atuais do processo.
+2. O sistema abre a tela `Cadastro de processo`, preenchida com os dados atuais do processo.
 
-3. O usuário escolhe o botão Remover.
+3. O usuário escolhe o botão `Remover`.
 
 4. O sistema mostra o diálogo de confirmação "Remover o processo '[Descrição do processo]'? Esta ação não poderá ser
-   desfeita.", botões `Remover` e `Cancelar`.
+   desfeita.", com botões `Remover` e `Cancelar`.
 
    4.1. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem
    efetuar alterações.
 
-   4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente, mostra a mensagem "
-   Processo [Descrição do Processo] removido" e redireciona para o Painel.
+   4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente, mostra a mensagem "Processo [Descrição do Processo] removido" e redireciona para o Painel.
 
 ## Fluxo alternativo
 
-Caso o usuário escolha o botão Iniciar processo em vez do botão Salvar, o sistema realiza as validações dos dados
-informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo de do caso de uso
-`Iniciar processo de mapeamento`, ou `Iniciar processo de revisão` etc., dependendo do tipo do processo.
+Caso o usuário escolha o botão `Iniciar processo` em vez do botão `Salvar`, o sistema realiza as validações dos dados
+informados, cria o processo (se ainda não tiver sido criado) e segue para o fluxo do caso de uso `Iniciar processo de mapeamento`, ou `Iniciar processo de revisão`, ou `Iniciar processo de diagnóstico`, dependendo do tipo do processo.

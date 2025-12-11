@@ -21,13 +21,13 @@ Fluxo principal:
 5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
    tela, o botão Histórico de análise.
 
-   5.1. Se CHEFE clicar no botão Histórico de análise, o sistema mostra, em tela modal, os dados das análises do
+   5.1. Se CHEFE clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
    cadastro realizadas pelas unidades superiores desde a última disponibilização.
     - As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução'
       ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro, antes da
       realização de nova disponibilização.
 
-6. CHEFE clica no botão Disponibilizar.
+6. CHEFE clica no botão `Disponibilizar`.
 
 7. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
 
@@ -36,11 +36,11 @@ Fluxo principal:
 
 8. O sistema mostra diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a
    finalização da revisão e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro
-   por unidades superiores" / Botões Confirmar e Cancelar.
+   por unidades superiores" / Botões `Confirmar` e `Cancelar`.
 
-   8.1. Caso CHEFE escolha Cancelar, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
+   8.1. Caso CHEFE escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-9. CHEFE escolhe Confirmar.
+9. CHEFE escolhe `Confirmar`.
 
 10. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
 
