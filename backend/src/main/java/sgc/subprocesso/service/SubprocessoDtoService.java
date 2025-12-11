@@ -84,6 +84,15 @@ public class SubprocessoDtoService {
         Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
         log.debug("Responsável encontrado: {}", responsavel);
 
+        Usuario titular = null;
+        if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
+            try {
+                titular = sgrhService.buscarUsuarioPorLogin(sp.getUnidade().getTituloTitular());
+            } catch (Exception e) {
+                log.warn("Erro ao buscar titular da unidade: {}", e.getMessage());
+            }
+        }
+
         List<Movimentacao> movimentacoes =
                 repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
@@ -92,7 +101,7 @@ public class SubprocessoDtoService {
         log.debug("Permissões calculadas: {}", permissoes);
 
         return SubprocessoDetalheDto.of(
-                sp, responsavel, movimentacoes, movimentacaoMapper, permissoes);
+                sp, responsavel, titular, movimentacoes, movimentacaoMapper, permissoes);
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {

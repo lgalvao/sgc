@@ -18,7 +18,7 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
      * @param unidadeCodigo Código da unidade
      * @return Optional contendo o mapa vigente se existir
      */
-    @Query("SELECT u.mapaVigente FROM Unidade u WHERE u.codigo = :unidadeCodigo")
+    @Query("SELECT um.mapaVigente FROM UnidadeMapa um WHERE um.unidadeCodigo = :unidadeCodigo")
     Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 
     /**

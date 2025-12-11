@@ -11,6 +11,8 @@ import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.List;
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
     private final SubprocessoRepo codSubprocesso;
+    private final UnidadeRepo unidadeRepo;
 
     /**
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
@@ -61,6 +64,12 @@ public class AnaliseService {
                                         new ErroEntidadeNaoEncontrada(
                                                 "Subprocesso", req.getCodSubprocesso()));
 
+        Unidade unidade = null;
+        if (req.getSiglaUnidade() != null) {
+            unidade = unidadeRepo.findBySigla(req.getSiglaUnidade())
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", req.getSiglaUnidade()));
+        }
+
         Analise analise =
                 Analise.builder()
                         .subprocesso(sp)
@@ -68,8 +77,8 @@ public class AnaliseService {
                         .observacoes(req.getObservacoes())
                         .tipo(req.getTipo())
                         .acao(req.getAcao())
-                        .unidadeSigla(req.getSiglaUnidade())
-                        .analistaUsuarioTitulo(req.getTituloUsuario())
+                        .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
+                        .usuarioTitulo(req.getTituloUsuario())
                         .motivo(req.getMotivo())
                         .build();
 

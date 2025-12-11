@@ -147,7 +147,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
             // 3. Verificar a movimentação
             List<Movimentacao> movimentacoes =
@@ -193,7 +193,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo())
+            assertThat(analiseRegistrada.getUsuarioTitulo())
                     .isEqualTo("666666666666"); // From
             // @WithMockGestor("666666666666")
 
