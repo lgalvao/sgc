@@ -12,6 +12,9 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class WithMockChefeSecurityContextFactory
         implements WithSecurityContextFactory<WithMockChefe> {
     @Autowired(required = false)
@@ -23,11 +26,9 @@ public class WithMockChefeSecurityContextFactory
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
         Unidade unidade = null;
-        boolean dbAvailable = false;
         if (unidadeRepo != null) {
             try {
                 unidade = unidadeRepo.findById(10L).orElse(null);
-                dbAvailable = true;
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -51,39 +52,29 @@ public class WithMockChefeSecurityContextFactory
                     new Usuario(
                             annotation.value(), "Chefe Teste", "chefe@teste.com", "123", unidade);
 
-            usuario.getAtribuicoes()
-                    .add(
+            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+            atribuicoes.add(
                             UsuarioPerfil.builder()
                                     .usuario(usuario)
                                     .unidade(unidade)
                                     .perfil(Perfil.CHEFE)
                                     .build());
-            if (dbAvailable && usuarioRepo != null) {
-                try {
-                    usuarioRepo.save(usuario);
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
+            usuario.setAtribuicoes(atribuicoes);
+
         }
 
         // Garante que a unidade está correta no usuário do contexto
         usuario.setUnidadeLotacao(unidade);
-        if (usuario.getAtribuicoes().stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
-            usuario.getAtribuicoes()
-                    .add(
+
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getAtribuicoes());
+        if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
+            atribuicoes.add(
                             UsuarioPerfil.builder()
                                     .usuario(usuario)
                                     .unidade(unidade)
                                     .perfil(Perfil.CHEFE)
                                     .build());
-        }
-        if (dbAvailable && usuarioRepo != null) {
-            try {
-                usuarioRepo.save(usuario);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+            usuario.setAtribuicoes(atribuicoes);
         }
 
         UsernamePasswordAuthenticationToken authentication =

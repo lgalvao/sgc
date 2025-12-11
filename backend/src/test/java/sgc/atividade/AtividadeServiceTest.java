@@ -96,6 +96,8 @@ class AtividadeServiceTest {
         dto.setMapaCodigo(mapaId);
 
         Unidade unidade = new Unidade();
+        unidade.setTituloTitular(usuarioId);
+
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
 
@@ -128,6 +130,8 @@ class AtividadeServiceTest {
         dto.setMapaCodigo(mapaId);
 
         Unidade unidade = new Unidade();
+        unidade.setTituloTitular(usuarioId);
+
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
 
@@ -196,6 +200,8 @@ class AtividadeServiceTest {
         dto.setMapaCodigo(mapaId);
 
         Unidade unidade = new Unidade();
+        unidade.setTituloTitular("outro");
+
         Usuario titular = new Usuario();
         titular.setTituloEleitoral("outro");
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.model.Usuario;
@@ -43,24 +44,19 @@ public class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Test
     @DisplayName("Deve persistir e consultar VW_UNIDADE")
     void testUnidadeView() {
         // Arrange
-        Unidade unidade = new Unidade();
-        unidade.setNome("Unidade de Teste View");
-        unidade.setSigla("UTVIEW");
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setMatriculaTitular("12345");
-        unidade.setTituloTitular("999999999999");
-        unidade.setDataInicioTitularidade(LocalDateTime.now());
+        Long id = 9901L;
+        jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, matricula_titular, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                id, "Unidade de Teste View", "UTVIEW", TipoUnidade.OPERACIONAL.name(), SituacaoUnidade.ATIVA.name(), "12345", "999999999999");
         
-        // Act
-        Unidade saved = unidadeRepo.save(unidade);
-        
-        // Assert
-        Optional<Unidade> found = unidadeRepo.findById(saved.getCodigo());
+        // Act & Assert
+        Optional<Unidade> found = unidadeRepo.findById(id);
         assertThat(found).isPresent();
         assertThat(found.get().getNome()).isEqualTo("Unidade de Teste View");
         assertThat(found.get().getSigla()).isEqualTo("UTVIEW");
@@ -73,49 +69,39 @@ public class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve persistir e consultar VW_USUARIO")
     void testUsuarioView() {
         // Arrange
-        Unidade unidade = new Unidade("Unidade Lotacao", "ULOT");
-        unidadeRepo.save(unidade);
+        Long unidadeId = 9902L;
+        jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO) VALUES (?, ?, ?, ?, ?)",
+                unidadeId, "Unidade Lotacao", "ULOT", TipoUnidade.OPERACIONAL.name(), SituacaoUnidade.ATIVA.name());
 
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123456789012");
-        usuario.setNome("Usuario Teste View");
-        usuario.setEmail("teste@view.com");
-        usuario.setRamal("1234");
-        usuario.setMatricula("88888");
-        usuario.setUnidadeLotacao(unidade);
+        String uniqueId = "999888777666";
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, MATRICULA, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?, ?)",
+                uniqueId, "Usuario Teste View", "teste@view.com", "1234", "88888", unidadeId);
         
-        // Act
-        usuarioRepo.save(usuario);
-        
-        // Assert
-        Optional<Usuario> found = usuarioRepo.findById("123456789012");
+        // Act & Assert
+        Optional<Usuario> found = usuarioRepo.findById(uniqueId);
         assertThat(found).isPresent();
         assertThat(found.get().getNome()).isEqualTo("Usuario Teste View");
         assertThat(found.get().getEmail()).isEqualTo("teste@view.com");
-        assertThat(found.get().getUnidadeLotacao().getCodigo()).isEqualTo(unidade.getCodigo());
+        assertThat(found.get().getUnidadeLotacao().getCodigo()).isEqualTo(unidadeId);
     }
 
     @Test
     @DisplayName("Deve persistir e consultar VW_VINCULACAO_UNIDADE")
     void testVinculacaoUnidadeView() {
         // Arrange
-        // Precisamos criar as unidades referenciadas primeiro por causa das FKs
-        Unidade unidadeAtual = new Unidade("Unidade Atual", "UATUAL");
-        unidadeRepo.save(unidadeAtual);
+        Long unidadeAtualId = 9903L;
+        jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO) VALUES (?, ?, ?, ?, ?)",
+                unidadeAtualId, "Unidade Atual", "UATUAL", TipoUnidade.OPERACIONAL.name(), SituacaoUnidade.ATIVA.name());
         
-        Unidade unidadeAnterior = new Unidade("Unidade Anterior", "UANT");
-        unidadeRepo.save(unidadeAnterior);
+        Long unidadeAntId = 9904L;
+        jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO) VALUES (?, ?, ?, ?, ?)",
+                unidadeAntId, "Unidade Anterior", "UANT", TipoUnidade.OPERACIONAL.name(), SituacaoUnidade.ATIVA.name());
 
-        VinculacaoUnidade vinculacao = new VinculacaoUnidade();
-        vinculacao.setUnidadeAtualCodigo(unidadeAtual.getCodigo());
-        vinculacao.setUnidadeAnteriorCodigo(unidadeAnterior.getCodigo());
-        vinculacao.setDemaisUnidadesHistoricas("UANT -> UANT2 -> UANT3");
+        jdbcTemplate.update("INSERT INTO SGC.VW_VINCULACAO_UNIDADE (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) VALUES (?, ?, ?)",
+                unidadeAtualId, unidadeAntId, "UANT -> UANT2 -> UANT3");
 
-        // Act
-        vinculacaoUnidadeRepo.save(vinculacao);
-
-        // Assert
-        VinculacaoUnidadeId id = new VinculacaoUnidadeId(unidadeAtual.getCodigo(), unidadeAnterior.getCodigo());
+        // Act & Assert
+        VinculacaoUnidadeId id = new VinculacaoUnidadeId(unidadeAtualId, unidadeAntId);
         Optional<VinculacaoUnidade> found = vinculacaoUnidadeRepo.findById(id);
         
         assertThat(found).isPresent();
@@ -126,27 +112,21 @@ public class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve persistir e consultar VW_USUARIO_PERFIL_UNIDADE")
     void testUsuarioPerfilUnidadeView() {
         // Arrange
-        Unidade unidade = new Unidade("Unidade Perfil", "UPERFIL");
-        unidadeRepo.save(unidade);
+        Long unidadeId = 9905L;
+        jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO) VALUES (?, ?, ?, ?, ?)",
+                unidadeId, "Unidade Perfil", "UPERFIL", TipoUnidade.OPERACIONAL.name(), SituacaoUnidade.ATIVA.name());
 
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("987654321098");
-        usuario.setNome("Usuario Perfil");
-        usuario.setUnidadeLotacao(unidade);
-        usuarioRepo.save(usuario);
+        String uniqueId = "555444333222";
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, MATRICULA, unidade_lot_codigo) VALUES (?, ?, ?, ?, ?, ?)",
+                uniqueId, "Usuario Perfil", "perfil@view.com", "1234", "88888", unidadeId);
 
-        UsuarioPerfil perfil = new UsuarioPerfil();
-        perfil.setUsuarioTitulo("987654321098");
-        perfil.setUnidadeCodigo(unidade.getCodigo());
-        perfil.setPerfil(Perfil.GESTOR);
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                uniqueId, unidadeId, Perfil.GESTOR.name());
         
-        // Act
-        usuarioPerfilRepo.save(perfil);
-
-        // Assert
-        List<UsuarioPerfil> perfis = usuarioPerfilRepo.findByUsuarioTitulo("987654321098");
+        // Act & Assert
+        List<UsuarioPerfil> perfis = usuarioPerfilRepo.findByUsuarioTitulo(uniqueId);
         assertThat(perfis).hasSize(1);
         assertThat(perfis.get(0).getPerfil()).isEqualTo(Perfil.GESTOR);
-        assertThat(perfis.get(0).getUnidade().getCodigo()).isEqualTo(unidade.getCodigo());
+        assertThat(perfis.get(0).getUnidade().getCodigo()).isEqualTo(unidadeId);
     }
 }
