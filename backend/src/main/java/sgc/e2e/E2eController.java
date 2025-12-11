@@ -83,7 +83,9 @@ public class E2eController {
                 "DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN (SELECT codigo FROM"
                         + " sgc.subprocesso WHERE processo_codigo = ?)",
                 codigo);
-        jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
+
+        // Desvincular mapa para permitir exclusão
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET mapa_codigo = NULL WHERE processo_codigo = ?", codigo);
 
         if (!mapaIds.isEmpty()) {
             String ids = mapaIds.toString().replace("[", "").replace("]", "");
@@ -106,6 +108,8 @@ public class E2eController {
             jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN (" + ids + ")");
             jdbcTemplate.update("DELETE FROM sgc.mapa WHERE codigo IN (" + ids + ")");
         }
+
+        jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.alerta_usuario WHERE alerta_codigo IN (SELECT codigo FROM"

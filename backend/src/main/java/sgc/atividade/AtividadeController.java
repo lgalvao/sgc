@@ -110,6 +110,8 @@ public class AtividadeController {
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(
             @PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
 
+        atividadeService.atualizar(codigo, atividadeDto);
+
         // Buscar subprocesso e status
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codigo);
         Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
