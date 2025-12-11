@@ -9,7 +9,11 @@
             v-if="permissoes.podeEditarMapa"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades"
+            role="button"
+            tabindex="0"
             @click="navegarPara('SubprocessoCadastro')"
+            @keydown.enter.prevent="navegarPara('SubprocessoCadastro')"
+            @keydown.space.prevent="navegarPara('SubprocessoCadastro')"
         >
           <BCardTitle>
             Atividades e conhecimentos
@@ -26,7 +30,11 @@
             v-else-if="permissoes.podeVisualizarMapa"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades-vis"
+            role="button"
+            tabindex="0"
             @click="navegarPara('SubprocessoVisCadastro')"
+            @keydown.enter.prevent="navegarPara('SubprocessoVisCadastro')"
+            @keydown.space.prevent="navegarPara('SubprocessoVisCadastro')"
         >
           <BCardTitle>
             Atividades e conhecimentos
@@ -47,10 +55,15 @@
       >
         <BCard
             v-if="permissoes.podeEditarMapa"
+            :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa"
-            @click="navegarPara('SubprocessoMapa')"
+            role="button"
+            :tabindex="!mapa ? -1 : 0"
+            @click="!mapa ? null : navegarPara('SubprocessoMapa')"
+            @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
+            @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
         >
           <BCardTitle>
             Mapa de Competências
@@ -65,10 +78,15 @@
         </BCard>
         <BCard
             v-else-if="permissoes.podeVisualizarMapa"
+            :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa"
-            @click="navegarPara('SubprocessoVisMapa')"
+            role="button"
+            :tabindex="!mapa ? -1 : 0"
+            @click="!mapa ? null : navegarPara('SubprocessoVisMapa')"
+            @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
+            @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
         >
           <BCardTitle>
             Mapa de Competências
@@ -93,7 +111,11 @@
             v-if="permissoes.podeVisualizarDiagnostico"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-diagnostico"
+            role="button"
+            tabindex="0"
             @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
+            @keydown.enter.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
+            @keydown.space.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
         >
           <BCardTitle>
             Autoavaliação
@@ -115,7 +137,11 @@
         <BCard
             class="h-100 card-actionable"
             data-testid="card-subprocesso-ocupacoes"
+            role="button"
+            tabindex="0"
             @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
+            @keydown.enter.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
+            @keydown.space.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
         >
           <BCardTitle>
             Ocupações Críticas
@@ -136,7 +162,11 @@
         <BCard
             class="h-100 card-actionable"
             data-testid="card-subprocesso-monitoramento"
+            role="button"
+            tabindex="0"
             @click="navegarParaDiag('MonitoramentoDiagnostico')"
+            @keydown.enter.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
+            @keydown.space.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
         >
           <BCardTitle>
             Monitoramento
@@ -217,5 +247,17 @@ const navegarParaDiag = (routeName: string) => {
 
 .card-actionable.disabled-card {
   opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ensure hover effect doesn't happen on disabled cards */
+.card-actionable.disabled-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.card-actionable:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
 }
 </style>

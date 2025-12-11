@@ -185,4 +185,75 @@ describe("SubprocessoCards.vue", () => {
             expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(false);
         });
     });
+
+    describe("Acessibilidade", () => {
+        it("cards devem ter role='button' e tabindex='0'", () => {
+            const wrapper = createWrapper({
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+                mapa: null,
+                situacao: "Mapa disponibilizado",
+                permissoes: {...defaultPermissoes, podeEditarMapa: true},
+            });
+            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
+
+            expect(card.attributes("role")).toBe("button");
+            expect(card.attributes("tabindex")).toBe("0");
+        });
+
+        it("deve navegar ao pressionar Enter", async () => {
+            const wrapper = createWrapper({
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+                mapa: null,
+                situacao: "Mapa disponibilizado",
+                permissoes: {...defaultPermissoes, podeEditarMapa: true},
+            });
+            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
+
+            await card.trigger("keydown.enter");
+
+            expect(pushMock).toHaveBeenCalledWith({
+                name: "SubprocessoCadastro",
+                params: {
+                    codProcesso: 1,
+                    siglaUnidade: "TEST",
+                },
+            });
+        });
+
+        it("deve navegar ao pressionar Espaço", async () => {
+            const wrapper = createWrapper({
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+                mapa: null,
+                situacao: "Mapa disponibilizado",
+                permissoes: {...defaultPermissoes, podeEditarMapa: true},
+            });
+            const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
+
+            await card.trigger("keydown.space");
+
+            expect(pushMock).toHaveBeenCalledWith({
+                name: "SubprocessoCadastro",
+                params: {
+                    codProcesso: 1,
+                    siglaUnidade: "TEST",
+                },
+            });
+        });
+
+        it("deve desabilitar navegação e foco se mapa não existir (card desabilitado)", async () => {
+            const wrapper = createWrapper({
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+                mapa: null, // Sem mapa
+                situacao: "Mapa disponibilizado",
+                permissoes: {...defaultPermissoes, podeEditarMapa: true},
+            });
+            const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
+
+            expect(card.attributes("aria-disabled")).toBe("true");
+            expect(card.attributes("tabindex")).toBe("-1");
+
+            await card.trigger("click");
+            expect(pushMock).not.toHaveBeenCalled();
+        });
+    });
 });
