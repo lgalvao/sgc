@@ -299,7 +299,7 @@ import {
 } from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {situacaoLabel} from "@/utils";
@@ -310,6 +310,7 @@ import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const route = useRoute();
+const router = useRouter();
 const mapasStore = useMapasStore();
 const {mapaCompleto} = storeToRefs(mapasStore);
 const atividadesStore = useAtividadesStore();
@@ -529,7 +530,7 @@ async function disponibilizarMapa() {
     await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
     fecharModalDisponibilizar();
-    // TODO: Adicionar redirecionamento para o painel
+    await router.push({name: "Painel"});
   } catch {
     // O erro já é tratado e notificado pelo store
   }
