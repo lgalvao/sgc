@@ -21,6 +21,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -209,7 +210,7 @@ class SubprocessoWorkflowServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
         assertThatThrownBy(() -> service.disponibilizarMapa(id, "obs", null, new Usuario()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ErroMapaNaoAssociado.class);
     }
 
     // --- Apresentar Sugestões ---
