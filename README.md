@@ -125,15 +125,24 @@ npm run test:e2e
 O projeto possui uma suite especial de testes Playwright dedicada a capturar screenshots de todas as telas do sistema
 para análise manual e refinamento de UI.
 
+**Quick Start:**
 ```bash
-# Execução via script (recomendado)
+# 1. Capturar todas as telas
 ./scripts/capturar-telas.sh
 
-# Ou via npm
-npm run test:e2e:captura
+# 2. Visualizar as capturas
+./scripts/visualizar-telas.sh
 ```
 
-Veja mais detalhes em [screenshots/README.md](screenshots/README.md).
+**Recursos:**
+- 🖼️ 50+ screenshots automáticas organizadas em 8 categorias
+- 🔍 Visualizador HTML interativo
+- 📱 Capturas em múltiplas resoluções
+- 🎯 Scripts para captura por categoria
+
+**Documentação:**
+- [screenshots/README.md](screenshots/README.md) - Guia rápido
+- [docs/GUIA-CAPTURA-TELAS.md](docs/GUIA-CAPTURA-TELAS.md) - Guia completo
 
 ## 🛡️ Verificações de Qualidade
 
