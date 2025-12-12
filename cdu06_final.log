@@ -1,0 +1,16 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+2025-12-12 02:01:37,263 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-12-12 02:01:37,433 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-12-12 02:01:37,467 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+> Task :backend:test
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 43s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry reused.

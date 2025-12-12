@@ -61,20 +61,6 @@ public class ProcessoService {
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
-    /**
-     * Verifica se um usuário autenticado tem permissão para acessar um processo.
-     * 
-     * <p>Um usuário tem acesso se:
-     * <ul>
-     *   <li>For ADMIN (verificado via @PreAuthorize)</li>
-     *   <li>For GESTOR ou CHEFE e existir subprocesso para sua unidade</li>
-     *   <li>For GESTOR ou CHEFE e existir subprocesso para unidades subordinadas à sua unidade</li>
-     * </ul>
-     *
-     * @param authentication contexto de autenticação do usuário
-     * @param codProcesso código do processo a verificar
-     * @return true se o usuário tem acesso, false caso contrário
-     */
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) return false;
 
@@ -102,7 +88,6 @@ public class ProcessoService {
             return false;
         }
 
-        // Buscar todas as unidades subordinadas (incluindo a própria unidade)
         List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
         log.debug("checarAcesso: usuário {} (unidade {}) tem acesso a {} unidades na hierarquia: {}",
                 username, codUnidadeUsuario, codigosUnidadesHierarquia.size(), codigosUnidadesHierarquia);
@@ -112,7 +97,6 @@ public class ProcessoService {
             return false;
         }
 
-        // Verificar se existe subprocesso para a unidade do usuário ou para qualquer subordinada
         boolean temAcesso = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(
                 codProcesso, codigosUnidadesHierarquia);
         log.debug("checarAcesso: usuário {} {} acesso ao processo {}",
@@ -120,14 +104,6 @@ public class ProcessoService {
         return temAcesso;
     }
 
-    /**
-     * Busca recursivamente todos os códigos de unidades descendentes de uma unidade.
-     * Inclui a própria unidade e todas as suas subordinadas em qualquer nível da hierarquia.
-     * Implementação em Java para portabilidade entre bancos de dados.
-     *
-     * @param codUnidade código da unidade raiz
-     * @return lista de códigos incluindo a unidade raiz e todos os descendentes
-     */
     private List<Long> buscarCodigosDescendentes(Long codUnidade) {
         List<Long> resultado = new ArrayList<>();
         resultado.add(codUnidade);
@@ -135,9 +111,6 @@ public class ProcessoService {
         return resultado;
     }
 
-    /**
-     * Método auxiliar recursivo para buscar descendentes.
-     */
     private void buscarDescendentesRecursivo(Long codUnidadeSuperior, List<Long> resultado) {
         List<Unidade> filhos = unidadeRepo.findByUnidadeSuperiorCodigo(codUnidadeSuperior);
         for (Unidade filho : filhos) {
@@ -166,7 +139,6 @@ public class ProcessoService {
                             .orElseThrow(
                                     () -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
-            // Validação defensiva: unidades INTERMEDIARIAS não devem participar de processos
             if (unidade.getTipo() == INTERMEDIARIA) {
                 log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}",
                         unidade.getSigla());
@@ -487,7 +459,7 @@ public class ProcessoService {
             return Optional.empty();
         }
         List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
-        // Buscar mapas vigentes via UnidadeMapaRepo
+
         List<Long> unidadesSemMapa =
                 unidades.stream()
                         .filter(u -> !unidadeMapaRepo.existsById(u.getCodigo()))
@@ -524,10 +496,14 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
+        log.debug("Criando subprocesso de revisão para unidade: {}", unidade.getCodigo());
         // Buscar mapa vigente da unidade
         sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                .orElseThrow(() -> new ErroProcesso(
-                        "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla())));
+                .orElseThrow(() -> {
+                    log.error("ERRO CRITICO: Unidade {} nao possui mapa vigente, mas passou pela validacao.", unidade.getCodigo());
+                    return new ErroProcesso(
+                        "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
+                });
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Mapa mapaCopiado =
@@ -551,24 +527,11 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaDiagnostico(Processo processo, Unidade unidade) {
-        // Buscar mapa vigente da unidade
         sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
                 .orElseThrow(() -> new ErroProcesso(
                         "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla())));
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
-        // Para diagnostico, não precisamos copiar o mapa para EDIÇÃO (revisão),
-        // mas o subprocesso precisa apontar para QUAL mapa está sendo diagnosticado.
-        // O modelo Subprocesso tem relacionamento com Mapa.
-        // Se apontarmos para o mapa vigente DIRETO, não podemos alterá-lo.
-        // O diagnóstico preenche notas (Autoavaliação). As notas ficam em Subprocesso?
-        // Não, as notas ficam em entidades associadas a Avaliação/Diagnóstico?
-        // Vamos checar o modelo de dados?
-        // Por hora, vou seguir o padrão de COPIAR o mapa para garantir isolamento,
-        // assim como na Revisão, pois o diagnóstico pode "congelar" o estado das competências?
-        // Ou o diagnóstico é sobre o mapa vigente?
-        // Se eu olhar o código de criarSubprocessoParaRevisao, ele usa servicoDeCopiaDeMapa.
-        // Vou assumir que diagnóstico também trabalha sobre uma cópia (snapshot) do mapa vigente.
         Mapa mapaCopiado =
                 servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
 
@@ -580,35 +543,8 @@ public class ProcessoService {
                         .situacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build();
-        // Diagnóstico começa como NAO_INICIADO
-        // Mas a UI do teste espera "Realizar Autoavaliação".
-        // Se estiver NAO_INICIADO, o Chefe vê o botão "Iniciar"?
-        // No teste, o Admin inicia o processo geral.
-        // Ao criar os subprocessos, eles podem já nascer em estado "AUTOAVALIACAO_EM_ANDAMENTO"?
-        // Ou o Chefe tem que clicar em iniciar?
-        // No teste passo 3: "await page.getByText(descProcessoDiagnostico).click(); ... Navega para Autoavaliação -> click card-subprocesso-diagnostico"
-        // Parece que o subprocesso já deve estar disponível.
-        // Se o processo pai está EM_ANDAMENTO, o subprocesso deve estar ativo.
-
-        // Vamos checar SituacaoSubprocesso para Diagnostico.
-        // Existe SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO?
-        // Se eu usar NAO_INICIADO, o frontend pode não mostrar.
-        // Vou setar DIAGNOSTICO_EM_ANDAMENTO se existir, ou deixar NAO_INICIADO se houver transição automática.
-        // Mas o mapa de revisão começa NAO_INICIADO.
-        // Vou usar NAO_INICIADO e verificar se precisa de transição.
 
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-
-        // E automaticamente iniciar o diagnóstico?
-        // Para Mapeamento e Revisão, fica NAO_INICIADO até alguém abrir.
-        // Mas se o Processo já está iniciado...
-        // O código de 'iniciarProcessoMapeamento' seta situacao NAO_INICIADO.
-
-        // AJUSTE: O teste espera ver "Mapeamento Setup ... - Finalizado".
-        // O novo processo é "Diagnostico Teste ... - Em andamento".
-        // Se o subprocesso estiver NAO_INICIADO, o card pode aparecer diferente.
-
-        // Vamos ver SituacaoSubprocesso disponíveis.
 
         movimentacaoRepo.save(
                 new Movimentacao(
@@ -677,7 +613,6 @@ public class ProcessoService {
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            // Atualizar mapa vigente via UnidadeMapa
             sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
                     .orElse(new sgc.unidade.model.UnidadeMapa());
             unidadeMapa.setUnidadeCodigo(unidade.getCodigo());

@@ -1,0 +1,31 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.integracao.CDU14IntegrationTest.debugUnidadeMapa
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Debug: Verificar existência do Mapa FAILED
+    java.lang.AssertionError:
+    Expecting Optional to contain a value but it was empty.
+        at sgc.integracao.CDU14IntegrationTest.debugUnidadeMapa(CDU14IntegrationTest.java:172)
+
+1 test completed, 1 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 25s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry stored.
