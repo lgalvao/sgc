@@ -3,7 +3,9 @@ package sgc.painel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
@@ -53,19 +55,34 @@ public class PainelService {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
+        // Garante ordenação padrão por data de criação decrescente se nenhuma for fornecida
+        // Isso resolve o problema onde processos recém-criados ("Rev 10") ficavam escondidos
+        // dependendo da ordem aleatória do banco ou paginação.
+        Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
+
         Page<Processo> processos;
         if (perfil == Perfil.ADMIN) {
-            processos = processoRepo.findAll(pageable);
+            processos = processoRepo.findAll(sortedPageable);
         } else {
-            if (codigoUnidade == null) return Page.empty(pageable);
+            if (codigoUnidade == null) return Page.empty(sortedPageable);
 
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
             processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
-                    unidadeIds, SituacaoProcesso.CRIADO, pageable);
+                    unidadeIds, SituacaoProcesso.CRIADO, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
+    }
+
+    private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            return PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "dataCriacao"));
+        }
+        return pageable;
     }
 
     /**
@@ -80,16 +97,25 @@ public class PainelService {
      * @return Uma página {@link Page} de {@link AlertaDto}.
      */
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
+        // Aplica ordenação padrão por dataHora decrescente para alertas também
+        Pageable sortedPageable = pageable;
+        if (pageable.getSort().isUnsorted()) {
+            sortedPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "dataHora"));
+        }
+
         Page<Alerta> alertasPage;
     
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-            alertasPage = alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable);
+            alertasPage = alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, sortedPageable);
         } else if (codigoUnidade != null) {
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
-            alertasPage = alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, pageable);
+            alertasPage = alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, sortedPageable);
         } else {
-            alertasPage = alertaRepo.findAll(pageable);
+            alertasPage = alertaRepo.findAll(sortedPageable);
         }
 
         return alertasPage.map(
@@ -215,12 +241,5 @@ public class PainelService {
                 .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
                 .dataHoraLeitura(dataHoraLeitura)
                 .build();
-    }
-
-    private String calcularLinkDestinoAlerta(Alerta alerta) {
-        if (alerta.getProcesso() != null && alerta.getUnidadeDestino() != null) {
-            return String.format("/processo/%s/%s", alerta.getProcesso().getCodigo(), alerta.getUnidadeDestino().getSigla());
-        }
-        return null;
     }
 }
