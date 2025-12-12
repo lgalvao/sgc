@@ -17,7 +17,7 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:db/schema.sql
+      schema-locations: file:src/test/resources/db/schema.sql
       data-locations: file:../e2e/setup/seed.sql
 
 management:
