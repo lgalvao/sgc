@@ -2,6 +2,16 @@
 
 Este diretório contém as capturas de tela automatizadas do sistema SGC para análise e refinamento de UI.
 
+## 🚀 Quick Start
+
+```bash
+# 1. Capturar todas as telas
+./scripts/capturar-telas.sh
+
+# 2. Visualizar as capturas
+./scripts/visualizar-telas.sh
+```
+
 ## Objetivo
 
 O objetivo desta suite de testes **NÃO é** fazer testes de regressão visual, mas sim:
@@ -154,6 +164,23 @@ Após a execução:
 3. Compare visualmente as diferentes telas e estados
 4. Identifique inconsistências, problemas de layout ou melhorias necessárias
 5. Anote os itens para refinamento
+
+### Visualizador Web (Recomendado)
+
+Para uma experiência melhor de análise, use o visualizador HTML interativo:
+
+```bash
+# Inicia servidor HTTP e abre o visualizador no navegador
+./scripts/visualizar-telas.sh
+```
+
+O visualizador oferece:
+- 🖼️ Galeria organizada de todas as screenshots
+- 🔍 Filtros por categoria
+- 🔎 Busca por nome/descrição
+- 📊 Estatísticas de capturas
+- 🔭 Zoom para visualização ampliada
+- 📱 Interface responsiva
 
 ## Manutenção
 
