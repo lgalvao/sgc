@@ -23,6 +23,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -77,14 +78,15 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     private org.springframework.security.core.Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
         Usuario principal =
                 new Usuario(TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123", unidade);
-        principal
-                .getAtribuicoes()
-                .add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(principal)
-                                .unidade(unidade)
-                                .perfil(perfil)
-                                .build());
+
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        atribuicoes.add(
+                UsuarioPerfil.builder()
+                        .usuario(principal)
+                        .unidade(unidade)
+                        .perfil(perfil)
+                        .build());
+        principal.setAtribuicoes(atribuicoes);
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(

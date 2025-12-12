@@ -1,0 +1,106 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar histórico de análise corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarHistoricoDeAnalise(CDU14IntegrationTest.java:381)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar impactos no mapa corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarImpactosNoMapa(CDU14IntegrationTest.java:409)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:320)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:320)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > Não pode homologar em estado inválido FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.naoPodeHomologarEmEstadoInvalido(CDU14IntegrationTest.java:465)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > CHEFE não pode homologar revisão FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.chefeNaoPodeHomologar(CDU14IntegrationTest.java:439)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$Aceite.gestorAceitaRevisao(CDU14IntegrationTest.java:288)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:231)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:181)
+        at sgc.integracao.CDU14IntegrationTest$Devolucao.gestorDevolveRevisao(CDU14IntegrationTest.java:254)
+
+9 tests completed, 8 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 43s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry reused.

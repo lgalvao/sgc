@@ -14,28 +14,33 @@ Este documento resume os problemas encontrados durante a execução dos testes d
 **Causa:** O método `isCurrentUserChefeOuCoordenador` acessava `attr.getUnidade().getCodigo().equals(...)`. Em testes com `@WithMockAdmin`, a unidade mockada não possui ID (`codigo` é null), causando NPE.
 **Correção:** Alterado para usar `java.util.Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo())`.
 
-## Problemas Pendentes
+### 3. `CDU06IntegrationTest` (Resolvido)
+**Erro Original:** HTTP 403 Forbidden.
+**Causa:** O método `setupSecurityContext` no teste não inicializava corretamente as atribuições de perfil (`UsuarioPerfil`) no objeto `Usuario`. Como resultado, `getAuthorities()` retornava uma lista vazia ou incorreta, falhando as verificações de segurança baseadas em role (`hasRole`).
+**Correção:** Atualizado o método `setupSecurityContext` em `CDU06IntegrationTest.java` para criar explicitamente um `Set<UsuarioPerfil>`, populá-lo com a unidade e perfil corretos, e atribuí-lo ao usuário mock via `setAtribuicoes`.
 
-Os testes abaixo continuam falhando e requerem investigação aprofundada da lógica de negócio ou configuração de segurança.
+## Problemas Pendentes e Bloqueantes
 
-### 1. `CDU06IntegrationTest` (3 falhas)
-**Erro:** HTTP 403 Forbidden (esperado 200 OK).
-**Testes Afetados:**
-- `testPodeHomologarCadastro_true`
-- `testPodeHomologarMapa_true`
-- `testPodeFinalizar_false_semAdmin`
-**Análise:** O método `ProcessoService.checarAcesso` retorna `false` mesmo quando o usuário (configurado via `setupSecurityContext`) deveria ter permissão. A configuração de segurança com `MockMvc` foi atualizada para usar `.with(authentication(auth))`, mas a validação interna do serviço ainda falha, possivelmente devido a inconsistências no mock de `SgrhService` ou na propagação do contexto de segurança para o bean proxied.
+### 1. `CDU14IntegrationTest` (8 falhas)
+Este teste de integração enfrenta múltiplos problemas estruturais relacionados à configuração dos dados de teste e mapeamento de entidades.
 
-### 2. `CDU14IntegrationTest` (7 falhas)
-**Erro:** HTTP 409 Conflict (esperado 200 OK).
-**Análise:** Indica que a operação está sendo tentada em um estado inválido do processo/subprocesso. Provavelmente relacionado à máquina de estados ou validações de transição que não estão satisfeitas pelos dados de teste.
+**Erro A: 409 Conflict - "Unidade SUB-UNIT não possui mapa vigente"**
+*   **Causa:** O serviço `ProcessoService` falha ao recuperar o `UnidadeMapa` (mapa vigente) da unidade 102 (`SUB-UNIT`).
+*   **Análise Técnica:** Embora o registro exista na tabela `UNIDADE_MAPA`, a entidade JPA `UnidadeMapa` tem um relacionamento `@ManyToOne` com `Mapa` (`mapaVigente`). A entidade `Mapa`, por sua vez, possui um relacionamento obrigatório (`optional = false`) com `Subprocesso`.
+*   **Raiz do Problema:** O script de dados de teste (`data.sql`) insere mapas (ex: ID 1004) sem associá-los a um subprocesso (coluna `subprocesso_codigo` é NULL). Quando o Hibernate tenta buscar o `UnidadeMapa`, ele executa um `INNER JOIN` com a tabela `SUBPROCESSO` devido à restrição de não-nulidade na entidade `Mapa`. Como o subprocesso não existe, o join falha e a consulta retorna vazio, levando o serviço a lançar `ErroProcesso` (409).
+*   **Solução Necessária:** Atualizar `data.sql` para garantir que todo `Mapa` de teste esteja associado a um `Subprocesso` válido, ou ajustar a entidade `Mapa` se a associação não for estritamente obrigatória em todos os cenários.
 
-### 3. `CDU12IntegrationTest` (4 falhas)
-**Erro:** Falha na asserção do JSON `$.temImpactos` (esperado `true`, recebido `false`).
-**Análise:** A lógica de detecção de impactos no mapa de competências não está identificando as alterações simuladas no teste.
+**Erro B: 403 Forbidden - "Usuário não é o titular da unidade"**
+*   **Causa:** O método `SubprocessoWorkflowService.validarSubprocessoParaDisponibilizacao` verifica se o usuário logado é o titular da unidade. A verificação falha com a mensagem "Titular é não definido".
+*   **Análise Técnica:** O teste tenta definir o titular da unidade no método `setUp` chamando `unidade.setTituloTitular(...)` e `unidadeRepo.saveAll(...)`. No entanto, a entidade `Unidade` está anotada com `@Immutable` (pois reflete uma VIEW de banco de dados).
+*   **Raiz do Problema:** O Hibernate ignora silenciosamente quaisquer atualizações (UPDATEs) em entidades `@Immutable`. Portanto, a alteração do titular no teste não é persistida no banco H2. Quando o serviço recarrega a unidade do banco, o campo `titulo_titular` permanece `NULL` (valor original do `data.sql`), causando a negação de acesso.
+*   **Solução Necessária:** Utilizar `JdbcTemplate` nos testes para realizar atualizações diretas via SQL, contornando a restrição do Hibernate para fins de configuração de cenário de teste.
 
-### 4. Outros
-- `CDU13IntegrationTest`: Falha de dados (null vs esperado).
-- `CDU15IntegrationTest`: Estrutura JSON incorreta ou dados não salvos.
-- `CDU20IntegrationTest`: Retorno nulo inesperado.
-- `ProcessoServiceTest`: Falha em teste unitário de lógica de acesso.
+### 2. `CDU12IntegrationTest` (4 falhas)
+**Erro:** Falha na asserção `$.temImpactos` (esperado `true`, recebido `false`).
+**Análise:** A lógica de detecção de impactos (`ImpactoMapaService`) não está identificando as alterações simuladas (ex: remoção de atividade). Isso pode ser causado por transações de teste que isolam as alterações de dados da lógica de verificação, ou por dados de teste que não satisfazem as condições complexas de comparação de mapas (versão anterior vs atual).
+
+### 3. Outros Testes com Falhas
+*   `CDU13IntegrationTest`: Falha de dados (null vs esperado).
+*   `CDU15IntegrationTest`: Estrutura JSON incorreta.
+*   `CDU20IntegrationTest`: Retorno nulo inesperado.
