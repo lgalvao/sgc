@@ -80,7 +80,8 @@ public class PainelService {
             return PageRequest.of(
                     pageable.getPageNumber(),
                     pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "dataCriacao"));
+                    Sort.by(Sort.Direction.DESC, "dataCriacao")
+                            .and(Sort.by(Sort.Direction.DESC, "codigo")));
         }
         return pageable;
     }
