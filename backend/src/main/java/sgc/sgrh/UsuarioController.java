@@ -9,6 +9,7 @@ import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
+import sgc.comum.util.TokenSimuladoUtil;
 import sgc.sgrh.service.UsuarioService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -96,7 +97,8 @@ public class UsuarioController {
             String jsonClaims = objectMapper.writeValueAsString(claims);
             String encodedClaims =
                     Base64.getEncoder().encodeToString(jsonClaims.getBytes(StandardCharsets.UTF_8));
-            response.setToken(encodedClaims);
+            String assinatura = TokenSimuladoUtil.assinar(encodedClaims);
+            response.setToken(encodedClaims + "." + assinatura);
         } catch (Exception e) {
             // Logar o erro ou lançar uma exceção apropriada
             log.error("Erro ao gerar token simulado", e);

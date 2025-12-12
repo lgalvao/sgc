@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sgc.comum.util.TokenSimuladoUtil;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -37,8 +38,13 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
+                String[] parts = token.split("\\.");
+                if (parts.length != 2 || !TokenSimuladoUtil.validar(parts[0], parts[1])) {
+                    throw new IllegalArgumentException("Token inválido ou assinatura incorreta");
+                }
+
                 // O token é apenas um Base64 de um JSON simulado
-                String json = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+                String json = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
                 JsonNode node = objectMapper.readTree(json);
 
                 if (node.has("tituloEleitoral")) {
