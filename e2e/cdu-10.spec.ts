@@ -427,19 +427,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        // Aguardar que o processo de revisão apareça na tabela de alertas
+        // Verificar que o processo de revisão está visível no painel (deveria estar na tabela de processos)
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         
-        // Clicar no alerta que contém o processo de revisão para ir para a página do processo
-        await page.locator('table').nth(1).locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
-
-        // Aguardar redirecionamento para a página de detalhes do processo
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
-        
-        // DEBUG: Verificar URL e processo exibido
-        console.log(`[DEBUG] URL após clique: ${page.url()}`);
-        const tituloProcesso = await page.getByRole('heading', {level: 2}).textContent();
-        console.log(`[DEBUG] Título do processo exibido: "${tituloProcesso}"`);
+        // Clicar no processo de revisão na tabela de processos
+        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).first().click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();

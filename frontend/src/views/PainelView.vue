@@ -123,9 +123,7 @@ async function abrirDetalhesAlerta(alerta: Alerta) {
   if (!alerta.dataHoraLeitura) {
     await alertasStore.marcarAlertaComoLido(alerta.codigo);
   }
-  if (alerta.linkDestino) {
-    await router.push(alerta.linkDestino);
-  }
+  // Alertas não têm link de navegação
 }
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)

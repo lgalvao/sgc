@@ -206,7 +206,6 @@ public class PainelService {
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
-        String linkDestino = calcularLinkDestinoAlerta(alerta);
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
                 .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
@@ -215,7 +214,6 @@ public class PainelService {
                 .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
                 .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
                 .dataHoraLeitura(dataHoraLeitura)
-                .linkDestino(linkDestino)
                 .build();
     }
 

@@ -48,7 +48,6 @@ describe("mappers/alertas", () => {
         expect(mapped.dataHora).toBe("2025-10-18T10:00:00");
         expect(mapped.unidadeOrigem).toBe("UO");
         expect(mapped.unidadeDestino).toBe("UD");
-        expect(mapped.linkDestino).toBe("/test");
         expect(mapped.mensagem).toBe("Test Message");
         expect(mapped.dataHoraFormatada).toBe("18/10/2025 10:00");
         expect(mapped.origem).toBe("UO");

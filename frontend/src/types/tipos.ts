@@ -174,7 +174,6 @@ export interface Alerta {
     descricao: string;
     dataHora: string;
     dataHoraLeitura: string | null;
-    linkDestino: string;
     mensagem: string;
     dataHoraFormatada: string;
     origem: string;

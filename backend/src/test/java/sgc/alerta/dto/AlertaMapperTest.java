@@ -27,9 +27,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AlertaMapperTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @InjectMocks
     private AlertaMapperImpl mapper;
 
@@ -60,54 +60,6 @@ class AlertaMapperTest {
         assertThat(mapper.extractProcessoName(desc)).isEqualTo("");
     }
 
-    @Test
-    @DisplayName("buildLinkDestino returns correct link")
-    void buildLinkDestino() {
-        Alerta alerta = new Alerta();
-        Processo p = new Processo();
-        p.setCodigo(1L);
-        alerta.setProcesso(p);
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        alerta.setUnidadeDestino(u);
-
-        Usuario user = new Usuario();
-        Unidade uUser = new Unidade();
-        uUser.setCodigo(10L);
-        user.setUnidadeLotacao(uUser);
-
-        Set<sgc.sgrh.model.UsuarioPerfil> attrs = new HashSet<>();
-        attrs.add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(user)
-                                .unidade(uUser)
-                                .perfil(sgc.sgrh.model.Perfil.SERVIDOR)
-                                .build());
-        user.setAtribuicoes(attrs);
-
-        Authentication auth = mock(Authentication.class);
-        SecurityContext sc = mock(SecurityContext.class);
-        when(sc.getAuthentication()).thenReturn(auth);
-        when(auth.getPrincipal()).thenReturn(user);
-        SecurityContextHolder.setContext(sc);
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(50L);
-        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 10L))
-                .thenReturn(Optional.of(sp));
-
-        String link = mapper.buildLinkDestino(alerta);
-        assertThat(link).isEqualTo("/subprocessos/50");
-    }
-
-    @Test
-    @DisplayName("buildLinkDestino returns null if missing info")
-    void buildLinkDestinoMissingInfo() {
-        Alerta alerta = new Alerta();
-        assertThat(mapper.buildLinkDestino(alerta)).isNull();
-    }
-
-    // Subclass to test protected methods and inject mocks
     static class AlertaMapperImpl extends AlertaMapper {
         @Override
         public AlertaDto toDto(Alerta alerta) {

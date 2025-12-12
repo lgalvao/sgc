@@ -16,7 +16,6 @@ const mockAlertas: Alerta[] = [
         codProcesso: 101,
         unidadeOrigem: "DTI",
         unidadeDestino: "DEST",
-        linkDestino: "/link",
         descricao: "Desc"
     },
     {
@@ -30,7 +29,6 @@ const mockAlertas: Alerta[] = [
         codProcesso: 102,
         unidadeOrigem: "DTI",
         unidadeDestino: "DEST",
-        linkDestino: "/link",
         descricao: "Desc"
     },
 ];

@@ -26,36 +26,12 @@ public abstract class AlertaMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
-    @Mapping(source = "alerta", target = "linkDestino", qualifiedByName = "buildLinkDestino")
     @Mapping(source = "descricao", target = "mensagem")
     @Mapping(source = "dataHora", target = "dataHoraFormatada", qualifiedByName = "formatDataHora")
     @Mapping(source = "descricao", target = "processo", qualifiedByName = "extractProcessoName")
     @Mapping(source = "unidadeOrigem.sigla", target = "origem")
     @Mapping(target = "dataHoraLeitura", ignore = true)
     public abstract AlertaDto toDto(Alerta alerta);
-
-    @Named("buildLinkDestino")
-    protected String buildLinkDestino(Alerta alerta) {
-        if (alerta.getProcesso() == null || alerta.getUnidadeDestino() == null) {
-            return null;
-        }
-
-        Usuario usuario =
-                (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // Try to find a subprocess for any of the user's units
-        return usuario.getTodasAtribuicoes().stream()
-                .map(
-                        attr ->
-                                subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(
-                                        alerta.getProcesso().getCodigo(),
-                                        attr.getUnidade().getCodigo()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst()
-                .map(sp -> String.format("/subprocessos/%d", sp.getCodigo()))
-                .orElse(null);
-    }
 
     @Named("formatDataHora")
     protected String formatDataHora(LocalDateTime dataHora) {

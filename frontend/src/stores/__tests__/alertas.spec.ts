@@ -29,7 +29,6 @@ describe("useAlertasStore", () => {
         descricao: "Alerta Teste",
         dataHora: "2025-01-01T10:00:00",
         dataHoraLeitura: null,
-        linkDestino: "/destino",
         mensagem: "Mensagem Teste",
         dataHoraFormatada: "01/01/2025 10:00",
         origem: "Origem",
