@@ -396,16 +396,13 @@ public class ProcessoService {
         if (codsUnidades == null || codsUnidades.isEmpty()) {
             return Optional.empty();
         }
-        List<Long> unidadesBloqueadas = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
-                        .flatMap(p -> p.getParticipantes().stream())
-                        .map(Unidade::getCodigo)
-                        .filter(codsUnidades::contains)
-                        .distinct()
-                        .toList();
+        List<Long> unidadesBloqueadas = processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
+                SituacaoProcesso.EM_ANDAMENTO, codsUnidades);
 
         if (!unidadesBloqueadas.isEmpty()) {
             List<String> siglasUnidadesBloqueadas = unidadeRepo.findSiglasByCodigos(unidadesBloqueadas);
-            return Optional.of("As seguintes unidades já participam de outro processo ativo: %s".formatted(String.join(", ", siglasUnidadesBloqueadas)));
+            return Optional.of("As seguintes unidades já participam de outro processo ativo: %s"
+                    .formatted(String.join(", ", siglasUnidadesBloqueadas)));
         }
         return Optional.empty();
     }
@@ -423,7 +420,8 @@ public class ProcessoService {
 
         if (!unidadesSemMapa.isEmpty()) {
             List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
-            return Optional.of("As seguintes unidades não possuem mapa vigente e não podem participar" + " de um processo de revisão: %s".formatted(String.join(", ", siglasUnidadesSemMapa)));
+            return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
+                    + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }
         return Optional.empty();
     }
@@ -579,12 +577,7 @@ public class ProcessoService {
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
         TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
 
-        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
-                .filter(p -> p.getTipo() == tipoProcesso)
-                .flatMap(p -> p.getParticipantes().stream())
-                .map(Unidade::getCodigo)
-                .distinct()
-                .toList();
+        return processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, tipoProcesso);
     }
 
     @Transactional(readOnly = true)
