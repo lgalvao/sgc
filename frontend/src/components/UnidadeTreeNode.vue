@@ -2,14 +2,20 @@
   <div>
     <div class="unidade-node">
       <!-- Expansor ANTES do checkbox -->
-      <span
+      <button
           v-if="unidade.filhas && unidade.filhas.length > 0"
+          type="button"
           :data-testid="`btn-arvore-expand-${unidade.sigla}`"
           class="expansor"
+          :aria-expanded="isExpanded(unidade)"
+          :aria-label="isExpanded(unidade) ? `Recolher ${unidade.sigla}` : `Expandir ${unidade.sigla}`"
           @click="onToggleExpand(unidade)"
       >
-        {{ isExpanded(unidade) ? '▼' : '▶' }}
-      </span>
+        <i
+          :class="isExpanded(unidade) ? 'bi bi-caret-down-fill' : 'bi bi-caret-right-fill'"
+          aria-hidden="true"
+        />
+      </button>
       <span v-else class="expansor-placeholder"></span>
 
       <!-- Checkbox com label -->
@@ -86,17 +92,28 @@ const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggle
 
 .expansor {
   cursor: pointer;
-  user-select: none;
   width: 1rem;
-  text-align: center;
   font-size: 0.75rem;
   color: #6c757d;
   transition: color 0.2s;
+
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
 .expansor:hover {
   color: #495057;
+}
+
+.expansor:focus-visible {
+  outline: 2px solid #0d6efd;
+  border-radius: 2px;
 }
 
 .expansor-placeholder {
