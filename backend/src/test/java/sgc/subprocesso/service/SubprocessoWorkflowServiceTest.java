@@ -66,7 +66,9 @@ class SubprocessoWorkflowServiceTest {
     void disponibilizarCadastro() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = new Unidade();
+        u.setTituloTitular("123");
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
@@ -111,7 +113,9 @@ class SubprocessoWorkflowServiceTest {
     void disponibilizarCadastroValidacao() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = new Unidade();
+        u.setTituloTitular("123");
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
@@ -131,7 +135,9 @@ class SubprocessoWorkflowServiceTest {
     void disponibilizarRevisao() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = new Unidade();
+        u.setTituloTitular("123");
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
@@ -610,7 +616,9 @@ class SubprocessoWorkflowServiceTest {
     void disponibilizarCadastro_deveRejeitarQuandoListaVazia() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = new Unidade();
+        u.setTituloTitular("123");
         Mapa mapa = new Mapa(); 
         mapa.setCodigo(10L);
 
@@ -639,7 +647,9 @@ class SubprocessoWorkflowServiceTest {
     void disponibilizarRevisao_deveRejeitarQuandoListaVazia() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = new Unidade();
+        u.setTituloTitular("123");
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
 
