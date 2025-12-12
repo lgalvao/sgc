@@ -1,0 +1,406 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+> Task :backend:test
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarCadastro_true(CDU06IntegrationTest.java:192)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarMapa_true(CDU06IntegrationTest.java:212)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como false para não Admin FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeFinalizar_false_semAdmin(CDU06IntegrationTest.java:170)
+
+AtividadeServiceReproductionTest > REPRODUÇÃO: criar falha com NPE se processo do subprocesso for nulo durante atualização de situação FAILED
+    java.lang.AssertionError:
+    Expecting actual throwable to be an instance of:
+      sgc.comum.erros.ErroEntidadeNaoEncontrada
+    but was:
+      sgc.comum.erros.ErroAccessoNegado: Usuário não autorizado a criar atividades para este subprocesso.
+	at sgc.atividade.AtividadeService.criar(AtividadeService.java:112)
+	at sgc.atividade.AtividadeServiceReproductionTest.lambda$criarComProcessoNulo$1(AtividadeServiceReproductionTest.java:85)
+	at org.assertj.core.api.ThrowableAssert.catchThrowable(ThrowableAssert.java:63)
+	...(95 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)
+        at sgc.atividade.AtividadeServiceReproductionTest.criarComProcessoNulo(AtividadeServiceReproductionTest.java:86)
+
+E2eFixtureEndpointTest > deveGerarDescricaoAutomaticaQuandoNaoFornecida() FAILED
+    java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@7d595a65 testClass = sgc.e2e.E2eFixtureEndpointTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["e2e"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@765bf8a6, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@3e6c5486, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizerFactory$Customizer@6af737df, [ImportsContextCustomizer@498e1742 key = [org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@460c6af8, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3d88403e, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@5880c1c2], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.lambda$loadContext$0(DefaultCacheAwareContextLoaderDelegate.java:195)
+        at org.springframework.test.context.cache.DefaultContextCache.put(DefaultContextCache.java:172)
+        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:160)
+        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
+        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:203)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at java.base/java.util.Optional.orElseGet(Optional.java:364)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+        Caused by:
+        org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'e2eController' defined in file [/app/backend/build/classes/java/main/sgc/e2e/E2eController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jdbcTemplate' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/JdbcTemplateConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of JdbcTemplate bean 'jdbcTemplate': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/DataSourceInitializationAutoConfiguration.class]: Failed to execute SQL script statement #1 of URL [file:../e2e/setup/seed.sql]: INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL)
+            at app//org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804)
+            at app//org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1382)
+            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1221)
+            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565)
+            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
+            at app//org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
+            at app//org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
+            at app//org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
+            at app//org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)
+            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1218)
+            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1184)
+            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121)
+            at app//org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:983)
+            at app//org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:620)
+            at app//org.springframework.boot.SpringApplication.refresh(SpringApplication.java:765)
+            at app//org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:454)
+            at app//org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
+            at app//org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$2(SpringBootContextLoader.java:148)
+            at app//org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+            at app//org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+            at app//org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1474)
+            at app//org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:573)
+            at app//org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:148)
+            at app//org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:114)
+            at app//org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:247)
+            at app//org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.lambda$loadContext$0(DefaultCacheAwareContextLoaderDelegate.java:167)
+            ... 21 more
+
+            Caused by:
+            org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jdbcTemplate' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/JdbcTemplateConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of JdbcTemplate bean 'jdbcTemplate': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/DataSourceInitializationAutoConfiguration.class]: Failed to execute SQL script statement #1 of URL [file:../e2e/setup/seed.sql]: INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL)
+                at app//org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:322)
+                at app//org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
+                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:1225)
+                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1704)
+                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651)
+                at app//org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912)
+                at app//org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+                ... 47 more
+
+                Caused by:
+                org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/DataSourceInitializationAutoConfiguration.class]: Failed to execute SQL script statement #1 of URL [file:../e2e/setup/seed.sql]: INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL)
+                    at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1817)
+                    at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
+                    at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
+                    at app//org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
+                    at app//org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
+                    at app//org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
+                    at app//org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)
+                    at app//org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:309)
+                    ... 53 more
+
+                    Caused by:
+                    org.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script statement #1 of URL [file:../e2e/setup/seed.sql]: INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL)
+                        at app//org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:293)
+                        at app//org.springframework.jdbc.datasource.init.ResourceDatabasePopulator.populate(ResourceDatabasePopulator.java:254)
+                        at app//org.springframework.jdbc.datasource.init.DatabasePopulatorUtils.execute(DatabasePopulatorUtils.java:54)
+                        at app//org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer.runScripts(DataSourceScriptDatabaseInitializer.java:87)
+                        at app//org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.runScripts(AbstractScriptDatabaseInitializer.java:159)
+                        at app//org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applyScripts(AbstractScriptDatabaseInitializer.java:120)
+                        at app//org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applyDataScripts(AbstractScriptDatabaseInitializer.java:113)
+                        at app//org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.initializeDatabase(AbstractScriptDatabaseInitializer.java:88)
+                        at app//org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.afterPropertiesSet(AbstractScriptDatabaseInitializer.java:77)
+                        at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
+                        at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
+                        ... 60 more
+
+                        Caused by:
+                        org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "UNIDADE" not found; SQL statement:
+                        INSERT INTO sgc.unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo) VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL) [42102-240]
+                            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+                            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+                            at app//org.h2.message.DbException.get(DbException.java:223)
+                            at app//org.h2.message.DbException.get(DbException.java:199)
+                            at app//org.h2.command.Parser.getTableOrViewNotFoundDbException(Parser.java:8049)
+                            at app//org.h2.command.Parser.getTableOrViewNotFoundDbException(Parser.java:8030)
+                            at app//org.h2.command.Parser.getTableOrViewNotFoundDbException(Parser.java:8014)
+                            at app//org.h2.command.Parser.readTableOrView(Parser.java:7999)
+                            at app//org.h2.command.Parser.readTableOrView(Parser.java:7961)
+                            at app//org.h2.command.Parser.parseInsert(Parser.java:1524)
+                            at app//org.h2.command.Parser.parsePrepared(Parser.java:701)
+                            at app//org.h2.command.Parser.parse(Parser.java:584)
+                            at app//org.h2.command.Parser.parse(Parser.java:559)
+                            at app//org.h2.command.Parser.prepareCommand(Parser.java:487)
+                            at app//org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:647)
+                            at app//org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:563)
+                            at app//org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1160)
+                            at app//org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:245)
+                            at app//org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231)
+                            at app//com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+                            at app//com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+                            at app//org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:261)
+                            ... 70 more
+
+E2eFixtureEndpointTest > devePermitirCriarProcessoMapeamentoViaFixture() FAILED
+    java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@7d595a65 testClass = sgc.e2e.E2eFixtureEndpointTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["e2e"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@765bf8a6, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@3e6c5486, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizerFactory$Customizer@6af737df, [ImportsContextCustomizer@498e1742 key = [org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@460c6af8, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3d88403e, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@5880c1c2], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:157)
+        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
+        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:203)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at java.base/java.util.Optional.orElseGet(Optional.java:364)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+E2eFixtureEndpointTest > devePermitirCriarEIniciarProcessoMapeamentoViaFixture() FAILED
+    java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@7d595a65 testClass = sgc.e2e.E2eFixtureEndpointTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["e2e"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@765bf8a6, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@3e6c5486, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizerFactory$Customizer@6af737df, [ImportsContextCustomizer@498e1742 key = [org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@460c6af8, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3d88403e, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@5880c1c2], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:157)
+        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
+        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:203)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at java.base/java.util.Optional.orElseGet(Optional.java:364)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+E2eFixtureEndpointTest > deveRetornarErroQuandoUnidadeNaoExiste() FAILED
+    java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@7d595a65 testClass = sgc.e2e.E2eFixtureEndpointTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["e2e"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@765bf8a6, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@3e6c5486, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizerFactory$Customizer@6af737df, [ImportsContextCustomizer@498e1742 key = [org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@460c6af8, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3d88403e, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@5880c1c2], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:157)
+        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
+        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:203)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at java.base/java.util.Optional.orElseGet(Optional.java:364)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades alteradas como uma remoção e uma inserção FAILED
+    java.lang.AssertionError: JSON path "$.temImpactos"
+    Expected: is <true>
+         but: was <false>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:87)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesAlteradas(CDU12IntegrationTest.java:203)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades inseridas FAILED
+    java.lang.AssertionError: JSON path "$.temImpactos"
+    Expected: is <true>
+         but: was <false>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:87)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesInseridas(CDU12IntegrationTest.java:159)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve identificar competências impactadas por remoções e alterações FAILED
+    java.lang.AssertionError: JSON path "$.temImpactos"
+    Expected: is <true>
+         but: was <false>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:87)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveIdentificarCompetenciasImpactadas(CDU12IntegrationTest.java:228)
+
+CDU-12: Verificar impactos no mapa de competências > Cenários de Sucesso > Deve detectar atividades removidas e as competências relacionadas FAILED
+    java.lang.AssertionError: JSON path "$.temImpactos"
+    Expected: is <true>
+         but: was <false>
+        at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:107)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$0(JsonPathResultMatchers.java:87)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Sucesso.deveDetectarAtividadesRemovidas(CDU12IntegrationTest.java:177)
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Fluxo de Histórico de Análise > Deve retornar o histórico de devoluções e aceites ordenado FAILED
+    org.opentest4j.AssertionFailedError:
+    expected: "COSIS"
+     but was: null
+        at app//sgc.integracao.CDU13IntegrationTest$Historico.getHistorico_deveRetornarAcoesOrdenadas(CDU13IntegrationTest.java:317)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar histórico de análise corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarHistoricoDeAnalise(CDU14IntegrationTest.java:362)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar impactos no mapa corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarImpactosNoMapa(CDU14IntegrationTest.java:390)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:301)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:301)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > Não pode homologar em estado inválido FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.naoPodeHomologarEmEstadoInvalido(CDU14IntegrationTest.java:446)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > CHEFE não pode homologar revisão FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.chefeNaoPodeHomologar(CDU14IntegrationTest.java:420)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$Aceite.gestorAceitaRevisao(CDU14IntegrationTest.java:269)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<409>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:212)
+        at sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:162)
+        at sgc.integracao.CDU14IntegrationTest$Devolucao.gestorDevolveRevisao(CDU14IntegrationTest.java:235)
+
+CDU-15: Manter Mapa de Competências > Deve editar, adicionar e remover competências de um mapa existente FAILED
+    java.lang.AssertionError: No matching value at JSON path "$.competencias[?(@.descricao == 'Competência Editada')].atividadesCodigos.length()"
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:40)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:151)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU15IntegrationTest.deveEditarAdicionarRemoverCompetencias(CDU15IntegrationTest.java:156)
+
+CDU-15: Manter Mapa de Competências > Testes de CRUD de Competência Individual > Deve atualizar uma competência existente FAILED
+    java.lang.AssertionError: No value at JSON path "$.competencias[0].atividadesCodigos.length()"
+        at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:350)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:148)
+        at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU15IntegrationTest$CrudCompetenciaTests.deveAtualizarCompetencia(CDU15IntegrationTest.java:279)
+
+        Caused by:
+        com.jayway.jsonpath.PathNotFoundException: Missing property in path $['competencias'][0]['atividadesCodigos']
+
+CDU-20: Analisar validação de mapa de competências > Devolução e aceite da validação do mapa com verificação do histórico FAILED
+    java.lang.AssertionError:
+    Expecting actual not to be null
+        at sgc.integracao.CDU20IntegrationTest.devolucaoEaceiteComVerificacaoHistorico(CDU20IntegrationTest.java:134)
+
+ProcessoServiceTest > Checar acesso retorna true se gestor da unidade participante FAILED
+    org.opentest4j.AssertionFailedError:
+    Expecting value to be true but was false
+        at app//sgc.processo.ProcessoServiceTest.checarAcessoParticipante(ProcessoServiceTest.java:532)
+
+582 tests completed, 25 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2m 19s
+5 actionable tasks: 4 executed, 1 up-to-date
+Configuration cache entry stored.

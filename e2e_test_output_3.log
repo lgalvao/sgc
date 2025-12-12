@@ -1,0 +1,13 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.e2e.E2eFixtureEndpointTest
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+> Task :backend:test
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 29s
+6 actionable tasks: 2 executed, 4 up-to-date
+Configuration cache entry stored.

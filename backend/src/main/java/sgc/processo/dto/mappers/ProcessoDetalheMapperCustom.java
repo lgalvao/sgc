@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
     @Autowired
@@ -74,9 +75,7 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                                 user.getTodasAtribuicoes().stream()
                                         .anyMatch(
                                                 attr ->
-                                                        attr.getUnidade()
-                                                                .getCodigo()
-                                                                .equals(unidade.getCodigo())));
+                                                        Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo())));
     }
 
     private boolean isCurrentUserAdmin() {
