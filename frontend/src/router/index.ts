@@ -14,8 +14,9 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-    history:
-        typeof window === "undefined" ? createMemoryHistory() : createWebHistory(),
+    history: import.meta.env.VITEST
+        ? createMemoryHistory()
+        : createWebHistory(),
     routes,
 });
 

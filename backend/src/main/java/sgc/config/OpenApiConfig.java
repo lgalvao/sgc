@@ -13,9 +13,9 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI(
-            @Value("${springdoc.info.title}") String title,
-            @Value("${springdoc.info.description}") String description,
-            @Value("${springdoc.info.version}") String version) {
+            @Value("${springdoc.info.title:SGC API}") String title,
+            @Value("${springdoc.info.description:Sistema de Gestão de Competências}") String description,
+            @Value("${springdoc.info.version:v1}") String version) {
         return new OpenAPI()
                 .info(new Info()
                         .title(title)

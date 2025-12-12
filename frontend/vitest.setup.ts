@@ -1,6 +1,7 @@
 import {config} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {vi} from "vitest";
+import {ref} from "vue";
 
 vi.mock("bootstrap", () => ({
     Tooltip: class Tooltip {
@@ -46,3 +47,17 @@ const localStorageMock = (function () {
 Object.defineProperty(window, "localStorage", {
     value: localStorageMock,
 });
+
+// Mock window.location
+const locationMock = {
+    href: "http://localhost/",
+    assign: vi.fn(),
+    replace: vi.fn(),
+    reload: vi.fn(),
+};
+
+Object.defineProperty(window, "location", {
+    value: locationMock,
+});
+
+

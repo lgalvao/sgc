@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, type MockInstance, vi,} from "vitest";
 import {ref} from "vue";
-import {createRouter, createWebHistory} from "vue-router";
+import {createRouter, createMemoryHistory} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
 import {initPinia} from "@/test-utils/helpers";
@@ -29,7 +29,7 @@ describe("MainNavbar.vue", () => {
     beforeEach(() => {
         vi.restoreAllMocks();
         initPinia();
-        router = createRouter({history: createWebHistory(), routes});
+        router = createRouter({history: createMemoryHistory(), routes});
         pushSpy = vi.spyOn(router, "push");
 
         vi.mocked(usePerfil).mockReturnValue({

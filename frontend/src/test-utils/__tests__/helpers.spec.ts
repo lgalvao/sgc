@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import {createRouter, createWebHistory} from "vue-router";
+import {createRouter, createMemoryHistory} from "vue-router";
 import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore,} from "../helpers";
 import {
     assertUnidadeOptions,
@@ -91,7 +91,7 @@ describe("test-utils/uiHelpers", () => {
 
     it("navigateAndAssertBreadcrumbs should work correctly", async () => {
         const routes = [{path: "/", component: TestComponent}];
-        const router = createRouter({history: createWebHistory(), routes});
+        const router = createRouter({history: createMemoryHistory(), routes}); // <-- This line
         const mountFn = async () =>
             mount(TestComponent, {global: {plugins: [router]}});
         await navigateAndAssertBreadcrumbs(router, mountFn, "/", ["Page"]);

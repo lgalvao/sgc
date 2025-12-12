@@ -3,6 +3,9 @@ package sgc.processo.dto.mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import lombok.extern.slf4j.Slf4j;
+import sgc.comum.util.FormatadorData;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
@@ -12,6 +15,7 @@ import sgc.unidade.model.Unidade;
 
 import java.util.*;
 
+@Slf4j
 public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
     @Autowired
     private ProcessoDetalheMapper delegate;
@@ -33,22 +37,15 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                         .podeFinalizar(isCurrentUserAdmin())
                         .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
                         .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
-                        // Campos formatados
-                        .dataCriacaoFormatada(
-                                sgc.comum.util.FormatadorData.formatarData(
-                                        processo.getDataCriacao()))
-                        .dataFinalizacaoFormatada(
-                                sgc.comum.util.FormatadorData.formatarData(
-                                        processo.getDataFinalizacao()))
-                        .dataLimiteFormatada(
-                                sgc.comum.util.FormatadorData.formatarData(
-                                        processo.getDataLimite()))
+                        .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
+                        .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
+                        .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
                         .situacaoLabel(processo.getSituacao().getLabel())
                         .tipoLabel(processo.getTipo().getLabel())
                         .build();
 
-        List<Subprocesso> subprocessos =
-                subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+
         // Montar a hierarquia de unidades participantes
         montarHierarquiaUnidades(dto, processo, subprocessos);
 
@@ -118,11 +115,11 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             }
         }
 
-        // Adiciona unidades raiz E unidades sem pai no mapa (participantes diretos sem
-        // hierarquia)
+        // Adiciona unidades raiz e unidades sem pai no mapa (participantes diretos sem  hierarquia)
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            if (unidadeDto.getCodUnidadeSuperior() == null
-                    || !mapaUnidades.containsKey(unidadeDto.getCodUnidadeSuperior())) {
+            Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
+
+            if (codUnidadeSuperior == null || !mapaUnidades.containsKey(codUnidadeSuperior)) {
                 dto.getUnidades().add(unidadeDto);
             }
         }
@@ -130,7 +127,9 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         // Ordena as unidades e seus filhos
         Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator =
                 Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
+
         dto.getUnidades().sort(comparator);
+
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             unidadeDto.getFilhos().sort(comparator);
         }

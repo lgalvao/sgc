@@ -20,7 +20,6 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-import jakarta.persistence.EntityManager;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
 @Import(TestSecurityConfig.class)
-public class CDU02IntegrationTest extends BaseIntegrationTest {
+class CDU02IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
@@ -45,9 +44,6 @@ public class CDU02IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private EntityManager entityManager;
-
     // Unidades
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha1;

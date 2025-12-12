@@ -1,22 +1,33 @@
 spring:
+  main:
+    banner-mode: off
+  security:
+    user:
+      password: password
   datasource:
     url: jdbc:h2:file:./target/testdb-${random.uuid};DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password:
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
   sql:
     init:
       mode: always
       schema-locations: classpath:db/schema.sql
       data-locations: classpath:data.sql
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 aplicacao:
   email:
@@ -25,13 +36,14 @@ aplicacao:
     assunto-prefixo: '[SGC-TEST]'
 logging:
   level:
-    org.hibernate: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.orm.jpa: INFO
-    org.springframework.jdbc: INFO
-    com.zaxxer.hikari: INFO
-    org.springframework.boot.autoconfigure.orm.jpa: INFO
-    org.springframework: INFO
-    org.hibernate.tool.schema.internal.SchemaDropperImpl: INFO
-    sgc: DEBUG
+    root: INFO
+    org.hibernate: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.springframework.orm.jpa: WARN
+    org.springframework.jdbc: WARN
+    com.zaxxer.hikari: WARN
+    org.springframework.boot.autoconfigure.orm.jpa: WARN
+    org.springframework: WARN
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: WARN
+    sgc: INFO

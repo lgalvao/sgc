@@ -287,19 +287,38 @@ const nomeUnidade = computed(() =>
     unidade.value?.nome ? `${unidade.value.nome}` : "",
 );
 const novaAtividade = ref("");
-const codSubrocesso = computed(
-    () =>
-        processosStore.processoDetalhe?.unidades.find(
-            (u) => u.sigla === unidadeId.value,
-        )?.codSubprocesso,
-);
 
-const codMapa = computed(
-    () =>
-        processosStore.processoDetalhe?.unidades.find(
-            (u) => u.sigla === unidadeId.value,
-        )?.mapaCodigo,
-);
+// Função helper para buscar unidade recursivamente na árvore
+function buscarUnidadeNaArvore(unidades: any[], sigla: string): any {
+    for (const unidade of unidades) {
+        if (unidade.sigla === sigla) {
+            return unidade;
+        }
+        if (unidade.filhos && unidade.filhos.length > 0) {
+            const encontrada = buscarUnidadeNaArvore(unidade.filhos, sigla);
+            if (encontrada) return encontrada;
+        }
+    }
+    return null;
+}
+
+const codSubrocesso = computed(() => {
+    if (!processosStore.processoDetalhe?.unidades) return undefined;
+    const unidadeEncontrada = buscarUnidadeNaArvore(
+        processosStore.processoDetalhe.unidades,
+        unidadeId.value
+    );
+    return unidadeEncontrada?.codSubprocesso;
+});
+
+const codMapa = computed(() => {
+    if (!processosStore.processoDetalhe?.unidades) return undefined;
+    const unidadeEncontrada = buscarUnidadeNaArvore(
+        processosStore.processoDetalhe.unidades,
+        unidadeId.value
+    );
+    return unidadeEncontrada?.mapaCodigo;
+});
 
 const atividades = computed({
   get: () => {
@@ -468,6 +487,9 @@ onMounted(async () => {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
     await analisesStore.buscarAnalisesCadastro(codSubrocesso.value);
     permissoes.value = await subprocessoService.obterPermissoes(codSubrocesso.value);
+  } else {
+    console.error('[CadAtividades] ERRO: codSubprocesso está undefined!');
+    console.error('[CadAtividades] Não foi possível carregar atividades e permissões');
   }
 });
 

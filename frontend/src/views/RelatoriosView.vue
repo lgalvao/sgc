@@ -16,9 +16,9 @@
             v-model="filtroTipo"
             :options="[
             { value: '', text: 'Todos' },
-            { value: 'Mapeamento', text: 'Mapeamento' },
-            { value: 'Revisão', text: 'Revisão' },
-            { value: 'Diagnóstico', text: 'Diagnóstico' },
+            { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
+            { value: TipoProcesso.REVISAO, text: 'Revisão' },
+            { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' },
           ]"
             data-testid="sel-filtro-tipo"
         />

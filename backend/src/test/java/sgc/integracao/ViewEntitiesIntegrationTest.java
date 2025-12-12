@@ -20,7 +20,6 @@ import sgc.unidade.model.VinculacaoUnidade;
 import sgc.unidade.model.VinculacaoUnidadeRepo;
 import sgc.unidade.model.VinculacaoUnidadeId;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("Integração: Entidades de Views (SGC)")
-public class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
+class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UnidadeRepo unidadeRepo;
