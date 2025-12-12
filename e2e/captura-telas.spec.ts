@@ -43,11 +43,8 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
 test.describe('Captura de Telas - Sistema SGC', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({request}) => {
+    test.beforeEach(async ({request}) => {
         await resetDatabase(request);
-    });
-
-    test.beforeEach(() => {
         cleanup = useProcessoCleanup();
     });
 
@@ -77,6 +74,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '01-autenticacao', '03-login-selecao-perfil');
 
             // Login com perfil selecionado
+            // Reiniciar a página para garantir estado limpo para a função helper
+            await page.goto('/login');
             await loginComPerfil(page, USUARIOS.ADMIN_2_PERFIS.titulo, USUARIOS.ADMIN_2_PERFIS.senha, USUARIOS.ADMIN_2_PERFIS.perfil);
             await capturarTela(page, '01-autenticacao', '04-painel-apos-login', {fullPage: true});
         });
@@ -323,7 +322,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
             const descricao = `Proc Mapa ${Date.now()}`;
-            const UNIDADE_ALVO = 'ASSESSORIA_22';
+            const UNIDADE_ALVO = 'SECAO_121';
 
             // Setup: criar processo e disponibilizar atividades
             await page.goto('/login');
@@ -334,7 +333,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_22']
+                expandir: ['SECRETARIA_1', 'COORD_12']
             });
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
@@ -346,7 +345,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
             await page.getByTestId('btn-logout').click();
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_22.titulo, USUARIOS.CHEFE_ASSESSORIA_22.senha);
+            await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
 
             await page.getByText(descricao).click();
             await navegarParaAtividades(page);
@@ -360,14 +359,30 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await adicionarConhecimento(page, 'Desenvolvimento Backend', 'Java');
             await adicionarConhecimento(page, 'Desenvolvimento Backend', 'Spring Boot');
 
-            // Disponibilizar
+            // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(1000);
 
-            // Navegar para mapa
-            await page.goto('/painel');
+            // Logout e login como ADMIN para Homologar
+            await page.getByTestId('btn-logout').click();
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+
+            // Navegar para o subprocesso
             await page.getByText(descricao).click();
+            // Clicar na unidade (como admin vê tabela)
+            await page.getByRole('row', {name: 'Seção 121'}).click();
+
+            // Entrar no cadastro de atividades (visualização)
+            await page.getByTestId('card-subprocesso-atividades-vis').click();
+
+            // Homologar cadastro
+            await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await page.waitForTimeout(1000);
+
+            // Agora o Mapa deve estar habilitado para edição pelo Admin
+            // Navegar para mapa
             await navegarParaMapa(page);
             await capturarTela(page, '05-mapa', '01-mapa-vazio', {fullPage: true});
 
