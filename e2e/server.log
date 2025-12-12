@@ -1,6 +1,4 @@
-[FRONTEND]   [32m[1mVITE[22m v7.2.7[39m  [2mready in [0m[1m4806[22m[2m[0m ms[22m
+[BACKEND] Calculating task graph as configuration cache cannot be reused because system property 'idea.io.use.nio2' has changed.
+[FRONTEND]   [32m[1mVITE[22m v7.2.7[39m  [2mready in [0m[1m465[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[BACKEND] INFO  s.p.service.ProcessoService.criar:197 - Processo 1 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:196 - E-mail enviado para unidade SECAO_221
-[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:331 - Processo de mapeamento 1 iniciado para 1 unidades.
