@@ -25,6 +25,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeMapa;
+import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
@@ -59,6 +61,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
     private MapaRepo mapaRepo;
@@ -90,6 +94,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
         unidadeRepo.save(unidade);
+
+        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaVigente));
 
         atividadeVigente1 =
                 atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
@@ -255,7 +261,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
-            unidadeRepo.save(unidade);
+            unidadeMapaRepo.deleteById(unidade.getCodigo());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
