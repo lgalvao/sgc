@@ -12,7 +12,7 @@ O objetivo desta suite de testes **NÃO é** fazer testes de regressão visual, 
 
 ## Como Executar
 
-### Opção 1: Script Shell (Recomendado)
+### Opção 1: Script Shell - Todas as Capturas (Recomendado)
 
 ```bash
 # Execução básica (headless)
@@ -28,7 +28,36 @@ O objetivo desta suite de testes **NÃO é** fazer testes de regressão visual, 
 ./scripts/capturar-telas.sh --ui
 ```
 
-### Opção 2: NPM Scripts
+### Opção 2: Script Shell - Por Categoria
+
+Útil quando você quer capturar apenas uma categoria específica:
+
+```bash
+# Capturar apenas telas de autenticação
+./scripts/capturar-telas-categoria.sh autenticacao
+
+# Capturar apenas o painel principal
+./scripts/capturar-telas-categoria.sh painel --headed
+
+# Capturar apenas mapas de competências
+./scripts/capturar-telas-categoria.sh mapa
+
+# Ver todas as categorias disponíveis
+./scripts/capturar-telas-categoria.sh
+```
+
+**Categorias disponíveis:**
+- `autenticacao` - Telas de login e autenticação
+- `painel` - Painel principal
+- `processo` - Criação e gerenciamento de processos
+- `subprocesso` - Dashboard e atividades
+- `mapa` - Mapa de competências
+- `navegacao` - Elementos de navegação
+- `estados` - Diferentes estados de processo
+- `responsividade` - Screenshots em múltiplas resoluções
+- `all` - Todas as categorias
+
+### Opção 3: NPM Scripts
 
 ```bash
 # Execução básica (headless)
@@ -41,7 +70,7 @@ npm run test:e2e:captura:headed
 npm run test:e2e:captura:ui
 ```
 
-### Opção 3: Playwright Diretamente
+### Opção 4: Playwright Diretamente
 
 ```bash
 # Executar apenas os testes de captura
@@ -51,6 +80,11 @@ npx playwright test e2e/captura-telas.spec.ts
 npx playwright test e2e/captura-telas.spec.ts --headed
 npx playwright test e2e/captura-telas.spec.ts --ui
 npx playwright test e2e/captura-telas.spec.ts --debug
+
+# Executar apenas uma categoria específica
+npx playwright test e2e/captura-telas.spec.ts --grep "01 - Autenticação"
+npx playwright test e2e/captura-telas.spec.ts --grep "02 - Painel Principal"
+npx playwright test e2e/captura-telas.spec.ts --grep "05 - Mapa de Competências"
 ```
 
 ## Estrutura das Screenshots
