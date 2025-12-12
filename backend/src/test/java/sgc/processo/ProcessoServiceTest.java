@@ -50,7 +50,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -307,15 +307,16 @@ class ProcessoServiceTest {
         u1.setCodigo(1L);
         processo.setParticipantes(Set.of(u1));
 
-        Processo outroProcesso = new Processo();
-        outroProcesso.setParticipantes(Set.of(u1));
-
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO))
-                .thenReturn(List.of(outroProcesso));
+
+        // Mocking the new method
+        when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
+                eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
+                .thenReturn(List.of(1L));
+        when(unidadeRepo.findSiglasByCodigos(List.of(1L))).thenReturn(List.of("U1"));
 
         List<String> erros = processoService.iniciarProcessoMapeamento(id, List.of(1L));
-        assertThat(erros).contains("As seguintes unidades já participam de outro processo ativo: ");
+        assertThat(erros).contains("As seguintes unidades já participam de outro processo ativo: U1");
     }
 
     @Test
@@ -535,13 +536,9 @@ class ProcessoServiceTest {
     @Test
     @DisplayName("Listar Unidades Bloqueadas")
     void listarUnidadesBloqueadas() {
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
-
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(p));
+        when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(
+                        SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
+                .thenReturn(List.of(1L));
 
         List<Long> bloqueadas = processoService.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
         assertThat(bloqueadas).contains(1L);
