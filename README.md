@@ -114,6 +114,27 @@ cd frontend
 npm run test:unit
 ```
 
+### Testes End-to-End (Playwright)
+
+```bash
+npm run test:e2e
+```
+
+### Captura de Telas para Refinamento de UI
+
+O projeto possui uma suite especial de testes Playwright dedicada a capturar screenshots de todas as telas do sistema
+para análise manual e refinamento de UI.
+
+```bash
+# Execução via script (recomendado)
+./scripts/capturar-telas.sh
+
+# Ou via npm
+npm run test:e2e:captura
+```
+
+Veja mais detalhes em [screenshots/README.md](screenshots/README.md).
+
 ## 🛡️ Verificações de Qualidade
 
 O projeto possui um sistema unificado de verificação de qualidade de código que engloba análise estática, linting e
