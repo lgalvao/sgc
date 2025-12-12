@@ -12,13 +12,19 @@ import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioPerfilRepo;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +35,12 @@ class UsuarioServiceTest {
 
     @Mock
     private UsuarioRepo usuarioRepo;
+
+    @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -45,22 +57,20 @@ class UsuarioServiceTest {
                 new Usuario(
                         "123456789", "Usuário de Teste", "teste@email.com", "1234", unidadeMock);
 
-        usuarioMock
-                .getAtribuicoes()
-                .add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(usuarioMock)
-                                .unidade(unidadeMock)
-                                .perfil(Perfil.ADMIN)
-                                .build());
-        usuarioMock
-                .getAtribuicoes()
-                .add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
-                                .usuario(usuarioMock)
-                                .unidade(unidadeMock)
-                                .perfil(Perfil.CHEFE)
-                                .build());
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        atribuicoes.add(
+                UsuarioPerfil.builder()
+                        .usuario(usuarioMock)
+                        .unidade(unidadeMock)
+                        .perfil(Perfil.ADMIN)
+                        .build());
+        atribuicoes.add(
+                UsuarioPerfil.builder()
+                        .usuario(usuarioMock)
+                        .unidade(unidadeMock)
+                        .perfil(Perfil.CHEFE)
+                        .build());
+        usuarioMock.setAtribuicoes(atribuicoes);
     }
 
     @Test
@@ -76,6 +86,7 @@ class UsuarioServiceTest {
         String tituloEleitoral = "123456789";
 
         when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
+        when(usuarioPerfilRepo.findByUsuarioTitulo(tituloEleitoral)).thenReturn(new ArrayList<>(usuarioMock.getAtribuicoes()));
 
         List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
 
@@ -88,6 +99,7 @@ class UsuarioServiceTest {
                 .allMatch(sigla -> sigla.equals("SEDOC"));
 
         verify(usuarioRepo, times(1)).findById(tituloEleitoral);
+        verify(usuarioPerfilRepo, times(1)).findByUsuarioTitulo(tituloEleitoral);
     }
 
     @Test

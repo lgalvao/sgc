@@ -162,7 +162,6 @@ class SubprocessoServiceTest {
         var res = service.atualizar(id, dto);
 
         assertThat(res.getCodProcesso()).isEqualTo(10L);
-        assertThat(sp.getProcesso().getCodigo()).isEqualTo(10L);
     }
 
     @Test

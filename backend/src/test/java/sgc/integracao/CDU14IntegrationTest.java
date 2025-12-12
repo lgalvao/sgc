@@ -128,7 +128,33 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
+
+        unidade.setTituloTitular(chefe.getTituloEleitoral());
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
+
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> adminAttrs = new java.util.HashSet<>();
+        adminAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
+                .usuario(admin)
+                .perfil(Perfil.ADMIN)
+                .unidade(unidadeAdmin)
+                .build());
+        admin.setAtribuicoes(adminAttrs);
+
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> gestorAttrs = new java.util.HashSet<>();
+        gestorAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
+                .usuario(gestor)
+                .perfil(Perfil.GESTOR)
+                .unidade(unidadeGestor)
+                .build());
+        gestor.setAtribuicoes(gestorAttrs);
+
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> chefeAttrs = new java.util.HashSet<>();
+        chefeAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
+                .usuario(chefe)
+                .perfil(Perfil.CHEFE)
+                .unidade(unidade)
+                .build());
+        chefe.setAtribuicoes(chefeAttrs);
     }
 
     // Métodos de setup

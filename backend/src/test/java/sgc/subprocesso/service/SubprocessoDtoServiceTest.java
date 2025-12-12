@@ -109,13 +109,14 @@ class SubprocessoDtoServiceTest {
         when(auth.getName()).thenReturn("admin");
 
         Usuario admin = new Usuario();
-        admin.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(admin)
                                 .unidade(new Unidade())
                                 .perfil(Perfil.ADMIN)
                                 .build());
+        admin.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
@@ -155,13 +156,14 @@ class SubprocessoDtoServiceTest {
 
         Usuario servidor = new Usuario();
         servidor.setUnidadeLotacao(u);
-        servidor.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(servidor)
                                 .unidade(u)
                                 .perfil(Perfil.SERVIDOR)
                                 .build());
+        servidor.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
@@ -194,13 +196,14 @@ class SubprocessoDtoServiceTest {
 
         Usuario servidor = new Usuario();
         servidor.setUnidadeLotacao(u2);
-        servidor.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(servidor)
                                 .unidade(u2)
                                 .perfil(Perfil.SERVIDOR)
                                 .build());
+        servidor.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
@@ -230,13 +233,14 @@ class SubprocessoDtoServiceTest {
 
         Usuario gestor = new Usuario();
         gestor.setUnidadeLotacao(u);
-        gestor.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(gestor)
                                 .unidade(u)
                                 .perfil(Perfil.GESTOR)
                                 .build());
+        gestor.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
@@ -269,13 +273,14 @@ class SubprocessoDtoServiceTest {
 
         Usuario gestor = new Usuario();
         gestor.setUnidadeLotacao(u2);
-        gestor.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(gestor)
                                 .unidade(u2)
                                 .perfil(Perfil.GESTOR)
                                 .build());
+        gestor.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
@@ -301,13 +306,14 @@ class SubprocessoDtoServiceTest {
         when(auth.getName()).thenReturn("admin");
 
         Usuario admin = new Usuario();
-        admin.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(admin)
                                 .unidade(new Unidade())
                                 .perfil(Perfil.ADMIN)
                                 .build());
+        admin.setAtribuicoes(attrs);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);

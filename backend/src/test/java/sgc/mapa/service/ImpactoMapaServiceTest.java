@@ -71,8 +71,8 @@ class ImpactoMapaServiceTest {
     }
 
     private void addAtribuicao(Usuario u, Perfil p) {
-        u.getAtribuicoes()
-                .add(
+        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        attrs.add(
                         sgc.sgrh.model.UsuarioPerfil.builder()
                                 .usuario(u)
                                 .unidade(
@@ -80,6 +80,7 @@ class ImpactoMapaServiceTest {
                                 // unit matches if strictly required
                                 .perfil(p)
                                 .build());
+        u.setAtribuicoes(attrs);
     }
 
     @Nested
