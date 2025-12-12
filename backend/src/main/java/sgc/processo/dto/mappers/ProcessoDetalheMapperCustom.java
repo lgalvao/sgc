@@ -10,11 +10,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
     @Autowired
@@ -65,17 +61,15 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             return false;
         }
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof Usuario)) {
+        if (!(principal instanceof Usuario user)) {
             return false;
         }
-        Usuario user = (Usuario) principal;
-        return processo.getParticipantes().stream()
-                .anyMatch(
-                        unidade ->
-                                user.getTodasAtribuicoes().stream()
-                                        .anyMatch(
-                                                attr ->
-                                                        Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo())));
+        return processo.getParticipantes()
+                .stream()
+                .anyMatch(unidade -> user.getTodasAtribuicoes()
+                        .stream()
+                        .anyMatch(attr -> Objects.equals(attr.getUnidade().getCodigo(), unidade.getCodigo()))
+                );
     }
 
     private boolean isCurrentUserAdmin() {

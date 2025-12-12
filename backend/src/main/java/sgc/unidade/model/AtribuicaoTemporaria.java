@@ -51,7 +51,4 @@ public class AtribuicaoTemporaria extends EntidadeBase {
         return perfil != null ? perfil : sgc.sgrh.model.Perfil.SERVIDOR;
     }
 
-    public void setPerfil(sgc.sgrh.model.Perfil perfil) {
-        this.perfil = perfil;
-    }
 }

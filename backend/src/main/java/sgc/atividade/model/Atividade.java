@@ -40,12 +40,6 @@ public class Atividade extends EntidadeBase {
             inverseJoinColumns = @JoinColumn(name = "competencia_codigo"))
     private Set<Competencia> competencias = new HashSet<>();
 
-    public Atividade(Long codigo, String descricao, sgc.mapa.model.Mapa mapa) {
-        super(codigo);
-        this.descricao = descricao;
-        this.mapa = mapa;
-    }
-
     /**
      * Construtor para criar uma nova atividade.
      *

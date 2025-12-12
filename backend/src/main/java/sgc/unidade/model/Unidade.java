@@ -23,36 +23,34 @@ import java.util.Set;
 public class Unidade extends EntidadeBase {
     @Column(name = "nome")
     private String nome;
+
     @Column(name = "sigla", length = 20)
     private String sigla;
+
     @Column(name = "matricula_titular", length = 8)
     private String matriculaTitular;
+
     @Column(name = "titulo_titular", length = 12)
     private String tituloTitular;
+
     @Column(name = "data_inicio_titularidade")
     private LocalDateTime dataInicioTitularidade;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoUnidade tipo;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20)
     private SituacaoUnidade situacao;
+
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     private Unidade unidadeSuperior;
+
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default
     private Set<Processo> processos = new HashSet<>();
-
-    @Transient
-    public String getTituloTitularOuNull() {
-        return tituloTitular;
-    }
-
-    @Transient
-    public String getMatriculaTitularOuNull() {
-        return matriculaTitular;
-    }
 
     /**
      * Método temporário para testes. Como Unidade agora é VIEW imutável,
@@ -64,26 +62,6 @@ public class Unidade extends EntidadeBase {
             this.tituloTitular = usuario.getTituloEleitoral();
             this.matriculaTitular = usuario.getMatricula();
         }
-    }
-
-    /** Método temporário para compatibilidade com testes */
-    @Deprecated
-    @Transient
-    private sgc.mapa.model.Mapa mapaVigenteTransient;
-
-    @Deprecated
-    public sgc.mapa.model.Mapa getMapaVigente() {
-        return mapaVigenteTransient;
-    }
-
-    @Deprecated
-    public void setMapaVigente(sgc.mapa.model.Mapa mapa) {
-        this.mapaVigenteTransient = mapa;
-    }
-
-    @Deprecated
-    public LocalDateTime getDataVigenciaMapa() {
-        return null; // Não usado mais
     }
 
     public Unidade(String nome, String sigla) {

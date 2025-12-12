@@ -189,7 +189,7 @@ async function concluirAutoavaliacao() {
   try {
     await diagnosticoService.concluirAutoavaliacao(codSubprocesso.value);
     feedbackStore.show('Sucesso', 'Autoavaliação concluída com sucesso!', 'success');
-    router.push('/painel');
+    await router.push('/painel');
   } catch (error: any) {
     feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
   }

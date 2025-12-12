@@ -24,13 +24,6 @@ export async function verificarPaginaPainel(page: Page) {
 }
 
 /**
- * Verifica que está na página de detalhes do subprocesso
- */
-export async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
-}
-
-/**
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
@@ -207,21 +200,6 @@ export async function aceitarRevisao(page: Page, observacao?: string) {
     await verificarPaginaPainel(page);
 }
 
-/**
- * Cancela aceite de cadastro
- */
-export async function cancelarAceite(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Verificar modal de aceite
-    await expect(page.getByRole('dialog')).toBeVisible();
-
-    await page.getByRole('button', {name: 'Cancelar'}).click();
-
-    // Verificar que modal fechou
-    await expect(page.getByRole('dialog')).toBeHidden();
-}
-
 // ============================================================================
 // Funções de Homologação (ADMIN)
 // ============================================================================
@@ -241,49 +219,6 @@ export async function homologarCadastroMapeamento(page: Page) {
 
     // Sistema redireciona para Detalhes do subprocesso após homologação (CDU-13 passo 11.7)
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-}
-
-/**
- * Homologa revisão (ADMIN) - COM impactos
- */
-export async function homologarRevisaoComImpactos(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Modal: "Homologação do cadastro de atividades e conhecimentos"
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
-
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
-
-    // Verifica redirecionamento para tela de detalhes do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-    // Verificar situação após homologação
-    await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-        .toHaveText(/Revisão de Cadastro Homologada/i);
-}
-
-/**
- * Homologa revisão (ADMIN) - SEM impactos
- */
-export async function homologarRevisaoSemImpactos(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Modal: "Homologação do mapa de competências"
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i)).toBeVisible();
-    await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
-
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
-
-    // Verifica redirecionamento para tela de detalhes do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-    // Verificar situação após homologação
-    await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
-        .toHaveText(/Mapa homologado/i);
 }
 
 /**

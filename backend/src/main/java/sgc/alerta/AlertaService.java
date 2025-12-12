@@ -126,7 +126,6 @@ public class AlertaService {
      * @return Uma lista contendo todos os alertas que foram criados.
      */
     @Transactional
-    @SuppressWarnings({"PMD.ExhaustiveSwitchHasDefault", "PMD.AvoidCatchingGenericException"})
     public List<Alerta> criarAlertasProcessoIniciado(
             Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
 

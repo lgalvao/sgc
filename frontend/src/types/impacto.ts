@@ -1,3 +1,4 @@
+// noinspection JSUnusedGlobalSymbols
 export enum TipoImpactoAtividade {
     INSERIDA = "INSERIDA",
     REMOVIDA = "REMOVIDA",

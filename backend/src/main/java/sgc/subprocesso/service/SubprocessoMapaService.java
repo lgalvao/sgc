@@ -83,7 +83,6 @@ public class SubprocessoMapaService {
     }
 
     @Transactional
-    @SuppressWarnings("PMD.ExhaustiveSwitchHasDefault")
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         final Subprocesso spDestino =
                 subprocessoRepo

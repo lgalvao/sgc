@@ -462,8 +462,8 @@ public class ProcessoService {
 
         List<Long> unidadesSemMapa =
                 unidades.stream()
-                        .filter(u -> !unidadeMapaRepo.existsById(u.getCodigo()))
                         .map(Unidade::getCodigo)
+                        .filter(codigo -> !unidadeMapaRepo.existsById(codigo))
                         .toList();
 
         if (!unidadesSemMapa.isEmpty()) {

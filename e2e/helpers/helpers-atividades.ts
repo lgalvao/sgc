@@ -106,25 +106,6 @@ export async function verificarBotaoImpacto(page: Page, visivel: boolean) {
     }
 }
 
-export async function abrirModalImportar(page: Page) {
-    await page.getByTestId('btn-cad-atividades-importar').click();
-    await expect(page.getByRole('dialog', {name: 'Importação de atividades'})).toBeVisible();
-}
-
-export async function importarAtividades(page: Page, processoDescricao: string, unidadeSigla: string, atividadesCodigos: number[]) {
-    await abrirModalImportar(page);
-
-    await page.getByTestId('select-processo').selectOption({label: processoDescricao});
-    await page.getByTestId('select-unidade').selectOption({label: unidadeSigla});
-
-    for (const codigo of atividadesCodigos) {
-        await page.getByTestId(`checkbox-atividade-${codigo}`).check();
-    }
-
-    await page.getByTestId('btn-importar').click();
-    await expect(page.getByRole('dialog')).toBeHidden();
-}
-
 export async function abrirModalImpacto(page: Page) {
     await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
     await expect(page.getByRole('dialog')).toBeVisible();

@@ -1,3 +1,5 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort.MAX
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -73,6 +75,7 @@ dependencies {
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.36")
+    implementation("org.mozilla:rhino:1.8.1")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
@@ -101,7 +104,6 @@ spotless {
     }
 }
 
-// JaCoCo
 jacoco {
     toolVersion = "0.8.14"
 }
@@ -122,9 +124,7 @@ tasks.jacocoTestReport {
             exclude(
                 "**/config/**",
                 "**/dto/**",
-                "**/entity/**",
                 "**/mapper/**",
-                "**/*Application.class",
                 "**/Sgc.class"
             )
         }
@@ -147,9 +147,9 @@ tasks.jacocoTestCoverageVerification {
 spotbugs {
     toolVersion.set("4.9.8")
     excludeFilter.set(file("config/spotbugs/exclude.xml"))
-    ignoreFailures.set(true) // Don't fail build
-    effort.set(com.github.spotbugs.snom.Effort.MAX)
-    reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
+    effort.set(MAX)
+    reportLevel.set(Confidence.HIGH)
+    ignoreFailures.set(true)
 }
 
 // Checkstyle
@@ -157,22 +157,19 @@ checkstyle {
     toolVersion = "12.2.0"
     configFile = file("config/checkstyle/checkstyle.xml")
     maxWarnings = 0
-    isIgnoreFailures = true // Don't fail build, we check manually via quality task
+    isIgnoreFailures = true
 }
 
 // PMD
 pmd {
     toolVersion = "7.19.0"
-    // ruleSets = listOf(file("config/pmd/ruleset.xml").toURI().toString())
     ruleSetFiles = files("config/pmd/ruleset.xml")
-    isIgnoreFailures = true // Don't fail build
+    isIgnoreFailures = true
 }
 
 tasks.named("pmdTest") {
     enabled = false
 }
-
-// --- Custom Quality Tasks ---
 
 tasks.register("qualityCheck") {
     group = "quality"
@@ -187,19 +184,6 @@ tasks.register("qualityCheck") {
     dependsOn(tasks.pmdTest)
     dependsOn(tasks.spotbugsMain)
     dependsOn(tasks.spotbugsTest)
-
-    val buildDir = layout.buildDirectory.get().asFile.absolutePath
-
-    doLast {
-        println("\n=== Quality Check Summary ===")
-        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
-        println("Checkstyle Main: file://$buildDir/reports/checkstyle/main.html")
-        println("Checkstyle Test: file://$buildDir/reports/checkstyle/test.html")
-        println("PMD Main: file://$buildDir/reports/pmd/main.html")
-        println("PMD Test: file://$buildDir/reports/pmd/test.html")
-        println("SpotBugs Main: file://$buildDir/reports/spotbugs/main.html")
-        println("SpotBugs Test: file://$buildDir/reports/spotbugs/test.html")
-    }
 }
 
 tasks.register("qualityCheckFast") {
@@ -209,16 +193,8 @@ tasks.register("qualityCheckFast") {
     dependsOn(tasks.test)
     dependsOn(tasks.jacocoTestReport)
     dependsOn(tasks.jacocoTestCoverageVerification)
-
-    val buildDir = layout.buildDirectory.get().asFile.absolutePath
-
-    doLast {
-        println("\n=== Quality Check Fast Summary ===")
-        println("JaCoCo Report: file://$buildDir/reports/jacoco/test/html/index.html")
-    }
 }
 
-// Ensure quality checks don't run on normal 'check'
 tasks.named("check") {
     setDependsOn(dependsOn.filter {
         it != tasks.checkstyleMain &&
@@ -243,7 +219,7 @@ tasks.withType<Test> {
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
         stackTraceFilters = setOf(TestStackTraceFilter.ENTRY_POINT)
     }
 
@@ -258,7 +234,9 @@ tasks.withType<Test> {
     )
 
     val byteBuddyAgentFile =
-        project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
+        project.configurations.getByName("testRuntimeClasspath").files.find {
+            it.name.contains("byte-buddy-agent")
+        }
 
     doFirst {
         if (byteBuddyAgentFile != null) {

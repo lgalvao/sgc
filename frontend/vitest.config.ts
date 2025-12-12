@@ -3,7 +3,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import {defineConfig} from "vitest/config";
 
 export default defineConfig({
-    plugins: [vue(), tsconfigPaths()],
+    plugins: [vue() as any, tsconfigPaths() as any],
     test: {
         globals: true,
         reporters: "dot",

@@ -151,10 +151,8 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   // 6. Nenhuma descendente selecionada? → desmarcada (ou marcada se INTEROPERACIONAL)
   if (descendentesSelecionadas === 0) {
     // INTEROPERACIONAL pode estar marcada sozinha
-    if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
-      return true;
-    }
-    return false;
+    return unidade.tipo === "INTEROPERACIONAL" && selfSelected;
+
   }
 
   // 7. Algumas descendentes selecionadas → indeterminada (ou marcada se INTEROPERACIONAL)

@@ -35,8 +35,4 @@ public class Mapa extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private sgc.subprocesso.model.Subprocesso subprocesso;
-
-    public Mapa(Long codigo) {
-        super(codigo);
-    }
 }

@@ -95,7 +95,8 @@ tasks.register<Exec>("qualityCheckFast") {
     workingDir = file("frontend")
     val isWindows = System.getProperty("os.name").lowercase().contains("win")
     commandLine =
-        if (isWindows) listOf("cmd", "/c", "npm", "run", "quality:test") else listOf("npm", "run", "quality:test")
+        if (isWindows) listOf("cmd", "/c", "npm", "run", "quality:test")
+        else listOf("npm", "run", "quality:test")
 
     isIgnoreExitValue = true
 }

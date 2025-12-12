@@ -114,7 +114,7 @@ public class UnidadeService {
         List<Processo> criados = processoRepo.findBySituacao(SituacaoProcesso.CRIADO);
 
         return Stream.concat(emAndamento.stream(), criados.stream())
-                .filter(p -> codProcessoIgnorar == null || !p.getCodigo().equals(codProcessoIgnorar))
+                .filter(p -> !p.getCodigo().equals(codProcessoIgnorar))
                 .flatMap(p -> p.getParticipantes().stream())
                 .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());

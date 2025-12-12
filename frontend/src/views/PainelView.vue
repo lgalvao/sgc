@@ -77,7 +77,7 @@ async function carregarDados() {
         0,
         10,
     ); // Paginação inicial
-    alertasStore.buscarAlertas(
+    await alertasStore.buscarAlertas(
         Number(perfil.servidorId) || 0,
         Number(perfil.unidadeSelecionada),
         0,
@@ -124,7 +124,7 @@ async function abrirDetalhesAlerta(alerta: Alerta) {
     await alertasStore.marcarAlertaComoLido(alerta.codigo);
   }
   if (alerta.linkDestino) {
-    router.push(alerta.linkDestino);
+    await router.push(alerta.linkDestino);
   }
 }
 

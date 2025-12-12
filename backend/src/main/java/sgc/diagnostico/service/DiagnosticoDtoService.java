@@ -21,7 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DiagnosticoDtoService {
-
     public DiagnosticoDto toDto(
             Diagnostico diagnostico,
             List<ServidorDiagnosticoDto> servidores,
@@ -62,15 +61,9 @@ public class DiagnosticoDtoService {
         String situacaoLabel = SituacaoServidorDiagnostico.AUTOAVALIACAO_NAO_REALIZADA.getLabel();
 
         if (!avaliacoes.isEmpty()) {
-            // Em tese todas as avaliações do servidor deveriam ter a mesma situação de processo
-            // Mas vamos pegar a mais avançada encontrada
-            SituacaoServidorDiagnostico sit = avaliacoes.get(0).getSituacao();
+            SituacaoServidorDiagnostico sit = avaliacoes.getFirst().getSituacao();
             situacao = sit.name();
             situacaoLabel = sit.getLabel();
-        } else if (totalCompetencias == 0) {
-            // Se não tem competências para avaliar, considera concluída? 
-            // Não, vamos manter como não realizada ou tratar caso especial
-            // Mas por enquanto segue padrão
         }
 
         int competenciasAvaliadas = (int) avaliacoes.stream()

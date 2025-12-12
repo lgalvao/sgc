@@ -177,7 +177,7 @@ public class E2eController {
                                                         + " não encontrada"));
 
         // Calcular data limite
-        Integer diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
         // Criar requisição de processo

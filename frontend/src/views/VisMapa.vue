@@ -385,8 +385,7 @@ onMounted(async () => {
 const podeValidar = computed(() => {
   return (
       perfilSelecionado.value === "CHEFE" &&
-      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_DISPONIBILIZADO ||
-          subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
+      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO ||
           subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
   );
 });
@@ -395,11 +394,9 @@ const podeAnalisar = computed(() => {
   const situacao = subprocesso.value?.situacaoSubprocesso;
   const isGestorOrAdmin = perfilSelecionado.value === "GESTOR" || perfilSelecionado.value === "ADMIN";
   const isValidado =
-      situacao === SituacaoSubprocesso.MAPA_VALIDADO ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
   const isComSugestoes =
-      situacao === SituacaoSubprocesso.MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
 
@@ -409,7 +406,6 @@ const podeAnalisar = computed(() => {
 const podeVerSugestoes = computed(() => {
   const situacao = subprocesso.value?.situacaoSubprocesso;
   return (
-      situacao === SituacaoSubprocesso.MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES
   );

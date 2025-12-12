@@ -11,7 +11,6 @@ import sgc.unidade.model.UnidadeRepo;
  */
 @Mapper(componentModel = "spring")
 public abstract class AnaliseMapper {
-
     @Autowired
     protected UnidadeRepo unidadeRepo;
 

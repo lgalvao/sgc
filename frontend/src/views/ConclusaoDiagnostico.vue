@@ -95,7 +95,7 @@ onMounted(async () => {
     diagnostico.value = await diagnosticoService.buscarDiagnostico(codSubprocesso.value);
     if (diagnostico.value.situacao === 'CONCLUIDO') {
       feedbackStore.show('Aviso', 'Este diagnóstico já foi concluído.', 'warning');
-      router.push('/painel');
+      await router.push('/painel');
     }
   } catch (error) {
     feedbackStore.show('Erro', 'Erro ao carregar dados: ' + error, 'danger');
@@ -108,7 +108,7 @@ async function concluir() {
   try {
     await diagnosticoService.concluirDiagnostico(codSubprocesso.value, justificativa.value);
     feedbackStore.show('Sucesso', 'Diagnóstico da unidade concluído com sucesso!', 'success');
-    router.push('/painel');
+    await router.push('/painel');
   } catch (error: any) {
     feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
   }

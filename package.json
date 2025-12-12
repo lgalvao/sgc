@@ -7,7 +7,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "^24.10.2",
+    "@types/node": "^25.0.1",
     "typescript": "^5.9.3"
   },
   "description": "Testes E2E"

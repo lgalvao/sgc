@@ -229,7 +229,7 @@ public class DiagnosticoService {
     }
 
     @Transactional
-    public DiagnosticoDto concluirDiagnostico(Long subprocessoCodigo, ConcluirDiagnosticoRequest request) {
+    public void concluirDiagnostico(Long subprocessoCodigo, ConcluirDiagnosticoRequest request) {
         Diagnostico diagnostico = buscarOuCriarDiagnosticoEntidade(subprocessoCodigo);
 
         DiagnosticoDto overview = buscarDiagnosticoCompleto(subprocessoCodigo);
@@ -260,7 +260,6 @@ public class DiagnosticoService {
         sp.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocessoRepo.save(sp);
 
-        return overview;
     }
 
     private boolean validarSePodeConcluirDiagnostico(List<ServidorDiagnosticoDto> servidores) {

@@ -9,7 +9,6 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
-import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 import sgc.unidade.model.Unidade;
@@ -36,8 +35,7 @@ public class SubprocessoNotificacaoService {
             String descricao,
             Processo processo,
             Unidade unidadeOrigem,
-            Unidade unidadeDestino,
-            Usuario usuarioDestino) {
+            Unidade unidadeDestino) {
         Alerta alerta =
                 Alerta.builder()
                         .descricao(descricao)
@@ -45,7 +43,7 @@ public class SubprocessoNotificacaoService {
                         .dataHora(LocalDateTime.now())
                         .unidadeOrigem(unidadeOrigem)
                         .unidadeDestino(unidadeDestino)
-                        .usuarioDestino(usuarioDestino)
+                        .usuarioDestino(null)
                         .build();
         repositorioAlerta.save(alerta);
     }
@@ -106,8 +104,8 @@ public class SubprocessoNotificacaoService {
                         siglaUnidade),
                 sp.getProcesso(),
                 sedoc,
-                unidade,
-                null);
+                unidade
+        );
     }
 
     /**
@@ -141,8 +139,8 @@ public class SubprocessoNotificacaoService {
                         + " disponibilizado para análise",
                 sp.getProcesso(),
                 sp.getUnidade(),
-                unidadeDestino,
-                null);
+                unidadeDestino
+        );
     }
 
     /**
@@ -177,8 +175,8 @@ public class SubprocessoNotificacaoService {
                             + " aguardando análise",
                     sp.getProcesso(),
                     sp.getUnidade(),
-                    unidadeSuperior,
-                    null);
+                    unidadeSuperior
+            );
         } else {
             log.debug(
                     "Unidade superior não encontrada para subprocesso {}. Não será criado alerta ou"
@@ -212,8 +210,8 @@ public class SubprocessoNotificacaoService {
                             + " aguardando análise",
                     sp.getProcesso(),
                     sp.getUnidade(),
-                    unidadeSuperior,
-                    null);
+                    unidadeSuperior
+            );
         }
     }
 
@@ -241,8 +239,8 @@ public class SubprocessoNotificacaoService {
                         + " devolvido para ajustes",
                 sp.getProcesso(),
                 sp.getUnidade().getUnidadeSuperior(),
-                unidadeDevolucao,
-                null);
+                unidadeDevolucao
+        );
     }
 
     /**
@@ -271,8 +269,8 @@ public class SubprocessoNotificacaoService {
                             + " submetida para análise",
                     sp.getProcesso(),
                     sp.getUnidade().getUnidadeSuperior(),
-                    unidadeSuperior,
-                    null);
+                    unidadeSuperior
+            );
         }
     }
 
@@ -304,8 +302,8 @@ public class SubprocessoNotificacaoService {
                         + motivo,
                 sp.getProcesso(),
                 sp.getUnidade().getUnidadeSuperior(),
-                unidadeDevolucao,
-                null);
+                unidadeDevolucao
+        );
     }
 
     /**
@@ -342,8 +340,8 @@ public class SubprocessoNotificacaoService {
                         + " submetido para análise",
                 sp.getProcesso(),
                 sp.getUnidade(),
-                unidadeDestino,
-                null);
+                unidadeDestino
+        );
     }
 
     /**
@@ -383,8 +381,8 @@ public class SubprocessoNotificacaoService {
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 sp.getUnidade(),
-                unidadeDestino,
-                null);
+                unidadeDestino
+        );
     }
 
     /**
@@ -420,8 +418,8 @@ public class SubprocessoNotificacaoService {
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 unidadeAnalise,
-                unidadeDevolucao,
-                null);
+                unidadeDevolucao
+        );
     }
 
     /**
@@ -461,8 +459,8 @@ public class SubprocessoNotificacaoService {
                         siglaUnidadeSubprocesso),
                 sp.getProcesso(),
                 sp.getUnidade(),
-                unidadeDestino,
-                null);
+                unidadeDestino
+        );
     }
 
     public void notificarHomologacaoMapa(Subprocesso sp) {
@@ -491,7 +489,7 @@ public class SubprocessoNotificacaoService {
                 String.format("Mapa de competências do processo %s homologado", descricaoProcesso),
                 sp.getProcesso(),
                 sedoc,
-                sedoc,
-                null);
+                sedoc
+        );
     }
 }

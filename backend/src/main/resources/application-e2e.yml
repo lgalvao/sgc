@@ -25,9 +25,6 @@ management:
     web:
       exposure:
         include: health
-  endpoint:
-    health:
-      enabled: true
 
 # Configuração de logging otimizada para e2e
 logging:

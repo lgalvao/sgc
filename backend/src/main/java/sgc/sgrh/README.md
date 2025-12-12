@@ -73,7 +73,6 @@ graph TD
 
 - **`AutenticacaoReq`**, **`EntrarReq`**: Requisições de login.
 - **`LoginResp`**: Resposta de login contendo token (simulado).
-- **`PerfilUnidade`**: DTO que combina um perfil e uma unidade, usado durante a autorização.
 
 ## Propósito e Uso
 

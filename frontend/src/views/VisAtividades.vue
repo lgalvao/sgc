@@ -256,13 +256,10 @@ const isHomologacao = computed(() => {
   const {situacaoSubprocesso} = subprocesso.value;
   return (
       perfilSelecionado.value === Perfil.ADMIN &&
-      (situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
-          situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_HOMOLOGADO ||
-          situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-          situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
-          situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-          situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
-  );
+                (situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+                situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
+                situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+                situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)  );
 });
 
 const podeVerImpacto = computed(() => {
@@ -270,7 +267,6 @@ const podeVerImpacto = computed(() => {
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
   const situacaoCorreta =
-      subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
       subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
       subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
   return podeVer && situacaoCorreta;
