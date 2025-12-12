@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "test:e2e": "playwright test",
+    "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
+    "test:e2e:captura:headed": "playwright test e2e/captura-telas.spec.ts --headed",
+    "test:e2e:captura:ui": "playwright test e2e/captura-telas.spec.ts --ui",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json"
   },
   "devDependencies": {

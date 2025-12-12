@@ -27,6 +27,11 @@ backend/bin/
 
 *.gz
 
+# Screenshots (não versionar)
+/screenshots/*.png
+/screenshots/*.jpg
+!/screenshots/README.md
+
 # Arquivos compilados/binários
 *.class
 /frontend/tsconfig.tsbuildinfo

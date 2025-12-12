@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGC - Visualizador de Screenshots</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .controls select, .controls input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .controls select:focus, .controls input:focus {
+            border-color: #667eea;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .stat-value {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .screenshot-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .screenshot-info {
+            padding: 15px;
+        }
+
+        .screenshot-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .screenshot-category {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .no-screenshots {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            color: #666;
+        }
+
+        .no-screenshots svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Modal para visualização ampliada */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding: 20px;
+            max-width: 95%;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+
+        .modal-title {
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖼️ SGC - Visualizador de Screenshots</h1>
+        <p>Visualize e compare as capturas de tela do sistema para refinamento de UI</p>
+    </div>
+
+    <div class="controls">
+        <label for="category-filter">Categoria:</label>
+        <select id="category-filter">
+            <option value="all">Todas as categorias</option>
+            <option value="01-autenticacao">Autenticação</option>
+            <option value="02-painel">Painel Principal</option>
+            <option value="03-processo">Processo</option>
+            <option value="04-subprocesso">Subprocesso</option>
+            <option value="05-mapa">Mapa de Competências</option>
+            <option value="06-navegacao">Navegação</option>
+            <option value="07-estados">Estados</option>
+            <option value="08-responsividade">Responsividade</option>
+        </select>
+
+        <label for="search-input">Buscar:</label>
+        <input type="text" id="search-input" placeholder="Digite para filtrar...">
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-label">Total:</span>
+            <span class="stat-value" id="total-count">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Exibindo:</span>
+            <span class="stat-value" id="visible-count">0</span>
+        </div>
+    </div>
+
+    <div class="gallery" id="gallery"></div>
+
+    <div class="no-screenshots" id="no-screenshots" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21,5c0-1.1-0.9-2-2-2H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5z M11.5,16.5l2.5-3.01L16.5,17h-11 l3-3.5L11.5,16.5z"/>
+        </svg>
+        <h3>Nenhuma screenshot encontrada</h3>
+        <p>Execute os testes de captura primeiro usando:<br><code>./scripts/capturar-telas.sh</code></p>
+    </div>
+
+    <!-- Modal para visualização ampliada -->
+    <div id="modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modal-img" src="" alt="">
+            <div class="modal-title" id="modal-title"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simular lista de screenshots (em produção, viria de um endpoint ou listagem de arquivos)
+        // Para usar este HTML, coloque-o no diretório screenshots/ e execute um servidor local
+        
+        let allScreenshots = [];
+        
+        async function loadScreenshots() {
+            try {
+                // Tentar carregar do sistema de arquivos (requer servidor local)
+                // Esta é uma simulação - você precisaria de um servidor ou script para listar os arquivos
+                const response = await fetch('list-files.json').catch(() => null);
+                
+                if (response && response.ok) {
+                    allScreenshots = await response.json();
+                } else {
+                    // Fallback: tentar padrões conhecidos
+                    allScreenshots = await detectScreenshots();
+                }
+                
+                renderGallery();
+            } catch (error) {
+                console.error('Erro ao carregar screenshots:', error);
+                document.getElementById('no-screenshots').style.display = 'block';
+            }
+        }
+
+        async function detectScreenshots() {
+            // Tentar carregar screenshots com base em padrões conhecidos
+            const screenshots = [];
+            const categories = [
+                '01-autenticacao', '02-painel', '03-processo', '04-subprocesso',
+                '05-mapa', '06-navegacao', '07-estados', '08-responsividade'
+            ];
+            
+            for (const category of categories) {
+                for (let i = 1; i <= 20; i++) {
+                    const num = String(i).padStart(2, '0');
+                    const filename = `${category}--${num}-*.png`;
+                    // Em um ambiente real, você verificaria a existência do arquivo
+                }
+            }
+            
+            return screenshots;
+        }
+
+        function renderGallery(filter = 'all', search = '') {
+            const gallery = document.getElementById('gallery');
+            const noScreenshots = document.getElementById('no-screenshots');
+            
+            let filtered = allScreenshots;
+            
+            // Aplicar filtro de categoria
+            if (filter !== 'all') {
+                filtered = filtered.filter(s => s.filename.startsWith(filter));
+            }
+            
+            // Aplicar busca
+            if (search) {
+                filtered = filtered.filter(s => 
+                    s.filename.toLowerCase().includes(search.toLowerCase()) ||
+                    s.title.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // Atualizar estatísticas
+            document.getElementById('total-count').textContent = allScreenshots.length;
+            document.getElementById('visible-count').textContent = filtered.length;
+            
+            // Limpar galeria
+            gallery.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                gallery.style.display = 'none';
+                noScreenshots.style.display = 'block';
+                return;
+            }
+            
+            gallery.style.display = 'grid';
+            noScreenshots.style.display = 'none';
+            
+            // Renderizar screenshots
+            filtered.forEach(screenshot => {
+                const card = document.createElement('div');
+                card.className = 'screenshot-card';
+                card.innerHTML = `
+                    <img src="${screenshot.filename}" alt="${screenshot.title}" onclick="openModal('${screenshot.filename}', '${screenshot.title}')">
+                    <div class="screenshot-info">
+                        <div class="screenshot-title">${screenshot.title}</div>
+                        <span class="screenshot-category">${screenshot.category}</span>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        function openModal(src, title) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalTitle = document.getElementById('modal-title');
+            
+            modal.style.display = 'block';
+            modalImg.src = src;
+            modalTitle.textContent = title;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Event listeners
+        document.getElementById('category-filter').addEventListener('change', (e) => {
+            renderGallery(e.target.value, document.getElementById('search-input').value);
+        });
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            renderGallery(document.getElementById('category-filter').value, e.target.value);
+        });
+
+        // Fechar modal ao clicar fora da imagem
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeModal();
+            }
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Nota: Este HTML precisa ser servido por um servidor HTTP
+        // Para uso local, execute: python3 -m http.server 8000
+        // Ou: npx serve .
+        
+        // Instruções de uso
+        console.log('Para usar este visualizador:');
+        console.log('1. Certifique-se de que as screenshots foram geradas');
+        console.log('2. Execute um servidor HTTP neste diretório:');
+        console.log('   python3 -m http.server 8000');
+        console.log('   ou: npx serve .');
+        console.log('3. Abra http://localhost:8000/visualizador.html');
+    </script>
+</body>
+</html>
