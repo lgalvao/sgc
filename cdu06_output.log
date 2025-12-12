@@ -1,0 +1,97 @@
+Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.2.1!
+
+Here are the highlights of this release:
+ - Windows ARM support
+ - Improved publishing APIs
+ - Better guidance for dependency verification failures
+
+For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.integracao.CDU06IntegrationTest
+> Task :backend:processResources
+> Task :backend:processTestResources
+
+> Task :backend:compileJava
+/app/backend/src/main/java/sgc/analise/dto/AnaliseMapper.java:17: warning: Unmapped target properties: "unidadeSigla, analistaUsuarioTitulo".
+    AnaliseHistoricoDto toAnaliseHistoricoDto(Analise analise);
+                        ^
+/app/backend/src/main/java/sgc/analise/dto/AnaliseMapper.java:25: warning: Unmapped target properties: "unidadeSigla, analistaUsuarioTitulo".
+    AnaliseValidacaoHistoricoDto toAnaliseValidacaoHistoricoDto(Analise analise);
+                                 ^
+2 warnings
+
+> Task :backend:classes
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+> Task :backend:test
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeFinalizar_true_comAdmin(CDU06IntegrationTest.java:149)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarCadastro_true(CDU06IntegrationTest.java:191)
+
+CDU-06: Detalhar processo > Deve detalhar processo para Admin FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testDetalharProcesso_sucesso(CDU06IntegrationTest.java:121)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarMapa_true(CDU06IntegrationTest.java:211)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como false para não Admin FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeFinalizar_false_semAdmin(CDU06IntegrationTest.java:169)
+
+CDU-06: Detalhar processo > Deve retornar detalhes da unidade com situação do subprocesso correta FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testDetalharProcesso_dadosSubprocesso(CDU06IntegrationTest.java:233)
+
+7 tests completed, 6 failed
+
+> Task :backend:test FAILED
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 3m 37s
+5 actionable tasks: 5 executed
+Configuration cache entry stored.

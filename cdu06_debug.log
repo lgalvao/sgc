@@ -1,0 +1,50 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarCadastro_true(CDU06IntegrationTest.java:192)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeHomologarMapa_true(CDU06IntegrationTest.java:212)
+
+CDU-06: Detalhar processo > Deve mostrar 'podeFinalizar' como false para não Admin FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU06IntegrationTest.testPodeFinalizar_false_semAdmin(CDU06IntegrationTest.java:170)
+
+7 tests completed, 3 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 26s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.
