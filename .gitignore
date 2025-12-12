@@ -36,3 +36,5 @@ backend/bin/
 .DS_Store
 /backend/.jqwik-database
 scripts/stats/node_modules/
+/.vscode/
+/frontend/bin/
