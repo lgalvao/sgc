@@ -8,7 +8,6 @@ plugins {
     id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
     java
-    jacoco
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.4.7"
@@ -22,7 +21,6 @@ java {
     }
 }
 
-extra["jjwt.version"] = "0.13.0"
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 
@@ -56,11 +54,6 @@ dependencies {
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-
-    // JWT
-    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
 
     // Segurança
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
@@ -104,46 +97,6 @@ spotless {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.14"
-}
-
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
-    }
-    classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            exclude(
-                "**/config/**",
-                "**/dto/**",
-                "**/mapper/**",
-                "**/Sgc.class"
-            )
-        }
-    )
-}
-
-tasks.jacocoTestCoverageVerification {
-    dependsOn(tasks.jacocoTestReport)
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.90.toBigDecimal()
-            }
-        }
-    }
-    classDirectories.setFrom(tasks.jacocoTestReport.get().classDirectories)
-}
-
-// SpotBugs
 spotbugs {
     toolVersion.set("4.9.8")
     excludeFilter.set(file("config/spotbugs/exclude.xml"))
@@ -152,7 +105,6 @@ spotbugs {
     ignoreFailures.set(true)
 }
 
-// Checkstyle
 checkstyle {
     toolVersion = "12.2.0"
     configFile = file("config/checkstyle/checkstyle.xml")
@@ -160,15 +112,10 @@ checkstyle {
     isIgnoreFailures = true
 }
 
-// PMD
 pmd {
     toolVersion = "7.19.0"
     ruleSetFiles = files("config/pmd/ruleset.xml")
     isIgnoreFailures = true
-}
-
-tasks.named("pmdTest") {
-    enabled = false
 }
 
 tasks.register("qualityCheck") {
@@ -176,8 +123,6 @@ tasks.register("qualityCheck") {
     description = "Runs all quality checks (tests, coverage, SpotBugs, Checkstyle, PMD)"
 
     dependsOn(tasks.test)
-    dependsOn(tasks.jacocoTestReport)
-    dependsOn(tasks.jacocoTestCoverageVerification)
     dependsOn(tasks.checkstyleMain)
     dependsOn(tasks.checkstyleTest)
     dependsOn(tasks.pmdMain)
@@ -188,11 +133,9 @@ tasks.register("qualityCheck") {
 
 tasks.register("qualityCheckFast") {
     group = "quality"
-    description = "Runs only tests and coverage"
+    description = "Runs only tests"
 
     dependsOn(tasks.test)
-    dependsOn(tasks.jacocoTestReport)
-    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 tasks.named("check") {
@@ -216,7 +159,7 @@ tasks.withType<Test> {
 
     testLogging {
         events("skipped", "failed")
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = true

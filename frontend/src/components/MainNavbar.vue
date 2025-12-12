@@ -1,75 +1,68 @@
 <template>
-  <BNavbar
-      class="navbar-expand-lg navbar-dark bg-dark border-bottom"
-      toggleable="lg"
-  >
-    <BContainer>
-      <BNavbarBrand to="/painel">
+  <nav class="navbar navbar-expand navbar-dark bg-dark border-bottom">
+    <div class="container-fluid">
+      <router-link to="/painel" class="navbar-brand fw-bold fs-5 me-4">
         SGC
-      </BNavbarBrand>
-      <BNavbarToggle target="navbarNav"/>
+      </router-link>
 
-      <BCollapse
-          id="navbarNav"
-          is-nav
-      >
-        <BNavbarNav class="me-auto mb-2 mb-lg-0 left-nav">
-          <BNavItem
-              href="#"
-              @click.prevent="navigateFromNavbar('/painel')"
-          >
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="navigateFromNavbar('/painel')">
             <i class="bi bi-house-door"/> Painel
-          </BNavItem>
-          <BNavItem
-              href="#"
-              @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
-          >
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)">
             <i class="bi bi-person"/> Minha unidade
-          </BNavItem>
-          <BNavItem
-              href="#"
-              @click.prevent="navigateFromNavbar('/relatorios')"
-          >
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="navigateFromNavbar('/relatorios')">
             <i class="bi bi-bar-chart-line"/> Relatórios
-          </BNavItem>
-          <BNavItem
-              href="#"
-              @click.prevent="navigateFromNavbar('/historico')"
-          >
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="navigateFromNavbar('/historico')">
             <i class="bi bi-clock-history"/> Histórico
-          </BNavItem>
-        </BNavbarNav>
+          </a>
+        </li>
+      </ul>
 
-        <BNavbarNav class="align-items-center">
-          <BNavItem class="me-3 d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 fs-5"/>
-            <span class="nav-link">
-              {{ perfilSelecionado }} - {{ unidadeSelecionada }}
-            </span>
-          </BNavItem>
-
-          <BNavItem
-              v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-              class="me-2"
-              data-testid="btn-configuracoes"
-              href="#"
-              title="Configurações do sistema"
-              @click.prevent="navigateFromNavbar('/configuracoes')"
+      <ul class="navbar-nav align-items-center">
+        <li class="nav-item me-3">
+          <span class="nav-link">
+            <i class="bi bi-person-circle me-2"/>
+            {{ perfilSelecionado }} - {{ unidadeSelecionada }}
+          </span>
+        </li>
+        <li v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="nav-item me-2">
+          <a 
+            href="#" 
+            class="nav-link" 
+            title="Configurações do sistema"
+            data-testid="btn-configuracoes"
+            @click.prevent="navigateFromNavbar('/configuracoes')"
           >
-            <i class="bi bi-gear fs-5"/>
-          </BNavItem>
-
-          <BNavItem data-testid="btn-logout" href="#" title="Sair" @click.prevent="handleLogout">
-            <i class="bi bi-box-arrow-right fs-5"/>
-          </BNavItem>
-        </BNavbarNav>
-      </BCollapse>
-    </BContainer>
-  </BNavbar>
+            <i class="bi bi-gear"/>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a 
+            href="#" 
+            class="nav-link" 
+            title="Sair"
+            data-testid="btn-logout"
+            @click.prevent="handleLogout"
+          >
+            <i class="bi bi-box-arrow-right"/>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts" setup>
-import {BCollapse, BContainer, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem,} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
@@ -95,11 +88,16 @@ defineExpose({
 </script>
 
 <style scoped>
-.left-nav .nav-link {
+.nav-link {
   color: rgba(255, 255, 255, 0.85) !important;
+  white-space: nowrap;
 }
 
-.left-nav .nav-link:hover {
+.nav-link:hover {
   color: rgba(255, 255, 255, 1) !important;
+}
+
+.nav-link i {
+  margin-right: 0.25rem;
 }
 </style>

@@ -34,6 +34,7 @@ public class SubprocessoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final SubprocessoMapper subprocessoMapper;
+    private final sgc.mapa.model.MapaRepo mapaRepo;
 
     @Transactional(readOnly = true)
     public List<AtividadeVisualizacaoDto> listarAtividadesPorSubprocesso(Long codSubprocesso) {
@@ -191,7 +192,20 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
         var entity = subprocessoMapper.toEntity(subprocessoDto);
-        var salvo = repositorioSubprocesso.save(entity);
+        
+        // 1. Criar subprocesso SEM mapa primeiro
+        entity.setMapa(null);
+        var subprocessoSalvo = repositorioSubprocesso.save(entity);
+        
+        // 2. Criar mapa COM referência ao subprocesso
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocessoSalvo);
+        Mapa mapaSalvo = mapaRepo.save(mapa);
+        
+        // 3. Atualizar subprocesso com o mapa
+        subprocessoSalvo.setMapa(mapaSalvo);
+        var salvo = repositorioSubprocesso.save(subprocessoSalvo);
+        
         return subprocessoMapper.toDTO(salvo);
     }
 

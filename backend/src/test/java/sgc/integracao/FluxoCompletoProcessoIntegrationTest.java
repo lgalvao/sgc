@@ -83,7 +83,6 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
 
         var processoCriado = processoService.criar(criarReq);
         codProcesso = processoCriado.getCodigo();
-        System.out.println("Processo criado com código: " + codProcesso);
 
         // ============================================================
         // PASSO 2: Admin inicia processo
@@ -92,13 +91,11 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                 processoService.iniciarProcessoMapeamento(
                         codProcesso, List.of(unidadeSENIC.getCodigo()));
         assertThat(errosIniciacao).isEmpty();
-        System.out.println("Processo iniciado");
 
         // Buscar o subprocesso criado
         var subprocessos = processoService.listarTodosSubprocessos(codProcesso);
         assertThat(subprocessos).hasSize(1);
         codSubprocesso = subprocessos.get(0).getCodigo();
-        System.out.println("Subprocesso criado com código: " + codSubprocesso);
 
         // ============================================================
         // PASSO 3-7: Simular transições de estado diretamente no repositório
@@ -112,14 +109,11 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // Alterar situação para MAPA_HOMOLOGADO (pré-requisito para finalizar)
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.saveAndFlush(subprocesso);
-        System.out.println("Subprocesso atualizado para situação: " + subprocesso.getSituacao());
 
         // Verificar situação antes de finalizar via service
-        var subprocessoAntesFinalizar =
-                subprocessoDtoService.obterPorProcessoEUnidade(
-                        codProcesso, unidadeSENIC.getCodigo());
-        System.out.println(
-                "Situação antes de finalizar: " + subprocessoAntesFinalizar.getSituacao());
+        var subprocessoAntesFinalizar = subprocessoDtoService.obterPorProcessoEUnidade(
+                codProcesso, unidadeSENIC.getCodigo());
+
         assertThat(subprocessoAntesFinalizar.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
@@ -127,25 +121,16 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // PASSO 8: Finalizar processo (Admin)
         // ============================================================
         processoService.finalizar(codProcesso);
-        System.out.println("Processo finalizado");
 
         // ============================================================
         // PASSO 9: Buscar subprocesso via API (como o frontend faz)
         // ============================================================
-        System.out.println("Buscando subprocesso via API...");
-        System.out.println("codProcesso: " + codProcesso);
-        System.out.println("siglaUnidade: " + unidadeSENIC.getSigla());
-
         // Esta é a chamada que o frontend faz ao navegar para SubprocessoView
-        var result =
-                mockMvc.perform(
-                                get(API_SUBPROCESSOS_BUSCAR)
-                                        .param("codProcesso", codProcesso.toString())
-                                        .param("siglaUnidade", unidadeSENIC.getSigla()))
-                        .andExpect(status().isOk())
-                        .andReturn();
-
-        System.out.println("Resposta API: " + result.getResponse().getContentAsString());
+        var result = mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
+                        .param("codProcesso", codProcesso.toString())
+                        .param("siglaUnidade", unidadeSENIC.getSigla()))
+                .andExpect(status().isOk())
+                .andReturn();
 
         mockMvc.perform(
                         get(API_SUBPROCESSOS_BUSCAR)
@@ -153,7 +138,5 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                                 .param("siglaUnidade", unidadeSENIC.getSigla()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo", is(codSubprocesso.intValue())));
-
-        System.out.println("✅ Subprocesso encontrado via API após finalização!");
     }
 }

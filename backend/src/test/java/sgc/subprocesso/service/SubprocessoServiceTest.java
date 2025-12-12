@@ -43,6 +43,8 @@ class SubprocessoServiceTest {
     private CompetenciaRepo competenciaRepo;
     @Mock
     private SubprocessoMapper subprocessoMapper;
+    @Mock
+    private sgc.mapa.model.MapaRepo mapaRepo;
 
     @InjectMocks
     private SubprocessoService service;
@@ -137,13 +139,20 @@ class SubprocessoServiceTest {
     @DisplayName("criar salva entidade")
     void criar() {
         SubprocessoDto dto = SubprocessoDto.builder().build();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        
         when(subprocessoMapper.toEntity(dto)).thenReturn(new Subprocesso());
-        when(repositorioSubprocesso.save(any())).thenReturn(new Subprocesso());
+        when(repositorioSubprocesso.save(any())).thenReturn(subprocesso);
+        when(mapaRepo.save(any())).thenReturn(mapa);
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
         service.criar(dto);
 
-        verify(repositorioSubprocesso).save(any());
+        verify(repositorioSubprocesso, org.mockito.Mockito.times(2)).save(any());
+        verify(mapaRepo).save(any());
     }
 
     @Test

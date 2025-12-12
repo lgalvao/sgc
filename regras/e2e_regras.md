@@ -20,3 +20,12 @@ mostrados durante os testes. Então nao se preocupe em rodar o backend ou fronte
 
 Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela no momento da falha -- nao deixe de ler
 esses arquivos.
+
+## Regras para execução de testes E2E
+
+- **NUNCA rode apenas um cenário isolado**: Muitos testes usam `test.describe.serial()`, o que significa que os cenários
+  dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
+- **Sempre redirecione a saída para um arquivo**: Use `> resultado.txt 2>&1` ao rodar testes E2E para capturar toda a
+  saída (stdout e stderr) em um arquivo de texto.
+- **Use grep para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e analisar partes
+  específicas da saída, como erros, logs do backend, ou mensagens específicas.

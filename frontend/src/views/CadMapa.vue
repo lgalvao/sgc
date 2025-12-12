@@ -465,8 +465,11 @@ async function adicionarCompetenciaEFecharModal() {
       await mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
     }
 
-    // Recarregar mapa completo para garantir que novas competências tenham seus códigos
-    await mapasStore.buscarMapaCompleto(codSubrocesso.value as number);
+    // Recarregar mapa completo e subprocesso para garantir que situação e competências estejam atualizadas
+    await Promise.all([
+      mapasStore.buscarMapaCompleto(codSubrocesso.value as number),
+      subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number),
+    ]);
   } finally {
     // Limpar formulário e fechar modal independente do resultado (o feedbackStore já notifica erros)
     novaCompetencia.value.descricao = "";
@@ -485,12 +488,14 @@ function excluirCompetencia(codigo: number) {
   }
 }
 
-function confirmarExclusaoCompetencia() {
+async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapasStore.removerCompetencia(
+    await mapasStore.removerCompetencia(
         codSubrocesso.value as number,
         competenciaParaExcluir.value.codigo,
     );
+    // Recarregar subprocesso para atualizar situação se mapa ficou vazio
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
     fecharModalExcluirCompetencia();
   }
 }

@@ -167,7 +167,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                                     "/api/subprocessos/{id}/cadastro/disponibilizar",
                                     subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
-                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("Cadastro de atividades disponibilizado")));
 

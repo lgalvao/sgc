@@ -2,7 +2,8 @@
   <div class="d-flex align-items-center gap-3">
     <BButton
         v-if="shouldShowBackButton"
-        class="btn btn-outline-secondary btn-sm"
+        variant="primary"
+        size="sm"
         data-testid="btn-nav-voltar"
         @click="goBack"
     >

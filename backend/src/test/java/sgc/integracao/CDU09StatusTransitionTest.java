@@ -88,12 +88,6 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
                 .isNotNull();
 
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
-        System.out.println("=== TEST INFO ===");
-        System.out.println("Subprocess ID: " + subprocesso.getCodigo());
-        System.out.println("Mapa ID: " + mapaCodigo);
-        System.out.println("Initial Status: " + subprocesso.getSituacao());
-        System.out.println("Titular: " + titularTitulo);
-        System.out.println("=================");
 
         // WHEN: The titular creates an activity
         AtividadeDto novaAtividade = new AtividadeDto();
@@ -104,14 +98,11 @@ public class CDU09StatusTransitionTest extends BaseIntegrationTest {
 
         assertThat(atividadeCriada).isNotNull();
         assertThat(atividadeCriada.getCodigo()).isNotNull();
-        System.out.println("Created Activity ID: " + atividadeCriada.getCodigo());
 
         // THEN: Subprocess status should have changed to MAPEAMENTO_CADASTRO_EM_ANDAMENTO
         // Re-fetch the subprocess to get updated status
         Subprocesso updatedSubprocesso = subprocessoRepo.findById(subprocesso.getCodigo())
                 .orElseThrow(() -> new AssertionError("Subprocess not found after activity creation"));
-
-        System.out.println("Updated Status: " + updatedSubprocesso.getSituacao());
 
         assertThat(updatedSubprocesso.getSituacao())
                 .as("Status should transition to MAPEAMENTO_CADASTRO_EM_ANDAMENTO after activity is added")

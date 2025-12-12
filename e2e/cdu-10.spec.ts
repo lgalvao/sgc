@@ -398,7 +398,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
@@ -415,7 +415,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
@@ -427,12 +427,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        // DEBUG: Verificar processos visíveis no painel
-        console.log(`[DEBUG] Processo esperado: "${descProcessoRevisao}"`);
-        const linhasProcesso = await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).count();
-        console.log(`[DEBUG] Linhas com processo de revisão: ${linhasProcesso}`);
-
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        // Aguardar que o processo de revisão apareça na tabela de alertas
+        await expect(page.getByText(descProcessoRevisao)).toBeVisible();
+        
+        // Clicar no alerta que contém o processo de revisão para ir para a página do processo
+        await page.locator('table').nth(1).locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
 
         // Aguardar redirecionamento para a página de detalhes do processo
         await expect(page).toHaveURL(/\/processo\/\d+$/);

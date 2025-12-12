@@ -1,7 +1,5 @@
 spring:
   main.banner-mode: off
-  jackson:
-    use-jackson2-defaults: true
   test.mockmvc.print: none
   jpa:
     hibernate.ddl-auto: create-drop

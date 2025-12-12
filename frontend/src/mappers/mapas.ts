@@ -23,14 +23,7 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
         competencias: (dto.competencias || []).map((c: any) => ({
             codigo: c.codigo,
             descricao: c.descricao,
-            atividades: (c.atividades || []).map((a: any) => ({
-                codigo: a.codigo,
-                descricao: a.descricao,
-                conhecimentos: (a.conhecimentos || []).map((con: any) => ({
-                    id: con.id,
-                    descricao: con.descricao,
-                })),
-            })),
+            atividadesAssociadas: c.atividadesCodigos || [],
         })),
         situacao: dto.situacao || "",
     };

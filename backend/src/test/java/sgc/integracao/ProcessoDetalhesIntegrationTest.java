@@ -115,9 +115,6 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                             .andExpect(status().isOk())
                             .andReturn();
 
-            System.out.println(
-                    "Resposta JSON (em andamento): " + result.getResponse().getContentAsString());
-
             mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo", is(processoEmAndamento.getCodigo().intValue())))

@@ -65,8 +65,20 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto adicionarCompetencia(
             Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
+        
+        Long codMapa = subprocesso.getMapa().getCodigo();
+        boolean eraVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
+        
         competenciaService.adicionarCompetencia(
                 subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds());
+        
+        // Alterar situação para MAPA_CRIADO se era vazio e passou a ter competências
+        if (eraVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            repositorioSubprocesso.save(subprocesso);
+            log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", codSubprocesso);
+        }
+        
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
@@ -84,7 +96,18 @@ public class SubprocessoMapaWorkflowService {
     public MapaCompletoDto removerCompetencia(
             Long codSubprocesso, Long codCompetencia, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
+        
+        Long codMapa = subprocesso.getMapa().getCodigo();
         competenciaService.removerCompetencia(codCompetencia);
+        
+        // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
+        boolean ficouVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
+        if (ficouVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            repositorioSubprocesso.save(subprocesso);
+            log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
+        }
+        
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 

@@ -123,7 +123,6 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
         Subprocesso subprocessoAtualizado =
