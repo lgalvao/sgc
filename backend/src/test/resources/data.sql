@@ -324,3 +324,34 @@ VALUES ('2000', 'Processo Criado', 'CRIADO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', 
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
 VALUES ('2000', 8);
 
+-- CORREÇÕES DE INTEGRIDADE: MAPA -> SUBPROCESSO
+
+-- Vincula Mapa 1001 ao Subprocesso 60000 (já existente, Processo 50000 - EM ANDAMENTO)
+UPDATE SGC.MAPA SET subprocesso_codigo = 60000 WHERE codigo = 1001;
+
+-- Processo 50002 (FINALIZADO) para abrigar subprocessos históricos que não devem bloquear novos processos
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES ('50002', 'Processo Histórico Finalizado', 'FINALIZADO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', CURRENT_TIMESTAMP());
+
+-- Mapa 1002 (Unidade 9) -> Processo 50001 (FINALIZADO)
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
+VALUES ('60002', 50001, 9, 1002, 'DIAGNOSTICO_CONCLUIDO', CURRENT_TIMESTAMP());
+UPDATE SGC.MAPA SET subprocesso_codigo = 60002 WHERE codigo = 1002;
+
+-- Mapa 1003 (Unidade 10) -> Processo 50002 (FINALIZADO)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 10);
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
+VALUES ('60003', 50002, 10, 1003, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+UPDATE SGC.MAPA SET subprocesso_codigo = 60003 WHERE codigo = 1003;
+
+-- Mapa 1004 (Unidade 102) -> Processo 50002 (FINALIZADO)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 102);
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
+VALUES ('60004', 50002, 102, 1004, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+UPDATE SGC.MAPA SET subprocesso_codigo = 60004 WHERE codigo = 1004;
+
+-- Mapa 201 (Unidade 201) -> Processo 50002 (FINALIZADO)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 201);
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
+VALUES ('60201', 50002, 201, 201, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+UPDATE SGC.MAPA SET subprocesso_codigo = 60201 WHERE codigo = 201;

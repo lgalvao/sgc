@@ -70,6 +70,7 @@ class AtividadeServiceReproductionTest {
         dto.setMapaCodigo(mapaId);
 
         Unidade unidade = new Unidade();
+        unidade.setTituloTitular(usuarioId);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(usuarioId);
 

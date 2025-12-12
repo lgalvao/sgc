@@ -1,6 +1,6 @@
 # Problemas Identificados nos Testes de Backend
 
-Este documento resume os problemas encontrados durante a execução dos testes de backend e as correções aplicadas ou pendentes.
+Este documento resume os problemas encontrados durante a execução dos testes de backend e as correções aplicadas.
 
 ## Correções Aplicadas
 
@@ -19,28 +19,40 @@ Este documento resume os problemas encontrados durante a execução dos testes d
 **Causa:** O método `setupSecurityContext` no teste não inicializava corretamente as atribuições de perfil (`UsuarioPerfil`) no objeto `Usuario`. Como resultado, `getAuthorities()` retornava uma lista vazia ou incorreta, falhando as verificações de segurança baseadas em role (`hasRole`).
 **Correção:** Atualizado o método `setupSecurityContext` em `CDU06IntegrationTest.java` para criar explicitamente um `Set<UsuarioPerfil>`, populá-lo com a unidade e perfil corretos, e atribuí-lo ao usuário mock via `setAtribuicoes`.
 
-## Problemas Pendentes e Bloqueantes
-
-### 1. `CDU14IntegrationTest` (8 falhas)
-Este teste de integração enfrenta múltiplos problemas estruturais relacionados à configuração dos dados de teste e mapeamento de entidades.
-
+### 4. `CDU14IntegrationTest` (Resolvido)
 **Erro A: 409 Conflict - "Unidade SUB-UNIT não possui mapa vigente"**
-*   **Causa:** O serviço `ProcessoService` falha ao recuperar o `UnidadeMapa` (mapa vigente) da unidade 102 (`SUB-UNIT`).
-*   **Análise Técnica:** Embora o registro exista na tabela `UNIDADE_MAPA`, a entidade JPA `UnidadeMapa` tem um relacionamento `@ManyToOne` com `Mapa` (`mapaVigente`). A entidade `Mapa`, por sua vez, possui um relacionamento obrigatório (`optional = false`) com `Subprocesso`.
-*   **Raiz do Problema:** O script de dados de teste (`data.sql`) insere mapas (ex: ID 1004) sem associá-los a um subprocesso (coluna `subprocesso_codigo` é NULL). Quando o Hibernate tenta buscar o `UnidadeMapa`, ele executa um `INNER JOIN` com a tabela `SUBPROCESSO` devido à restrição de não-nulidade na entidade `Mapa`. Como o subprocesso não existe, o join falha e a consulta retorna vazio, levando o serviço a lançar `ErroProcesso` (409).
-*   **Solução Necessária:** Atualizar `data.sql` para garantir que todo `Mapa` de teste esteja associado a um `Subprocesso` válido, ou ajustar a entidade `Mapa` se a associação não for estritamente obrigatória em todos os cenários.
+**Causa:** `UnidadeMapa` dependia de `Mapa` que dependia de `Subprocesso`. Mapas de teste não tinham subprocesso associado.
+**Correção:** Atualizado `data.sql` para garantir que todo `Mapa` esteja associado a um `Subprocesso` válido. Adicionalmente, criados subprocessos e processos "FINALIZADOS" para unidades de teste (10, 102, 201) para evitar bloqueios ao iniciar novos processos.
 
 **Erro B: 403 Forbidden - "Usuário não é o titular da unidade"**
-*   **Causa:** O método `SubprocessoWorkflowService.validarSubprocessoParaDisponibilizacao` verifica se o usuário logado é o titular da unidade. A verificação falha com a mensagem "Titular é não definido".
-*   **Análise Técnica:** O teste tenta definir o titular da unidade no método `setUp` chamando `unidade.setTituloTitular(...)` e `unidadeRepo.saveAll(...)`. No entanto, a entidade `Unidade` está anotada com `@Immutable` (pois reflete uma VIEW de banco de dados).
-*   **Raiz do Problema:** O Hibernate ignora silenciosamente quaisquer atualizações (UPDATEs) em entidades `@Immutable`. Portanto, a alteração do titular no teste não é persistida no banco H2. Quando o serviço recarrega a unidade do banco, o campo `titulo_titular` permanece `NULL` (valor original do `data.sql`), causando a negação de acesso.
-*   **Solução Necessária:** Utilizar `JdbcTemplate` nos testes para realizar atualizações diretas via SQL, contornando a restrição do Hibernate para fins de configuração de cenário de teste.
+**Causa:** Entidade `Unidade` é `@Immutable`, então `unidadeRepo.saveAll` não persistia o titular no H2.
+**Correção:** Injetado `JdbcTemplate` no teste para realizar atualização direta na tabela `vw_unidade`.
 
-### 2. `CDU12IntegrationTest` (4 falhas)
-**Erro:** Falha na asserção `$.temImpactos` (esperado `true`, recebido `false`).
-**Análise:** A lógica de detecção de impactos (`ImpactoMapaService`) não está identificando as alterações simuladas (ex: remoção de atividade). Isso pode ser causado por transações de teste que isolam as alterações de dados da lógica de verificação, ou por dados de teste que não satisfazem as condições complexas de comparação de mapas (versão anterior vs atual).
+### 5. `CDU12IntegrationTest` (Resolvido)
+**Erro:** Falha na detecção de impactos (`$.temImpactos` false).
+**Causa:** O setup do teste criava um `Mapa` mas não o associava à `Unidade` via `UnidadeMapaRepo`, fazendo com que o `ImpactoMapaService` não encontrasse um mapa vigente para comparação.
+**Correção:** Injetado `UnidadeMapaRepo` e persistido o vínculo `UnidadeMapa` no `setUp`. Teste de borda ajustado para remover explicitamente o vínculo.
 
-### 3. Outros Testes com Falhas
-*   `CDU13IntegrationTest`: Falha de dados (null vs esperado).
-*   `CDU15IntegrationTest`: Estrutura JSON incorreta.
-*   `CDU20IntegrationTest`: Retorno nulo inesperado.
+### 6. `CDU13IntegrationTest` e `CDU20IntegrationTest` (Resolvido)
+**Erro:** Falha ao verificar sigla da unidade no histórico (`expected: "COSIS", but was: null`).
+**Causa:** `AnaliseMapper` não estava populando o campo `unidadeSigla` no DTO, pois a entidade `Analise` possui apenas `unidadeCodigo`.
+**Correção:** Convertido `AnaliseMapper` para classe abstrata e injetado `UnidadeRepo` para buscar a sigla a partir do código durante o mapeamento.
+
+### 7. `CDU15IntegrationTest` (Resolvido)
+**Erro:** JSON path inválido (`atividadesCodigos` não encontrado).
+**Causa:** O campo no DTO `CompetenciaMapaDto` chamava-se `atividadesAssociadas`, mas o teste esperava `atividadesCodigos`.
+**Correção:** Renomeado o campo `atividadesAssociadas` para `atividadesCodigos` no DTO `CompetenciaMapaDto` e atualizado suas referências no `MapaService`.
+
+### 8. `AtividadeServiceReproductionTest` (Resolvido)
+**Erro:** Exceção inesperada (`ErroAccessoNegado` em vez de `ErroEntidadeNaoEncontrada`).
+**Causa:** O teste de reprodução falhava na verificação de titularidade antes de atingir o cenário de erro desejado (NPE/Entidade não encontrada).
+**Correção:** Configurado o titular da unidade no mock para passar pela verificação de segurança.
+
+### 9. `ProcessoServiceTest` (Resolvido)
+**Erro:** `checarAcesso` retornando false.
+**Causa:** O teste mockava `existsByProcessoCodigoAndUnidadeCodigo` (singular), mas o serviço foi refatorado para usar `existsByProcessoCodigoAndUnidadeCodigoIn` (lista) para suportar hierarquia.
+**Correção:** Atualizado o mock para `existsByProcessoCodigoAndUnidadeCodigoIn`.
+
+## Problemas Pendentes e Bloqueantes
+
+Nenhum. Todos os testes de backend estão passando.

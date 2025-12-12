@@ -160,7 +160,7 @@ public class MapaService {
                 log.debug("Competência atualizada: {}", competencia.getCodigo());
             }
             mapaVinculoService.atualizarVinculosAtividades(
-                    competencia.getCodigo(), compDto.getAtividadesAssociadas());
+                    competencia.getCodigo(), compDto.getAtividadesCodigos());
         }
 
         mapaIntegridadeService.validarIntegridadeMapa(codMapa);

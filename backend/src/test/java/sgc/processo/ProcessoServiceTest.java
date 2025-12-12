@@ -527,7 +527,7 @@ class ProcessoServiceTest {
                 .build();
         when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-        when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
+        when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
 
         assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
     }

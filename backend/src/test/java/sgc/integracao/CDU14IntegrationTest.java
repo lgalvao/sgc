@@ -78,6 +78,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
     @MockitoBean
     private SgrhService sgrhService;
 
@@ -129,8 +131,13 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
 
-        unidade.setTituloTitular(chefe.getTituloEleitoral());
-        unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
+        // Atualiza titular via JDBC para contornar restrição @Immutable da entidade Unidade
+        jdbcTemplate.update("UPDATE sgc.vw_unidade SET titulo_titular = ? WHERE codigo = ?",
+                chefe.getTituloEleitoral(), unidade.getCodigo());
+
+        // Recarrega a unidade para refletir a alteração no contexto JPA
+        entityManager.clear();
+        unidade = unidadeRepo.findById(102L).orElseThrow();
 
         java.util.Set<sgc.sgrh.model.UsuarioPerfil> adminAttrs = new java.util.HashSet<>();
         adminAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
