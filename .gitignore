@@ -24,13 +24,7 @@ backend/bin/
 /backend/build/test-results/test/binary
 
 # Logs
-
 *.gz
-
-# Screenshots (não versionar)
-/screenshots/*.png
-/screenshots/*.jpg
-!/screenshots/README.md
 
 # Arquivos compilados/binários
 *.class
