@@ -192,6 +192,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await disponibilizarMapa(page);
 
-        await expect(page.getByTestId('txt-badge-situacao')).toHaveText(/Mapa disponibilizado/i);
+        // Após disponibilizar, deve redirecionar para o painel
+        await expect(page).toHaveURL(/\/painel/);
+        await expect(page.getByRole('heading', {name: /Mapa disponibilizado/i})).toBeVisible();
     });
 });

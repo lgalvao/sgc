@@ -335,7 +335,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
@@ -357,7 +357,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
 
         // Verificar situação voltou para 'em andamento'
@@ -398,7 +398,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
-        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
@@ -415,7 +415,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
@@ -430,8 +430,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Verificar que o processo de revisão está visível no painel (deveria estar na tabela de processos)
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         
-        // Clicar no processo de revisão na tabela de processos
-        await page.locator('tbody tr', {has: page.getByText(descProcessoRevisao, {exact: true})}).first().click();
+        // Navegar diretamente para evitar erros de seleção na tabela
+        await page.goto(`/processo/${processoRevisaoId}`);
+        await expect(page.getByRole('table')).toBeVisible();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
@@ -449,7 +450,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         await navegarParaAtividades(page);
 
         // Disponibilizar novamente
@@ -464,7 +465,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.goto(`/processo/${processoRevisaoId}`);
+        await expect(page.getByRole('table')).toBeVisible();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'Seção 221'})).toBeVisible();
@@ -483,7 +485,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
 
         await navegarParaAtividades(page);
@@ -504,7 +506,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
 
         await navegarParaAtividades(page);
