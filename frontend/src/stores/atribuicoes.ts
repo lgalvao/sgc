@@ -52,6 +52,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
             } catch (err: any) {
                 lastError.value = normalizeError(err);
                 error.value = lastError.value.message;
+                throw err;
             } finally {
                 isLoading.value = false;
             }
