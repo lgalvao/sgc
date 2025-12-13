@@ -5,7 +5,6 @@ import CadProcesso from '@/views/CadProcesso.vue';
 import { useProcessosStore } from '@/stores/processos';
 import { useUnidadesStore } from '@/stores/unidades';
 import { TipoProcesso } from '@/types/tipos';
-import { nextTick } from 'vue';
 
 // Mocks
 const mockPush = vi.fn();

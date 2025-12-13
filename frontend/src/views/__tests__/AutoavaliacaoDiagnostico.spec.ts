@@ -139,8 +139,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     await new Promise(resolve => setTimeout(resolve, 10));
     await wrapper.vm.$nextTick();
     
-    const btn = wrapper.find('[data-testid="btn-concluir-autoavaliacao"]');
-    
     // Initially false because Comp 2 is incomplete
     // Note: BButton stub renders a button, so we check attribute
     // In Vue Test Utils, boolean attributes might be present or not

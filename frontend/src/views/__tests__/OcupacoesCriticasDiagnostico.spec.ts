@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnostico.vue';
-import { useFeedbackStore } from '@/stores/feedback';
 import { diagnosticoService } from '@/services/diagnosticoService';
 
 // Mocks
@@ -27,7 +26,6 @@ vi.mock('@/services/diagnosticoService', () => ({
 
 describe('OcupacoesCriticasDiagnostico.vue', () => {
   let wrapper: any;
-  let feedbackStore: any;
 
   const mockAvaliacaoGap = {
     competenciaCodigo: 1,
@@ -91,7 +89,6 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
       },
     });
 
-    feedbackStore = useFeedbackStore();
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnostico);
   });
 

@@ -65,6 +65,29 @@ describe('SubprocessoView.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        subprocessos: {
+          // Set subprocessoDetalhe directly in initial state for most tests
+          subprocessoDetalhe: mockSubprocesso,
+        },
+        mapas: {
+          mapaCompleto: null,
+        },
+      },
+    });
+
+    subprocessosStore = useSubprocessosStore(pinia);
+    mapaStore = useMapasStore(pinia);
+    feedbackStore = useFeedbackStore(pinia);
+
+    // Set mock resolved values for async actions
+    subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(10);
+    subprocessosStore.buscarSubprocessoDetalhe.mockResolvedValue(mockSubprocesso);
+    mapaStore.buscarMapaCompleto.mockResolvedValue({});
+    subprocessosStore.alterarDataLimiteSubprocesso.mockResolvedValue({});
+
     wrapper = mount(SubprocessoView, {
       props: {
         codProcesso: 1,
@@ -72,18 +95,7 @@ describe('SubprocessoView.vue', () => {
       },
       global: {
         plugins: [
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              subprocessos: {
-                // Set subprocessoDetalhe directly in initial state for most tests
-                subprocessoDetalhe: mockSubprocesso, 
-              },
-              mapas: {
-                mapaCompleto: null,
-              },
-            },
-          }),
+          pinia,
         ],
         stubs: {
           BContainer: { template: '<div><slot /></div>' },
@@ -94,22 +106,20 @@ describe('SubprocessoView.vue', () => {
         },
       },
     });
-
-    subprocessosStore = useSubprocessosStore();
-    mapaStore = useMapasStore();
-    feedbackStore = useFeedbackStore();
-    
-    // Set mock resolved values for async actions
-    subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockImplementation(() => Promise.resolve(10));
-    subprocessosStore.buscarSubprocessoDetalhe.mockResolvedValue(mockSubprocesso); 
-    mapaStore.buscarMapaCompleto.mockResolvedValue({}); 
-    subprocessosStore.alterarDataLimiteSubprocesso.mockResolvedValue({}); 
   });
 
   it.skip('fetches data on mount', async () => {
     // Create a fresh pinia for this test to ensure clean state and correct store usage
     const testingPinia = createTestingPinia({ createSpy: vi.fn });
     
+    // Pre-configure the store mocks before mount
+    const store = useSubprocessosStore(testingPinia);
+    const mapa = useMapasStore(testingPinia);
+
+    (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(10);
+    (store.buscarSubprocessoDetalhe as any).mockResolvedValue(mockSubprocesso);
+    (mapa.buscarMapaCompleto as any).mockResolvedValue({});
+
     wrapper = mount(SubprocessoView, {
         props: { codProcesso: 1, siglaUnidade: 'TEST' },
         global: {
@@ -123,15 +133,6 @@ describe('SubprocessoView.vue', () => {
             }
         }
     });
-
-    // Get the stores associated with THIS testingPinia
-    const store = useSubprocessosStore(testingPinia);
-    const mapa = useMapasStore(testingPinia);
-
-    // Setup mocks on THIS store instance
-    (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(10);
-    (store.buscarSubprocessoDetalhe as any).mockResolvedValue(mockSubprocesso);
-    (mapa.buscarMapaCompleto as any).mockResolvedValue({});
 
     await flushPromises();
 

@@ -195,7 +195,6 @@ describe("ImpactoMapaModal.vue", () => {
 
     it("deve exibir estado de carregamento", async () => {
         // Forçamos o estado de carregamento simulando a chamada
-        const mapasStore = useMapasStore();
 
         // Recriar para pegar a transição de props
         wrapper = mount(ImpactoMapaModal, {

@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import RelatoriosView from '@/views/RelatoriosView.vue';
-import { useProcessosStore } from '@/stores/processos';
-import { useMapasStore } from '@/stores/mapas';
 import { TipoProcesso } from '@/types/tipos';
 
 // Mock URL.createObjectURL
@@ -11,8 +9,6 @@ global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 
 describe('RelatoriosView.vue', () => {
   let wrapper: any;
-  let processosStore: any;
-  let mapasStore: any;
 
   const mockProcessos = [
     {
@@ -75,9 +71,6 @@ describe('RelatoriosView.vue', () => {
         },
       },
     });
-
-    processosStore = useProcessosStore();
-    mapasStore = useMapasStore();
   });
   
   afterEach(() => {
