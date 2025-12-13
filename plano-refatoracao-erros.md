@@ -845,7 +845,7 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 21. [x] Validar testes completos (unit + E2E)
 
 ### Sprint 6: Documentação e Finalização
-22. [ ] Atualizar documentação (READMEs, AGENTS.md)
+22. [x] Atualizar documentação (READMEs, AGENTS.md)
 23. [ ] Code review final
 24. [ ] Smoke tests E2E completos
 25. [ ] Merge para main
