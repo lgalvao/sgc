@@ -3,7 +3,7 @@
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
-      <span class="text-xs text-muted">Debug: {{ codSubrocesso }} | {{ isRevisao }} | {{ perfilSelecionado }}</span>
+      <span class="text-xs text-muted">Debug: {{ codSubprocesso }} | {{ isRevisao }} | {{ perfilSelecionado }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -77,15 +77,15 @@
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
-        :id-processo="codProcesso"
+        v-if="codSubprocesso"
+        :cod-subprocesso="codSubprocesso"
         :mostrar="mostrarModalImpacto"
-        :sigla-unidade="siglaUnidade"
         @fechar="fecharModalImpacto"
     />
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-        :cod-subrocesso="codSubrocesso"
+        :cod-subrocesso="codSubprocesso"
         :mostrar="mostrarModalHistoricoAnalise"
         @fechar="fecharModalHistoricoAnalise"
     />
@@ -272,11 +272,11 @@ const podeVerImpacto = computed(() => {
   return podeVer && situacaoCorreta;
 });
 
-const codSubrocesso = computed(() => subprocesso.value?.codSubprocesso);
+const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const atividades = computed<Atividade[]>(() => {
-  if (codSubrocesso.value === undefined) return [];
-  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  if (codSubprocesso.value === undefined) return [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -286,8 +286,8 @@ const isRevisao = computed(
 
 onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
-  if (codSubrocesso.value) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
+  if (codSubprocesso.value) {
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
   }
 });
 
@@ -300,7 +300,7 @@ function devolverCadastro() {
 }
 
 async function confirmarValidacao() {
-  if (!codSubrocesso.value || !perfilSelecionado.value) return;
+  if (!codSubprocesso.value || !perfilSelecionado.value) return;
 
   const commonRequest = {
     observacoes: observacaoValidacao.value,
@@ -315,11 +315,11 @@ async function confirmarValidacao() {
     try {
       if (isRevisao.value) {
         await subprocessosStore.homologarRevisaoCadastro(
-            codSubrocesso.value,
+            codSubprocesso.value,
             req,
         );
       } else {
-        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
+        await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
       }
 
       feedbackStore.show(
@@ -350,9 +350,9 @@ async function confirmarValidacao() {
     const req: AceitarCadastroRequest = {...commonRequest};
     try {
       if (isRevisao.value) {
-        await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
+        await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
       } else {
-        await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
+        await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
       }
 
       fecharModalValidar();
@@ -369,15 +369,15 @@ async function confirmarValidacao() {
 }
 
 async function confirmarDevolucao() {
-  if (!codSubrocesso.value || !perfilSelecionado.value) return;
+  if (!codSubprocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
     observacoes: observacaoDevolucao.value,
   };
 
   if (isRevisao.value) {
-    await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
   } else {
-    await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
+    await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
   }
 
   fecharModalDevolver();

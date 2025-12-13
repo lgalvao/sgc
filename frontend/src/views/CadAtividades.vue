@@ -79,7 +79,7 @@
       </BCol>
       <BCol cols="auto">
         <BButton
-            :disabled="!codSubrocesso || !permissoes?.podeEditarMapa"
+            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
             data-testid="btn-adicionar-atividade"
             size="sm"
             title="Adicionar atividade"
@@ -106,16 +106,16 @@
     </div>
 
     <ImportarAtividadesModal
-        :cod-subrocesso-destino="codSubrocesso"
+        :cod-subprocesso-destino="codSubprocesso"
         :mostrar="mostrarModalImportar"
         @fechar="mostrarModalImportar = false"
         @importar="handleImportAtividades"
     />
 
     <ImpactoMapaModal
-        :id-processo="codProcesso"
+        v-if="codSubprocesso"
+        :cod-subprocesso="codSubprocesso"
         :mostrar="mostrarModalImpacto"
-        :sigla-unidade="siglaUnidade"
         @fechar="fecharModalImpacto"
     />
 
@@ -302,7 +302,7 @@ function buscarUnidadeNaArvore(unidades: any[], sigla: string): any {
     return null;
 }
 
-const codSubrocesso = computed(() => {
+const codSubprocesso = computed(() => {
     if (!processosStore.processoDetalhe?.unidades) return undefined;
     const unidadeEncontrada = buscarUnidadeNaArvore(
         processosStore.processoDetalhe.unidades,
@@ -322,8 +322,8 @@ const codMapa = computed(() => {
 
 const atividades = computed({
   get: () => {
-    if (codSubrocesso.value === undefined) return [];
-    return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value);
+    if (codSubprocesso.value === undefined) return [];
+    return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value);
   },
   set: () => {
   },
@@ -337,24 +337,24 @@ const isRevisao = computed(
 const permissoes = ref<SubprocessoPermissoes | null>(null);
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && codMapa.value && codSubrocesso.value) {
+  if (novaAtividade.value?.trim() && codMapa.value && codSubprocesso.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
     const status = await atividadesStore.adicionarAtividade(
-        codSubrocesso.value,
+        codSubprocesso.value,
         codMapa.value,
         request,
     );
     novaAtividade.value = "";
     if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
     }
   }
 }
 
 async function removerAtividade(idx: number) {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
   const atividadeRemovida = atividades.value[idx];
   if (
       confirm(
@@ -362,50 +362,50 @@ async function removerAtividade(idx: number) {
       )
   ) {
     const status = await atividadesStore.removerAtividade(
-        codSubrocesso.value,
+        codSubprocesso.value,
         atividadeRemovida.codigo,
     );
     if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
     }
   }
 }
 
 async function adicionarConhecimento(idx: number, descricao: string) {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
   const atividade = atividades.value[idx];
   if (descricao.trim()) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
     const status = await atividadesStore.adicionarConhecimento(
-        codSubrocesso.value,
+        codSubprocesso.value,
         atividade.codigo,
         request,
     );
     if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
     }
   }
 }
 
 async function removerConhecimento(idx: number, idConhecimento: number) {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
   const atividade = atividades.value[idx];
   if (confirm("Confirma a remoção deste conhecimento?")) {
     const status = await atividadesStore.removerConhecimento(
-        codSubrocesso.value,
+        codSubprocesso.value,
         atividade.codigo,
         idConhecimento,
     );
     if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
     }
   }
 }
 
 async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: number, descricao: string) {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
 
   if (descricao.trim()) {
     const conhecimentoAtualizado: Conhecimento = {
@@ -413,19 +413,19 @@ async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: num
       descricao: descricao.trim(),
     };
     const status = await atividadesStore.atualizarConhecimento(
-        codSubrocesso.value,
+        codSubprocesso.value,
         atividadeId,
         conhecimentoId,
         conhecimentoAtualizado,
     );
     if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
     }
   }
 }
 
 async function salvarEdicaoAtividade(id: number, descricao: string) {
-  if (descricao.trim() && codSubrocesso.value) {
+  if (descricao.trim() && codSubprocesso.value) {
     const atividadeOriginal = atividades.value.find((a) => a.codigo === id);
     if (atividadeOriginal) {
       const atividadeAtualizada: Atividade = {
@@ -433,12 +433,12 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
         descricao: descricao.trim(),
       };
       const status = await atividadesStore.atualizarAtividade(
-          codSubrocesso.value,
+          codSubprocesso.value,
           id,
           atividadeAtualizada,
       );
       if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+        processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
       }
     }
   }
@@ -446,10 +446,10 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  if (codSubrocesso.value) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
-    const status = await subprocessoService.obterStatus(codSubrocesso.value);
-    processosStore.atualizarStatusSubprocesso(codSubrocesso.value, status);
+  if (codSubprocesso.value) {
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
+    const status = await subprocessoService.obterStatus(codSubprocesso.value);
+    processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
   }
   feedbackStore.show(
       "Importação Concluída",
@@ -483,10 +483,10 @@ const errosValidacao = ref<ErroValidacao[]>([]);
 onMounted(async () => {
   await unidadesStore.buscarUnidade(props.sigla);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
-  if (codSubrocesso.value) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(codSubrocesso.value);
-    await analisesStore.buscarAnalisesCadastro(codSubrocesso.value);
-    permissoes.value = await subprocessoService.obterPermissoes(codSubrocesso.value);
+  if (codSubprocesso.value) {
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
+    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+    permissoes.value = await subprocessoService.obterPermissoes(codSubprocesso.value);
   } else {
     console.error('[CadAtividades] ERRO: codSubprocesso está undefined!');
     console.error('[CadAtividades] Não foi possível carregar atividades e permissões');
@@ -495,8 +495,8 @@ onMounted(async () => {
 
 
 const historicoAnalises = computed(() => {
-  if (!codSubrocesso.value) return [];
-  return analisesStore.obterAnalisesPorSubprocesso(codSubrocesso.value);
+  if (!codSubprocesso.value) return [];
+  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
 });
 
 function formatarData(data: string): string {
@@ -541,9 +541,9 @@ async function disponibilizarCadastro() {
   }
 
   // Backend valida atividades sem conhecimento via SubprocessoCadastroController/DTO
-  if (codSubrocesso.value) {
+  if (codSubprocesso.value) {
     try {
-      const resultado = await subprocessoService.validarCadastro(codSubrocesso.value);
+      const resultado = await subprocessoService.validarCadastro(codSubprocesso.value);
       if (resultado.valido) {
         mostrarModalConfirmacao.value = true;
       } else {
@@ -561,13 +561,13 @@ function fecharModalConfirmacao() {
 }
 
 async function confirmarDisponibilizacao() {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
 
   let sucesso: boolean;
   if (isRevisao.value) {
-    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubrocesso.value);
+    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubprocesso.value);
   } else {
-    sucesso = await subprocessosStore.disponibilizarCadastro(codSubrocesso.value);
+    sucesso = await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
   }
 
   fecharModalConfirmacao();

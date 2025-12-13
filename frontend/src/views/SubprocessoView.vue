@@ -21,7 +21,7 @@
     </div>
 
     <SubprocessoCards
-        v-if="subprocesso"
+        v-if="subprocesso && codSubprocesso"
         :cod-processo="props.codProcesso"
         :cod-subprocesso="codSubprocesso"
         :mapa="mapa"

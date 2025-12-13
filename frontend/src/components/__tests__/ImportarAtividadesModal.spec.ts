@@ -62,7 +62,7 @@ describe("ImportarAtividadesModal", () => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
         wrapper = mount(ImportarAtividadesModal, {
-            props: {mostrar: true, codSubrocessoDestino: 999},
+            props: {mostrar: true, codSubprocessoDestino: 999},
         });
     });
 

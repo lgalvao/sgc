@@ -145,19 +145,16 @@ import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {ref, watch} from "vue";
 import {useMapasStore} from "@/stores/mapas";
-import {useProcessosStore} from "@/stores/processos";
 import {TipoImpactoCompetencia} from "@/types/impacto";
 
 const props = defineProps<{
   mostrar: boolean;
-  idProcesso: number; // codProcesso
-  siglaUnidade: string;
+  codSubprocesso: number;
 }>();
 
 const emit = defineEmits<(e: "fechar") => void>();
 
 const mapasStore = useMapasStore();
-const processosStore = useProcessosStore();
 const {impactoMapa: impacto} = storeToRefs(mapasStore);
 
 const carregando = ref(false);
@@ -168,11 +165,10 @@ watch(
       if (novoValor) {
         carregando.value = true;
         try {
-          const unidadeParticipante = processosStore.processoDetalhe?.unidades.find((u) => u.sigla === props.siglaUnidade,);
-          if (unidadeParticipante && unidadeParticipante.codSubprocesso) {
-            await mapasStore.buscarImpactoMapa(unidadeParticipante.codSubprocesso);
+          if (props.codSubprocesso) {
+            await mapasStore.buscarImpactoMapa(props.codSubprocesso);
           } else {
-            console.error("Subprocesso não encontrado para unidade", props.siglaUnidade);
+            console.error("Código do subprocesso não fornecido.");
           }
         } finally {
           carregando.value = false;
