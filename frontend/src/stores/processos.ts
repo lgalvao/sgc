@@ -9,6 +9,7 @@ import type {
     SubprocessoElegivel,
     TipoProcesso,
 } from "@/types/tipos";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
 
@@ -18,6 +19,7 @@ export const useProcessosStore = defineStore("processos", () => {
     const processoDetalhe = ref<Processo | null>(null);
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
+    const lastError = ref<NormalizedError | null>(null);
 
     const obterUnidadesProcesso = computed(
         () =>
@@ -29,6 +31,10 @@ export const useProcessosStore = defineStore("processos", () => {
             },
     );
 
+    function clearError() {
+        lastError.value = null;
+    }
+
     async function buscarProcessosPainel(
         perfil: string,
         unidade: number,
@@ -37,50 +43,105 @@ export const useProcessosStore = defineStore("processos", () => {
         sort?: keyof ProcessoResumo,
         order?: "asc" | "desc",
     ) {
-        const response = await painelService.listarProcessos(
-            perfil,
-            unidade,
-            page,
-            size,
-            sort,
-            order,
-        );
-        processosPainel.value = response.content;
-        processosPainelPage.value = response;
+        lastError.value = null;
+        try {
+            const response = await painelService.listarProcessos(
+                perfil,
+                unidade,
+                page,
+                size,
+                sort,
+                order,
+            );
+            processosPainel.value = response.content;
+            processosPainelPage.value = response;
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function buscarProcessosFinalizados() {
-        processosFinalizados.value = await processoService.buscarProcessosFinalizados();
+        lastError.value = null;
+        try {
+            processosFinalizados.value = await processoService.buscarProcessosFinalizados();
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function buscarProcessoDetalhe(idProcesso: number) {
-        processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
+        lastError.value = null;
+        try {
+            processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            processoDetalhe.value = null;
+            throw error;
+        }
     }
 
     async function buscarSubprocessosElegiveis(idProcesso: number) {
-        subprocessosElegiveis.value =
-            await processoService.buscarSubprocessosElegiveis(idProcesso);
+        lastError.value = null;
+        try {
+            subprocessosElegiveis.value =
+                await processoService.buscarSubprocessosElegiveis(idProcesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function criarProcesso(payload: CriarProcessoRequest) {
-        return await processoService.criarProcesso(payload);
+        lastError.value = null;
+        try {
+            return await processoService.criarProcesso(payload);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
-        await processoService.atualizarProcesso(idProcesso, payload);
+        lastError.value = null;
+        try {
+            await processoService.atualizarProcesso(idProcesso, payload);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function removerProcesso(idProcesso: number) {
-        await processoService.excluirProcesso(idProcesso);
+        lastError.value = null;
+        try {
+            await processoService.excluirProcesso(idProcesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
-        await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
+        lastError.value = null;
+        try {
+            await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function finalizarProcesso(idProcesso: number) {
-        await processoService.finalizarProcesso(idProcesso);
-        await buscarProcessoDetalhe(idProcesso);
+        lastError.value = null;
+        try {
+            await processoService.finalizarProcesso(idProcesso);
+            await buscarProcessoDetalhe(idProcesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function processarCadastroBloco(payload: {
@@ -89,33 +150,63 @@ export const useProcessosStore = defineStore("processos", () => {
         tipoAcao: "aceitar" | "homologar";
         unidadeUsuario: string;
     }) {
-        await processoService.processarAcaoEmBloco(payload);
-        // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
-        await buscarProcessoDetalhe(payload.codProcesso);
+        lastError.value = null;
+        try {
+            await processoService.processarAcaoEmBloco(payload);
+            // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
+            await buscarProcessoDetalhe(payload.codProcesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
-        await processoService.alterarDataLimiteSubprocesso(id, dados);
-        if (processoDetalhe.value) {
-            await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        lastError.value = null;
+        try {
+            await processoService.alterarDataLimiteSubprocesso(id, dados);
+            if (processoDetalhe.value) {
+                await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+            }
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
         }
     }
 
     async function apresentarSugestoes(id: number, dados: { sugestoes: string }) {
-        await processoService.apresentarSugestoes(id, dados);
-        if (processoDetalhe.value) {
-            await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        lastError.value = null;
+        try {
+            await processoService.apresentarSugestoes(id, dados);
+            if (processoDetalhe.value) {
+                await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+            }
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
         }
     }
 
     async function validarMapa(id: number) {
-        await processoService.validarMapa(id);
-        if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        lastError.value = null;
+        try {
+            await processoService.validarMapa(id);
+            if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function homologarValidacao(id: number) {
-        await processoService.homologarValidacao(id);
-        if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        lastError.value = null;
+        try {
+            await processoService.homologarValidacao(id);
+            if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     function atualizarStatusSubprocesso(codSubprocesso: number, dados: { situacao: any, situacaoLabel: string }) {
@@ -134,6 +225,7 @@ export const useProcessosStore = defineStore("processos", () => {
         processoDetalhe,
         subprocessosElegiveis,
         processosFinalizados,
+        lastError,
         obterUnidadesDoProcesso: obterUnidadesProcesso,
         buscarProcessosPainel,
         buscarProcessosFinalizados,
@@ -150,5 +242,6 @@ export const useProcessosStore = defineStore("processos", () => {
         validarMapa,
         homologarValidacao,
         atualizarStatusSubprocesso,
+        clearError,
     };
 });

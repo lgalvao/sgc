@@ -20,7 +20,8 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar ErroEntidadeNaoEncontrada com status 404")
     void handleErroDominioNaoEncontrado() {
         ErroEntidadeNaoEncontrada ex = new ErroEntidadeNaoEncontrada("Teste");
-        ResponseEntity<Object> response = handler.handleErroDominioNaoEncontrado(ex);
+        // ErroEntidadeNaoEncontrada estende ErroNegocioBase, então é tratado pelo handleErroNegocio
+        ResponseEntity<Object> response = handler.handleErroNegocio(ex);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 

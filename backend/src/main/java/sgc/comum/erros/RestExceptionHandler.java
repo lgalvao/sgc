@@ -54,8 +54,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage()), null, traceId));
     }
 
-    @ExceptionHandler(ErroNegocio.class)
-    protected ResponseEntity<Object> handleErroNegocio(ErroNegocio ex) {
+    // Nota: O Spring @ExceptionHandler requer que a classe seja uma Exception (Throwable).
+    // Como ErroNegocio é uma interface, não podemos usá-la diretamente no annotation
+    // se ela não estender Throwable, ou se as implementações concretas não forem capturadas.
+    // No entanto, como ErroNegocioBase estende RuntimeException, podemos capturar ErroNegocioBase.
+    // Ou, se quisermos capturar pela interface, precisamos garantir que o Spring suporte isso (geralmente não suporta interface em @ExceptionHandler).
+    // A melhor abordagem é capturar Exception e verificar se é instanceof ErroNegocio, OU capturar ErroNegocioBase.
+    @ExceptionHandler(ErroNegocioBase.class)
+    protected ResponseEntity<Object> handleErroNegocio(ErroNegocioBase ex) {
         String traceId = UUID.randomUUID().toString();
 
         if (ex.getStatus().is4xxClientError()) {
