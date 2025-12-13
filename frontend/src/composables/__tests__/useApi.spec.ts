@@ -28,7 +28,7 @@ describe("useApi", () => {
 
     it("should set error on failed api call", async () => {
         const apiCall = vi.fn(() =>
-            Promise.reject({response: {data: {message: "error"}}}),
+            Promise.reject({isAxiosError: true, response: {data: {message: "error"}}}),
         );
         const {execute, error} = useApi(apiCall);
 
@@ -43,7 +43,7 @@ describe("useApi", () => {
 
     it("should clear error when clearError is called", async () => {
         const apiCall = vi.fn(() =>
-            Promise.reject({response: {data: {message: "error"}}}),
+            Promise.reject({isAxiosError: true, response: {data: {message: "error"}}}),
         );
         const {execute, error, clearError} = useApi(apiCall);
 

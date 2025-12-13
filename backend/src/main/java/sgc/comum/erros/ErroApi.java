@@ -18,6 +18,9 @@ public class ErroApi {
     private final LocalDateTime timestamp;
     private int status;
     private String message;
+    private String code;
+    @Setter
+    private String traceId;
     private List<ErroSubApi> subErrors;
 
     @Setter
@@ -31,6 +34,16 @@ public class ErroApi {
         this();
         this.status = status.value();
         this.message = message;
+    }
+
+    public ErroApi(HttpStatusCode status, String message, String code) {
+        this(status, message);
+        this.code = code;
+    }
+
+    public ErroApi(HttpStatusCode status, String message, String code, String traceId) {
+        this(status, message, code);
+        this.traceId = traceId;
     }
 
     public ErroApi(HttpStatusCode status, String message, List<ErroSubApi> subErrors) {

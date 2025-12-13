@@ -1,6 +1,7 @@
 import axios from "axios";
 import router from "./router";
 import {useFeedbackStore} from "@/stores/feedback";
+import { normalizeError, notifyError, shouldNotifyGlobally } from '@/utils/apiError';
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",
@@ -11,47 +12,29 @@ const apiClient = axios.create({
 
 const handleResponseError = (error: any) => {
     const feedbackStore = useFeedbackStore();
-    try {
-        if (error && typeof error === "object" && "response" in error) {
-            const {status, data} = (error as any).response;
-            // Do not show global popups for these statuses, they will be handled locally
-            const isHandledInline = [400, 404, 409, 422].includes(status);
+    const normalized = normalizeError(error);
 
-            if (isHandledInline) {
-                // Just forward the error to the local handler without showing a global toast
-                return Promise.reject(error); // Correctly return the rejected promise
-                // Removed `return;` as it's redundant after `return Promise.reject`
-            }
-
-            if (status === 401) {
-                feedbackStore.show(
-                    "Não Autorizado",
-                    "Sua sessão expirou ou você não está autenticado. Faça login novamente.",
-                    "danger"
-                );
-                router.push("/login");
-            } else if (data && data.message) {
-                // For other errors (like 500), show a generic popup
-                feedbackStore.show("Erro Inesperado", data.message, "danger");
-            } else {
-                feedbackStore.show(
-                    "Erro Inesperado",
-                    "Ocorreu um erro. Tente novamente mais tarde.",
-                    "danger"
-                );
-            }
-        } else if (error && typeof error === "object" && "request" in error) {
-            feedbackStore.show(
-                "Erro de Rede",
-                "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
-                "danger"
-            );
-        } else if (error && typeof error === "object" && "message" in error) {
-            feedbackStore.show("Erro", (error as any).message, "danger");
-        }
-    } catch (storeError) {
-        console.error("Erro ao exibir notificação:", storeError);
+    // Caso especial: 401 - redirecionar para login
+    if (normalized.kind === 'unauthorized') {
+        feedbackStore.show(
+            'Não Autorizado',
+            'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
+            'danger'
+        );
+        router.push('/login');
+        return Promise.reject(error);
     }
+
+    // Decidir se mostra toast global baseado no kind
+    if (shouldNotifyGlobally(normalized)) {
+        try {
+            notifyError(normalized);
+        } catch (storeError) {
+            console.error("Erro ao exibir notificação:", storeError);
+        }
+    }
+
+    // Sempre rejeitar para permitir tratamento local
     return Promise.reject(error);
 };
 
