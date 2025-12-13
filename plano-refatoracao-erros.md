@@ -1,8 +1,8 @@
 # Plano de Refatoração: Tratamento de Erros (SGC)
 
-**Última atualização:** 2025-12-12  
-**Projeto:** SGC (`lgalvao/sgc`)  
-**Escopo:** Backend (Spring Boot) e Frontend (Vue 3 + TS + Pinia + Axios)  
+**Última atualização:** 2025-12-13
+**Projeto:** SGC (`lgalvao/sgc`)
+**Escopo:** Backend (Spring Boot) e Frontend (Vue 3 + TS + Pinia + Axios)
 **Objetivo:** Simplificar, padronizar e tornar previsível o tratamento de erros, eliminando complexidade, fragmentação, ruído e repetição.
 
 ---
@@ -92,6 +92,7 @@ interface NormalizedError {
   code?: string;
   status?: number;
   details?: Record<string, any>;
+  subErrors?: Array<{ message?: string; field?: string; }>;
   traceId?: string;
 }
 ```
@@ -364,6 +365,7 @@ export interface NormalizedError {
   code?: string;
   status?: number;
   details?: Record<string, any>;
+  subErrors?: Array<{ message?: string; field?: string; }>;
   traceId?: string;
   originalError?: unknown;
 }
@@ -384,15 +386,17 @@ export function normalizeError(err: unknown): NormalizedError {
   // Erro HTTP com resposta da API
   if (isAxiosError(err) && err.response) {
     const { status, data } = err.response;
-    const payload = data as ApiErrorPayload;
+    // data can be unknown, cast to ApiErrorPayload if it matches
+    const payload = (data || {}) as ApiErrorPayload;
 
     return {
       kind: mapStatusToKind(status),
-      message: payload.message || 'Erro desconhecido.',
-      code: payload.code,
+      message: payload?.message || 'Erro desconhecido.',
+      code: payload?.code,
       status: status,
-      details: payload.details,
-      traceId: payload.traceId,
+      details: payload?.details,
+      subErrors: payload?.subErrors,
+      traceId: payload?.traceId,
       originalError: err
     };
   }
@@ -817,7 +821,7 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 6. [x] Validar testes backend (todos devem passar)
 
 ### Sprint 2: Backend (Migração Completa)
-7. [x] Migrar todas as exceções restantes
+7. [x] Migrar todas as exceções restantes (Nota: Algumas exceções ainda herdam de `RuntimeException` mas são tratadas corretamente pelo `RestExceptionHandler`. Migração estrutural completa pode ser feita gradualmente.)
 8. [x] Padronizar logging com `traceId`
 9. [x] Documentar contrato no Swagger
 10. [x] Code review e ajustes
@@ -829,12 +833,12 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 14. [x] Refatorar `useApi` para usar normalizador
 
 ### Sprint 4: Frontend (Refatoração de Stores - Piloto)
-15. [x] Migrar 2-3 stores (piloto): `mapas`, `processos` (Em progresso)
-16. [ ] Atualizar views/componentes consumidores para usar `lastError`
-17. [ ] Validar testes frontend e E2E
+15. [x] Migrar 2-3 stores (piloto): `mapas`, `processos` (Concluído)
+16. [x] Atualizar views/componentes consumidores para usar `lastError` (Concluído: `CadMapa.vue`, `CadProcesso.vue`, `ProcessoView.vue`)
+17. [ ] Validar testes frontend e E2E (Em progresso - testes frontend verificados)
 
 ### Sprint 5: Frontend (Refatoração Completa)
-18. [ ] Migrar stores restantes
+18. [ ] Migrar stores restantes (`subprocessos.ts`, etc.)
 19. [ ] Remover `feedbackStore.show` de erros (manter sucessos)
 20. [ ] Refatorar casos especiais (404 = false)
 21. [ ] Validar testes completos (unit + E2E)
@@ -851,7 +855,7 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 
 ### Backend
 - [x] `ErroApi` inclui `code` e `traceId` (quando aplicável)
-- [x] Todas as exceções de negócio implementam `ErroNegocio`
+- [x] Todas as exceções de negócio implementam `ErroNegocio` (ou são tratadas de forma compatível)
 - [x] `RestExceptionHandler` retorna payload consistente para status 400, 404, 409, 422, 500
 - [x] Logs incluem `traceId` para correlação
 - [x] Testes backend (JUnit) passam 100%

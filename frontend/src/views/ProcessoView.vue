@@ -1,5 +1,18 @@
 <template>
   <BContainer class="mt-4">
+    <BAlert
+        v-if="processosStore.lastError"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="processosStore.clearError()"
+    >
+      {{ processosStore.lastError.message }}
+      <div v-if="processosStore.lastError.details">
+        <small>Detalhes: {{ processosStore.lastError.details }}</small>
+      </div>
+    </BAlert>
+
     <div v-if="processo">
       <ProcessoDetalhes
           :descricao="processo.descricao"
@@ -182,11 +195,7 @@ async function executarFinalizacao() {
     );
     await router.push("/painel");
   } catch {
-    feedbackStore.show(
-        "Erro ao finalizar processo",
-        "Ocorreu um erro durante a finalização. Tente novamente.",
-        "danger"
-    );
+    // Erro já está em processosStore.lastError e será exibido pelo BAlert
   }
 }
 
@@ -241,11 +250,8 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
     fecharModalBloco();
     await router.push("/painel");
   } catch {
-    feedbackStore.show(
-        "Erro ao processar em bloco",
-        "Ocorreu um erro ao processar os cadastros em bloco.",
-        "danger"
-    );
+    // Erro já está em processosStore.lastError e será exibido pelo BAlert
+    fecharModalBloco(); // Fecha o modal para mostrar o erro na tela (ou poderíamos mostrar no modal se passássemos o erro para ele)
   }
 }
 

@@ -301,12 +301,14 @@ async function salvarProcesso() {
       await router.push("/painel");
     }
     limparCampos();
-  } catch (error: any) {
+  } catch (error) {
     let msg = "Não foi possível salvar o processo. Verifique os dados e tente novamente.";
-    if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
-      msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
-    } else if (error.response?.data?.message) {
-      msg = error.response.data.message;
+    const lastError = processosStore.lastError;
+    if (lastError) {
+      msg = lastError.message;
+      if (lastError.subErrors && lastError.subErrors.length > 0) {
+        msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
+      }
     }
     mostrarAlerta('danger', "Erro ao salvar processo", msg);
     console.error("Erro ao salvar processo:", error);
@@ -339,12 +341,14 @@ async function confirmarIniciarProcesso() {
       };
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
-    } catch (error: any) {
+    } catch (error) {
       let msg = "Não foi possível criar o processo para iniciá-lo.";
-      if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
-        msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
-      } else if (error.response?.data?.message) {
-        msg = error.response.data.message;
+      const lastError = processosStore.lastError;
+      if (lastError) {
+        msg = lastError.message;
+        if (lastError.subErrors && lastError.subErrors.length > 0) {
+          msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
+        }
       }
       mostrarAlerta('danger', "Erro ao criar processo", msg);
       console.error("Erro ao criar processo:", error);
@@ -360,12 +364,14 @@ async function confirmarIniciarProcesso() {
     );
     await router.push("/painel");
     feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
-  } catch (error: any) {
+  } catch (error) {
     let msg = "Não foi possível iniciar o processo. Tente novamente.";
-    if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
-      msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
-    } else if (error.response?.data?.message) {
-      msg = error.response.data.message;
+    const lastError = processosStore.lastError;
+    if (lastError) {
+      msg = lastError.message;
+      if (lastError.subErrors && lastError.subErrors.length > 0) {
+        msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
+      }
     }
     mostrarAlerta('danger', "Erro ao iniciar processo", msg);
     console.error("Erro ao iniciar processo:", error);
@@ -389,12 +395,14 @@ async function confirmarRemocao() {
         // Only clear fields if it was a new process
         limparCampos();
       }
-    } catch (error: any) {
+    } catch (error) {
       let msg = "Não foi possível remover o processo. Tente novamente.";
-      if (error.response?.data?.subErrors && error.response.data.subErrors.length > 0) {
-        msg = error.response.data.subErrors.map((e: any) => e.message).join(' ');
-      } else if (error.response?.data?.message) {
-        msg = error.response.data.message;
+      const lastError = processosStore.lastError;
+      if (lastError) {
+        msg = lastError.message;
+        if (lastError.subErrors && lastError.subErrors.length > 0) {
+          msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
+        }
       }
       mostrarAlerta('danger', "Erro ao remover processo", msg);
       console.error("Erro ao remover processo:", error);
