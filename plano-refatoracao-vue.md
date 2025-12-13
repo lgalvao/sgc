@@ -1,6 +1,6 @@
 # Plano de Refatoração de Componentes Vue.js
 
-Última atualização: 2025-12-10T14:05:31.223Z
+Última atualização: 2025-12-13
 
 Este documento detalha as alterações necessárias nos componentes Vue.js localizados em `@frontend/src/components/`. O
 objetivo é remover lógicas de "protótipo" (hardcoded, filtros locais excessivos, mocks) e otimizar a integração com o
@@ -43,7 +43,7 @@ backend real.
 3. **Desacoplar Modais de Stores Globais:** Modais devem, preferencialmente, receber dados via `props` e emitir eventos,
    ou buscar dados específicos baseados em um ID passado, em vez de dependerem do estado global de listas carregadas em
    outras telas.
-4. **Padronizar Tratamento de Erros:** Remover `window.alert()` e `window.confirm()` nativos do browser e substituir
+4. **Padronizar Tratamento de Erros (CONCLUÍDO):** Remover `window.alert()` e `window.confirm()` nativos do browser e substituir
    por:
     - **BAlert** (componente BootstrapVueNext) para mensagens inline na UI, com botão de fechar.
     - **useFeedbackStore** (store Pinia em `src/stores/feedback.ts`) para notificações toast/banner que aparecem no topo
@@ -52,6 +52,7 @@ backend real.
       `error.value` (string); o componente consumidor deve renderizar esse erro via `BAlert`.
     - Validações devem emitir eventos (via `emit`) para o componente pai tratar a exibição de mensagem, em vez de
       bloquear com `alert()`.
+    - Detalhes adicionais em `plano-refatoracao-erros.md` e `frontend/src/utils/README.md`.
 
 ---
 
@@ -324,80 +325,16 @@ SEDOC é realmente especial e deve ser ocultada; vale a pena só rever o uso do 
 
 ## 3. Padronização Geral
 
-- [ ] **Alerts:** Remover `window.alert()` e `window.confirm()` nativos do browser (encontrados em
-  `AcoesEmBlocoModal.vue` linha 114).
+- [x] **Alerts (Concluído):** Remover `window.alert()` e `window.confirm()` nativos do browser.
 
   **Mecanismos de Tratamento de Erro/Validação Disponíveis:**
 
-    1. **BAlert (BootstrapVueNext)** — Mensagem inline dentro de um componente/modal. Exemplo em
-       `ImportarAtividadesModal.vue` linhas 11-20:
-
-       ```vue
-       <BAlert v-if="erroImportacao" variant="danger" dismissible @dismissed="limparErroImportacao">
-         {{ erroImportacao }}
-       </BAlert>
-       ```
-
-       Use para: erros de validação de formulário dentro de modais ou telas específicas.
-
-    2. **useFeedbackStore** (Pinia) — Notificação toast que aparece no topo/rodapé da aplicação e desaparece
-       automaticamente (5s padrão). Definido em `src/stores/feedback.ts`:
-
-       ```typescript
-       const feedbackStore = useFeedbackStore();
-       feedbackStore.show("Sucesso", "Processo importado!", "success", 5000);
-       feedbackStore.show("Erro", "Falha ao importar.", "danger");
-       ```
-
-       Use para: feedback de ações globais (sucesso/erro) que afetam múltiplas telas.
-
+    1. **BAlert (BootstrapVueNext)** — Mensagem inline dentro de um componente/modal.
+    2. **useFeedbackStore** (Pinia) — Notificação toast.
     3. **useApi (composable)** — Captura automaticamente erros de requisições HTTP e armazena em `error.value` (string
-       com mensagem). Definido em `src/composables/useApi.ts`:
-
-       ```typescript
-       const { error, isLoading, execute } = useApi(minhaFuncaoDeAPI);
-       await execute(parametros);
-       // error.value conterá a mensagem de erro da API
-       ```
-
-       Use para: operações assíncronas; o componente deve renderizar `error.value` via `BAlert`.
-
+       com mensagem).
     4. **Emits** — Para validações que impedem ação (ex: "selecione ao menos um item"), o componente deve emitir um
-       evento e deixar o **componente pai** exibir a mensagem via um dos mecanismos acima. Exemplo:
-
-       ```typescript
-       if (items.length === 0) {
-         emit("validacaoFalhou", { mensagem: "Selecione ao menos um item" });
-         return;
-       }
-       ```
-
-  **Buscar e Substituir:**
-    - `grep -r "window.alert\|window.confirm\|alert(\|confirm(" frontend/src/components/ --include="*.vue"` para
-      localizar usos.
-    - Cada `alert()` de validação → converter para `emit` + `BAlert` no pai (se componente filho) ou `BAlert` direto (se
-      componente principal).
-    - Cada `alert()` de sucesso → converter para `useFeedbackStore.show(..., "success")`.
-    - Cada `confirm()` → converter para modal com botões "Confirmar/Cancelar" emitindo eventos.
-
-  **Exemplos de Padrão Correto:**
-    - ✅ `ImportarAtividadesModal.vue` — Usa `BAlert` para erro de validação e `useApi` para capturar erros da API.
-    - ❌ `AcoesEmBlocoModal.vue` — Usa `alert()` nativo para validação (linha 114) — REMOVER.
-
-  **Checklist geral de QA e testes:**
-    - Unitários: cobertura mínima em áreas alteradas (stores e componentes refatorados). Escrever testes para props
-      obrigatórias, chamadas de store e handlers de erro.
-    - E2E: validar fluxos críticos (importação de atividades, árvore de unidades, histórico de análise, ações em bloco,
-      tabelas de processos) usando fixtures e stubs do backend (Playwright em `e2e/`).
-    - Integração: contratos de API (endpoints com paginação/filtragem/ordenacao) devem ser testados com mocks e
-      documentados.
-
-  **Contratos/DTOs e convenções esperadas (resumo):**
-    - Processos listagem: GET /api/processos?finalizado=true → [{ id, codigo, descricao, finalizado }]
-    - Processos paginação/ordenacao: GET /api/processos?pagina=&size=&sort=
-    - Analises: GET /api/analises?processoId=
-    - Mapas/impacto: GET /api/mapas?codSubprocesso=
-    - Unidades: GET /api/unidades → [{ id, codigo, sigla, tipo, nivel, ocultar?: boolean }]
+       evento e deixar o **componente pai** exibir a mensagem.
 
   **Rollout:**
     - Estratégia de rollout: dividir em PRs por domínio/componentes (ImportarAtividades & ArvoreUnidades como PRs

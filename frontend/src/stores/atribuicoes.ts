@@ -2,13 +2,20 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",
     () => {
         const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
         const isLoading = ref(false);
-        const error = ref<string | null>(null);
+        const error = ref<string | null>(null); // Keeping for backward compatibility
+        const lastError = ref<NormalizedError | null>(null);
+
+        function clearError() {
+            lastError.value = null;
+            error.value = null;
+        }
 
         const obterAtribuicoesPorServidor = computed(
             () =>
@@ -31,6 +38,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
         async function buscarAtribuicoes() {
             isLoading.value = true;
             error.value = null;
+            lastError.value = null;
             try {
                 const response = await buscarTodasAtribuicoes();
                 atribuicoes.value = (response as any).data.map((a: any) => ({
@@ -42,7 +50,8 @@ export const useAtribuicaoTemporariaStore = defineStore(
                     unidade: a.unidade,
                 })) as AtribuicaoTemporaria[];
             } catch (err: any) {
-                error.value = `Falha ao carregar atribuições: ${err.message}`;
+                lastError.value = normalizeError(err);
+                error.value = lastError.value.message;
             } finally {
                 isLoading.value = false;
             }
@@ -52,6 +61,8 @@ export const useAtribuicaoTemporariaStore = defineStore(
             atribuicoes,
             isLoading,
             error,
+            lastError,
+            clearError,
             obterAtribuicoesPorServidor,
             obterAtribuicoesPorUnidade,
             buscarAtribuicoes,

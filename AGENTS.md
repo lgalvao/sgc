@@ -76,6 +76,12 @@ Antes de submeter alterações no **frontend**, execute (dentro de `frontend`):
 - **`npm run typecheck`**: Verifica tipagem TypeScript.
 - **`npm run lint`**: Verifica estilo de código.
 
+### 5.1. Tratamento de Erros (Frontend)
+
+- **Normalização:** Ao capturar erros em services/stores, utilize `normalizeError` de `@/utils/apiError` para converter o erro em um formato padrão.
+- **Stores:** Evite usar `feedbackStore.show` dentro de blocos `catch` nas Stores. Em vez disso, popule uma variável reativa `lastError` e deixe o componente decidir como exibir o erro (inline vs global).
+- **Componentes:** Para erros de validação ou negócio, prefira exibir um `BAlert` inline. Para erros inesperados, o interceptor global já cuidará da notificação via toast.
+
 Antes de submeter alterações no **backend**, execute (na raiz):
 
 - **`./gradlew :backend:test`**: Testes unitários/integração em Junit.

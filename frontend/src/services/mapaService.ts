@@ -1,7 +1,7 @@
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from "@/mappers/mapas";
 import type {ImpactoMapa} from "@/types/impacto";
 import type {DisponibilizarMapaRequest, MapaAjuste, MapaCompleto, MapaVisualizacao,} from "@/types/tipos";
-import {existsOrFalse} from "@/utils/apiError";
+import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";
 
 export async function obterMapaVisualizacao(
@@ -52,12 +52,13 @@ export async function salvarMapaAjuste(
 export async function verificarMapaVigente(
     codigoUnidade: number,
 ): Promise<boolean> {
-    return existsOrFalse(async () => {
+    const result = await getOrNull(async () => {
         const response = await apiClient.get(
             `/unidades/${codigoUnidade}/mapa-vigente`,
         );
         return response.data.temMapaVigente;
     });
+    return result ?? false;
 }
 
 export async function disponibilizarMapa(

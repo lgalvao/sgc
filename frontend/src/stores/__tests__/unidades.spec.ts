@@ -86,7 +86,7 @@ describe("useUnidadesStore", () => {
                 unidadesService.buscarArvoreComElegibilidade,
             ).mockRejectedValueOnce(new Error("API Error"));
             await unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO");
-            expect(unidadesStore.error).toContain("Falha ao carregar unidades");
+            expect(unidadesStore.error).toContain("API Error");
         });
 
         it("buscarUnidade should set unidade state", async () => {
@@ -108,7 +108,7 @@ describe("useUnidadesStore", () => {
                 new Error("Fail"),
             );
             await unidadesStore.buscarUnidade("TEST");
-            expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+            expect(unidadesStore.error).toContain("Fail");
         });
 
         it("buscarUnidadePorCodigo should set unidade state", async () => {
@@ -128,7 +128,7 @@ describe("useUnidadesStore", () => {
                 new Error("Fail"),
             );
             await unidadesStore.buscarUnidadePorCodigo(123);
-            expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+            expect(unidadesStore.error).toContain("Fail");
         });
 
         it("buscarArvoreUnidade should call service and set unidade", async () => {
@@ -144,7 +144,7 @@ describe("useUnidadesStore", () => {
         it("buscarArvoreUnidade should handle error", async () => {
             vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(new Error("Fail"));
             await unidadesStore.buscarArvoreUnidade(1);
-            expect(unidadesStore.error).toContain("Falha ao carregar unidade");
+            expect(unidadesStore.error).toContain("Fail");
         });
 
         it("obterUnidadesSubordinadas should call service", async () => {
@@ -160,7 +160,7 @@ describe("useUnidadesStore", () => {
         it("obterUnidadesSubordinadas should handle error", async () => {
             vi.mocked(unidadesService.buscarSubordinadas).mockRejectedValue(new Error("Fail"));
             const result = await unidadesStore.obterUnidadesSubordinadas("TEST");
-            expect(unidadesStore.error).toContain("Falha ao buscar subordinadas");
+            expect(unidadesStore.error).toContain("Fail");
             expect(result).toEqual([]);
         });
 
@@ -177,7 +177,7 @@ describe("useUnidadesStore", () => {
         it("obterUnidadeSuperior should handle error", async () => {
             vi.mocked(unidadesService.buscarSuperior).mockRejectedValue(new Error("Fail"));
             const result = await unidadesStore.obterUnidadeSuperior("TEST");
-            expect(unidadesStore.error).toContain("Falha ao buscar superior");
+            expect(unidadesStore.error).toContain("Fail");
             expect(result).toBeNull();
         });
     });

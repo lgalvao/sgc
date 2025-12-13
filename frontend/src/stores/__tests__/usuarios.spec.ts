@@ -55,7 +55,7 @@ describe("useUsuariosStore", () => {
                 new Error("Failed"),
             );
             await usuariosStore.buscarUsuarios();
-            expect(usuariosStore.error).toContain("Falha ao carregar usuários");
+            expect(usuariosStore.error).toContain("Failed");
         });
     });
 

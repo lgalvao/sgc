@@ -10,12 +10,19 @@ import {
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useUnidadesStore = defineStore("unidades", () => {
     const unidades = ref<Unidade[]>([]);
     const unidade = ref<Unidade | null>(null);
     const isLoading = ref(false);
     const error = ref<string | null>(null);
+    const lastError = ref<NormalizedError | null>(null);
+
+    function clearError() {
+        lastError.value = null;
+        error.value = null;
+    }
 
     async function buscarUnidadesParaProcesso(
         tipoProcesso: string,
@@ -23,6 +30,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
     ) {
         isLoading.value = true;
         error.value = null;
+        lastError.value = null;
         try {
             const response = await buscarArvoreComElegibilidade(
                 tipoProcesso,
@@ -30,7 +38,8 @@ export const useUnidadesStore = defineStore("unidades", () => {
             );
             unidades.value = mapUnidadesArray(response as any) as Unidade[];
         } catch (err: any) {
-            error.value = "Falha ao carregar unidades: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
         } finally {
             isLoading.value = false;
         }
@@ -39,11 +48,13 @@ export const useUnidadesStore = defineStore("unidades", () => {
     async function buscarUnidade(sigla: string) {
         isLoading.value = true;
         error.value = null;
+        lastError.value = null;
         try {
             const response = await buscarUnidadePorSigla(sigla);
             unidade.value = response as unknown as Unidade;
         } catch (err: any) {
-            error.value = "Falha ao carregar unidade: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
         } finally {
             isLoading.value = false;
         }
@@ -52,11 +63,13 @@ export const useUnidadesStore = defineStore("unidades", () => {
     async function buscarUnidadePorCodigo(codigo: number) {
         isLoading.value = true;
         error.value = null;
+        lastError.value = null;
         try {
             const response = await serviceBuscarUnidadePorCodigo(codigo);
             unidade.value = response as unknown as Unidade;
         } catch (err: any) {
-            error.value = "Falha ao carregar unidade: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
         } finally {
             isLoading.value = false;
         }
@@ -65,11 +78,13 @@ export const useUnidadesStore = defineStore("unidades", () => {
     async function buscarArvoreUnidade(codigo: number) {
         isLoading.value = true;
         error.value = null;
+        lastError.value = null;
         try {
             const response = await serviceBuscarArvoreUnidade(codigo);
             unidade.value = response as unknown as Unidade;
         } catch (err: any) {
-            error.value = "Falha ao carregar unidade: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
         } finally {
             isLoading.value = false;
         }
@@ -77,10 +92,12 @@ export const useUnidadesStore = defineStore("unidades", () => {
 
     async function obterUnidadesSubordinadas(siglaUnidade: string): Promise<string[]> {
         isLoading.value = true;
+        lastError.value = null;
         try {
             return await serviceBuscarSubordinadas(siglaUnidade);
         } catch (err: any) {
-            error.value = "Falha ao buscar subordinadas: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
             return [];
         } finally {
             isLoading.value = false;
@@ -89,10 +106,12 @@ export const useUnidadesStore = defineStore("unidades", () => {
 
     async function obterUnidadeSuperior(siglaUnidade: string): Promise<string | null> {
         isLoading.value = true;
+        lastError.value = null;
         try {
             return await serviceBuscarSuperior(siglaUnidade);
         } catch (err: any) {
-            error.value = "Falha ao buscar superior: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
             return null;
         } finally {
             isLoading.value = false;
@@ -104,6 +123,8 @@ export const useUnidadesStore = defineStore("unidades", () => {
         unidade,
         isLoading,
         error,
+        lastError,
+        clearError,
         buscarUnidadesParaProcesso,
         buscarUnidade,
         buscarUnidadePorCodigo,
