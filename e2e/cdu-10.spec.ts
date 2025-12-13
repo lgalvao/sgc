@@ -64,7 +64,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
         // Capturar ID do processo para cleanup
-        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoMapeamentoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
         if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -216,7 +216,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoRevisao);
 
         // Capturar ID do processo para cleanup
-        processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoRevisaoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -357,8 +357,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
+        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
 
         // Verificar situação voltou para 'em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
@@ -415,7 +415,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
+        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
@@ -485,8 +485,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
+        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
 
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-historico').click();
@@ -506,8 +506,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         // Chefe vai direto
+        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
 
         await navegarParaAtividades(page);
 
