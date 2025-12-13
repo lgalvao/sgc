@@ -25,5 +25,5 @@ public class ProcessoDto {
     private String dataLimiteFormatada;
     private String situacaoLabel;
     private String tipoLabel;
+    private String unidadesParticipantes;
 }
-
