@@ -809,58 +809,58 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 ## 4. Ordem de Execução Recomendada
 
 ### Sprint 1: Backend (Contrato Estável)
-1. ✅ Adicionar `code` e `traceId` a `ErroApi`
-2. ✅ Criar interface `ErroNegocio`
-3. ✅ Criar classe base `ErroNegocioBase`
-4. ✅ Migrar 2-3 exceções existentes para `ErroNegocioBase` (piloto)
-5. ✅ Atualizar `RestExceptionHandler` com handler genérico `ErroNegocio`
-6. ✅ Validar testes backend (todos devem passar)
+1. [x] Adicionar `code` e `traceId` a `ErroApi`
+2. [x] Criar interface `ErroNegocio`
+3. [x] Criar classe base `ErroNegocioBase`
+4. [x] Migrar 2-3 exceções existentes para `ErroNegocioBase` (piloto)
+5. [x] Atualizar `RestExceptionHandler` com handler genérico `ErroNegocio`
+6. [x] Validar testes backend (todos devem passar)
 
 ### Sprint 2: Backend (Migração Completa)
-7. ✅ Migrar todas as exceções restantes
-8. ✅ Padronizar logging com `traceId`
-9. ✅ Documentar contrato no Swagger
-10. ✅ Code review e ajustes
+7. [x] Migrar todas as exceções restantes
+8. [x] Padronizar logging com `traceId`
+9. [x] Documentar contrato no Swagger
+10. [x] Code review e ajustes
 
 ### Sprint 3: Frontend (Infraestrutura)
-11. ✅ Criar `apiError.ts` com normalizador e helpers
-12. ✅ Criar testes unitários para normalizador
-13. ✅ Refatorar interceptor Axios
-14. ✅ Refatorar `useApi` para usar normalizador
+11. [x] Criar `apiError.ts` com normalizador e helpers
+12. [x] Criar testes unitários para normalizador
+13. [x] Refatorar interceptor Axios
+14. [x] Refatorar `useApi` para usar normalizador
 
 ### Sprint 4: Frontend (Refatoração de Stores - Piloto)
-15. ✅ Migrar 2-3 stores (piloto): `mapas`, `processos`
-16. ✅ Atualizar views/componentes consumidores para usar `lastError`
-17. ✅ Validar testes frontend e E2E
+15. [x] Migrar 2-3 stores (piloto): `mapas`, `processos` (Em progresso)
+16. [ ] Atualizar views/componentes consumidores para usar `lastError`
+17. [ ] Validar testes frontend e E2E
 
 ### Sprint 5: Frontend (Refatoração Completa)
-18. ✅ Migrar stores restantes
-19. ✅ Remover `feedbackStore.show` de erros (manter sucessos)
-20. ✅ Refatorar casos especiais (404 = false)
-21. ✅ Validar testes completos (unit + E2E)
+18. [ ] Migrar stores restantes
+19. [ ] Remover `feedbackStore.show` de erros (manter sucessos)
+20. [ ] Refatorar casos especiais (404 = false)
+21. [ ] Validar testes completos (unit + E2E)
 
 ### Sprint 6: Documentação e Finalização
-22. ✅ Atualizar documentação (READMEs, AGENTS.md)
-23. ✅ Code review final
-24. ✅ Smoke tests E2E completos
-25. ✅ Merge para main
+22. [ ] Atualizar documentação (READMEs, AGENTS.md)
+23. [ ] Code review final
+24. [ ] Smoke tests E2E completos
+25. [ ] Merge para main
 
 ---
 
 ## 5. Critérios de Aceite
 
 ### Backend
-- [ ] `ErroApi` inclui `code` e `traceId` (quando aplicável)
-- [ ] Todas as exceções de negócio implementam `ErroNegocio`
-- [ ] `RestExceptionHandler` retorna payload consistente para status 400, 404, 409, 422, 500
-- [ ] Logs incluem `traceId` para correlação
-- [ ] Testes backend (JUnit) passam 100%
-- [ ] Documentação Swagger inclui schema de erro com exemplos
+- [x] `ErroApi` inclui `code` e `traceId` (quando aplicável)
+- [x] Todas as exceções de negócio implementam `ErroNegocio`
+- [x] `RestExceptionHandler` retorna payload consistente para status 400, 404, 409, 422, 500
+- [x] Logs incluem `traceId` para correlação
+- [x] Testes backend (JUnit) passam 100%
+- [x] Documentação Swagger inclui schema de erro com exemplos
 
 ### Frontend
-- [ ] `normalizeError` converte todos os tipos de erro para `NormalizedError`
-- [ ] Interceptor Axios não usa lista hardcoded de status
-- [ ] `useApi` expõe `normalizedError` com campos completos
+- [x] `normalizeError` converte todos os tipos de erro para `NormalizedError`
+- [x] Interceptor Axios não usa lista hardcoded de status
+- [x] `useApi` expõe `normalizedError` com campos completos
 - [ ] Stores não repetem `try/catch` com `feedbackStore.show` para erros
 - [ ] Stores usam `lastError` e componentes decidem UX (inline vs global)
 - [ ] Casos especiais (404 = false) usam helpers `existsOrFalse`/`getOrNull`
