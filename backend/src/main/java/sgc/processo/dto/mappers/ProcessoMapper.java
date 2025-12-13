@@ -7,6 +7,9 @@ import org.mapstruct.MappingTarget;
 import sgc.comum.util.FormatadorData;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
+import sgc.unidade.model.Unidade;
+
+import java.util.stream.Collectors;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Processo e seu DTO principal.
@@ -18,6 +21,7 @@ public interface ProcessoMapper {
     @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "tipoLabel", ignore = true)
+    @Mapping(target = "unidadesParticipantes", ignore = true)
     ProcessoDto toDto(Processo processo);
 
     @Mapping(target = "participantes", ignore = true)
@@ -34,6 +38,15 @@ public interface ProcessoMapper {
         dto.setDataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()));
         dto.setSituacaoLabel(processo.getSituacao().getLabel());
         dto.setTipoLabel(processo.getTipo().getLabel());
+
+        if (processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()) {
+            String participantes = processo.getParticipantes().stream()
+                    .map(Unidade::getSigla)
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+            dto.setUnidadesParticipantes(participantes);
+        } else {
+            dto.setUnidadesParticipantes(null);
+        }
     }
 }
-
