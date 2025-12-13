@@ -41,9 +41,9 @@ vi.mock("@/composables/useApi", () => ({
 }));
 vi.mock("@/stores/processos", () => ({
     useProcessosStore: () => ({
-        processosPainel: mockProcessos,
+        processosFinalizados: mockProcessos,
         processoDetalhe: mockProcessoDetalhe,
-        buscarProcessosPainel: vi.fn(),
+        buscarProcessosFinalizados: vi.fn(),
         buscarProcessoDetalhe: vi.fn(),
     }),
 }));
