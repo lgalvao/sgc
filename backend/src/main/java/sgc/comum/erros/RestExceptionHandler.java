@@ -26,6 +26,7 @@ import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,12 +45,37 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handleBusinessException(Exception ex, HttpStatus status, String logLevel) {
+        String traceId = UUID.randomUUID().toString();
         if (LOG_LEVEL_ERROR.equals(logLevel)) {
-            log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+            log.error("[{}] {}: {}", traceId, ex.getClass().getSimpleName(), ex.getMessage(), ex);
         } else {
-            log.warn("{}: {}", ex.getClass().getSimpleName(), ex.getMessage());
+            log.warn("[{}] {}: {}", traceId, ex.getClass().getSimpleName(), ex.getMessage());
         }
-        return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage()), null, traceId));
+    }
+
+    @ExceptionHandler(ErroNegocio.class)
+    protected ResponseEntity<Object> handleErroNegocio(ErroNegocio ex) {
+        String traceId = UUID.randomUUID().toString();
+
+        if (ex.getStatus().is4xxClientError()) {
+            log.warn("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage());
+        } else {
+            log.error("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage(), (Throwable) ex);
+        }
+
+        ErroApi erroApi = new ErroApi(
+            ex.getStatus(),
+            sanitizar(ex.getMessage()),
+            ex.getCode(),
+            traceId
+        );
+
+        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+            erroApi.setDetails(ex.getDetails());
+        }
+
+        return buildResponseEntity(erroApi);
     }
 
     @Override
@@ -99,7 +125,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException(
             ConstraintViolationException ex) {
-        log.error("Erro de constraint de banco de dados: {}", ex.getMessage(), ex);
+        String traceId = UUID.randomUUID().toString();
+        log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
         var subErrors =
                 ex.getConstraintViolations().stream().map(violation ->
@@ -109,13 +136,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                         violation.getInvalidValue(),
                                         sanitizar(violation.getMessage())))
                         .collect(Collectors.toList());
-        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
-    }
 
-    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
-    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroEntidadeNaoEncontrada ex) {
-        return handleBusinessException(
-                ex, HttpStatus.NOT_FOUND, LOG_LEVEL_WARN);
+        ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors);
+        erroApi.setTraceId(traceId);
+        return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(ErroUnidadeNaoEncontrada.class)
@@ -139,16 +163,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
-        log.warn("Estado ilegal da aplicação: {}", ex.getMessage());
+        String traceId = UUID.randomUUID().toString();
+        log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "A operação não pode ser executada no estado atual do recurso.";
-        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, message));
+        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("Argumento ilegal fornecido: {}", ex.getMessage(), ex);
+        String traceId = UUID.randomUUID().toString();
+        log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém um argumento inválido ou malformado.";
-        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message));
+        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId));
     }
 
     @ExceptionHandler(ErroProcesso.class)
@@ -190,8 +216,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
-        log.error("Erro inesperado na aplicação", ex);
+        String traceId = UUID.randomUUID().toString();
+        log.error("[{}] Erro inesperado na aplicação", traceId, ex);
         return buildResponseEntity(
-                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado"));
+                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado", "ERRO_INTERNO", traceId));
     }
 }

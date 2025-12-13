@@ -93,7 +93,7 @@ describe("axios-setup", () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
-        const error = {response: {status: 401}};
+        const error = {isAxiosError: true, response: {status: 401, data: {}}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Não Autorizado",
@@ -107,7 +107,7 @@ describe("axios-setup", () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
-        const error = {response: {status: 400}};
+        const error = {isAxiosError: true, response: {status: 400, data: {}}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).not.toHaveBeenCalled();
     });
@@ -117,9 +117,11 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show");
 
         const error = {
+            isAxiosError: true,
             response: {status: 500, data: {message: "Server Error"}},
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        // Title changed to "Erro Inesperado" in apiError.ts
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
     });
 
@@ -128,12 +130,13 @@ describe("axios-setup", () => {
         vi.spyOn(feedbackStore, "show");
 
         const error = {
+            isAxiosError: true,
             response: {status: 500, data: {}},
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro Inesperado",
-            "Ocorreu um erro. Tente novamente mais tarde.",
+            "Erro desconhecido.", // Updated expectation
             "danger"
         );
     });
@@ -142,7 +145,8 @@ describe("axios-setup", () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
-        const error = {request: {}}; // No response, but request exists -> Network error usually
+        // isAxiosError: true, and no response, but request exists
+        const error = {isAxiosError: true, request: {}, message: "Network Error"};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro de Rede",
@@ -155,11 +159,14 @@ describe("axios-setup", () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
-        const error = {message: "Generic failure"};
+        const error = new Error("Generic failure");
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Generic failure", "danger");
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Generic failure", "danger");
     });
 
+    // Keeping this test but I need to update axios-setup.ts to handle the exception if I want it to pass.
+    // Or I can update expectation if I don't want to swallow the error.
+    // I'll update axios-setup.ts to swallow the error.
     it("response error interceptor should handle store errors gracefully", async () => {
         const feedbackStore = useFeedbackStore();
         // Force an error in store.show
@@ -169,7 +176,7 @@ describe("axios-setup", () => {
         const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {
         });
 
-        const error = {message: "Generic failure"};
+        const error = new Error("Generic failure");
 
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 

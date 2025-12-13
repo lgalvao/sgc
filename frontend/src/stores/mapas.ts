@@ -13,6 +13,7 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 
 export const useMapasStore = defineStore("mapas", () => {
@@ -20,45 +21,45 @@ export const useMapasStore = defineStore("mapas", () => {
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
+    const lastError = ref<NormalizedError | null>(null);
     const feedbackStore = useFeedbackStore();
 
+    function clearError() {
+        lastError.value = null;
+    }
+
     async function buscarMapaVisualizacao(codSubrocesso: number) {
+        lastError.value = null;
         try {
             mapaVisualizacao.value =
                 await mapaService.obterMapaVisualizacao(codSubrocesso);
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao buscar mapa de visualização",
-                "Não foi possível carregar o mapa para visualização.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             mapaVisualizacao.value = null;
             throw error;
         }
     }
 
     async function buscarMapaCompleto(codSubrocesso: number) {
+        lastError.value = null;
         try {
             mapaCompleto.value = await mapaService.obterMapaCompleto(codSubrocesso);
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao buscar mapa completo",
-                "Não foi possível carregar o mapa completo.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             mapaCompleto.value = null;
             throw error;
         }
     }
 
     async function salvarMapa(codSubrocesso: number, request: SalvarMapaRequest) {
+        lastError.value = null;
         try {
             mapaCompleto.value = await mapaService.salvarMapaCompleto(
                 codSubrocesso,
                 request,
             );
         } catch (error) {
-            feedbackStore.show("Erro ao salvar mapa", "Não foi possível salvar o mapa.", "danger");
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
@@ -67,6 +68,7 @@ export const useMapasStore = defineStore("mapas", () => {
         codSubrocesso: number,
         competencia: Competencia,
     ) {
+        lastError.value = null;
         try {
             mapaCompleto.value = await subprocessoService.adicionarCompetencia(
                 codSubrocesso,
@@ -77,11 +79,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 await buscarMapaCompleto(codSubrocesso);
             }
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao adicionar competência",
-                "Não foi possível adicionar a competência.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
@@ -90,14 +88,12 @@ export const useMapasStore = defineStore("mapas", () => {
         codSubrocesso: number,
         competencia: Competencia,
     ) {
+        lastError.value = null;
         if (!competencia || !competencia.codigo) {
             // Evitar chamada ao backend com id inválido
-            feedbackStore.show(
-                "Erro ao atualizar competência",
-                "Código da competência inválido.",
-                "danger"
-            );
-            throw new Error("Código da competência inválido");
+            const err = new Error("Código da competência inválido");
+            lastError.value = normalizeError(err);
+            throw err;
         }
 
         try {
@@ -106,23 +102,17 @@ export const useMapasStore = defineStore("mapas", () => {
                 competencia,
             );
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao atualizar competência",
-                "Não foi possível atualizar a competência.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
 
     async function removerCompetencia(codSubrocesso: number, idCompetencia: number) {
+        lastError.value = null;
         if (!idCompetencia || idCompetencia === 0) {
-            feedbackStore.show(
-                "Erro ao remover competência",
-                "Código da competência inválido.",
-                "danger"
-            );
-            throw new Error("Código da competência inválido");
+            const err = new Error("Código da competência inválido");
+            lastError.value = normalizeError(err);
+            throw err;
         }
 
         try {
@@ -131,52 +121,39 @@ export const useMapasStore = defineStore("mapas", () => {
                 idCompetencia,
             );
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao remover competência",
-                "Não foi possível remover a competência.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
 
     async function buscarMapaAjuste(codSubrocesso: number) {
+        lastError.value = null;
         try {
             mapaAjuste.value = await mapaService.obterMapaAjuste(codSubrocesso);
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao buscar mapa de ajuste",
-                "Não foi possível carregar o mapa para ajuste.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             mapaAjuste.value = null;
             throw error;
         }
     }
 
     async function salvarAjustes(codSubrocesso: number, request: SalvarAjustesRequest) {
+        lastError.value = null;
         try {
             await mapaService.salvarMapaAjuste(codSubrocesso, request);
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao salvar ajustes",
-                "Não foi possível salvar os ajustes do mapa.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
 
     async function buscarImpactoMapa(codSubrocesso: number) {
+        lastError.value = null;
         try {
             impactoMapa.value =
                 await mapaService.verificarImpactosMapa(codSubrocesso);
         } catch (error) {
-            feedbackStore.show(
-                "Erro ao buscar impacto do mapa",
-                "Não foi possível carregar o impacto do mapa.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             impactoMapa.value = null;
             throw error;
         }
@@ -186,6 +163,7 @@ export const useMapasStore = defineStore("mapas", () => {
         codSubrocesso: number,
         request: DisponibilizarMapaRequest,
     ) {
+        lastError.value = null;
         try {
             await mapaService.disponibilizarMapa(codSubrocesso, request);
             feedbackStore.show(
@@ -194,11 +172,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 "success"
             );
         } catch (error: any) {
-            feedbackStore.show(
-                "Erro ao disponibilizar mapa",
-                "Não foi possível disponibilizar o mapa.",
-                "danger"
-            );
+            lastError.value = normalizeError(error);
             throw error;
         }
     }
@@ -208,6 +182,7 @@ export const useMapasStore = defineStore("mapas", () => {
         mapaAjuste,
         impactoMapa,
         mapaVisualizacao,
+        lastError,
         buscarMapaVisualizacao,
         buscarMapaCompleto,
         salvarMapa,
@@ -218,5 +193,6 @@ export const useMapasStore = defineStore("mapas", () => {
         salvarAjustes,
         buscarImpactoMapa,
         disponibilizarMapa,
+        clearError
     };
 });
