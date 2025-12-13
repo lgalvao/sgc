@@ -48,9 +48,11 @@ public class ConfigSeguranca {
                         auth.requestMatchers(
                                         "/api/usuarios/autenticar",
                                         "/api/usuarios/autorizar",
-                                        "/api/usuarios/entrar",
-                                        "/actuator/**")
+                                        "/api/usuarios/entrar")
                                 .permitAll()
+                                // SENTINEL: Protege endpoints do Actuator (observabilidade) para apenas administradores
+                                .requestMatchers("/actuator/**")
+                                .hasRole("ADMIN")
                                 .requestMatchers("/api/**")
                                 .authenticated()
                                 .anyRequest()
