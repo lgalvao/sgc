@@ -42,6 +42,23 @@ const props = defineProps<{
   showDataFinalizacao?: boolean;
 }>();
 
+/**
+ * TabelaProcessos - Componente de apresentação "burro"
+ *
+ * IMPORTANTE: Este componente NÃO ordena dados localmente.
+ * A ordenação é SERVER-SIDE e funciona da seguinte forma:
+ *
+ * 1. Usuário clica em coluna ordenável
+ * 2. BTable emite evento @sort-changed
+ * 3. Componente emite evento 'ordenar' para o pai (view)
+ * 4. View chama store com parâmetros de ordenação
+ * 5. Store chama backend com query params (ex: ?sort=descricao&order=asc)
+ * 6. Backend retorna dados ordenados
+ * 7. View atualiza prop 'processos' com novos dados
+ *
+ * Props 'criterioOrdenacao' e 'direcaoOrdenacaoAsc' são usadas apenas
+ * para indicar visualmente qual coluna está ordenada (setas na UI).
+ */
 const emit = defineEmits<{
   (e: "ordenar", campo: keyof ProcessoResumo | "dataFinalizacao"): void;
   (e: "selecionarProcesso", processo: ProcessoResumo): void;

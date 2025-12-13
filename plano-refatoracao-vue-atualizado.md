@@ -31,6 +31,7 @@ Views (Páginas) → Stores (Pinia) → Services (Axios) → API REST (Backend)
 ```
 
 **Princípios:**
+
 1. **Views** são "inteligentes": orquestram stores e componentes
 2. **Componentes** são "burros": recebem props, emitem eventos
 3. **Stores** gerenciam estado global e chamam services
@@ -98,6 +99,7 @@ frontend/src/
 ### ✅ Funcionalidades de Diagnóstico Adicionadas
 
 Quatro novas views para o fluxo de diagnóstico de competências:
+
 - `AutoavaliacaoDiagnostico.vue`
 - `ConclusaoDiagnostico.vue`
 - `MonitoramentoDiagnostico.vue`
@@ -156,6 +158,7 @@ Store dedicada para exibir notificações globais (toasts) de forma centralizada
 
 - **Problema principal:** Usa `processosStore.processosPainel` (resultado de `buscarProcessosPainel()` com paginação hardcoded de 1000 registros) e filtra localmente por tipo e situação "FINALIZADO"
 - **Lógica problemática (linhas 170-176):**
+
   ```typescript
   const processosDisponiveis = computed<ProcessoResumo[]>(() => {
     return processosStore.processosPainel.filter(
@@ -165,17 +168,20 @@ Store dedicada para exibir notificações globais (toasts) de forma centralizada
     );
   });
   ```
+
 - **Watch problemático (linhas 182-190):** Dispara `buscarProcessosPainel("ADMIN", 0, 0, 1000)` toda vez que o modal abre
 - **Impacto:** Se houver mais de 1000 processos ou se a paginação mudar, o modal não verá todos os processos finalizados disponíveis para importação
 
 #### Solução
 
 **Backend/Store:**
+
 - ✅ Endpoint `GET /api/processos/finalizados` existe (implementado em `processoService.ts:18-23`)
 - ✅ Ação `buscarProcessosFinalizados()` existe em `stores/processos.ts:64-72`
 - ✅ Ref `processosFinalizados` existe na store
 
 **Componente:**
+
 1. Remover computed `processosDisponiveis` (linhas 170-176)
 2. Remover watch que chama `buscarProcessosPainel()` (linhas 182-190)
 3. No watch de `mostrar`, chamar `processosStore.buscarProcessosFinalizados()`
@@ -227,28 +233,33 @@ watch(
 - **Props atuais:** `mostrar`, `idProcesso`, `siglaUnidade` (nenhuma obrigatória)
 - **Problema:** Depende de `processosStore.processoDetalhe` para buscar `codSubprocesso` usando `siglaUnidade` (linhas 45-52)
 - **Lógica frágil:**
+
   ```typescript
   const subprocesso = processoDetalhe.value?.resumoSubprocessos?.find(
     (s) => s.siglaUnidade === props.siglaUnidade
   );
   const codSubprocesso = subprocesso?.codigo;
   ```
+
 - **Impacto:** Se o modal for usado fora do contexto de detalhe do processo ou se `processoDetalhe` não estiver carregado, a lógica quebra
 
 #### Solução
 
 **Componente:**
+
 1. Adicionar prop **obrigatória** `codSubprocesso: number`
 2. Remover props `idProcesso` e `siglaUnidade` (se não forem usadas para mais nada)
 3. Remover dependência de `processosStore.processoDetalhe`
 4. Usar `props.codSubprocesso` diretamente na chamada `mapasStore.buscarImpactoMapa(codSubprocesso)`
 
 **Consumidores a atualizar:**
+
 - `CadAtividades.vue`
 - `VisAtividades.vue`
 - `CadMapa.vue`
 
 **Busca de consumidores:**
+
 ```bash
 grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 ```
@@ -286,11 +297,13 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 #### Solução
 
 **Componente:**
+
 1. Tornar props `codProcesso`, `codSubprocesso` e `siglaUnidade` **obrigatórias** (remover `?`)
 2. Remover `useRoute()` e leitura de `route.params`
 3. Usar props diretamente para montar os links de navegação
 
 **Consumidor:**
+
 - `SubprocessoView.vue` (principal consumidor)
 - Garantir que está passando todas as props necessárias
 
@@ -314,6 +327,7 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 ### 4. `AcoesEmBlocoModal.vue` & `ModalAcaoBloco.vue` (Prioridade Média)
 
 **Localização:**  
+
 - `frontend/src/components/AcoesEmBlocoModal.vue` (não utilizado)
 - `frontend/src/components/ModalAcaoBloco.vue` (utilizado)
 
@@ -327,22 +341,24 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 #### Solução
 
 **Exclusão:**
+
 1. Apagar `frontend/src/components/AcoesEmBlocoModal.vue` (não utilizado)
 2. Remover testes associados se existirem
 
 **Refatoração de `ModalAcaoBloco.vue` (se necessário):**
+
 1. Verificar se há uso de `window.alert()` ou `window.confirm()` — substituir por `BAlert` ou `emit`
 2. Garantir que validações mostram `BAlert` inline
 3. Garantir que erros inesperados são tratados via `lastError` da store
 
 #### Checklist de Implementação
 
-- [ ] Confirmar que `AcoesEmBlocoModal.vue` não é usado (busca no código)
-- [ ] Excluir `AcoesEmBlocoModal.vue`
-- [ ] Remover testes associados (se existirem)
-- [ ] Auditar `ModalAcaoBloco.vue` para uso de `alert()`/`confirm()`
-- [ ] Substituir por `BAlert` ou `emit` conforme necessário
-- [ ] Atualizar testes
+- [x] Confirmar que `AcoesEmBlocoModal.vue` não é usado (busca no código)
+- [x] Excluir `AcoesEmBlocoModal.vue`
+- [x] Remover testes associados (se existirem)
+- [x] Auditar `ModalAcaoBloco.vue` para uso de `alert()`/`confirm()`
+- [x] Substituir por `BAlert` ou `emit` conforme necessário
+- [x] Atualizar testes
 
 #### Estimativa
 
@@ -362,6 +378,7 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 
 - **Problema:** Contém hardcoding explícito: `if (u.sigla === 'SEDOC' || u.codigo === 1)` (linhas 66-68)
 - **Lógica atual:**
+
   ```typescript
   // Se for SEDOC (pela sigla ou código 1), não mostra ela, mas mostra as filhas
   if (u.sigla === 'SEDOC' || u.codigo === 1) {
@@ -370,21 +387,25 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
     lista.push(u);
   }
   ```
+
 - **Contexto:** A SEDOC é realmente especial (raiz da hierarquia) e deve ser ocultada, mas o critério deve ser genérico
 - **Lógica de tipo:** `tipo` (INTERMEDIARIA, INTEROPERACIONAL) é usado para habilitação de seleção (lógica válida, manter)
 
 #### Solução
 
 **Opção 1: Backend fornece flag `ocultar: boolean`**
+
 - Backend retorna `{ ocultar: true }` para unidades que devem ser ocultadas
 - Componente filtra por `!u.ocultar`
 
 **Opção 2: Prop `ocultarRaiz: boolean` (mais simples)**
+
 - Adicionar prop `ocultarRaiz: boolean` (padrão `true`)
 - Ocultar unidades com `nivel === 0` (ou critério similar)
 - Remover hardcoding de sigla/código
 
 **Opção 3: Critério de nível**
+
 - Remover hardcoding de `SEDOC` e `codigo === 1`
 - Usar `u.nivel === 0` ou `u.tipo === 'ROOT'` (se backend fornecer)
 
@@ -421,6 +442,7 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 #### Solução
 
 **Componente:**
+
 1. Adicionar verificação de `loading` antes de disparar nova busca
 2. Limpar dados (`analises.value = []`) ao fechar o modal (no handler de `@hide`)
 
@@ -444,10 +466,10 @@ const fechar = () => {
 
 #### Checklist de Implementação
 
-- [ ] Adicionar verificação de `loading` no watch
-- [ ] Implementar limpeza de dados ao fechar
-- [ ] Atualizar testes para validar prevenção de race conditions
-- [ ] Testar abrir/fechar modal rapidamente (manual ou E2E)
+- [x] Adicionar verificação de `loading` no watch
+- [x] Implementar limpeza de dados ao fechar
+- [x] Atualizar testes para validar prevenção de race conditions
+- [x] Testar abrir/fechar modal rapidamente (manual ou E2E)
 
 #### Estimativa
 
@@ -473,23 +495,25 @@ const fechar = () => {
 #### Solução
 
 **Documentação e Validação:**
+
 1. Documentar em comentário que ordenação é **server-side**
 2. Verificar que componente **não** ordena localmente (remover qualquer `Array.sort()` se existir)
 3. Garantir que evento `ordenar` é emitido corretamente
 4. O pai (view) deve chamar a store com parâmetros de ordenação, que chama o backend
 
 **Contrato esperado:**
+
 ```typescript
 emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 ```
 
 #### Checklist de Implementação
 
-- [ ] Auditar componente para verificar que **não** há `Array.sort()` local
-- [ ] Adicionar comentário documentando que ordenação é server-side
-- [ ] Validar que evento `ordenar` propaga corretamente
-- [ ] Atualizar testes para validar que componente não reordena dados
-- [ ] Testar ordenação via backend (stub E2E ou manual)
+- [x] Auditar componente para verificar que **não** há `Array.sort()` local
+- [x] Adicionar comentário documentando que ordenação é server-side
+- [x] Validar que evento `ordenar` propaga corretamente
+- [x] Atualizar testes para validar que componente não reordena dados
+- [x] Testar ordenação via backend (stub E2E ou manual)
 
 #### Estimativa
 
@@ -506,6 +530,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 **Status:** Recém-criados, arquitetura já moderna.
 
 **Análise:**
+
 - `AtividadeItem.vue`: Componente granular para renderizar atividades individuais com edição inline. Usa padrão de props/emits correto.
 - `UnidadeTreeNode.vue`: Componente recursivo para árvore de unidades. Usa padrão tri-state correto.
 
@@ -516,6 +541,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 ### 9. Views de Diagnóstico (Novas)
 
 **Arquivos:**
+
 - `AutoavaliacaoDiagnostico.vue`
 - `ConclusaoDiagnostico.vue`
 - `MonitoramentoDiagnostico.vue`
@@ -524,12 +550,10 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 **Análise:** Módulo recém-implementado seguindo arquitetura moderna (Views → Stores → Services → API).
 
 **Ação recomendada:**
+
 - [ ] Auditar para garantir que não há hardcoding de IDs/estados
 - [ ] Validar que tratamento de erros usa `lastError` e `BAlert` inline
 - [ ] Garantir que filtros/paginação são server-side
-- [ ] Criar testes E2E para fluxo completo de diagnóstico
-
-**Estimativa:** 2-3 horas de auditoria + ajustes menores
 
 ---
 
@@ -538,6 +562,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 **Status:** Parcialmente implementado (stores principais como `processos`, `mapas` já usam)
 
 **Stores a revisar:**
+
 - `alertas.ts`
 - `analises.ts`
 - `atividades.ts`
@@ -546,6 +571,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 - `unidades.ts`
 
 **Ação:**
+
 - [ ] Auditar cada store para verificar se usa `lastError: NormalizedError | null`
 - [ ] Remover `feedbackStore.show()` de blocos `catch` (exceto para mensagens de sucesso)
 - [ ] Garantir que stores sempre fazem `throw error` após captura (para propagação)
@@ -583,6 +609,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 ### Fase 1: Alta Prioridade (Sprint 1-2)
 
 **Componentes críticos com impacto funcional:**
+
 1. `ImportarAtividadesModal.vue` (filtragem server-side)
 2. `ArvoreUnidades.vue` (remover hardcoding)
 3. `ImpactoMapaModal.vue` (desacoplar de `processoDetalhe`)
@@ -590,6 +617,7 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 **Estimativa total:** 5-7 horas
 
 **Critérios de aceite:**
+
 - Todos os testes unitários passam
 - E2E relevantes atualizados e passando
 - Lint e typecheck sem erros
@@ -662,52 +690,17 @@ emit('ordenar', { campo: 'descricao', direcao: 'asc' | 'desc' })
 # Testes
 npm run test:unit              # Testes unitários Vitest
 npm run test:unit -- [arquivo] # Teste específico
-npm run coverage:unit          # Cobertura de testes
 
 # Qualidade de código
 npm run lint                   # ESLint com auto-fix
 npm run typecheck              # Verificação de tipos TypeScript
-npm run quality:all            # Todas as verificações
-
-# Desenvolvimento
-npm run dev                    # Dev server (Vite)
-npm run build                  # Build de produção
-```
-
-### E2E (executar na raiz)
-
-```bash
-npm run test:e2e               # Todos os testes E2E
-npm run test:e2e -- [spec]     # Teste E2E específico
-./scripts/capturar-telas.sh    # Captura de telas automatizada
-./scripts/visualizar-telas.sh  # Visualizador de capturas
 ```
 
 ### Backend (executar na raiz)
 
 ```bash
 ./gradlew :backend:test        # Testes unitários backend
-./gradlew qualityCheck         # Qualidade backend
-./gradlew qualityCheckAll      # Qualidade backend + frontend
 ```
-
-### Busca no Código
-
-```bash
-# Encontrar uso de componente
-grep -r "ImportarAtividadesModal" frontend/src/ --include="*.vue"
-
-# Encontrar window.alert ou confirm
-grep -r "window.alert\|window.confirm" frontend/src/ --include="*.vue" --include="*.ts"
-
-# Encontrar hardcoding de IDs
-grep -r "codigo === 1\|codigo === '1'" frontend/src/ --include="*.vue" --include="*.ts"
-
-# Encontrar uso de feedbackStore em stores
-grep -r "feedbackStore.show" frontend/src/stores/ --include="*.ts"
-```
-
----
 
 ## Referências e Documentação
 
@@ -715,7 +708,6 @@ grep -r "feedbackStore.show" frontend/src/stores/ --include="*.ts"
 
 - **README.md:** Visão geral do projeto e stack tecnológico
 - **AGENTS.md:** Guia para agentes de desenvolvimento (convenções, boas práticas)
-- **plano-refatoracao-erros.md:** Plano detalhado de tratamento de erros (CONCLUÍDO)
 - **frontend/README.md:** Arquitetura detalhada do frontend com diagramas
 - **backend/README.md:** Arquitetura detalhada do backend com diagramas
 - **frontend/src/[diretório]/README.md:** Documentação específica de cada módulo
@@ -735,17 +727,12 @@ grep -r "feedbackStore.show" frontend/src/stores/ --include="*.ts"
 
 ---
 
-## Conclusão
-
-Este plano atualizado reflete o estado atual do projeto SGC, incorporando as melhorias já implementadas (especialmente tratamento de erros) e identificando os itens restantes de refatoração. O projeto evoluiu significativamente desde o protótipo inicial, e as refatorações propostas visam consolidar a arquitetura moderna, eliminar resquícios de código prototipado e garantir escalabilidade e manutenibilidade.
-
 **Prioridades:**
+
 1. Filtragem server-side (`ImportarAtividadesModal`)
 2. Remover hardcoding (`ArvoreUnidades`)
 3. Desacoplar modais de estado global (`ImpactoMapaModal`)
 4. Componentes "dumb" sem `useRoute()` (`SubprocessoCards`)
 5. Consolidar padrão `lastError` em todas as stores
-
-**Estimativa total:** 15-20 horas de desenvolvimento + testes para completar todas as fases.
 
 **Próximos passos:** Iniciar Fase 1 (Alta Prioridade) com `ImportarAtividadesModal.vue`.

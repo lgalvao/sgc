@@ -6,7 +6,7 @@
       hide-footer
       size="lg"
       title="Histórico de Análises"
-      @hide="emit('fechar')"
+      @hide="fechar"
   >
     <div data-testid="modal-historico-body">
       <BAlert
@@ -48,7 +48,7 @@
       <BButton
           data-testid="btn-modal-fechar"
           variant="secondary"
-          @click="emit('fechar')"
+          @click="fechar"
       >
         Fechar
       </BButton>
@@ -68,7 +68,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   mostrar: boolean;
-  codSubrocesso: number | undefined;
+  codSubprocesso: number | undefined;
 }>();
 
 const emit = defineEmits(["fechar"]);
@@ -76,13 +76,26 @@ const emit = defineEmits(["fechar"]);
 const analisesStore = useAnalisesStore();
 const analises = ref<Analise[]>([]);
 
+/**
+ * Fecha o modal e limpa os dados para evitar flicker ao reabrir
+ */
+function fechar() {
+  analises.value = [];
+  analisesStore.clearError();
+  emit("fechar");
+}
+
+/**
+ * Watch que busca análises quando o modal é aberto
+ * Previne race conditions verificando se já está carregando
+ */
 watch(
     () => props.mostrar,
     async (newVal) => {
-      if (newVal && props.codSubrocesso) {
-        await analisesStore.buscarAnalisesCadastro(props.codSubrocesso);
+      if (newVal && props.codSubprocesso && !analisesStore.isLoading) {
+        await analisesStore.buscarAnalisesCadastro(props.codSubprocesso);
         analises.value = analisesStore.obterAnalisesPorSubprocesso(
-            props.codSubrocesso,
+            props.codSubprocesso,
         );
       }
     },

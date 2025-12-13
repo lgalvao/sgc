@@ -25,6 +25,8 @@ vi.mock("@/stores/analises", () => ({
             return codSubprocesso === 1 ? mockAnalises : [];
         },
         buscarAnalisesCadastro: vi.fn().mockResolvedValue(undefined), // Adicionado o mock para buscarAnalisesCadastro
+        isLoading: false,
+        clearError: vi.fn(),
     })),
 }));
 
@@ -37,7 +39,7 @@ describe("HistoricoAnaliseModal", () => {
         const wrapper = mount(HistoricoAnaliseModal, {
             props: {
                 mostrar: false,
-                codSubrocesso: 1,
+                codSubprocesso: 1,
             },
         });
         expect(wrapper.find('[data-testid="modal-historico-body"]').exists()).toBe(
@@ -49,7 +51,7 @@ describe("HistoricoAnaliseModal", () => {
         const wrapper = mount(HistoricoAnaliseModal, {
             props: {
                 mostrar: true,
-                codSubrocesso: 2,
+                codSubprocesso: 2,
             },
         });
 
@@ -62,7 +64,7 @@ describe("HistoricoAnaliseModal", () => {
         const wrapper = mount(HistoricoAnaliseModal, {
             props: {
                 mostrar: true,
-                codSubrocesso: 1,
+                codSubprocesso: 1,
             },
         });
 
@@ -81,7 +83,7 @@ describe("HistoricoAnaliseModal", () => {
         const wrapper = mount(HistoricoAnaliseModal, {
             props: {
                 mostrar: true,
-                codSubrocesso: 1,
+                codSubprocesso: 1,
             },
         });
 

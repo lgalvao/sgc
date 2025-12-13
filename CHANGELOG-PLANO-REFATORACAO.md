@@ -6,11 +6,7 @@
 
 **Novo Documento:** `plano-refatoracao-vue-atualizado.md` — Versão expandida e atualizada do plano de refatoração.
 
-**Documento Original:** `plano-refatoracao-vue.md` — Marcado como supersedido, mantido para referência histórica.
-
-### Conteúdo Adicionado
-
-1. **Contexto Expandido:**
+1. **Contexto:**
    - Stack tecnológico completo (Vue 3.5, Pinia, BootstrapVueNext, Vitest, Playwright)
    - Arquitetura de camadas detalhada
    - Estrutura de diretórios com contagem de arquivos (25 componentes, 18 views, 12 stores, 12 services)
@@ -101,3 +97,21 @@ Documento inicial criado para guiar refatoração de componentes Vue.js do prot�
 - **Refatoração:** Substituída filtragem client-side de processos por chamada de API específica `buscarProcessosFinalizados`.
 - **Store:** Utiliza `processosStore.processosFinalizados`.
 - **Testes:** Atualizados mocks e expectativas para refletir a nova lógica.
+
+#### AcoesEmBlocoModal.vue & ModalAcaoBloco.vue (CONCLUÍDO)
+- **Refatoração:** Removido `AcoesEmBlocoModal.vue` (componente não utilizado com `alert()` nativo).
+- **Validação:** Confirmado que `ModalAcaoBloco.vue` já segue todas as boas práticas.
+- **Resultado:** Código morto eliminado, sem impacto em funcionalidade.
+- **Testes:** 6 testes de `ModalAcaoBloco.spec.ts` + 17 testes de `ProcessoView.spec.ts` passando.
+
+#### TabelaProcessos.vue (CONCLUÍDO)
+- **Refatoração:** Adicionado comentário documentando ordenação server-side.
+- **Validação:** Confirmado ausência de `Array.sort()` local.
+- **Resultado:** Componente já seguia padrão correto, apenas faltava documentação.
+- **Testes:** 8 testes de `TabelaProcessos.spec.ts` passando.
+
+#### HistoricoAnaliseModal.vue (CONCLUÍDO)
+- **Refatoração:** Corrigido typo `codSubrocesso` → `codSubprocesso`, adicionado `isLoading` na store, verificação de loading no watch, limpeza de dados ao fechar.
+- **Store:** Adicionado `isLoading` em `analises.ts` para prevenir race conditions.
+- **Resultado:** Modal robusto contra abertura/fechamento rápido, sem flicker de dados antigos.
+- **Testes:** 4 testes de `HistoricoAnaliseModal.spec.ts` passando.

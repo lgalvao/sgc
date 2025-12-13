@@ -85,7 +85,7 @@
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-        :cod-subrocesso="codSubprocesso"
+        :cod-subprocesso="codSubprocesso"
         :mostrar="mostrarModalHistoricoAnalise"
         @fechar="fecharModalHistoricoAnalise"
     />

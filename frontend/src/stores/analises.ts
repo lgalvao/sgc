@@ -10,6 +10,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 export const useAnalisesStore = defineStore("analises", () => {
     const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
     const lastError = ref<NormalizedError | null>(null);
+    const isLoading = ref(false);
 
     function clearError() {
         lastError.value = null;
@@ -20,7 +21,10 @@ export const useAnalisesStore = defineStore("analises", () => {
     });
 
     async function buscarAnalisesCadastro(codSubrocesso: number) {
+        if (isLoading.value) return; // Previne race conditions
+        
         lastError.value = null;
+        isLoading.value = true;
         try {
             const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
             const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
@@ -36,11 +40,16 @@ export const useAnalisesStore = defineStore("analises", () => {
             // But if we don't rethrow, the component won't know it failed unless it checks lastError.
             // Let's assume components are not currently checking for errors here since it was swallowed.
             // But to be safe and consistent with other stores, let's keep it swallowing but populating lastError.
+        } finally {
+            isLoading.value = false;
         }
     }
 
     async function buscarAnalisesValidacao(codSubrocesso: number) {
+        if (isLoading.value) return; // Previne race conditions
+        
         lastError.value = null;
+        isLoading.value = true;
         try {
             const analises =
                 await analiseService.listarAnalisesValidacao(codSubrocesso);
@@ -49,12 +58,15 @@ export const useAnalisesStore = defineStore("analises", () => {
             analisesPorSubprocesso.value.set(codSubrocesso, [...outras, ...analises]);
         } catch (error) {
             lastError.value = normalizeError(error);
+        } finally {
+            isLoading.value = false;
         }
     }
 
     return {
         analisesPorSubprocesso,
         lastError,
+        isLoading,
         obterAnalisesPorSubprocesso,
         buscarAnalisesCadastro,
         buscarAnalisesValidacao,
