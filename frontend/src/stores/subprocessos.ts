@@ -34,7 +34,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         lastError.value = null;
     }
 
-    async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroMsg: string): Promise<boolean> {
+    async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, _: string): Promise<boolean> {
         lastError.value = null;
         try {
             await acao();

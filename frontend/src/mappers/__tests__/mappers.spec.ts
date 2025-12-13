@@ -12,7 +12,6 @@ import {
 import {
     mapImpactoMapaDtoToModel,
     mapMapaAjusteDtoToModel,
-    mapMapaCompletoDtoToModel,
     mapMapaDtoToModel,
 } from "../mapas";
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";

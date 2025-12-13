@@ -1,4 +1,3 @@
-import type { AxiosError } from "axios";
 import type { Ref } from "vue";
 import { ref } from "vue";
 import { normalizeError, type NormalizedError } from "@/utils/apiError";

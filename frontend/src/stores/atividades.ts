@@ -2,14 +2,12 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useFeedbackStore} from "@/stores/feedback";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
     const lastError = ref<NormalizedError | null>(null);
-    const feedbackStore = useFeedbackStore();
 
     function clearError() {
         lastError.value = null;

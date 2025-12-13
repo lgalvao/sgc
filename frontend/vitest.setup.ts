@@ -1,7 +1,6 @@
 import {config} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {vi} from "vitest";
-import {ref} from "vue";
 
 vi.mock("bootstrap", () => ({
     Tooltip: class Tooltip {

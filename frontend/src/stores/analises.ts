@@ -1,7 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import {useFeedbackStore} from "@/stores/feedback";
 import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
@@ -11,7 +10,6 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 export const useAnalisesStore = defineStore("analises", () => {
     const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
     const lastError = ref<NormalizedError | null>(null);
-    const feedbackStore = useFeedbackStore();
 
     function clearError() {
         lastError.value = null;
