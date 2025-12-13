@@ -40,10 +40,11 @@
             href="#" 
             class="nav-link" 
             title="Configurações do sistema"
+            aria-label="Configurações do sistema"
             data-testid="btn-configuracoes"
             @click.prevent="navigateFromNavbar('/configuracoes')"
           >
-            <i class="bi bi-gear"/>
+            <i class="bi bi-gear" aria-hidden="true"/>
           </a>
         </li>
         <li class="nav-item">
@@ -51,10 +52,11 @@
             href="#" 
             class="nav-link" 
             title="Sair"
+            aria-label="Sair"
             data-testid="btn-logout"
             @click.prevent="handleLogout"
           >
-            <i class="bi bi-box-arrow-right"/>
+            <i class="bi bi-box-arrow-right" aria-hidden="true"/>
           </a>
         </li>
       </ul>

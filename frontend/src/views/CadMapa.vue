@@ -77,10 +77,11 @@
                     data-testid="btn-editar-competencia"
                     size="sm"
                     title="Editar"
+                    :aria-label="`Editar competência ${comp.descricao}`"
                     variant="outline-primary"
                     @click="iniciarEdicaoCompetencia(comp)"
                 >
-                  <i class="bi bi-pencil"/>
+                  <i class="bi bi-pencil" aria-hidden="true"/>
                 </BButton>
                 <BButton
                     v-b-tooltip.hover
@@ -88,10 +89,11 @@
                     data-testid="btn-excluir-competencia"
                     size="sm"
                     title="Excluir"
+                    :aria-label="`Excluir competência ${comp.descricao}`"
                     variant="outline-danger"
                     @click="excluirCompetencia(comp.codigo)"
                 >
-                  <i class="bi bi-trash"/>
+                  <i class="bi bi-trash" aria-hidden="true"/>
                 </BButton>
               </div>
             </div>
@@ -120,10 +122,11 @@
                       data-testid="btn-remover-atividade-associada"
                       size="sm"
                       title="Remover Atividade"
+                      :aria-label="`Remover atividade ${descricaoAtividade(atvId)}`"
                       variant="outline-secondary"
                       @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
-                    <i class="bi bi-trash"/>
+                    <i class="bi bi-trash" aria-hidden="true"/>
                   </BButton>
                 </BCardBody>
               </BCard>
