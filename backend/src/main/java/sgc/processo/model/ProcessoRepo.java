@@ -35,4 +35,10 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     List<Long> findUnidadeCodigosBySituacaoAndTipo(
             @Param("situacao") SituacaoProcesso situacao,
             @Param("tipo") TipoProcesso tipo);
+
+    @Query("SELECT distinct u.codigo FROM Processo p JOIN p.participantes u "
+            + "WHERE p.situacao IN :situacoes AND (:idIgnorado IS NULL OR p.codigo <> :idIgnorado)")
+    List<Long> findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+            @Param("situacoes") List<SituacaoProcesso> situacoes,
+            @Param("idIgnorado") Long idIgnorado);
 }

@@ -174,8 +174,10 @@ class UnidadeServiceTest {
     @DisplayName("buscarArvoreComElegibilidade deve usar findAllComMapas quando requerMapaVigente")
     void buscarArvoreComElegibilidadeRevisao() {
         when(unidadeRepo.findAllComMapas()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                1L))
+                .thenReturn(Collections.emptyList());
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, 1L);
@@ -188,8 +190,10 @@ class UnidadeServiceTest {
     @DisplayName("buscarArvoreComElegibilidade deve usar findAll quando nao requerMapaVigente")
     void buscarArvoreComElegibilidadeMapeamento() {
         when(unidadeRepo.findAll()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                1L))
+                .thenReturn(Collections.emptyList());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 1L);
 
@@ -205,13 +209,10 @@ class UnidadeServiceTest {
 
         when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
 
-        Processo processoAtivo = new Processo();
-        processoAtivo.setCodigo(99L);
-        processoAtivo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoAtivo.setParticipantes(Set.of(unidade));
-
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(processoAtivo));
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                null))
+                .thenReturn(List.of(10L));
 
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
 
@@ -228,13 +229,12 @@ class UnidadeServiceTest {
 
         when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
 
-        Processo processoAtual = new Processo();
-        processoAtual.setCodigo(100L);
-        processoAtual.setSituacao(SituacaoProcesso.CRIADO);
-        processoAtual.setParticipantes(Set.of(unidade));
-
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of(processoAtual));
+        // O novo método do repo deve retornar uma lista vazia, pois o único processo ativo
+        // é o próprio processo que estamos editando (que deve ser ignorado)
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                100L))
+                .thenReturn(Collections.emptyList());
 
         // Passamos o codigo do processo atual para ignorar
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 100L);
@@ -252,8 +252,10 @@ class UnidadeServiceTest {
 
         when(unidadeRepo.findAll()).thenReturn(List.of(unidade));
 
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                null))
+                .thenReturn(Collections.emptyList());
 
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
 
@@ -280,8 +282,10 @@ class UnidadeServiceTest {
         assessoria.setUnidadeSuperior(secretaria);
 
         when(unidadeRepo.findAll()).thenReturn(List.of(sedoc, secretaria, assessoria));
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(List.of());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                null))
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(
@@ -343,8 +347,10 @@ class UnidadeServiceTest {
         List<Unidade> todasUnidades = Arrays.asList(sedoc, secretaria1, assessoria11);
 
         when(unidadeRepo.findAll()).thenReturn(todasUnidades);
-        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(Collections.emptyList());
-        when(processoRepo.findBySituacao(SituacaoProcesso.CRIADO)).thenReturn(Collections.emptyList());
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                null))
+                .thenReturn(Collections.emptyList());
 
         // Act
         // TipoProcesso.MAPEAMENTO não requer mapa vigente
