@@ -9,14 +9,6 @@ const pushMock = vi.fn();
 vi.mock("vue-router", () => ({
     useRouter: () => ({
         push: pushMock,
-        currentRoute: {
-            value: {
-                params: {
-                    codProcesso: "1",
-                    siglaUnidade: "TEST",
-                },
-            },
-        },
     }),
 }));
 
@@ -42,6 +34,11 @@ describe("SubprocessoCards.vue", () => {
         return mount(SubprocessoCards, {
             props: {
                 permissoes: defaultPermissoes,
+                codProcesso: 1,
+                siglaUnidade: "TEST",
+                codSubprocesso: 10,
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+                mapa: null,
                 ...propsOverride,
             },
             global: {

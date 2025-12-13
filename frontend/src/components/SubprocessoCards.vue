@@ -197,38 +197,29 @@ const props = defineProps<{
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;
   permissoes: SubprocessoPermissoes;
-  codSubprocesso?: number | null;
-  codProcesso?: number;
-  siglaUnidade?: string;
+  codSubprocesso: number;
+  codProcesso: number;
+  siglaUnidade: string;
 }>();
 
 const router = useRouter();
-const route = router.currentRoute;
 
 const navegarPara = (routeName: string) => {
-  const codigoProcesso = props.codProcesso || Number(route.value.params.codProcesso);
-  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
-
-  if (!codigoProcesso || !sigla) return;
-
   router.push({
     name: routeName,
     params: {
-      codProcesso: codigoProcesso,
-      siglaUnidade: sigla
+      codProcesso: props.codProcesso,
+      siglaUnidade: props.siglaUnidade
     },
   });
 };
 
 const navegarParaDiag = (routeName: string) => {
-  if (!props.codSubprocesso) return;
-  const sigla = props.siglaUnidade || String(route.value.params.siglaUnidade);
-
   router.push({
     name: routeName,
     params: {
       codSubprocesso: props.codSubprocesso,
-      siglaUnidade: sigla
+      siglaUnidade: props.siglaUnidade
     }
   });
 };

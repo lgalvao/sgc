@@ -12,8 +12,7 @@ describe("ImpactoMapaModal.vue", () => {
         return mount(ImpactoMapaModal, {
             props: {
                 mostrar: true,
-                idProcesso: 1,
-                siglaUnidade: "TESTE",
+                codSubprocesso: 123,
                 ...propsOverrides
             },
             global: {
@@ -23,11 +22,6 @@ describe("ImpactoMapaModal.vue", () => {
                         initialState: {
                             mapas: {
                                 impactoMapa: null,
-                            },
-                            processos: {
-                                processoDetalhe: {
-                                    unidades: [{sigla: "TESTE", codSubprocesso: 123}],
-                                },
                             },
                             ...initialState
                         },
@@ -161,20 +155,13 @@ describe("ImpactoMapaModal.vue", () => {
         wrapper = mount(ImpactoMapaModal, {
             props: {
                 mostrar: false,
-                idProcesso: 1,
-                siglaUnidade: "TESTE",
+                codSubprocesso: 123,
             },
             global: {
                 plugins: [
                     createTestingPinia({
                         stubActions: false,
-                        initialState: {
-                            processos: {
-                                processoDetalhe: {
-                                    unidades: [{sigla: "TESTE", codSubprocesso: 123}],
-                                },
-                            },
-                        }
+                        initialState: {}
                     }),
                 ],
             },
@@ -187,44 +174,6 @@ describe("ImpactoMapaModal.vue", () => {
         await flushPromises();
 
         expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
-    });
-
-    it("não deve buscar dados se subprocesso não encontrado", async () => {
-        // Inicia com mostrar: false e unidade sem subprocesso
-        wrapper = mount(ImpactoMapaModal, {
-            props: {
-                mostrar: false,
-                idProcesso: 1,
-                siglaUnidade: "OUTRA", // Unidade que não existe no store
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false,
-                        initialState: {
-                            processos: {
-                                processoDetalhe: {
-                                    unidades: [{sigla: "TESTE", codSubprocesso: 123}],
-                                },
-                            },
-                        }
-                    }),
-                ],
-            },
-        });
-
-        const mapasStore = useMapasStore();
-        mapasStore.buscarImpactoMapa = vi.fn();
-
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
-        });
-
-        await wrapper.setProps({mostrar: true});
-        await flushPromises();
-
-        expect(mapasStore.buscarImpactoMapa).not.toHaveBeenCalled();
-        expect(consoleSpy).toHaveBeenCalledWith("Subprocesso não encontrado para unidade", "OUTRA");
-        consoleSpy.mockRestore();
     });
 
     it("deve emitir evento 'fechar' ao clicar no botão", async () => {
@@ -245,24 +194,22 @@ describe("ImpactoMapaModal.vue", () => {
     });
 
     it("deve exibir estado de carregamento", async () => {
-        wrapper = createWrapper();
         // Forçamos o estado de carregamento simulando a chamada
         const mapasStore = useMapasStore();
 
-        mapasStore.buscarImpactoMapa = vi.fn((_: number) => new Promise<void>(() => {
-        })); // Promise que nunca resolve
-
         // Recriar para pegar a transição de props
         wrapper = mount(ImpactoMapaModal, {
-            props: {mostrar: false, idProcesso: 1, siglaUnidade: "TESTE"},
+            props: {mostrar: false, codSubprocesso: 123},
             global: {
                 plugins: [createTestingPinia({
-                    initialState: {
-                        processos: {processoDetalhe: {unidades: [{sigla: "TESTE", codSubprocesso: 123}]}}
-                    }
+                    initialState: {}
                 })]
             }
         });
+
+        // Mockar depois de montar, pois o pinia é criado no mount via plugins
+        const store = useMapasStore();
+        store.buscarImpactoMapa = vi.fn((_: number) => new Promise<void>(() => {})); // Promise que nunca resolve
 
         await wrapper.setProps({mostrar: true});
         // Não damos flushPromises para manter o loading state

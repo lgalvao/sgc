@@ -1,7 +1,7 @@
 # Plano de Refatoração de Componentes Vue.js (Atualizado)
 
 **Última atualização:** 2025-12-13  
-**Versão:** 2.0  
+**Versão:** 2.1
 **Status do Projeto:** Em produção ativa com 21 CDUs implementados
 
 Este documento detalha as alterações necessárias nos componentes Vue.js localizados em `frontend/src/components/` e módulos relacionados. O objetivo é continuar removendo lógicas de "protótipo" (hardcoded, filtros locais excessivos, mocks), otimizar a integração com o backend real, e consolidar as melhorias arquiteturais já implementadas.
@@ -255,12 +255,12 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 
 #### Checklist de Implementação
 
-- [ ] Adicionar prop obrigatória `codSubprocesso: number`
-- [ ] Remover props opcionais desnecessárias
-- [ ] Remover lógica de busca de subprocesso via `processoDetalhe`
-- [ ] Atualizar todos os consumidores para passar `codSubprocesso`
-- [ ] Atualizar testes para validar prop obrigatória
-- [ ] Validar funcionamento em todos os contextos (E2E)
+- [x] Adicionar prop obrigatória `codSubprocesso: number`
+- [x] Remover props opcionais desnecessárias
+- [x] Remover lógica de busca de subprocesso via `processoDetalhe`
+- [x] Atualizar todos os consumidores para passar `codSubprocesso`
+- [x] Atualizar testes para validar prop obrigatória
+- [x] Validar funcionamento em todos os contextos (E2E)
 
 #### Estimativa
 
@@ -296,12 +296,12 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 
 #### Checklist de Implementação
 
-- [ ] Tornar props obrigatórias (remover `| undefined`)
-- [ ] Remover `const route = useRoute()`
-- [ ] Remover fallbacks para `route.params`
-- [ ] Atualizar consumidores para passar todas as props
-- [ ] Atualizar testes para passar props mock (sem route mock)
-- [ ] Validar links de navegação em contexto sem route.params
+- [x] Tornar props obrigatórias (remover `| undefined`)
+- [x] Remover `const route = useRoute()`
+- [x] Remover fallbacks para `route.params`
+- [x] Atualizar consumidores para passar todas as props
+- [x] Atualizar testes para passar props mock (sem route mock)
+- [x] Validar links de navegação em contexto sem route.params
 
 #### Estimativa
 
@@ -392,11 +392,11 @@ grep -r "ImpactoMapaModal" frontend/src/views/ --include="*.vue"
 
 #### Checklist de Implementação
 
-- [ ] Remover `if (u.sigla === 'SEDOC' || u.codigo === 1)`
-- [ ] Implementar lógica genérica baseada em `nivel` ou prop `ocultarRaiz`
-- [ ] Manter lógica de `tipo` (INTERMEDIARIA, INTEROPERACIONAL) para habilitação
-- [ ] Atualizar testes para validar comportamento sem hardcoding
-- [ ] Testar com diferentes estruturas de unidades (E2E)
+- [x] Remover `if (u.sigla === 'SEDOC' || u.codigo === 1)`
+- [x] Implementar lógica genérica baseada em `nivel` ou prop `ocultarRaiz`
+- [x] Manter lógica de `tipo` (INTERMEDIARIA, INTEROPERACIONAL) para habilitação
+- [x] Atualizar testes para validar comportamento sem hardcoding
+- [x] Testar com diferentes estruturas de unidades (E2E)
 
 #### Estimativa
 

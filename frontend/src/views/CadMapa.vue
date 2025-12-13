@@ -303,9 +303,9 @@
     </BModal>
 
     <ImpactoMapaModal
-        :id-processo="codProcesso"
+        v-if="codSubprocesso"
+        :cod-subprocesso="codSubprocesso"
         :mostrar="mostrarModalImpacto"
-        :sigla-unidade="siglaUnidade"
         @fechar="fecharModalImpacto"
     />
   </BContainer>
@@ -365,7 +365,7 @@ function fecharModalImpacto() {
 }
 
 const unidade = computed(() => unidadesStore.unidade);
-const codSubrocesso = ref<number | null>(null);
+const codSubprocesso = ref<number | null>(null);
 
 onMounted(async () => {
   // Carrega unidade diretamente
@@ -378,7 +378,7 @@ onMounted(async () => {
   );
 
   if (id) {
-    codSubrocesso.value = id;
+    codSubprocesso.value = id;
     await Promise.all([
       mapasStore.buscarMapaCompleto(id),
       subprocessosStore.buscarSubprocessoDetalhe(id),
@@ -388,10 +388,10 @@ onMounted(async () => {
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof codSubrocesso.value !== "number") {
+  if (typeof codSubprocesso.value !== "number") {
     return [];
   }
-  return atividadesStore.obterAtividadesPorSubprocesso(codSubrocesso.value) || [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
 });
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
@@ -486,15 +486,15 @@ async function adicionarCompetenciaEFecharModal() {
 
   try {
     if (competenciaSendoEditada.value) {
-      await mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
+      await mapasStore.atualizarCompetencia(codSubprocesso.value as number, competencia);
     } else {
-      await mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+      await mapasStore.adicionarCompetencia(codSubprocesso.value as number, competencia);
     }
 
     // Recarregar mapa completo e subprocesso para garantir que situação e competências estejam atualizadas
     await Promise.all([
-      mapasStore.buscarMapaCompleto(codSubrocesso.value as number),
-      subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number),
+      mapasStore.buscarMapaCompleto(codSubprocesso.value as number),
+      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number),
     ]);
 
     // Sucesso: Limpar e fechar
@@ -519,11 +519,11 @@ function excluirCompetencia(codigo: number) {
 async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
     await mapasStore.removerCompetencia(
-        codSubrocesso.value as number,
+        codSubprocesso.value as number,
         competenciaParaExcluir.value.codigo,
     );
     // Recarregar subprocesso para atualizar situação se mapa ficou vazio
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number);
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number);
     fecharModalExcluirCompetencia();
   }
 }
@@ -545,17 +545,17 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       ),
     };
     mapasStore.atualizarCompetencia(
-        codSubrocesso.value as number,
+        codSubprocesso.value as number,
         competenciaAtualizada,
     );
   }
 }
 
 async function disponibilizarMapa() {
-  if (!codSubrocesso.value) return;
+  if (!codSubprocesso.value) return;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubrocesso.value, {
+    await mapasStore.disponibilizarMapa(codSubprocesso.value, {
       dataLimite: dataLimiteValidacao.value,
       observacoes: observacoesDisponibilizacao.value,
     });

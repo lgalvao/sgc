@@ -23,10 +23,12 @@ interface Props {
   unidades: Unidade[];
   modelValue: number[];
   filtrarPor?: (unidade: Unidade) => boolean;
+  ocultarRaiz?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   filtrarPor: () => true,
+  ocultarRaiz: true,
 });
 
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
@@ -57,14 +59,14 @@ const parentMap = computed(() => {
   return map;
 });
 
-// Filtrar unidades pela função customizada e ocultar SEDOC (raiz)
+// Filtrar unidades pela função customizada e ocultar Raiz se configurado
 const unidadesExibidas = computed(() => {
   const filtradas = props.unidades.filter(props.filtrarPor);
   const lista: Unidade[] = [];
 
   for (const u of filtradas) {
-    // Se for SEDOC (pela sigla ou código 1), não mostra ela, mas mostra as filhas
-    if (u.sigla === 'SEDOC' || u.codigo === 1) {
+    if (props.ocultarRaiz) {
+      // Se ocultarRaiz for true, ignoramos o nó raiz e mostramos suas filhas
       if (u.filhas) lista.push(...u.filhas);
     } else {
       lista.push(u);

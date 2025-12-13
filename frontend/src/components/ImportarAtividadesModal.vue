@@ -141,7 +141,7 @@ import {type Atividade, type ProcessoResumo, type UnidadeParticipante,} from "@/
 
 const props = defineProps<{
   mostrar: boolean;
-  codSubrocessoDestino: number | undefined;
+  codSubprocessoDestino: number | undefined;
 }>();
 
 const emit = defineEmits<{
@@ -250,7 +250,7 @@ function fechar() {
 
 async function importar() {
   limparErroImportacao();
-  if (!props.codSubrocessoDestino || !unidadeSelecionada.value) {
+  if (!props.codSubprocessoDestino || !unidadeSelecionada.value) {
     return;
   }
   if (atividadesSelecionadas.value.length === 0) {
@@ -262,7 +262,7 @@ async function importar() {
 
   try {
     await executarImportacao(
-        props.codSubrocessoDestino,
+        props.codSubprocessoDestino,
         unidadeSelecionada.value.codSubprocesso,
         idsAtividades,
     );
