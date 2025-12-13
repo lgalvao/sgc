@@ -39,6 +39,7 @@ export interface NormalizedError {
   code?: string;
   status?: number;
   details?: Record<string, any>;
+  subErrors?: Array<{ message?: string; field?: string; }>;
   traceId?: string;
   originalError?: unknown;
 }
@@ -60,15 +61,16 @@ export function normalizeError(err: unknown): NormalizedError {
   if (isAxiosError(err) && err.response) {
     const { status, data } = err.response;
     // data can be unknown, cast to ApiErrorPayload if it matches
-    const payload = data as ApiErrorPayload;
+    const payload = (data || {}) as ApiErrorPayload;
 
     return {
       kind: mapStatusToKind(status),
-      message: payload.message || 'Erro desconhecido.',
-      code: payload.code,
+      message: payload?.message || 'Erro desconhecido.',
+      code: payload?.code,
       status: status,
-      details: payload.details,
-      traceId: payload.traceId,
+      details: payload?.details,
+      subErrors: payload?.subErrors,
+      traceId: payload?.traceId,
       originalError: err
     };
   }

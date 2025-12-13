@@ -7,6 +7,19 @@
         }}</span>
     </div>
 
+    <BAlert
+        v-if="mapasStore.lastError"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="mapasStore.clearError()"
+    >
+      {{ mapasStore.lastError.message }}
+      <div v-if="mapasStore.lastError.details">
+        <small>Detalhes: {{ mapasStore.lastError.details }}</small>
+      </div>
+    </BAlert>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6 mb-3">
         Mapa de competências técnicas
@@ -133,6 +146,19 @@
         size="lg"
         @hidden="fecharModalCriarNovaCompetencia"
     >
+      <BAlert
+          v-if="mapasStore.lastError"
+          :model-value="true"
+          variant="danger"
+          dismissible
+          @dismissed="mapasStore.clearError()"
+      >
+        {{ mapasStore.lastError.message }}
+        <div v-if="mapasStore.lastError.details">
+          <small>Detalhes: {{ mapasStore.lastError.details }}</small>
+        </div>
+      </BAlert>
+
       <!-- Conteúdo do card movido para cá -->
       <div class="mb-4">
         <h5>Descrição</h5>
@@ -470,13 +496,15 @@ async function adicionarCompetenciaEFecharModal() {
       mapasStore.buscarMapaCompleto(codSubrocesso.value as number),
       subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso.value as number),
     ]);
-  } finally {
-    // Limpar formulário e fechar modal independente do resultado (o feedbackStore já notifica erros)
+
+    // Sucesso: Limpar e fechar
     novaCompetencia.value.descricao = "";
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
-
     fecharModalCriarNovaCompetencia();
+  } catch (error) {
+    // Erro: Manter modal aberto para exibir o erro
+    console.error("Erro ao salvar competência:", error);
   }
 }
 

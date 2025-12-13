@@ -336,38 +336,30 @@ describe("ProcessoView.vue", () => {
     });
 
     it("executarFinalizacao deve mostrar erro se falhar", async () => {
-        const {wrapper: w, feedbackStore} = createWrapper();
+        const {wrapper: w, processosStore} = createWrapper();
         wrapper = w;
         await flushPromises();
         vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent(ModalFinalizacaoStub);
         modal.vm.$emit("confirmar");
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro ao finalizar processo",
-            expect.any(String),
-            "danger"
-        );
+        expect(processosStore.lastError).toBeTruthy();
+        expect(processosStore.lastError?.message).toContain("Fail");
     });
 
     it("confirmarAcaoBloco deve mostrar erro se falhar", async () => {
-        const {wrapper: w, feedbackStore} = createWrapper();
+        const {wrapper: w, processosStore} = createWrapper();
         wrapper = w;
         await flushPromises();
         vi.mocked(processoService.processarAcaoEmBloco).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         modal.vm.$emit("confirmar", [{sigla: "TU", selecionada: true}]);
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro ao processar em bloco",
-            expect.any(String),
-            "danger"
-        );
+        expect(processosStore.lastError).toBeTruthy();
+        expect(processosStore.lastError?.message).toContain("Fail");
     });
 });
