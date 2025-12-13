@@ -1,10 +1,14 @@
 # Plano de Refatoração de Componentes Vue.js
 
-Última atualização: 2025-12-13
+**⚠️ DOCUMENTO SUPERSEDIDO — Veja `plano-refatoracao-vue-atualizado.md` para a versão mais recente (v2.0)**
+
+Última atualização: 2025-12-13 (versão original mantida para referência histórica)
 
 Este documento detalha as alterações necessárias nos componentes Vue.js localizados em `@frontend/src/components/`. O
 objetivo é remover lógicas de "protótipo" (hardcoded, filtros locais excessivos, mocks) e otimizar a integração com o
 backend real.
+
+**Nova versão disponível:** [`plano-refatoracao-vue-atualizado.md`](plano-refatoracao-vue-atualizado.md) — Documento expandido com contexto completo do estado atual do projeto, análise das mudanças recentes, e plano detalhado atualizado.
 
 ## Contexto Técnico do Projeto
 
