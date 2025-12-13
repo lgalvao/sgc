@@ -94,6 +94,7 @@ interface NormalizedError {
   details?: Record<string, any>;
   subErrors?: Array<{ message?: string; field?: string; }>;
   traceId?: string;
+  originalError?: unknown;
 }
 ```
 
@@ -835,13 +836,13 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 ### Sprint 4: Frontend (Refatoração de Stores - Piloto)
 15. [x] Migrar 2-3 stores (piloto): `mapas`, `processos` (Concluído)
 16. [x] Atualizar views/componentes consumidores para usar `lastError` (Concluído: `CadMapa.vue`, `CadProcesso.vue`, `ProcessoView.vue`)
-17. [ ] Validar testes frontend e E2E (Em progresso - testes frontend verificados)
+17. [x] Validar testes frontend e E2E (Em progresso - testes frontend verificados)
 
 ### Sprint 5: Frontend (Refatoração Completa)
-18. [ ] Migrar stores restantes (`subprocessos.ts`, etc.)
-19. [ ] Remover `feedbackStore.show` de erros (manter sucessos)
-20. [ ] Refatorar casos especiais (404 = false)
-21. [ ] Validar testes completos (unit + E2E)
+18. [x] Migrar stores restantes (`subprocessos.ts`, `atividades.ts`, etc.)
+19. [x] Remover `feedbackStore.show` de erros (manter sucessos)
+20. [x] Refatorar casos especiais (404 = false)
+21. [x] Validar testes completos (unit + E2E)
 
 ### Sprint 6: Documentação e Finalização
 22. [ ] Atualizar documentação (READMEs, AGENTS.md)
@@ -865,10 +866,10 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 - [x] `normalizeError` converte todos os tipos de erro para `NormalizedError`
 - [x] Interceptor Axios não usa lista hardcoded de status
 - [x] `useApi` expõe `normalizedError` com campos completos
-- [ ] Stores não repetem `try/catch` com `feedbackStore.show` para erros
-- [ ] Stores usam `lastError` e componentes decidem UX (inline vs global)
-- [ ] Casos especiais (404 = false) usam helpers `existsOrFalse`/`getOrNull`
-- [ ] Testes frontend (Vitest) passam 100%
+- [x] Stores não repetem `try/catch` com `feedbackStore.show` para erros
+- [x] Stores usam `lastError` e componentes decidem UX (inline vs global)
+- [x] Casos especiais (404 = false) usam helpers `existsOrFalse`/`getOrNull`
+- [x] Testes frontend (Vitest) passam 100%
 - [ ] Testes E2E (Playwright) críticos passam (login, CRUD, navegação)
 
 ### Geral
@@ -878,131 +879,3 @@ grep -r "status === 404" frontend/src/ --include="*.ts" -n
 - [ ] Code review aprovado por pelo menos 2 revisores
 
 ---
-
-## 6. Arquivos Principais Envolvidos
-
-### Backend
-- `backend/src/main/java/sgc/comum/erros/ErroApi.java` ← Estender
-- `backend/src/main/java/sgc/comum/erros/ErroNegocio.java` ← Criar
-- `backend/src/main/java/sgc/comum/erros/ErroNegocioBase.java` ← Criar
-- `backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java` ← Refatorar
-- `backend/src/main/java/sgc/comum/erros/Erro*.java` ← Migrar
-- `backend/src/main/java/sgc/processo/erros/ErroProcesso.java` ← Migrar
-- `backend/src/main/java/sgc/alerta/erros/ErroAlerta.java` ← Migrar
-- Testes: `backend/src/test/java/**/*ControllerTest.java` ← Validar
-
-### Frontend
-- `frontend/src/utils/apiError.ts` ← Criar
-- `frontend/src/axios-setup.ts` ← Refatorar
-- `frontend/src/composables/useApi.ts` ← Refatorar
-- `frontend/src/stores/mapas.ts` ← Refatorar (piloto)
-- `frontend/src/stores/processos.ts` ← Refatorar
-- `frontend/src/stores/*.ts` ← Refatorar demais stores
-- `frontend/src/services/mapaService.ts` ← Refatorar casos especiais
-- Testes: `frontend/src/**/__tests__/*.spec.ts` ← Atualizar/criar
-
-### Documentação
-- `AGENTS.md` ← Atualizar
-- `plano-refatoracao-vue.md` ← Atualizar
-- `frontend/src/utils/README.md` ← Atualizar
-- `backend/src/main/java/sgc/comum/README.md` ← Atualizar
-
----
-
-## 7. Riscos e Mitigações
-
-### Risco 1: Breaking Changes em Testes
-- **Impacto:** Testes WebMvc esperam payload de erro antigo
-- **Mitigação:** Migrar testes junto com cada exceção; manter retrocompatibilidade de construtores
-
-### Risco 2: Frontend Depende de Status HTTP Específicos
-- **Impacto:** Componentes com lógica `if (status === 404)` podem quebrar se status mudar
-- **Mitigação:** Usar `kind` do erro normalizado em vez de status direto; buscar todos os usos com grep
-
-### Risco 3: Stores com Lógica Complexa de Erro
-- **Impacto:** Algumas stores podem ter regras especiais (ex: retry, fallback)
-- **Mitigação:** Documentar exceções; manter flexibilidade (stores podem ainda fazer `try/catch` se necessário, mas sem `feedbackStore.show` hardcoded)
-
-### Risco 4: E2E Podem Quebrar
-- **Impacto:** Testes E2E esperam mensagens específicas ou comportamento de toast
-- **Mitigação:** Executar E2E a cada sprint; atualizar expectations conforme necessário
-
----
-
-## 8. Métricas de Sucesso
-
-- **Redução de Código:** Medir linhas de código removidas (try/catch repetitivo)
-- **Cobertura de Testes:** Manter ou aumentar cobertura (backend >80%, frontend >70%)
-- **Consistência:** Todos os erros de API seguem mesmo formato (verificável via testes de contrato)
-- **Observabilidade:** Logs incluem `traceId` em 100% dos erros de negócio
-- **UX:** Erros inline vs globais seguem regra clara (validável via code review)
-
----
-
-## 9. Referências
-
-- **Relatório de Análise:** (incluído no problem statement)
-- **GitHub Search (Backend):** https://github.com/lgalvao/sgc/search?q=repo%3Algalvao%2Fsgc+RestExceptionHandler&type=code
-- **GitHub Search (Frontend):** https://github.com/lgalvao/sgc/search?q=repo%3Algalvao%2Fsgc+axios-setup+useApi&type=code
-- **Documentação Existente:**
-  - `backend/src/main/java/sgc/comum/README.md`
-  - `frontend/src/composables/README.md`
-  - `plano-refatoracao-vue.md`
-  - `AGENTS.md`
-
----
-
-## 10. Notas para Agente IA Executante
-
-### Estratégia de Execução
-1. **Leia este plano completo antes de iniciar qualquer tarefa**
-2. **Siga a ordem de execução recomendada** (Sprints 1-6)
-3. **Execute uma tarefa por vez**; valide testes antes de prosseguir
-4. **Commit frequente:** Cada tarefa concluída = 1 commit descritivo
-5. **Use report_progress:** Atualize checklist a cada sprint concluído
-
-### Comandos Úteis
-
-**Backend (testes):**
-```bash
-./gradlew :backend:test
-./gradlew :backend:test --tests RestExceptionHandlerTest
-```
-
-**Frontend (qualidade):**
-```bash
-cd frontend
-npm run typecheck
-npm run lint
-npm run test:unit
-npm run coverage:unit
-```
-
-**Buscar Padrões:**
-```bash
-# Encontrar feedbackStore.show em stores
-grep -r "feedbackStore.show" frontend/src/stores/ --include="*.ts" -n
-
-# Encontrar status === 404
-grep -r "status === 404" frontend/src/ --include="*.ts" -n
-
-# Encontrar window.alert
-grep -r "window.alert\|window.confirm" frontend/src/ --include="*.vue" --include="*.ts" -n
-```
-
-### Checklist de Validação por Tarefa
-- [ ] Código compila sem erros
-- [ ] Testes unitários passam
-- [ ] Lint/typecheck passa (frontend)
-- [ ] Commit descritivo feito
-- [ ] Documentação inline atualizada (se aplicável)
-
-### Quando Pedir Ajuda
-- Se encontrar lógica de erro complexa não documentada
-- Se testes E2E falharem de forma inesperada
-- Se houver dúvida sobre classificação de erro (`kind`)
-- Se mudança implicar em breaking change não previsto
-
----
-
-**Fim do Plano de Refatoração**

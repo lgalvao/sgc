@@ -2,11 +2,18 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {buscarTodosUsuarios} from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useUsuariosStore = defineStore("usuarios", () => {
     const usuarios = ref<Usuario[]>([]);
     const isLoading = ref(false);
     const error = ref<string | null>(null);
+    const lastError = ref<NormalizedError | null>(null);
+
+    function clearError() {
+        lastError.value = null;
+        error.value = null;
+    }
 
     const obterUsuarioPorId = computed(() => (id: number): Usuario | undefined => {
         return usuarios.value.find((u) => u.codigo === id);
@@ -15,6 +22,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
     async function buscarUsuarios() {
         isLoading.value = true;
         error.value = null;
+        lastError.value = null;
         try {
             const response = await buscarTodosUsuarios();
             usuarios.value = (response as any).map((u: any) => ({
@@ -22,7 +30,8 @@ export const useUsuariosStore = defineStore("usuarios", () => {
                 unidade: {sigla: u.unidade},
             })) as Usuario[];
         } catch (err: any) {
-            error.value = "Falha ao carregar usuários: " + err.message;
+            lastError.value = normalizeError(err);
+            error.value = lastError.value.message;
         } finally {
             isLoading.value = false;
         }
@@ -32,6 +41,8 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         usuarios,
         isLoading,
         error,
+        lastError,
+        clearError,
         obterUsuarioPorId,
         buscarUsuarios,
     };

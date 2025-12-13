@@ -94,7 +94,7 @@ describe("useAtribuicaoTemporariaStore", () => {
             ).mockRejectedValue(new Error("Failed"));
             await atribuicaoTemporariaStore.buscarAtribuicoes();
             expect(atribuicaoTemporariaStore.error).toContain(
-                "Falha ao carregar atribuições",
+                "Failed",
             );
         });
     });

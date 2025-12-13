@@ -14,7 +14,7 @@ import {
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {
@@ -23,38 +23,59 @@ import type {
     HomologarCadastroRequest,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-
-async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroMsg: string): Promise<boolean> {
-    const feedbackStore = useFeedbackStore();
-    try {
-        await acao();
-        feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
-
-        const processosStore = useProcessosStore();
-        if (processosStore.processoDetalhe) {
-            await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
-        }
-        return true;
-    } catch {
-        feedbackStore.show(erroMsg, `Não foi possível concluir a ação: ${erroMsg}.`, 'danger');
-        return false;
-    }
-}
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
+    const lastError = ref<NormalizedError | null>(null);
+    const feedbackStore = useFeedbackStore();
+
+    function clearError() {
+        lastError.value = null;
+    }
+
+    async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, erroMsg: string): Promise<boolean> {
+        lastError.value = null;
+        try {
+            await acao();
+            feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
+
+            const processosStore = useProcessosStore();
+            if (processosStore.processoDetalhe) {
+                await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
+            }
+            return true;
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            // Propagating error is important if the component relies on it,
+            // but the original code was catching it and returning false.
+            // The plan says: "Deixar componente/view decidir UX"
+            // However, _executarAcao is a helper. Let's populate lastError and return false,
+            // but we might want to throw if components need to handle it.
+            // The original code was returning false, so let's stick to that for now
+            // but ensure lastError is set so components CAN display it if they want.
+            // AND we remove the feedbackStore.show call for errors.
+            return false;
+        }
+    }
 
     async function alterarDataLimiteSubprocesso(
         id: number,
         dados: { novaData: string },
     ) {
-        const processosStore = useProcessosStore();
-        await processosStore.alterarDataLimiteSubprocesso(id, dados);
+        lastError.value = null;
+        try {
+            const processosStore = useProcessosStore();
+            await processosStore.alterarDataLimiteSubprocesso(id, dados);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function buscarSubprocessoDetalhe(id: number) {
+        lastError.value = null;
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidadeSel = perfilStore.unidadeSelecionada;
         let codUnidade: number | null = null;
@@ -73,11 +94,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         const perfilGlobal = perfil === 'ADMIN' || perfil === 'GESTOR';
 
         if (!perfil || (!perfilGlobal && codUnidade === null)) {
-            feedbackStore.show(
-                "Erro ao buscar detalhes do subprocesso",
-                "Informações de perfil ou unidade não disponíveis.",
-                "danger"
-            );
+            const err = new Error("Informações de perfil ou unidade não disponíveis.");
+            lastError.value = normalizeError(err);
             subprocessoDetalhe.value = null;
             return;
         }
@@ -88,12 +106,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 perfil,
                 codUnidade,
             );
-        } catch {
-            feedbackStore.show(
-                "Erro ao buscar detalhes do subprocesso",
-                "Não foi possível carregar as informações.",
-                "danger"
-            );
+        } catch (error) {
+            lastError.value = normalizeError(error);
             subprocessoDetalhe.value = null;
         }
     }
@@ -102,22 +116,20 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
-        const feedbackStore = useFeedbackStore();
+        lastError.value = null;
         try {
             const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
-        } catch {
-            feedbackStore.show(
-                "Erro",
-                "Não foi possível encontrar o subprocesso para esta unidade.",
-                "danger"
-            );
+        } catch (error) {
+            lastError.value = normalizeError(error);
             return null;
         }
     }
 
     return {
         subprocessoDetalhe,
+        lastError,
+        clearError,
         alterarDataLimiteSubprocesso,
         buscarSubprocessoDetalhe,
         buscarSubprocessoPorProcessoEUnidade,

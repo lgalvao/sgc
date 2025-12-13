@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import type {PerfilUnidade} from "@/mappers/sgrh";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const usePerfilStore = defineStore("perfil", () => {
     const servidorId = ref<number | null>(
@@ -25,9 +26,14 @@ export const usePerfilStore = defineStore("perfil", () => {
     const perfis = ref<Perfil[]>(
         (JSON.parse(localStorage.getItem("perfis") || "[]")) as Perfil[],
     );
+    const lastError = ref<NormalizedError | null>(null);
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
     const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
+
+    function clearError() {
+        lastError.value = null;
+    }
 
     function definirServidorId(novoId: string | number) {
         servidorId.value = Number(novoId);
@@ -53,60 +59,73 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     async function loginCompleto(tituloEleitoral: string, senha: string) {
-        const tituloEleitoralNum = Number(tituloEleitoral);
-        const autenticado = await usuarioService.autenticar({
-            tituloEleitoral: tituloEleitoralNum,
-            senha,
-        });
-        if (autenticado) {
-            const responsePerfisUnidades =
-                await usuarioService.autorizar(tituloEleitoralNum);
-            perfisUnidades.value = responsePerfisUnidades;
+        lastError.value = null;
+        try {
+            const tituloEleitoralNum = Number(tituloEleitoral);
+            const autenticado = await usuarioService.autenticar({
+                tituloEleitoral: tituloEleitoralNum,
+                senha,
+            });
+            if (autenticado) {
+                const responsePerfisUnidades =
+                    await usuarioService.autorizar(tituloEleitoralNum);
+                perfisUnidades.value = responsePerfisUnidades;
 
-            const listaPerfis = [
-                ...new Set(
-                    responsePerfisUnidades.map((p) => p.perfil as unknown as Perfil),
-                ),
-            ];
-            definirPerfis(listaPerfis);
+                const listaPerfis = [
+                    ...new Set(
+                        responsePerfisUnidades.map((p) => p.perfil as unknown as Perfil),
+                    ),
+                ];
+                definirPerfis(listaPerfis);
 
-            // Se houver apenas uma opção, seleciona automaticamente
-            if (responsePerfisUnidades.length === 1) {
-                const perfilUnidadeSelecionado = responsePerfisUnidades[0];
-                const loginResponse = await usuarioService.entrar({
-                    tituloEleitoral: tituloEleitoralNum,
-                    perfil: perfilUnidadeSelecionado.perfil,
-                    unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
-                });
-                definirPerfilUnidade(
-                    loginResponse.perfil as unknown as Perfil,
-                    loginResponse.unidadeCodigo,
-                    perfilUnidadeSelecionado.unidade.sigla,
-                );
-                definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
-                definirToken(loginResponse.token); // Adicionar esta linha
+                // Se houver apenas uma opção, seleciona automaticamente
+                if (responsePerfisUnidades.length === 1) {
+                    const perfilUnidadeSelecionado = responsePerfisUnidades[0];
+                    const loginResponse = await usuarioService.entrar({
+                        tituloEleitoral: tituloEleitoralNum,
+                        perfil: perfilUnidadeSelecionado.perfil,
+                        unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
+                    });
+                    definirPerfilUnidade(
+                        loginResponse.perfil as unknown as Perfil,
+                        loginResponse.unidadeCodigo,
+                        perfilUnidadeSelecionado.unidade.sigla,
+                    );
+                    definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
+                    definirToken(loginResponse.token); // Adicionar esta linha
+                }
+                return true;
             }
-            return true;
+            return false;
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            // It was implicitly rethrowing before, so we rethrow now to let the component handle it (e.g. show error message on login form)
+            throw error;
         }
-        return false;
     }
 
     async function selecionarPerfilUnidade(
         tituloEleitoral: number,
         perfilUnidade: PerfilUnidade,
     ) {
-        const loginResponse = await usuarioService.entrar({
-            tituloEleitoral: tituloEleitoral,
-            perfil: perfilUnidade.perfil,
-            unidadeCodigo: perfilUnidade.unidade.codigo,
-        });
-        definirPerfilUnidade(
-            loginResponse.perfil as unknown as Perfil,
-            loginResponse.unidadeCodigo,
-            perfilUnidade.unidade.sigla,
-        );
-        definirServidorId(loginResponse.tituloEleitoral);
-        definirToken(loginResponse.token);
+        lastError.value = null;
+        try {
+            const loginResponse = await usuarioService.entrar({
+                tituloEleitoral: tituloEleitoral,
+                perfil: perfilUnidade.perfil,
+                unidadeCodigo: perfilUnidade.unidade.codigo,
+            });
+            definirPerfilUnidade(
+                loginResponse.perfil as unknown as Perfil,
+                loginResponse.unidadeCodigo,
+                perfilUnidade.unidade.sigla,
+            );
+            definirServidorId(loginResponse.tituloEleitoral);
+            definirToken(loginResponse.token);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     function logout() {
@@ -133,6 +152,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfis,
         isAdmin,
         isGestor,
+        lastError,
+        clearError,
         definirServidorId,
         definirPerfilUnidade,
         loginCompleto,

@@ -5,10 +5,16 @@ import type {Alerta} from "@/types/tipos";
 import * as alertaService from "../services/alertaService";
 import * as painelService from "../services/painelService";
 import {usePerfilStore} from "./perfil";
+import { normalizeError, type NormalizedError } from "@/utils/apiError";
 
 export const useAlertasStore = defineStore("alertas", () => {
     const alertas = ref<Alerta[]>([]);
     const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
+    const lastError = ref<NormalizedError | null>(null);
+
+    function clearError() {
+        lastError.value = null;
+    }
 
     async function buscarAlertas(
         usuarioTitulo: number,
@@ -18,19 +24,26 @@ export const useAlertasStore = defineStore("alertas", () => {
         sort?: "data" | "processo",
         order?: "asc" | "desc",
     ) {
-        const response = await painelService.listarAlertas(
-            usuarioTitulo,
-            unidade,
-            page,
-            size,
-            sort,
-            order,
-        );
-        alertas.value = response.content;
-        alertasPage.value = response;
+        lastError.value = null;
+        try {
+            const response = await painelService.listarAlertas(
+                usuarioTitulo,
+                unidade,
+                page,
+                size,
+                sort,
+                order,
+            );
+            alertas.value = response.content;
+            alertasPage.value = response;
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
     }
 
     async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
+        lastError.value = null;
         try {
             await alertaService.marcarComoLido(idAlerta);
             const perfilStore = usePerfilStore();
@@ -45,7 +58,8 @@ export const useAlertasStore = defineStore("alertas", () => {
                 );
             }
             return true;
-        } catch {
+        } catch (error) {
+            lastError.value = normalizeError(error);
             return false;
         }
     }
@@ -53,7 +67,9 @@ export const useAlertasStore = defineStore("alertas", () => {
     return {
         alertas,
         alertasPage,
+        lastError,
         buscarAlertas,
         marcarAlertaComoLido,
+        clearError
     };
 });
