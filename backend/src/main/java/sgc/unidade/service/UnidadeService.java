@@ -110,14 +110,12 @@ public class UnidadeService {
     }
 
     private Set<Long> getUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
-        List<Processo> emAndamento = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
-        List<Processo> criados = processoRepo.findBySituacao(SituacaoProcesso.CRIADO);
-
-        return Stream.concat(emAndamento.stream(), criados.stream())
-                .filter(p -> !p.getCodigo().equals(codProcessoIgnorar))
-                .flatMap(p -> p.getParticipantes().stream())
-                .map(Unidade::getCodigo)
-                .collect(Collectors.toSet());
+        // Bolt Optimization: Use JPQL projection to fetch only IDs instead of hydrating full entities
+        // and avoid N+1 queries from lazy loading participants
+        return new HashSet<>(
+                processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
+                        Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
+                        codProcessoIgnorar));
     }
 
     public void criarAtribuicaoTemporaria(
