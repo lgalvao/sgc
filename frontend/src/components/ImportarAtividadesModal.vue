@@ -27,7 +27,7 @@
         <BFormSelect
             id="processo-select"
             v-model="processoSelecionadoId"
-            :options="processosDisponiveis"
+            :options="processosStore.processosFinalizados"
             data-testid="select-processo"
             text-field="descricao"
             value-field="codigo"
@@ -42,7 +42,7 @@
           </template>
         </BFormSelect>
         <div
-            v-if="!processosDisponiveis.length"
+            v-if="!processosStore.processosFinalizados.length"
             class="text-center text-muted mt-3"
         >
           Nenhum processo disponível para importação.
@@ -133,11 +133,11 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal,} from "bootstrap-vue-next";
-import {computed, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {useApi} from "@/composables/useApi";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
-import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante,} from "@/types/tipos";
+import {type Atividade, type ProcessoResumo, type UnidadeParticipante,} from "@/types/tipos";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -167,14 +167,6 @@ const unidadeSelecionadaId = ref<number | null>(null);
 const atividadesParaImportar = ref<Atividade[]>([]);
 const atividadesSelecionadas = ref<Atividade[]>([]);
 
-const processosDisponiveis = computed<ProcessoResumo[]>(() => {
-  return processosStore.processosPainel.filter(
-      (p) =>
-          (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) &&
-          p.situacao === "FINALIZADO",
-  );
-});
-
 onMounted(() => {
   // A busca é feita ao abrir o modal
 });
@@ -184,14 +176,14 @@ watch(
     (mostrar) => {
       if (mostrar) {
         resetModal();
-        processosStore.buscarProcessosPainel("ADMIN", 0, 0, 1000);
+        processosStore.buscarProcessosFinalizados();
       }
     },
 );
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosDisponiveis.value.find(
+    const processo = processosStore.processosFinalizados.find(
         (p) => p.codigo === Number(newId),
     );
     if (processo) {

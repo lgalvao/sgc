@@ -202,11 +202,11 @@ watch(
 
 #### Checklist de Implementação
 
-- [ ] Remover computed `processosDisponiveis`
-- [ ] Atualizar watch para chamar `buscarProcessosFinalizados()`
-- [ ] Atualizar template para usar `processosStore.processosFinalizados`
-- [ ] Atualizar testes para mockar `buscarProcessosFinalizados` em vez de `buscarProcessosPainel`
-- [ ] Validar com múltiplos processos finalizados (E2E ou manual)
+- [x] Remover computed `processosDisponiveis`
+- [x] Atualizar watch para chamar `buscarProcessosFinalizados()`
+- [x] Atualizar template para usar `processosStore.processosFinalizados`
+- [x] Atualizar testes para mockar `buscarProcessosFinalizados` em vez de `buscarProcessosPainel`
+- [x] Validar com múltiplos processos finalizados (E2E ou manual)
 
 #### Estimativa
 

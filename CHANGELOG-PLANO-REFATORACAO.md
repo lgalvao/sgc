@@ -92,3 +92,12 @@ Documento inicial criado para guiar refatoração de componentes Vue.js do prot�
 - TabelaProcessos
 
 **Foco:** Remover hardcoding, filtros client-side, dependências de estado global.
+
+## Andamento (2025-12-13)
+
+### Fase 1: Alta Prioridade
+
+#### ImportarAtividadesModal.vue (CONCLUÍDO)
+- **Refatoração:** Substituída filtragem client-side de processos por chamada de API específica `buscarProcessosFinalizados`.
+- **Store:** Utiliza `processosStore.processosFinalizados`.
+- **Testes:** Atualizados mocks e expectativas para refletir a nova lógica.
