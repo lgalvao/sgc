@@ -1,0 +1,50 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Mapeamento STANDARD_OUT
+    2025-12-13 15:47:27,229 INFO  s.i.FluxoEstadosIntegrationTest$FluxoMapeamento - Starting FluxoEstadosIntegrationTest.FluxoMapeamento using Java 21.0.8 with PID 10067 (started by jules in /app/backend)
+    2025-12-13 15:47:27,238 INFO  s.i.FluxoEstadosIntegrationTest$FluxoMapeamento - The following 1 profile is active: "test"
+    2025-12-13 15:47:36,553 INFO  s.n.NotificacaoEmailServiceMock - NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados
+    2025-12-13 15:47:36,566 INFO  s.n.NotificacaoModelosServiceMock - NotificacaoModelosServiceMock ATIVADO - Modelos de e-mail serão mockados
+    2025-12-13 15:47:39,062 INFO  s.i.FluxoEstadosIntegrationTest$FluxoMapeamento - Started FluxoEstadosIntegrationTest.FluxoMapeamento in 12.311 seconds (process running for 16.796)
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Mapeamento > Fluxo Mapeamento Happy Path: Inicio -> Cadastro -> Mapa -> Finalização STANDARD_OUT
+    2025-12-13 15:47:39,498 INFO  s.processo.service.ProcessoService - Processo 1 criado.
+    2025-12-13 15:47:39,586 INFO  s.notificacao.EventoProcessoListener - E-mail enviado para unidade SENIC
+    2025-12-13 15:47:39,586 INFO  s.processo.service.ProcessoService - Processo de mapeamento 1 iniciado para 1 unidades.
+    2025-12-13 15:47:40,153 INFO  s.processo.service.ProcessoService - Homologados 1 subprocessos.
+    2025-12-13 15:47:40,153 INFO  s.processo.service.ProcessoService - Mapa vigente definido para o processo 1
+    2025-12-13 15:47:40,160 INFO  s.processo.service.ProcessoService - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+    2025-12-13 15:47:40,164 INFO  s.p.s.ProcessoNotificacaoService - Enviando notificações de finalização para o processo 1
+    2025-12-13 15:47:40,207 INFO  s.p.s.ProcessoNotificacaoService - E-mail de finalização enviado para SENIC
+    2025-12-13 15:47:40,207 INFO  s.processo.service.ProcessoService - Processo 1 finalizado
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Mapeamento > Fluxo Mapeamento com Devolução de Cadastro STANDARD_OUT
+    2025-12-13 15:47:40,250 INFO  s.processo.service.ProcessoService - Processo 2 criado.
+    2025-12-13 15:47:40,275 INFO  s.notificacao.EventoProcessoListener - E-mail enviado para unidade SENIC
+    2025-12-13 15:47:40,275 INFO  s.processo.service.ProcessoService - Processo de mapeamento 2 iniciado para 1 unidades.
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Revisão > Fluxo Revisão Happy Path com Impactos e Ajuste de Mapa STANDARD_OUT
+    2025-12-13 15:47:40,408 INFO  s.processo.service.ProcessoService - Processo 3 criado.
+    2025-12-13 15:47:40,409 INFO  s.processo.service.ProcessoService - Iniciando processo de revisão para código 3 com unidades [9]
+    2025-12-13 15:47:40,431 INFO  s.processo.service.ProcessoService - Subprocesso 3 para revisão criado para unidade SEDIA
+    2025-12-13 15:47:40,449 INFO  s.notificacao.EventoProcessoListener - E-mail enviado para unidade SEDIA
+    2025-12-13 15:47:40,449 INFO  s.processo.service.ProcessoService - Processo de revisão 3 iniciado para 1 unidades.
+
+Fluxo de Estados: Processo e Subprocesso > Fluxo de Revisão > Fluxo Revisão Sem Impactos STANDARD_OUT
+    2025-12-13 15:47:40,558 INFO  s.processo.service.ProcessoService - Processo 4 criado.
+    2025-12-13 15:47:40,559 INFO  s.processo.service.ProcessoService - Iniciando processo de revisão para código 4 com unidades [9]
+    2025-12-13 15:47:40,576 INFO  s.processo.service.ProcessoService - Subprocesso 4 para revisão criado para unidade SEDIA
+    2025-12-13 15:47:40,593 INFO  s.notificacao.EventoProcessoListener - E-mail enviado para unidade SEDIA
+    2025-12-13 15:47:40,593 INFO  s.processo.service.ProcessoService - Processo de revisão 4 iniciado para 1 unidades.
+
+BUILD SUCCESSFUL in 24s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.
