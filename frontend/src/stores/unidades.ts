@@ -40,6 +40,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
+            throw err;
         } finally {
             isLoading.value = false;
         }
@@ -55,6 +56,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
+            throw err;
         } finally {
             isLoading.value = false;
         }
@@ -70,6 +72,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
+            throw err;
         } finally {
             isLoading.value = false;
         }
@@ -85,6 +88,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
+            throw err;
         } finally {
             isLoading.value = false;
         }
@@ -98,7 +102,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
-            return [];
+            throw err;
         } finally {
             isLoading.value = false;
         }
@@ -112,7 +116,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         } catch (err: any) {
             lastError.value = normalizeError(err);
             error.value = lastError.value.message;
-            return null;
+            throw err;
         } finally {
             isLoading.value = false;
         }
