@@ -20,7 +20,6 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
-import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -67,7 +66,7 @@ class ProcessoServiceTest {
     @Mock
     private ProcessoMapper processoMapper;
     @Mock
-    private ProcessoDetalheMapper processoDetalheMapper;
+    private sgc.processo.service.ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private MapaRepo mapaRepo;
     @Mock
@@ -249,7 +248,7 @@ class ProcessoServiceTest {
         Long id = 100L;
         Processo processo = new Processo();
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-        when(processoDetalheMapper.toDetailDTO(processo)).thenReturn(new ProcessoDetalheDto());
+        when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
         var res = processoService.obterDetalhes(id);
 

@@ -1,10 +1,10 @@
-package sgc.processo.dto.mappers;
+package sgc.processo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
@@ -15,38 +15,34 @@ import sgc.unidade.model.Unidade;
 
 import java.util.*;
 
-@Slf4j
-public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
-    @Autowired
-    private ProcessoDetalheMapper delegate;
+@Service
+@RequiredArgsConstructor
+public class ProcessoDetalheBuilder {
 
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo subprocessoRepo;
 
-    @Override
-    public ProcessoDetalheDto toDetailDTO(Processo processo) {
-        ProcessoDetalheDto dto =
-                ProcessoDetalheDto.builder()
-                        .codigo(processo.getCodigo())
-                        .descricao(processo.getDescricao())
-                        .situacao(processo.getSituacao())
-                        .tipo(processo.getTipo().name())
-                        .dataCriacao(processo.getDataCriacao())
-                        .dataFinalizacao(processo.getDataFinalizacao())
-                        .dataLimite(processo.getDataLimite())
-                        .podeFinalizar(isCurrentUserAdmin())
-                        .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
-                        .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
-                        .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
-                        .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
-                        .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
-                        .situacaoLabel(processo.getSituacao().getLabel())
-                        .tipoLabel(processo.getTipo().getLabel())
-                        .build();
+    @Transactional(readOnly = true)
+    public ProcessoDetalheDto build(Processo processo) {
+        ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
+                .codigo(processo.getCodigo())
+                .descricao(processo.getDescricao())
+                .situacao(processo.getSituacao())
+                .tipo(processo.getTipo().name())
+                .dataCriacao(processo.getDataCriacao())
+                .dataFinalizacao(processo.getDataFinalizacao())
+                .dataLimite(processo.getDataLimite())
+                .podeFinalizar(isCurrentUserAdmin())
+                .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
+                .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
+                .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
+                .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
+                .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
+                .situacaoLabel(processo.getSituacao().getLabel())
+                .tipoLabel(processo.getTipo().getLabel())
+                .unidades(new ArrayList<>()) // Inicializar a lista
+                .build();
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
-
-        // Montar a hierarquia de unidades participantes
         montarHierarquiaUnidades(dto, processo, subprocessos);
 
         return dto;
@@ -78,15 +74,18 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
     }
 
-    protected void montarHierarquiaUnidades(
+    private void montarHierarquiaUnidades(
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
         Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
+
+        // Mapear participantes
         for (Unidade participante : processo.getParticipantes()) {
             mapaUnidades.put(
                     participante.getCodigo(),
-                    delegate.unidadeToUnidadeParticipanteDTO(participante));
+                    converterUnidadeParaDto(participante));
         }
 
+        // Preencher dados dos subprocessos
         for (Subprocesso sp : subprocessos) {
             ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto =
                     mapaUnidades.get(sp.getUnidade().getCodigo());
@@ -97,14 +96,13 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 if (sp.getMapa() != null) {
                     unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
                 }
-                // Campos formatados
                 unidadeDto.setDataLimiteFormatada(
-                        sgc.comum.util.FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
+                        FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
         }
 
-        // Monta a hierarquia
+        // Montar a hierarquia (pai/filho)
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             if (unidadeDto.getCodUnidadeSuperior() != null) {
                 ProcessoDetalheDto.UnidadeParticipanteDto pai =
@@ -115,16 +113,16 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             }
         }
 
-        // Adiciona unidades raiz e unidades sem pai no mapa (participantes diretos sem  hierarquia)
+        // Adicionar raízes à lista principal do DTO
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
-
+            // Se não tem pai ou o pai não está participando do processo
             if (codUnidadeSuperior == null || !mapaUnidades.containsKey(codUnidadeSuperior)) {
                 dto.getUnidades().add(unidadeDto);
             }
         }
 
-        // Ordena as unidades e seus filhos
+        // Ordenação
         Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator =
                 Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
 
@@ -133,5 +131,15 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             unidadeDto.getFilhos().sort(comparator);
         }
+    }
+
+    private ProcessoDetalheDto.UnidadeParticipanteDto converterUnidadeParaDto(Unidade unidade) {
+        ProcessoDetalheDto.UnidadeParticipanteDto dto = new ProcessoDetalheDto.UnidadeParticipanteDto();
+        dto.setCodUnidade(unidade.getCodigo());
+        dto.setNome(unidade.getNome());
+        dto.setSigla(unidade.getSigla());
+        dto.setCodUnidadeSuperior(
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null);
+        return dto;
     }
 }

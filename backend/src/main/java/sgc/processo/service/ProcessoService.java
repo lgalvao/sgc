@@ -14,7 +14,6 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
-import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -54,7 +53,7 @@ public class ProcessoService {
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
-    private final ProcessoDetalheMapper processoDetalheMapper;
+    private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final SubprocessoMapper subprocessoMapper;
     private final MapaRepo mapaRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
@@ -228,7 +227,7 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(codProcesso)
                         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
-        return processoDetalheMapper.toDetailDTO(processo);
+        return processoDetalheBuilder.build(processo);
     }
 
     @Transactional(readOnly = true)
