@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.sgrh.model.Usuario;
+import sgc.subprocesso.mapper.MovimentacaoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -31,6 +32,7 @@ public class SubprocessoDetalheDto {
     private final List<MovimentacaoDto> movimentacoes;
     private final SubprocessoPermissoesDto permissoes;
 
+    @Deprecated(forRemoval = true)
     public static SubprocessoDetalheDto of(
             Subprocesso sp,
             Usuario responsavel,

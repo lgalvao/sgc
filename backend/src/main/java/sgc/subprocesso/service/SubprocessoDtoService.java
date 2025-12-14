@@ -22,6 +22,10 @@ import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.mapper.MapaAjusteMapper;
+import sgc.subprocesso.mapper.MovimentacaoMapper;
+import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
@@ -48,6 +52,8 @@ public class SubprocessoDtoService {
     private final SubprocessoMapper subprocessoMapper;
     private final SubprocessoPermissoesService subprocessoPermissoesService;
     private final SgrhService sgrhService;
+    private final SubprocessoDetalheMapper subprocessoDetalheMapper;
+    private final MapaAjusteMapper mapaAjusteMapper;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
@@ -100,8 +106,8 @@ public class SubprocessoDtoService {
                 subprocessoPermissoesService.calcularPermissoes(sp, usuario);
         log.debug("Permissões calculadas: {}", permissoes);
 
-        return SubprocessoDetalheDto.of(
-                sp, responsavel, titular, movimentacoes, movimentacaoMapper, permissoes);
+        return subprocessoDetalheMapper.toDto(
+                sp, responsavel, titular, movimentacoes, permissoes);
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
@@ -235,7 +241,7 @@ public class SubprocessoDtoService {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
 
-        return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
+        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
     }
 
     @Transactional(readOnly = true)

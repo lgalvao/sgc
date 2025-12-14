@@ -28,7 +28,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoMapper;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;

@@ -1,7 +1,8 @@
-package sgc.subprocesso.dto;
+package sgc.subprocesso.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Movimentacao;
 
 /**
