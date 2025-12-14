@@ -238,7 +238,14 @@ export async function excluir(codigo: number): Promise<void> {
 ```typescript
 import type { Processo, ProcessoResumo } from '@/types/tipos';
 
-export function mapProcessoDtoToFrontend(dto: any): Processo {
+// Idealmente, crie uma interface para o DTO do backend
+interface ProcessoBackendDto {
+    codigo: number;
+    descricao: string;
+    // ... outros campos
+}
+
+export function mapProcessoDtoToFrontend(dto: ProcessoBackendDto): Processo {
     return {
         ...dto,
         // Transformações específicas se necessário
@@ -254,7 +261,7 @@ export function mapProcessoToRequest(processo: Processo): CriarProcessoRequest {
 }
 
 // Mapper recursivo para estruturas aninhadas
-export function mapUnidadeParticipanteDtoToFrontend(dto: any): UnidadeParticipante {
+export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
         ...dto,
         codUnidade: dto.codigo,
@@ -268,6 +275,8 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: any): UnidadeParticipan
 **Convenções:**
 - Funções puras (sem side effects)
 - Nomenclatura: `map{Source}To{Target}`
+- **Importante:** Evite usar `any` - crie interfaces para os DTOs do backend em `@/types/`
+- Uso opcional (quando há transformação real)
 - Uso opcional (quando há transformação real)
 - Suporte a estruturas recursivas/aninhadas
 
