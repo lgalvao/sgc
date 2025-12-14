@@ -457,7 +457,7 @@ public interface MeuMapper {
 ## 5. Plano de Implementação
 
 ### Fase 1: Correções Críticas (Sprint 1)
-1. Refatorar `UnidadeService` para usar builders
+1. ✅ Refatorar `UnidadeService` para usar builders (Concluído)
 2. Refatorar `MapaService` para usar builders
 3. Simplificar `ProcessoDetalheMapperCustom`
 
