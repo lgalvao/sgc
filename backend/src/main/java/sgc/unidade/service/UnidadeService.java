@@ -77,15 +77,16 @@ public class UnidadeService {
                             && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
-            UnidadeDto dto =
-                    new UnidadeDto(
-                            u.getCodigo(),
-                            u.getNome(),
-                            u.getSigla(),
-                            codigoPai,
-                            u.getTipo().name(),
-                            new ArrayList<>(),
-                            isElegivel);
+            UnidadeDto dto = UnidadeDto.builder()
+                    .codigo(u.getCodigo())
+                    .nome(u.getNome())
+                    .sigla(u.getSigla())
+                    .codigoPai(codigoPai)
+                    .tipo(u.getTipo().name())
+                    .subunidades(new ArrayList<>())
+                    .isElegivel(isElegivel)
+                    .build();
+
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
         }
@@ -178,16 +179,16 @@ public class UnidadeService {
             Long codigoPai =
                     u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
 
-            UnidadeDto dto =
-                    new UnidadeDto(
-                            u.getCodigo(),
-                            u.getNome(),
-                            u.getSigla(),
-                            codigoPai,
-                            u.getTipo().name(),
-                            new ArrayList<>(),
-                            true // isElegivel: Set to true by default for now
-                    );
+            UnidadeDto dto = UnidadeDto.builder()
+                    .codigo(u.getCodigo())
+                    .nome(u.getNome())
+                    .sigla(u.getSigla())
+                    .codigoPai(codigoPai)
+                    .tipo(u.getTipo().name())
+                    .subunidades(new ArrayList<>())
+                    .isElegivel(true)
+                    .build();
+
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
         }
@@ -241,14 +242,15 @@ public class UnidadeService {
                         ? unidade.getUnidadeSuperior().getCodigo()
                         : null;
 
-        return new UnidadeDto(
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                codigoPai,
-                unidade.getTipo().name(),
-                new ArrayList<>(),
-                false);
+        return UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(codigoPai)
+                .tipo(unidade.getTipo().name())
+                .subunidades(new ArrayList<>())
+                .isElegivel(false)
+                .build();
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -267,14 +269,15 @@ public class UnidadeService {
                         ? unidade.getUnidadeSuperior().getCodigo()
                         : null;
 
-        return new UnidadeDto(
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                codigoPai,
-                unidade.getTipo().name(),
-                new ArrayList<>(),
-                false);
+        return UnidadeDto.builder()
+                .codigo(unidade.getCodigo())
+                .nome(unidade.getNome())
+                .sigla(unidade.getSigla())
+                .codigoPai(codigoPai)
+                .tipo(unidade.getTipo().name())
+                .subunidades(new ArrayList<>())
+                .isElegivel(false)
+                .build();
     }
 
     public UnidadeDto buscarArvore(Long codigo) {
