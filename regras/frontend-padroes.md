@@ -121,3 +121,619 @@ flowchart LR
     - **Unitários:** Testar funções isoladas (utils, mappers) e componentes simples.
     - **Integração:** Testar Stores e Views (montando o componente e mockando serviços/stores).
 - **Execução:** `npm run test:unit`.
+## 7. Padrões de Implementação Detalhados
+
+### 7.1. Stores (Pinia) - Setup Store Pattern
+
+**Estrutura Padrão:**
+```typescript
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { Processo } from '@/types/tipos';
+import { normalizeError, type NormalizedError } from '@/utils/apiError';
+import * as processoService from '@/services/processoService';
+
+export const useProcessosStore = defineStore('processos', () => {
+    // Estado reativo
+    const processos = ref<Processo[]>([]);
+    const isLoading = ref(false);
+    const lastError = ref<NormalizedError | null>(null);
+    
+    // Getters (computed)
+    const processosAtivos = computed(() => 
+        processos.value.filter(p => p.situacao === 'EM_ANDAMENTO')
+    );
+    
+    // Actions (functions)
+    async function buscarProcessos() {
+        lastError.value = null;
+        isLoading.value = true;
+        try {
+            processos.value = await processoService.listar();
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+    
+    function clearError() {
+        lastError.value = null;
+    }
+    
+    // Retorna estado, getters e actions
+    return {
+        processos,
+        isLoading,
+        lastError,
+        processosAtivos,
+        buscarProcessos,
+        clearError
+    };
+});
+```
+
+**Convenções:**
+- Use `ref()` para estado reativo
+- Use `computed()` para getters derivados
+- Funções assíncronas para actions que chamam API
+- Sempre gerenciar `isLoading` e `lastError`
+- Nomenclatura: `use{Entidade}Store` (plural)
+- ID da store: string minúscula (ex: "processos")
+
+**Total de Stores:** 12 identificadas
+
+### 7.2. Services - Módulos de Funções Puras
+
+**Estrutura Padrão:**
+```typescript
+import type { Processo, CriarProcessoRequest } from '@/types/tipos';
+import apiClient from '@/axios-setup';
+
+export async function listar(): Promise<Processo[]> {
+    const response = await apiClient.get<Processo[]>('/processos');
+    return response.data;
+}
+
+export async function buscarPorCodigo(codigo: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${codigo}`);
+    return response.data;
+}
+
+export async function criar(request: CriarProcessoRequest): Promise<Processo> {
+    const response = await apiClient.post<Processo>('/processos', request);
+    return response.data;
+}
+
+export async function atualizar(
+    codigo: number, 
+    request: AtualizarProcessoRequest
+): Promise<Processo> {
+    const response = await apiClient.post<Processo>(
+        `/processos/${codigo}/atualizar`,
+        request
+    );
+    return response.data;
+}
+
+export async function excluir(codigo: number): Promise<void> {
+    await apiClient.post(`/processos/${codigo}/excluir`);
+}
+```
+
+**Convenções:**
+- Exportar funções nomeadas (não default export)
+- Usar `async/await`
+- Tipagem explícita dos retornos
+- Importar `apiClient` de `@/axios-setup`
+- Nomenclatura de arquivo: `{entidade}Service.ts` (camelCase)
+- Funções CRUD: `listar`, `buscarPorCodigo`, `criar`, `atualizar`, `excluir`
+
+**Total de Services:** 12 identificados
+
+### 7.3. Mappers - Funções de Transformação
+
+**Estrutura Padrão:**
+```typescript
+import type { Processo, ProcessoResumo } from '@/types/tipos';
+
+// Idealmente, crie uma interface para o DTO do backend
+interface ProcessoBackendDto {
+    codigo: number;
+    descricao: string;
+    // ... outros campos
+}
+
+export function mapProcessoDtoToFrontend(dto: ProcessoBackendDto): Processo {
+    return {
+        ...dto,
+        // Transformações específicas se necessário
+    };
+}
+
+export function mapProcessoToRequest(processo: Processo): CriarProcessoRequest {
+    return {
+        descricao: processo.descricao,
+        dataLimite: processo.dataLimite,
+        tipo: processo.tipo
+    };
+}
+
+// Mapper recursivo para estruturas aninhadas
+export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto): UnidadeParticipante {
+    return {
+        ...dto,
+        codUnidade: dto.codigo,
+        filhos: dto.filhos 
+            ? dto.filhos.map(mapUnidadeParticipanteDtoToFrontend) 
+            : []
+    };
+}
+```
+
+**Convenções:**
+- Funções puras (sem side effects)
+- Nomenclatura: `map{Source}To{Target}`
+- **Importante:** Evite usar `any` - crie interfaces para os DTOs do backend em `@/types/`
+- Uso opcional (quando há transformação real)
+- Suporte a estruturas recursivas/aninhadas
+
+**Total de Mappers:** 7 identificados
+
+### 7.4. Components - Componentes Apresentacionais
+
+**Estrutura Padrão:**
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+
+// Props
+interface Props {
+    processo: Processo;
+    mostrarDetalhes?: boolean;
+}
+
+const props = defineProps<Props>();
+
+// Emits
+interface Emits {
+    (e: 'iniciar', codigo: number): void;
+    (e: 'editar', codigo: number): void;
+}
+
+const emit = defineEmits<Emits>();
+
+// Computed
+const badgeClass = computed(() => {
+    switch (props.processo.situacao) {
+        case 'EM_ANDAMENTO': return 'badge-success';
+        case 'FINALIZADO': return 'badge-secondary';
+        default: return 'badge-warning';
+    }
+});
+
+// Methods
+function handleIniciar() {
+    emit('iniciar', props.processo.codigo);
+}
+</script>
+
+<template>
+    <BCard data-testid="processo-card">
+        <BCardTitle>{{ processo.descricao }}</BCardTitle>
+        <span :class="badgeClass">{{ processo.situacao }}</span>
+        <BButton 
+            @click="handleIniciar"
+            data-testid="btn-iniciar"
+        >
+            Iniciar
+        </BButton>
+    </BCard>
+</template>
+
+<style scoped>
+.badge-success { background-color: #28a745; }
+</style>
+```
+
+**Convenções:**
+- Use `<script setup lang="ts">`
+- Defina interfaces para Props e Emits
+- Props são readonly, use `emit` para comunicação
+- Use `computed` para lógica derivada
+- Sempre adicione `data-testid` para testes
+- Prefira componentes BootstrapVueNext
+- Style: `scoped` quando necessário
+
+**Total de Componentes:** 24 identificados
+
+### 7.5. Views - Páginas Inteligentes
+
+**Estrutura Padrão:**
+```vue
+<script setup lang="ts">
+import { onMounted, computed } from 'vue';
+import { useProcessosStore } from '@/stores/processos';
+import ProcessoCard from '@/components/ProcessoCard.vue';
+
+const store = useProcessosStore();
+
+onMounted(async () => {
+    await store.buscarProcessos();
+});
+
+const processos = computed(() => store.processos);
+const isLoading = computed(() => store.isLoading);
+
+async function handleIniciar(codigo: number) {
+    await store.iniciarProcesso(codigo);
+}
+</script>
+
+<template>
+    <div class="container">
+        <h1>Processos</h1>
+        
+        <div v-if="isLoading">Carregando...</div>
+        
+        <div v-else>
+            <ProcessoCard
+                v-for="processo in processos"
+                :key="processo.codigo"
+                :processo="processo"
+                @iniciar="handleIniciar"
+            />
+        </div>
+    </div>
+</template>
+```
+
+**Convenções:**
+- Carrega dados no `onMounted`
+- Usa stores via composables
+- Usa `computed` para reatividade
+- Delega apresentação para componentes
+- Trata eventos de componentes filhos
+
+**Total de Views:** 18 identificadas
+
+## 8. Axios Setup e Interceptors
+
+### 8.1. Configuração Centralizada
+
+```typescript
+import axios from 'axios';
+import router from './router';
+import { useFeedbackStore } from '@/stores/feedback';
+import { normalizeError, shouldNotifyGlobally, notifyError } from '@/utils/apiError';
+
+const apiClient = axios.create({
+    baseURL: 'http://localhost:10000/api',
+    headers: {
+        'Content-type': 'application/json'
+    }
+});
+
+// Interceptor de REQUEST: Adiciona JWT token
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Interceptor de RESPONSE: Trata erros globalmente
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const normalized = normalizeError(error);
+        
+        // 401: Redireciona para login
+        if (normalized.kind === 'unauthorized') {
+            const feedbackStore = useFeedbackStore();
+            feedbackStore.show('Sessão Expirada', 'Faça login novamente', 'danger');
+            router.push('/login');
+        }
+        
+        // Notificação global para erros inesperados
+        if (shouldNotifyGlobally(normalized)) {
+            notifyError(normalized);
+        }
+        
+        return Promise.reject(error);
+    }
+);
+
+export default apiClient;
+```
+
+**Benefícios:**
+- Configuração única para todas as requisições
+- JWT automático em todas as chamadas
+- Tratamento de erro centralizado
+- Logout automático em 401
+
+## 9. Tratamento de Erros
+
+### 9.1. Normalização de Erros
+
+**Arquivo:** `@/utils/apiError.ts`
+
+```typescript
+export type NormalizedError = {
+    kind: 'network' | 'unauthorized' | 'validation' | 'business' | 'unknown';
+    message: string;
+    details?: string[];
+};
+
+export function normalizeError(error: any): NormalizedError {
+    if (!error.response) {
+        return { kind: 'network', message: 'Erro de conexão com o servidor' };
+    }
+    
+    const status = error.response.status;
+    
+    if (status === 401) {
+        return { kind: 'unauthorized', message: 'Não autorizado' };
+    }
+    
+    if (status === 400 || status === 422) {
+        return {
+            kind: 'validation',
+            message: error.response.data.mensagem || 'Erro de validação',
+            details: error.response.data.erros
+        };
+    }
+    
+    if (status === 409) {
+        return {
+            kind: 'business',
+            message: error.response.data.mensagem || 'Erro de negócio'
+        };
+    }
+    
+    return {
+        kind: 'unknown',
+        message: 'Erro inesperado'
+    };
+}
+
+export function shouldNotifyGlobally(error: NormalizedError): boolean {
+    return error.kind === 'network' || error.kind === 'unknown';
+}
+
+export function notifyError(error: NormalizedError) {
+    const feedbackStore = useFeedbackStore();
+    feedbackStore.show('Erro', error.message, 'danger');
+}
+```
+
+**Padrão de Uso:**
+
+**Na Store:**
+```typescript
+async function buscar() {
+    lastError.value = null;
+    try {
+        // chamada API
+    } catch (error) {
+        lastError.value = normalizeError(error);
+        throw error; // Re-throw para tratamento local se necessário
+    }
+}
+```
+
+**No Componente:**
+```vue
+<script setup lang="ts">
+const store = useProcessosStore();
+
+async function handleBuscar() {
+    await store.buscar();
+    
+    // Exibir erro inline se houver
+    if (store.lastError && store.lastError.kind === 'validation') {
+        // Mostrar BAlert inline
+    }
+}
+</script>
+
+<template>
+    <BAlert v-if="store.lastError?.kind === 'validation'" variant="danger">
+        {{ store.lastError.message }}
+    </BAlert>
+</template>
+```
+
+## 10. Roteamento
+
+### 10.1. Estrutura Modular
+
+**Arquivo:** `@/router/index.ts`
+
+```typescript
+import { createRouter, createWebHistory } from 'vue-router';
+import { usePerfilStore } from '@/stores/perfil';
+import processoRoutes from './processo.routes';
+import unidadeRoutes from './unidade.routes';
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {
+            path: '/',
+            redirect: '/login'
+        },
+        {
+            path: '/login',
+            name: 'Login',
+            component: () => import('@/views/LoginView.vue')
+        },
+        ...processoRoutes,
+        ...unidadeRoutes
+    ]
+});
+
+// Guard global de autenticação
+router.beforeEach((to, from, next) => {
+    const perfilStore = usePerfilStore();
+    const requiresAuth = to.meta.requiresAuth !== false;
+    
+    if (requiresAuth && !perfilStore.isAuthenticated) {
+        next('/login');
+    } else {
+        next();
+    }
+});
+
+export default router;
+```
+
+**Módulo de Rotas:** `@/router/processo.routes.ts`
+
+```typescript
+export default [
+    {
+        path: '/processos',
+        name: 'Processos',
+        component: () => import('@/views/ProcessosView.vue'),
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/processos/:id',
+        name: 'ProcessoDetalhes',
+        component: () => import('@/views/ProcessoDetalhesView.vue'),
+        meta: { requiresAuth: true }
+    }
+];
+```
+
+**Convenções:**
+- Lazy loading com `import()`
+- Guards globais para autenticação
+- Meta dados para controle de acesso
+- Rotas organizadas por domínio
+
+## 11. Testes Unitários
+
+### 11.1. Estrutura de Testes
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import { useProcessosStore } from '@/stores/processos';
+import * as processoService from '@/services/processoService';
+
+vi.mock('@/services/processoService');
+
+describe('useProcessosStore', () => {
+    beforeEach(() => {
+        setActivePinia(createPinia());
+    });
+    
+    it('deve buscar processos com sucesso', async () => {
+        const mockProcessos = [{ codigo: 1, descricao: 'Teste' }];
+        vi.mocked(processoService.listar).mockResolvedValue(mockProcessos);
+        
+        const store = useProcessosStore();
+        await store.buscarProcessos();
+        
+        expect(store.processos).toEqual(mockProcessos);
+        expect(store.isLoading).toBe(false);
+    });
+    
+    it('deve tratar erro ao buscar processos', async () => {
+        vi.mocked(processoService.listar).mockRejectedValue(new Error('Erro'));
+        
+        const store = useProcessosStore();
+        
+        await expect(store.buscarProcessos()).rejects.toThrow();
+        expect(store.lastError).not.toBeNull();
+    });
+});
+```
+
+**Convenções:**
+- Use Vitest
+- Mock de services com `vi.mock`
+- Setup com Pinia em `beforeEach`
+- Teste estado, getters e actions
+- Nomenclatura: `deve{Acao}Quando{Condicao}`
+
+## 12. TypeScript - Tipos e Interfaces
+
+### 12.1. Definição de Tipos
+
+**Arquivo:** `@/types/tipos.ts`
+
+```typescript
+export interface Processo {
+    codigo: number;
+    descricao: string;
+    dataCriacao: string;
+    dataLimite: string;
+    situacao: SituacaoProcesso;
+    tipo: TipoProcesso;
+}
+
+export type SituacaoProcesso = 
+    | 'CRIADO' 
+    | 'EM_ANDAMENTO' 
+    | 'FINALIZADO';
+
+export type TipoProcesso = 
+    | 'MAPEAMENTO' 
+    | 'REVISAO' 
+    | 'DIAGNOSTICO';
+
+export interface CriarProcessoRequest {
+    descricao: string;
+    dataLimite: string;
+    tipo: TipoProcesso;
+}
+```
+
+**Convenções:**
+- Interfaces para objetos complexos
+- Type aliases para unions
+- PascalCase para tipos
+- Enums como union types (não `enum`)
+
+## 13. Resumo de Contadores
+
+- **Stores (Pinia):** 12
+- **Services:** 12
+- **Mappers:** 7
+- **Components:** 24
+- **Views:** 18
+- **Composables:** Variados
+- **Utils:** Variados
+- **Types:** 50+
+
+## 14. Boas Práticas Identificadas
+
+1. **Separation of Concerns:** Camadas bem definidas (View → Store → Service → API)
+2. **Single Responsibility:** Cada componente tem responsabilidade única
+3. **Composition API:** Uso consistente de `<script setup>`
+4. **TypeScript:** Tipagem estrita em todo o código
+5. **Error Handling:** Normalização e tratamento centralizado
+6. **Reactive State:** Uso correto de `ref` e `computed`
+7. **Lazy Loading:** Componentes e rotas carregados sob demanda
+8. **Testing:** data-testid em elementos interativos
+9. **Accessibility:** Uso de componentes semânticos
+10. **Performance:** Memoization com `computed`
+
+## 15. Referências
+
+- **Vue.js 3 Docs:** https://vuejs.org/
+- **Pinia Docs:** https://pinia.vuejs.org/
+- **Vue Router Docs:** https://router.vuejs.org/
+- **Vite Docs:** https://vitejs.dev/
+- **TypeScript Docs:** https://www.typescriptlang.org/
+- **BootstrapVueNext:** https://bootstrap-vue-next.github.io/
+- **Vitest Docs:** https://vitest.dev/
