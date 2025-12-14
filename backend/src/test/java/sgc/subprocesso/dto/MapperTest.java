@@ -10,6 +10,8 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
+import sgc.subprocesso.mapper.MovimentacaoMapper;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;

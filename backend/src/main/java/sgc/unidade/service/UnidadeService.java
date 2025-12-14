@@ -10,6 +10,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
@@ -32,6 +33,7 @@ public class UnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ProcessoRepo processoRepo;
+    private final SgrhMapper sgrhMapper;
 
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
@@ -67,9 +69,6 @@ public class UnidadeService {
                 : Collections.emptySet();
 
         for (Unidade u : unidades) {
-            Long codigoPai =
-                    u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
-
             // Elegibilidade simples (não recursiva):
             // 3. NÃO está em outro processo ativo
             boolean isElegivel =
@@ -77,15 +76,7 @@ public class UnidadeService {
                             && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
-            UnidadeDto dto = UnidadeDto.builder()
-                    .codigo(u.getCodigo())
-                    .nome(u.getNome())
-                    .sigla(u.getSigla())
-                    .codigoPai(codigoPai)
-                    .tipo(u.getTipo().name())
-                    .subunidades(new ArrayList<>())
-                    .isElegivel(isElegivel)
-                    .build();
+            UnidadeDto dto = sgrhMapper.toUnidadeDto(u, isElegivel);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -159,14 +150,7 @@ public class UnidadeService {
         List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
 
         return usuarios.stream()
-                .map(
-                        u ->
-                                new ServidorDto(
-                                        u.getTituloEleitoral(),
-                                        u.getNome(),
-                                        u.getTituloEleitoral(),
-                                        u.getEmail(),
-                                        u.getUnidadeLotacao().getCodigo()))
+                .map(sgrhMapper::toServidorDto)
                 .toList();
     }
 
@@ -176,18 +160,7 @@ public class UnidadeService {
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            Long codigoPai =
-                    u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null;
-
-            UnidadeDto dto = UnidadeDto.builder()
-                    .codigo(u.getCodigo())
-                    .nome(u.getNome())
-                    .sigla(u.getSigla())
-                    .codigoPai(codigoPai)
-                    .tipo(u.getTipo().name())
-                    .subunidades(new ArrayList<>())
-                    .isElegivel(true)
-                    .build();
+            UnidadeDto dto = sgrhMapper.toUnidadeDto(u);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -237,20 +210,7 @@ public class UnidadeService {
                                         new ErroEntidadeNaoEncontrada(
                                                 "Unidade com sigla " + sigla + " não encontrada"));
 
-        Long codigoPai =
-                unidade.getUnidadeSuperior() != null
-                        ? unidade.getUnidadeSuperior().getCodigo()
-                        : null;
-
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .codigoPai(codigoPai)
-                .tipo(unidade.getTipo().name())
-                .subunidades(new ArrayList<>())
-                .isElegivel(false)
-                .build();
+        return sgrhMapper.toUnidadeDto(unidade, false);
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -264,20 +224,7 @@ public class UnidadeService {
                                                         + codigo
                                                         + " não encontrada"));
 
-        Long codigoPai =
-                unidade.getUnidadeSuperior() != null
-                        ? unidade.getUnidadeSuperior().getCodigo()
-                        : null;
-
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .codigoPai(codigoPai)
-                .tipo(unidade.getTipo().name())
-                .subunidades(new ArrayList<>())
-                .isElegivel(false)
-                .build();
+        return sgrhMapper.toUnidadeDto(unidade, false);
     }
 
     public UnidadeDto buscarArvore(Long codigo) {

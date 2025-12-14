@@ -11,6 +11,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
@@ -34,6 +35,7 @@ public class MapaService {
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
+    private final MapaCompletoMapper mapaCompletoMapper;
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
@@ -83,29 +85,7 @@ public class MapaService {
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
 
-        List<CompetenciaMapaDto> competenciasDto =
-                competencias.stream()
-                        .map(
-                                c -> {
-                                    List<Long> idsAtividades =
-                                            c.getAtividades().stream()
-                                                    .map(Atividade::getCodigo)
-                                                    .toList();
-
-                                    return CompetenciaMapaDto.builder()
-                                            .codigo(c.getCodigo())
-                                            .descricao(c.getDescricao())
-                                            .atividadesCodigos(idsAtividades)
-                                            .build();
-                                })
-                        .toList();
-
-        return MapaCompletoDto.builder()
-                .codigo(mapa.getCodigo())
-                .subprocessoCodigo(codSubprocesso)
-                .observacoes(mapa.getObservacoesDisponibilizacao())
-                .competencias(competenciasDto)
-                .build();
+        return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
     }
 
     public MapaCompletoDto salvarMapaCompleto(
@@ -170,28 +150,7 @@ public class MapaService {
         mapaIntegridadeService.validarIntegridadeMapa(codMapa);
 
         List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
-        List<CompetenciaMapaDto> competenciasDtoFinais =
-                competenciasFinais.stream()
-                        .map(
-                                c -> {
-                                    List<Long> idsAtividades =
-                                            c.getAtividades().stream()
-                                                    .map(Atividade::getCodigo)
-                                                    .toList();
 
-                                    return CompetenciaMapaDto.builder()
-                                            .codigo(c.getCodigo())
-                                            .descricao(c.getDescricao())
-                                            .atividadesCodigos(idsAtividades)
-                                            .build();
-                                })
-                        .toList();
-
-        return MapaCompletoDto.builder()
-                .codigo(mapa.getCodigo())
-                .subprocessoCodigo(null)
-                .observacoes(mapa.getObservacoesDisponibilizacao())
-                .competencias(competenciasDtoFinais)
-                .build();
+        return mapaCompletoMapper.toDto(mapa, null, competenciasFinais);
     }
 }

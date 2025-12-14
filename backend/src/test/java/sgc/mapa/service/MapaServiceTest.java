@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
@@ -33,6 +35,8 @@ class MapaServiceTest {
     private MapaIntegridadeService mapaIntegridadeService;
     @Mock
     private MapaVinculoService mapaVinculoService;
+    @Mock
+    private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaService service;
@@ -43,6 +47,7 @@ class MapaServiceTest {
         Long id = 1L;
         when(mapaRepo.findById(id)).thenReturn(Optional.of(new Mapa()));
         when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of());
+        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         var res = service.obterMapaCompleto(id, 10L);
 
@@ -60,6 +65,7 @@ class MapaServiceTest {
         when(mapaRepo.findById(id)).thenReturn(Optional.of(new Mapa()));
         when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of());
         when(mapaRepo.save(any())).thenReturn(new Mapa());
+        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
         service.salvarMapaCompleto(id, req, "user");
 

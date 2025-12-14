@@ -30,9 +30,13 @@ import sgc.mapa.model.Mapa;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.dto.MovimentacaoMapper;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.mapper.MapaAjusteMapper;
+import sgc.subprocesso.mapper.MovimentacaoMapper;
+import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoMapper;
+import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
@@ -76,6 +80,10 @@ class SubprocessoDtoServiceTest {
     private SubprocessoPermissoesService subprocessoPermissoesService;
     @Mock
     private SgrhService sgrhService;
+    @Mock
+    private SubprocessoDetalheMapper subprocessoDetalheMapper;
+    @Mock
+    private MapaAjusteMapper mapaAjusteMapper;
 
     @InjectMocks
     private SubprocessoDtoService service;
@@ -122,6 +130,8 @@ class SubprocessoDtoServiceTest {
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
@@ -169,6 +179,8 @@ class SubprocessoDtoServiceTest {
         when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.SERVIDOR, 10L);
 
@@ -246,6 +258,8 @@ class SubprocessoDtoServiceTest {
         when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.GESTOR, 10L);
 
@@ -319,6 +333,8 @@ class SubprocessoDtoServiceTest {
         when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
         when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                 .thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(SubprocessoDetalheDto.builder().build());
 
         var res = service.obterDetalhes(id, Perfil.ADMIN, null);
 
@@ -397,6 +413,8 @@ class SubprocessoDtoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO))
                 .thenReturn(Collections.emptyList());
+        when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any()))
+                .thenReturn(MapaAjusteDto.builder().build());
 
         var res = service.obterMapaParaAjuste(id);
 

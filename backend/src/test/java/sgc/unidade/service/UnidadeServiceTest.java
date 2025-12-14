@@ -12,7 +12,9 @@ import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.processo.model.TipoProcesso;
@@ -25,6 +27,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +55,9 @@ class UnidadeServiceTest {
     @Mock
     private ProcessoRepo processoRepo;
 
+    @Mock
+    private SgrhMapper sgrhMapper;
+
     @Test
     @DisplayName("buscarTodasUnidades deve retornar hierarquia correta")
     void buscarTodasUnidades() {
@@ -65,6 +71,11 @@ class UnidadeServiceTest {
         filha.setUnidadeSuperior(raiz);
 
         when(unidadeRepo.findAll()).thenReturn(Arrays.asList(raiz, filha));
+
+        when(sgrhMapper.toUnidadeDto(raiz)).thenReturn(UnidadeDto.builder()
+                .codigo(1L).nome("Raiz").sigla("RAIZ").subunidades(new ArrayList<>()).build());
+        when(sgrhMapper.toUnidadeDto(filha)).thenReturn(UnidadeDto.builder()
+                .codigo(2L).nome("Filha").sigla("FILHA").codigoPai(1L).subunidades(new ArrayList<>()).build());
 
         List<UnidadeDto> resultado = unidadeService.buscarTodasUnidades();
 
@@ -123,6 +134,7 @@ class UnidadeServiceTest {
         usuario.setUnidadeLotacao(unidade);
 
         when(usuarioRepo.findByUnidadeLotacaoCodigo(unidadeId)).thenReturn(List.of(usuario));
+        when(sgrhMapper.toServidorDto(usuario)).thenReturn(ServidorDto.builder().nome("Teste").build());
 
         var resultado = unidadeService.buscarServidoresPorUnidade(unidadeId);
 
@@ -139,6 +151,7 @@ class UnidadeServiceTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         when(unidadeRepo.findBySigla(sigla)).thenReturn(Optional.of(unidade));
+        when(sgrhMapper.toUnidadeDto(unidade, false)).thenReturn(UnidadeDto.builder().sigla(sigla).build());
 
         UnidadeDto dto = unidadeService.buscarPorSigla(sigla);
 
@@ -154,6 +167,7 @@ class UnidadeServiceTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         when(unidadeRepo.findById(id)).thenReturn(Optional.of(unidade));
+        when(sgrhMapper.toUnidadeDto(unidade, false)).thenReturn(UnidadeDto.builder().codigo(id).build());
 
         UnidadeDto dto = unidadeService.buscarPorCodigo(id);
 
@@ -173,12 +187,16 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("buscarArvoreComElegibilidade deve usar findAllComMapas quando requerMapaVigente")
     void buscarArvoreComElegibilidadeRevisao() {
-        when(unidadeRepo.findAllComMapas()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+        Unidade u1 = new Unidade("U1", "SIGLA1");
+        u1.setCodigo(1L);
+
+        when(unidadeRepo.findAllComMapas()).thenReturn(List.of(u1));
         when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 1L))
                 .thenReturn(Collections.emptyList());
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of());
+        when(sgrhMapper.toUnidadeDto(any(), any(Boolean.class))).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, 1L);
 
@@ -189,11 +207,15 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("buscarArvoreComElegibilidade deve usar findAll quando nao requerMapaVigente")
     void buscarArvoreComElegibilidadeMapeamento() {
-        when(unidadeRepo.findAll()).thenReturn(List.of(new Unidade("U1", "SIGLA1")));
+        Unidade u1 = new Unidade("U1", "SIGLA1");
+        u1.setCodigo(1L);
+
+        when(unidadeRepo.findAll()).thenReturn(List.of(u1));
         when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 1L))
                 .thenReturn(Collections.emptyList());
+        when(sgrhMapper.toUnidadeDto(any(), any(Boolean.class))).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
         unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 1L);
 
@@ -213,6 +235,8 @@ class UnidadeServiceTest {
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 null))
                 .thenReturn(List.of(10L));
+
+        when(sgrhMapper.toUnidadeDto(unidade, false)).thenReturn(UnidadeDto.builder().codigo(10L).isElegivel(false).build());
 
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
 
@@ -236,6 +260,8 @@ class UnidadeServiceTest {
                 100L))
                 .thenReturn(Collections.emptyList());
 
+        when(sgrhMapper.toUnidadeDto(unidade, true)).thenReturn(UnidadeDto.builder().codigo(10L).isElegivel(true).build());
+
         // Passamos o codigo do processo atual para ignorar
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, 100L);
 
@@ -256,6 +282,8 @@ class UnidadeServiceTest {
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 null))
                 .thenReturn(Collections.emptyList());
+
+        when(sgrhMapper.toUnidadeDto(unidade, true)).thenReturn(UnidadeDto.builder().codigo(10L).isElegivel(true).build());
 
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
 
@@ -286,6 +314,14 @@ class UnidadeServiceTest {
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 null))
                 .thenReturn(Collections.emptyList());
+
+        // Mock sgrhMapper
+        when(sgrhMapper.toUnidadeDto(eq(sedoc), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(1L).sigla("SEDOC").subunidades(new ArrayList<>()).build());
+        when(sgrhMapper.toUnidadeDto(eq(secretaria), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(2L).codigoPai(1L).sigla("SECRETARIA_1").subunidades(new ArrayList<>()).build());
+        when(sgrhMapper.toUnidadeDto(eq(assessoria), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(3L).codigoPai(2L).sigla("ASSESSORIA_11").isElegivel(true).subunidades(new ArrayList<>()).build());
 
         // Act
         List<UnidadeDto> resultado = unidadeService.buscarArvoreComElegibilidade(
@@ -351,6 +387,14 @@ class UnidadeServiceTest {
                 Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                 null))
                 .thenReturn(Collections.emptyList());
+
+        // Mock mappers
+        when(sgrhMapper.toUnidadeDto(eq(sedoc), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(1L).sigla("SEDOC").subunidades(new ArrayList<>()).build());
+        when(sgrhMapper.toUnidadeDto(eq(secretaria1), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(2L).codigoPai(1L).sigla("SECRETARIA_1").subunidades(new ArrayList<>()).build());
+        when(sgrhMapper.toUnidadeDto(eq(assessoria11), any(Boolean.class)))
+                .thenReturn(UnidadeDto.builder().codigo(3L).codigoPai(2L).sigla("ASSESSORIA_11").isElegivel(true).subunidades(new ArrayList<>()).build());
 
         // Act
         // TipoProcesso.MAPEAMENTO não requer mapa vigente
