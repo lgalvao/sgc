@@ -48,16 +48,28 @@ watch(
     {deep: true}
 );
 
-// Map to find parent of a unit
-const parentMap = computed(() => {
-  const map = new Map<number, Unidade>();
+// Mapas computados uma única vez para acesso O(1)
+// Bolt Optimization: Pre-calculate maps to avoid O(N^2) lookups during rendering
+const maps = computed(() => {
+  const pMap = new Map<number, Unidade>();
+  const uMap = new Map<number, Unidade>();
+
   const traverse = (node: Unidade, parent?: Unidade) => {
-    if (parent) map.set(node.codigo, parent);
-    if (node.filhas) node.filhas.forEach(child => traverse(child, node));
+    uMap.set(node.codigo, node);
+    if (parent) {
+      pMap.set(node.codigo, parent);
+    }
+    if (node.filhas) {
+      node.filhas.forEach(child => traverse(child, node));
+    }
   };
+
   props.unidades.forEach(u => traverse(u));
-  return map;
+  return { parentMap: pMap, unitMap: uMap };
 });
+
+const parentMap = computed(() => maps.value.parentMap);
+const unitMap = computed(() => maps.value.unitMap);
 
 // Filtrar unidades pela função customizada e ocultar Raiz se configurado
 const unidadesExibidas = computed(() => {
@@ -75,27 +87,18 @@ const unidadesExibidas = computed(() => {
   return lista;
 });
 
-// Busca uma unidade por código na árvore
-function findUnidadeById(codigo: number): Unidade | null {
-  const search = (nodes: Unidade[]): Unidade | null => {
-    for (const node of nodes) {
-      if (node.codigo === codigo) return node;
-      if (node.filhas) {
-        const found = search(node.filhas);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
-  return search(props.unidades);
+// Busca uma unidade por código de forma otimizada O(1)
+function findUnidadeById(codigo: number): Unidade | undefined {
+  return unitMap.value.get(codigo);
 }
 
-// Obtém todas subunidades recursivamente
-function getTodasSubunidades(unidade: Unidade): number[] {
-  const result: number[] = [];
+// Obtém todas subunidades recursivamente (retorna objetos para evitar lookups)
+// Bolt Optimization: Return Unidade objects directly to avoid O(N) lookup for each child
+function getTodasSubunidades(unidade: Unidade): Unidade[] {
+  const result: Unidade[] = [];
   if (unidade.filhas) {
     for (const filha of unidade.filhas) {
-      result.push(filha.codigo);
+      result.push(filha);
       if (filha.filhas) {
         result.push(...getTodasSubunidades(filha));
       }
@@ -111,6 +114,7 @@ function isChecked(codigo: number): boolean {
 
 // Verifica se unidade deve estar habilitada (recursivo)
 // Habilitado se: elegível OU tem pelo menos uma filha elegível
+// Bolt Optimization: This could be memoized, but relying on object identity is fast enough for now
 function isHabilitado(unidade: Unidade): boolean {
   if (unidade.isElegivel) return true;
 
@@ -130,10 +134,8 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   }
 
   // 2. Conta descendentes ELEGÍVEIS
-  const descendentesElegiveis = getTodasSubunidades(unidade).filter(codigo => {
-    const desc = findUnidadeById(codigo);
-    return desc?.isElegivel;
-  });
+  // Bolt Optimization: Access objects directly, avoid O(N) lookup
+  const descendentesElegiveis = getTodasSubunidades(unidade).filter(desc => desc.isElegivel);
 
   // 3. Se não tem descendentes elegíveis, retorna próprio estado
   if (descendentesElegiveis.length === 0) {
@@ -141,8 +143,8 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   }
 
   // 4. Conta quantas descendentes elegíveis estão no modelValue
-  const descendentesSelecionadas = descendentesElegiveis.filter(codigo =>
-      isChecked(codigo)
+  const descendentesSelecionadas = descendentesElegiveis.filter(desc =>
+      isChecked(desc.codigo)
   ).length;
 
   // 5. Todas descendentes selecionadas? → marcada
@@ -154,7 +156,6 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
   if (descendentesSelecionadas === 0) {
     // INTEROPERACIONAL pode estar marcada sozinha
     return unidade.tipo === "INTEROPERACIONAL" && selfSelected;
-
   }
 
   // 7. Algumas descendentes selecionadas → indeterminada (ou marcada se INTEROPERACIONAL)
@@ -170,19 +171,18 @@ function toggle(unidade: Unidade, checked: boolean) {
   const newSelection = new Set(unidadesSelecionadasLocal.value);
 
   // 1. Handle Self and Descendants
-  const idsToToggle = [unidade.codigo, ...getTodasSubunidades(unidade)];
+  // Bolt Optimization: Use already available object references
+  const unitsToToggle = [unidade, ...getTodasSubunidades(unidade)];
 
   if (checked) {
     // Adiciona apenas unidades elegíveis (filtra INTERMEDIARIA automaticamente)
-    // INTERMEDIARIA nunca é elegível, então nunca será adicionada
-    idsToToggle.forEach(id => {
-      const unidadeParaAdicionar = findUnidadeById(id);
-      if (unidadeParaAdicionar?.isElegivel) {
-        newSelection.add(id);
+    unitsToToggle.forEach(u => {
+      if (u.isElegivel) {
+        newSelection.add(u.codigo);
       }
     });
   } else {
-    idsToToggle.forEach(id => newSelection.delete(id));
+    unitsToToggle.forEach(u => newSelection.delete(u.codigo));
   }
 
   // 2. Handle Ancestors (Upwards)
@@ -232,9 +232,15 @@ watch(
 
 // Estado de expansão das unidades
 // Inicializa com as raízes expandidas
-const expandedUnits = ref<Set<number>>(
-    new Set(props.unidades.map(u => u.codigo))
-);
+// Bolt Optimization: Calculate initial set in O(N) once
+const expandedUnits = ref<Set<number>>(new Set());
+
+// Initialize expanded units when units prop changes
+watch(() => props.unidades, (newUnidades) => {
+   if (newUnidades && newUnidades.length > 0) {
+       expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
+   }
+}, { immediate: true });
 
 function isExpanded(unidade: Unidade): boolean {
   return expandedUnits.value.has(unidade.codigo);
