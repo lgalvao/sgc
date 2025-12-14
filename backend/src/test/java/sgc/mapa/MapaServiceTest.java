@@ -13,6 +13,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
@@ -29,6 +30,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -46,6 +48,9 @@ class MapaServiceTest {
 
     @Mock
     private MapaIntegridadeService mapaIntegridadeService;
+
+    @Mock
+    private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaService mapaService;
@@ -131,6 +136,15 @@ class MapaServiceTest {
         when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
 
+        MapaCompletoDto dtoMock = MapaCompletoDto.builder()
+                .codigo(1L)
+                .subprocessoCodigo(100L)
+                .observacoes("Observações do Mapa")
+                .competencias(List.of(new CompetenciaMapaDto(1L, "Competência 1", List.of(1L))))
+                .build();
+
+        when(mapaCompletoMapper.toDto(any(), anyLong(), anyList())).thenReturn(dtoMock);
+
         MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
         assertThat(mapaCompleto).isNotNull();
@@ -175,6 +189,8 @@ class MapaServiceTest {
                             if (c.getCodigo() == null) c.setCodigo(2L);
                             return c;
                         });
+
+        when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
 
         mapaService.salvarMapaCompleto(1L, req, "123");
 
