@@ -92,10 +92,10 @@ describe("useAtribuicaoTemporariaStore", () => {
             (
                 atribuicaoTemporariaService.buscarTodasAtribuicoes as any
             ).mockRejectedValue(new Error("Failed"));
-            await atribuicaoTemporariaStore.buscarAtribuicoes();
-            expect(atribuicaoTemporariaStore.error).toContain(
-                "Failed",
-            );
+            await expect(
+                atribuicaoTemporariaStore.buscarAtribuicoes(),
+            ).rejects.toThrow("Failed");
+            expect(atribuicaoTemporariaStore.error).toContain("Failed");
         });
     });
 

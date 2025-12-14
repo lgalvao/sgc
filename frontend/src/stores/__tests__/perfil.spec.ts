@@ -178,5 +178,46 @@ describe("usePerfilStore", () => {
             expect(perfilStore.unidadeSelecionadaSigla).toBe("XYZ"); // Add this
             expect(perfilStore.servidorId).toBe(456);
         });
+
+        it("should handle error in loginCompleto", async () => {
+            mockUsuarioService.autenticar.mockRejectedValue(new Error("Fail"));
+            await expect(perfilStore.loginCompleto("123", "pass")).rejects.toThrow(
+                "Fail",
+            );
+            expect(perfilStore.lastError).toBeTruthy();
+        });
+
+        it("should handle error in selecionarPerfilUnidade", async () => {
+            mockUsuarioService.entrar.mockRejectedValue(new Error("Fail"));
+            const perfilUnidade = {
+                perfil: Perfil.GESTOR,
+                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
+                siglaUnidade: "XYZ",
+            };
+            await expect(
+                perfilStore.selecionarPerfilUnidade(123, perfilUnidade),
+            ).rejects.toThrow("Fail");
+            expect(perfilStore.lastError).toBeTruthy();
+        });
+
+        it("should return false if authentication fails in loginCompleto", async () => {
+            mockUsuarioService.autenticar.mockResolvedValue(false);
+            const result = await perfilStore.loginCompleto("123", "pass");
+            expect(result).toBe(false);
+        });
+
+        it("should logout correctly", () => {
+            perfilStore.logout();
+            expect(perfilStore.servidorId).toBeNull();
+            expect(perfilStore.perfilSelecionado).toBeNull();
+            expect(perfilStore.unidadeSelecionada).toBeNull();
+            expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(6);
+        });
+
+        it("should clear error", () => {
+            perfilStore.lastError = { kind: "unexpected", message: "Error", subErrors: [] };
+            perfilStore.clearError();
+            expect(perfilStore.lastError).toBeNull();
+        });
     });
 });

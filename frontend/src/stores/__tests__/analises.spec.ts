@@ -146,7 +146,9 @@ describe("useAnalisesStore", () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
                 new Error("Fail"),
             );
-            await store.buscarAnalisesCadastro(codSubrocesso);
+            await expect(
+                store.buscarAnalisesCadastro(codSubrocesso),
+            ).rejects.toThrow("Fail");
             // It just catches and logs toast, state remains or empty
             expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
@@ -155,7 +157,9 @@ describe("useAnalisesStore", () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
                 new Error("Fail"),
             );
-            await store.buscarAnalisesValidacao(codSubrocesso);
+            await expect(
+                store.buscarAnalisesValidacao(codSubrocesso),
+            ).rejects.toThrow("Fail");
             expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
     });
