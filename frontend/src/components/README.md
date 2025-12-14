@@ -1,6 +1,5 @@
 # Componentes do Frontend
 
-Última atualização: 2025-12-14
 
 Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend.
 
@@ -140,6 +139,3 @@ Tabela hierárquica genérica com suporte a expansão/colapso de linhas.
 
 Item recursivo para a árvore de seleção de unidades (`ArvoreUnidades`).
 
-## Detalhamento técnico (gerado em 2025-12-14)
-
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

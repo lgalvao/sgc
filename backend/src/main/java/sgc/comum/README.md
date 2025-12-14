@@ -1,6 +1,5 @@
 # Pacote Comum
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -93,6 +92,10 @@ public Recurso buscar(Long codigo) {
 }
 ```
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.comum.*"
+```

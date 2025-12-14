@@ -1,6 +1,5 @@
 # Pacote E2E (End-to-End Testing Support)
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -134,6 +133,10 @@ test.afterEach(async ({ request }, testInfo) => {
 - Os endpoints `/e2e/**` permitem operações destrutivas no banco de dados.
 - Não há autenticação ou autorização nestes endpoints.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.e2e.*"
+```

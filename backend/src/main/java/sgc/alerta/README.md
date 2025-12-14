@@ -1,6 +1,5 @@
 # Módulo de Alerta
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -83,6 +82,10 @@ graph TD
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
 - **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.alerta.*"
+```

@@ -1,6 +1,5 @@
 # Módulo de Atividade
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -88,6 +87,10 @@ A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API 
 ter endpoints soltos para conhecimentos, o acesso hierárquico `/api/atividades/{atividadeId}/conhecimentos` garante que
 todo conhecimento esteja sempre corretamente vinculado à sua atividade pai.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.atividade.*"
+```

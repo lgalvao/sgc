@@ -1,6 +1,5 @@
 # Pacote Config
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -72,6 +71,10 @@ Para adicionar novas configurações Spring:
 2. Se for específica de uma funcionalidade de domínio, adicione em `sgc.config`.
 3. Use `@Configuration` e siga o padrão de nomenclatura (sufixo `Config`).
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.config.*"
+```

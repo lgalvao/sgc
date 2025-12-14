@@ -1,6 +1,5 @@
 # Módulo de Diagnóstico
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -112,6 +111,10 @@ graph TD
 - **`Mapa`**: As competências avaliadas vêm do mapa de competências consolidado.
 - **`SGRH`**: Informações sobre servidores da unidade são obtidas via `SgrhService`.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.diagnostico.*"
+```
