@@ -277,7 +277,6 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto)
 - Nomenclatura: `map{Source}To{Target}`
 - **Importante:** Evite usar `any` - crie interfaces para os DTOs do backend em `@/types/`
 - Uso opcional (quando há transformação real)
-- Uso opcional (quando há transformação real)
 - Suporte a estruturas recursivas/aninhadas
 
 **Total de Mappers:** 7 identificados
