@@ -21,22 +21,48 @@ O SGC permite:
 - Hibernate 7
 - Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
-- Arquitetura: Em camadas, estruturada por domínio
+- Arquitetura: Modular Monolith em camadas, estruturada por domínio
 
 **Frontend:**
 
 - Vue.js 3.5 + TypeScript
 - Vite (build)
-- Pinia (estado)
-- Vue Router (rotas)
+- Pinia (estado com Setup Stores)
+- Vue Router (rotas modulares)
 - BootstrapVueNext
-- Axios (cliente http)
+- Axios (cliente HTTP com interceptors)
 
 **Testes:**
 
-- JUnit (testes unitários do backend)
+- JUnit 5 + Mockito (testes unitários do backend)
 - Vitest (testes unitários do frontend)
 - Playwright (testes end-to-end)
+
+### Design Patterns Utilizados
+
+O SGC utiliza diversos design patterns consolidados para garantir manutenibilidade e escalabilidade:
+
+**Backend:**
+- **Service Facade Pattern:** Cada módulo tem um serviço principal como ponto de entrada único
+- **Repository Pattern:** Abstração de persistência com Spring Data JPA (22 repositórios)
+- **DTO Pattern + MapStruct:** Separação entre entidades JPA e objetos de transferência (10 mappers)
+- **Event-Driven Architecture:** 23 eventos de domínio para comunicação assíncrona entre módulos
+- **Layered Architecture:** Separação clara (Controller → Service → Repository → Entity)
+- **Exception Hierarchy:** Tratamento centralizado com `RestExceptionHandler`
+
+**Frontend:**
+- **Setup Store Pattern (Pinia):** Gerenciamento de estado reativo com Composition API (12 stores)
+- **Service Layer Pattern:** Encapsulamento de chamadas HTTP (12 services)
+- **Presentational Components:** Componentes burros com props/emits (24 componentes)
+- **Smart Views:** Orquestração de dados e componentes (18 views)
+- **Mapper Functions:** Transformação de DTOs (7 mappers)
+- **Interceptor Pattern:** Axios interceptors para JWT e tratamento de erros
+- **Modular Routing:** Rotas organizadas por domínio
+
+Para detalhes completos sobre os padrões arquiteturais, consulte:
+- **Backend:** [`/regras/backend-padroes.md`](regras/backend-padroes.md)
+- **Frontend:** [`/regras/frontend-padroes.md`](regras/frontend-padroes.md)
+- **Guia para Agentes:** [`AGENTS.md`](AGENTS.md)
 
 ### Estrutura do Projeto
 
@@ -55,49 +81,52 @@ sgc/
 
 ### Estrutura Detalhada dos Módulos
 
+**Backend - 15 Módulos:**
+
 ```text
-sgc/
-├── backend/              # API REST baseada em Spring Boot
-│   ├── src/main/java/sgc/
-│   │   ├── processo/     # Orquestrador dos fluxos de negócio (Mapeamento, Revisão, Diagnóstico)
-│   │   ├── subprocesso/  # Workflow de cada unidade dentro de um processo
-│   │   ├── mapa/         # Gestão dos mapas de competências
-│   │   ├── atividade/    # CRUD de atividades e conhecimentos
-│   │   ├── diagnostico/  # Diagnóstico de competências e ocupações críticas
-│   │   ├── analise/      # Trilha de auditoria
-│   │   ├── notificacao/  # Envio de notificações por e-mail
-│   │   ├── alerta/       # Alertas exibidos na interface
-│   │   ├── painel/       # Endpoints para os dashboards
-│   │   ├── sgrh/         # Integração com SGRH (usuários, perfis, unidades)
-│   │   ├── unidade/      # Representação da estrutura organizacional
-│   │   ├── comum/        # Componentes compartilhados (DTOs, exceções)
-│   │   ├── config/       # Configurações específicas (OpenAPI/Swagger)
-│   │   └── e2e/          # Suporte para testes end-to-end (perfil e2e apenas)
-│   └── src/main/resources/
-│       ├── application.yml         # Config padrão (PostgreSQL)
-│       └── application-e2e.yml     # Config para testes end-to-end (H2)
-│
-├── frontend/             # Aplicação Vue.js
-│   ├── src/
-│      ├── components/   # Componentes reutilizáveis (Vue)
-│      ├── views/        # Páginas da aplicação (Vue)
-│      ├── stores/       # Módulos de estado (Pinia)
-│      ├── services/     # Comunicação com a API (Axios)
-│      ├── router/       # Configuração de rotas (Vue Router)
-│      ├── composables/  # Funções reutilizáveis (Composition API)
-│      ├── mappers/      # Mapeamento de DTOs
-│      ├── utils/        # Funções utilitárias
-│      ├── constants/    # Constantes e enums
-│      ├── types/        # Tipos e interfaces (TypeScript)
-│      └── test-utils/   # Utilitários para testes
-├── reqs/                 # Documentação de requisitos
-│   ├── cdu-01.md         # Caso de uso 01: Login
-│   ├── cdu-02.md         # Caso de uso 02: Criar processo
-│   ├── ...               # 21 casos de uso documentados
-│   └── _intro.md
-│
-├── build.gradle.kts      # Build raiz (multi-projeto)
-└── AGENTS.md             # Guia para agentes de IA
+sgc/backend/src/main/java/sgc/
+├── processo/     # Orquestrador dos fluxos de negócio (Mapeamento, Revisão, Diagnóstico)
+├── subprocesso/  # Workflow de cada unidade com máquina de estados
+├── mapa/         # Gestão dos mapas de competências
+├── atividade/    # CRUD de atividades e conhecimentos
+├── diagnostico/  # Diagnóstico de competências e ocupações críticas
+├── analise/      # Trilha de auditoria
+├── notificacao/  # Envio de notificações por e-mail (reativo)
+├── alerta/       # Alertas exibidos na interface (reativo)
+├── painel/       # Endpoints para os dashboards
+├── sgrh/         # Integração com SGRH (usuários, perfis)
+├── unidade/      # Representação da estrutura organizacional
+├── comum/        # Componentes compartilhados (exceções, config, base entities)
+├── config/       # Configurações específicas (OpenAPI/Swagger)
+└── e2e/          # Suporte para testes end-to-end
+```
+
+**Comunicação Entre Módulos:**
+- **Síncrona:** Chamadas diretas via Service Facades
+- **Assíncrona:** 23 eventos de domínio (Spring Events) para desacoplamento
+
+**Frontend - 12 Diretórios:**
+
+```text
+sgc/frontend/src/
+├── views/        # 18 páginas (componentes inteligentes associados a rotas)
+├── components/   # 24 componentes reutilizáveis (apresentacionais)
+├── stores/       # 12 stores Pinia (gerenciamento de estado)
+├── services/     # 12 services (comunicação com API)
+├── router/       # Configuração de rotas modulares
+├── mappers/      # 7 mappers (transformação de DTOs)
+├── types/        # 50+ tipos e interfaces TypeScript
+├── composables/  # Hooks customizados da Composition API
+├── utils/        # Funções utilitárias (apiError, formatadores)
+├── constants/    # Constantes e enums
+└── test-utils/   # Utilitários para testes
+```
+
+**Arquitetura Frontend:**
+```
+View → Store (Pinia) → Service (Axios) → Backend API
+  ↑        ↓
+Component  Estado Reativo
 ```
 
 ---
@@ -226,9 +255,40 @@ Serviços orientados a eventos que reage aos eventos de domínio:
 
 ## 📚 Documentação Adicional
 
-### Documentação Geral
+### Documentação Geral e Padrões Arquiteturais
 
-- **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
+- **[AGENTS.md](AGENTS.md)**: Guia completo para agentes de IA trabalhando no projeto
+  - Design Patterns detalhados (Backend e Frontend)
+  - Convenções de nomenclatura consolidadas
+  - Exemplos de código para cada pattern
+  - Princípios arquiteturais do sistema
+
+- **[regras/backend-padroes.md](regras/backend-padroes.md)**: Padrões de Arquitetura e Desenvolvimento Backend
+  - Service Facade Pattern
+  - Event-Driven Architecture (23 eventos de domínio)
+  - Repository Pattern (22 repositórios)
+  - DTO + Mapper Pattern (MapStruct - 10 mappers)
+  - Hierarquia de Exceções
+  - Arquitetura em Camadas
+  - Padrões de Persistência JPA
+  - Organização de Módulos (15 módulos)
+  - Segurança e Sanitização
+
+- **[regras/frontend-padroes.md](regras/frontend-padroes.md)**: Padrões de Arquitetura e Desenvolvimento Frontend
+  - Setup Store Pattern (Pinia - 12 stores)
+  - Service Layer Pattern (12 services)
+  - Component Pattern (24 componentes)
+  - Smart Views Pattern (18 views)
+  - Mapper Pattern (7 mappers)
+  - Axios Interceptors
+  - Tratamento de Erros Normalizado
+  - Roteamento Modular
+  - TypeScript - Tipos e Interfaces (50+ tipos)
+
+- **[regras/e2e_regras.md](regras/e2e_regras.md)**: Regras para testes end-to-end
+
+### Documentação de Arquitetura
+
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
 - **[frontend/README.md](frontend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
@@ -272,3 +332,96 @@ Cada diretório frontend possui um README.md detalhado em `frontend/src/<diretó
 
 - <http://localhost:10000/swagger-ui.html>
 - <http://localhost:10000/api-docs>
+---
+
+## 📋 Convenções de Código
+
+### Idioma
+
+**Português Brasileiro** é o idioma oficial do projeto. Todo o código (variáveis, métodos, classes, comentários, documentação) deve estar em português, com exceção de termos técnicos consagrados e sufixos de padrões (Controller, Service, etc.).
+
+### Nomenclatura Backend
+
+| Elemento | Convenção | Exemplo |
+|----------|-----------|---------|
+| Classes | PascalCase | `UsuarioService`, `ProcessoController` |
+| Métodos e Variáveis | camelCase | `buscarPorCodigo`, `dataCriacao` |
+| Pacotes | lowercase | `sgc.processo`, `sgc.mapa` |
+| Exceções | Prefixo `Erro` | `ErroEntidadeNaoEncontrada` |
+| Controllers | Sufixo `Controller` | `ProcessoController` |
+| Services | Sufixo `Service` | `MapaService` |
+| Repositórios | Sufixo `Repo` | `ProcessoRepo` |
+| Mappers | Sufixo `Mapper` | `ProcessoMapper` |
+| DTOs | Sufixo `Dto`, `Req`, `Resp` | `ProcessoDto`, `CriarProcessoReq` |
+| Testes | Sufixo `Test` | `MapaServiceTest` |
+| Entidades JPA | Campo PK | `codigo` (não `id`) |
+
+### Nomenclatura Frontend
+
+| Elemento | Convenção | Exemplo |
+|----------|-----------|---------|
+| Componentes Vue | PascalCase | `ProcessoCard.vue`, `SubprocessoHeader.vue` |
+| Arquivos TS | camelCase | `processoService.ts`, `apiError.ts` |
+| Stores | `use{Entidade}Store` | `useProcessosStore`, `usePerfilStore` |
+| Services | `{entidade}Service.ts` | `processoService.ts` |
+| Tipos/Interfaces | PascalCase | `Processo`, `UnidadeParticipante` |
+| Diretórios | kebab-case/lowercase | `test-utils`, `components`, `stores` |
+| Funções mapper | `map{Source}To{Target}` | `mapProcessoDtoToFrontend` |
+
+### Padrões de Testes
+
+**Backend (JUnit 5):**
+```java
+@Test
+void deveCriarProcessoComSucesso() { ... }
+
+@Test
+void deveLancarErroQuandoProcessoNaoEncontrado() { ... }
+```
+
+**Frontend (Vitest):**
+```typescript
+it('deve buscar processos com sucesso', async () => { ... })
+
+it('deve tratar erro ao buscar processos', async () => { ... })
+```
+
+### Contadores do Sistema
+
+| Categoria | Quantidade |
+|-----------|-----------|
+| **Backend** | |
+| Módulos | 15 |
+| Controllers | 14 |
+| Services | 30+ |
+| Repositórios | 22 |
+| Mappers (MapStruct) | 10 |
+| Eventos de Domínio | 23 |
+| Exceções Customizadas | 9+ |
+| Entidades JPA | 20+ |
+| DTOs | 50+ |
+| **Frontend** | |
+| Stores (Pinia) | 12 |
+| Services | 12 |
+| Mappers | 7 |
+| Components | 24 |
+| Views | 18 |
+| Types/Interfaces | 50+ |
+
+---
+
+## 🎯 Princípios Arquiteturais
+
+1. **Separation of Concerns:** Cada camada tem responsabilidade única e bem definida
+2. **Single Responsibility:** Classes/componentes fazem uma coisa bem feita
+3. **DRY (Don't Repeat Yourself):** Código compartilhado em módulos `comum` (backend) ou `utils` (frontend)
+4. **KISS (Keep It Simple):** Soluções simples e diretas
+5. **Dependency Injection:** Spring IoC (backend), Pinia Stores (frontend)
+6. **Event-Driven:** Desacoplamento via eventos de domínio
+7. **Fail Fast:** Validações early, exceções específicas
+8. **Immutability:** Records para DTOs (backend), computed para getters (frontend)
+
+Para detalhes completos sobre os padrões e práticas, consulte:
+- [`AGENTS.md`](AGENTS.md) - Guia completo para desenvolvedores
+- [`regras/backend-padroes.md`](regras/backend-padroes.md) - Padrões Backend
+- [`regras/frontend-padroes.md`](regras/frontend-padroes.md) - Padrões Frontend
