@@ -1,6 +1,6 @@
 # Utils (Utilitários Gerais)
 
-Última atualização: 2025-12-13
+Última atualização: 2025-12-14
 
 Este diretório contém funções utilitárias de propósito geral, que não dependem de estado da aplicação (Pinia) ou do
 framework (Vue). São funções puras de JavaScript/TypeScript.

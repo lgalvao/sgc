@@ -51,9 +51,11 @@ sgc/
 ├── reqs/               # Documentação de requisitos (CDUs)
 ├── test-results/       # Resultados de testes e logs (E2E)
 ├── build.gradle.kts    # Build raiz (multi-projeto)
+```
 
-`
-text
+### Estrutura Detalhada dos Módulos
+
+```text
 sgc/
 ├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
@@ -61,13 +63,16 @@ sgc/
 │   │   ├── subprocesso/  # Workflow de cada unidade dentro de um processo
 │   │   ├── mapa/         # Gestão dos mapas de competências
 │   │   ├── atividade/    # CRUD de atividades e conhecimentos
+│   │   ├── diagnostico/  # Diagnóstico de competências e ocupações críticas
 │   │   ├── analise/      # Trilha de auditoria
 │   │   ├── notificacao/  # Envio de notificações por e-mail
 │   │   ├── alerta/       # Alertas exibidos na interface
 │   │   ├── painel/       # Endpoints para os dashboards
 │   │   ├── sgrh/         # Integração com SGRH (usuários, perfis, unidades)
 │   │   ├── unidade/      # Representação da estrutura organizacional
-│   │   └── comum/        # Componentes compartilhados (DTOs, exceções)
+│   │   ├── comum/        # Componentes compartilhados (DTOs, exceções)
+│   │   ├── config/       # Configurações específicas (OpenAPI/Swagger)
+│   │   └── e2e/          # Suporte para testes end-to-end (perfil e2e apenas)
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
 │       └── application-e2e.yml     # Config para testes end-to-end (H2)
@@ -221,10 +226,47 @@ Serviços orientados a eventos que reage aos eventos de domínio:
 
 ## 📚 Documentação Adicional
 
+### Documentação Geral
+
 - **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
-- **[frontend/README.md](backend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
+- **[frontend/README.md](frontend/README.md)**: Arquitetura detalhada do frontend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
+
+### Documentação de Módulos Backend
+
+Cada módulo backend possui um README.md detalhado em `backend/src/main/java/sgc/<módulo>/`:
+
+- **[processo](backend/src/main/java/sgc/processo/README.md)**: Orquestrador dos fluxos de negócio
+- **[subprocesso](backend/src/main/java/sgc/subprocesso/README.md)**: Máquina de estados e workflow
+- **[mapa](backend/src/main/java/sgc/mapa/README.md)**: Gestão de mapas de competências
+- **[atividade](backend/src/main/java/sgc/atividade/README.md)**: CRUD de atividades e conhecimentos
+- **[diagnostico](backend/src/main/java/sgc/diagnostico/README.md)**: Diagnóstico e ocupações críticas
+- **[analise](backend/src/main/java/sgc/analise/README.md)**: Trilha de auditoria
+- **[notificacao](backend/src/main/java/sgc/notificacao/README.md)**: Sistema de notificações por e-mail
+- **[alerta](backend/src/main/java/sgc/alerta/README.md)**: Alertas da interface
+- **[painel](backend/src/main/java/sgc/painel/README.md)**: Dashboards
+- **[sgrh](backend/src/main/java/sgc/sgrh/README.md)**: Integração com sistema de RH
+- **[unidade](backend/src/main/java/sgc/unidade/README.md)**: Estrutura organizacional
+- **[comum](backend/src/main/java/sgc/comum/README.md)**: Componentes compartilhados
+- **[config](backend/src/main/java/sgc/config/README.md)**: Configurações (OpenAPI)
+- **[e2e](backend/src/main/java/sgc/e2e/README.md)**: Suporte para testes E2E
+
+### Documentação de Diretórios Frontend
+
+Cada diretório frontend possui um README.md detalhado em `frontend/src/<diretório>/`:
+
+- **[components](frontend/src/components/README.md)**: Componentes Vue reutilizáveis
+- **[views](frontend/src/views/README.md)**: Páginas da aplicação
+- **[stores](frontend/src/stores/README.md)**: Gerenciamento de estado (Pinia)
+- **[services](frontend/src/services/README.md)**: Comunicação com a API
+- **[router](frontend/src/router/README.md)**: Configuração de rotas
+- **[composables](frontend/src/composables/README.md)**: Composition API helpers
+- **[mappers](frontend/src/mappers/README.md)**: Mapeamento de DTOs
+- **[utils](frontend/src/utils/README.md)**: Funções utilitárias
+- **[types](frontend/src/types/README.md)**: Tipos e interfaces TypeScript
+- **[constants](frontend/src/constants/README.md)**: Constantes da aplicação
+- **[test-utils](frontend/src/test-utils/README.md)**: Utilitários para testes
 
 ### Especificação OpenAPI e Swagger
 

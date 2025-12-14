@@ -1,6 +1,6 @@
 # Views (Páginas da Aplicação)
 
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-14
 
 Este diretório contém os componentes de **página** (Views) do Vue.js. As views são os componentes de nível superior que
 são carregados diretamente pelo Vue Router.
@@ -47,6 +47,6 @@ Diferente dos componentes "burros" (`src/components`), as views são "inteligent
 - **`RelatoriosView.vue`**: Geração e visualização de relatórios gerenciais.
 - **`ConfiguracoesView.vue`**: Configurações do sistema (acesso restrito a administradores).
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-14)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
