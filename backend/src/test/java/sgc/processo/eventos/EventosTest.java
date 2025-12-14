@@ -19,10 +19,11 @@ class EventosTest {
 
     @Test
     void processoFinalizadoEvento_Getters() {
-        EventoProcessoFinalizado evento = new EventoProcessoFinalizado(this, 1L);
+        LocalDateTime now = LocalDateTime.now();
+        EventoProcessoFinalizado evento = new EventoProcessoFinalizado(1L, now);
 
         assertEquals(1L, evento.getCodProcesso());
-        assertEquals(this, evento.getSource());
+        assertEquals(now, evento.getDataHoraFinalizacao());
     }
 
     @Test

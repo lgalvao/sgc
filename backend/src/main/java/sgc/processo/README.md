@@ -25,10 +25,6 @@ graph TD
     subgraph "Módulo Processo"
         Facade(ProcessoService - Fachada Única)
 
-        subgraph "Serviços Especializados"
-            Notificacao(ProcessoNotificacaoService)
-        end
-
         Eventos(ApplicationEventPublisher)
     end
 
@@ -39,7 +35,6 @@ graph TD
 
     Controle -- Utiliza --> Facade
 
-    Facade -- Orquestra e delega para --> Notificacao
     Facade -- Utiliza --> SubprocessoService & CopiaMapaService
     Facade -- Publica eventos via --> Eventos
 ```
@@ -58,8 +53,6 @@ graph TD
     - `GET /api/processos/{id}/detalhes`: Visão completa do processo e seus subprocessos.
     - `POST /api/processos/{id}/iniciar`: Dispara o início do processo (CDU-03).
     - `POST /api/processos/{id}/finalizar`: Encerra o processo (CDU-21).
-- **`ProcessoNotificacaoService`**: Centraliza a lógica para enviar notificações específicas do processo, mantendo a
-  fachada mais limpa.
 
 ### Modelo de Dados (`model`)
 
