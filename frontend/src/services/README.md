@@ -1,6 +1,6 @@
 # Services (Camada de Serviço)
 
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-14
 
 Este diretório contém os módulos responsáveis pela **comunicação com o Backend**.
 
@@ -32,6 +32,6 @@ utilizam a instância configurada do Axios (`apiClient` de `src/axios-setup.ts`)
 Os serviços devem repassar os erros do Axios para que possam ser tratados pelas camadas superiores (Stores ou
 Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, etc.).
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-14)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

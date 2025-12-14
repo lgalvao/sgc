@@ -1,6 +1,6 @@
 # Módulo de Análise
 
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -77,6 +77,6 @@ graph TD
 A principal função deste módulo é fornecer **rastreabilidade**. A abordagem de modelo genérico com um campo de "tipo"
 foi utilizada para registrar o histórico de decisões em diferentes etapas do workflow sem duplicar estruturas de dados.
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-14)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

@@ -1,6 +1,6 @@
 # Router (Roteamento)
 
-Última atualização: 2025-12-04 14:18:38Z
+Última atualização: 2025-12-14
 
 Este diretório contém a configuração do **Vue Router**, responsável pela navegação entre as páginas da aplicação.
 
@@ -39,6 +39,6 @@ funcional.
 - **Meta Fields:** O campo `meta` é usado para definir propriedades da rota, como `requiresAuth` (se exige login) e
   `breadcrumb` (para navegação).
 
-## Detalhamento técnico (gerado em 2025-12-04T14:22:48Z)
+## Detalhamento técnico (gerado em 2025-12-14)
 
 Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
