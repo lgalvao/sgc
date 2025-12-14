@@ -11,3 +11,8 @@
 ## 2025-12-13 - [INFO] Non-standard Spring Boot Packages
 **Observation:** The project uses a custom or future version of Spring Boot (4.0.0) where `AutoConfigureMockMvc` is located in `org.springframework.boot.webmvc.test.autoconfigure` instead of the standard `org.springframework.boot.test.autoconfigure.web.servlet`.
 **Action:** Used the repository-specific package in tests to avoid compilation errors.
+
+## 2025-12-14 - [MEDIUM] Information Exposure in Validation Errors
+**Vulnerability:** The `RestExceptionHandler` was reflecting `rejectedValue` from `MethodArgumentNotValidException` and `ConstraintViolationException` back to the client in JSON responses.
+**Learning:** Even with generic error handlers, standard Spring validation exceptions often carry the raw invalid input. If this input is sensitive (e.g., a password that failed complexity checks), it gets logged or returned to the user, leading to info leakage (CWE-209).
+**Prevention:** Explicitly nullify or mask `rejectedValue` in global exception handlers. Do not trust that validation errors only occur on non-sensitive fields.
