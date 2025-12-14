@@ -154,8 +154,9 @@ Os relatórios HTML são gerados em `backend/build/reports/`:
 
 ## Padrões de Design e Boas Práticas
 
-- **Lombok:** Utilizado para reduzir código repetitivo.
-- **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
+- **Lombok:** Utilizado para reduzir código repetitivo (`@Builder`, `@Data`, etc.).
+- **MapStruct:** Utilizado para conversão eficiente e limpa entre Entidades e DTOs, evitando código boilerplate de mapeamento manual.
+- **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA. Devem ser classes simples, sem lógica de negócio.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos
   `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService`

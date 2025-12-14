@@ -36,7 +36,10 @@ iniciar qualquer tarefa.
 
 - **Service Facade:** Cada módulo (pacote) deve ter um serviço principal (Fachada) que orquestra a lógica de negócio e
   delega para serviços especializados. O Controller deve interagir apenas com essa fachada.
-- **DTOs:** Nunca exponha entidades JPA diretamente nos Controllers. Utilize DTOs (`dto/`) e Mappers (`MapStruct`).
+- **DTOs e Mappers:**
+    - Nunca exponha entidades JPA diretamente nos Controllers.
+    - Utilize DTOs (`dto/`) como contêineres de dados simples (preferencialmente com `@Builder` e sem lógica).
+    - Utilize Mappers (`MapStruct`) para conversão entre DTOs e Entidades. Evite factory methods complexos (`from`, `of`) dentro dos DTOs.
 - **Pacote Comum:** Utilize o pacote `sgc.comum` para exceções (`ErroApi`), configurações e utilitários compartilhados.
 
 ### 3.2. API REST

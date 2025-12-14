@@ -46,13 +46,16 @@
 6. ✅ Padronizar annotations Lombok em todos os DTOs
    - Verificado o uso consistente de `@Builder` nos DTOs chave (`UnidadeDto`, `CompetenciaMapaDto`, `MapaCompletoDto`, `SubprocessoDetalheDto`, `MapaAjusteDto`, etc.).
 
-### Fase 3: Refinamento (Sprint 3) - EM ANDAMENTO
+### Fase 3: Refinamento (Sprint 3) - ✅ CONCLUÍDO
 7. ✅ Adicionar testes para novos mappers
    - Criados testes unitários para `MapaCompletoMapper`, `SgrhMapper`, `SubprocessoDetalheMapper`, `MapaAjusteMapper`.
    - Corrigidos testes existentes (`MapaServiceTest`) para mockar corretamente os novos mappers.
    - Todos os testes de backend passando (incluindo regressão).
-8. Atualizar documentação (AGENTS.md, README.md)
-9. Revisar e otimizar queries em mappers (se necessário)
+8. ✅ Atualizar documentação (AGENTS.md, README.md)
+   - Atualizado `AGENTS.md` com diretrizes sobre DTOs e MapStruct.
+   - Atualizado `backend/README.md` destacando o uso de MapStruct e padrões de design.
+9. ✅ Revisar e otimizar queries em mappers (se necessário)
+   - Verificado `CompetenciaRepo`: já possui `JOIN FETCH` para evitar problemas de N+1 ao carregar competências e suas atividades.
 
 ---
 
@@ -75,11 +78,12 @@
 
 ---
 
-## 4. Próximos Passos (Fase 3)
+## 4. Próximos Passos
 
-1. **Documentação**: Atualizar `AGENTS.md` com as novas diretrizes sobre criação de Mappers e proibição de lógica complexa em factory methods de DTOs.
-2. **Revisão de Desempenho**: Verificar se os novos mappers introduziram algum overhead, especialmente em listagens grandes (embora MapStruct seja performático).
+A refatoração principal foi concluída. As recomendações para o futuro incluem:
+1. **Manutenção**: Garantir que novos DTOs sigam os padrões estabelecidos (MapStruct + Builder).
+2. **Monitoramento**: Observar se há impacto no tempo de build com o aumento do número de mappers MapStruct (geração de código).
 
 ---
 
-**Status Atual:** Testes de mappers implementados e validação geral do backend concluída com sucesso. Próximo passo é atualizar a documentação.
+**Status Atual:** CONCLUÍDO. Todas as fases foram finalizadas e validadas.
