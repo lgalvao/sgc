@@ -1,6 +1,5 @@
 # Frontend SGC
 
-Última atualização: 2025-12-14
 
 Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema de Gestão de Competências). Este documento
 serve como um guia para desenvolvedores, detalhando a arquitetura, as tecnologias e as convenções do projeto.
@@ -141,6 +140,3 @@ Os relatórios de cobertura ficam em `coverage/`.
 - `npm run test:unit`: Executa os testes de unidade.
 - `npm run quality:all`: Executa verificações de qualidade (testes, lint, typecheck).
 
-## Detalhamento técnico (gerado em 2025-12-14)
-
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

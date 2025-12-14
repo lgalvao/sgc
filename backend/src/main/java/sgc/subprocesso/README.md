@@ -1,6 +1,5 @@
 # Módulo de Subprocesso
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -119,6 +118,10 @@ stateDiagram-v2
 Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem
 fez o quê e quando.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.subprocesso.*"
+```

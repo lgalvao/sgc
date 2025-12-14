@@ -1,6 +1,5 @@
 # Test Utils (Utilitários de Teste)
 
-Última atualização: 2025-12-14
 
 Este diretório contém ferramentas, mocks e helpers para facilitar a escrita de testes unitários e de integração com *
 *Vitest**.
@@ -22,6 +21,3 @@ Este diretório contém ferramentas, mocks e helpers para facilitar a escrita de
 
 - Contém dados falsos (fixtures) e implementações mockadas de serviços ou objetos complexos para isolar os testes.
 
-## Detalhamento técnico (gerado em 2025-12-14)
-
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

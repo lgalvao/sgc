@@ -1,6 +1,5 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -162,6 +161,3 @@ Os relatórios HTML são gerados em `backend/build/reports/`:
   vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
 
-## Detalhamento técnico (gerado em 2025-12-14)
-
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

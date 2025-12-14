@@ -1,6 +1,5 @@
 # Stores (Gerenciamento de Estado - Pinia)
 
-Última atualização: 2025-12-14
 
 Este diretório contém as **Stores do Pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
 
@@ -10,6 +9,31 @@ que precisam persistir durante a navegação.
 ## Estrutura de uma Store
 
 As stores são definidas usando a sintaxe `defineStore` utilizando o estilo **Setup Stores** (similar à Composition API).
+
+```mermaid
+graph TD
+    subgraph Componente
+        A[View/Component]
+    end
+    subgraph Store
+        B[Action]
+        C[State]
+    end
+    subgraph Service
+        D[Service Function]
+    end
+    subgraph API
+        E[Backend API]
+    end
+
+    A -- Chama Action --> B
+    B -- Chama Service --> D
+    D -- Request HTTP --> E
+    E -- Response JSON --> D
+    D -- Retorna Dados --> B
+    B -- Atualiza --> C
+    C -- Reage e Atualiza --> A
+```
 
 A função de setup deve retornar um objeto contendo:
 
@@ -39,6 +63,3 @@ A função de setup deve retornar um objeto contendo:
 - **Single Source of Truth:** Evite duplicar dados entre stores e componentes.
 - **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante.
 
-## Detalhamento técnico (gerado em 2025-12-14)
-
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.

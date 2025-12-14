@@ -1,6 +1,5 @@
 # Módulo de Análise
 
-Última atualização: 2025-12-14
 
 ## Visão Geral
 
@@ -77,6 +76,10 @@ graph TD
 A principal função deste módulo é fornecer **rastreabilidade**. A abordagem de modelo genérico com um campo de "tipo"
 foi utilizada para registrar o histórico de decisões em diferentes etapas do workflow sem duplicar estruturas de dados.
 
-## Detalhamento técnico (gerado em 2025-12-14)
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+## Como Testar
+
+Para executar apenas os testes deste módulo:
+```bash
+./gradlew :backend:test --tests "sgc.analise.*"
+```

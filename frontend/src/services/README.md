@@ -1,6 +1,5 @@
 # Services (Camada de Serviço)
 
-Última atualização: 2025-12-14
 
 Este diretório contém os módulos responsáveis pela **comunicação com o Backend**.
 
@@ -32,6 +31,19 @@ utilizam a instância configurada do Axios (`apiClient` de `src/axios-setup.ts`)
 Os serviços devem repassar os erros do Axios para que possam ser tratados pelas camadas superiores (Stores ou
 Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, etc.).
 
-## Detalhamento técnico (gerado em 2025-12-14)
+## Referência Cruzada de API
 
-Resumo detalhado dos artefatos, comandos e observações técnicas gerado automaticamente.
+| Frontend Service | Backend Controller | Prefixo URL |
+|------------------|--------------------|-------------|
+| `alertaService.ts` | `AlertaController` | `/api/alertas` |
+| `analiseService.ts` | `AnaliseController` | `/api/subprocessos/{id}` |
+| `atividadeService.ts` | `AtividadeController` | `/api/atividades` |
+| `atribuicaoTemporariaService.ts` | `UnidadeController` | `/api/unidades` |
+| `cadastroService.ts` | `SubprocessoCadastroController` | `/api/subprocessos` |
+| `mapaService.ts` | `MapaController` | `/api/mapas` |
+| `painelService.ts` | `PainelController` | `/api/painel` |
+| `processoService.ts` | `ProcessoController` | `/api/processos` |
+| `subprocessoService.ts` | `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController` | `/api/subprocessos` |
+| `unidadesService.ts` | `UnidadeController` | `/api/unidades` |
+| `usuarioService.ts` | `UsuarioController` | `/api/usuarios` |
+
