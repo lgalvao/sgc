@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import sgc.alerta.AlertaService;
+import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -341,5 +342,31 @@ class EventoProcessoListenerTest {
         verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq(TITULAR_EMAIL), any(), any());
         verify(notificacaoEmailService, never())
                 .enviarEmailHtml(eq(SUBSTITUTO_EMAIL), any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve processar finalização e enviar e-mail para unidade operacional")
+    void aoFinalizarProcesso_deveEnviarEmail_quandoUnidadeOperacional() {
+        EventoProcessoFinalizado eventoFinalizado = new EventoProcessoFinalizado(1L, LocalDateTime.now());
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(100L);
+        unidade.setSigla(UNID_OP);
+        unidade.setTipo(sgc.unidade.model.TipoUnidade.OPERACIONAL);
+        processo.setParticipantes(java.util.Set.of(unidade));
+
+        ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
+        UsuarioDto titular = new UsuarioDto(String.valueOf(T123), TITULAR_TESTE, TITULAR_EMAIL, RAMAL);
+
+        when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Map.of(100L, responsavelDto));
+        when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Map.of(String.valueOf(T123), titular));
+
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any()))
+                .thenReturn("html-finalizacao");
+
+        ouvinteDeEvento.aoFinalizarProcesso(eventoFinalizado);
+
+        verify(notificacaoEmailService).enviarEmailHtml(eq(TITULAR_EMAIL), anyString(), eq("html-finalizacao"));
     }
 }

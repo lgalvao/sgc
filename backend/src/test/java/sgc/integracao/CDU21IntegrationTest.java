@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
@@ -65,14 +65,15 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private MapaRepo mapaRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
-    @MockitoBean
-    private ProcessoNotificacaoService processoNotificacaoService;
 
     @MockitoBean
     private SgrhService sgrhService;
 
     @MockitoBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoBean
+    private NotificacaoEmailService notificacaoEmailService;
 
     private Processo processo;
     private Unidade unidadeOperacional1;
@@ -183,8 +184,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Processo processoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(processoFinalizado.getDataFinalizacao()).isNotNull();
-        verify(processoNotificacaoService, times(1))
-                .enviarNotificacoesDeFinalizacao(eq(processo), anyList());
+        verify(notificacaoEmailService, times(3)).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 
     @Test

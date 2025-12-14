@@ -58,7 +58,6 @@ public class ProcessoService {
     private final MapaRepo mapaRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
-    private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
@@ -385,8 +384,8 @@ public class ProcessoService {
         processo.setDataFinalizacao(LocalDateTime.now());
 
         processoRepo.save(processo);
-        processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, new ArrayList<>(processo.getParticipantes()));
-        publicadorEventos.publishEvent(new EventoProcessoFinalizado(this, processo.getCodigo()));
+        publicadorEventos.publishEvent(
+                new EventoProcessoFinalizado(processo.getCodigo(), LocalDateTime.now()));
 
         log.info("Processo {} finalizado", codigo);
     }

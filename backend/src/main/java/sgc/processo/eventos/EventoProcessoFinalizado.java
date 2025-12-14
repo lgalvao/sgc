@@ -1,7 +1,11 @@
 package sgc.processo.eventos;
 
-import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /**
  * Evento de domínio publicado quando um Processo é finalizado.
@@ -10,12 +14,11 @@ import org.springframework.context.ApplicationEvent;
  * vigentes e as notificações de conclusão foram enviadas. Pode ser usado para acionar lógicas de
  * pós-processamento, como arquivamento ou geração de relatórios consolidados.
  */
-@Getter
-public class EventoProcessoFinalizado extends ApplicationEvent {
-    private final Long codProcesso;
-
-    public EventoProcessoFinalizado(Object source, Long codProcesso) {
-        super(source);
-        this.codProcesso = codProcesso;
-    }
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventoProcessoFinalizado {
+    private Long codProcesso;
+    private LocalDateTime dataHoraFinalizacao;
 }

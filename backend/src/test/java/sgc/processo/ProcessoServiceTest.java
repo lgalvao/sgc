@@ -31,7 +31,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.service.SgrhService;
@@ -73,8 +72,6 @@ class ProcessoServiceTest {
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
-    @Mock
-    private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
     private SgrhService sgrhService;
     @Mock

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.model.Alerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -19,8 +20,11 @@ import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static sgc.unidade.model.TipoUnidade.*;
@@ -28,7 +32,7 @@ import static sgc.unidade.model.TipoUnidade.*;
 /**
  * Listener para eventos de processo.
  *
- * <p>Processa eventos de processo iniciado, criando alertas e enviando e-mails para as unidades
+ * <p>Processa eventos de processo iniciado e finalizado, criando alertas e enviando e-mails para as unidades
  * participantes de forma diferenciada, conforme o tipo de unidade.
  *
  * <p>Nota: Este listener permanece no pacote 'notificacao' pois sua responsabilidade principal é
@@ -71,6 +75,27 @@ public class EventoProcessoListener {
         } catch (RuntimeException e) {
             log.error(
                     "Erro ao processar evento de processo iniciado: {}",
+                    e.getClass().getSimpleName(),
+                    e);
+        }
+    }
+
+    /**
+     * Escuta e processa o evento {@link EventoProcessoFinalizado}, disparado quando um processo
+     * é concluído.
+     *
+     * @param evento O evento contendo os detalhes do processo que foi finalizado.
+     */
+    @EventListener
+    @Transactional
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
+        log.debug("Processando evento de processo finalizado: {}", evento.getCodProcesso());
+        try {
+            processarFinalizacaoProcesso(evento);
+        } catch (RuntimeException e) {
+            log.error(
+                    "Erro ao processar evento de processo finalizado: {}",
                     e.getClass().getSimpleName(),
                     e);
         }
@@ -119,6 +144,127 @@ public class EventoProcessoListener {
             }
         }
         log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
+    }
+
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
+        Processo processo = processoRepo.findById(evento.getCodProcesso())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", evento.getCodProcesso()));
+
+        List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
+
+        if (unidadesParticipantes.isEmpty()) {
+            log.warn(
+                    "Nenhuma unidade participante encontrada para notificar na finalização do"
+                            + " processo {}",
+                    processo.getCodigo());
+            return;
+        }
+
+        List<Long> todosCodigosUnidades =
+                unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
+        Map<Long, ResponsavelDto> responsaveis =
+                sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<String, UsuarioDto> usuarios =
+                sgrhService.buscarUsuariosPorTitulos(
+                        responsaveis.values().stream()
+                                .map(ResponsavelDto::getTitularTitulo)
+                                .distinct()
+                                .toList());
+
+        for (Unidade unidade : unidadesParticipantes) {
+            try {
+                ResponsavelDto responsavel =
+                        Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
+                                .orElseThrow(
+                                        () ->
+                                                new IllegalStateException(
+                                                        "Responsável não encontrado para a unidade %s"
+                                                                .formatted(unidade.getSigla())));
+
+                UsuarioDto titular =
+                        Optional.ofNullable(usuarios.get(responsavel.getTitularTitulo()))
+                                .orElseThrow(
+                                        () ->
+                                                new IllegalStateException(
+                                                        "Usuário titular não encontrado: %s"
+                                                                .formatted(
+                                                                        responsavel
+                                                                                .getTitularTitulo())));
+
+                String emailTitular =
+                        Optional.ofNullable(titular.getEmail())
+                                .filter(e -> !e.isBlank())
+                                .orElseThrow(
+                                        () ->
+                                                new IllegalStateException(
+                                                        "E-mail não cadastrado para o titular %s"
+                                                                .formatted(titular.getNome())));
+
+                if (unidade.getTipo() == TipoUnidade.OPERACIONAL
+                        || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
+                    enviarEmailUnidadeFinal(processo, unidade, emailTitular);
+                } else if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
+                    enviarEmailUnidadeIntermediaria(
+                            processo, unidade, emailTitular, unidadesParticipantes);
+                }
+            } catch (RuntimeException ex) {
+                log.error(
+                        "Falha ao preparar notificação para unidade {} no processo {}: {}",
+                        unidade.getSigla(),
+                        processo.getCodigo(),
+                        ex.getMessage(),
+                        ex);
+            }
+        }
+    }
+
+    private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
+        String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
+        String html =
+                notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                        unidade.getSigla(), processo.getDescricao());
+        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
+        log.info("E-mail de finalização enviado para {}", unidade.getSigla());
+    }
+
+    private void enviarEmailUnidadeIntermediaria(
+            Processo processo,
+            Unidade unidadeIntermediaria,
+            String email,
+            List<Unidade> todasUnidades) {
+        List<String> siglasSubordinadas =
+                todasUnidades.stream()
+                        .filter(
+                                u ->
+                                        u.getUnidadeSuperior() != null
+                                                && u.getUnidadeSuperior()
+                                                .getCodigo()
+                                                .equals(unidadeIntermediaria.getCodigo()))
+                        .map(Unidade::getSigla)
+                        .sorted()
+                        .toList();
+
+        if (siglasSubordinadas.isEmpty()) {
+            log.warn(
+                    "Nenhuma unidade subordinada encontrada para notificar a unidade intermediária"
+                            + " {}",
+                    unidadeIntermediaria.getSigla());
+            return;
+        }
+
+        String assunto =
+                String.format(
+                        "SGC: Conclusão do processo %s em unidades subordinadas",
+                        processo.getDescricao());
+        String html =
+                notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                        unidadeIntermediaria.getSigla(),
+                        processo.getDescricao(),
+                        siglasSubordinadas);
+
+        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
+        log.info("E-mail de finalização enviado para {})", unidadeIntermediaria.getSigla());
     }
 
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
