@@ -92,16 +92,20 @@ public class MapaService {
                                                     .map(Atividade::getCodigo)
                                                     .toList();
 
-                                    return new CompetenciaMapaDto(
-                                            c.getCodigo(), c.getDescricao(), idsAtividades);
+                                    return CompetenciaMapaDto.builder()
+                                            .codigo(c.getCodigo())
+                                            .descricao(c.getDescricao())
+                                            .atividadesCodigos(idsAtividades)
+                                            .build();
                                 })
                         .toList();
 
-        return new MapaCompletoDto(
-                mapa.getCodigo(),
-                codSubprocesso,
-                mapa.getObservacoesDisponibilizacao(),
-                competenciasDto);
+        return MapaCompletoDto.builder()
+                .codigo(mapa.getCodigo())
+                .subprocessoCodigo(codSubprocesso)
+                .observacoes(mapa.getObservacoesDisponibilizacao())
+                .competencias(competenciasDto)
+                .build();
     }
 
     public MapaCompletoDto salvarMapaCompleto(
@@ -175,15 +179,19 @@ public class MapaService {
                                                     .map(Atividade::getCodigo)
                                                     .toList();
 
-                                    return new CompetenciaMapaDto(
-                                            c.getCodigo(), c.getDescricao(), idsAtividades);
+                                    return CompetenciaMapaDto.builder()
+                                            .codigo(c.getCodigo())
+                                            .descricao(c.getDescricao())
+                                            .atividadesCodigos(idsAtividades)
+                                            .build();
                                 })
                         .toList();
 
-        return new MapaCompletoDto(
-                mapa.getCodigo(),
-                null,
-                mapa.getObservacoesDisponibilizacao(),
-                competenciasDtoFinais);
+        return MapaCompletoDto.builder()
+                .codigo(mapa.getCodigo())
+                .subprocessoCodigo(null)
+                .observacoes(mapa.getObservacoesDisponibilizacao())
+                .competencias(competenciasDtoFinais)
+                .build();
     }
 }

@@ -1,6 +1,6 @@
 # Plano de Refatoração de DTOs
 
-**Data:** 2025-12-13  
+**Data:** 2025-12-14
 **Objetivo:** Padronizar e melhorar a consistência dos DTOs, eliminando construtores longos, padronizando a instanciação e identificando onde mappers devem ser adicionados ou simplificados.
 
 ---
@@ -458,8 +458,8 @@ public interface MeuMapper {
 
 ### Fase 1: Correções Críticas (Sprint 1)
 1. ✅ Refatorar `UnidadeService` para usar builders (Concluído)
-2. Refatorar `MapaService` para usar builders
-3. Simplificar `ProcessoDetalheMapperCustom`
+2. ✅ Refatorar `MapaService` para usar builders (Concluído)
+3. ✅ Simplificar `ProcessoDetalheMapperCustom` (Concluído - substituído por `ProcessoDetalheBuilder`)
 
 ### Fase 2: Padronização (Sprint 2)
 4. Criar mappers faltando (MapaCompletoMapper, SgrhMapper)
