@@ -2,12 +2,13 @@
   <BContainer class="mt-4">
     <div class="d-flex align-items-center mb-3">
       <BButton
+          aria-label="Voltar"
           class="p-0 me-3 text-decoration-none"
           data-testid="btn-cad-atividades-voltar"
           variant="link"
           @click="router.back()"
       >
-        <i class="bi bi-arrow-left fs-4"/>
+        <i class="bi bi-arrow-left fs-4" aria-hidden="true"/>
       </BButton>
       <div class="fs-5 d-flex align-items-center gap-2">
         <span>{{ siglaUnidade }} - {{ nomeUnidade }}</span>
@@ -79,6 +80,7 @@
       </BCol>
       <BCol cols="auto">
         <BButton
+            aria-label="Adicionar atividade"
             :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
             data-testid="btn-adicionar-atividade"
             size="sm"
@@ -87,6 +89,7 @@
             variant="outline-primary"
         >
           <i
+              aria-hidden="true"
               class="bi bi-save"
           />
         </BButton>

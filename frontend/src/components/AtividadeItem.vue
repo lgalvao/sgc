@@ -12,6 +12,7 @@
               data-testid="inp-editar-atividade"
           />
           <BButton
+              aria-label="Salvar"
               class="me-1 botao-acao"
               data-testid="btn-salvar-edicao-atividade"
               size="sm"
@@ -19,9 +20,10 @@
               variant="outline-success"
               @click="salvarEdicaoAtividade"
           >
-            <i class="bi bi-save"/>
+            <i class="bi bi-save" aria-hidden="true"/>
           </BButton>
           <BButton
+              aria-label="Cancelar"
               class="botao-acao"
               data-testid="btn-cancelar-edicao-atividade"
               size="sm"
@@ -29,7 +31,7 @@
               variant="outline-secondary"
               @click="cancelarEdicaoAtividade"
           >
-            <i class="bi bi-x"/>
+            <i class="bi bi-x" aria-hidden="true"/>
           </BButton>
         </template>
 
@@ -43,6 +45,7 @@
               class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
           >
             <BButton
+                aria-label="Editar"
                 class="botao-acao"
                 data-testid="btn-editar-atividade"
                 size="sm"
@@ -50,9 +53,10 @@
                 variant="outline-primary"
                 @click="iniciarEdicaoAtividade"
             >
-              <i class="bi bi-pencil"/>
+              <i class="bi bi-pencil" aria-hidden="true"/>
             </BButton>
             <BButton
+                aria-label="Remover"
                 class="botao-acao"
                 data-testid="btn-remover-atividade"
                 size="sm"
@@ -60,7 +64,7 @@
                 variant="outline-danger"
                 @click="$emit('remover-atividade')"
             >
-              <i class="bi bi-trash"/>
+              <i class="bi bi-trash" aria-hidden="true"/>
             </BButton>
           </div>
         </template>
@@ -81,6 +85,7 @@
                 size="sm"
             />
             <BButton
+                aria-label="Salvar"
                 class="me-1 botao-acao"
                 data-testid="btn-salvar-edicao-conhecimento"
                 size="sm"
@@ -88,9 +93,10 @@
                 variant="outline-success"
                 @click="salvarEdicaoConhecimento(conhecimento.id)"
             >
-              <i class="bi bi-save"/>
+              <i class="bi bi-save" aria-hidden="true"/>
             </BButton>
             <BButton
+                aria-label="Cancelar"
                 class="botao-acao"
                 data-testid="btn-cancelar-edicao-conhecimento"
                 size="sm"
@@ -98,7 +104,7 @@
                 variant="outline-secondary"
                 @click="cancelarEdicaoConhecimento"
             >
-              <i class="bi bi-x"/>
+              <i class="bi bi-x" aria-hidden="true"/>
             </BButton>
           </template>
           <template v-else>
@@ -108,6 +114,7 @@
                 class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group"
             >
               <BButton
+                  aria-label="Editar"
                   class="botao-acao"
                   data-testid="btn-editar-conhecimento"
                   size="sm"
@@ -115,9 +122,10 @@
                   variant="outline-primary"
                   @click="iniciarEdicaoConhecimento(conhecimento)"
               >
-                <i class="bi bi-pencil"/>
+                <i class="bi bi-pencil" aria-hidden="true"/>
               </BButton>
               <BButton
+                  aria-label="Remover"
                   class="botao-acao"
                   data-testid="btn-remover-conhecimento"
                   size="sm"
@@ -125,7 +133,7 @@
                   variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.id)"
               >
-                <i class="bi bi-trash"/>
+                <i class="bi bi-trash" aria-hidden="true"/>
               </BButton>
             </div>
           </template>
@@ -148,13 +156,14 @@
           </BCol>
           <BCol cols="auto">
             <BButton
+                aria-label="Adicionar Conhecimento"
                 data-testid="btn-adicionar-conhecimento"
                 size="sm"
                 title="Adicionar Conhecimento"
                 type="submit"
                 variant="outline-secondary"
             >
-              <i class="bi bi-save"/>
+              <i class="bi bi-save" aria-hidden="true"/>
             </BButton>
           </BCol>
         </BForm>
