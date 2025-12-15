@@ -31,8 +31,8 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
     const card = page.locator('.competencia-card', {has: page.getByText(descricaoAtual, {exact: true})});
     const editButton = card.getByTestId('btn-editar-competencia');
 
-    // Hover on the row to trigger CSS hover state
-    await card.locator('.competencia-hover-row').hover();
+    // Hover on the card to trigger CSS hover state (buttons use card-level hover now)
+    await card.hover();
     // Wait for button to become visible (CSS transition)
     await expect(editButton).toBeVisible();
     await editButton.click();

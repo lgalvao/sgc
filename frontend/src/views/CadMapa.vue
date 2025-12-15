@@ -62,42 +62,40 @@
             data-testid="cad-mapa__card-competencia"
             no-body
         >
-          <BCardBody>
-            <div class="d-flex align-items-center competencia-hover-row">
-              <div
-                  class="card-title fs-5 flex-grow-1 d-flex align-items-center competencia-edicao-row position-relative competencia-titulo-card"
+          <BCardBody class="position-relative">
+            <div
+                class="card-title fs-5 d-flex align-items-center competencia-edicao-row competencia-titulo-card"
+            >
+              <strong
+                  class="competencia-descricao"
+                  data-testid="cad-mapa__txt-competencia-descricao"
+              > {{ comp.descricao }}</strong>
+            </div>
+            <div class="botoes-acao-competencia position-absolute">
+              <BButton
+                  v-b-tooltip.hover
+                  class="botao-acao"
+                  data-testid="btn-editar-competencia"
+                  size="sm"
+                  title="Editar"
+                  :aria-label="`Editar competência ${comp.descricao}`"
+                  variant="outline-primary"
+                  @click="iniciarEdicaoCompetencia(comp)"
               >
-                <strong
-                    class="competencia-descricao"
-                    data-testid="cad-mapa__txt-competencia-descricao"
-                > {{ comp.descricao }}</strong>
-              </div>
-              <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
-                <BButton
-                    v-b-tooltip.hover
-                    class="botao-acao"
-                    data-testid="btn-editar-competencia"
-                    size="sm"
-                    title="Editar"
-                    :aria-label="`Editar competência ${comp.descricao}`"
-                    variant="outline-primary"
-                    @click="iniciarEdicaoCompetencia(comp)"
-                >
-                  <i class="bi bi-pencil" aria-hidden="true"/>
-                </BButton>
-                <BButton
-                    v-b-tooltip.hover
-                    class="botao-acao"
-                    data-testid="btn-excluir-competencia"
-                    size="sm"
-                    title="Excluir"
-                    :aria-label="`Excluir competência ${comp.descricao}`"
-                    variant="outline-danger"
-                    @click="excluirCompetencia(comp.codigo)"
-                >
-                  <i class="bi bi-trash" aria-hidden="true"/>
-                </BButton>
-              </div>
+                <i class="bi bi-pencil" aria-hidden="true"/>
+              </BButton>
+              <BButton
+                  v-b-tooltip.hover
+                  class="botao-acao ms-1"
+                  data-testid="btn-excluir-competencia"
+                  size="sm"
+                  title="Excluir"
+                  :aria-label="`Excluir competência ${comp.descricao}`"
+                  variant="outline-danger"
+                  @click="excluirCompetencia(comp.codigo)"
+              >
+                <i class="bi bi-trash" aria-hidden="true"/>
+              </BButton>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
               <BCard
@@ -587,15 +585,17 @@ function fecharModalDisponibilizar() {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
 }
 
-.botoes-acao {
-  opacity: 1; /* sempre visível para evitar flakiness em testes */
-  pointer-events: auto;
+.botoes-acao-competencia {
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.2s;
-  position: relative;
-  z-index: 1;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
 }
 
-.competencia-hover-row:hover .botoes-acao {
+/* Show buttons when card is hovered */
+.competencia-card:hover .botoes-acao-competencia {
   opacity: 1;
   pointer-events: auto;
 }

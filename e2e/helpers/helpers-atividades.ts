@@ -36,9 +36,13 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
 export async function editarAtividade(page: Page, descricaoAtual: string, novaDescricao: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(descricaoAtual)});
     const row = card.locator('.atividade-hover-row');
+    const editButton = card.getByTestId('btn-editar-atividade');
 
+    // Hover on the row to trigger CSS hover state
     await row.hover();
-    await card.getByTestId('btn-editar-atividade').click();
+    // Wait for button to become visible (CSS transition: opacity 0.2s)
+    await expect(editButton).toBeVisible();
+    await editButton.click();
 
     await page.locator(`input[value="${descricaoAtual}"]`).fill(novaDescricao);
     await page.getByTestId('btn-salvar-edicao-atividade').click();

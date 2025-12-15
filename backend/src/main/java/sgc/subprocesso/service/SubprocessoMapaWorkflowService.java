@@ -123,7 +123,9 @@ public class SubprocessoMapaWorkflowService {
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
-                && situacao != SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
+                && situacao != SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+                && situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA  // CDU-16
+                && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {      // CDU-16
             throw new ErroMapaEmSituacaoInvalida(
                     "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s"
                             .formatted(situacao));
