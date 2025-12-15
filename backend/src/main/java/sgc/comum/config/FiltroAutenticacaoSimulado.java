@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import sgc.comum.util.TokenSimuladoUtil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -19,11 +21,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
+    private final UsuarioRepo usuarioRepo;
 
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
@@ -51,10 +55,14 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
                     String titulo = node.get("tituloEleitoral").asString();
                     String perfil = node.has("perfil") ? node.get("perfil").asString() : "USER";
 
-                    // Cria autenticação simples
+                    // Load Usuario entity from database to enable @AuthenticationPrincipal Usuario
+                    Optional<Usuario> usuarioOpt = usuarioRepo.findById(titulo);
+                    Object principal = usuarioOpt.isPresent() ? usuarioOpt.get() : titulo;
+
+                    // Cria autenticação com Usuario entity como principal
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
-                                    titulo,
+                                    principal,
                                     null,
                                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + perfil))
                             );
@@ -70,3 +78,4 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
