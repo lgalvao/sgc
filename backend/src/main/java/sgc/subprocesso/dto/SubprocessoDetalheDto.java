@@ -2,15 +2,9 @@ package sgc.subprocesso.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import sgc.sgrh.model.Usuario;
-import sgc.subprocesso.mapper.MovimentacaoMapper;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07).
@@ -31,95 +25,6 @@ public class SubprocessoDetalheDto {
     private final Integer etapaAtual;
     private final List<MovimentacaoDto> movimentacoes;
     private final SubprocessoPermissoesDto permissoes;
-
-    @Deprecated(forRemoval = true)
-    public static SubprocessoDetalheDto of(
-            Subprocesso sp,
-            Usuario responsavel,
-            Usuario titular,
-            List<Movimentacao> movimentacoes,
-            MovimentacaoMapper movimentacaoMapper,
-            SubprocessoPermissoesDto permissoes) {
-        UnidadeDto unidadeDto = null;
-
-        if (sp.getUnidade() != null) {
-            unidadeDto = UnidadeDto.builder()
-                    .codigo(sp.getUnidade().getCodigo())
-                    .sigla(sp.getUnidade().getSigla())
-                    .nome(sp.getUnidade().getNome())
-                    .build();
-        }
-
-        String tituloTitular = (sp.getUnidade() != null) ? sp.getUnidade().getTituloTitular() : null;
-        ResponsavelDto responsavelDto = null;
-        boolean isTitularResponsavel = false;
-
-        if (responsavel != null) {
-            String tipo = "Substituição"; // Default
-            if (tituloTitular != null && tituloTitular.equals(responsavel.getTituloEleitoral())) {
-                tipo = "Titular";
-                isTitularResponsavel = true;
-            }
-
-            responsavelDto =
-                    ResponsavelDto.builder()
-                            .nome(responsavel.getNome())
-                            .ramal(responsavel.getRamal())
-                            .email(responsavel.getEmail())
-                            .tipoResponsabilidade(tipo)
-                            .build();
-        }
-
-        ResponsavelDto titularDto = null;
-        // Titular só é exibido se não for o responsável
-        if (tituloTitular != null && !isTitularResponsavel && titular != null) {
-            titularDto =
-                    ResponsavelDto.builder()
-                            .codigo(null) // Não temos o código ID Long na View, apenas o Título
-                            .nome(titular.getNome())
-                            .tipoResponsabilidade("Titular")
-                            .ramal(titular.getRamal())
-                            .email(titular.getEmail())
-                            .build();
-        }
-
-        String localizacaoAtual = null;
-        if (movimentacoes != null && !movimentacoes.isEmpty()) {
-            Movimentacao movimentacaoRecente = movimentacoes.getFirst();
-            if (movimentacaoRecente.getUnidadeDestino() != null) {
-                localizacaoAtual = movimentacaoRecente.getUnidadeDestino().getSigla();
-            }
-        }
-
-        var prazoEtapaAtual =
-                sp.getDataLimiteEtapa1() != null
-                        ? sp.getDataLimiteEtapa1()
-                        : sp.getDataLimiteEtapa2();
-
-        List<MovimentacaoDto> movimentacoesDto = new ArrayList<>();
-        if (movimentacoes != null) {
-            movimentacoesDto =
-                    movimentacoes.stream()
-                            .map(movimentacaoMapper::toDTO)
-                            .collect(Collectors.toList());
-        }
-
-        return SubprocessoDetalheDto.builder()
-                .unidade(unidadeDto)
-                .titular(titularDto)
-                .responsavel(responsavelDto)
-                .situacao(sp.getSituacao().name())
-                .situacaoLabel(sp.getSituacao().getDescricao())
-                .localizacaoAtual(localizacaoAtual)
-                .processoDescricao(sp.getProcesso() != null ? sp.getProcesso().getDescricao() : null)
-                .tipoProcesso(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)
-                .prazoEtapaAtual(prazoEtapaAtual)
-                .isEmAndamento(sp.isEmAndamento())
-                .etapaAtual(sp.getEtapaAtual())
-                .movimentacoes(movimentacoesDto)
-                .permissoes(permissoes)
-                .build();
-    }
 
     @Getter
     @Builder

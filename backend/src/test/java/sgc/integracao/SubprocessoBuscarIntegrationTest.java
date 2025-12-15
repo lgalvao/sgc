@@ -31,10 +31,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Testes de integração focados no endpoint /api/subprocessos/buscar. Este endpoint é crítico para a
- * navegação do frontend para a tela de subprocesso.
- */
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Transactional
@@ -45,10 +41,13 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ProcessoRepo processoRepo;
+
     @Autowired
     private UnidadeRepo unidadeRepo;
+
     @Autowired
     private SubprocessoRepo subprocessoRepo;
+
     @Autowired
     private MapaRepo mapaRepo;
 
@@ -94,58 +93,42 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
         processoRepo.save(processoFinalizado);
 
         var mapaFinalizado = mapaRepo.save(new Mapa());
-        subprocessoFinalizado =
-                new Subprocesso(
-                        processoFinalizado,
-                        unidade,
-                        mapaFinalizado,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processoFinalizado.getDataLimite());
+        subprocessoFinalizado = new Subprocesso(processoFinalizado, unidade, mapaFinalizado,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processoFinalizado.getDataLimite());
         subprocessoRepo.save(subprocessoFinalizado);
     }
 
     @Nested
     @DisplayName("Buscar por processo e unidade")
     class BuscarPorProcessoEUnidade {
-
         @Test
         @WithMockAdmin
         @DisplayName("Deve retornar subprocesso para processo em andamento")
         void deveRetornarSubprocesso_QuandoProcessoEmAndamento() throws Exception {
-            mockMvc.perform(
-                            get(API_SUBPROCESSOS_BUSCAR)
-                                    .param(
-                                            "codProcesso",
-                                            processoEmAndamento.getCodigo().toString())
+            mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
+                                    .param("codProcesso", processoEmAndamento.getCodigo().toString())
                                     .param("siglaUnidade", unidade.getSigla()))
                     .andExpect(status().isOk())
-                    .andExpect(
-                            jsonPath(
-                                    "$.codigo", is(subprocessoEmAndamento.getCodigo().intValue())));
+                    .andExpect(jsonPath("$.codigo", is(subprocessoEmAndamento.getCodigo().intValue())));
         }
 
         @Test
         @WithMockAdmin
         @DisplayName("Deve retornar subprocesso para processo FINALIZADO")
         void deveRetornarSubprocesso_QuandoProcessoFinalizado() throws Exception {
-            mockMvc.perform(
-                            get(API_SUBPROCESSOS_BUSCAR)
+            mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
                                     .param("codProcesso", processoFinalizado.getCodigo().toString())
                                     .param("siglaUnidade", unidade.getSigla()))
                     .andExpect(status().isOk())
-                    .andExpect(
-                            jsonPath("$.codigo", is(subprocessoFinalizado.getCodigo().intValue())));
+                    .andExpect(jsonPath("$.codigo", is(subprocessoFinalizado.getCodigo().intValue())));
         }
 
         @Test
         @WithMockAdmin
         @DisplayName("Deve retornar 404 quando sigla de unidade não existe")
         void deveRetornar404_QuandoSiglaUnidadeNaoExiste() throws Exception {
-            mockMvc.perform(
-                            get(API_SUBPROCESSOS_BUSCAR)
-                                    .param(
-                                            "codProcesso",
-                                            processoEmAndamento.getCodigo().toString())
+            mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
+                                    .param("codProcesso", processoEmAndamento.getCodigo().toString())
                                     .param("siglaUnidade", "UNIDADE_INEXISTENTE"))
                     .andExpect(status().isNotFound());
         }
@@ -154,8 +137,7 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve retornar 404 quando processo não existe")
         void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
-            mockMvc.perform(
-                            get(API_SUBPROCESSOS_BUSCAR)
+            mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
                                     .param("codProcesso", "999999")
                                     .param("siglaUnidade", unidade.getSigla()))
                     .andExpect(status().isNotFound());
@@ -168,11 +150,8 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
             // Busca uma unidade que existe mas não participa do processo
             Unidade outraUnidade = unidadeRepo.findById(1L).orElseThrow(); // SEDOC
 
-            mockMvc.perform(
-                            get(API_SUBPROCESSOS_BUSCAR)
-                                    .param(
-                                            "codProcesso",
-                                            processoEmAndamento.getCodigo().toString())
+            mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
+                                    .param("codProcesso", processoEmAndamento.getCodigo().toString())
                                     .param("siglaUnidade", outraUnidade.getSigla()))
                     .andExpect(status().isNotFound());
         }

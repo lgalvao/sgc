@@ -113,34 +113,24 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         // 1. Criar um processo de revisão para ser iniciado
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
-        CriarProcessoReq criarRequestDTO =
-                criarCriarProcessoReq(
-                        "Processo de Revisão para Iniciar",
-                        unidades,
-                        LocalDateTime.now().plusDays(30));
+        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar", unidades,
+                LocalDateTime.now().plusDays(30));
 
-        MvcResult result =
-                mockMvc.perform(
-                                post("/api/processos")
-                                        .with(csrf())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                        .andExpect(status().isCreated())
-                        .andReturn();
+        MvcResult result = mockMvc.perform(post("/api/processos")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        Long processoId =
-                objectMapper
-                        .readTree(result.getResponse().getContentAsString())
-                        .get("codigo")
-                        .asLong();
+        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
         var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
 
         // 2. Iniciar o processo de revisão
-        mockMvc.perform(
-                        post(API_PROCESSOS_ID_INICIAR, processoId)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(iniciarReq)))
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 3. Buscar o subprocesso criado e verificar a cópia do mapa
@@ -154,20 +144,17 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
         // 3.2. Verificar se o conteúdo foi copiado
-        List<Competencia> competenciasCopiadas =
-                competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        List<Competencia> competenciasCopiadas = competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(competenciasCopiadas).hasSize(1);
         assertThat(competenciasCopiadas.getFirst().getDescricao())
                 .isEqualTo(competenciaOriginal.getDescricao());
 
-        List<Atividade> atividadesCopiadas =
-                atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        List<Atividade> atividadesCopiadas = atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(atividadesCopiadas).hasSize(1);
         assertThat(atividadesCopiadas.getFirst().getDescricao())
                 .isEqualTo(atividadeOriginal.getDescricao());
 
-        List<Conhecimento> conhecimentosCopiados =
-                conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.getFirst().getCodigo());
+        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.getFirst().getCodigo());
         assertThat(conhecimentosCopiados).hasSize(1);
         assertThat(conhecimentosCopiados.getFirst().getDescricao())
                 .isEqualTo(conhecimentoOriginal.getDescricao());
@@ -180,15 +167,11 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());
-        CriarProcessoReq criarRequestDTO =
-                criarCriarProcessoReq(
-                        "Processo de Revisão para Unidade Sem Mapa",
-                        unidades,
-                        LocalDateTime.now().plusDays(30));
+        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Unidade Sem Mapa", unidades,
+                LocalDateTime.now().plusDays(30));
 
         // A validação agora ocorre na criação do processo
-        mockMvc.perform(
-                        post("/api/processos")
+        mockMvc.perform(post("/api/processos")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(criarRequestDTO)))
@@ -198,11 +181,10 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
         var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        mockMvc.perform(
-                        post(API_PROCESSOS_ID_INICIAR, 999L)
-                                .with(csrf()) // código que não existe
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(iniciarReq)))
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L)
+                .with(csrf()) // código que não existe
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isNotFound());
     }
 
@@ -211,42 +193,32 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         // 1. Criar e iniciar um processo de revisão
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
-        CriarProcessoReq criarRequestDTO =
-                criarCriarProcessoReq(
-                        "Processo de Revisão para Iniciar Duas Vezes",
-                        unidades,
-                        LocalDateTime.now().plusDays(30));
+        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar Duas Vezes", unidades,
+                LocalDateTime.now().plusDays(30));
 
         MvcResult result =
-                mockMvc.perform(
-                                post("/api/processos")
+                mockMvc.perform(post("/api/processos")
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
                         .andExpect(status().isCreated())
                         .andReturn();
 
-        Long processoId =
-                objectMapper
-                        .readTree(result.getResponse().getContentAsString())
-                        .get("codigo")
-                        .asLong();
+        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
         var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
 
         // Inicia o processo a primeira vez
-        mockMvc.perform(
-                        post(API_PROCESSOS_ID_INICIAR, processoId)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(iniciarReq)))
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(
-                        post(API_PROCESSOS_ID_INICIAR, processoId)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(iniciarReq)))
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isUnprocessableContent());
     }
 }

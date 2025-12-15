@@ -91,20 +91,15 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Tentar Disponibilizar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de pendências ABRE (validação no backend retornou erro)
-        const modalPendencias = page.locator('.modal-content').filter({hasText: 'Pendências para disponibilização'});
-        await expect(modalPendencias).toBeVisible();
-        await expect(modalPendencias.getByText(/Corrija as seguintes pendências/i)).toBeVisible();
-        await expect(modalPendencias.getByText(/Atividade sem conhecimento/i)).toBeVisible();
-        await expect(modalPendencias.getByText(/não possui conhecimentos associados/i)).toBeVisible();
-
-        // Fechar modal de pendências
-        await page.getByTestId('btn-fechar-modal-pendencias').click();
+        // Verificar que erro inline aparece na atividade (não há mais modal de pendências)
+        const erroInline = page.getByTestId('atividade-erro-validacao');
+        await expect(erroInline).toBeVisible();
+        await expect(erroInline).toContainText(/conhecimento/i);
 
         // Adicionar conhecimento para corrigir
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
 
-        // Tentar Disponibilizar novamente - Agora deve abrir o modal
+        // Tentar Disponibilizar novamente - Agora deve abrir o modal de confirmação
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
 

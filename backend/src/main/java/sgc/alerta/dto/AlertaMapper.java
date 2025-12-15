@@ -3,9 +3,7 @@ package sgc.alerta.dto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 import sgc.alerta.model.Alerta;
-import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,11 +13,7 @@ import java.util.regex.Pattern;
 @Mapper(componentModel = "spring")
 public abstract class AlertaMapper {
 
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
+    private static final DateTimeFormatter FORMATTER =         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")

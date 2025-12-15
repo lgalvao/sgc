@@ -34,7 +34,7 @@ O SGC permite:
 
 **Testes:**
 
-- JUnit 5 + Mockito (testes unitários do backend)
+- JUnit + Mockito (testes unitários do backend)
 - Vitest (testes unitários do frontend)
 - Playwright (testes end-to-end)
 

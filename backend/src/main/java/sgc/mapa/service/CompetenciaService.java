@@ -25,25 +25,18 @@ public class CompetenciaService {
         Competencia competencia = new Competencia(descricao, mapa);
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
-        // Explicitly save activities to ensure the relationship is persisted in the join table
-        // This is necessary because Atividade is the owning side of the relationship
         if (competencia.getAtividades() != null) {
             atividadeRepo.saveAll(competencia.getAtividades());
         }
     }
 
-    public void atualizarCompetencia(
-            Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        Competencia competencia =
-                competenciaRepo
-                        .findById(codCompetencia)
-                        .orElseThrow(
-                                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+    public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
+        Competencia competencia = competenciaRepo
+                .findById(codCompetencia)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         competencia.setDescricao(descricao);
 
-        // Remove from existing activities
-        // We need to save the activities we are removing from to update the join table
         Set<Atividade> atividadesAntigas = new HashSet<>(competencia.getAtividades());
         for (Atividade atividade : atividadesAntigas) {
             atividade.getCompetencias().remove(competencia);
@@ -51,22 +44,18 @@ public class CompetenciaService {
         atividadeRepo.saveAll(atividadesAntigas);
 
         competencia.getAtividades().clear();
-
         prepararCompetenciasAtividades(atividadesIds, competencia);
         competenciaRepo.save(competencia);
-        
-        // Explicitly save new activities
+
         if (competencia.getAtividades() != null) {
             atividadeRepo.saveAll(competencia.getAtividades());
         }
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        Competencia competencia =
-                competenciaRepo
-                        .findById(codCompetencia)
-                        .orElseThrow(
-                                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+        Competencia competencia = competenciaRepo
+                .findById(codCompetencia)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         for (Atividade atividade : competencia.getAtividades()) {
             atividade.getCompetencias().remove(competencia);

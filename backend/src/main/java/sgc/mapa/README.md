@@ -6,14 +6,12 @@
 Este é um dos módulos centrais do sistema, responsável por toda a gestão do **Mapa de Competências**. Um "Mapa" é o
 artefato que agrega competências, atividades e conhecimentos de uma unidade organizacional.
 
-O pacote se destaca por sua arquitetura orientada a serviços, onde a lógica de negócio complexa é dividida em
-componentes coesos com responsabilidades únicas.
+O pacote organiza a lógica de negócio em componentes coesos com responsabilidades únicas.
 
-## Arquitetura de Serviços (Padrão Fachada)
+## Arquitetura de Serviços
 
-O módulo utiliza o padrão **Service Facade**. O `MapaService` atua como uma fachada única para todos os clientes, sejam
-eles internos (como `MapaController`) ou externos (como `ProcessoService`). Ele orquestra os serviços especializados
-para executar tanto operações de CRUD quanto lógicas de negócio mais complexas.
+O módulo utiliza um conjunto enxuto de serviços especializados. O `MapaService` atua como fachada para operações de CRUD
+e salvamento de mapas, enquanto serviços auxiliares tratam de funcionalidades específicas.
 
 ```mermaid
 graph TD
@@ -24,14 +22,12 @@ graph TD
     end
 
     subgraph "Módulo Mapa"
-        Facade(MapaService - Fachada Única)
+        Facade(MapaService)
 
         subgraph "Serviços Especializados"
             Copia(CopiaMapaService)
-            Impacto(ImpactoMapaService, etc.)
+            Impacto(ImpactoMapaService)
             Visualizacao(MapaVisualizacaoService)
-            Integridade(MapaIntegridadeService)
-            Vinculo(MapaVinculoService)
             Competencia(CompetenciaService)
         end
 
@@ -40,31 +36,22 @@ graph TD
 
     ProcessoService & SubprocessoService & Controle -- Utilizam --> Facade
 
-    Facade -- Orquestra e delega para --> Copia & Impacto & Visualizacao & Integridade & Vinculo
     Facade -- Executa CRUD e acessa --> Repos
 
-    Copia & Impacto & Visualizacao & Integridade & Vinculo & Competencia -- Acessam --> Repos
+    Copia & Impacto & Visualizacao & Competencia -- Acessam --> Repos
 ```
 
 ## Componentes Principais
 
-### Camada de Fachada
+### Serviços
 
-- **`MapaService`**: O ponto de entrada único para o módulo. Ele gerencia as operações de CRUD e orquestra os outros
-  serviços para executar operações de alto nível.
-
-### Serviços Especializados
-
-- **`CompetenciaService`**: Gerencia o ciclo de vida das competências.
-- **`CopiaMapaService`**: Responsável por clonar um mapa existente (deep copy), incluindo suas competências, atividades
-  e conhecimentos. É utilizado pelo `ProcessoService` ao iniciar ciclos de revisão.
-- **`ImpactoMapaService`**: Orquestra a análise de diferenças entre duas versões de um mapa.
-- **`ImpactoAtividadeService` / `ImpactoCompetenciaService`**: Serviços granulares que analisam os impactos em
-  atividades e competências, respectivamente.
-- **`MapaVisualizacaoService`**: Constrói os DTOs de visualização hierárquica complexos para o frontend.
-- **`MapaIntegridadeService`**: Contém regras de validação para garantir a integridade de um mapa (ex: regras de
-  associação).
-- **`MapaVinculoService`**: Gerencia os vínculos entre as entidades do mapa.
+| Serviço | Responsabilidade |
+|---------|------------------|
+| **`MapaService`** | CRUD de mapas + salvamento completo com vínculos e validação de integridade |
+| **`CompetenciaService`** | Gerencia ciclo de vida das competências |
+| **`CopiaMapaService`** | Deep copy de mapas (usado em revisões) |
+| **`ImpactoMapaService`** | Análise de diferenças entre mapas (CDU-12) |
+| **`MapaVisualizacaoService`** | Constrói DTOs de visualização hierárquica |
 
 ### Outros Componentes
 

@@ -25,19 +25,17 @@ public class CopiaMapaService {
 
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Long codUnidadeDestino) {
-        Mapa fonte =
-                repositorioMapa
-                        .findById(codMapaOrigem)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapaOrigem));
+        Mapa fonte = repositorioMapa
+                .findById(codMapaOrigem)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapaOrigem));
 
-        Mapa novoMapa =
-                new Mapa()
-                        .setDataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
-                        .setObservacoesDisponibilizacao(fonte.getObservacoesDisponibilizacao())
-                        .setDataHoraHomologado(null);
+        Mapa novoMapa = new Mapa()
+                .setDataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(fonte.getObservacoesDisponibilizacao())
+                .setDataHoraHomologado(null);
 
         Mapa mapaSalvo = repositorioMapa.save(novoMapa);
-        
+
         Map<Long, Atividade> mapaDeAtividades = new HashMap<>();
 
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigo(fonte.getCodigo());
@@ -52,15 +50,13 @@ public class CopiaMapaService {
             Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
             mapaDeAtividades.put(atividadeFonte.getCodigo(), atividadeSalva);
 
-            List<Conhecimento> conhecimentosFonte =
-                    conhecimentoRepo.findByAtividadeCodigo(atividadeFonte.getCodigo());
+            List<Conhecimento> conhecimentosFonte = conhecimentoRepo.findByAtividadeCodigo(atividadeFonte.getCodigo());
             if (conhecimentosFonte != null && !conhecimentosFonte.isEmpty()) {
                 List<Conhecimento> novosConhecimentos = new ArrayList<>();
                 for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
-                    Conhecimento novoConhecimento =
-                            new Conhecimento()
-                                    .setAtividade(atividadeSalva)
-                                    .setDescricao(conhecimentoFonte.getDescricao());
+                    Conhecimento novoConhecimento = new Conhecimento()
+                            .setAtividade(atividadeSalva)
+                            .setDescricao(conhecimentoFonte.getDescricao());
 
                     novosConhecimentos.add(novoConhecimento);
                 }
@@ -71,15 +67,13 @@ public class CopiaMapaService {
         List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(fonte.getCodigo());
         if (competenciasFonte != null && !competenciasFonte.isEmpty()) {
             for (Competencia competenciaFonte : competenciasFonte) {
-                Competencia novaCompetencia =
-                        new Competencia()
-                                .setDescricao(competenciaFonte.getDescricao())
-                                .setMapa(mapaSalvo);
+                Competencia novaCompetencia = new Competencia()
+                        .setDescricao(competenciaFonte.getDescricao())
+                        .setMapa(mapaSalvo);
 
                 Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
                 for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
-                    novasAtividadesAssociadas.add(
-                            mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
+                    novasAtividadesAssociadas.add(mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
                 }
                 novaCompetencia.setAtividades(novasAtividadesAssociadas);
 

@@ -2,12 +2,12 @@ package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -40,11 +40,9 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoWorkflowService;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -63,22 +61,18 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @DisplayName("Fluxo de Estados: Processo e Subprocesso")
 @Import(TestSecurityConfig.class)
+@Slf4j
 class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
-
-    private static final Logger log = LoggerFactory.getLogger(FluxoEstadosIntegrationTest.class);
-
     @Autowired private ProcessoService processoService;
     @Autowired private SubprocessoWorkflowService workflowService;
     @Autowired private AtividadeService atividadeService;
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private UnidadeRepo unidadeRepo;
     @Autowired private UsuarioRepo usuarioRepo;
-    @Autowired private SubprocessoMapper subprocessoMapper;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private CompetenciaRepo competenciaRepo;
     @Autowired private AtividadeRepo atividadeRepo;
     @Autowired private MapaRepo mapaRepo;
-    @Autowired private SubprocessoService subprocessoService;
     @PersistenceContext private EntityManager em;
 
     @MockitoBean

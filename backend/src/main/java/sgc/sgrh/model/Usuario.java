@@ -81,12 +81,12 @@ public class Usuario implements UserDetails {
         if (atribuicoesCache != null) {
             todas.addAll(atribuicoesCache);
         }
+
         LocalDateTime now = LocalDateTime.now();
         if (atribuicoesTemporarias != null) {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
                 if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now))
-                        && (temp.getDataTermino() == null
-                                || !temp.getDataTermino().isBefore(now))) {
+                        && (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
                     UsuarioPerfil perfil = new UsuarioPerfil();
                     perfil.setUsuarioTitulo(this.tituloEleitoral);
                     perfil.setUsuario(this);
@@ -129,11 +129,5 @@ public class Usuario implements UserDetails {
     @Override
     public String getUsername() {
         return tituloEleitoral;
-    }
-
-    @Override
-    public String toString() {
-        return "Usuario{titulo='%s', nome='%s', unidade=%s}"
-                .formatted(tituloEleitoral, nome, unidadeLotacao.getSigla());
     }
 }

@@ -43,28 +43,25 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
     void setUp() {
         unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
     }
-
     @Nested
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
         @Test
         @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            String tituloEleitoral = "111111111111";
+            String tituloEleitoral = "111111111111"; // ADMIN
             String senha = "password";
             AutenticacaoReq authRequest =
                     AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
-            mockMvc.perform(
-                            post(BASE_URL + "/autenticar")
+            mockMvc.perform(post(BASE_URL + "/autenticar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").value(true));
 
-            mockMvc.perform(
-                            post(BASE_URL + "/autorizar")
+            mockMvc.perform(post(BASE_URL + "/autorizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(tituloEleitoral))
@@ -73,14 +70,13 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$[0].siglaUnidade").value("ADMIN-UNIT"));
 
             // Act & Assert: Etapa 3 - Entrar
-            EntrarReq entrarReq =
-                    EntrarReq.builder()
+            EntrarReq entrarReq = EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("ADMIN")
                             .unidadeCodigo(unidadeAdmin.getCodigo())
                             .build();
-            mockMvc.perform(
-                            post(BASE_URL + "/entrar")
+
+            mockMvc.perform(post(BASE_URL + "/entrar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(entrarReq)))
@@ -90,29 +86,25 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            String tituloEleitoral = "999999999999";
-            // GESTOR)
+            String tituloEleitoral = "999999999999"; // GESTOR
             String senha = "password";
             AutenticacaoReq authRequest =
                     AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
-            mockMvc.perform(
-                            post(BASE_URL + "/autenticar")
+            mockMvc.perform(post(BASE_URL + "/autenticar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").value(true));
 
-            mockMvc.perform(
-                            post(BASE_URL + "/autorizar")
+            mockMvc.perform(post(BASE_URL + "/autorizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(tituloEleitoral))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(
-                            jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
+                    .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
 
             EntrarReq entrarReq =
                     EntrarReq.builder()
@@ -120,8 +112,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                             .perfil("GESTOR")
                             .unidadeCodigo(unidadeAdmin.getCodigo())
                             .build();
-            mockMvc.perform(
-                            post(BASE_URL + "/entrar")
+            mockMvc.perform(post(BASE_URL + "/entrar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(entrarReq)))
@@ -134,21 +125,14 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
             // Arrange
             String tituloEleitoral = "888888888888"; // Non-existent user
 
-            // O SgrhService não é mais mockado. A lógica agora busca um usuário no banco.
-            // Se o usuário não existe, a exceção será lançada.
             // Act & Assert
-            mockMvc.perform(
-                            post(BASE_URL + "/autorizar")
+            mockMvc.perform(post(BASE_URL + "/autorizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(tituloEleitoral))
                     .andExpect(status().isNotFound())
-                    .andExpect(
-                            jsonPath("$.message")
-                                    .value(
-                                            "&#39;Usuário&#39; com codigo &#39;"
-                                                    + tituloEleitoral
-                                                    + "&#39; não encontrado(a)."));
+                    .andExpect(jsonPath("$.message").value("&#39;Usuário&#39; com codigo &#39;"
+                            + tituloEleitoral + "&#39; não encontrado(a)."));
         }
 
         @Test
@@ -157,25 +141,19 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
             // Arrange
             String tituloEleitoral = "111222333444";
             long codigoUnidadeInexistente = 999L;
-            EntrarReq entrarReq =
-                    EntrarReq.builder()
+            EntrarReq entrarReq = EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("ADMIN")
                             .unidadeCodigo(codigoUnidadeInexistente)
                             .build();
 
             // Act & Assert
-            mockMvc.perform(
-                            post(BASE_URL + "/entrar")
+            mockMvc.perform(post(BASE_URL + "/entrar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().isNotFound())
-                    .andExpect(
-                            jsonPath("$.message")
-                                    .value(
-                                            "Unidade não encontrada, código: "
-                                                    + codigoUnidadeInexistente));
+                    .andExpect(jsonPath("$.message").value("Unidade não encontrada, código: " + codigoUnidadeInexistente));
         }
     }
 }

@@ -203,6 +203,21 @@ VALUES (99, 99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
 VALUES (4, 99);
 
+-- Atividades e conhecimentos para o mapa 99 (ASSESSORIA_12)
+-- Necessário para testes de revisão (CDU-08, CDU-10)
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (9901, 'Atividade Seed 1', 99);
+
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (990101, 'Conhecimento Seed 1.1', 9901);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (9902, 'Atividade Seed 2', 99);
+
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (990201, 'Conhecimento Seed 2.1', 9902);
+
+
 
 -- Atualizar titulares das unidades depois da criação dos usuários (com matrícula e data inicio)
 UPDATE sgc.vw_unidade

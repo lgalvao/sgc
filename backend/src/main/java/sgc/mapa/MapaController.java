@@ -74,8 +74,7 @@ public class MapaController {
      */
     @PostMapping("/{codMapa}/atualizar")
     @Operation(summary = "Atualiza um mapa existente")
-    public ResponseEntity<MapaDto> atualizar(
-            @PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
+    public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         var atualizado = mapaService.atualizar(codMapa, entidade);
         return ResponseEntity.ok(mapaMapper.toDto(atualizado));

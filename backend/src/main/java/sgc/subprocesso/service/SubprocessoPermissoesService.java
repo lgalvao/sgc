@@ -27,30 +27,41 @@ public class SubprocessoPermissoesService {
 
     public void validar(Subprocesso subprocesso, Long unidadeCodigo, String acao) {
         if (!subprocesso.getUnidade().getCodigo().equals(unidadeCodigo)) {
-            // TODO explicar melhor na mensagem o contexto do erro
-            throw new ErroAccessoNegado("Unidade sem acesso a este subprocesso.");
+            throw new ErroAccessoNegado(String.format(
+                    "Unidade '%s' sem acesso a este subprocesso (Unidade do Subprocesso: '%s').",
+                    unidadeCodigo,
+                    subprocesso.getUnidade().getCodigo()));
         }
 
         SituacaoSubprocesso situacaoSubprocesso = subprocesso.getSituacao();
 
         if (ACAO_ENVIAR_REVISAO.equals(acao)) {
             if (REVISAO_CADASTRO_EM_ANDAMENTO != situacaoSubprocesso) {
-                // TODO explicar melhor na mensagem o contexto do erro
-                throw new ErroAccessoNegado("Situação inválida.");
+                throw new ErroAccessoNegado(String.format(
+                        "Ação '%s' inválida. O subprocesso deve estar na situação '%s', mas está em '%s'.",
+                        acao,
+                        REVISAO_CADASTRO_EM_ANDAMENTO,
+                        situacaoSubprocesso));
             }
 
         } else if (ACAO_AJUSTAR_MAPA.equals(acao)) {
             if (REVISAO_CADASTRO_HOMOLOGADA != situacaoSubprocesso
                     && REVISAO_MAPA_AJUSTADO != situacaoSubprocesso) {
-                // TODO explicar melhor na mensagem o contexto do erro
-                throw new ErroAccessoNegado("Situação inválida para ajuste.");
+                throw new ErroAccessoNegado(String.format(
+                        "Ação '%s' inválida. O subprocesso deve estar em '%s' ou '%s', mas está em '%s'.",
+                        ACAO_AJUSTAR_MAPA,
+                        REVISAO_CADASTRO_HOMOLOGADA,
+                        REVISAO_MAPA_AJUSTADO,
+                        situacaoSubprocesso));
             }
 
             if (subprocesso.getMapa() != null
                     && atividadeRepo.countByMapaCodigo(subprocesso.getMapa().getCodigo()) == 0
                     && REVISAO_MAPA_AJUSTADO == situacaoSubprocesso) {
-                // TODO explicar melhor na mensagem o contexto do erro
-                throw new ErroAccessoNegado("Mapa vazio.");
+                throw new ErroAccessoNegado(String.format(
+                        "Não é possível realizar a ação '%s' pois o mapa do subprocesso '%s' está vazio.",
+                        ACAO_AJUSTAR_MAPA,
+                        subprocesso.getCodigo()));
             }
         }
     }

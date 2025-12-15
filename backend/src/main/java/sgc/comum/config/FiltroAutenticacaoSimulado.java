@@ -4,8 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,10 +24,14 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
     private final UsuarioRepo usuarioRepo;
+
+    public FiltroAutenticacaoSimulado(ObjectMapper objectMapper, @Lazy UsuarioRepo usuarioRepo) {
+        this.objectMapper = objectMapper;
+        this.usuarioRepo = usuarioRepo;
+    }
 
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")

@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest extends BaseIntegrationTest {
-
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
@@ -78,13 +77,8 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         Mapa mapa = new Mapa();
         mapaRepo.save(mapa);
 
-        subprocesso =
-                new Subprocesso(
-                        processo,
-                        unidade,
-                        mapa,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
-                        processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, mapa,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
     }
 
@@ -119,12 +113,15 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao())
                     .isEqualTo("Sugestões apresentadas para o mapa de competências");
+
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())
                     .isEqualTo(unidade.getSigla());
+
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla())
                     .isEqualTo(unidadeSuperior.getSigla());
             List<Alerta> alertas =
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+
             assertThat(alertas).hasSize(1);
         }
     }

@@ -1,31 +1,37 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.TipoImpactoAtividade;
+import sgc.mapa.model.TipoImpactoCompetencia;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
- * Interface do serviço responsável por detectar impactos no mapa de competências causados por
- * alterações no cadastro de atividades durante processos de revisão.
+ * Serviço responsável por detectar impactos no mapa de competências causados por alterações no
+ * cadastro de atividades durante processos de revisão.
  *
  * <p>CDU-12 - Verificar impactos no mapa de competências
  */
@@ -43,10 +49,12 @@ public class ImpactoMapaService {
             O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão\
              do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
              Ajustado'.""";
+
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
-    private final ImpactoAtividadeService impactoAtividadeService;
-    private final ImpactoCompetenciaService impactoCompetenciaService;
+    private final AtividadeRepo atividadeRepo;
+    private final ConhecimentoRepo conhecimentoRepo;
+    private final CompetenciaRepo competenciaRepo;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa em revisão de um
@@ -92,26 +100,20 @@ public class ImpactoMapaService {
                         "Mapa não encontrado para subprocesso", codSubprocesso)
                 );
 
-        List<Atividade> atividadesAtuais =
-                impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso);
-        List<Atividade> atividadesVigentes =
-                impactoAtividadeService.obterAtividadesDoMapa(mapaVigente);
+        List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
+        List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
 
         List<AtividadeImpactadaDto> inseridas =
-                impactoAtividadeService.detectarAtividadesInseridas(
-                        atividadesAtuais, atividadesVigentes);
+                detectarAtividadesInseridas(atividadesAtuais, atividadesVigentes);
 
         List<AtividadeImpactadaDto> removidas =
-                impactoAtividadeService.detectarAtividadesRemovidas(
-                        atividadesAtuais, atividadesVigentes, mapaVigente);
+                detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, mapaVigente);
 
         List<AtividadeImpactadaDto> alteradas =
-                impactoAtividadeService.detectarAtividadesAlteradas(
-                        atividadesAtuais, atividadesVigentes, mapaVigente);
+                detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, mapaVigente);
 
         List<CompetenciaImpactadaDto> competenciasImpactadas =
-                impactoCompetenciaService.identificarCompetenciasImpactadas(
-                        mapaVigente, removidas, alteradas);
+                identificarCompetenciasImpactadas(mapaVigente, removidas, alteradas);
 
         ImpactoMapaDto impactos =
                 ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
@@ -125,6 +127,10 @@ public class ImpactoMapaService {
 
         return impactos;
     }
+
+    // ========================================================================================
+    // Métodos de verificação de acesso
+    // ========================================================================================
 
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
         final SituacaoSubprocesso situacao = subprocesso.getSituacao();
@@ -152,5 +158,233 @@ public class ImpactoMapaService {
     private boolean hasRole(Usuario usuario, String role) {
         return usuario.getAuthorities().stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_%s".formatted(role)));
+    }
+
+    // ========================================================================================
+    // Métodos de detecção de impacto em atividades (anteriormente em ImpactoAtividadeService)
+    // ========================================================================================
+
+    private Map<String, Atividade> mapAtividadesByDescricao(List<Atividade> atividades) {
+        return atividades.stream()
+                .collect(Collectors.toMap(Atividade::getDescricao, atividade -> atividade));
+    }
+
+    /**
+     * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
+     *
+     * @param mapa O mapa do qual as atividades serão extraídas.
+     * @return Uma {@link List} de {@link Atividade}s.
+     */
+    private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
+        log.debug("Buscando atividades e conhecimentos para o mapa {}", mapa.getCodigo());
+        return atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
+    }
+
+    private List<AtividadeImpactadaDto> detectarAtividadesInseridas(
+            List<Atividade> atuais, List<Atividade> vigentes) {
+        Set<String> descricoesVigentes =
+                vigentes.stream().map(Atividade::getDescricao).collect(Collectors.toSet());
+        List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
+
+        for (Atividade atual : atuais) {
+            if (!descricoesVigentes.contains(atual.getDescricao())) {
+                inseridas.add(
+                        AtividadeImpactadaDto.builder()
+                                .codigo(atual.getCodigo())
+                                .descricao(atual.getDescricao())
+                                .tipoImpacto(TipoImpactoAtividade.INSERIDA)
+                                .descricaoAnterior(null)
+                                .competenciasVinculadas(List.of())
+                                .build());
+            }
+        }
+        return inseridas;
+    }
+
+    private List<AtividadeImpactadaDto> detectarAtividadesRemovidas(
+            List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
+
+        List<AtividadeImpactadaDto> removidas = new ArrayList<>();
+        Map<String, Atividade> atuaisMap = mapAtividadesByDescricao(atuais);
+
+        for (Atividade vigente : vigentes) {
+            if (!atuaisMap.containsKey(vigente.getDescricao())) {
+                AtividadeImpactadaDto atividadeImpactadaDto =
+                        AtividadeImpactadaDto.builder()
+                                .codigo(vigente.getCodigo())
+                                .descricao(vigente.getDescricao())
+                                .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
+                                .descricaoAnterior(null)
+                                .competenciasVinculadas(
+                                        obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente))
+                                .build();
+
+                removidas.add(atividadeImpactadaDto);
+            }
+        }
+        return removidas;
+    }
+
+    private List<AtividadeImpactadaDto> detectarAtividadesAlteradas(
+            List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
+        List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
+        Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
+
+        for (Atividade atual : atuais) {
+            if (vigentesMap.containsKey(atual.getDescricao())) {
+                Atividade vigente = vigentesMap.get(atual.getDescricao());
+                List<Conhecimento> conhecimentosAtuais =
+                        conhecimentoRepo.findByAtividadeCodigo(atual.getCodigo());
+                List<Conhecimento> conhecimentosVigentes =
+                        conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
+
+                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
+                    alteradas.add(
+                            AtividadeImpactadaDto.builder()
+                                    .codigo(atual.getCodigo())
+                                    .descricao(atual.getDescricao())
+                                    .tipoImpacto(TipoImpactoAtividade.ALTERADA)
+                                    .descricaoAnterior(
+                                            "Descrição ou conhecimentos associados alterados.")
+                                    .competenciasVinculadas(
+                                            obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente))
+                                    .build());
+                }
+            }
+        }
+        return alteradas;
+    }
+
+    private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
+        if (lista1.size() != lista2.size()) return true;
+
+        Set<String> descricoes1 =
+                lista1.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+        Set<String> descricoes2 =
+                lista2.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+
+        return !descricoes1.equals(descricoes2);
+    }
+
+    // ========================================================================================
+    // Métodos de detecção de impacto em competências (anteriormente em ImpactoCompetenciaService)
+    // ========================================================================================
+
+    private List<CompetenciaImpactadaDto> identificarCompetenciasImpactadas(
+            Mapa mapaVigente,
+            List<AtividadeImpactadaDto> removidas,
+            List<AtividadeImpactadaDto> alteradas) {
+
+        Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
+        List<Competencia> competenciasDoMapa =
+                competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
+
+        for (AtividadeImpactadaDto atividadeDto : removidas) {
+            if (atividadeDto.getCodigo() == null) continue;
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
+            if (atividade == null) continue;
+
+            for (Competencia comp : competenciasDoMapa) {
+                if (comp.getAtividades().stream()
+                        .anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
+                    CompetenciaImpactoAcumulador acumulador =
+                            mapaImpactos.computeIfAbsent(
+                                    comp.getCodigo(),
+                                    x ->
+                                            CompetenciaImpactoAcumulador.builder()
+                                                    .codigo(comp.getCodigo())
+                                                    .descricao(comp.getDescricao())
+                                                    .build());
+
+                    acumulador.adicionarImpacto(
+                            "Atividade removida: %s".formatted(atividadeDto.getDescricao()));
+                }
+            }
+        }
+
+        for (AtividadeImpactadaDto atividadeDto : alteradas) {
+            if (atividadeDto.getCodigo() == null) continue;
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
+            if (atividade == null) continue;
+
+            for (Competencia comp : atividade.getCompetencias()) {
+                if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
+                    CompetenciaImpactoAcumulador acumulador =
+                            mapaImpactos.computeIfAbsent(
+                                    comp.getCodigo(),
+                                    x ->
+                                            CompetenciaImpactoAcumulador.builder()
+                                                    .codigo(comp.getCodigo())
+                                                    .descricao(comp.getDescricao())
+                                                    .build());
+
+                    String detalhe =
+                            String.format(
+                                    "Atividade alterada: '%s' → '%s'",
+                                    atividadeDto.getDescricaoAnterior(),
+                                    atividadeDto.getDescricao());
+                    acumulador.adicionarImpacto(detalhe);
+                }
+            }
+        }
+
+        return mapaImpactos.values().stream()
+                .map(
+                        acc ->
+                                new CompetenciaImpactadaDto(
+                                        acc.codigo,
+                                        acc.descricao,
+                                        new ArrayList<>(acc.atividadesAfetadas),
+                                        TipoImpactoCompetencia.valueOf(
+                                                determinarTipoImpacto(acc.atividadesAfetadas))))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private List<String> obterCompetenciasDaAtividade(Long codAtividade, Mapa mapaVigente) {
+        if (codAtividade == null) return Collections.emptyList();
+        Atividade atividade = atividadeRepo.findById(codAtividade).orElse(null);
+        if (atividade == null) return Collections.emptyList();
+
+        return atividade.getCompetencias().stream()
+                .filter(c -> c.getMapa().getCodigo().equals(mapaVigente.getCodigo()))
+                .map(Competencia::getDescricao)
+                .toList();
+    }
+
+    private String determinarTipoImpacto(Set<String> atividadesAfetadas) {
+        boolean temRemovida =
+                atividadesAfetadas.stream().anyMatch(desc -> desc.contains("removida"));
+
+        boolean temAlterada =
+                atividadesAfetadas.stream().anyMatch(desc -> desc.contains("alterada"));
+
+        if (temRemovida && temAlterada) {
+            return "IMPACTO_GENERICO";
+        } else if (temRemovida) {
+            return "ATIVIDADE_REMOVIDA";
+        } else if (temAlterada) {
+            return "ATIVIDADE_ALTERADA";
+        }
+        return "IMPACTO_GENERICO";
+    }
+
+    // ========================================================================================
+    // Classes internas
+    // ========================================================================================
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class CompetenciaImpactoAcumulador {
+        private Long codigo;
+        private String descricao;
+        @Builder.Default
+        private Set<String> atividadesAfetadas = new LinkedHashSet<>();
+
+        /* default */ void adicionarImpacto(String descricaoImpacto) {
+            atividadesAfetadas.add(descricaoImpacto);
+        }
     }
 }

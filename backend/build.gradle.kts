@@ -5,11 +5,11 @@ import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "4.0.0"
-    id("io.spring.dependency-management") version "1.1.7"
     java
     checkstyle
     pmd
+    id("org.springframework.boot") version "4.0.0"
+    id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.7"
     id("com.diffplug.spotless") version "8.1.0"
     id("com.github.ben-manes.versions") version "0.53.0"
@@ -76,16 +76,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.21")
     implementation("ch.qos.logback:logback-core:1.5.21")
 
-    // Quality Check Dependencies (SpotBugs)
     spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 }
 
-// --- Quality Checks Configurations ---
-
-// Spotless
 spotless {
-    // EnforceCheck is disabled by default to avoid breaking CI for existing formatting issues.
-    // Run './gradlew spotlessApply' to fix.
     isEnforceCheck = false
     java {
         googleJavaFormat("1.33.0").aosp().reflowLongStrings()
@@ -134,7 +128,6 @@ tasks.register("qualityCheck") {
 tasks.register("qualityCheckFast") {
     group = "quality"
     description = "Runs only tests"
-
     dependsOn(tasks.test)
 }
 
@@ -159,15 +152,13 @@ tasks.withType<Test> {
 
     testLogging {
         events("skipped", "failed")
-        exceptionFormat = TestExceptionFormat.SHORT
+        exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = true
-        stackTraceFilters = setOf(TestStackTraceFilter.ENTRY_POINT)
+        showStandardStreams = false
     }
 
     jvmArgs = listOf(
-        "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
@@ -195,7 +186,5 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
-
-        compilerArgs.add("-Xlint:deprecation")
     }
 }

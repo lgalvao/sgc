@@ -44,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
 @Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest extends BaseIntegrationTest {
-
     @Autowired
     ProcessoRepo processoRepo;
 
@@ -106,8 +105,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
-        mockMvc.perform(
-                        post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+        mockMvc.perform(                        post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType("application/json")
                                 .content(objectMapper.writeValueAsString(devolverReq)))
@@ -115,11 +113,8 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Verificação do histórico após devolução
         String responseDevolucao =
-                mockMvc.perform(
-                                get(
-                                        "/api/subprocessos/{id}/historico-validacao",
-                                        subprocesso.getCodigo())
-                                        .with(csrf()))
+                mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()

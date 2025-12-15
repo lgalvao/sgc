@@ -32,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Testes de integração focados no endpoint /api/processos/{id}. Este endpoint é chamado pelo
+ * Testes de integração focados no endpoint /api/processos/{id}. Este endpoint é
+ * chamado pelo
  * ProcessoView para mostrar a lista de unidades participantes.
  */
 @SpringBootTest(classes = Sgc.class)
@@ -41,101 +42,94 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Endpoint: /api/processos/{id}")
 @Import(sgc.integracao.mocks.TestSecurityConfig.class)
 class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
-    private static final String API_PROCESSO_DETALHES = "/api/processos/{codProcesso}";
+        private static final String API_PROCESSO_DETALHES = "/api/processos/{codProcesso}";
 
-    @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
+        @Autowired
+        private ProcessoRepo processoRepo;
 
-    private Unidade unidade;
-    private Processo processoEmAndamento;
-    private Processo processoFinalizado;
+        @Autowired
+        private UnidadeRepo unidadeRepo;
 
-    @BeforeEach
-    void setUp() {
-        unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
+        @Autowired
+        private SubprocessoRepo subprocessoRepo;
 
-        // Processo em andamento
-        processoEmAndamento =
-                new Processo(
-                        "Processo em Andamento",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
-        processoEmAndamento.setParticipantes(Set.of(unidade));
-        processoEmAndamento = processoRepo.saveAndFlush(processoEmAndamento);
+        @Autowired
+        private MapaRepo mapaRepo;
 
-        var mapaEmAndamento = mapaRepo.save(new Mapa());
-        var subprocessoEmAndamento =
-                new Subprocesso(
-                        processoEmAndamento,
-                        unidade,
-                        mapaEmAndamento,
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                        processoEmAndamento.getDataLimite());
-        subprocessoRepo.save(subprocessoEmAndamento);
+        private Unidade unidade;
+        private Processo processoEmAndamento;
+        private Processo processoFinalizado;
 
-        // Processo finalizado
-        processoFinalizado =
-                new Processo(
-                        "Processo Finalizado",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.FINALIZADO,
-                        LocalDateTime.now().plusDays(30));
-        processoFinalizado.setParticipantes(Set.of(unidade));
-        processoFinalizado.setDataFinalizacao(LocalDateTime.now());
-        processoFinalizado = processoRepo.saveAndFlush(processoFinalizado);
+        @BeforeEach
+        void setUp() {
+                unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 
-        var mapaFinalizado = mapaRepo.save(new Mapa());
-        var subprocessoFinalizado =
-                new Subprocesso(
-                        processoFinalizado,
-                        unidade,
-                        mapaFinalizado,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processoFinalizado.getDataLimite());
-        subprocessoRepo.save(subprocessoFinalizado);
-    }
+                // Processo em andamento
+                processoEmAndamento = new Processo(
+                                "Processo em Andamento",
+                                TipoProcesso.MAPEAMENTO,
+                                SituacaoProcesso.EM_ANDAMENTO,
+                                LocalDateTime.now().plusDays(30));
+                processoEmAndamento.setParticipantes(Set.of(unidade));
+                processoEmAndamento = processoRepo.saveAndFlush(processoEmAndamento);
 
-    @Nested
-    @DisplayName("Detalhes do processo com unidades participantes")
-    class DetalhesProcesso {
+                var mapaEmAndamento = mapaRepo.save(new Mapa());
+                var subprocessoEmAndamento = new Subprocesso(
+                                processoEmAndamento,
+                                unidade,
+                                mapaEmAndamento,
+                                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                                processoEmAndamento.getDataLimite());
+                subprocessoRepo.save(subprocessoEmAndamento);
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve retornar detalhes com unidades para processo em andamento")
-        void deveRetornarDetalhesComUnidades_QuandoProcessoEmAndamento() throws Exception {
-            var result =
-                    mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
-                            .andExpect(status().isOk())
-                            .andReturn();
+                // Processo finalizado
+                processoFinalizado = new Processo(
+                                "Processo Finalizado",
+                                TipoProcesso.MAPEAMENTO,
+                                SituacaoProcesso.FINALIZADO,
+                                LocalDateTime.now().plusDays(30));
+                processoFinalizado.setParticipantes(Set.of(unidade));
+                processoFinalizado.setDataFinalizacao(LocalDateTime.now());
+                processoFinalizado = processoRepo.saveAndFlush(processoFinalizado);
 
-            mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.codigo", is(processoEmAndamento.getCodigo().intValue())))
-                    .andExpect(jsonPath("$.situacao", is("EM_ANDAMENTO")));
+                var mapaFinalizado = mapaRepo.save(new Mapa());
+                var subprocessoFinalizado = new Subprocesso(
+                                processoFinalizado,
+                                unidade,
+                                mapaFinalizado,
+                                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                                processoFinalizado.getDataLimite());
+                subprocessoRepo.save(subprocessoFinalizado);
         }
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve retornar detalhes com unidades para processo FINALIZADO")
-        void deveRetornarDetalhesComUnidades_QuandoProcessoFinalizado() throws Exception {
-            mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.codigo", is(processoFinalizado.getCodigo().intValue())))
-                    .andExpect(jsonPath("$.situacao", is("FINALIZADO")));
-        }
+        @Nested
+        @DisplayName("Detalhes do processo com unidades participantes")
+        class DetalhesProcesso {
+                @Test
+                @WithMockAdmin
+                @DisplayName("Deve retornar detalhes com unidades para processo em andamento")
+                void deveRetornarDetalhesComUnidades_QuandoProcessoEmAndamento() throws Exception {
+                        mockMvc.perform(get(API_PROCESSO_DETALHES, processoEmAndamento.getCodigo()))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$.codigo", is(processoEmAndamento.getCodigo().intValue())))
+                                        .andExpect(jsonPath("$.situacao", is("EM_ANDAMENTO")));
+                }
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve retornar 404 quando processo não existe")
-        void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
-            mockMvc.perform(get(API_PROCESSO_DETALHES, 999999L)).andExpect(status().isNotFound());
+                @Test
+                @WithMockAdmin
+                @DisplayName("Deve retornar detalhes com unidades para processo FINALIZADO")
+                void deveRetornarDetalhesComUnidades_QuandoProcessoFinalizado() throws Exception {
+                        mockMvc.perform(get(API_PROCESSO_DETALHES, processoFinalizado.getCodigo()))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$.codigo", is(processoFinalizado.getCodigo().intValue())))
+                                        .andExpect(jsonPath("$.situacao", is("FINALIZADO")));
+                }
+
+                @Test
+                @WithMockAdmin
+                @DisplayName("Deve retornar 404 quando processo não existe")
+                void deveRetornar404_QuandoProcessoNaoExiste() throws Exception {
+                        mockMvc.perform(get(API_PROCESSO_DETALHES, 999999L)).andExpect(status().isNotFound());
+                }
         }
-    }
 }

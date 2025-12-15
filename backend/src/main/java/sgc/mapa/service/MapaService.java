@@ -6,6 +6,8 @@ import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -29,11 +31,9 @@ import java.util.stream.Collectors;
 public class MapaService {
     private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
-    private final MapaVinculoService mapaVinculoService;
-    private final MapaIntegridadeService mapaIntegridadeService;
-
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
+    private final AtividadeRepo atividadeRepo;
     private final MapaCompletoMapper mapaCompletoMapper;
 
     @Transactional(readOnly = true)
@@ -142,14 +142,87 @@ public class MapaService {
                 competencia = competenciaRepo.save(competencia);
                 log.debug("Competência atualizada: {}", competencia.getCodigo());
             }
-            mapaVinculoService.atualizarVinculosAtividades(
-                    competencia.getCodigo(), compDto.getAtividadesCodigos());
+            atualizarVinculosAtividades(competencia.getCodigo(), compDto.getAtividadesCodigos());
         }
 
-        mapaIntegridadeService.validarIntegridadeMapa(codMapa);
+        validarIntegridadeMapa(codMapa);
 
         List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
 
         return mapaCompletoMapper.toDto(mapa, null, competenciasFinais);
+    }
+
+    // ========================================================================================
+    // Métodos auxiliares (anteriormente em MapaVinculoService e MapaIntegridadeService)
+    // ========================================================================================
+
+    /**
+     * Sincroniza os vínculos entre uma competência e uma lista de atividades.
+     *
+     * <p>O método compara a lista de IDs de atividades fornecida com os vínculos existentes para a
+     * competência e realiza as seguintes operações:
+     *
+     * <ul>
+     *   <li>Remove vínculos com atividades que não estão na nova lista.
+     *   <li>Cria novos vínculos para atividades que estão na nova lista mas não nos vínculos
+     *       atuais.
+     * </ul>
+     *
+     * @param codCompetencia      O código da competência a ser atualizada.
+     * @param novosCodsAtividades A lista completa de IDs de atividades que devem estar vinculadas à
+     *                            competência.
+     */
+    private void atualizarVinculosAtividades(Long codCompetencia, List<Long> novosCodsAtividades) {
+        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow();
+
+        Set<Atividade> novasAtividades =
+                new HashSet<>(atividadeRepo.findAllById(novosCodsAtividades));
+
+        competencia.setAtividades(novasAtividades);
+        competenciaRepo.save(competencia);
+
+        log.debug(
+                "Atualizados {} vínculos para competência {}",
+                novosCodsAtividades.size(),
+                codCompetencia);
+    }
+
+    /**
+     * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
+     *
+     * <p>Este método loga avisos (warnings) para:
+     *
+     * <ul>
+     *   <li>Atividades que não estão vinculadas a nenhuma competência.
+     *   <li>Competências que não estão vinculadas a nenhuma atividade.
+     * </ul>
+     *
+     * <p>Nota: Esta é uma validação defensiva. Em operação normal, não deve haver atividades ou
+     * competências órfãs se as camadas de negócio estiverem corretamente configuradas. Serve como
+     * proteção contra dados inconsistentes e para diagnosticar problemas.
+     *
+     * @param codMapa O código do mapa a ser validado.
+     */
+    private void validarIntegridadeMapa(Long codMapa) {
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+
+        for (Atividade atividade : atividades) {
+            if (atividade.getCompetencias().isEmpty()) {
+                log.warn(
+                        "Atividade {} não vinculada a nenhuma competência no mapa {}",
+                        atividade.getCodigo(),
+                        codMapa);
+            }
+        }
+
+        for (Competencia competencia : competencias) {
+            if (competencia.getAtividades().isEmpty()) {
+                log.warn(
+                        "Competência {} sem atividades vinculadas no mapa {}",
+                        competencia.getCodigo(),
+                        codMapa);
+            }
+        }
     }
 }

@@ -29,12 +29,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Teste de integração que replica o fluxo completo do sistema: 1. Admin cria processo de mapeamento
- * 2. Admin inicia processo 3. Transições de estado até MAPA_HOMOLOGADO 4. Admin finaliza processo
+ * Teste de integração que replica o fluxo completo do sistema para um processo de mapeamento: 
+ * 1. Admin cria processo de mapeamento
+ * 2. Admin inicia processo
+ * 3. Transições de estado até MAPA_HOMOLOGADO
+ * 4. Admin finaliza processo
  * 5. Tenta buscar subprocesso por processo e sigla da unidade
  *
- * <p>Este teste replica o que o E2E CDU-11 faz para identificar por que "Unidade não encontrada"
- * ocorre após finalização.
  */
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
@@ -59,10 +60,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Buscar a unidade SENIC (código 11 no data.sql do backend)
-        unidadeSENIC =
-                unidadeRepo
-                        .findBySigla("SENIC")
+        unidadeSENIC = unidadeRepo.findBySigla("SENIC")
                         .orElseThrow(() -> new RuntimeException("Unidade SENIC não encontrada"));
     }
 
@@ -126,16 +124,9 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // PASSO 9: Buscar subprocesso via API (como o frontend faz)
         // ============================================================
         // Esta é a chamada que o frontend faz ao navegar para SubprocessoView
-        var result = mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
+        mockMvc.perform(get(API_SUBPROCESSOS_BUSCAR)
                         .param("codProcesso", codProcesso.toString())
                         .param("siglaUnidade", unidadeSENIC.getSigla()))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        mockMvc.perform(
-                        get(API_SUBPROCESSOS_BUSCAR)
-                                .param("codProcesso", codProcesso.toString())
-                                .param("siglaUnidade", unidadeSENIC.getSigla()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo", is(codSubprocesso.intValue())));
     }

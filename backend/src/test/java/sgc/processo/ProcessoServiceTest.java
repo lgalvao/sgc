@@ -21,6 +21,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
@@ -70,6 +71,8 @@ class ProcessoServiceTest {
     private MapaRepo mapaRepo;
     @Mock
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock

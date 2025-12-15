@@ -297,11 +297,6 @@ public class AlertaService {
                                     novoUsuario.setNome(usuarioDto.getNome());
                                     novoUsuario.setEmail(usuarioDto.getEmail());
                                     novoUsuario.setUnidadeLotacao(unidade);
-
-                                    // NOTA: Usuario agora é VIEW somente-leitura
-                                    // Perfis são gerenciados via ADMINISTRADOR ou derivados automaticamente
-                                    // TODO: Revisar lógica de criação de perfis após migração
-
                                     return novoUsuario;
                                 }).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
                     });

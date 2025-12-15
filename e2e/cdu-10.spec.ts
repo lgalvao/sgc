@@ -273,16 +273,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         const atividadeIncompleta = `Atividade Incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
 
-        // Tentar disponibilizar - deve mostrar modal de pendências
+        // Tentar disponibilizar - deve mostrar erro inline (não há mais modal de pendências)
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-        // Verificar que modal de pendências ABRE com o erro
-        await expect(page.getByRole('heading', {name: /Pendências para disponibilização/i})).toBeVisible();
-        await expect(page.locator('body')).toContainText(/Atividade sem conhecimento/i);
-        await expect(page.locator('body')).toContainText(atividadeIncompleta);
-
-        // Fechar o modal de pendências
-        await page.getByTestId('btn-fechar-modal-pendencias').click();
+        // Verificar que erro inline aparece na atividade
+        const erroInline = page.getByTestId('atividade-erro-validacao');
+        await expect(erroInline).toBeVisible();
+        await expect(erroInline).toContainText(/conhecimento/i);
 
         // Corrigir adicionando conhecimento
         await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
