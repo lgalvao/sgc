@@ -185,7 +185,6 @@ public class AlertaService {
 
             AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(chave)
                     .orElseGet(() -> {
-                        // Lazy creation do AlertaUsuario
                         AlertaUsuario novoAlertaUsuario = new AlertaUsuario();
                         novoAlertaUsuario.setId(chave);
                         novoAlertaUsuario.setAlerta(alerta);
