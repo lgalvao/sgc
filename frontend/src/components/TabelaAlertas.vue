@@ -7,13 +7,13 @@
       data-testid="tbl-alertas"
       hover
       responsive
-      striped
-      @row-clicked="emit('selecionar-alerta', $event)"
+      show-empty
+      :striped="alertas.length > 0"
       @sort-changed="handleSortChange"
   >
     <template #empty>
       <div class="text-center text-muted">
-        Nenhum alerta no momento.
+        Nenhum alerta encontrado.
       </div>
     </template>
   </BTable>
@@ -29,7 +29,6 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: "ordenar", criterio: "data" | "processo"): void;
-  (e: "selecionar-alerta", alerta: Alerta): void;
 }>();
 
 const fields = [

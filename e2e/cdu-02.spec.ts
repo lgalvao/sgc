@@ -168,9 +168,10 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             const tabelaAlertas = page.getByTestId('tbl-alertas');
             await expect(tabelaAlertas).toBeVisible();
 
-            // Como não há alertas, a tabela deve estar vazia (apenas header)
+            // Como não há alertas, a tabela deve estar vazia e exibir a mensagem
             const linhasAlertas = await tabelaAlertas.getByRole('row').count();
             expect(linhasAlertas).toBeLessThanOrEqual(2);
+            await expect(tabelaAlertas).toContainText('Nenhum alerta encontrado.');
         });
     });
 });

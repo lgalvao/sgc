@@ -84,19 +84,6 @@ describe("TabelaAlertas.vue", () => {
         expect(fn(null, "row")).toEqual({});
     });
 
-    it("deve emitir 'selecionar-alerta' quando BTable emitir row-clicked", async () => {
-        const wrapper = mount(TabelaAlertas, {
-            props: {alertas: mockAlertas},
-            global: {stubs: {BTable: true}}
-        });
-
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
-        await bTable.vm.$emit("row-clicked", mockAlertas[0]);
-
-        expect(wrapper.emitted("selecionar-alerta")).toBeTruthy();
-        expect(wrapper.emitted("selecionar-alerta")?.[0]).toEqual([mockAlertas[0]]);
-    });
-
     it("deve emitir 'ordenar' quando BTable emitir sort-changed", async () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},

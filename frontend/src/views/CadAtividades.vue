@@ -93,10 +93,15 @@
       </BCol>
     </BForm>
 
-    <div v-for="(atividade, idx) in atividades" :key="atividade.codigo || idx">
+    <div 
+      v-for="(atividade, idx) in atividades" 
+      :key="atividade.codigo || idx"
+      :ref="el => setAtividadeRef(atividade.codigo, el)"
+    >
       <AtividadeItem
           :atividade="atividade"
           :pode-editar="!!permissoes?.podeEditarMapa"
+          :erro-validacao="obterErroParaAtividade(atividade.codigo)"
           @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
           @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
@@ -200,39 +205,12 @@
         </BButton>
       </template>
     </BModal>
-
-    <BModal
-        v-model="mostrarModalErros"
-        centered
-        header-bg-variant="warning"
-        header-text-variant="dark"
-        hide-footer
-        title="Pendências para disponibilização"
-    >
-      <div v-if="errosValidacao.length > 0">
-        <p class="mb-3">Corrija as seguintes pendências antes de disponibilizar:</p>
-        <ul class="list-group">
-          <li v-for="(erro, index) in errosValidacao" :key="index" class="list-group-item list-group-item-warning">
-            <div class="fw-bold">
-              {{ erro.tipo === 'ATIVIDADE_SEM_CONHECIMENTO' ? 'Atividade sem conhecimento' : erro.tipo }}
-            </div>
-            <div v-if="erro.descricaoAtividade" class="small text-muted">{{ erro.descricaoAtividade }}</div>
-            <div>{{ erro.mensagem }}</div>
-          </li>
-        </ul>
-      </div>
-      <template #footer>
-        <BButton data-testid="btn-fechar-modal-pendencias" variant="secondary" @click="mostrarModalErros = false">
-          Fechar
-        </BButton>
-      </template>
-    </BModal>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
 import {BButton, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
-import {computed, onMounted, ref} from "vue";
+import {computed, nextTick, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
@@ -476,8 +454,45 @@ const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 
 const mostrarModalHistorico = ref(false);
-const mostrarModalErros = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
+
+// Mapeamento de erros para atividades
+const mapaErros = computed(() => {
+  const mapa = new Map<number, string>();
+  errosValidacao.value.forEach(erro => {
+    if (erro.atividadeId) {
+      mapa.set(erro.atividadeId, erro.mensagem);
+    }
+  });
+  return mapa;
+});
+
+// Obter erro para uma atividade específica
+function obterErroParaAtividade(atividadeId: number): string | undefined {
+  return mapaErros.value.get(atividadeId);
+}
+
+// Refs para scroll automático
+const atividadeRefs = new Map<number, any>();
+
+function setAtividadeRef(atividadeId: number, el: any) {
+  if (el) {
+    atividadeRefs.set(atividadeId, el);
+  }
+}
+
+// Scroll para primeira atividade com erro
+function scrollParaPrimeiroErro() {
+  if (errosValidacao.value.length > 0 && errosValidacao.value[0].atividadeId) {
+    const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeId);
+    if (primeiraAtividadeComErro) {
+      primeiraAtividadeComErro.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  }
+}
 
 
 onMounted(async () => {
@@ -548,7 +563,9 @@ async function disponibilizarCadastro() {
         mostrarModalConfirmacao.value = true;
       } else {
         errosValidacao.value = resultado.erros;
-        mostrarModalErros.value = true;
+        // Scroll para primeiro erro
+        await nextTick();
+        scrollParaPrimeiroErro();
       }
     } catch {
       feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");

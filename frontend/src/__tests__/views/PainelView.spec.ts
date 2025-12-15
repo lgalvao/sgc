@@ -69,7 +69,7 @@ describe("PainelView.vue", () => {
                 TabelaAlertas: {
                     name: 'TabelaAlertas',
                     props: ['alertas'],
-                    emits: ['ordenar', 'selecionar-alerta'],
+                    emits: ['ordenar'],
                     template: '<div data-testid="tabela-alertas"></div>'
                 }
             },
@@ -148,32 +148,6 @@ describe("PainelView.vue", () => {
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('selecionar-processo', processoMock);
 
         expect(routerPushMock).toHaveBeenCalledWith("/processo/1");
-    });
-
-    it("deve marcar alerta como lido", async () => {
-        const wrapper = mount(PainelView, mountOptions());
-        const alertasStore = useAlertasStore();
-
-        const alertaNaoLido = {codigo: 99, linkDestino: "/alerta/99", dataHoraLeitura: null};
-
-        await wrapper.findComponent({name: 'TabelaAlertas'}).vm.$emit('selecionar-alerta', alertaNaoLido);
-        await flushPromises();
-
-        expect(alertasStore.marcarAlertaComoLido).toHaveBeenCalledWith(99);
-        // Alertas não têm link de navegação implementado no componente
-    });
-
-    it("deve processar alerta já lido sem marcar novamente", async () => {
-        const wrapper = mount(PainelView, mountOptions());
-        const alertasStore = useAlertasStore();
-
-        const alertaLido = {codigo: 99, linkDestino: "/alerta/99", dataHoraLeitura: "2023-01-01"};
-
-        await wrapper.findComponent({name: 'TabelaAlertas'}).vm.$emit('selecionar-alerta', alertaLido);
-        await flushPromises();
-
-        expect(alertasStore.marcarAlertaComoLido).not.toHaveBeenCalled();
-        // Alertas não têm link de navegação implementado no componente
     });
 
     it("deve reordenar alertas", async () => {

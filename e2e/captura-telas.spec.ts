@@ -19,6 +19,9 @@ import * as fs from 'fs';
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
 
 // Criar diretório se não existir
+if (fs.existsSync(SCREENSHOTS_DIR)) {
+    fs.rmSync(SCREENSHOTS_DIR, {recursive: true, force: true});
+}
 if (!fs.existsSync(SCREENSHOTS_DIR)) {
     fs.mkdirSync(SCREENSHOTS_DIR, {recursive: true});
 }
@@ -31,7 +34,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
     await page.screenshot({
         path: caminhoCompleto,
-        fullPage: opcoes?.fullPage ?? false
+        fullPage: opcoes?.fullPage ?? true // Alterado para true por padrão
     });
 }
 
@@ -269,7 +272,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {fullPage: true});
         });
 
-        test('Captura estados de validação de atividades', async ({page}) => {
+        test('Captura estados de validação inline de atividades', async ({page}) => {
             const descricao = `Proc Validação ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_212';
 
@@ -298,18 +301,72 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByText(descricao).click();
             await navegarParaAtividades(page);
 
-            // Adicionar atividade SEM conhecimento
-            const atividadeIncompleta = `Atividade Incompleta ${Date.now()}`;
-            await adicionarAtividade(page, atividadeIncompleta);
+            // Capturar tela inicial vazia com label "Conhecimentos *"
+            await capturarTela(page, '04-subprocesso', '20-cadastro-vazio-com-label-obrigatorio', {fullPage: true});
 
-            // Tentar disponibilizar
+            // Adicionar primeira atividade SEM conhecimento
+            const atividade1 = `Atividade Sem Conhecimento 1 ${Date.now()}`;
+            await adicionarAtividade(page, atividade1);
+            await page.waitForTimeout(300);
+            await capturarTela(page, '04-subprocesso', '21-atividade-sem-conhecimento', {fullPage: true});
+
+            // Adicionar segunda atividade SEM conhecimento
+            const atividade2 = `Atividade Sem Conhecimento 2 ${Date.now()}`;
+            await adicionarAtividade(page, atividade2);
+            await page.waitForTimeout(300);
+
+            // Adicionar terceira atividade COM conhecimento (para contraste)
+            const atividade3 = `Atividade Com Conhecimento ${Date.now()}`;
+            await adicionarAtividade(page, atividade3);
+            await adicionarConhecimento(page, atividade3, 'Java');
+            await page.waitForTimeout(300);
+            await capturarTela(page, '04-subprocesso', '22-mix-atividades-com-sem-conhecimento', {fullPage: true});
+
+            // Tentar disponibilizar - deve mostrar validação inline
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.waitForTimeout(800); // Aguardar scroll automático
+
+            // Capturar primeira atividade com erro inline (scroll automático já levou até ela)
+            await capturarTela(page, '04-subprocesso', '23-validacao-inline-primeira-atividade', {fullPage: true});
+
+            // Scroll para segunda atividade com erro
+            const card2 = page.locator('.atividade-card', {has: page.getByText(atividade2)});
+            await card2.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '04-subprocesso', '24-validacao-inline-segunda-atividade');
+
+            // Capturar zoom na mensagem de erro inline
+            const primeiroCard = page.locator('.atividade-card', {has: page.getByText(atividade1)});
+            await primeiroCard.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            
+            // Capturar apenas o card com erro para detalhe
+            await primeiroCard.screenshot({
+                path: path.join(SCREENSHOTS_DIR, '04-subprocesso--25-detalhe-card-com-erro.png')
+            });
+
+            // Corrigir primeira atividade adicionando conhecimento
+            await adicionarConhecimento(page, atividade1, 'Python');
+            await page.waitForTimeout(500);
+            await capturarTela(page, '04-subprocesso', '26-erro-desaparece-apos-correcao', {fullPage: true});
+
+            // Tentar disponibilizar novamente - ainda deve ter erro na atividade 2
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.waitForTimeout(1000);
+            await capturarTela(page, '04-subprocesso', '27-validacao-apenas-atividade-restante');
+
+            // Corrigir segunda atividade
+            await adicionarConhecimento(page, atividade2, 'JavaScript');
+            await page.waitForTimeout(500);
+
+            // Tentar disponibilizar - agora deve funcionar
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.waitForTimeout(500);
             
-            // Modal de pendências
-            const modalPendencias = page.locator('.modal-content').filter({hasText: 'Pendências para disponibilização'});
-            if (await modalPendencias.isVisible()) {
-                await capturarTela(page, '04-subprocesso', '20-validacao-atividade-sem-conhecimento');
+            // Modal de confirmação deve aparecer
+            const modalConfirmacao = page.locator('.modal-content').filter({hasText: 'Disponibilização do cadastro'});
+            if (await modalConfirmacao.isVisible()) {
+                await capturarTela(page, '04-subprocesso', '28-modal-confirmacao-disponibilizacao');
             }
         });
     });

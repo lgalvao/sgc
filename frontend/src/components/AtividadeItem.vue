@@ -1,5 +1,9 @@
 <template>
-  <BCard class="mb-3 atividade-card" no-body>
+  <BCard 
+    class="mb-3 atividade-card" 
+    :class="{'atividade-com-erro': !!erroValidacao}"
+    no-body
+  >
     <BCardBody class="py-2 position-relative">
       <div
           class="card-title d-flex align-items-center atividade-edicao-row atividade-titulo-card"
@@ -43,7 +47,7 @@
       </div>
       <div
           v-if="podeEditar && !emEdicao"
-          class="botoes-acao-atividade position-absolute"
+          class="botoes-acao-atividade position-absolute d-flex"
       >
         <BButton
             class="botao-acao"
@@ -67,7 +71,24 @@
         </BButton>
       </div>
 
+      <!-- Mensagem de erro inline -->
+      <div 
+        v-if="erroValidacao" 
+        class="alert alert-danger d-flex align-items-center mt-2 mb-0 py-2"
+        role="alert"
+        data-testid="atividade-erro-validacao"
+      >
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span>{{ erroValidacao }}</span>
+      </div>
+
       <div class="mt-3 ms-3">
+        <!-- Label com asterisco para conhecimentos obrigatórios -->
+        <div class="mb-2 text-muted small">
+          <strong>Conhecimentos <span class="text-danger">*</span></strong>
+          <span class="ms-1">(adicione pelo menos um)</span>
+        </div>
+
         <div
             v-for="conhecimento in atividade.conhecimentos"
             :key="conhecimento.id"
@@ -172,6 +193,7 @@ import type {Atividade, Conhecimento} from "@/types/tipos";
 interface Props {
   atividade: Atividade;
   podeEditar: boolean;
+  erroValidacao?: string;
 }
 
 const props = defineProps<Props>();
@@ -252,6 +274,15 @@ function adicionarConhecimento() {
 
 .atividade-card:hover {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
+}
+
+.atividade-com-erro {
+  border: 2px solid var(--bs-danger) !important;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-danger-rgb), 0.25) !important;
+}
+
+.atividade-com-erro .atividade-titulo-card {
+  background-color: var(--bs-danger-bg-subtle);
 }
 
 .botoes-acao-atividade {
