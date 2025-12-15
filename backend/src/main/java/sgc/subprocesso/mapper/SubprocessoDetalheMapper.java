@@ -53,13 +53,7 @@ public interface SubprocessoDetalheMapper {
     }
 
     default SubprocessoDetalheDto.ResponsavelDto mapTitular(Subprocesso sp, Usuario titular, Usuario responsavel) {
-        String tituloTitular = (sp.getUnidade() != null) ? sp.getUnidade().getTituloTitular() : null;
-        boolean isTitularResponsavel = false;
-        if (responsavel != null && tituloTitular != null && tituloTitular.equals(responsavel.getTituloEleitoral())) {
-            isTitularResponsavel = true;
-        }
-
-        if (tituloTitular != null && !isTitularResponsavel && titular != null) {
+        if (titular != null) {
             return SubprocessoDetalheDto.ResponsavelDto.builder()
                     .codigo(null)
                     .nome(titular.getNome())

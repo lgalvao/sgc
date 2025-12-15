@@ -159,6 +159,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
+        // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
+        await verificarPaginaPainel(page);
         await expect(page.getByRole('heading', {name: /Mapa validado/i})).toBeVisible();
     });
 
@@ -173,6 +175,12 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
+        // Aguardar redirecionamento para o Painel
+        await verificarPaginaPainel(page);
+
+        // Navegar de volta para verificar situação atualizada
+        await page.getByText(descProcessoMapeamento).click();
+        await page.getByRole('row', {name: 'Seção 221'}).click();
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
 
         // Finalizar processo

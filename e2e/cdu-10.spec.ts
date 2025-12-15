@@ -169,7 +169,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa validado/i);
+        // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
+        await verificarPaginaPainel(page);
     });
 
     test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page}) => {
@@ -187,16 +188,17 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
-
-        // Finalizar processo
-        await page.goto('/painel');
+        // Validação: confirmar redirecionamento para Painel (CDU-20 passo 10.6)
+        await verificarPaginaPainel(page);
+        
+        // Finalizar o processo de mapeamento para liberar a unidade para novos processos
         await page.getByText(descProcessoMapeamento).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
-
+        
         await verificarPaginaPainel(page);
     });
+
 
     test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page}) => {
         await page.goto('/login');

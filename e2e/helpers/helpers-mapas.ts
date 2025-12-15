@@ -67,7 +67,7 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
 
 export async function excluirCompetencia(page: Page, descricao: string, confirmar: boolean = true) {
     const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
-    await card.locator('.competencia-hover-row').hover();
+    await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
 
     const modal = page.getByTestId('mdl-excluir-competencia');

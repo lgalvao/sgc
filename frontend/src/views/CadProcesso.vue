@@ -11,6 +11,9 @@
     >
       <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
       <p class="mb-0">{{ alertState.body }}</p>
+      <ul v-if="alertState.errors && alertState.errors.length > 0" class="mb-0 mt-2">
+        <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
+      </ul>
     </BAlert>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
@@ -22,10 +25,14 @@
         <BFormInput
             id="descricao"
             v-model="descricao"
+            :state="fieldErrors.descricao ? false : null"
             data-testid="inp-processo-descricao"
             placeholder="Descreva o processo"
             type="text"
         />
+        <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
+          {{ fieldErrors.descricao }}
+        </BFormInvalidFeedback>
       </BFormGroup>
 
       <BFormGroup
@@ -37,15 +44,19 @@
             id="tipo"
             v-model="tipo"
             :options="Object.values(TipoProcessoEnum)"
+            :state="fieldErrors.tipo ? false : null"
             data-testid="sel-processo-tipo"
         />
+        <BFormInvalidFeedback :state="fieldErrors.tipo ? false : null">
+          {{ fieldErrors.tipo }}
+        </BFormInvalidFeedback>
       </BFormGroup>
 
       <BFormGroup
           class="mb-3"
           label="Unidades participantes"
       >
-        <div class="border rounded p-3">
+        <div class="border rounded p-3" :class="{ 'border-danger': fieldErrors.unidades }">
           <ArvoreUnidades
               v-if="!unidadesStore.isLoading"
               v-model="unidadesSelecionadas"
@@ -59,6 +70,9 @@
             Carregando unidades...
           </div>
         </div>
+        <div v-if="fieldErrors.unidades" class="text-danger small mt-1">
+          {{ fieldErrors.unidades }}
+        </div>
       </BFormGroup>
 
       <BFormGroup
@@ -69,9 +83,13 @@
         <BFormInput
             id="dataLimite"
             v-model="dataLimite"
+            :state="fieldErrors.dataLimite ? false : null"
             data-testid="inp-processo-data-limite"
             type="date"
         />
+        <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
+          {{ fieldErrors.dataLimite }}
+        </BFormInvalidFeedback>
       </BFormGroup>
 
       <BButton
@@ -174,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormSelect, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BModal} from "bootstrap-vue-next";
 import {nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
@@ -197,6 +215,18 @@ const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
 const feedbackStore = useFeedbackStore();
 
+const fieldErrors = ref({
+  descricao: '',
+  tipo: '',
+  dataLimite: '',
+  unidades: ''
+});
+
+watch(descricao, () => fieldErrors.value.descricao = '');
+watch(tipo, () => fieldErrors.value.tipo = '');
+watch(dataLimite, () => fieldErrors.value.dataLimite = '');
+watch(unidadesSelecionadas, () => fieldErrors.value.unidades = '');
+
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
@@ -206,21 +236,24 @@ interface AlertState {
   variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
   title: string;
   body: string;
+  errors?: string[];
 }
 
 const alertState = ref<AlertState>({
   show: false,
   variant: 'info',
   title: '',
-  body: ''
+  body: '',
+  errors: []
 });
 
-function mostrarAlerta(variant: AlertState['variant'], title: string, body: string) {
+function mostrarAlerta(variant: AlertState['variant'], title: string, body: string, errors: string[] = []) {
   alertState.value = {
     show: true,
     variant,
     title,
-    body
+    body,
+    errors
   };
   window.scrollTo(0, 0);
 }
@@ -272,9 +305,50 @@ function limparCampos() {
   tipo.value = "MAPEAMENTO";
   dataLimite.value = "";
   unidadesSelecionadas.value = [];
+  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+}
+
+function handleApiErrors(error: any, title: string, defaultMsg: string) {
+  // Limpa erros anteriores e esconde alerta
+  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  alertState.value.show = false;
+
+  let msg = defaultMsg;
+  let genericErrors: string[] = []; 
+  let hasMappedFieldErrors = false;
+
+  const lastError = processosStore.lastError;
+
+  if (lastError) {
+    msg = lastError.message; 
+    if (lastError.subErrors && lastError.subErrors.length > 0) {
+      lastError.subErrors.forEach(e => {
+        const message = e.message || 'Inválido';
+        if (e.field === 'descricao') { fieldErrors.value.descricao = message; hasMappedFieldErrors = true; }
+        else if (e.field === 'tipo') { fieldErrors.value.tipo = message; hasMappedFieldErrors = true; }
+        else if (e.field === 'dataLimiteEtapa1') { fieldErrors.value.dataLimite = message; hasMappedFieldErrors = true; }
+        else if (e.field === 'unidades') { fieldErrors.value.unidades = message; hasMappedFieldErrors = true; }
+        else genericErrors.push(message); 
+      });
+    }
+  } else {
+    // Se não houver lastError (erro de runtime/network não capturado pelo store), mostra msg padrão
+    mostrarAlerta('danger', title, defaultMsg, []);
+    console.error(title + ":", error);
+    return;
+  }
+  
+  // Exibe alerta global APENAS se houver erros genéricos OU se não houve nenhum erro de campo mapeado (erro global puro)
+  if (genericErrors.length > 0 || !hasMappedFieldErrors) {
+    mostrarAlerta('danger', title, msg, genericErrors); 
+  }
+  console.error(title + ":", error);
 }
 
 async function salvarProcesso() {
+  // Limpa erros antes de tentar salvar
+  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  
   // Validações agora são feitas no backend via Bean Validation
   try {
     if (processoEditando.value) {
@@ -302,16 +376,7 @@ async function salvarProcesso() {
     }
     limparCampos();
   } catch (error) {
-    let msg = "Não foi possível salvar o processo. Verifique os dados e tente novamente.";
-    const lastError = processosStore.lastError;
-    if (lastError) {
-      msg = lastError.message;
-      if (lastError.subErrors && lastError.subErrors.length > 0) {
-        msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
-      }
-    }
-    mostrarAlerta('danger', "Erro ao salvar processo", msg);
-    console.error("Erro ao salvar processo:", error);
+    handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
   }
 }
 
@@ -326,6 +391,9 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
+  
+  // Limpa erros
+  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
 
   let codigoProcesso = processoEditando.value?.codigo;
 
@@ -342,16 +410,7 @@ async function confirmarIniciarProcesso() {
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
-      let msg = "Não foi possível criar o processo para iniciá-lo.";
-      const lastError = processosStore.lastError;
-      if (lastError) {
-        msg = lastError.message;
-        if (lastError.subErrors && lastError.subErrors.length > 0) {
-          msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
-        }
-      }
-      mostrarAlerta('danger', "Erro ao criar processo", msg);
-      console.error("Erro ao criar processo:", error);
+      handleApiErrors(error, "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
       return;
     }
   }
@@ -365,16 +424,7 @@ async function confirmarIniciarProcesso() {
     await router.push("/painel");
     feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
   } catch (error) {
-    let msg = "Não foi possível iniciar o processo. Tente novamente.";
-    const lastError = processosStore.lastError;
-    if (lastError) {
-      msg = lastError.message;
-      if (lastError.subErrors && lastError.subErrors.length > 0) {
-        msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
-      }
-    }
-    mostrarAlerta('danger', "Erro ao iniciar processo", msg);
-    console.error("Erro ao iniciar processo:", error);
+    handleApiErrors(error, "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
   }
 }
 
@@ -396,16 +446,7 @@ async function confirmarRemocao() {
         limparCampos();
       }
     } catch (error) {
-      let msg = "Não foi possível remover o processo. Tente novamente.";
-      const lastError = processosStore.lastError;
-      if (lastError) {
-        msg = lastError.message;
-        if (lastError.subErrors && lastError.subErrors.length > 0) {
-          msg += ' ' + lastError.subErrors.map(e => e.message).join(' ');
-        }
-      }
-      mostrarAlerta('danger', "Erro ao remover processo", msg);
-      console.error("Erro ao remover processo:", error);
+      handleApiErrors(error, "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
     }
   }
   fecharModalRemocao();

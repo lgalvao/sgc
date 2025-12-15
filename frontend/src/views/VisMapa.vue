@@ -503,10 +503,7 @@ async function confirmarSugestoes() {
         "success"
     );
 
-    await router.push({
-      name: "Subprocesso",
-      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
-    });
+    await router.push({name: "Painel"});
   } catch {
     feedbackStore.show(
         "Erro ao apresentar sugestões",

@@ -213,9 +213,15 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
-        // Validação: confirmar Mapa foi validado
-        // Nota: Redireciona para SubprocessoView que usa o test-id com prefixo
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa validado/i);
+        // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
+        await verificarPaginaPainel(page);
+        
+        // Verificar que o processo ainda está visível no painel
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcesso,
+            tipo: 'Mapeamento',
+            situacao: 'Em andamento'
+        });
     }
 
     async function passo5_AdminHomologaEFinalizaProcesso(page: Page, descricaoProcesso: string): Promise<void> {
@@ -238,8 +244,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-        // Validação: Mapa foi homologado
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
+        // Validação: confirmar redirecionamento para Painel (CDU-20 passo 10.6)
+        await verificarPaginaPainel(page);
 
         // Voltar ao painel e finalizar processo
         await page.goto('/painel');

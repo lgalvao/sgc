@@ -462,6 +462,7 @@ public class ProcessoService {
                 });
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
+        log.debug("Mapa vigente da unidade {}: codigo={}", unidade.getSigla(), codMapaVigente);
         
         // 1. Criar subprocesso SEM mapa primeiro
         Subprocesso subprocesso = Subprocesso.builder()
@@ -472,19 +473,38 @@ public class ProcessoService {
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+        log.debug("Subprocesso criado: codigo={}", subprocessoSalvo.getCodigo());
         
         // 2. Copiar mapa COM referência ao subprocesso
+        log.debug("Iniciando copia do mapa vigente {} para unidade {}", codMapaVigente, unidade.getSigla());
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
+        
+        if (mapaCopiado == null) {
+            log.error("ERRO CRITICO: Copia do mapa retornou null para unidade {}", unidade.getSigla());
+            throw new ErroProcesso("Falha ao copiar mapa para unidade " + unidade.getSigla());
+        }
+        
+        log.debug("Mapa copiado: codigo={}", mapaCopiado.getCodigo());
         mapaCopiado.setSubprocesso(subprocessoSalvo);  // Associar ao subprocesso
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
+        log.debug("Mapa salvo com associacao ao subprocesso: codigo={}", mapaSalvo.getCodigo());
         
         // 3. Atualizar subprocesso com o mapa
         subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
+        Subprocesso subprocessoAtualizado = subprocessoRepo.save(subprocessoSalvo);
+        
+        // 4. Validar que o mapa foi associado corretamente
+        if (subprocessoAtualizado.getMapa() == null) {
+            log.error("ERRO CRITICO: Subprocesso {} foi salvo mas mapa nao foi associado!", subprocessoAtualizado.getCodigo());
+            throw new ErroProcesso("Falha ao associar mapa ao subprocesso da unidade " + unidade.getSigla());
+        }
+        
+        log.debug("Validacao OK: Subprocesso {} possui mapa {}", subprocessoAtualizado.getCodigo(), subprocessoAtualizado.getMapa().getCodigo());
 
-        // 4. Criar movimentação
+        // 5. Criar movimentação
         movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
-        log.info("Subprocesso {} para revisão criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
+        log.info("Subprocesso {} para revisão criado para unidade {} com mapa {}", 
+                subprocessoSalvo.getCodigo(), unidade.getSigla(), mapaSalvo.getCodigo());
     }
 
     private void criarSubprocessoParaDiagnostico(Processo processo, Unidade unidade) {

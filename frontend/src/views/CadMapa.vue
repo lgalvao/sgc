@@ -149,18 +149,9 @@
         size="lg"
         @hidden="fecharModalCriarNovaCompetencia"
     >
-      <BAlert
-          v-if="mapasStore.lastError"
-          :model-value="true"
-          variant="danger"
-          dismissible
-          @dismissed="mapasStore.clearError()"
-      >
-        {{ mapasStore.lastError.message }}
-        <div v-if="mapasStore.lastError.details">
-          <small>Detalhes: {{ mapasStore.lastError.details }}</small>
-        </div>
-      </BAlert>
+      <div v-if="fieldErrors.generic" class="alert alert-danger mb-4">
+        {{ fieldErrors.generic }}
+      </div>
 
       <!-- Conteúdo do card movido para cá -->
       <div class="mb-4">
@@ -168,16 +159,23 @@
         <div class="mb-2">
           <BFormTextarea
               v-model="novaCompetencia.descricao"
+              :state="fieldErrors.descricao ? false : null"
               data-testid="inp-criar-competencia-descricao"
               placeholder="Descreva a competência"
               rows="3"
           />
+          <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
+            {{ fieldErrors.descricao }}
+          </BFormInvalidFeedback>
         </div>
       </div>
 
       <div class="mb-4">
         <h5>Atividades</h5>
-        <div class="d-flex flex-wrap gap-2">
+        <div 
+          class="d-flex flex-wrap gap-2 p-2 border rounded"
+          :class="{ 'border-danger': fieldErrors.atividades }"
+        >
           <BCard
               v-for="atividade in atividades"
               :key="atividade.codigo"
@@ -204,6 +202,9 @@
               </BFormCheckbox>
             </BCardBody>
           </BCard>
+        </div>
+        <div v-if="fieldErrors.atividades" class="text-danger small mt-1">
+          {{ fieldErrors.atividades }}
         </div>
       </div>
       <template #footer>
@@ -235,6 +236,9 @@
         title="Disponibilização do mapa de competências"
         @hidden="fecharModalDisponibilizar"
     >
+      <div v-if="fieldErrors.generic" class="alert alert-danger mb-3">
+        {{ fieldErrors.generic }}
+      </div>
       <div class="mb-3">
         <label
             class="form-label"
@@ -243,9 +247,13 @@
         <BFormInput
             id="dataLimite"
             v-model="dataLimiteValidacao"
+            :state="fieldErrors.dataLimite ? false : null"
             data-testid="inp-disponibilizar-mapa-data"
             type="date"
         />
+        <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
+          {{ fieldErrors.dataLimite }}
+        </BFormInvalidFeedback>
       </div>
       <div class="mb-3">
         <label
@@ -255,10 +263,14 @@
         <BFormTextarea
             id="observacoes"
             v-model="observacoesDisponibilizacao"
+            :state="fieldErrors.observacoes ? false : null"
             data-testid="inp-disponibilizar-mapa-obs"
             placeholder="Digite observações sobre a disponibilização..."
             rows="3"
         />
+        <BFormInvalidFeedback :state="fieldErrors.observacoes ? false : null">
+          {{ fieldErrors.observacoes }}
+        </BFormInvalidFeedback>
       </div>
       <BAlert
           v-if="notificacaoDisponibilizacao"
@@ -323,11 +335,12 @@ import {
   BContainer,
   BFormCheckbox,
   BFormInput,
+  BFormInvalidFeedback,
   BFormTextarea,
   BModal,
 } from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
@@ -411,12 +424,66 @@ const dataLimiteValidacao = ref("");
 const observacoesDisponibilizacao = ref("");
 const notificacaoDisponibilizacao = ref("");
 
+const fieldErrors = ref({
+  descricao: '',
+  atividades: '',
+  dataLimite: '',
+  observacoes: '',
+  generic: ''
+});
+
+// Limpar erros ao editar
+watch(() => novaCompetencia.value.descricao, () => fieldErrors.value.descricao = '');
+watch(atividadesSelecionadas, () => fieldErrors.value.atividades = '');
+watch(dataLimiteValidacao, () => fieldErrors.value.dataLimite = '');
+watch(observacoesDisponibilizacao, () => fieldErrors.value.observacoes = '');
+
+function handleApiErrors(error: any, defaultMsg: string) {
+  // Limpa erros anteriores
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+
+  let msg = defaultMsg;
+  let genericErrors: string[] = [];
+  
+  const lastError = mapasStore.lastError;
+
+  if (lastError) {
+    msg = lastError.message;
+    if (lastError.subErrors && lastError.subErrors.length > 0) {
+      lastError.subErrors.forEach(e => {
+        const message = e.message || 'Inválido';
+        if (e.field === 'descricao') fieldErrors.value.descricao = message;
+        else if (e.field === 'atividadesAssociadas' || e.field === 'atividades') fieldErrors.value.atividades = message;
+        else if (e.field === 'dataLimite') fieldErrors.value.dataLimite = message;
+        else if (e.field === 'observacoes') fieldErrors.value.observacoes = message;
+        else genericErrors.push(message);
+      });
+    }
+  } else {
+    // Erro inesperado
+    console.error(defaultMsg, error);
+    fieldErrors.value.generic = defaultMsg;
+    return;
+  }
+  
+  if (genericErrors.length > 0) {
+    fieldErrors.value.generic = genericErrors.join('; ');
+  } else if (!fieldErrors.value.descricao && !fieldErrors.value.atividades && !fieldErrors.value.dataLimite && !fieldErrors.value.observacoes) {
+    // Se houve erro mas nada mapeado e nada no genericErrors, usa a mensagem principal
+    fieldErrors.value.generic = msg;
+  }
+}
+
 function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
 }
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  mapasStore.clearError(); 
+  
   if (competenciaParaEditar) {
     novaCompetencia.value.descricao = competenciaParaEditar.descricao;
     atividadesSelecionadas.value = [
@@ -437,6 +504,7 @@ function abrirModalCriarLimpo() {
 
 function fecharModalCriarNovaCompetencia() {
   mostrarModalCriarNovaCompetencia.value = false;
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
 }
 
 function iniciarEdicaoCompetencia(competencia: Competencia) {
@@ -506,8 +574,7 @@ async function adicionarCompetenciaEFecharModal() {
     competenciaSendoEditada.value = null;
     fecharModalCriarNovaCompetencia();
   } catch (error) {
-    // Erro: Manter modal aberto para exibir o erro
-    console.error("Erro ao salvar competência:", error);
+    handleApiErrors(error, "Erro ao salvar competência");
   }
 }
 
@@ -556,6 +623,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
 
 async function disponibilizarMapa() {
   if (!codSubprocesso.value) return;
+  mapasStore.clearError();
 
   try {
     await mapasStore.disponibilizarMapa(codSubprocesso.value, {
@@ -564,8 +632,8 @@ async function disponibilizarMapa() {
     });
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
-  } catch {
-    // O erro já é tratado e notificado pelo store
+  } catch (error) {
+    handleApiErrors(error, "Erro ao disponibilizar mapa");
   }
 }
 
@@ -573,6 +641,7 @@ function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
   observacoesDisponibilizacao.value = "";
   notificacaoDisponibilizacao.value = "";
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '' };
 }
 </script>
 

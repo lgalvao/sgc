@@ -1,16 +1,13 @@
 <template>
-  <BModal
-      :fade="false"
-      :model-value="mostrar"
-      :title="processoDescricao ? 'Finalização de processo' : 'Finalização'"
-      centered
-      header-bg-variant="success"
-      header-text-variant="white"
-      hide-footer
-      size="lg"
-      @hide="emit('fechar')"
-  >
-    <BAlert
+      <BModal
+        :fade="false"
+        :model-value="mostrar"
+        :title="processoDescricao ? 'Finalização de processo' : 'Finalização'"
+        centered
+        hide-footer
+        size="lg"
+        @hide="emit('fechar')"
+      >    <BAlert
         :fade="false"
         :model-value="true"
         variant="info"

@@ -39,9 +39,11 @@ public class PainelService {
     /**
      * Lista processos com base no perfil e na unidade do usuário.
      *
-     * <p>- Se o perfil for 'ADMIN', todos os processos são retornados. - Para outros perfis, os
-     * processos são filtrados pela unidade do usuário e suas subordinadas. Processos no estado
-     * 'CRIADO' são omitidos.
+     * <p>Regras de visibilidade:
+     * - ADMIN: vê todos os processos
+     * - GESTOR: vê processos da unidade e de todas as subordinadas (recursivamente)
+     * - CHEFE e SERVIDOR: veem processos APENAS da própria unidade
+     * - Processos no estado 'CRIADO' são omitidos para perfis não-ADMIN
      *
      * @param perfil        O perfil do usuário (obrigatório).
      * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
@@ -66,7 +68,14 @@ public class PainelService {
         } else {
             if (codigoUnidade == null) return Page.empty(sortedPageable);
 
-            List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
+            List<Long> unidadeIds = new ArrayList<>();
+            
+            // GESTOR vê processos da unidade e subordinadas
+            if (perfil == Perfil.GESTOR) {
+                unidadeIds.addAll(obterIdsUnidadesSubordinadas(codigoUnidade));
+            }
+            
+            // Todos os perfis veem processos da própria unidade
             unidadeIds.add(codigoUnidade);
 
             processos = processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(

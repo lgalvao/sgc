@@ -123,6 +123,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
 
 
+
         // Passo 6: CHEFE valida mapa
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
@@ -131,6 +132,12 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        
+        // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
+        await verificarPaginaPainel(page);
+        
+        // Navegar novamente ao subprocesso para verificar situação
+        await page.getByText(descMapeamento).click();
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa validado/i);
 
         // Passo 7: ADMIN homologa mapa
@@ -142,7 +149,9 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
+        
+        // Validação: confirmar redirecionamento para Painel (CDU-20 passo 10.6)
+        await verificarPaginaPainel(page);
 
         // Passo 8: ADMIN finaliza o processo
         await page.goto('/painel');

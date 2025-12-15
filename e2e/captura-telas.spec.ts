@@ -403,7 +403,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Hover na competência
             const card = page.locator('.competencia-card', {has: page.getByText(competenciaDesc)});
-            await card.locator('.competencia-hover-row').hover();
+            await card.hover();
             await page.waitForTimeout(300);
             await capturarTela(page, '05-mapa', '06-mapa-competencia-hover');
 
