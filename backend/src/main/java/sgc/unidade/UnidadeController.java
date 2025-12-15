@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.service.UnidadeService;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class UnidadeController {
      */
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
-            @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaRequest request) {
+            @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaReq request) {
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

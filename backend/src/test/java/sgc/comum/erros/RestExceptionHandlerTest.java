@@ -20,17 +20,24 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar ErroEntidadeNaoEncontrada com status 404")
     void handleErroDominioNaoEncontrado() {
         ErroEntidadeNaoEncontrada ex = new ErroEntidadeNaoEncontrada("Teste");
-        // ErroEntidadeNaoEncontrada estende ErroNegocioBase, então é tratado pelo handleErroNegocio
         ResponseEntity<Object> response = handler.handleErroNegocio(ex);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
-    @DisplayName("Deve tratar ErroAccessoNegado com status 403")
-    void handleErroDominioAccessoNegado() {
+    @DisplayName("Deve tratar ErroAccessoNegado com status 403 via handleErroNegocio")
+    void handleErroAccessoNegado() {
         ErroAccessoNegado ex = new ErroAccessoNegado("Teste");
-        ResponseEntity<Object> response = handler.handleErroDominioAccessoNegado(ex);
+        ResponseEntity<Object> response = handler.handleErroNegocio(ex);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Deve tratar ErroRequisicaoSemCorpo com status 400 via handleErroNegocio")
+    void handleErroRequisicaoSemCorpo() {
+        ErroRequisicaoSemCorpo ex = new ErroRequisicaoSemCorpo("Teste");
+        ResponseEntity<Object> response = handler.handleErroNegocio(ex);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test

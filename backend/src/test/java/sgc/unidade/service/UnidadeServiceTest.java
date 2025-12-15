@@ -17,7 +17,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.model.*;
 
 import java.time.LocalDate;
@@ -90,8 +90,8 @@ class UnidadeServiceTest {
     void criarAtribuicaoTemporaria() {
         Long unidadeId = 1L;
         String usuarioId = "123456789012";
-        CriarAtribuicaoTemporariaRequest req =
-                new CriarAtribuicaoTemporariaRequest(
+        CriarAtribuicaoTemporariaReq req =
+                new CriarAtribuicaoTemporariaReq(
                         usuarioId, LocalDate.now().plusDays(5), "Justificativa");
 
         Unidade unidade = new Unidade();

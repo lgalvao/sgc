@@ -12,7 +12,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
@@ -108,7 +108,7 @@ public class UnidadeService {
     }
 
     public void criarAtribuicaoTemporaria(
-            Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+            Long codUnidade, CriarAtribuicaoTemporariaReq request) {
         Unidade unidade =
                 unidadeRepo
                         .findById(codUnidade)

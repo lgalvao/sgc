@@ -44,24 +44,7 @@ public class AlertaService {
     private final UsuarioRepo usuarioRepo;
     private final AlertaMapper alertaMapper;
 
-    /**
-     * Cria um alerta genérico para uma unidade específica e o associa aos seus responsáveis
-     * (titular e substituto).
-     *
-     * <p>Este método busca a unidade de destino no repositório local e, em seguida, busca os
-     * responsáveis (titular e substituto) da unidade no serviço SGRH. Para cada responsável
-     * encontrado, cria um {@link AlertaUsuario} associando-o ao alerta.
-     *
-     * @param processo          O processo ao qual o alerta está associado.
-     * @param tipoAlerta        O tipo de alerta a ser criado (e.g., PROCESSO_INICIADO_OPERACIONAL).
-     * @param codUnidadeDestino O código da unidade para a qual o alerta é destinado.
-     * @param descricao         O texto descritivo do alerta.
-     * @param dataLimite        A data limite para a ação relacionada ao alerta (pode ser nulo).
-     * @return A entidade {@link Alerta} que foi criada e persistida.
-     * @throws ErroEntidadeNaoEncontrada se a unidade de destino não for encontrada.
-     */
     @Transactional
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public Alerta criarAlerta(
             Processo processo,
             TipoAlerta tipoAlerta,
@@ -105,31 +88,9 @@ public class AlertaService {
         return alertaSalvo;
     }
 
-    /**
-     * Cria alertas específicos para o início de um processo, com mensagens customizadas baseadas no
-     * tipo de cada unidade participante.
-     *
-     * <p>Para cada unidade, o método determina seu tipo (OPERACIONAL, INTERMEDIARIA,
-     * INTEROPERACIONAL) consultando o serviço SGRH e gera alertas com descrições adequadas à sua
-     * função no processo.
-     *
-     * <p>OPERACIONAL: Recebe um alerta para iniciar o preenchimento do mapa.
-     *
-     * <p>INTERMEDIARIA: Recebe um alerta para aguardar o envio dos mapas das unidades subordinadas.
-     *
-     * <p>INTEROPERACIONAL: Recebe ambos os tipos de alertas.
-     *
-     * @param processo        O processo que foi iniciado.
-     * @param codigosUnidades A lista de códigos das unidades participantes.
-     * @param subprocessos    A lista de subprocessos correspondentes, usada para obter a data limite
-     *                        de cada unidade.
-     * @return Uma lista contendo todos os alertas que foram criados.
-     */
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(
             Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
-
-        log.debug("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long codUnidade : codigosUnidades) {
@@ -157,9 +118,8 @@ public class AlertaService {
                 // Criar alertas baseados no tipo de unidade
                 switch (tipoUnidade) {
                     case OPERACIONAL -> {
-                        String desc =
-                                "Início do processo '%s'. Preencha as atividades e conhecimentos até %s."
-                                        .formatted(nomeProcesso, fmtData(dataLimite));
+                        String desc = "Início do processo '%s'. Preencha as atividades e conhecimentos até %s."
+                                .formatted(nomeProcesso, fmtData(dataLimite));
                         Alerta alerta = criarAlerta(
                                 processo,
                                 PROCESSO_INICIADO_OPERACIONAL,
@@ -168,6 +128,7 @@ public class AlertaService {
                                 dataLimite);
                         alertasCriados.add(alerta);
                     }
+
                     case INTERMEDIARIA -> {
                         String desc = """
                                 Início do processo '%s' em unidade(s) subordinada(s).%n
@@ -192,6 +153,7 @@ public class AlertaService {
                                 codUnidade,
                                 desc,
                                 dataLimite);
+
                         alertasCriados.add(alertaOperacional);
 
                         String descIntermediaria = """
@@ -212,33 +174,14 @@ public class AlertaService {
                     }
                 }
             } catch (RuntimeException e) {
-                log.error(
-                        "Erro ao criar alerta para a unidade {}: {}",
-                        codUnidade,
-                        e.getClass().getSimpleName(),
-                        e);
+                log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
                 throw new ErroAlerta(
-                        "Falha ao criar alerta para a unidade %d: %s"
-                                .formatted(codUnidade, e.getMessage()),
-                        e);
+                        "Falha ao criar alerta para a unidade %d: %s".formatted(codUnidade, e.getMessage()), e);
             }
         }
-
-        log.debug("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
         return alertasCriados;
     }
 
-    /**
-     * Cria um alerta para notificar que o cadastro de um mapa foi disponibilizado por uma unidade.
-     *
-     * <p>O alerta é destinado à unidade de destino (geralmente a SEDOC), informando qual unidade de
-     * origem concluiu o cadastro e que a análise já pode ser realizada.
-     *
-     * @param processo          O processo ao qual o cadastro pertence.
-     * @param codUnidadeOrigem  O código da unidade que disponibilizou o cadastro.
-     * @param codUnidadeDestino O código da unidade que deve analisar o cadastro (destino).
-     * @throws ErroEntidadeNaoEncontrada se a unidade de origem não for encontrada.
-     */
     @Transactional
     public void criarAlertaCadastroDisponibilizado(
             Processo processo, Long codUnidadeOrigem, Long codUnidadeDestino) {
@@ -309,13 +252,9 @@ public class AlertaService {
             alertaUsuario.setDataHoraLeitura(null);
 
             alertaUsuarioRepo.save(alertaUsuario);
-            log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), titulo);
         } catch (RuntimeException e) {
             log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}",
-                    alerta.getCodigo(),
-                    titulo,
-                    e.getClass().getSimpleName(),
-                    e);
+                    alerta.getCodigo(), titulo, e.getClass().getSimpleName(), e);
         }
     }
 
@@ -326,21 +265,6 @@ public class AlertaService {
                 : "Data não definida";
     }
 
-    /**
-     * Marca um alerta específico como lido para um determinado usuário.
-     *
-     * <p>Este método localiza a associação {@link AlertaUsuario} pela sua chave composta (código do
-     * alerta e título de eleitor do usuário) e, caso o alerta ainda não tenha sido lido, define a
-     * data e hora da leitura como o momento atual.
-     *
-     * <p>Corresponde à ação do CDU-02: Visualizar alertas.
-     *
-     * @param usuarioTitulo O título de eleitor do usuário (em formato String).
-     * @param alertaId      O código do alerta a ser marcado como lido.
-     * @throws ErroEntidadeNaoEncontrada se a associação entre o alerta e o usuário não for
-     *                                   encontrada.
-     * @throws NumberFormatException     se o {@code usuarioTituloStr} não for um número válido.
-     */
     @Transactional
     public void marcarComoLido(String usuarioTitulo, Long alertaId) {
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
@@ -355,16 +279,9 @@ public class AlertaService {
         }
     }
 
-    /**
-     * Lista todos os alertas para um usuário específico.
-     *
-     * @param usuarioTitulo O título de eleitor do usuário.
-     * @return Uma lista de {@link AlertaDto}.
-     */
     @Transactional(readOnly = true)
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
-        List<AlertaUsuario> alertasUsuario =
-                alertaUsuarioRepo.findById_UsuarioTitulo(usuarioTitulo);
+        List<AlertaUsuario> alertasUsuario = alertaUsuarioRepo.findById_UsuarioTitulo(usuarioTitulo);
 
         return alertasUsuario.stream().map(alertaUsuario -> {
             Alerta alerta = alertaUsuario.getAlerta();

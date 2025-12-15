@@ -16,25 +16,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import sgc.alerta.erros.ErroAlerta;
-import sgc.painel.erros.ErroParametroPainelInvalido;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.erros.ErroUnidadesNaoDefinidas;
-import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Handler centralizado para tratamento de exceções REST.
+ *
+ * <p>Todas as exceções de negócio devem estender {@link ErroNegocioBase} para serem
+ * tratadas automaticamente pelo método {@link #handleErroNegocio(ErroNegocioBase)}.
+ */
 @Slf4j
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
-    private static final String LOG_LEVEL_ERROR = "error";
-    private static final String LOG_LEVEL_WARN = "warn";
 
     private String sanitizar(String texto) {
         return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
@@ -44,22 +39,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(erroApi, HttpStatus.valueOf(erroApi.getStatus()));
     }
 
-    private ResponseEntity<Object> handleBusinessException(Exception ex, HttpStatus status, String logLevel) {
-        String traceId = UUID.randomUUID().toString();
-        if (LOG_LEVEL_ERROR.equals(logLevel)) {
-            log.error("[{}] {}: {}", traceId, ex.getClass().getSimpleName(), ex.getMessage(), ex);
-        } else {
-            log.warn("[{}] {}: {}", traceId, ex.getClass().getSimpleName(), ex.getMessage());
-        }
-        return buildResponseEntity(new ErroApi(status, sanitizar(ex.getMessage()), null, traceId));
-    }
-
-    // Nota: O Spring @ExceptionHandler requer que a classe seja uma Exception (Throwable).
-    // Como ErroNegocio é uma interface, não podemos usá-la diretamente no annotation
-    // se ela não estender Throwable, ou se as implementações concretas não forem capturadas.
-    // No entanto, como ErroNegocioBase estende RuntimeException, podemos capturar ErroNegocioBase.
-    // Ou, se quisermos capturar pela interface, precisamos garantir que o Spring suporte isso (geralmente não suporta interface em @ExceptionHandler).
-    // A melhor abordagem é capturar Exception e verificar se é instanceof ErroNegocio, OU capturar ErroNegocioBase.
+    /**
+     * Trata todas as exceções de negócio que estendem {@link ErroNegocioBase}.
+     * O status HTTP e código de erro são definidos na própria exceção.
+     */
     @ExceptionHandler(ErroNegocioBase.class)
     protected ResponseEntity<Object> handleErroNegocio(ErroNegocioBase ex) {
         String traceId = UUID.randomUUID().toString();
@@ -148,18 +131,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(erroApi);
     }
 
-    @ExceptionHandler(ErroUnidadeNaoEncontrada.class)
-    protected ResponseEntity<Object> handleErroUnidadeNaoEncontrada(ErroUnidadeNaoEncontrada ex) {
-        return handleBusinessException(
-                ex, HttpStatus.NOT_FOUND, LOG_LEVEL_WARN);
-    }
-
-    @ExceptionHandler(ErroAccessoNegado.class)
-    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroAccessoNegado ex) {
-        return handleBusinessException(
-                ex, HttpStatus.FORBIDDEN, LOG_LEVEL_WARN);
-    }
-
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Acesso negado via Spring Security: {}", ex.getMessage());
@@ -181,43 +152,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém um argumento inválido ou malformado.";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId));
-    }
-
-    @ExceptionHandler(ErroProcesso.class)
-    protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
-        return handleBusinessException(ex, HttpStatus.CONFLICT, LOG_LEVEL_ERROR);
-    }
-
-    @ExceptionHandler(ErroRequisicaoSemCorpo.class)
-    protected ResponseEntity<Object> handleErroRequisicaoSemCorpo(ErroRequisicaoSemCorpo ex) {
-        return handleBusinessException(
-                ex, HttpStatus.BAD_REQUEST, LOG_LEVEL_WARN);
-    }
-
-    @ExceptionHandler(ErroParametroPainelInvalido.class)
-    protected ResponseEntity<Object> handleErroParametroPainelInvalido(
-            ErroParametroPainelInvalido ex) {
-        return handleBusinessException(
-                ex, HttpStatus.BAD_REQUEST, LOG_LEVEL_WARN);
-    }
-
-    @ExceptionHandler({
-            ErroProcessoEmSituacaoInvalida.class,
-            ErroUnidadesNaoDefinidas.class,
-            ErroMapaEmSituacaoInvalida.class,
-            ErroAtividadesEmSituacaoInvalida.class,
-            ErroMapaNaoAssociado.class
-    })
-    protected ResponseEntity<Object> handleUnprocessableEntityExceptions(Exception ex) {
-        return handleBusinessException(
-                ex,
-                HttpStatus.UNPROCESSABLE_CONTENT,
-                LOG_LEVEL_WARN);
-    }
-
-    @ExceptionHandler(ErroAlerta.class)
-    protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(ErroAlerta ex) {
-        return handleBusinessException(ex, HttpStatus.CONFLICT, LOG_LEVEL_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

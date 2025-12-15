@@ -12,7 +12,10 @@ public abstract class ErroNegocioBase extends RuntimeException implements ErroNe
     private final Map<String, ?> details;
 
     protected ErroNegocioBase(String message, String code, HttpStatus status) {
-        this(message, code, status, null);
+        super(message);
+        this.code = code;
+        this.status = status;
+        this.details = null;
     }
 
     protected ErroNegocioBase(String message, String code, HttpStatus status, Map<String, ?> details) {
@@ -20,5 +23,12 @@ public abstract class ErroNegocioBase extends RuntimeException implements ErroNe
         this.code = code;
         this.status = status;
         this.details = details;
+    }
+
+    protected ErroNegocioBase(String message, String code, HttpStatus status, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+        this.status = status;
+        this.details = null;
     }
 }

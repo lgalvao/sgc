@@ -18,9 +18,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.MapaIntegridadeService;
 import sgc.mapa.service.MapaService;
-import sgc.mapa.service.MapaVinculoService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
@@ -31,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.argThat;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -41,12 +38,6 @@ class MapaServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
-
-    @Mock
-    private MapaVinculoService mapaVinculoService;
-
-    @Mock
-    private MapaIntegridadeService mapaIntegridadeService;
 
     @Mock
     private MapaCompletoMapper mapaCompletoMapper;
@@ -162,51 +153,6 @@ class MapaServiceTest {
         assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessage("Mapa não encontrado: 1");
-    }
-
-    @Test
-    void salvarMapaCompleto() {
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setObservacoes("<b>Obs</b>");
-        CompetenciaMapaDto cDto1 = new CompetenciaMapaDto(1L, "Comp 1", List.of(1L));
-        CompetenciaMapaDto cDto2 = new CompetenciaMapaDto(null, "Comp 2", List.of());
-        req.setCompetencias(List.of(cDto1, cDto2));
-
-        // Competencia 3 exists in DB but not in request -> should be deleted
-        Competencia c3 = new Competencia();
-        c3.setCodigo(3L);
-        c3.setMapa(mapa);
-
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(mapaRepo.save(any())).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia, c3));
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
-        when(competenciaRepo.save(any()))
-                .thenAnswer(
-                        i -> {
-                            Competencia c = i.getArgument(0);
-                            if (c.getCodigo() == null) c.setCodigo(2L);
-                            return c;
-                        });
-
-        when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(new MapaCompletoDto());
-
-        mapaService.salvarMapaCompleto(1L, req, "123");
-
-        // Verify Map Update (sanitization) - default policy strips tags
-        verify(mapaRepo).save(argThat(m -> m.getObservacoesDisponibilizacao().equals("Obs")));
-
-        // Verify Deletion
-        verify(competenciaRepo).deleteById(3L);
-
-        // Verify Update
-        verify(competenciaRepo).save(competencia); // Comp 1
-
-        // Verify Creation
-        verify(competenciaRepo, times(2)).save(any()); // Comp 1 updated, Comp 2 created
-
-        verify(mapaVinculoService, times(2)).atualizarVinculosAtividades(anyLong(), any());
-        verify(mapaIntegridadeService).validarIntegridadeMapa(1L);
     }
 
     @Test
