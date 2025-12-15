@@ -63,13 +63,15 @@
             no-body
         >
           <BCardBody>
-            <div
-                class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
-            >
-              <strong
-                  class="competencia-descricao"
-                  data-testid="cad-mapa__txt-competencia-descricao"
-              > {{ comp.descricao }}</strong>
+            <div class="d-flex align-items-center competencia-hover-row">
+              <div
+                  class="card-title fs-5 flex-grow-1 d-flex align-items-center competencia-edicao-row position-relative competencia-titulo-card"
+              >
+                <strong
+                    class="competencia-descricao"
+                    data-testid="cad-mapa__txt-competencia-descricao"
+                > {{ comp.descricao }}</strong>
+              </div>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <BButton
                     v-b-tooltip.hover
@@ -589,6 +591,8 @@ function fecharModalDisponibilizar() {
   opacity: 1; /* sempre visível para evitar flakiness em testes */
   pointer-events: auto;
   transition: opacity 0.2s;
+  position: relative;
+  z-index: 1;
 }
 
 .competencia-hover-row:hover .botoes-acao {
@@ -608,6 +612,8 @@ function fecharModalDisponibilizar() {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   margin-left: 0;
   margin-right: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .botao-acao:focus,

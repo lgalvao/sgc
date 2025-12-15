@@ -9,46 +9,48 @@ Testes de mutação avaliam a qualidade da suíte de testes introduzindo pequeno
 ## 2. Análise Backend (Java / Spring Boot)
 
 ### Ferramenta Recomendada: Pitest
+
 O **Pitest** é o padrão da indústria para Java. Ele opera em nível de bytecode, tornando-o rápido e capaz de se integrar bem com JUnit 5.
 
-### Estado Atual e Desafios
-- **Compatibilidade:** O plugin Gradle do Pitest (`info.solidsoft.pitest`) na versão 1.15.0 (e anteriores) apresenta incompatibilidade com o **Gradle 9**, utilizado neste projeto. O erro `Could not get unknown property 'baseDir'` impede a execução via plugin padrão.
-- **Preview Features:** O projeto foi configurado sem features de preview do Java 21, o que simplifica a execução do Pitest quando a compatibilidade do plugin for resolvida.
-
-### Solução Proposta para Integração
-Devido à incompatibilidade do plugin com Gradle 9, recomenda-se aguardar uma atualização do plugin ou utilizar uma execução via CLI/Maven em um pipeline separado se urgência for necessária. Para o ambiente de desenvolvimento atual, a adoção imediata no backend está **bloqueada** até a correção do plugin ou downgrade do Gradle (não recomendado).
-
 ### Alvos de Alto Valor (Backend)
+
 Quando viável, a aplicação deve focar nos pacotes que contêm lógica de estado e regras de negócio críticas:
-1.  `sgc.processo.service`: Orquestração de workflows.
-2.  `sgc.subprocesso.service`: Máquina de estados das unidades (transições complexas).
-3.  `sgc.alerta.service`: Regras de disparo de notificações.
+
+1. `sgc.processo.service`: Orquestração de workflows.
+2. `sgc.subprocesso.service`: Máquina de estados das unidades (transições complexas).
+3. `sgc.alerta.service`: Regras de disparo de notificações.
 
 ## 3. Análise Frontend (Vue.js / TypeScript)
 
 ### Ferramenta Recomendada: StrykerJS
+
 O **StrykerJS** é a ferramenta líder para JavaScript/TypeScript, com suporte robusto para Vitest e Vue SFCs (Single File Components).
 
 ### Prova de Conceito (Executada com Sucesso)
+
 Realizamos uma execução piloto no arquivo `src/stores/usuarios.ts`.
+
 - **Resultado:** Score de mutação de **61.11%**.
 - **Mutantes Sobreviventes:** 6 mutantes não foram detectados (ex: alterações em booleanos de loading e tratamento de erro).
 - **Performance:** Execução em ~3 minutos para um único arquivo (com overhead de setup).
 
 ### Benefícios Identificados
+
 - Detecção de lógica de UI não testada (ex: flags de `isLoading` que nunca são verificadas nos testes).
 - Validação de tratamento de erros (blocos `catch` vazios ou ignorados).
 
-## 4. Estratégia de Adoção
+### Estratégia de Adoção
 
 Recomendamos uma abordagem gradual ("Shift Left") focada primeiro no Frontend, onde a ferramenta já é compatível.
 
 ### Fase 1: Piloto Frontend (Imediato)
+
 - **Instalação:** Adicionar `@stryker-mutator/core` e `@stryker-mutator/vitest-runner` como `devDependencies`.
 - **Configuração:** Utilizar `stryker.config.json` focado apenas nas *Stores* (Pinia) e *Services*, que contêm a maior parte da lógica de negócio do frontend.
 - **Execução:** Rodar localmente ou em CI apenas para arquivos modificados (incremental).
 
 ### Fase 2: Monitoramento Backend (Futuro)
+
 - Monitorar a issue [#378](https://github.com/szpak/gradle-pitest-plugin/issues/378) do plugin Pitest.
 - Assim que resolvido, aplicar configuração para os pacotes críticos listados na seção 2.
 
@@ -56,13 +58,15 @@ Recomendamos uma abordagem gradual ("Shift Left") focada primeiro no Frontend, o
 
 ### Frontend (Vue/Stryker)
 
-1.  **Instalar Dependências:**
+1. **Instalar Dependências:**
+
     ```bash
     cd frontend
     npm install --save-dev @stryker-mutator/core @stryker-mutator/vitest-runner
     ```
 
-2.  **Criar Configuração (`frontend/stryker.config.json`):**
+2. **Criar Configuração (`frontend/stryker.config.json`):**
+
     ```json
     {
       "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
@@ -77,7 +81,8 @@ Recomendamos uma abordagem gradual ("Shift Left") focada primeiro no Frontend, o
     }
     ```
 
-3.  **Executar:**
+3. **Executar:**
+
     ```bash
     npx stryker run
     ```
@@ -104,5 +109,6 @@ pitest {
 ## 6. Conclusão
 
 O projeto SGC se beneficiaria significativamente de testes de mutação para garantir a robustez de seus workflows complexos.
+
 - **Frontend:** Adoção imediata recomendada para Stores e Services.
 - **Backend:** Aguardar atualização do ecossistema Gradle.

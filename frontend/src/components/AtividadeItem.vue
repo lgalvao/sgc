@@ -1,8 +1,9 @@
 <template>
   <BCard class="mb-3 atividade-card" no-body>
-    <BCardBody class="py-2">
+    <BCardBody class="py-2 position-relative">
       <div
-          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+          class="card-title d-flex align-items-center atividade-edicao-row atividade-titulo-card"
+          :class="{'atividade-hover-row': !emEdicao}"
       >
         <template v-if="emEdicao">
           <BFormInput
@@ -38,32 +39,32 @@
               class="atividade-descricao"
               data-testid="cad-atividades__txt-atividade-descricao"
           >{{ atividade?.descricao }}</strong>
-          <div
-              v-if="podeEditar"
-              class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group"
-          >
-            <BButton
-                class="botao-acao"
-                data-testid="btn-editar-atividade"
-                size="sm"
-                title="Editar"
-                variant="outline-primary"
-                @click="iniciarEdicaoAtividade"
-            >
-              <i class="bi bi-pencil"/>
-            </BButton>
-            <BButton
-                class="botao-acao"
-                data-testid="btn-remover-atividade"
-                size="sm"
-                title="Remover"
-                variant="outline-danger"
-                @click="$emit('remover-atividade')"
-            >
-              <i class="bi bi-trash"/>
-            </BButton>
-          </div>
         </template>
+      </div>
+      <div
+          v-if="podeEditar && !emEdicao"
+          class="botoes-acao-atividade position-absolute"
+      >
+        <BButton
+            class="botao-acao"
+            data-testid="btn-editar-atividade"
+            size="sm"
+            title="Editar"
+            variant="outline-primary"
+            @click="iniciarEdicaoAtividade"
+        >
+          <i class="bi bi-pencil"/>
+        </BButton>
+        <BButton
+            class="botao-acao ms-1"
+            data-testid="btn-remover-atividade"
+            size="sm"
+            title="Remover"
+            variant="outline-danger"
+            @click="$emit('remover-atividade')"
+        >
+          <i class="bi bi-trash"/>
+        </BButton>
       </div>
 
       <div class="mt-3 ms-3">
@@ -253,14 +254,25 @@ function adicionarConhecimento() {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
 }
 
-.botoes-acao-atividade,
+.botoes-acao-atividade {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+}
+
 .botoes-acao {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
+  position: relative;
+  z-index: 1;
 }
 
-.atividade-hover-row:hover .botoes-acao-atividade,
+/* Show buttons when card is hovered */
+.atividade-card:hover .botoes-acao-atividade,
 .conhecimento-hover-row:hover .botoes-acao {
   opacity: 1;
   pointer-events: auto;
@@ -278,6 +290,8 @@ function adicionarConhecimento() {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   margin-left: 0;
   margin-right: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .botao-acao:focus,

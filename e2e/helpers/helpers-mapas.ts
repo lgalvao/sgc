@@ -29,10 +29,13 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
 
 export async function editarCompetencia(page: Page, descricaoAtual: string, novaDescricao: string, novasAtividades?: string[], removerAtividades?: string[]) {
     const card = page.locator('.competencia-card', {has: page.getByText(descricaoAtual, {exact: true})});
+    const editButton = card.getByTestId('btn-editar-competencia');
 
-    // Hover to see actions if necessary (css suggests they are always visible or on hover, but playwrigth hovers automatically on click usually, or we force it)
+    // Hover on the row to trigger CSS hover state
     await card.locator('.competencia-hover-row').hover();
-    await card.getByTestId('btn-editar-competencia').click();
+    // Wait for button to become visible (CSS transition)
+    await expect(editButton).toBeVisible();
+    await editButton.click();
 
     const modal = page.getByTestId('mdl-criar-competencia');
     await expect(modal).toBeVisible();

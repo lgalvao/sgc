@@ -177,6 +177,11 @@ VALUES ('292929', '00292929', 'Flea', 'flea@tre-pe.jus.br', '2029', 18, 18);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('292929', 'SERVIDOR', 18);
 
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('303030', '00303030', 'Alice Cooper', 'alice.cooper@tre-pe.jus.br', '2031', 8, 8);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('303030', 'CHEFE', 8);
+
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
@@ -227,6 +232,10 @@ WHERE codigo = 6;
 UPDATE sgc.vw_unidade
 SET titulo_titular = '444444', matricula_titular = '00444444', data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 7;
+
+UPDATE sgc.vw_unidade
+SET titulo_titular = '303030', matricula_titular = '00303030', data_inicio_titularidade = CURRENT_TIMESTAMP
+WHERE codigo = 8;
 
 UPDATE sgc.vw_unidade
 SET titulo_titular = '222223', matricula_titular = '00222223', data_inicio_titularidade = CURRENT_TIMESTAMP

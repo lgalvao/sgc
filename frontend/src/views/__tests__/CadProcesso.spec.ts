@@ -48,6 +48,12 @@ describe('CadProcesso.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRoute.query = {};
+    
+    // Mock window.scrollTo
+    window.scrollTo = vi.fn();
+    
+    // Suppress console.error
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     wrapper = mount(CadProcesso, {
       global: {
@@ -80,7 +86,8 @@ describe('CadProcesso.vue', () => {
           },
           BFormSelect: {
             template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
-            props: ['modelValue', 'options']
+            props: ['modelValue', 'options'],
+            inheritAttrs: false
           },
           BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
           BModal: {
@@ -127,7 +134,7 @@ describe('CadProcesso.vue', () => {
            BForm: { template: '<form><slot /></form>' },
            BFormGroup: { template: '<div><slot /></div>' },
            BFormInput: { template: '<input />', props: ['modelValue'] },
-           BFormSelect: { template: '<select />', props: ['modelValue'] },
+           BFormSelect: { template: '<select />', props: ['modelValue', 'options'], inheritAttrs: false },
            BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
            BModal: { template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue'] },
            ArvoreUnidades: true

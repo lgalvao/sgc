@@ -39,6 +39,7 @@ describe('CadAtribuicao.vue', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     (buscarUnidadePorSigla as any).mockResolvedValue(mockUnidade);
     (buscarUsuariosPorUnidade as any).mockResolvedValue(mockUsuarios);

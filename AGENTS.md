@@ -41,6 +41,7 @@ O backend segue uma **arquitetura em camadas modular** (Modular Monolith) com 15
 **Descrição:** Cada módulo possui um serviço principal (Fachada) que serve como ponto de entrada único.
 
 **Exemplo:**
+
 ```java
 @Service
 @Transactional
@@ -68,11 +69,13 @@ public class MapaService {
 **Descrição:** Comunicação assíncrona entre módulos via Spring Events para desacoplamento.
 
 **23 Eventos de Domínio identificados** no sistema, incluindo:
+
 - `EventoProcessoIniciado`, `EventoProcessoFinalizado`
 - `EventoSubprocessoCadastroAceito`, `EventoSubprocessoCadastroDevolvido`
 - `EventoSubprocessoMapaValidado`, `EventoSubprocessoMapaHomologado`
 
 **Exemplo:**
+
 ```java
 // Publicar evento
 @Service
@@ -103,11 +106,13 @@ public class EventoProcessoListener {
 #### 3.1.3. Repository Pattern (JPA)
 
 **Convenções:**
+
 - Nome: `{Entidade}Repo` (ex: `ProcessoRepo`, `MapaRepo`)
 - Extends: `JpaRepository<Entidade, Long>`
 - **22 repositórios** identificados no sistema
 
 **Exemplo:**
+
 ```java
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     List<Processo> findBySituacao(SituacaoProcesso situacao);
@@ -122,12 +127,14 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 **Descrição:** Separação entre entidades JPA e objetos de transferência.
 
 **Convenções de Nomenclatura:**
+
 - `{Entidade}Dto`: DTO genérico
 - `Criar{Entidade}Req`: Request de criação
 - `Atualizar{Entidade}Req`: Request de atualização
 - `{Entidade}Resp`: Response específica
 
 **Exemplo de Mapper (MapStruct):**
+
 ```java
 @Component
 @Mapper(componentModel = "spring")
@@ -145,6 +152,7 @@ public abstract class ProcessoMapper {
 #### 3.1.5. Hierarquia de Exceções
 
 **Estrutura:**
+
 ```
 RuntimeException
 └── ErroNegocioBase (abstract)
@@ -157,6 +165,7 @@ RuntimeException
 ```
 
 **Uso:**
+
 ```java
 public Processo buscarPorCodigo(Long codigo) {
     return processoRepo.findById(codigo)
@@ -175,6 +184,7 @@ Controller → Service Facade → Serviços Especializados → Repository → En
 ```
 
 **Responsabilidades:**
+
 - **Controller:** Recebe HTTP, valida entrada básica, delega para Service, retorna DTO
 - **Service Facade:** Orquestra lógica de negócio, gerencia transações, publica eventos
 - **Serviços Especializados:** Lógica de negócio específica
@@ -186,6 +196,7 @@ Controller → Service Facade → Serviços Especializados → Repository → En
 #### 3.2.1. Entidades JPA
 
 **Base Class:**
+
 ```java
 @MappedSuperclass
 public abstract class EntidadeBase implements Serializable {
@@ -197,6 +208,7 @@ public abstract class EntidadeBase implements Serializable {
 ```
 
 **Convenções:**
+
 - Tabelas: `UPPER_CASE` com schema `sgc`
 - Colunas: `snake_case`
 - Enums: `@Enumerated(EnumType.STRING)` (legibilidade)
@@ -235,6 +247,7 @@ public class ProcessoService {
 **15 Módulos identificados:**
 
 **Domínio Principal:**
+
 - `processo`: Orquestrador de alto nível
 - `subprocesso`: Máquina de estados e workflow
 - `mapa`: Gestão de mapas de competências
@@ -242,12 +255,14 @@ public class ProcessoService {
 - `diagnostico`: Diagnóstico e ocupações críticas
 
 **Suporte:**
+
 - `analise`: Trilha de auditoria
 - `notificacao`: E-mails assíncronos
 - `alerta`: Alertas na interface
 - `painel`: Dashboards
 
 **Infraestrutura:**
+
 - `comum`: Componentes compartilhados (erros, config, base entities)
 - `config`: Configurações (OpenAPI/Swagger)
 - `sgrh`: Integração com sistema de RH
@@ -255,6 +270,7 @@ public class ProcessoService {
 - `e2e`: Suporte para testes
 
 **Estrutura Interna Padrão:**
+
 ```
 sgc/{modulo}/
 ├── {Modulo}Controller.java
@@ -281,11 +297,13 @@ sgc/{modulo}/
 **Importante:** Este projeto usa uma convenção REST não-padrão por escolha de design.
 
 **Verbos HTTP:**
+
 - `GET`: Consultas e listagens (idempotente)
 - `POST`: Criação de recursos
 - `POST` com sufixo: Atualizações, exclusões e ações de workflow
 
 **Exemplos:**
+
 ```
 GET    /api/processos              # Listar
 GET    /api/processos/{id}         # Buscar um
@@ -297,11 +315,13 @@ POST   /api/processos/{id}/finalizar    # Ação de workflow
 ```
 
 **Justificativa:**
+
 - Clareza semântica para ações de workflow
 - Facilita auditoria (todas modificações via POST)
 - Consistência em toda a API
 
 **Estrutura de Controller:**
+
 ```java
 @RestController
 @RequestMapping("/api/processos")
@@ -333,6 +353,7 @@ para respostas JSON padronizadas.
 ### 3.5. Testes Backend
 
 **Estrutura:**
+
 ```java
 @SpringBootTest
 @Transactional  // Rollback automático após cada teste
@@ -371,6 +392,7 @@ class ProcessoServiceTest {
 ```
 
 **Convenções:**
+
 - Use **JUnit 5** e **Mockito**
 - Banco H2 em memória (automático em testes)
 - Nomenclatura: `deve{Acao}Quando{Condicao}`
@@ -378,6 +400,7 @@ class ProcessoServiceTest {
 - Evite criar dados de teste manualmente se puder usar os builders ou factories existentes
 
 **Execução:**
+
 ```bash
 ./gradlew :backend:test
 ```
@@ -389,6 +412,7 @@ class ProcessoServiceTest {
 O frontend segue uma **arquitetura em camadas unidirecional**. Para detalhes completos, consulte `/regras/frontend-padroes.md`.
 
 **Fluxo:**
+
 ```
 View → Store (Pinia) → Service (Axios) → API Backend
   ↑        ↓
@@ -418,6 +442,7 @@ Component  Estado Reativo
 **Exemplo Completo:**
 
 **Service:**
+
 ```typescript
 // services/processoService.ts
 import type { Processo } from '@/types/tipos';
@@ -435,6 +460,7 @@ export async function buscarPorCodigo(codigo: number): Promise<Processo> {
 ```
 
 **Store (Pinia Setup Store):**
+
 ```typescript
 // stores/processos.ts
 import { defineStore } from 'pinia';
@@ -477,6 +503,7 @@ export const useProcessosStore = defineStore('processos', () => {
 ```
 
 **View:**
+
 ```vue
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
@@ -509,6 +536,7 @@ const isLoading = computed(() => store.isLoading);
 ```
 
 **Component (Apresentacional):**
+
 ```vue
 <script setup lang="ts">
 import type { Processo } from '@/types/tipos';
@@ -562,6 +590,7 @@ export const useProcessosStore = defineStore('processos', () => {
 #### 4.2.2. Componentes Vue
 
 **Convenções:**
+
 - Use `<script setup lang="ts">`
 - Defina interfaces para Props e Emits
 - Props são readonly
@@ -575,6 +604,7 @@ export const useProcessosStore = defineStore('processos', () => {
 #### 4.2.3. Axios Setup e Interceptors
 
 **Configuração Centralizada:**
+
 ```typescript
 // axios-setup.ts
 import axios from 'axios';
@@ -616,6 +646,7 @@ export default apiClient;
 #### 4.2.4. Tratamento de Erros
 
 **Normalização de Erros:**
+
 ```typescript
 // utils/apiError.ts
 export type NormalizedError = {
@@ -637,10 +668,12 @@ export function normalizeError(error: any): NormalizedError {
 ```
 
 **Uso nas Stores:**
+
 - Popule `lastError` em `catch`
 - Deixe o componente decidir como exibir (inline vs global)
 
 **Uso nos Componentes:**
+
 ```vue
 <BAlert v-if="store.lastError?.kind === 'validation'" variant="danger">
     {{ store.lastError.message }}
@@ -650,6 +683,7 @@ export function normalizeError(error: any): NormalizedError {
 ### 4.3. Roteamento Modular
 
 **Estrutura:**
+
 ```typescript
 // router/index.ts
 import processoRoutes from './processo.routes';
@@ -676,6 +710,7 @@ router.beforeEach((to, from, next) => {
 ```
 
 **Módulo de Rotas:**
+
 ```typescript
 // router/processo.routes.ts
 export default [
@@ -697,6 +732,7 @@ export default [
 - **Composables:** Para lógica reutilizável (`use{Feature}`)
 
 **Total de:**
+
 - Services: 12
 - Stores: 12
 - Views: 18
@@ -714,6 +750,7 @@ Antes de submeter alterações no **backend**, execute (na raiz):
 ```
 
 **Convenções:**
+
 - JUnit 5 + Mockito
 - Banco H2 em memória
 - `@Transactional` para rollback automático
@@ -730,6 +767,7 @@ npm run test:unit  # Testes unitários (Vitest)
 ```
 
 **Convenções para Testes:**
+
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
@@ -784,7 +822,7 @@ Para entendimento profundo dos padrões arquiteturais:
   - Axios interceptors
 
 - **E2E Testing:** `/regras/e2e_regras.md`
-  - Regras para execução de testes E2E
+  - Regras para execução de testes E2E, especialmente para correções do sistema com base nos testes E2E
   - Diagnóstico de falhas
   - Uso de error-context.md
 
@@ -792,20 +830,22 @@ Para entendimento profundo dos padrões arquiteturais:
 
 **Backend:**
 Cada módulo em `backend/src/main/java/sgc/{modulo}/` possui um `README.md` detalhado:
+
 - processo, subprocesso, mapa, atividade, diagnostico
 - analise, notificacao, alerta, painel
 - sgrh, unidade, comum, config, e2e
 
 **Frontend:**
 Cada diretório em `frontend/src/` possui um `README.md` detalhado:
+
 - components, views, stores, services
 - router, mappers, types, utils, composables
 - constants, test-utils
 
 ### 6.3. API Documentation
 
-- **Swagger UI:** http://localhost:10000/swagger-ui.html
-- **OpenAPI Spec:** http://localhost:10000/api-docs
+- **Swagger UI:** <http://localhost:10000/swagger-ui.html>
+- **OpenAPI Spec:** <http://localhost:10000/api-docs>
 
 ## 7. Design Patterns - Resumo Executivo
 
@@ -832,9 +872,10 @@ Cada diretório em `frontend/src/` possui um `README.md` detalhado:
 | **Axios Interceptors** | Cross-cutting concerns | JWT, error handling | Centralização |
 | **Modular Routing** | Organização de rotas | `processo.routes.ts` | Escalabilidade |
 
-### 7.3. Convenções de Nomenclatura - Consolidado
+### 7.3. Convenções de Nomenclatura
 
 **Backend:**
+
 - Classes: `PascalCase`
 - Métodos/Variáveis: `camelCase`
 - Pacotes: `lowercase` sem separadores
@@ -843,23 +884,9 @@ Cada diretório em `frontend/src/` possui um `README.md` detalhado:
 - DTOs: `Dto`, `Req`, `Resp`
 
 **Frontend:**
+
 - Components: `PascalCase` (ex: `ProcessoCard.vue`)
 - Arquivos TS: `camelCase` (ex: `processoService.ts`)
 - Stores: `use{Entidade}Store` (ex: `useProcessosStore`)
 - Tipos/Interfaces: `PascalCase`
 - Diretórios: `kebab-case` ou `lowercase`
-
-### 7.4. Princípios Arquiteturais
-
-1. **Separation of Concerns:** Cada camada tem responsabilidade única e bem definida
-2. **Single Responsibility:** Classes/componentes fazem uma coisa bem feita
-3. **DRY (Don't Repeat Yourself):** Código compartilhado em `comum` (backend) ou `utils` (frontend)
-4. **KISS (Keep It Simple):** Soluções simples e diretas
-5. **Dependency Injection:** Spring IoC (backend), Pinia Stores (frontend)
-6. **Event-Driven:** Desacoplamento via eventos de domínio
-7. **Fail Fast:** Validações early, exceções específicas
-8. **Immutability:** Records para DTOs, computed para getters
-
-## 8. Testes E2E (Playwright)
-
-Os testes de ponta a ponta (E2E) validam o funcionamento integrado do Frontend e Backend.

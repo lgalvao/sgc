@@ -37,7 +37,6 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
         path: caminhoCompleto,
         fullPage: opcoes?.fullPage ?? false
     });
-    console.log(`✓ Screenshot capturada: ${nomeArquivo}`);
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {

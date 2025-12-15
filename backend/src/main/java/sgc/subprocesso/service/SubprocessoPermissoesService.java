@@ -109,6 +109,7 @@ public class SubprocessoPermissoesService {
                 MAPEAMENTO_MAPA_CRIADO,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_CADASTRO_EM_ANDAMENTO,
+                REVISAO_CADASTRO_HOMOLOGADA, // CDU-16: ADMIN ajusta mapa neste estado
                 REVISAO_MAPA_AJUSTADO,
                 REVISAO_MAPA_COM_SUGESTOES,
                 DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
