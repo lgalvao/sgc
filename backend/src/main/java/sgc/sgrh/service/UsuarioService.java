@@ -3,6 +3,7 @@ package sgc.sgrh.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.dto.PerfilUnidade;
@@ -75,6 +76,24 @@ public class UsuarioService {
             throw new ErroEntidadeNaoEncontrada(
                     "Unidade não encontrada, código: " + request.getUnidadeCodigo());
         }
+
+        // SENTINEL: Verifica se o usuário realmente tem permissão para o perfil/unidade solicitados
+        // Previne escalonamento de privilégios (Authorization Bypass)
+        List<PerfilUnidade> autorizacoes = autorizar(request.getTituloEleitoral());
+        boolean autorizado =
+                autorizacoes.stream()
+                        .anyMatch(
+                                pu ->
+                                        pu.getPerfil().name().equals(request.getPerfil())
+                                                && pu.getUnidade()
+                                                        .getCodigo()
+                                                        .equals(request.getUnidadeCodigo()));
+
+        if (!autorizado) {
+            throw new ErroAccessoNegado(
+                    "Usuário não possui permissão para acessar com o perfil e unidade informados.");
+        }
+
         log.debug(
                 "Usuário {} entrou via request. Perfil: {}, Unidade: {}",
                 request.getTituloEleitoral(),
