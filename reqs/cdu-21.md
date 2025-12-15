@@ -11,7 +11,7 @@ Ator: ADMIN
 
 1. No Painel, o usuário clica no processo de mapeamento ou de revisão com situação 'Em andamento'.
 
-2. O sistema exibe a tela Detalhes do processo.
+2. O sistema exibe a tela `Detalhes do processo`.
 
 3. ADMIN clica no botão Finalizar processo.
 
@@ -49,8 +49,8 @@ Ator: ADMIN
    Prezado(a) responsável pela [SIGLA_UNIDADE],
 
    Comunicamos a conclusão do processo [DESCRIÇÃO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
-   ```
 
    Já é possível visualizar os mapas de competências atualizados destas unidades através do menu "Minha unidade" do Sistema de Gestão de Competências ([URL_SISTEMA]).
+   ```
 
 10. O sistema redireciona para o Painel, mostrando a mensagem "Processo finalizado".

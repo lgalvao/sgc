@@ -209,6 +209,17 @@ export const useProcessosStore = defineStore("processos", () => {
         }
     }
 
+    async function aceitarValidacao(id: number, dados?: { observacoes?: string }) {
+        lastError.value = null;
+        try {
+            await processoService.aceitarValidacao(id, dados);
+            if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
+    }
+
     function atualizarStatusSubprocesso(codSubprocesso: number, dados: { situacao: any, situacaoLabel: string }) {
         if (processoDetalhe.value) {
             const unidade = processoDetalhe.value.unidades.find(u => u.codSubprocesso === codSubprocesso);
@@ -241,6 +252,7 @@ export const useProcessosStore = defineStore("processos", () => {
         apresentarSugestoes,
         validarMapa,
         homologarValidacao,
+        aceitarValidacao,
         atualizarStatusSubprocesso,
         clearError,
     };

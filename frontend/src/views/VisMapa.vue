@@ -555,16 +555,15 @@ async function confirmarAceitacao(observacoes?: string) {
       await processosStore.homologarValidacao(codSubprocesso.value);
     }
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, {
+    // GESTOR: aceitar validação para MAPEAMENTO ou REVISAO
+    await processosStore.aceitarValidacao(codSubprocesso.value, {
       observacoes: observacoes || "",
     });
   }
 
   fecharModalAceitar();
-  await router.push({
-    name: "Subprocesso",
-    params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value},
-  });
+  // CDU-20 step 9.9: redireciona para Painel
+  await router.push({name: "Painel"});
 }
 
 async function confirmarDevolucao() {

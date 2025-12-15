@@ -105,6 +105,10 @@ export async function homologarValidacao(codSubprocesso: number): Promise<void> 
     await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`);
 }
 
+export async function aceitarValidacao(codSubprocesso: number, dados?: { observacoes?: string }): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados || {});
+}
+
 export async function buscarSubprocessos(
     codProcesso: number,
 ): Promise<Subprocesso[]> {
