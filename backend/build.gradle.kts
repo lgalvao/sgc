@@ -13,6 +13,7 @@ plugins {
     id("com.github.spotbugs") version "6.4.7"
     id("com.diffplug.spotless") version "8.1.0"
     id("com.github.ben-manes.versions") version "0.53.0"
+    id("jacoco")
 }
 
 java {
@@ -149,6 +150,7 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 
     testLogging {
         events("skipped", "failed")
@@ -186,5 +188,14 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        csv.required.set(true)
+        html.required.set(true)
     }
 }
