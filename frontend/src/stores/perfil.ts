@@ -3,7 +3,7 @@ import {computed, ref} from "vue";
 import type {PerfilUnidade} from "@/mappers/sgrh";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const usePerfilStore = defineStore("perfil", () => {
     const servidorId = ref<number | null>(

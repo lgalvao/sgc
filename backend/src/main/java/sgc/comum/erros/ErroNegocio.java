@@ -1,6 +1,7 @@
 package sgc.comum.erros;
 
 import org.springframework.http.HttpStatus;
+
 import java.util.Map;
 
 /**

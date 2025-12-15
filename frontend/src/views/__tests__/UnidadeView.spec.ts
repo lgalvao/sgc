@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import UnidadeView from '@/views/UnidadeView.vue';
-import { useUnidadesStore } from '@/stores/unidades';
-import { useAtribuicaoTemporariaStore } from '@/stores/atribuicoes';
-import { usePerfilStore } from '@/stores/perfil';
-import { useUsuariosStore } from '@/stores/usuarios';
-import { useMapasStore } from '@/stores/mapas';
+import {useUnidadesStore} from '@/stores/unidades';
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
+import {usePerfilStore} from '@/stores/perfil';
+import {useUsuariosStore} from '@/stores/usuarios';
+import {useMapasStore} from '@/stores/mapas';
 
 // Mocks
 const mockPush = vi.fn();

@@ -9,15 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.processo.model.TipoProcesso;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.*;
 

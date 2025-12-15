@@ -40,8 +40,8 @@ import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
 import sgc.unidade.model.UnidadeMapaRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;

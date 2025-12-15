@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnostico.vue';
-import { diagnosticoService } from '@/services/diagnosticoService';
+import {diagnosticoService} from '@/services/diagnosticoService';
 
 // Mocks
 const mockRouteParams = { value: { codSubprocesso: '10' } };

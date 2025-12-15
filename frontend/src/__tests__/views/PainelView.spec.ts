@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount, flushPromises} from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import PainelView from "@/views/PainelView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";

@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/CadAtribuicao.vue';
-import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService';
-import { buscarUnidadePorSigla } from '@/services/unidadesService';
-import { buscarUsuariosPorUnidade } from '@/services/usuarioService';
+import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
+import {buscarUnidadePorSigla} from '@/services/unidadesService';
+import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
 
 // Mocks
 const mockPush = vi.fn();

@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 

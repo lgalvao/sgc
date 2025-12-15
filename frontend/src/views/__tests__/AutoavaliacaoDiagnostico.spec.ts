@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import AutoavaliacaoDiagnostico from '@/views/AutoavaliacaoDiagnostico.vue';
-import { useMapasStore } from '@/stores/mapas';
-import { useUnidadesStore } from '@/stores/unidades';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService } from '@/services/diagnosticoService';
+import {useMapasStore} from '@/stores/mapas';
+import {useUnidadesStore} from '@/stores/unidades';
+import {useFeedbackStore} from '@/stores/feedback';
+import {diagnosticoService} from '@/services/diagnosticoService';
 
 // Mocks
 const mockPush = vi.fn();

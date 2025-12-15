@@ -1,16 +1,8 @@
-import {expect, test, Page} from '@playwright/test';
+import {expect, Page, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades
-} from './helpers/helpers-atividades';
-import {
-    criarCompetencia,
-    disponibilizarMapa,
-    navegarParaMapa
-} from './helpers/helpers-mapas';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 async function verificarPaginaPainel(page: Page) {

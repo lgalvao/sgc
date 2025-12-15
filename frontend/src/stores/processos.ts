@@ -9,7 +9,7 @@ import type {
     SubprocessoElegivel,
     TipoProcesso,
 } from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 import * as painelService from "../services/painelService";
 import * as processoService from "../services/processoService";
 

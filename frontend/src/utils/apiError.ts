@@ -1,4 +1,4 @@
-import { useFeedbackStore } from '@/stores/feedback';
+import {useFeedbackStore} from '@/stores/feedback';
 
 /**
  * Payload de erro retornado pela API (backend)

@@ -1,7 +1,7 @@
 import axios from "axios";
 import router from "./router";
 import {useFeedbackStore} from "@/stores/feedback";
-import { normalizeError, notifyError, shouldNotifyGlobally } from '@/utils/apiError';
+import {normalizeError, notifyError, shouldNotifyGlobally} from '@/utils/apiError';
 
 const apiClient = axios.create({
     baseURL: "http://localhost:10000/api",

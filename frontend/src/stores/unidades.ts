@@ -10,7 +10,7 @@ import {
     buscarUnidadePorSigla,
 } from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useUnidadesStore = defineStore("unidades", () => {
     const unidades = ref<Unidade[]>([]);

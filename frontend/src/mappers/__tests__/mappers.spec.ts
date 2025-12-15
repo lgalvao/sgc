@@ -9,11 +9,7 @@ import {
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
 } from "../atividades";
-import {
-    mapImpactoMapaDtoToModel,
-    mapMapaAjusteDtoToModel,
-    mapMapaDtoToModel,
-} from "../mapas";
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaDtoToModel,} from "../mapas";
 import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from "../processos";
 import {
     LoginResponseToFrontend,

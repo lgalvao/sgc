@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import RelatoriosView from '@/views/RelatoriosView.vue';
-import { TipoProcesso } from '@/types/tipos';
+import {TipoProcesso} from '@/types/tipos';
 
 // Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');

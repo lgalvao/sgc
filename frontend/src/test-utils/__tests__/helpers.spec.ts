@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import {createRouter, createMemoryHistory} from "vue-router";
+import {createMemoryHistory, createRouter} from "vue-router";
 import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore,} from "../helpers";
 import {
     assertUnidadeOptions,

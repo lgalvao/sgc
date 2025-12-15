@@ -4,18 +4,11 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {
     adicionarAtividade,
     adicionarConhecimento,
-    abrirModalImpacto,
     editarAtividade,
-    fecharModalImpacto,
     navegarParaAtividades,
     removerAtividade
 } from './helpers/helpers-atividades';
-import {
-    criarCompetencia,
-    disponibilizarMapa,
-    editarCompetencia,
-    navegarParaMapa
-} from './helpers/helpers-mapas';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 async function fazerLogout(page: Page) {

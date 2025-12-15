@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {buscarTodosUsuarios} from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useUsuariosStore = defineStore("usuarios", () => {
     const usuarios = ref<Usuario[]>([]);

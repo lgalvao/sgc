@@ -2,6 +2,7 @@ package sgc.comum.erros;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+
 import java.util.Map;
 
 @Getter

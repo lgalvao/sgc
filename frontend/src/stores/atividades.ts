@@ -3,7 +3,7 @@ import {computed, ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {nextTick} from 'vue';
 import CadProcesso from '@/views/CadProcesso.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { useProcessosStore } from '@/stores/processos';
-import { useUnidadesStore } from '@/stores/unidades';
+import {createTestingPinia} from '@pinia/testing';
+import {useProcessosStore} from '@/stores/processos';
+import {useUnidadesStore} from '@/stores/unidades';
 import * as processoService from "@/services/processoService";
 
 // Mock router

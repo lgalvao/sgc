@@ -2,14 +2,27 @@ import {expect, test} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
+    aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefe,
     acessarSubprocessoGestor,
-    aceitarCadastroMapeamento,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades';
-import {navegarParaMapa, criarCompetencia, editarCompetencia, excluirCompetencia, verificarCompetenciaNoMapa, verificarSituacaoSubprocesso, disponibilizarMapa} from './helpers/helpers-mapas';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades';
+import {
+    criarCompetencia,
+    disponibilizarMapa,
+    editarCompetencia,
+    excluirCompetencia,
+    navegarParaMapa,
+    verificarCompetenciaNoMapa,
+    verificarSituacaoSubprocesso
+} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {

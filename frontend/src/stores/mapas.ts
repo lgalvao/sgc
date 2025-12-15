@@ -13,7 +13,7 @@ import type {
     SalvarAjustesRequest,
     SalvarMapaRequest,
 } from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 
 export const useMapasStore = defineStore("mapas", () => {

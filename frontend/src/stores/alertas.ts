@@ -5,7 +5,7 @@ import type {Alerta} from "@/types/tipos";
 import * as alertaService from "../services/alertaService";
 import * as painelService from "../services/painelService";
 import {usePerfilStore} from "./perfil";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useAlertasStore = defineStore("alertas", () => {
     const alertas = ref<Alerta[]>([]);

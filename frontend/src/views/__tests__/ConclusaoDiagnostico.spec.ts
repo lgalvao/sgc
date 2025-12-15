@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import ConclusaoDiagnostico from '@/views/ConclusaoDiagnostico.vue';
-import { useFeedbackStore } from '@/stores/feedback';
-import { diagnosticoService } from '@/services/diagnosticoService';
+import {useFeedbackStore} from '@/stores/feedback';
+import {diagnosticoService} from '@/services/diagnosticoService';
 
 // Mocks
 const mockPush = vi.fn();

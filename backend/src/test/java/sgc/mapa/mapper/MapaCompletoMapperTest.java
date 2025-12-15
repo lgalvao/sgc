@@ -7,7 +7,6 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 

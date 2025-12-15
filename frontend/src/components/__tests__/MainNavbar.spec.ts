@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, type MockInstance, vi,} from "vitest";
 import {ref} from "vue";
-import {createRouter, createMemoryHistory} from "vue-router";
+import {createMemoryHistory, createRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
 import {initPinia} from "@/test-utils/helpers";

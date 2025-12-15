@@ -27,7 +27,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroValidacao;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
@@ -53,8 +52,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

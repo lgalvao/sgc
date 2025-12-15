@@ -1,6 +1,6 @@
-import type { Ref } from "vue";
-import { ref } from "vue";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import type {Ref} from "vue";
+import {ref} from "vue";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export function useApi<T>(apiCall: (...args: any[]) => Promise<T>) {
   const data: Ref<T | null> = ref(null);

@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {buscarTodasAtribuicoes} from "@/services/atribuicaoTemporariaService";
 import type {AtribuicaoTemporaria} from "@/types/tipos";
-import { normalizeError, type NormalizedError } from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useAtribuicaoTemporariaStore = defineStore(
     "atribuicaoTemporaria",

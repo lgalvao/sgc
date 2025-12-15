@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.util.TokenSimuladoUtil;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
-import sgc.comum.util.TokenSimuladoUtil;
 import sgc.sgrh.service.UsuarioService;
 import tools.jackson.databind.ObjectMapper;
 

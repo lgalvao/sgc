@@ -2,16 +2,14 @@ package sgc.subprocesso.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.sgrh.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {

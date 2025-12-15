@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { usePerfilStore } from '@/stores/perfil';
-import { createMemoryHistory, createRouter } from 'vue-router';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {usePerfilStore} from '@/stores/perfil';
+import {createMemoryHistory, createRouter} from 'vue-router';
 import mainRoutes from '../main.routes';
 import processoRoutes from '../processo.routes';
 import unidadeRoutes from '../unidade.routes';
