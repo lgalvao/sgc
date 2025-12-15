@@ -321,7 +321,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useSubprocessosStore();
+        const store = useProcessosStore();
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -333,7 +333,7 @@ describe("VisMapa.vue", () => {
 
         await modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
-        expect(store.aceitarRevisaoCadastro).toHaveBeenCalledWith(10, {
+        expect(store.aceitarValidacao).toHaveBeenCalledWith(10, {
             observacoes: "Obs aceite",
         });
     });

@@ -132,7 +132,7 @@ describe('RelatoriosView.vue', () => {
     
     const btn = wrapper.find('[data-testid="export-csv-mapas"]');
     
-    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click');
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
     
     await btn.trigger('click');
@@ -148,7 +148,7 @@ describe('RelatoriosView.vue', () => {
     
     const btn = wrapper.find('[data-testid="export-csv-diagnosticos"]');
     
-    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click');
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
     
     await btn.trigger('click');
@@ -163,7 +163,7 @@ describe('RelatoriosView.vue', () => {
     
     const btn = wrapper.find('[data-testid="export-csv-andamento"]');
     
-    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click');
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
     
     await btn.trigger('click');

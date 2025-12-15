@@ -166,6 +166,7 @@ describe("CadAtividades.vue", () => {
                     }),
                 ],
                 stubs: {
+                    BForm: {template: '<form @submit.prevent><slot /></form>'},
                     ImportarAtividadesModal: true,
                     BModal: {
                         name: "BModal",

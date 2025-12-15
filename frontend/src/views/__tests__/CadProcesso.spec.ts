@@ -131,7 +131,7 @@ describe('CadProcesso.vue', () => {
         stubs: {
            BContainer: { template: '<div><slot /></div>' },
            BAlert: { template: '<div><slot /></div>' },
-           BForm: { template: '<form><slot /></form>' },
+           BForm: { template: '<form @submit.prevent><slot /></form>' },
            BFormGroup: { template: '<div><slot /></div>' },
            BFormInput: { template: '<input />', props: ['modelValue'] },
            BFormSelect: { template: '<select />', props: ['modelValue', 'options'], inheritAttrs: false },

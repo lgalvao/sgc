@@ -21,7 +21,7 @@ describe("ConfiguracoesView.vue", () => {
             ],
             stubs: {
                 BContainer: {template: '<div><slot /></div>'},
-                BForm: {template: '<form><slot /></form>'},
+                BForm: {template: '<form @submit.prevent><slot /></form>'},
                 BFormInput: {
                     props: ['modelValue'],
                     emits: ['update:modelValue'],

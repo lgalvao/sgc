@@ -42,7 +42,7 @@ describe("LoginView.vue", () => {
             // Stubs for bootstrap components to simplify testing
             stubs: {
                 BCard: {template: "<div><slot /></div>"},
-                BForm: {template: '<form><slot /></form>'},
+                BForm: {template: '<form @submit.prevent><slot /></form>'},
                 // Simple input stubs that support v-model
                 BFormInput: {
                     props: ['modelValue'],
