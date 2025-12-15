@@ -66,9 +66,8 @@ flowchart LR
     - Não contém estado, apenas métodos assíncronos que retornam Promessas.
     - Usa a instância configurada `apiClient` (`axios-setup.ts`) que gerencia tokens JWT.
 
-4. **Mapper (`mappers/`)** (Opcional, mas recomendado):
-    - Usado dentro das Stores ou Services para transformar os dados brutos da API em objetos tipados e formatados para a
-      UI.
+4. **Mapper (`mappers/`)**:
+    - Usado dentro das Stores ou Services para transformar os dados brutos da API em objetos tipados e formatados para a UI.
 
 ## 4. Padrões de Implementação
 
@@ -83,7 +82,7 @@ flowchart LR
 ### 4.2. Stores (Pinia)
 
 - **Estilo:** O projeto utiliza o estilo **Setup Stores** (função de setup que retorna o estado, getters e actions).
-    - *Exemplo:*
+  - *Exemplo:*
       `export const useProcessosStore = defineStore("processos", () => { const state = ref(...); function action() {...}; return { state, action }; });`
 - **Modularidade:** Uma store por domínio/entidade (ex: `useProcessosStore`, `useUnidadesStore`).
 
@@ -118,14 +117,16 @@ flowchart LR
 
 - **Localização:** Arquivos `*.spec.ts` ou `*.test.ts` próximos ao código fonte ou em diretórios `__tests__`.
 - **Escopo:**
-    - **Unitários:** Testar funções isoladas (utils, mappers) e componentes simples.
-    - **Integração:** Testar Stores e Views (montando o componente e mockando serviços/stores).
+  - **Unitários:** Testar funções isoladas (utils, mappers) e componentes simples.
+  - **Integração:** Testar Stores e Views (montando o componente e mockando serviços/stores).
 - **Execução:** `npm run test:unit`.
+
 ## 7. Padrões de Implementação Detalhados
 
 ### 7.1. Stores (Pinia) - Setup Store Pattern
 
 **Estrutura Padrão:**
+
 ```typescript
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
@@ -175,6 +176,7 @@ export const useProcessosStore = defineStore('processos', () => {
 ```
 
 **Convenções:**
+
 - Use `ref()` para estado reativo
 - Use `computed()` para getters derivados
 - Funções assíncronas para actions que chamam API
@@ -187,6 +189,7 @@ export const useProcessosStore = defineStore('processos', () => {
 ### 7.2. Services - Módulos de Funções Puras
 
 **Estrutura Padrão:**
+
 ```typescript
 import type { Processo, CriarProcessoRequest } from '@/types/tipos';
 import apiClient from '@/axios-setup';
@@ -206,14 +209,8 @@ export async function criar(request: CriarProcessoRequest): Promise<Processo> {
     return response.data;
 }
 
-export async function atualizar(
-    codigo: number, 
-    request: AtualizarProcessoRequest
-): Promise<Processo> {
-    const response = await apiClient.post<Processo>(
-        `/processos/${codigo}/atualizar`,
-        request
-    );
+export async function atualizar(codigo: number, request: AtualizarProcessoRequest): Promise<Processo> {
+    const response = await apiClient.post<Processo>(`/processos/${codigo}/atualizar`, request);
     return response.data;
 }
 
@@ -223,6 +220,7 @@ export async function excluir(codigo: number): Promise<void> {
 ```
 
 **Convenções:**
+
 - Exportar funções nomeadas (não default export)
 - Usar `async/await`
 - Tipagem explícita dos retornos
@@ -235,6 +233,7 @@ export async function excluir(codigo: number): Promise<void> {
 ### 7.3. Mappers - Funções de Transformação
 
 **Estrutura Padrão:**
+
 ```typescript
 import type { Processo, ProcessoResumo } from '@/types/tipos';
 
@@ -273,6 +272,7 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto)
 ```
 
 **Convenções:**
+
 - Funções puras (sem side effects)
 - Nomenclatura: `map{Source}To{Target}`
 - **Importante:** Evite usar `any` - crie interfaces para os DTOs do backend em `@/types/`
@@ -284,6 +284,7 @@ export function mapUnidadeParticipanteDtoToFrontend(dto: UnidadeParticipanteDto)
 ### 7.4. Components - Componentes Apresentacionais
 
 **Estrutura Padrão:**
+
 ```vue
 <script setup lang="ts">
 import { computed } from 'vue';
@@ -338,6 +339,7 @@ function handleIniciar() {
 ```
 
 **Convenções:**
+
 - Use `<script setup lang="ts">`
 - Defina interfaces para Props e Emits
 - Props são readonly, use `emit` para comunicação
@@ -351,6 +353,7 @@ function handleIniciar() {
 ### 7.5. Views - Páginas Inteligentes
 
 **Estrutura Padrão:**
+
 ```vue
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
@@ -390,6 +393,7 @@ async function handleIniciar(codigo: number) {
 ```
 
 **Convenções:**
+
 - Carrega dados no `onMounted`
 - Usa stores via composables
 - Usa `computed` para reatividade
@@ -453,6 +457,7 @@ export default apiClient;
 ```
 
 **Benefícios:**
+
 - Configuração única para todas as requisições
 - JWT automático em todas as chamadas
 - Tratamento de erro centralizado
@@ -516,6 +521,7 @@ export function notifyError(error: NormalizedError) {
 **Padrão de Uso:**
 
 **Na Store:**
+
 ```typescript
 async function buscar() {
     lastError.value = null;
@@ -529,6 +535,7 @@ async function buscar() {
 ```
 
 **No Componente:**
+
 ```vue
 <script setup lang="ts">
 const store = useProcessosStore();
@@ -614,6 +621,7 @@ export default [
 ```
 
 **Convenções:**
+
 - Lazy loading com `import()`
 - Guards globais para autenticação
 - Meta dados para controle de acesso
@@ -659,6 +667,7 @@ describe('useProcessosStore', () => {
 ```
 
 **Convenções:**
+
 - Use Vitest
 - Mock de services com `vi.mock`
 - Setup com Pinia em `beforeEach`
@@ -699,21 +708,11 @@ export interface CriarProcessoRequest {
 ```
 
 **Convenções:**
+
 - Interfaces para objetos complexos
 - Type aliases para unions
 - PascalCase para tipos
 - Enums como union types (não `enum`)
-
-## 13. Resumo de Contadores
-
-- **Stores (Pinia):** 12
-- **Services:** 12
-- **Mappers:** 7
-- **Components:** 24
-- **Views:** 18
-- **Composables:** Variados
-- **Utils:** Variados
-- **Types:** 50+
 
 ## 14. Boas Práticas Identificadas
 
@@ -730,10 +729,10 @@ export interface CriarProcessoRequest {
 
 ## 15. Referências
 
-- **Vue.js 3 Docs:** https://vuejs.org/
-- **Pinia Docs:** https://pinia.vuejs.org/
-- **Vue Router Docs:** https://router.vuejs.org/
-- **Vite Docs:** https://vitejs.dev/
-- **TypeScript Docs:** https://www.typescriptlang.org/
-- **BootstrapVueNext:** https://bootstrap-vue-next.github.io/
-- **Vitest Docs:** https://vitest.dev/
+- **Vue.js 3 Docs:** <https://vuejs.org/>
+- **Pinia Docs:** <https://pinia.vuejs.org/>
+- **Vue Router Docs:** <https://router.vuejs.org/>
+- **Vite Docs:** <https://vitejs.dev/>
+- **TypeScript Docs:** <https://www.typescriptlang.org/>
+- **BootstrapVueNext:** <https://bootstrap-vue-next.github.io/>
+- **Vitest Docs:** <https://vitest.dev/>

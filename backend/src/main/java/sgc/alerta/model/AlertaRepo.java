@@ -37,4 +37,12 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
      * @return Uma página de alertas.
      */
     Page<Alerta> findByUnidadeDestino_CodigoIn(List<Long> unidadeCodigos, Pageable pageable);
+
+    /**
+     * Busca alertas destinados a uma unidade específica.
+     *
+     * @param codUnidade O código da unidade.
+     * @return Lista de alertas para a unidade.
+     */
+    List<Alerta> findByUnidadeDestino_Codigo(Long codUnidade);
 }

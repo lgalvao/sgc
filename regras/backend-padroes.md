@@ -53,11 +53,11 @@ O idioma oficial do projeto é o **Português Brasileiro**.
 - **Pacotes:** minúsculo, sem separadores, representando o domínio (ex: `sgc.processo`, `sgc.mapa`).
 - **Exceções:** Prefixo `Erro` (ex: `ErroEntidadeNaoEncontrada`).
 - **Sufixos Padronizados:**
-    - Controladores: `Controller` (ex: `ProcessoController`).
-    - Serviços: `Service` (ex: `MapaService`).
-    - Repositórios: `Repo` (ex: `SubprocessoRepo`).
-    - Testes: `Test` (ex: `MapaServiceTest`).
-    - DTOs: `Dto`, `Req` (Request), `Resp` (Response).
+  - Controladores: `Controller` (ex: `ProcessoController`).
+  - Serviços: `Service` (ex: `MapaService`).
+  - Repositórios: `Repo` (ex: `SubprocessoRepo`).
+  - Testes: `Test` (ex: `MapaServiceTest`).
+  - DTOs: `Dto`, `Req` (Request), `Resp` (Response).
 
 ## 3. Padrões de Projeto (Design Patterns)
 
@@ -67,6 +67,7 @@ O idioma oficial do projeto é o **Português Brasileiro**.
 orquestra serviços especializados internos e delega tarefas.
 
 **Responsabilidades da Fachada:**
+
 - Expor interface pública para Controllers e outros módulos
 - Orquestrar chamadas a serviços especializados
 - Gerenciar transações de alto nível
@@ -75,6 +76,7 @@ orquestra serviços especializados internos e delega tarefas.
 **Exemplo no módulo `mapa`:**
 
 O `MapaService` é a fachada pública. Ele utiliza internamente:
+
 - `CopiaMapaService`: Lógica de cópia de mapas
 - `ImpactoMapaService`: Análise de impacto de alterações
 - `MapaVisualizacaoService`: Formatação de dados para visualização
@@ -102,6 +104,7 @@ graph TD
 ```
 
 **Benefícios:**
+
 - Reduz acoplamento entre controllers e lógica complexa
 - Facilita testes unitários (mock da fachada)
 - Ponto único para logging e auditoria
@@ -112,12 +115,14 @@ graph TD
 **Descrição:** Abstração da camada de persistência usando Spring Data JPA.
 
 **Convenções:**
+
 - Nomenclatura: `{Entidade}Repo` (ex: `ProcessoRepo`, `SubprocessoRepo`)
 - Sempre extends `JpaRepository<Entidade, Long>`
 - Queries customizadas usando `@Query` ou métodos derivados
 - Localização: `{modulo}/model/{Entidade}Repo.java`
 
 **Exemplo:**
+
 ```java
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     List<Processo> findBySituacao(SituacaoProcesso situacao);
@@ -137,17 +142,20 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 **Eventos de Domínio Identificados (23 eventos):**
 
 **Eventos de Processo:**
+
 - `EventoProcessoCriado`
 - `EventoProcessoIniciado`
 - `EventoProcessoFinalizado`
 
 **Eventos de Subprocesso - Cadastro:**
+
 - `EventoSubprocessoCadastroDisponibilizado`
 - `EventoSubprocessoCadastroAceito`
 - `EventoSubprocessoCadastroDevolvido`
 - `EventoSubprocessoCadastroHomologado`
 
 **Eventos de Subprocesso - Mapa:**
+
 - `EventoSubprocessoMapaIniciado`
 - `EventoSubprocessoMapaDisponibilizado`
 - `EventoSubprocessoMapaComSugestoes`
@@ -158,6 +166,7 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 - `EventoSubprocessoMapaHomologado`
 
 **Eventos de Subprocesso - Revisão:**
+
 - `EventoRevisaoSubprocessoDisponibilizada`
 - `EventoSubprocessoRevisaoDisponibilizada`
 - `EventoSubprocessoRevisaoAceita`
@@ -183,6 +192,7 @@ sequenceDiagram
 **Implementação:**
 
 1. Serviço publica evento:
+
 ```java
 @Service
 public class ProcessoService {
@@ -197,6 +207,7 @@ public class ProcessoService {
 ```
 
 2. Listener reage ao evento:
+
 ```java
 @Component
 public class EventoProcessoListener {
@@ -210,6 +221,7 @@ public class EventoProcessoListener {
 ```
 
 **Benefícios:**
+
 - Desacoplamento entre módulos
 - Facilita adição de novos comportamentos reativos
 - Separação de responsabilidades (negócio vs notificação)
@@ -220,17 +232,20 @@ public class EventoProcessoListener {
 **Descrição:** Objetos que transportam dados entre as camadas, especialmente entre Controller e Service.
 
 **Convenções de Nomenclatura:**
+
 - `{Entidade}Dto`: DTO genérico (ex: `ProcessoDto`)
 - `{Acao}Req`: Request de entrada (ex: `CriarProcessoReq`, `AtualizarMapaReq`)
 - `{Entidade}Resp`: Response específica (ex: `ProcessoDetalheResp`)
 
 **Benefícios:**
+
 - Evita exposição de entidades JPA na API
 - Permite diferentes views dos mesmos dados
 - Facilita versionamento da API
 - Previne lazy loading exceptions
 
 **Exemplo:**
+
 ```java
 // DTO de entrada
 public record CriarProcessoReq(
@@ -253,12 +268,14 @@ public record ProcessoDto(
 **Descrição:** Conversão automática entre Entidades JPA e DTOs usando MapStruct.
 
 **Convenções:**
+
 - Nomenclatura: `{Entidade}Mapper` (ex: `ProcessoMapper`, `SubprocessoMapper`)
 - Anotação: `@Mapper(componentModel = "spring")`
 - Localização: `{modulo}/mapper/` ou `{modulo}/dto/`
 - Pode injetar Repositórios para resolver relacionamentos
 
 **Exemplo Simples:**
+
 ```java
 @Component
 @Mapper(componentModel = "spring")
@@ -272,6 +289,7 @@ public abstract class AtividadeMapper {
 ```
 
 **Exemplo Complexo (com Repositórios):**
+
 ```java
 @Component
 @Mapper(componentModel = "spring")
@@ -299,6 +317,7 @@ public abstract class SubprocessoMapper {
 **Total de Mappers:** 10 identificados no sistema
 
 **Benefícios:**
+
 - Performance superior a reflexão manual
 - Segurança de tipos em tempo de compilação
 - Menos código boilerplate
@@ -336,6 +355,7 @@ graph TD
 ```
 
 **Camada de Apresentação (Controllers):**
+
 - Recebe requisições HTTP
 - Valida entrada básica
 - Converte DTOs
@@ -343,12 +363,14 @@ graph TD
 - Retorna ResponseEntity com DTOs
 
 **Camada de Serviço:**
+
 - Service Facade: Ponto de entrada único
 - Serviços Especializados: Lógica de negócio específica
 - Gerenciam transações
 - Publicam eventos de domínio
 
 **Camada de Domínio:**
+
 - Entidades JPA: Modelo de dados
 - Repositórios: Acesso a dados
 - Regras de negócio no modelo (quando aplicável)
@@ -389,6 +411,7 @@ O sistema adota uma convenção específica para operações de escrita, prioriz
 explícitas.
 
 **Convenção Adotada:**
+
 - **GET:** Consultas e listagens (idempotente, sem side-effects)
 - **POST:** Criação de recursos
 - **POST (com sufixo):** Atualizações, exclusões e ações de workflow
@@ -406,6 +429,7 @@ explícitas.
 | Finalizar | POST | `/api/processos/{id}/finalizar` | Ação de workflow |
 
 **Justificativa da Convenção:**
+
 - Ações de workflow não são CRUD puro (iniciar, finalizar, devolver)
 - Clareza semântica: a URL indica explicitamente a ação
 - Facilita auditoria e logging
@@ -414,6 +438,7 @@ explícitas.
 ### 5.2. Estrutura de Controllers
 
 **Padrão de Controller:**
+
 ```java
 @RestController
 @RequestMapping("/api/processos")
@@ -445,6 +470,7 @@ public class ProcessoController {
 ```
 
 **Convenções:**
+
 - Controller interage APENAS com Service Facade
 - Não contém lógica de negócio
 - Usa `@PathVariable` para IDs
@@ -454,6 +480,7 @@ public class ProcessoController {
 **Controllers Especializados:**
 
 O módulo `subprocesso` demonstra uma especialização interessante, dividindo o controller em:
+
 - `SubprocessoCrudController`: Operações CRUD básicas
 - `SubprocessoCadastroController`: Ações da etapa de cadastro
 - `SubprocessoMapaController`: Operações relacionadas ao mapa
@@ -501,6 +528,7 @@ graph TD
 O `RestExceptionHandler` (anotado com `@ControllerAdvice`) intercepta exceções e converte para JSON padronizado.
 
 **Exemplo de Resposta de Erro:**
+
 ```json
 {
   "status": 404,
@@ -511,6 +539,7 @@ O `RestExceptionHandler` (anotado com `@ControllerAdvice`) intercepta exceções
 ```
 
 **Exemplo de Uso:**
+
 ```java
 public Processo buscarPorCodigo(Long codigo) {
     return processoRepo.findById(codigo)
@@ -527,6 +556,7 @@ public Processo buscarPorCodigo(Long codigo) {
 3. **Repository:** Constraints de banco de dados
 
 **Exemplo:**
+
 ```java
 public record CriarProcessoReq(
     @NotBlank(message = "Descrição é obrigatória")
@@ -562,6 +592,7 @@ public abstract class EntidadeBase implements Serializable {
 ```
 
 **Convenções:**
+
 - Campo PK: `codigo` (não `id`)
 - Strategy: `IDENTITY` (auto-increment)
 - Tipo: `Long` (permite valores grandes)
@@ -593,6 +624,7 @@ public class Processo extends EntidadeBase {
 ```
 
 **Convenções:**
+
 - Tabelas: UPPER_CASE com schema `sgc`
 - Colunas: snake_case
 - Enums: `EnumType.STRING` (legibilidade no banco)
@@ -602,6 +634,7 @@ public class Processo extends EntidadeBase {
 ### 6.3. Relacionamentos JPA
 
 **OneToMany / ManyToOne:**
+
 ```java
 // Lado One (Processo)
 @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL)
@@ -614,6 +647,7 @@ private Processo processo;
 ```
 
 **ManyToMany:**
+
 ```java
 @ManyToMany
 @JoinTable(
@@ -626,6 +660,7 @@ private Set<Unidade> unidades = new HashSet<>();
 ```
 
 **Boas Práticas:**
+
 - Use `Set` para evitar duplicatas em `@ManyToMany`
 - Inicialize coleções para evitar `NullPointerException`
 - `mappedBy` no lado inverso do relacionamento
@@ -634,6 +669,7 @@ private Set<Unidade> unidades = new HashSet<>();
 ### 6.4. Repositórios
 
 **Estrutura Padrão:**
+
 ```java
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     // Métodos derivados (query method)
@@ -685,6 +721,7 @@ sgc/{modulo}/
 ### 7.2. Módulos do Sistema (15 módulos)
 
 **Módulos de Domínio Principal:**
+
 1. **processo**: Orquestrador de alto nível
 2. **subprocesso**: Máquina de estados e workflow
 3. **mapa**: Gestão de mapas de competências
@@ -732,6 +769,7 @@ graph TD
 ```
 
 **Legenda:**
+
 - Seta sólida: Dependência direta (chamada de método)
 - Seta pontilhada: Comunicação via eventos
 
@@ -746,6 +784,7 @@ graph TD
 **Nomenclatura:** `{Classe}Test.java`
 
 **Exemplo:**
+
 ```java
 @SpringBootTest
 @Transactional
@@ -772,6 +811,7 @@ class ProcessoServiceTest {
 ```
 
 **Convenções:**
+
 - Use `@SpringBootTest` para testes de integração
 - Use `@MockBean` para mockar dependências
 - Use `@Transactional` para rollback automático
@@ -812,6 +852,7 @@ de idioma:
 ### 9.2. Anotações Importantes
 
 **Lombok:**
+
 - `@Getter` / `@Setter`: Gera getters e setters
 - `@NoArgsConstructor` / `@AllArgsConstructor`: Construtores
 - `@RequiredArgsConstructor`: Construtor com campos final
@@ -819,6 +860,7 @@ de idioma:
 - `@Builder`: Pattern Builder
 
 **Spring:**
+
 - `@RestController`: Controller REST
 - `@Service`: Serviço de negócio
 - `@Repository`: Repositório (herança de JpaRepository já marca)
@@ -827,6 +869,7 @@ de idioma:
 - `@ControllerAdvice`: Tratamento global de exceções
 
 **JPA:**
+
 - `@Entity`: Marca entidade JPA
 - `@Table`: Configura tabela
 - `@Id` / `@GeneratedValue`: Chave primária
@@ -835,6 +878,7 @@ de idioma:
 - `@Enumerated`: Mapeia enums
 
 **MapStruct:**
+
 - `@Mapper(componentModel = "spring")`: Marca mapper
 - `@Mapping`: Configura mapeamento customizado
 
@@ -845,12 +889,14 @@ de idioma:
 O sistema possui proteção contra XSS através de sanitização de HTML usando OWASP Java HTML Sanitizer.
 
 **Anotação Customizada:**
+
 ```java
 @SanitizeHtml
 private String descricao;
 ```
 
 **Deserializador Jackson:**
+
 ```java
 public class HtmlSanitizingDeserializer extends JsonDeserializer<String> {
     private static final PolicyFactory HTML_POLICY = 
@@ -867,6 +913,7 @@ public class HtmlSanitizingDeserializer extends JsonDeserializer<String> {
 ### 10.2. Autenticação e Autorização
 
 **JWT (JSON Web Tokens):**
+
 - Token enviado no header: `Authorization: Bearer {token}`
 - Validado em cada requisição via Spring Security
 - Perfis de usuário: ADMIN, GESTOR, SERVIDOR
@@ -876,6 +923,7 @@ public class HtmlSanitizingDeserializer extends JsonDeserializer<String> {
 ### 11.1. Logging
 
 **Convenção:**
+
 ```java
 @Slf4j
 @Service
@@ -889,6 +937,7 @@ public class ProcessoService {
 ```
 
 **Níveis:**
+
 - `ERROR`: Erros graves
 - `WARN`: Situações anormais mas tratáveis
 - `INFO`: Fluxo principal da aplicação
@@ -898,11 +947,13 @@ public class ProcessoService {
 ### 11.2. Transações
 
 **Regra Geral:**
+
 - `@Transactional` na camada de Service
 - Controllers não gerenciam transações
 - Repositórios herdam transacional do JpaRepository
 
 **Exemplo:**
+
 ```java
 @Service
 @Transactional  // Todas as operações são transacionais
@@ -922,6 +973,7 @@ public class ProcessoService {
 ### 11.3. Imutabilidade
 
 **Records para DTOs (Java 14+):**
+
 ```java
 public record ProcessoDto(
     Long codigo,
@@ -931,6 +983,7 @@ public record ProcessoDto(
 ```
 
 **Benefícios:**
+
 - Imutável por padrão
 - Menos código boilerplate
 - Segurança de threads
@@ -939,6 +992,7 @@ public record ProcessoDto(
 ### 11.4. Tratamento de Nulos
 
 **Uso de Optional:**
+
 ```java
 public Optional<Processo> buscarPorDescricao(String descricao) {
     return processoRepo.findByDescricao(descricao);
@@ -952,6 +1006,7 @@ processoService.buscarPorDescricao("Mapeamento")
 ### 11.5. Enumerações
 
 **Padrão:**
+
 ```java
 public enum SituacaoProcesso {
     CRIADO,
@@ -980,10 +1035,10 @@ public enum SituacaoProcesso {
 
 ## 13. Referências e Documentação Adicional
 
-- **OpenAPI/Swagger:** http://localhost:10000/swagger-ui.html
-- **Especificação API:** http://localhost:10000/api-docs
+- **OpenAPI/Swagger:** <http://localhost:10000/swagger-ui.html>
+- **Especificação API:** <http://localhost:10000/api-docs>
 - **README Módulos:** Cada módulo possui `README.md` detalhado em `backend/src/main/java/sgc/{modulo}/`
 - **README Principal:** `/backend/README.md`
-- **Spring Boot Docs:** https://spring.io/projects/spring-boot
-- **MapStruct Docs:** https://mapstruct.org/
-- **Lombok Docs:** https://projectlombok.org/
+- **Spring Boot Docs:** <https://spring.io/projects/spring-boot>
+- **MapStruct Docs:** <https://mapstruct.org/>
+- **Lombok Docs:** <https://projectlombok.org/>

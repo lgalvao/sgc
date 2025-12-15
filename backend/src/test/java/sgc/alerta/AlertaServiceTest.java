@@ -8,10 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.erros.ErroAlerta;
 import sgc.alerta.model.*;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
-import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -53,78 +52,34 @@ class AlertaServiceTest {
     void criarAlerta() {
         Processo p = new Processo();
         Long unidadeId = 1L;
-
         Unidade u = new Unidade();
         u.setCodigo(unidadeId);
 
-        ResponsavelDto resp = new ResponsavelDto();
-        resp.setTitularTitulo("123");
-        resp.setSubstitutoTitulo("456");
-
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
         when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
-        when(sgrhService.buscarResponsavelUnidade(unidadeId)).thenReturn(Optional.of(resp));
-        when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
-        when(usuarioRepo.findById("456")).thenReturn(Optional.of(new Usuario()));
 
-        service.criarAlerta(
-                p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
+        Alerta resultado = service.criarAlerta(
+                p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc");
 
-        verify(alertaUsuarioRepo, times(2)).save(any());
+        assertThat(resultado).isNotNull();
+        verify(alertaRepo).save(any());
     }
 
     @Test
-    @DisplayName("criarAlerta cria usuario se nao existir")
-    void criarAlertaCriaUsuario() {
+    @DisplayName("criarAlerta lança erro se unidade não existe")
+    void criarAlertaUnidadeNaoEncontrada() {
         Processo p = new Processo();
-        Long unidadeId = 1L;
+        Long unidadeId = 999L;
 
-        Unidade u = new Unidade();
-        u.setCodigo(unidadeId);
+        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.empty());
 
-        ResponsavelDto resp = new ResponsavelDto();
-        resp.setTitularTitulo("123");
-
-        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
-        when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
-        when(sgrhService.buscarResponsavelUnidade(unidadeId)).thenReturn(Optional.of(resp));
-
-        when(usuarioRepo.findById("123")).thenReturn(Optional.empty());
-
-        sgc.sgrh.dto.UsuarioDto userDto = new sgc.sgrh.dto.UsuarioDto();
-        userDto.setTitulo("123");
-        userDto.setNome("Nome");
-        userDto.setEmail("email");
-
-        when(sgrhService.buscarUsuarioPorTitulo("123")).thenReturn(Optional.of(userDto));
-
-        service.criarAlerta(
-                p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", LocalDateTime.now());
-
-        verify(alertaUsuarioRepo).save(any());
+        assertThatThrownBy(() ->
+                service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
-    @DisplayName("criarAlerta ignora erro ao buscar responsavel")
-    void criarAlertaIgnoraErro() {
-        Processo p = new Processo();
-        Long unidadeId = 1L;
-        Unidade u = new Unidade();
-        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
-        when(alertaRepo.save(any())).thenReturn(new Alerta());
-        when(sgrhService.buscarResponsavelUnidade(unidadeId))
-                .thenThrow(new RuntimeException("Erro"));
-
-        service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", null);
-
-        verify(alertaUsuarioRepo, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("criarAlertasProcessoIniciado operacional")
+    @DisplayName("criarAlertasProcessoIniciado operacional - texto fixo")
     void criarAlertasProcessoIniciadoOperacional() {
         Processo p = new Processo();
         p.setDescricao("Proc");
@@ -139,11 +94,12 @@ class AlertaServiceTest {
 
         service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
-        verify(alertaRepo).save(argThat(a -> a.getDescricao().contains("Preencha as atividades")));
+        // Texto fixo conforme CDU-04/05
+        verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao())));
     }
 
     @Test
-    @DisplayName("criarAlertasProcessoIniciado intermediaria")
+    @DisplayName("criarAlertasProcessoIniciado intermediaria - texto fixo")
     void criarAlertasProcessoIniciadoIntermediaria() {
         Processo p = new Processo();
         p.setDescricao("Proc");
@@ -158,12 +114,13 @@ class AlertaServiceTest {
 
         service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
-        verify(alertaRepo)
-                .save(argThat(a -> a.getDescricao().contains("Aguarde a disponibilização")));
+        // Texto fixo conforme CDU-04/05
+        verify(alertaRepo).save(argThat(a ->
+                "Início do processo em unidade(s) subordinada(s)".equals(a.getDescricao())));
     }
 
     @Test
-    @DisplayName("criarAlertasProcessoIniciado interoperacional")
+    @DisplayName("criarAlertasProcessoIniciado interoperacional cria 2 alertas")
     void criarAlertasProcessoIniciadoInteroperacional() {
         Processo p = new Processo();
         p.setDescricao("Proc");
@@ -176,49 +133,11 @@ class AlertaServiceTest {
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
         when(alertaRepo.save(any())).thenReturn(new Alerta());
 
-        service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+        List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
-        // Should save 2 alerts
+        // Interoperacional recebe 2 alertas
+        assertThat(resultado).hasSize(2);
         verify(alertaRepo, times(2)).save(any());
-    }
-
-    @Test
-    @DisplayName("criarAlertasProcessoIniciado falha lança ErroAlerta")
-    void criarAlertasProcessoIniciadoFalha() {
-        Processo p = new Processo();
-        Long unidadeId = 1L;
-
-        when(sgrhService.buscarUnidadePorCodigo(unidadeId))
-                .thenThrow(new RuntimeException("Erro SGRH"));
-
-        assertThatThrownBy(
-                () ->
-                        service.criarAlertasProcessoIniciado(
-                                p, List.of(unidadeId), List.of()))
-                .isInstanceOf(ErroAlerta.class);
-    }
-
-    @Test
-    @DisplayName("criarAlertaUsuario captura excecao e loga")
-    void criarAlertaUsuarioExcecao() {
-        Processo p = new Processo();
-        Long unidadeId = 1L;
-        Unidade u = new Unidade();
-        u.setCodigo(unidadeId);
-        ResponsavelDto resp = new ResponsavelDto();
-        resp.setTitularTitulo("123");
-
-        when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
-        when(alertaRepo.save(any())).thenReturn(new Alerta());
-        when(sgrhService.buscarResponsavelUnidade(unidadeId)).thenReturn(Optional.of(resp));
-        when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
-
-        doThrow(new RuntimeException("DB Error")).when(alertaUsuarioRepo).save(any());
-
-        // Should not throw exception
-        service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc", null);
-
-        verify(alertaUsuarioRepo).save(any());
     }
 
     @Test
@@ -272,18 +191,67 @@ class AlertaServiceTest {
     }
 
     @Test
-    @DisplayName("listarAlertasPorUsuario sucesso")
-    void listarAlertasPorUsuario() {
-        String user = "123";
+    @DisplayName("listarAlertasPorUsuario com lazy creation de AlertaUsuario")
+    void listarAlertasPorUsuarioComLazyCreation() {
+        String usuarioTitulo = "123";
+        Long codUnidade = 1L;
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codUnidade);
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(usuarioTitulo);
+        usuario.setUnidadeLotacao(unidade);
+
         Alerta alerta = new Alerta();
-        AlertaUsuario au = new AlertaUsuario();
-        au.setAlerta(alerta);
+        alerta.setCodigo(100L);
 
-        when(alertaUsuarioRepo.findById_UsuarioTitulo(user)).thenReturn(List.of(au));
-        when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().build());
+        AlertaUsuario alertaUsuarioCriado = new AlertaUsuario();
+        alertaUsuarioCriado.setAlerta(alerta);
+        alertaUsuarioCriado.setDataHoraLeitura(null);
 
-        var res = service.listarAlertasPorUsuario(user);
+        when(usuarioRepo.findById(usuarioTitulo)).thenReturn(Optional.of(usuario));
+        when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
+        when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty()); // Não existe ainda
+        when(alertaUsuarioRepo.save(any())).thenReturn(alertaUsuarioCriado);
+        when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().codigo(100L).build());
 
-        assertThat(res).hasSize(1);
+        List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+
+        assertThat(resultado).hasSize(1);
+        // Verifica que AlertaUsuario foi criado (lazy creation)
+        verify(alertaUsuarioRepo).save(any());
+    }
+
+    @Test
+    @DisplayName("listarAlertasPorUsuario retorna existente sem criar novo")
+    void listarAlertasPorUsuarioSemCriarNovo() {
+        String usuarioTitulo = "123";
+        Long codUnidade = 1L;
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codUnidade);
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(usuarioTitulo);
+        usuario.setUnidadeLotacao(unidade);
+
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(100L);
+
+        AlertaUsuario alertaUsuarioExistente = new AlertaUsuario();
+        alertaUsuarioExistente.setAlerta(alerta);
+        alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
+
+        when(usuarioRepo.findById(usuarioTitulo)).thenReturn(Optional.of(usuario));
+        when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
+        when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(alertaUsuarioExistente));
+        when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().codigo(100L).build());
+
+        List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+
+        assertThat(resultado).hasSize(1);
+        // Não deve criar novo AlertaUsuario
+        verify(alertaUsuarioRepo, never()).save(any());
     }
 }
