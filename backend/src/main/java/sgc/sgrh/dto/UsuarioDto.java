@@ -16,16 +16,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioDto {
-    /** Código do usuário (mesmo que título eleitoral, para retrocompatibilidade). */
-    private String codigo;
-
     private String nome;
-
-    /** Título eleitoral (identificador principal do usuário). */
     private String tituloEleitoral;
-
     private String email;
-
     private String matricula;
 
     /** Código da unidade de lotação do usuário. */

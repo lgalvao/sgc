@@ -9,7 +9,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.mapper.SgrhMapper;
+import sgc.sgrh.dto.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;

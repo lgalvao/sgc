@@ -45,5 +45,5 @@ Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, et
 | `processoService.ts` | `ProcessoController` | `/api/processos` |
 | `subprocessoService.ts` | `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController` | `/api/subprocessos` |
 | `unidadesService.ts` | `UnidadeController` | `/api/unidades` |
-| `usuarioService.ts` | `UsuarioController` | `/api/usuarios` |
+| `usuarioService.ts` | `SgrhController` | `/api/usuarios` |
 

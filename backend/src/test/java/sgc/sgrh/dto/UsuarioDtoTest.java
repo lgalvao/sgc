@@ -8,7 +8,6 @@ class UsuarioDtoTest {
     @Test
     void testUsuarioDtoBuilder() {
         UsuarioDto dto = UsuarioDto.builder()
-                .codigo("12345678901")
                 .tituloEleitoral("12345678901")
                 .nome("João Silva")
                 .email("joao.silva@tre-pe.jus.br")
@@ -16,7 +15,6 @@ class UsuarioDtoTest {
                 .unidadeCodigo(10L)
                 .build();
 
-        assertEquals("12345678901", dto.getCodigo());
         assertEquals("12345678901", dto.getTituloEleitoral());
         assertEquals("João Silva", dto.getNome());
         assertEquals("joao.silva@tre-pe.jus.br", dto.getEmail());

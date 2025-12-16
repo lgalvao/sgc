@@ -34,7 +34,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;

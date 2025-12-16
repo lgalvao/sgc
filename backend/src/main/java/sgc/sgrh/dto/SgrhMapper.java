@@ -1,8 +1,6 @@
-package sgc.sgrh.mapper;
+package sgc.sgrh.dto;
 
 import org.mapstruct.Mapper;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
@@ -16,10 +14,12 @@ public interface SgrhMapper {
             return dto;
         }
 
+        Unidade unidadeSuperior = unidade.getUnidadeSuperior();
+
         dto.setCodigo(unidade.getCodigo())
                 .setNome(unidade.getNome())
                 .setSigla(unidade.getSigla())
-                .setCodigoPai(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                .setCodigoPai(unidadeSuperior != null ? unidadeSuperior.getCodigo() : null)
                 .setTipo(unidade.getTipo() != null ? unidade.getTipo().name() : null)
                 .setSubunidades(new java.util.ArrayList<>())
                 .setElegivel(isElegivel);
@@ -46,7 +46,6 @@ public interface SgrhMapper {
         String titulo = tituloObj != null ? tituloObj.toString() : null;
 
         return UsuarioDto.builder()
-                .codigo(titulo)
                 .nome(usuario.getNome())
                 .tituloEleitoral(titulo)
                 .email(usuario.getEmail())

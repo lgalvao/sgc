@@ -22,7 +22,7 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;

@@ -20,7 +20,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;

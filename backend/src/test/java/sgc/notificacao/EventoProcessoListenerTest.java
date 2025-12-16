@@ -18,7 +18,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -111,14 +111,12 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
 
         UsuarioDto titular = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(TITULAR_EMAIL)
                 .matricula(RAMAL)
                 .build();
         UsuarioDto substituto = UsuarioDto.builder()
-                .codigo(String.valueOf(S456))
                 .tituloEleitoral(String.valueOf(S456))
                 .nome(SUBSTITUTO_TESTE)
                 .email(SUBSTITUTO_EMAIL)
@@ -188,7 +186,6 @@ class EventoProcessoListenerTest {
                 new ResponsavelDto(
                         100L, String.valueOf(T123), TITULAR_TESTE, null, null); // Sem substituto
         UsuarioDto titular = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(TITULAR_EMAIL)
@@ -235,7 +232,6 @@ class EventoProcessoListenerTest {
         ResponsavelDto responsavelDto =
                 new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
         UsuarioDto titular = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(TITULAR_EMAIL)
@@ -334,7 +330,6 @@ class EventoProcessoListenerTest {
         ResponsavelDto responsavelDto =
                 new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
         UsuarioDto titularSemEmail = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(" ") // Email em branco
@@ -382,7 +377,6 @@ class EventoProcessoListenerTest {
                         String.valueOf(S456),
                         SUBSTITUTO_TESTE);
         UsuarioDto titular = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(TITULAR_EMAIL)
@@ -421,7 +415,6 @@ class EventoProcessoListenerTest {
 
         ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);
         UsuarioDto titular = UsuarioDto.builder()
-                .codigo(String.valueOf(T123))
                 .tituloEleitoral(String.valueOf(T123))
                 .nome(TITULAR_TESTE)
                 .email(TITULAR_EMAIL)

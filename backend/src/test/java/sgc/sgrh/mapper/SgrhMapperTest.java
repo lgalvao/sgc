@@ -2,6 +2,7 @@ package sgc.sgrh.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import sgc.sgrh.dto.SgrhMapper;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
@@ -44,7 +45,6 @@ class SgrhMapperTest {
         UsuarioDto dto = mapper.toUsuarioDto(usuario);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo("123");
         assertThat(dto.getTituloEleitoral()).isEqualTo("123");
         assertThat(dto.getNome()).isEqualTo("Usuário Teste");
         assertThat(dto.getEmail()).isEqualTo("teste@email.com");

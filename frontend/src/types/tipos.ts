@@ -158,7 +158,6 @@ export interface Subprocesso {
 }
 
 export interface Usuario {
-    codigo: number;
     nome: string;
     tituloEleitoral: string;
     unidade: Unidade;

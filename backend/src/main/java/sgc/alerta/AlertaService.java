@@ -12,7 +12,7 @@ import sgc.processo.model.Processo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;

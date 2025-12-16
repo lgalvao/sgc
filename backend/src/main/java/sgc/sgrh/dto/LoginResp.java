@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import sgc.sgrh.model.Perfil;
 
 /**
- * DTO para resposta de login.
+ * DTO para resposta de login.''
  */
 @Data
 @Builder
@@ -18,12 +18,4 @@ public class LoginResp {
     private Perfil perfil;
     private Long unidadeCodigo;
     private String token;
-
-    // Construtor compatível com chamadas existentes que usavam (String, Perfil, Long)
-    public LoginResp(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
-        this.tituloEleitoral = tituloEleitoral;
-        this.perfil = perfil;
-        this.unidadeCodigo = unidadeCodigo;
-        this.token = null;
-    }
 }

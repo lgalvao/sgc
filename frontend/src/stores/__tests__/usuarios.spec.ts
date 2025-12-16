@@ -6,7 +6,6 @@ import {useUsuariosStore} from "../usuarios";
 
 const mockUsuarios: Usuario[] = [
     {
-        codigo: 1,
         nome: "Ana Paula Souza",
         unidade: {codigo: 1, nome: "Seção de Seleção", sigla: "SESEL"},
         email: "ana.souza@tre-pe.jus.br",
@@ -14,7 +13,6 @@ const mockUsuarios: Usuario[] = [
         tituloEleitoral: "123456789",
     },
     {
-        codigo: 2,
         nome: "Carlos Henrique Lima",
         unidade: {codigo: 2, nome: "Seção de Gestão de Pessoas", sigla: "SGP"},
         email: "carlos.lima@tre-pe.jus.br",
@@ -39,7 +37,7 @@ describe("useUsuariosStore", () => {
 
     it("should initialize with mock usuarios", () => {
         expect(usuariosStore.usuarios.length).toBe(2);
-        expect(usuariosStore.usuarios[0].codigo).toBe(1);
+        expect(usuariosStore.usuarios[0].tituloEleitoral).toBe("123456789");
     });
 
     describe("actions", () => {
@@ -60,15 +58,15 @@ describe("useUsuariosStore", () => {
     });
 
     describe("getters", () => {
-        it("obterUsuarioPorId should return the correct usuario by ID", () => {
-            const usuario = usuariosStore.obterUsuarioPorId(1);
+        it("obterUsuarioPorTitulo should return the correct usuario by titulo", () => {
+            const usuario = usuariosStore.obterUsuarioPorTitulo("123456789");
             expect(usuario).toBeDefined();
-            expect(usuario?.codigo).toBe(1);
+            expect(usuario?.tituloEleitoral).toBe("123456789");
             expect(usuario?.nome).toBe("Ana Paula Souza");
         });
 
-        it("obterUsuarioPorId should return undefined if no matching usuario is found", () => {
-            const usuario = usuariosStore.obterUsuarioPorId(999);
+        it("obterUsuarioPorTitulo should return undefined if no matching usuario is found", () => {
+            const usuario = usuariosStore.obterUsuarioPorTitulo("999999999");
             expect(usuario).toBeUndefined();
         });
     });

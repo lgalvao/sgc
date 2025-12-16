@@ -15,8 +15,8 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         error.value = null;
     }
 
-    const obterUsuarioPorId = computed(() => (id: number): Usuario | undefined => {
-        return usuarios.value.find((u) => u.codigo === id);
+    const obterUsuarioPorTitulo = computed(() => (titulo: string): Usuario | undefined => {
+        return usuarios.value.find((u) => u.tituloEleitoral === titulo);
     });
 
     async function buscarUsuarios() {
@@ -43,7 +43,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         error,
         lastError,
         clearError,
-        obterUsuarioPorId,
+        obterUsuarioPorTitulo,
         buscarUsuarios,
     };
 });

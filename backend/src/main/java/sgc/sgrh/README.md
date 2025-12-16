@@ -25,14 +25,13 @@ graph TD
         direction LR
         SpringSecurity
         OutrosServicos
-        SgrhController
-        UsuarioService
     end
 
     subgraph "Pacote SGRH (este pacote)"
         direction LR
+        SgrhController
+        SgrhService
         UsuarioRepo
-        SgrhServiceFacade(SgrhService - Fachada)
     end
 
     subgraph "Fontes de Dados"
@@ -41,12 +40,13 @@ graph TD
         SGRH_Externo(Sistema Externo de RH)
     end
 
-    SpringSecurity & UsuarioService -- Usa --> UsuarioRepo
+    SpringSecurity -- Usa --> UsuarioRepo
+    SgrhController -- Usa --> SgrhService
+    SgrhService -- Usa --> UsuarioRepo
     UsuarioRepo -- Gerencia entidade Usuario em --> DB_SGC
-    SgrhController -- Usa --> UsuarioService
 
-    OutrosServicos -- Consultam --> SgrhServiceFacade
-    SgrhServiceFacade -- Busca dados em --> SGRH_Externo
+    OutrosServicos -- Consultam --> SgrhService
+    SgrhService -- Busca dados em --> SGRH_Externo
 
     subgraph "Estado Atual"
        SGRH_Externo(Atualmente simulado/mockado)
@@ -57,9 +57,7 @@ graph TD
 
 ### Controladores e Serviços (`service`)
 
-- **`UsuarioService`**: Camada de serviço para lógica interna de usuários, como o fluxo de login/autenticação.
-- **`SgrhService`**: O serviço que atua como fachada/cliente do sistema de RH externo. Outros módulos do SGC (como
-  `alerta` ou `processo`) utilizam este serviço para obter informações organizacionais.
+- **`SgrhService`**: Serviço unificado que gerencia autenticação/autorização de usuários e atua como fachada para o sistema de RH externo. Outros módulos do SGC utilizam este serviço para obter informações organizacionais.
 - **`SgrhController`**: Expõe a API REST (`/api/usuarios`) para autenticação, autorização e finalização de login.
 
 ### Modelo de Dados (`model`)

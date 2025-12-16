@@ -1,13 +1,12 @@
-package sgc.sgrh.service;
+package sgc.sgrh;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.dto.*;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
@@ -18,6 +17,8 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
@@ -41,7 +42,6 @@ public class SgrhService {
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {
-        log.debug("Buscando responsável vigente para a sigla {}.", sigla);
         Unidade unidade = unidadeRepo
                 .findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
@@ -73,7 +73,7 @@ public class SgrhService {
     }
 
     public List<UsuarioDto> buscarUsuariosAtivos() {
-        return usuarioRepo.findAll().stream().map(this::toUsuarioDto).collect(Collectors.toList());
+        return usuarioRepo.findAll().stream().map(this::toUsuarioDto).toList();
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
@@ -85,13 +85,13 @@ public class SgrhService {
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        return unidadeRepo.findAll().stream().map(this::toUnidadeDto).collect(Collectors.toList());
+        return unidadeRepo.findAll().stream().map(this::toUnidadeDto).toList();
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
                 .map(this::toUnidadeDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<UnidadeDto> construirArvoreHierarquica() {
@@ -125,7 +125,7 @@ public class SgrhService {
         return todas.stream()
                 .filter(u -> u.getUnidadeSuperior() == null)
                 .map(u -> dtoMap.get(u.getCodigo()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
@@ -163,7 +163,7 @@ public class SgrhService {
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
         return usuarioRepo.findAllById(titulos).stream()
-                .collect(Collectors.toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
+                .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
     }
 
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
@@ -208,7 +208,6 @@ public class SgrhService {
 
     private UsuarioDto toUsuarioDto(Usuario usuario) {
         return UsuarioDto.builder()
-                .codigo(usuario.getTituloEleitoral())
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
@@ -250,5 +249,52 @@ public class SgrhService {
                 .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
                 .substitutoNome(substituto != null ? substituto.getNome() : null)
                 .build();
+    }
+
+    public boolean autenticar(String tituloEleitoral, String senha) {
+        log.debug("Simulando autenticação para usuário: {}", tituloEleitoral);
+        return true;
+    }
+
+    public List<PerfilUnidade> autorizar(String tituloEleitoral) {
+        log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
+        Usuario usuario = usuarioRepo
+                .findById(tituloEleitoral)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
+
+        carregarAtribuicoes(usuario);
+
+        return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidade(
+                        atribuicao.getPerfil(),
+                        toUnidadeDto(atribuicao.getUnidade())))
+                .toList();
+    }
+
+    public void entrar(String tituloEleitoral, @NonNull PerfilUnidade pu) {
+        log.debug("Usuário {} entrou. Perfil: {}, Unidade: {}",
+                tituloEleitoral,
+                pu.getPerfil(),
+                pu.getSiglaUnidade());
+    }
+
+    public void entrar(@NonNull EntrarReq request) {
+        Long codUnidade = request.getUnidadeCodigo();
+
+        if (!unidadeRepo.existsById(codUnidade)) {
+            throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
+        }
+
+        List<PerfilUnidade> autorizacoes = autorizar(request.getTituloEleitoral());
+        boolean autorizado = autorizacoes
+                .stream()
+                .anyMatch(pu -> {
+                    Perfil perfil = pu.getPerfil();
+                    return perfil.name().equals(request.getPerfil())
+                            && pu.getUnidade().getCodigo().equals(codUnidade);
+                });
+
+        if (!autorizado) {
+            throw new ErroAccessoNegado("Usuário não ten permissão para acessar com perfil e unidade informados.");
+        }
     }
 }

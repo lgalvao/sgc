@@ -17,7 +17,7 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;

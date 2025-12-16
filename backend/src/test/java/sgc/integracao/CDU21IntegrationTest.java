@@ -24,7 +24,7 @@ import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -150,7 +150,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                         Map.of(
                                 "1",
                                 UsuarioDto.builder()
-                                        .codigo("1")
                                         .tituloEleitoral("1")
                                         .nome("Titular Intermediaria")
                                         .email("titular.intermediaria@test.com")
@@ -158,7 +157,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                                         .build(),
                                 "2",
                                 UsuarioDto.builder()
-                                        .codigo("2")
                                         .tituloEleitoral("2")
                                         .nome("Titular Op1")
                                         .email("titular.op1@test.com")
@@ -166,7 +164,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                                         .build(),
                                 "3",
                                 UsuarioDto.builder()
-                                        .codigo("3")
                                         .tituloEleitoral("3")
                                         .nome("Titular Op2")
                                         .email("titular.op2@test.com")

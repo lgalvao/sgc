@@ -17,7 +17,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
@@ -119,24 +119,18 @@ public class SubprocessoCadastroController {
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (faltando != null && !faltando.isEmpty()) {
-            var lista =
-                    faltando.stream()
-                            .map(
-                                    a ->
-                                            Map.of(
-                                                    "codigo",
-                                                    a.getCodigo(),
-                                                    "descricao",
-                                                    a.getDescricao()))
-                            .toList();
+            var lista = faltando.stream()
+                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
+                    .toList();
+
             throw new ErroValidacao(
                     "Existem atividades sem conhecimentos associados.",
                     Map.of("atividadesSemConhecimento", lista));
         }
 
         subprocessoWorkflowService.disponibilizarRevisao(codigo, usuario);
-        return ResponseEntity.ok(
-                new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
+
+        return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
     }
 
     /**

@@ -21,7 +21,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.mapper.SgrhMapper;
+import sgc.sgrh.dto.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;

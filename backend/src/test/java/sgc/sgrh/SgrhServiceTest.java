@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.model.Perfil;
 
 import java.util.List;
 import java.util.Map;
@@ -199,4 +201,39 @@ class SgrhServiceTest {
         assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
         assertTrue(result.containsKey(TITULO_ADMIN));
     }
+
+    // ========== Testes migrados de UsuarioServiceTest ==========
+
+    @Test
+    void testAutenticar_deveRetornarTrue() {
+        boolean resultado = sgrhService.autenticar(TITULO_ADMIN, "senha");
+        assertTrue(resultado);
+    }
+
+    @Test
+    void testAutorizar_deveRetornarListaDePerfisUnidades() {
+        List<PerfilUnidade> resultado = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
+
+        assertNotNull(resultado);
+        assertFalse(resultado.isEmpty());
+        assertTrue(resultado.stream()
+                .anyMatch(pu -> pu.getPerfil() == Perfil.CHEFE
+                        && pu.getUnidade().getCodigo().equals(2L)));
+    }
+
+    @Test
+    void testAutorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
+        assertThrows(ErroEntidadeNaoEncontrada.class,
+                () -> sgrhService.autorizar("TITULO_INEXISTENTE_XYZ"));
+    }
+
+    @Test
+    void testEntrar_deveExecutarSemErro() {
+        List<PerfilUnidade> perfis = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
+        assertFalse(perfis.isEmpty());
+
+        PerfilUnidade perfilUnidade = perfis.getFirst();
+        assertDoesNotThrow(() -> sgrhService.entrar(TITULO_CHEFE_UNIT2, perfilUnidade));
+    }
 }
+

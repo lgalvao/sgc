@@ -154,7 +154,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("Unidade não encontrada, código: " + codigoUnidadeInexistente));
+                    .andExpect(jsonPath("$.message").value("&#39;Unidade&#39; com codigo &#39;" + codigoUnidadeInexistente + "&#39; não encontrado(a)."));
         }
     }
 }
