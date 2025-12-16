@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class JwtProperties {
-    private String secret = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+    private String secret;
     private int expiracaoMinutos = 120;
 }
