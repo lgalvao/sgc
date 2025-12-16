@@ -56,7 +56,7 @@ class UnidadeServiceTest {
     void buscarTodasUnidades() {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        when(unidadeRepo.findAll()).thenReturn(List.of(u1));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
         when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
         List<UnidadeDto> result = service.buscarTodasUnidades();
@@ -68,7 +68,7 @@ class UnidadeServiceTest {
     void buscarArvoreComElegibilidade() {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        when(unidadeRepo.findAll()).thenReturn(List.of(u1));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
         when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
                 .thenReturn(new ArrayList<>());
         when(sgrhMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
@@ -82,7 +82,7 @@ class UnidadeServiceTest {
     void buscarArvoreComElegibilidadeComMapa() {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        when(unidadeRepo.findAllComMapas()).thenReturn(List.of(u1));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
         when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
                 .thenReturn(new ArrayList<>());
@@ -145,7 +145,7 @@ class UnidadeServiceTest {
     void buscarArvore() {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        when(unidadeRepo.findAll()).thenReturn(List.of(u1));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
         when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
         assertThat(service.buscarArvore(1L)).isNotNull();
@@ -157,7 +157,7 @@ class UnidadeServiceTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
-        when(unidadeRepo.findAll()).thenReturn(List.of(u1));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
         when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
         List<String> result = service.buscarSiglasSubordinadas("U1");
