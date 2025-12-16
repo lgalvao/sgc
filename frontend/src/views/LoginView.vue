@@ -61,15 +61,30 @@
                 />
                 Senha
               </label>
-              <BFormInput
-                  id="senha"
-                  v-model="senha"
-                  autocomplete="current-password"
-                  data-testid="inp-login-senha"
-                  :disabled="loginStep > 1"
-                  placeholder="Digite sua senha"
-                  type="password"
-              />
+              <BInputGroup>
+                <BFormInput
+                    id="senha"
+                    v-model="senha"
+                    autocomplete="current-password"
+                    data-testid="inp-login-senha"
+                    :disabled="loginStep > 1"
+                    placeholder="Digite sua senha"
+                    :type="showPassword ? 'text' : 'password'"
+                />
+                <template #append>
+                  <BButton
+                      :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                      :disabled="loginStep > 1"
+                      variant="outline-secondary"
+                      @click="showPassword = !showPassword"
+                  >
+                    <i
+                        aria-hidden="true"
+                        :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    />
+                  </BButton>
+                </template>
+              </BInputGroup>
             </div>
 
             <div
@@ -140,6 +155,7 @@ import {
   BFormInput,
   BFormSelect,
   BFormSelectOption,
+  BInputGroup,
   BRow,
   BSpinner
 } from "bootstrap-vue-next";
@@ -159,6 +175,7 @@ const senha = ref(import.meta.env.DEV ? "123" : "");
 const loginStep = ref(1);
 const parSelecionado = ref<PerfilUnidade | null>(null);
 const isLoading = ref(false);
+const showPassword = ref(false);
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
