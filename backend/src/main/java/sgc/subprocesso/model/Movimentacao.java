@@ -19,18 +19,23 @@ public class Movimentacao extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
     private Subprocesso subprocesso;
+
     @Column(name = "data_hora")
     private LocalDateTime dataHora;
+
     @ManyToOne
     @JoinColumn(name = "unidade_origem_codigo")
     private Unidade unidadeOrigem;
+
     @ManyToOne
     @JoinColumn(name = "unidade_destino_codigo")
     private Unidade unidadeDestino;
+
     @Column(name = "descricao")
     private String descricao;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_codigo")
+    @JoinColumn(name = "usuario_titulo")
     private Usuario usuario;
 
     public Movimentacao(
@@ -39,6 +44,7 @@ public class Movimentacao extends EntidadeBase {
             Usuario usuario,
             String descricao,
             LocalDateTime dataHora) {
+
         super(codigo);
         this.subprocesso = subprocesso;
         this.usuario = usuario;

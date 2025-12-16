@@ -247,19 +247,17 @@ VALUES ('70002', 50000, '8', 'Alerta para Gestor', CURRENT_TIMESTAMP());
 INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_destino_codigo, descricao, data_hora)
 VALUES ('70003', 50000, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP());
 
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('60000', 50000, 8, NULL, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('60000', 50000, 8, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1001, 60000);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 1001 WHERE codigo = 60000;
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10001', 1001, 'Desenvolvimento em Java');
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10002', 1001, 'Desenvolvimento em Vue.js');
 
-INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_codigo, descricao, data_hora)
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora)
 VALUES ('80000', 60000, '50001', 'INICIADO', CURRENT_TIMESTAMP());
 
 -- DADOS ADICIONAIS PARA CDU-17 e CDU-19 e CDU-02
@@ -270,13 +268,11 @@ INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
 VALUES ('1700', 8);
 
 -- Mapa e Subprocesso para CDU-17
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('1700', 1700, 8, NULL, 'REVISAO_CADASTRO_HOMOLOGADA', '2025-12-31 23:59:59');
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('1700', 1700, 8, 'REVISAO_CADASTRO_HOMOLOGADA', '2025-12-31 23:59:59');
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1700, 1700);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 1700 WHERE codigo = 1700;
 
 INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
 VALUES ('17001', 1700, 'Atividade Teste CDU-17');
@@ -284,17 +280,6 @@ INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('17001', 1700, 'Competência Teste CDU-17');
 INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
 VALUES ('17001', 17001);
-
-
--- Process 1900 (para CDU-19) - COMENTADO PARA NÃO BLOQUEAR TESTES DE CDU-10 (Unit 9 ocupada)
--- INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
--- VALUES ('1900', 'Processo para CDU-19', 'EM_ANDAMENTO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', '2025-12-31 23:59:59');
--- INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('1900', 9);
-
--- Mapa e Subprocesso para CDU-19
--- INSERT INTO SGC.MAPA (codigo) VALUES (1900);
--- INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
--- VALUES ('1900', 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', '2025-12-31 23:59:59');
 
 -- Processo CRIADO (para CDU-02 teste de Admin)
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
@@ -312,12 +297,10 @@ INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_
 VALUES ('50002', 'Processo Histórico Finalizado', 'FINALIZADO', CURRENT_TIMESTAMP(), 'MAPEAMENTO', CURRENT_TIMESTAMP());
 
 -- Mapa 1002 (Unidade 9) -> Processo 50001 (FINALIZADO)
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('60002', 50001, 9, NULL, 'DIAGNOSTICO_CONCLUIDO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('60002', 50001, 9, 'DIAGNOSTICO_CONCLUIDO', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1002, 60002);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 1002 WHERE codigo = 60002;
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10003', 1002, 'Análise de Dados');
@@ -326,12 +309,10 @@ VALUES ('10004', 1002, 'Machine Learning');
 
 -- Mapa 1003 (Unidade 10) -> Processo 50002 (FINALIZADO)
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 10);
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('60003', 50002, 10, NULL, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('60003', 50002, 10, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1003, 60003);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 1003 WHERE codigo = 60003;
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10005', 1003, 'Segurança da Informação');
@@ -340,12 +321,10 @@ VALUES ('10006', 1003, 'Gestão de Projetos');
 
 -- Mapa 1004 (Unidade 102) -> Processo 50002 (FINALIZADO)
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 102);
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('60004', 50002, 102, NULL, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('60004', 50002, 102, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (1004, 60004);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 1004 WHERE codigo = 60004;
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10007', 1004, 'Gestão Administrativa');
@@ -359,12 +338,10 @@ VALUES ('30000', 10007);
 
 -- Mapa 201 (Unidade 201) -> Processo 50002 (FINALIZADO)
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES ('50002', 201);
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1)
-VALUES ('60201', 50002, 201, NULL, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES ('60201', 50002, 201, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP());
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo) VALUES (201, 60201);
-
-UPDATE SGC.SUBPROCESSO SET mapa_codigo = 201 WHERE codigo = 60201;
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('20001', 201, 'Gestão Administrativa');

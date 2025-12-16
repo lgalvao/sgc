@@ -199,9 +199,6 @@ VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO');
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
 VALUES (99, 99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 
--- Vincular o mapa ao subprocesso (referência bidirecional)
-UPDATE sgc.subprocesso SET mapa_codigo = 99 WHERE codigo = 99;
-
 -- Vincular o mapa à unidade via tabela de associação
 
 INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
@@ -322,9 +319,6 @@ VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO');
 -- Mapa para SECRETARIA_1 (Unidade 2)
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
 VALUES (200, 200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
-
--- Vincular o mapa ao subprocesso (referência bidirecional)
-UPDATE sgc.subprocesso SET mapa_codigo = 200 WHERE codigo = 200;
 
 -- Vincular o mapa à unidade
 

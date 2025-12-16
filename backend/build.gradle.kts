@@ -78,6 +78,31 @@ tasks.withType<BootJar> {
     mainClass.set("sgc.Sgc")
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    // Carregar variáveis do arquivo .env apropriado baseado na variável ENV
+    // Uso: ./gradlew bootRun -PENV=hom (ou test, e2e)
+    val env = project.findProperty("ENV")?.toString() ?: "test"
+    val envFile = rootProject.file(".env.$env")
+    
+    // Define o perfil Spring automaticamente baseado no ENV
+    systemProperty("spring.profiles.active", env)
+    println("Perfil Spring ativado: $env")
+    
+    if (envFile.exists()) {
+        println("Carregando configurações de: .env.$env")
+        envFile.readLines()
+            .filter { it.isNotBlank() && !it.trim().startsWith("#") }
+            .forEach { line ->
+                val parts = line.split("=", limit = 2)
+                if (parts.size == 2) {
+                    environment(parts[0].trim(), parts[1].trim())
+                }
+            }
+    } else {
+        println("Arquivo .env.$env não encontrado, usando configurações padrão do application.yml")
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 

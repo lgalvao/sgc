@@ -27,6 +27,6 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
      * @param subprocessoCodigo Código do subprocesso
      * @return Optional contendo o mapa se existir
      */
-    @Query("SELECT s.mapa FROM Subprocesso s WHERE s.codigo = :subprocessoCodigo")
+    @Query("SELECT m FROM Mapa m WHERE m.subprocesso.codigo = :subprocessoCodigo")
     Optional<Mapa> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
 }

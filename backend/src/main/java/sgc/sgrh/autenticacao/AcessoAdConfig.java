@@ -15,8 +15,8 @@ public class AcessoAdConfig {
     private final AcessoAdProperties properties;
 
     @Bean
-    public RestClient acessoAdRestClient(RestClient.Builder builder) {
-        return builder
+    public RestClient acessoAdRestClient() {
+        return RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
                 .build();
     }

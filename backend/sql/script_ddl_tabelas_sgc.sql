@@ -23,16 +23,18 @@ DROP TABLE UNIDADE_PROCESSO CASCADE CONSTRAINTS;
 DROP TABLE PROCESSO CASCADE CONSTRAINTS;
 */
 
-NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1
+NUMBER GENERATED ALWAYS AS IDENTITY START
+WITH 1 INCREMENT BY 1
 -- 1. Tabela PROCESSO
-CREATE TABLE PROCESSO (
+CREATE TABLE PROCESSO
+(
     codigo           NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    data_criacao     TIMESTAMP      NULL,
-    data_finalizacao TIMESTAMP      NULL,
-    data_limite      DATE           NULL,
-    descricao        VARCHAR2(255)  NULL,
-    situacao         VARCHAR2(20)   NULL,
-    tipo             VARCHAR2(20)   NULL,
+    data_criacao     TIMESTAMP     NULL,
+    data_finalizacao TIMESTAMP     NULL,
+    data_limite      DATE          NULL,
+    descricao        VARCHAR2(255) NULL,
+    situacao         VARCHAR2(20)  NULL,
+    tipo             VARCHAR2(20)  NULL,
     CONSTRAINT pk_processo PRIMARY KEY (codigo)
 );
 
@@ -46,17 +48,18 @@ COMMENT ON COLUMN PROCESSO.tipo IS 'Tipo do processo ("MAPEAMENTO", "REVISAO", "
 
 
 -- 2. Tabela UNIDADE_PROCESSO (Tabela de Associação N:M entre PROCESSO e unidades - Snapshot)
-CREATE TABLE UNIDADE_PROCESSO (
-    processo_codigo         NUMBER        NOT NULL,
-    unidade_codigo          NUMBER        NOT NULL,
-    nome                    VARCHAR2(255) NULL,
-    sigla                   VARCHAR2(20)  NULL,
-    matricula_titular       VARCHAR2(8)   NULL,
-    titulo_titular          VARCHAR2(12)  NULL,
-    data_inicio_titularidade DATE         NULL,
-    tipo                    VARCHAR2(20)  NULL,
-    situacao                VARCHAR2(20)  NULL,
-    unidade_superior_codigo NUMBER        NULL,
+CREATE TABLE UNIDADE_PROCESSO
+(
+    processo_codigo          NUMBER        NOT NULL,
+    unidade_codigo           NUMBER        NOT NULL,
+    nome                     VARCHAR2(255) NULL,
+    sigla                    VARCHAR2(20)  NULL,
+    matricula_titular        VARCHAR2(8)   NULL,
+    titulo_titular           VARCHAR2(12)  NULL,
+    data_inicio_titularidade DATE          NULL,
+    tipo                     VARCHAR2(20)  NULL,
+    situacao                 VARCHAR2(20)  NULL,
+    unidade_superior_codigo  NUMBER        NULL,
     CONSTRAINT pk_unidade_processo PRIMARY KEY (processo_codigo, unidade_codigo),
     CONSTRAINT fk_up_processo FOREIGN KEY (processo_codigo) REFERENCES PROCESSO (codigo)
 );
@@ -74,15 +77,16 @@ COMMENT ON COLUMN UNIDADE_PROCESSO.unidade_superior_codigo IS 'Unidade superior 
 
 
 -- 3. Tabela SUBPROCESSO
-CREATE TABLE SUBPROCESSO (
+CREATE TABLE SUBPROCESSO
+(
     codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    processo_codigo    NUMBER        NOT NULL,
-    unidade_codigo     NUMBER        NULL,
-    data_limite_etapa1 DATE          NULL,
-    data_fim_etapa1    TIMESTAMP     NULL,
-    data_limite_etapa2 DATE          NULL,
-    data_fim_etapa2    TIMESTAMP     NULL,
-    situacao           VARCHAR2(50)  NULL,
+    processo_codigo    NUMBER       NOT NULL,
+    unidade_codigo     NUMBER       NULL,
+    data_limite_etapa1 DATE         NULL,
+    data_fim_etapa1    TIMESTAMP    NULL,
+    data_limite_etapa2 DATE         NULL,
+    data_fim_etapa2    TIMESTAMP    NULL,
+    situacao           VARCHAR2(50) NULL,
     CONSTRAINT pk_subprocesso PRIMARY KEY (codigo),
     CONSTRAINT fk_subprocesso_up FOREIGN KEY (processo_codigo, unidade_codigo) REFERENCES UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
 );
@@ -98,13 +102,14 @@ COMMENT ON COLUMN SUBPROCESSO.situacao IS 'Situação atual do subprocesso.';
 
 
 -- 4. Tabela MAPA
-CREATE TABLE MAPA (
-    codigo                         NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    subprocesso_codigo             NUMBER          NOT NULL,
-    data_hora_disponibilizado      TIMESTAMP       NULL,
-    observacoes_disponibilizacao   VARCHAR2(1000)  NULL,
-    sugestoes                      VARCHAR2(1000)  NULL,
-    data_hora_homologado           TIMESTAMP       NULL,
+CREATE TABLE MAPA
+(
+    codigo                       NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    subprocesso_codigo           NUMBER         NOT NULL,
+    data_hora_disponibilizado    TIMESTAMP      NULL,
+    observacoes_disponibilizacao VARCHAR2(1000) NULL,
+    sugestoes                    VARCHAR2(1000) NULL,
+    data_hora_homologado         TIMESTAMP      NULL,
     CONSTRAINT pk_mapa PRIMARY KEY (codigo),
     CONSTRAINT fk_mapa_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
 );
@@ -118,7 +123,8 @@ COMMENT ON COLUMN MAPA.data_hora_homologado IS 'Data e hora em que o mapa foi ho
 
 
 -- 5. Tabela ADMINISTRADOR
-CREATE TABLE ADMINISTRADOR (
+CREATE TABLE ADMINISTRADOR
+(
     usuario_titulo VARCHAR2(12) NOT NULL,
     CONSTRAINT pk_administrador PRIMARY KEY (usuario_titulo)
     -- FK implícita para VW_USUARIO.titulo
@@ -128,7 +134,8 @@ COMMENT ON COLUMN ADMINISTRADOR.usuario_titulo IS 'Usuário administrador (PK).'
 
 
 -- 6. Tabela ALERTA
-CREATE TABLE ALERTA (
+CREATE TABLE ALERTA
+(
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     processo_codigo        NUMBER        NOT NULL,
     data_hora              TIMESTAMP     NULL,
@@ -150,7 +157,8 @@ COMMENT ON COLUMN ALERTA.descricao IS 'Descrição do alerta.';
 
 
 -- 7. Tabela ALERTA_USUARIO (Tabela de Associação N:M)
-CREATE TABLE ALERTA_USUARIO (
+CREATE TABLE ALERTA_USUARIO
+(
     alerta_codigo     NUMBER       NOT NULL,
     usuario_titulo    VARCHAR2(12) NOT NULL,
     data_hora_leitura TIMESTAMP    NULL,
@@ -165,7 +173,8 @@ COMMENT ON COLUMN ALERTA_USUARIO.data_hora_leitura IS 'Indica a data e hora de l
 
 
 -- 8. Tabela ANALISE
-CREATE TABLE ANALISE (
+CREATE TABLE ANALISE
+(
     codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo NUMBER        NOT NULL,
     data_hora          TIMESTAMP     NULL,
@@ -173,6 +182,7 @@ CREATE TABLE ANALISE (
     acao               VARCHAR2(100) NULL,
     usuario_titulo     VARCHAR2(12)  NULL,
     unidade_codigo     NUMBER        NULL,
+    motivo             VARCHAR2(200) NULL,
     observacoes        VARCHAR2(500) NULL,
     CONSTRAINT pk_analise PRIMARY KEY (codigo),
     CONSTRAINT fk_analise_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
@@ -190,14 +200,15 @@ COMMENT ON COLUMN ANALISE.observacoes IS 'Observações da análise.';
 
 
 -- 9. Tabela ATRIBUICAO_TEMPORARIA
-CREATE TABLE ATRIBUICAO_TEMPORARIA (
-    codigo          NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    unidade_codigo  NUMBER        NULL,
-    usuario_matricula VARCHAR2(8) NULL,
-    usuario_titulo  VARCHAR2(12)  NULL,
-    data_inicio     DATE          NULL,
-    data_termino    DATE          NULL,
-    justificativa   VARCHAR2(500) NULL,
+CREATE TABLE ATRIBUICAO_TEMPORARIA
+(
+    codigo            NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    unidade_codigo    NUMBER        NULL,
+    usuario_matricula VARCHAR2(8)   NULL,
+    usuario_titulo    VARCHAR2(12)  NULL,
+    data_inicio       DATE          NULL,
+    data_termino      DATE          NULL,
+    justificativa     VARCHAR2(500) NULL,
     CONSTRAINT pk_atrib_temp PRIMARY KEY (codigo)
     -- FKs implícitas para VW_UNIDADE.codigo e VW_USUARIO.titulo
 );
@@ -212,7 +223,8 @@ COMMENT ON COLUMN ATRIBUICAO_TEMPORARIA.justificativa IS 'Justificativa da atrib
 
 
 -- 10. Tabela ATIVIDADE
-CREATE TABLE ATIVIDADE (
+CREATE TABLE ATIVIDADE
+(
     codigo      NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     mapa_codigo NUMBER        NOT NULL,
     descricao   VARCHAR2(255) NULL,
@@ -226,7 +238,8 @@ COMMENT ON COLUMN ATIVIDADE.descricao IS 'Descrição da atividade.';
 
 
 -- 11. Tabela COMPETENCIA
-CREATE TABLE COMPETENCIA (
+CREATE TABLE COMPETENCIA
+(
     codigo      NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     mapa_codigo NUMBER        NOT NULL,
     descricao   VARCHAR2(255) NULL,
@@ -240,7 +253,8 @@ COMMENT ON COLUMN COMPETENCIA.descricao IS 'Descrição da competência.';
 
 
 -- 12. Tabela COMPETENCIA_ATIVIDADE (Tabela de Associação N:M)
-CREATE TABLE COMPETENCIA_ATIVIDADE (
+CREATE TABLE COMPETENCIA_ATIVIDADE
+(
     atividade_codigo   NUMBER NOT NULL,
     competencia_codigo NUMBER NOT NULL,
     CONSTRAINT pk_comp_ativ PRIMARY KEY (atividade_codigo, competencia_codigo),
@@ -253,10 +267,11 @@ COMMENT ON COLUMN COMPETENCIA_ATIVIDADE.competencia_codigo IS 'Referência a COM
 
 
 -- 13. Tabela CONHECIMENTO
-CREATE TABLE CONHECIMENTO (
-    codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    atividade_codigo   NUMBER        NOT NULL,
-    descricao          VARCHAR2(255) NULL,
+CREATE TABLE CONHECIMENTO
+(
+    codigo           NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    atividade_codigo NUMBER        NOT NULL,
+    descricao        VARCHAR2(255) NULL,
     CONSTRAINT pk_conhecimento PRIMARY KEY (codigo),
     CONSTRAINT fk_conhecimento_atividade FOREIGN KEY (atividade_codigo) REFERENCES ATIVIDADE (codigo)
 );
@@ -267,7 +282,8 @@ COMMENT ON COLUMN CONHECIMENTO.descricao IS 'Descrição do conhecimento.';
 
 
 -- 14. Tabela MOVIMENTACAO
-CREATE TABLE MOVIMENTACAO (
+CREATE TABLE MOVIMENTACAO
+(
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo     NUMBER        NOT NULL,
     data_hora              TIMESTAMP     NULL,
@@ -290,7 +306,8 @@ COMMENT ON COLUMN MOVIMENTACAO.descricao IS 'Descrição da movimentação.';
 
 
 -- 15. Tabela NOTIFICACAO
-CREATE TABLE NOTIFICACAO (
+CREATE TABLE NOTIFICACAO
+(
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo     NUMBER        NOT NULL,
     data_hora              TIMESTAMP     NULL,
@@ -311,11 +328,12 @@ COMMENT ON COLUMN NOTIFICACAO.conteudo IS 'Conteúdo da notificação.';
 
 
 -- 16. Tabela PARAMETRO
-CREATE TABLE PARAMETRO (
-    codigo      NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    chave       VARCHAR2(50)  NULL,
-    descricao   VARCHAR2(255) NULL,
-    valor       VARCHAR2(255) NULL,
+CREATE TABLE PARAMETRO
+(
+    codigo    NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    chave     VARCHAR2(50)  NULL,
+    descricao VARCHAR2(255) NULL,
+    valor     VARCHAR2(255) NULL,
     CONSTRAINT pk_parametro PRIMARY KEY (codigo)
 );
 
@@ -326,7 +344,8 @@ COMMENT ON COLUMN PARAMETRO.valor IS 'Valor do parâmetro.';
 
 
 -- 17. Tabela UNIDADE_MAPA (Relacionamento 1:1 onde a PK de uma é FK da outra)
-CREATE TABLE UNIDADE_MAPA (
+CREATE TABLE UNIDADE_MAPA
+(
     unidade_codigo      NUMBER NOT NULL,
     mapa_vigente_codigo NUMBER NOT NULL,
     CONSTRAINT pk_unidade_mapa PRIMARY KEY (unidade_codigo),

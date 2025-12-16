@@ -28,8 +28,7 @@ public class Subprocesso extends EntidadeBase {
     @JoinColumn(name = "unidade_codigo", nullable = false)
     private Unidade unidade;
     
-    @ManyToOne
-    @JoinColumn(name = "mapa_codigo")
+    @OneToOne(mappedBy = "subprocesso")
     private Mapa mapa;
     
     @Column(name = "data_limite_etapa1")

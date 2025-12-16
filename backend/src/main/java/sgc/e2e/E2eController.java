@@ -67,8 +67,7 @@ public class E2eController {
     @Transactional
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
         String sqlMapas =
-                "SELECT mapa_codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND mapa_codigo"
-                        + " IS NOT NULL";
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ?)";
         List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
 
         jdbcTemplate.update(
@@ -84,8 +83,7 @@ public class E2eController {
                         + " sgc.subprocesso WHERE processo_codigo = ?)",
                 codigo);
 
-        // Desvincular mapa para permitir exclusão
-        jdbcTemplate.update("UPDATE sgc.subprocesso SET mapa_codigo = NULL WHERE processo_codigo = ?", codigo);
+
 
         if (!mapaIds.isEmpty()) {
             String ids = mapaIds.toString().replace("[", "").replace("]", "");

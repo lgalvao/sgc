@@ -86,7 +86,6 @@ create table if not exists sgc.subprocesso
     data_limite_etapa2 timestamp(6),
     data_fim_etapa1    timestamp(6),
     data_fim_etapa2    timestamp(6),
-    mapa_codigo        bigint,
     processo_codigo    bigint,
     unidade_codigo     bigint,
     situacao           varchar(50) check (situacao in
@@ -273,8 +272,6 @@ alter table if exists sgc.notificacao
     add constraint fk_notificacao_unidade_destino foreign key (unidade_destino_codigo) references sgc.vw_unidade;
 alter table if exists sgc.notificacao
     add constraint fk_notificacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.vw_unidade;
-alter table if exists sgc.subprocesso
-    add constraint fk_subprocesso_mapa foreign key (mapa_codigo) references sgc.mapa;
 alter table if exists sgc.subprocesso
     add constraint fk_subprocesso_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.subprocesso

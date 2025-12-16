@@ -38,3 +38,4 @@ scripts/stats/node_modules/
 /.vscode/
 /frontend/bin/
 /screenshots/
+.env.hom

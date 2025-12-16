@@ -1,9 +1,18 @@
 spring:
   main.banner-mode: off
   test.mockmvc.print: none
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:testdb}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
   jpa:
+    open-in-view: false
     hibernate.ddl-auto: validate
-    properties.hibernate.default_schema: sgc
+    properties:
+      hibernate:
+        default_schema: sgc
+        jdbc.fetch_size: 50
     show-sql: false
     defer-datasource-initialization: true
   sql.init.mode: always
@@ -53,7 +62,6 @@ logging:
     org.springframework.orm.jpa: ERROR
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
-    org.springframework.boot.autoconfigure.orm.jpa: ERROR
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO

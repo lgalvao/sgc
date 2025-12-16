@@ -73,8 +73,6 @@ class E2eControllerTest {
 
         jdbcTemplate.execute("INSERT INTO sgc.mapa (codigo, subprocesso_codigo) VALUES (200, 300)");
 
-        jdbcTemplate.execute("UPDATE sgc.subprocesso SET mapa_codigo = 200 WHERE codigo = 300");
-
         jdbcTemplate.execute(
                 "INSERT INTO sgc.atividade (codigo, mapa_codigo, descricao) VALUES (400, 200,"
                         + " 'Atividade Teste')");
