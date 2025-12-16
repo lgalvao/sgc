@@ -588,13 +588,17 @@ function excluirCompetencia(codigo: number) {
 
 async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    await mapasStore.removerCompetencia(
-        codSubprocesso.value as number,
-        competenciaParaExcluir.value.codigo,
-    );
-    // Recarregar subprocesso para atualizar situação se mapa ficou vazio
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number);
-    fecharModalExcluirCompetencia();
+    try {
+      await mapasStore.removerCompetencia(
+          codSubprocesso.value as number,
+          competenciaParaExcluir.value.codigo,
+      );
+      // Recarregar subprocesso para atualizar situação se mapa ficou vazio
+      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number);
+      fecharModalExcluirCompetencia();
+    } catch (error) {
+      handleApiErrors(error, "Erro ao remover competência");
+    }
   }
 }
 
@@ -641,7 +645,7 @@ function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
   observacoesDisponibilizacao.value = "";
   notificacaoDisponibilizacao.value = "";
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '' };
+  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
 }
 </script>
 

@@ -13,6 +13,7 @@ build/
 frontend/node_modules/
 frontend/dist/
 frontend/build/
+frontend/coverage/
 
 # Java
 backend/src/main/resources/static/
