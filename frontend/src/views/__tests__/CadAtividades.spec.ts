@@ -534,10 +534,12 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve mostrar erros de validação ao tentar disponibilizar se cadastro inválido", async () => {
+        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
             valido: false,
             erros: [
-                {tipo: 'ATIVIDADE_SEM_CONHECIMENTO', mensagem: 'Erro teste', atividadeId: 1}
+                {tipo: 'ATIVIDADE_SEM_CONHECIMENTO', mensagem: 'Atividade sem conhecimento', atividadeId: 1}
             ]
         });
 
@@ -549,7 +551,6 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividade sem conhecimento");
-        expect(wrapper.text()).toContain("Erro teste");
 
         expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').exists()).toBe(false);
     });

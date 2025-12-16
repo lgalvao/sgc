@@ -106,11 +106,12 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$.length()").value(2))
                     .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
 
+            // O usuário 999999999999 possui perfis ADMIN e GESTOR na unidade de código 2 (data.sql)
             EntrarReq entrarReq =
                     EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("GESTOR")
-                            .unidadeCodigo(unidadeAdmin.getCodigo())
+                            .unidadeCodigo(2L) // Unidade onde o usuário tem o perfil GESTOR
                             .build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                                     .with(csrf())
