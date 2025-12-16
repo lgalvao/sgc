@@ -85,8 +85,11 @@ public class Usuario implements UserDetails {
         LocalDateTime now = LocalDateTime.now();
         if (atribuicoesTemporarias != null) {
             for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-                if ((temp.getDataInicio() == null || !temp.getDataInicio().isAfter(now))
-                        && (temp.getDataTermino() == null || !temp.getDataTermino().isBefore(now))) {
+                if ((temp.getDataInicio() == null || 
+                    !temp.getDataInicio().isAfter(now))
+                    && (temp.getDataTermino() == null 
+                    || !temp.getDataTermino().isBefore(now))) {
+
                     UsuarioPerfil perfil = new UsuarioPerfil();
                     perfil.setUsuarioTitulo(this.tituloEleitoral);
                     perfil.setUsuario(this);

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.ServidorDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.service.UnidadeService;
@@ -86,9 +86,9 @@ public class UnidadeController {
      * @return Lista de servidores da unidade
      */
     @GetMapping("/{codigoUnidade}/servidores")
-    public ResponseEntity<List<ServidorDto>> buscarServidoresPorUnidade(
+    public ResponseEntity<List<UsuarioDto>> buscarServidoresPorUnidade(
             @PathVariable Long codigoUnidade) {
-        List<ServidorDto> servidores = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
+        List<UsuarioDto> servidores = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
         return ResponseEntity.ok(servidores);
     }
 
@@ -100,9 +100,9 @@ public class UnidadeController {
      * @return Lista de usuários da unidade
      */
     @GetMapping("/{codigoUnidade}/usuarios")
-    public ResponseEntity<List<ServidorDto>> buscarUsuariosPorUnidade(
+    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(
             @PathVariable Long codigoUnidade) {
-        List<ServidorDto> usuarios = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
+        List<UsuarioDto> usuarios = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
         return ResponseEntity.ok(usuarios);
     }
 

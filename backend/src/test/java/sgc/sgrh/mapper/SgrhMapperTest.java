@@ -2,8 +2,8 @@ package sgc.sgrh.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
@@ -30,22 +30,26 @@ class SgrhMapperTest {
     }
 
     @Test
-    void toServidorDto() {
+    void toUsuarioDto() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
-        usuario.setNome("Servidor Teste");
+        usuario.setNome("Usuário Teste");
         usuario.setEmail("teste@email.com");
+        usuario.setMatricula("MAT001");
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         usuario.setUnidadeLotacao(unidade);
 
-        ServidorDto dto = mapper.toServidorDto(usuario);
+        UsuarioDto dto = mapper.toUsuarioDto(usuario);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo("123");
-        assertThat(dto.getNome()).isEqualTo("Servidor Teste");
+        assertThat(dto.getTituloEleitoral()).isEqualTo("123");
+        assertThat(dto.getNome()).isEqualTo("Usuário Teste");
         assertThat(dto.getEmail()).isEqualTo("teste@email.com");
+        assertThat(dto.getMatricula()).isEqualTo("MAT001");
         assertThat(dto.getUnidadeCodigo()).isEqualTo(10L);
     }
 }
+

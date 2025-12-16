@@ -11,7 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.ServidorDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.service.UnidadeService;
@@ -99,7 +99,7 @@ class UnidadeControllerTest {
     @DisplayName("buscarServidoresPorUnidade deve retornar lista")
     @WithMockUser
     void buscarServidoresPorUnidade() throws Exception {
-        when(unidadeService.buscarServidoresPorUnidade(1L)).thenReturn(List.of(new ServidorDto()));
+        when(unidadeService.buscarServidoresPorUnidade(1L)).thenReturn(List.of(UsuarioDto.builder().build()));
 
         mockMvc.perform(get("/api/unidades/1/servidores")).andExpect(status().isOk());
 

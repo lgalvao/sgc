@@ -7,7 +7,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.ServidorDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.mapper.SgrhMapper;
 import sgc.sgrh.model.Usuario;
@@ -143,11 +143,11 @@ public class UnidadeService {
         return mapaRepo.findMapaVigenteByUnidade(codigoUnidade).isPresent();
     }
 
-    public List<ServidorDto> buscarServidoresPorUnidade(Long codigoUnidade) {
+    public List<UsuarioDto> buscarServidoresPorUnidade(Long codigoUnidade) {
         List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
 
         return usuarios.stream()
-                .map(sgrhMapper::toServidorDto)
+                .map(sgrhMapper::toUsuarioDto)
                 .toList();
     }
 

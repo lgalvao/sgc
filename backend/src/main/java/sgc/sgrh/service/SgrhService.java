@@ -208,10 +208,12 @@ public class SgrhService {
 
     private UsuarioDto toUsuarioDto(Usuario usuario) {
         return UsuarioDto.builder()
-                .titulo(usuario.getTituloEleitoral())
+                .codigo(usuario.getTituloEleitoral())
+                .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .matricula("MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no  título
+                .matricula(usuario.getMatricula())
+                .unidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null)
                 .build();
     }
 

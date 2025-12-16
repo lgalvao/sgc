@@ -149,23 +149,29 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                 .thenReturn(
                         Map.of(
                                 "1",
-                                new UsuarioDto(
-                                        "1",
-                                        "Titular Intermediaria",
-                                        "titular.intermediaria@test.com",
-                                        "123"),
+                                UsuarioDto.builder()
+                                        .codigo("1")
+                                        .tituloEleitoral("1")
+                                        .nome("Titular Intermediaria")
+                                        .email("titular.intermediaria@test.com")
+                                        .matricula("123")
+                                        .build(),
                                 "2",
-                                new UsuarioDto(
-                                        "2",
-                                        "Titular Op1",
-                                        "titular.op1@test.com",
-                                        "123"),
+                                UsuarioDto.builder()
+                                        .codigo("2")
+                                        .tituloEleitoral("2")
+                                        .nome("Titular Op1")
+                                        .email("titular.op1@test.com")
+                                        .matricula("123")
+                                        .build(),
                                 "3",
-                                new UsuarioDto(
-                                        "3",
-                                        "Titular Op2",
-                                        "titular.op2@test.com",
-                                        "123")));
+                                UsuarioDto.builder()
+                                        .codigo("3")
+                                        .tituloEleitoral("3")
+                                        .nome("Titular Op2")
+                                        .email("titular.op2@test.com")
+                                        .matricula("123")
+                                        .build()));
     }
 
     @Test

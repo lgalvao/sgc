@@ -40,7 +40,7 @@ class SgrhServiceTest {
         Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO_ADMIN);
 
         assertTrue(result.isPresent());
-        assertEquals(TITULO_ADMIN, result.get().getTitulo());
+        assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
         assertEquals(NOME_ADMIN, result.get().getNome());
     }
 
@@ -49,7 +49,7 @@ class SgrhServiceTest {
         Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(EMAIL_ADMIN);
 
         assertTrue(result.isPresent());
-        assertEquals(TITULO_ADMIN, result.get().getTitulo());
+        assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
         assertEquals(EMAIL_ADMIN, result.get().getEmail());
     }
 

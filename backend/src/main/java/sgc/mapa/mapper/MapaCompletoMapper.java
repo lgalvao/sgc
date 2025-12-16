@@ -29,7 +29,6 @@ public interface MapaCompletoMapper {
     CompetenciaMapaDto toDto(Competencia competencia);
 
     @Named("mapAtividadesCodigos")
-    @SuppressWarnings("unused")
     default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.model.Atividade> atividades) {
         if (atividades == null) return null;
 

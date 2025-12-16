@@ -6,19 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UsuarioDtoTest {
     @Test
-    void testUsuarioDtoConstructor() {
-        // Test record constructor
-        UsuarioDto dto =
-                new UsuarioDto(
-                        "12345678901",
-                        "João Silva",
-                        "joao.silva@tre-pe.jus.br",
-                        "MAT001");
+    void testUsuarioDtoBuilder() {
+        UsuarioDto dto = UsuarioDto.builder()
+                .codigo("12345678901")
+                .tituloEleitoral("12345678901")
+                .nome("João Silva")
+                .email("joao.silva@tre-pe.jus.br")
+                .matricula("MAT001")
+                .unidadeCodigo(10L)
+                .build();
 
-        // Test getters (record provides accessors)
-        assertEquals("12345678901", dto.getTitulo());
+        assertEquals("12345678901", dto.getCodigo());
+        assertEquals("12345678901", dto.getTituloEleitoral());
         assertEquals("João Silva", dto.getNome());
         assertEquals("joao.silva@tre-pe.jus.br", dto.getEmail());
         assertEquals("MAT001", dto.getMatricula());
+        assertEquals(10L, dto.getUnidadeCodigo());
     }
 }

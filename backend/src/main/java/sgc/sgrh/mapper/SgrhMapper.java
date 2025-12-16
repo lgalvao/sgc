@@ -1,8 +1,8 @@
 package sgc.sgrh.mapper;
 
 import org.mapstruct.Mapper;
-import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
@@ -31,19 +31,27 @@ public interface SgrhMapper {
         return toUnidadeDto(unidade, true);
     }
 
-    default ServidorDto toServidorDto(Usuario usuario) {
-        ServidorDto dto = new ServidorDto();
-        if (usuario == null) return dto;
+    /**
+     * Converte uma entidade Usuario para UsuarioDto.
+     *
+     * @param usuario A entidade de usuário.
+     * @return O DTO de usuário.
+     */
+    default UsuarioDto toUsuarioDto(Usuario usuario) {
+        if (usuario == null) {
+            return UsuarioDto.builder().build();
+        }
 
         Object tituloObj = usuario.getTituloEleitoral();
         String titulo = tituloObj != null ? tituloObj.toString() : null;
-        dto.setCodigo(titulo);
 
-        dto.setNome(usuario.getNome());
-        dto.setTituloEleitoral(titulo);
-        dto.setEmail(usuario.getEmail());
-        dto.setUnidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null);
-
-        return dto;
+        return UsuarioDto.builder()
+                .codigo(titulo)
+                .nome(usuario.getNome())
+                .tituloEleitoral(titulo)
+                .email(usuario.getEmail())
+                .matricula(usuario.getMatricula())
+                .unidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null)
+                .build();
     }
 }
