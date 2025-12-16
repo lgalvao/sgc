@@ -17,6 +17,8 @@ spring:
 
 aplicacao:
   ambiente-testes: false
+  jwt:
+    secret: ${JWT_SECRET}
 
 logging:
   level:

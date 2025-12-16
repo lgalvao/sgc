@@ -36,7 +36,7 @@ aplicacao:
     base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
     codigo-sistema: SGC
   jwt:
-    secret: sgc-secret-key-change-this-in-production-minimum-32-chars
+    secret: ${JWT_SECRET:sgc-secret-key-change-this-in-production-minimum-32-chars}
     expiracao-minutos: 120
   email:
     remetente: sgc@tre-pe.jus.br
