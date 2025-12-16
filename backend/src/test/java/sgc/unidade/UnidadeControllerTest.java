@@ -37,6 +37,15 @@ class UnidadeControllerTest {
     @MockitoBean
     private UnidadeService unidadeService;
 
+    @MockitoBean
+    private sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt;
+
+    @MockitoBean
+    private sgc.sgrh.model.UsuarioRepo usuarioRepo;
+
+    @MockitoBean
+    private sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
+
     @Autowired
     private MockMvc mockMvc;
 

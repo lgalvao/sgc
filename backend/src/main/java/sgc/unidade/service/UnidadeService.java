@@ -33,7 +33,7 @@ public class UnidadeService {
     private final SgrhMapper sgrhMapper;
 
     public List<UnidadeDto> buscarTodasUnidades() {
-        List<Unidade> todasUnidades = unidadeRepo.findAll();
+        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
         return montarHierarquia(todasUnidades);
     }
 
@@ -42,12 +42,7 @@ public class UnidadeService {
         boolean requerMapaVigente =
                 tipoProcesso == TipoProcesso.REVISAO || tipoProcesso == TipoProcesso.DIAGNOSTICO;
 
-        List<Unidade> todasUnidades;
-        if (requerMapaVigente) {
-            todasUnidades = unidadeRepo.findAllComMapas();
-        } else {
-            todasUnidades = unidadeRepo.findAll();
-        }
+        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
 
         return montarHierarquiaComElegibilidade(todasUnidades, requerMapaVigente, codProcesso);
     }

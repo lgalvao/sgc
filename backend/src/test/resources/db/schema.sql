@@ -190,7 +190,7 @@ create table if not exists sgc.movimentacao
     subprocesso_codigo     bigint,
     unidade_destino_codigo bigint,
     unidade_origem_codigo  bigint,
-    usuario_codigo         varchar(12),
+    usuario_titulo         varchar(12),
     descricao              varchar(255),
     primary key (codigo)
 );
@@ -265,7 +265,7 @@ alter table if exists sgc.movimentacao
 alter table if exists sgc.movimentacao
     add constraint fk_movimentacao_unidade_origem foreign key (unidade_origem_codigo) references sgc.vw_unidade;
 alter table if exists sgc.movimentacao
-    add constraint fk_movimentacao_usuario foreign key (usuario_codigo) references sgc.vw_usuario;
+    add constraint fk_movimentacao_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
 alter table if exists sgc.notificacao
     add constraint fk_notificacao_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
 alter table if exists sgc.notificacao
