@@ -473,4 +473,62 @@ describe("CadMapa.vue", () => {
 
         expect(mapaService.obterMapaCompleto).not.toHaveBeenCalled();
     });
+
+    it("deve tratar erro ao criar competencia", async () => {
+        const {wrapper: w, mapasStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger("click");
+        await wrapper.find('[data-testid="inp-criar-competencia-descricao"]').setValue("Nova");
+
+        // Mock failure on STORE
+        (mapasStore.adicionarCompetencia as any).mockImplementation(async () => {
+             mapasStore.lastError = { message: "Erro API", subErrors: [], kind: 'business' } as any;
+             throw new Error("Erro API");
+        });
+
+        await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
+        await flushPromises();
+
+        expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
+    });
+
+    it("deve tratar erro ao excluir competencia", async () => {
+        const {wrapper: w, mapasStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-excluir-competencia"]').trigger("click");
+
+        (mapasStore.removerCompetencia as any).mockImplementation(async () => {
+             mapasStore.lastError = { message: "Erro API", subErrors: [], kind: 'business' } as any;
+             throw new Error("Erro API");
+        });
+
+        // Trigger confirm on modal
+        const deleteModal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]');
+        await deleteModal.vm.$emit("ok");
+        await flushPromises();
+
+        expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
+    });
+
+    it("deve tratar erro ao disponibilizar mapa", async () => {
+        const {wrapper: w, mapasStore} = createWrapper();
+        wrapper = w;
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').trigger("click");
+
+        (mapasStore.disponibilizarMapa as any).mockImplementation(async () => {
+             mapasStore.lastError = { message: "Erro API", subErrors: [], kind: 'business' } as any;
+             throw new Error("Erro API");
+        });
+
+        await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
+    });
 });

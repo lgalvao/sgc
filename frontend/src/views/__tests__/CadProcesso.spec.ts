@@ -290,4 +290,53 @@ describe('CadProcesso.vue', () => {
     await nextTick();
     expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('REVISAO', undefined);
   });
+
+  it('handles error when starting a new process (creation fail)', async () => {
+    wrapper.vm.processoEditando = null;
+    wrapper.vm.descricao = 'Novo Processo Fail';
+    wrapper.vm.tipo = 'MAPEAMENTO';
+    wrapper.vm.unidadesSelecionadas = [1];
+
+    wrapper.vm.mostrarModalConfirmacao = true;
+    await nextTick();
+
+    processosStore.criarProcesso.mockRejectedValue(new Error('Erro Criacao'));
+    // Simulate store error state which usually happens in the store action catch block
+    processosStore.lastError = { message: 'Erro ao criar', subErrors: [] };
+
+    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.vm.alertState.show).toBe(true);
+    expect(wrapper.vm.alertState.body).toContain('Erro ao criar');
+  });
+
+  it('handles error when starting a process (initiation fail)', async () => {
+    wrapper.vm.processoEditando = { codigo: 123 };
+    wrapper.vm.mostrarModalConfirmacao = true;
+    await nextTick();
+
+    processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro Inicio'));
+    processosStore.lastError = { message: 'Erro ao iniciar', subErrors: [] };
+
+    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.vm.alertState.show).toBe(true);
+    expect(wrapper.vm.alertState.body).toContain('Erro ao iniciar');
+  });
+
+  it('handles error when removing a process', async () => {
+     vi.spyOn(processoService, 'excluirProcesso').mockRejectedValue(new Error('Erro Remocao'));
+     // Direct service call doesn't set store error, so it hits the default error path
+
+     wrapper.vm.processoEditando = { codigo: 123 };
+     wrapper.vm.mostrarModalRemocao = true;
+
+     await wrapper.vm.confirmarRemocao();
+     await flushPromises();
+
+     expect(wrapper.vm.alertState.show).toBe(true);
+     expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
+  });
 });

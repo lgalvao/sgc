@@ -1,4 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createPinia, setActivePinia} from "pinia";
 import router from "../router";
 
 // Mock the views to avoid loading real components
@@ -59,6 +60,7 @@ vi.mock("../views/ConfiguracoesView.vue", () => ({
 
 describe("Router", () => {
     beforeEach(async () => {
+        setActivePinia(createPinia());
         // Reset router to initial state if possible, or just push to root
         await router.push("/");
     });
