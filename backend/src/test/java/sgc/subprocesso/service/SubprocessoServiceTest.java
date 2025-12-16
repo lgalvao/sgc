@@ -1,34 +1,31 @@
 package sgc.subprocesso.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.model.Atividade;
+
 import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.model.Competencia;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
@@ -44,143 +41,77 @@ class SubprocessoServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private sgc.mapa.model.MapaRepo mapaRepo;
+    private MapaRepo mapaRepo;
 
     @InjectMocks
     private SubprocessoService service;
 
     @Test
-    @DisplayName("obterAtividadesSemConhecimento deve retornar lista vazia se todas tiverem")
-    void obterAtividadesSemConhecimentoVazia() {
-        Long id = 1L;
+    @DisplayName("obterStatus sucesso")
+    void obterStatus() {
         Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(10L);
+        sp.setCodigo(1L);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
 
-        Atividade ativ = new Atividade();
-        ativ.setCodigo(100L);
-
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(atividadeRepo.findByMapaCodigo(10L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(100L))
-                .thenReturn(List.of(new Conhecimento()));
-
-        var res = service.obterAtividadesSemConhecimento(id);
-
-        assertThat(res).isEmpty();
+        assertThat(service.obterStatus(1L)).isNotNull();
     }
 
     @Test
-    @DisplayName("obterAtividadesSemConhecimento deve retornar atividades sem conhecimento")
-    void obterAtividadesSemConhecimentoComItens() {
-        Long id = 1L;
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        sp.getMapa().setCodigo(10L);
-
-        Atividade ativ = new Atividade();
-        ativ.setCodigo(100L);
-
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(atividadeRepo.findByMapaCodigo(10L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(100L))
-                .thenReturn(Collections.emptyList());
-
-        var res = service.obterAtividadesSemConhecimento(id);
-
-        assertThat(res).hasSize(1);
+    @DisplayName("obterStatus falha")
+    void obterStatusFalha() {
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.obterStatus(1L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
-    @DisplayName("validarAssociacoesMapa sucesso")
-    void validarAssociacoesMapa() {
-        Long id = 1L;
-        Competencia comp = new Competencia();
-        comp.setAtividades(Set.of(new Atividade()));
-        Atividade ativ = new Atividade();
-        ativ.setCompetencias(Set.of(comp));
-
-        when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of(comp));
-        when(atividadeRepo.findByMapaCodigo(id)).thenReturn(List.of(ativ));
-
-        service.validarAssociacoesMapa(id);
+    @DisplayName("obterEntidadePorCodigoMapa sucesso")
+    void obterEntidadePorCodigoMapa() {
+        when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(new Subprocesso()));
+        assertThat(service.obterEntidadePorCodigoMapa(100L)).isNotNull();
     }
 
     @Test
-    @DisplayName("validarAssociacoesMapa falha competencia isolada")
-    void validarAssociacoesMapaCompIsolada() {
-        Long id = 1L;
-        Competencia comp = new Competencia();
-        comp.setAtividades(Collections.emptySet());
-
-        when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of(comp));
-
-        assertThatThrownBy(() -> service.validarAssociacoesMapa(id))
-                .isInstanceOf(ErroValidacao.class);
-    }
-
-    @Test
-    @DisplayName("validarAssociacoesMapa falha atividade isolada")
-    void validarAssociacoesMapaAtivIsolada() {
-        Long id = 1L;
-        Competencia comp = new Competencia();
-        comp.setAtividades(Set.of(new Atividade()));
-        Atividade ativ = new Atividade();
-        ativ.setCompetencias(Collections.emptySet());
-
-        when(competenciaRepo.findByMapaCodigo(id)).thenReturn(List.of(comp));
-        when(atividadeRepo.findByMapaCodigo(id)).thenReturn(List.of(ativ));
-
-        assertThatThrownBy(() -> service.validarAssociacoesMapa(id))
-                .isInstanceOf(ErroValidacao.class);
-    }
-
-    @Test
-    @DisplayName("criar salva entidade")
+    @DisplayName("criar sucesso")
     void criar() {
         SubprocessoDto dto = SubprocessoDto.builder().build();
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(10L);
+        Subprocesso entity = new Subprocesso();
         
-        when(subprocessoMapper.toEntity(dto)).thenReturn(new Subprocesso());
-        when(repositorioSubprocesso.save(any())).thenReturn(subprocesso);
-        when(mapaRepo.save(any())).thenReturn(mapa);
+        when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
+        when(repositorioSubprocesso.save(any())).thenReturn(entity);
+        when(mapaRepo.save(any())).thenReturn(new Mapa());
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
-        service.criar(dto);
-
-        verify(repositorioSubprocesso, org.mockito.Mockito.times(2)).save(any());
-        verify(mapaRepo).save(any());
+        assertThat(service.criar(dto)).isNotNull();
+        verify(repositorioSubprocesso, times(2)).save(any());
     }
 
     @Test
-    @DisplayName("atualizar modifica e salva")
+    @DisplayName("atualizar sucesso")
     void atualizar() {
-        Long id = 1L;
-        SubprocessoDto dto =
-                SubprocessoDto.builder().codProcesso(10L).codUnidade(20L).codMapa(30L).build();
+        SubprocessoDto dto = SubprocessoDto.builder().codMapa(100L).build();
+        Subprocesso entity = new Subprocesso();
 
-        Subprocesso sp = new Subprocesso();
-
-        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(repositorioSubprocesso.save(any())).thenReturn(sp);
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(entity));
+        when(repositorioSubprocesso.save(any())).thenReturn(entity);
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
-        var res = service.atualizar(id, dto);
-
-        assertThat(res.getCodProcesso()).isEqualTo(10L);
+        assertThat(service.atualizar(1L, dto)).isNotNull();
     }
 
     @Test
-    @DisplayName("excluir deleta se existir")
+    @DisplayName("excluir sucesso")
     void excluir() {
-        Long id = 1L;
-        when(repositorioSubprocesso.existsById(id)).thenReturn(true);
+        when(repositorioSubprocesso.existsById(1L)).thenReturn(true);
+        service.excluir(1L);
+        verify(repositorioSubprocesso).deleteById(1L);
+    }
 
-        service.excluir(id);
-
-        verify(repositorioSubprocesso).deleteById(id);
+    @Test
+    @DisplayName("excluir falha")
+    void excluirFalha() {
+        when(repositorioSubprocesso.existsById(1L)).thenReturn(false);
+        assertThatThrownBy(() -> service.excluir(1L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

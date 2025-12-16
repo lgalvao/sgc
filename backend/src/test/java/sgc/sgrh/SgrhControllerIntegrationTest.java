@@ -83,8 +83,8 @@ class SgrhControllerIntegrationTest {
     void entrar_deveRetornarOk() throws Exception {
         EntrarReq request =
                 EntrarReq.builder()
-                        .tituloEleitoral("123456789101")
-                        .perfil(Perfil.CHEFE.toString())
+                        .tituloEleitoral("111111111111")
+                        .perfil(Perfil.ADMIN.toString())
                         .unidadeCodigo(unidade.getCodigo())
                         .build();
 

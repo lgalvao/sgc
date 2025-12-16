@@ -17,7 +17,8 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      * @param situacao Situação do processo (CRIADO, EM_ANDAMENTO, FINALIZADO)
      * @return Lista de processos com a situação especificada
      */
-    List<Processo> findBySituacao(SituacaoProcesso situacao);
+    @Query("SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao")
+    List<Processo> findBySituacao(@Param("situacao") SituacaoProcesso situacao);
 
     Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
 
