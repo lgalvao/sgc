@@ -89,28 +89,24 @@ public class AnaliseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova análise de validação")
     public Analise criarAnaliseValidacao(
-            @PathVariable("codSubprocesso") Long codSubprocesso,
+            @PathVariable Long codSubprocesso,
             @RequestBody(required = false) Map<String, String> corpo) {
         return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.VALIDACAO);
     }
 
-    private Analise criarAnaliseInterna(
-            Long codSubprocesso, Map<String, String> corpo, TipoAnalise tipo) {
-        if (corpo == null)
-            throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
+    private Analise criarAnaliseInterna(Long codSubprocesso, Map<String, String> corpo, TipoAnalise tipo) {
+        if (corpo == null) throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
 
         String observacoes = corpo.getOrDefault("observacoes", "");
-
-        CriarAnaliseRequest criarAnaliseRequest =
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(observacoes)
-                        .tipo(tipo)
-                        .acao(null)
-                        .siglaUnidade(corpo.get("siglaUnidade"))
-                        .tituloUsuario(corpo.get("tituloUsuario"))
-                        .motivo(corpo.get("motivo"))
-                        .build();
+        CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
+                .codSubprocesso(codSubprocesso)
+                .observacoes(observacoes)
+                .tipo(tipo)
+                .acao(null)
+                .siglaUnidade(corpo.get("siglaUnidade"))
+                .tituloUsuario(corpo.get("tituloUsuario"))
+                .motivo(corpo.get("motivo"))
+                .build();
 
         return analiseService.criarAnalise(criarAnaliseRequest);
     }

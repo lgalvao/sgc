@@ -414,7 +414,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(1000);
+            await page.waitForTimeout(100);
 
             // Logout e login como ADMIN para Homologar
             await page.getByTestId('btn-logout').click();
@@ -431,7 +431,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Homologar cadastro
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await page.waitForTimeout(1000);
+            await page.waitForTimeout(100);
 
             // Agora o Mapa deve estar habilitado para edição pelo Admin
             // Navegar para mapa
@@ -440,7 +440,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Criar competência
             await page.getByTestId('btn-abrir-criar-competencia').click();
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '02-modal-criar-competencia');
 
             const competenciaDesc = 'Desenvolvimento de Software';
@@ -455,25 +455,25 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(modal).toBeHidden();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '05-mapa-com-competencia', {fullPage: true});
 
             // Hover na competência
             const card = page.locator('.competencia-card', {has: page.getByText(competenciaDesc)});
             await card.hover();
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '06-mapa-competencia-hover');
 
             // Disponibilizar mapa
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '07-modal-disponibilizar-mapa');
 
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '08-mapa-disponibilizado', {fullPage: true});
         });
     });
@@ -494,22 +494,22 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Seção Minha Unidade
             await page.getByText('Minha unidade').click();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '03-minha-unidade', {fullPage: true});
 
             // Seção Relatórios
             await page.getByText('Relatórios').click();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '04-relatorios', {fullPage: true});
 
             // Seção Histórico
             await page.getByText('Histórico').click();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '05-historico', {fullPage: true});
 
             // Rodapé
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '06-rodape');
         });
     });

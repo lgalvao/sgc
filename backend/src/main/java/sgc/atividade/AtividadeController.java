@@ -15,7 +15,7 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -28,9 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
-@Tag(
-        name = "Atividades",
-        description = "Endpoints para gerenciamento de atividades e seus conhecimentos associados")
+@Tag(name = "Atividades", description = "Gerenciamento de atividades e seus conhecimentos")
 public class AtividadeController {
     private final AtividadeService atividadeService;
     private final SubprocessoService subprocessoService;
@@ -80,19 +78,8 @@ public class AtividadeController {
         }
         var salvo = atividadeService.criar(atividadeDto, tituloUsuario);
 
-        // Buscar subprocesso e status
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividadeDto.getMapaCodigo());
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
-                .stream()
-                .filter(a -> a.getCodigo().equals(salvo.getCodigo()))
-                .findFirst()
-                .orElse(null);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(atividadeVis)
-                .subprocesso(status)
-                .build();
+        // Buscar subprocesso e situação
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorMapaCodigo(atividadeDto.getMapaCodigo(), salvo.getCodigo(), true);
 
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(response);
@@ -107,26 +94,9 @@ public class AtividadeController {
      */
     @PostMapping("/{codigo}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
-    public ResponseEntity<AtividadeOperacaoResponse> atualizar(
-            @PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
-
+    public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo, @RequestBody @Valid AtividadeDto atividadeDto) {
         atividadeService.atualizar(codigo, atividadeDto);
-
-        // Buscar subprocesso e status
-        Atividade atividade = atividadeService.obterEntidadePorCodigo(codigo);
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
-                .stream()
-                .filter(a -> a.getCodigo().equals(codigo))
-                .findFirst()
-                .orElse(null);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(atividadeVis)
-                .subprocesso(status)
-                .build();
-
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codigo);
         return ResponseEntity.ok(response);
     }
 
@@ -145,17 +115,11 @@ public class AtividadeController {
     public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
         Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
         Long codMapa = atividade.getMapa().getCodigo();
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(codMapa);
 
         atividadeService.excluir(codAtividade);
 
         // Buscar status atualizado após exclusão
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(null) // Atividade foi excluída
-                .subprocesso(status)
-                .build();
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorMapaCodigo(codMapa, codAtividade, false);
 
         return ResponseEntity.ok(response);
     }
@@ -179,29 +143,16 @@ public class AtividadeController {
      * @param codAtividade    O código da atividade à qual o conhecimento será associado.
      * @param conhecimentoDto O DTO com os dados do conhecimento a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse}
-     * contendo a atividade atualizada com o novo conhecimento e o status do subprocesso.
+     * contendo a atividade atualizada com o novo conhecimento e o situação do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criarConhecimento(
-            @PathVariable Long codAtividade, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
+            @PathVariable Long codAtividade,
+            @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
 
-        // Buscar subprocesso e status
-        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
-                .stream()
-                .filter(a -> a.getCodigo().equals(codAtividade))
-                .findFirst()
-                .orElse(null);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(atividadeVis)
-                .subprocesso(status)
-                .build();
-
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.getCodigo()));
         return ResponseEntity.created(uri).body(response);
     }
@@ -221,22 +172,9 @@ public class AtividadeController {
             @PathVariable Long codAtividade,
             @PathVariable Long codConhecimento,
             @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
+
         atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto);
-
-        // Buscar subprocesso e status
-        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
-                .stream()
-                .filter(a -> a.getCodigo().equals(codAtividade))
-                .findFirst()
-                .orElse(null);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(atividadeVis)
-                .subprocesso(status)
-                .build();
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
 
         return ResponseEntity.ok(response);
     }
@@ -251,25 +189,10 @@ public class AtividadeController {
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
-    public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(
-            @PathVariable Long codAtividade, @PathVariable Long codConhecimento) {
+    public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento) {
         atividadeService.excluirConhecimento(codAtividade, codConhecimento);
 
-        // Buscar subprocesso e status
-        Atividade atividade = atividadeService.obterEntidadePorCodigo(codAtividade);
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
-        SubprocessoStatusDto status = subprocessoService.obterStatus(codSubprocesso);
-        AtividadeVisualizacaoDto atividadeVis = subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso)
-                .stream()
-                .filter(a -> a.getCodigo().equals(codAtividade))
-                .findFirst()
-                .orElse(null);
-
-        AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
-                .atividade(atividadeVis)
-                .subprocesso(status)
-                .build();
-
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
         return ResponseEntity.ok(response);
     }
 
@@ -285,4 +208,37 @@ public class AtividadeController {
         return subprocesso.getCodigo();
     }
 
+    // Helper: obtain subprocesso code from an atividade id (reads the Atividade entity once)
+    private Long obterCodigoSubprocessoPorAtividade(Long codigoAtividade) {
+        Atividade atividade = atividadeService.obterEntidadePorCodigo(codigoAtividade);
+        return obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
+    }
+
+    // Convenience helpers to reduce repeated code in endpoints
+    private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {
+        Long codSubprocesso = obterCodigoSubprocessoPorAtividade(codigoAtividade);
+        return criarRespostaOperacao(codSubprocesso, codigoAtividade, true);
+    }
+
+    private AtividadeOperacaoResponse criarRespostaOperacaoPorMapaCodigo(Long mapaCodigo, Long codigoAtividade, boolean incluirAtividade) {
+        Long codSubprocesso = obterCodigoSubprocessoPorMapa(mapaCodigo);
+        return criarRespostaOperacao(codSubprocesso, codigoAtividade, incluirAtividade);
+    }
+
+    // Helper to centralize repeated logic: obtain subprocesso situacao and optionally the atividade visualizacao
+    private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
+        SubprocessoSituacaoDto status = subprocessoService.obterSituacao(codSubprocesso);
+        AtividadeVisualizacaoDto atividadeVis = null;
+        if (incluirAtividade) {
+            atividadeVis = subprocessoService.listarAtividadesSubprocesso(codSubprocesso)
+                    .stream()
+                    .filter(a -> a.getCodigo().equals(codigoAtividade))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return AtividadeOperacaoResponse.builder()
+                .atividade(atividadeVis)
+                .subprocesso(status)
+                .build();
+    }
 }

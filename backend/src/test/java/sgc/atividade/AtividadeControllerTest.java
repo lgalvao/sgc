@@ -21,8 +21,9 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -71,12 +72,12 @@ class AtividadeControllerTest {
         when(subprocessoService.obterEntidadePorCodigoMapa(anyLong())).thenReturn(subprocessoMock);
 
         // Mock para SubprocessoService.obterStatus
-        SubprocessoStatusDto statusDtoMock = SubprocessoStatusDto.builder()
+        SubprocessoSituacaoDto statusDtoMock = SubprocessoSituacaoDto.builder()
                 .codigo(100L)
-                .situacao(null) // ou um valor apropriado, se necessário
-                .situacaoLabel(null) // ou um valor apropriado, se necessário
+                .situacao(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO) // valor de exemplo
+                .situacaoLabel("SITUACAO_TESTE") // valor de exemplo para assert
                 .build();
-        when(subprocessoService.obterStatus(anyLong())).thenReturn(statusDtoMock);
+        when(subprocessoService.obterSituacao(anyLong())).thenReturn(statusDtoMock);
 
         // Mock para SubprocessoService.listarAtividadesPorSubprocesso
         AtividadeVisualizacaoDto atividadeVisualizacaoDtoMock = AtividadeVisualizacaoDto.builder()
@@ -84,7 +85,7 @@ class AtividadeControllerTest {
                 .descricao(ATIVIDADE_TESTE)
                 .conhecimentos(Collections.emptyList())
                 .build();
-        when(subprocessoService.listarAtividadesPorSubprocesso(anyLong())).thenReturn(List.of(atividadeVisualizacaoDtoMock));
+        when(subprocessoService.listarAtividadesSubprocesso(anyLong())).thenReturn(List.of(atividadeVisualizacaoDtoMock));
     }
 
     @Nested
@@ -166,7 +167,7 @@ class AtividadeControllerTest {
                     .conhecimentos(Collections.emptyList())
                     .build();
             // O código do subprocesso mockado no setup é 100L
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeCriadaVis));
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeCriadaVis));
 
             mockMvc.perform(
                             post(API_ATIVIDADES)
@@ -176,7 +177,9 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.atividade.codigo").value(1L))
-                    .andExpect(jsonPath("$.atividade.descricao").value(NOVA_ATIVIDADE));
+                    .andExpect(jsonPath("$.atividade.descricao").value(NOVA_ATIVIDADE))
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
         }
 
         @Test
@@ -221,7 +224,7 @@ class AtividadeControllerTest {
                     .descricao(DESCRICAO_ATUALIZADA)
                     .conhecimentos(Collections.emptyList())
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeAtualizadaVis));
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeAtualizadaVis));
 
             mockMvc.perform(
                             post("/api/atividades/1/atualizar")
@@ -229,7 +232,9 @@ class AtividadeControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.atividade.descricao").value(DESCRICAO_ATUALIZADA));
+                    .andExpect(jsonPath("$.atividade.descricao").value(DESCRICAO_ATUALIZADA))
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
         }
 
         @Test
@@ -269,11 +274,13 @@ class AtividadeControllerTest {
             doNothing().when(atividadeService).excluir(1L);
 
             // Mock para listar atividades retornando vazio (atividade excluída)
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(Collections.emptyList());
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(Collections.emptyList());
 
             mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.atividade").doesNotExist());
+                    .andExpect(jsonPath("$.atividade").doesNotExist())
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
 
             verify(atividadeService, times(1)).excluir(1L);
         }
@@ -343,7 +350,7 @@ class AtividadeControllerTest {
                                     .build()
                     ))
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimento));
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimento));
 
             mockMvc.perform(
                             post(API_CONHECIMENTOS)
@@ -352,7 +359,9 @@ class AtividadeControllerTest {
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_CONHECIMENTOS_1))
-                    .andExpect(jsonPath("$.atividade.conhecimentos[0].codigo").value(1L));
+                    .andExpect(jsonPath("$.atividade.conhecimentos[0].codigo").value(1L))
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
         }
 
         @Test
@@ -383,7 +392,7 @@ class AtividadeControllerTest {
                                     .build()
                     ))
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
 
             mockMvc.perform(
                             post(API_CONHECIMENTOS_1_ATUALIZAR)
@@ -391,7 +400,9 @@ class AtividadeControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.atividade.conhecimentos[0].descricao").value("Atualizado"));
+                    .andExpect(jsonPath("$.atividade.conhecimentos[0].descricao").value("Atualizado"))
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
         }
 
         @Test
@@ -414,11 +425,13 @@ class AtividadeControllerTest {
                     .descricao(ATIVIDADE_TESTE) // ou outra descrição relevante
                     .conhecimentos(Collections.emptyList()) // Lista vazia após exclusão
                     .build();
-            when(subprocessoService.listarAtividadesPorSubprocesso(100L)).thenReturn(List.of(atividadeSemConhecimento));
+            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeSemConhecimento));
 
             mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.atividade.conhecimentos").isEmpty());
+                    .andExpect(jsonPath("$.atividade.conhecimentos").isEmpty())
+                    .andExpect(jsonPath("$.subprocesso.codigo").value(100))
+                    .andExpect(jsonPath("$.subprocesso.situacaoLabel").value("SITUACAO_TESTE"));
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);
         }

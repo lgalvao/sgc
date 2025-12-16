@@ -12,7 +12,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
  */
 @Data
 @Builder
-public class SubprocessoStatusDto {
+public class SubprocessoSituacaoDto {
     private Long codigo;
     private SituacaoSubprocesso situacao;
     private String situacaoLabel;

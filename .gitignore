@@ -37,3 +37,4 @@ backend/bin/
 scripts/stats/node_modules/
 /.vscode/
 /frontend/bin/
+/screenshots/

@@ -16,7 +16,7 @@ import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoStatusDto;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -41,7 +41,7 @@ public class SubprocessoService {
     private final sgc.mapa.model.MapaRepo mapaRepo;
 
     @Transactional(readOnly = true)
-    public List<AtividadeVisualizacaoDto> listarAtividadesPorSubprocesso(Long codSubprocesso) {
+    public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso
                 .findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
@@ -83,12 +83,12 @@ public class SubprocessoService {
      * @return DTO com informações básicas de status.
      */
     @Transactional(readOnly = true)
-    public SubprocessoStatusDto obterStatus(Long codSubprocesso) {
+    public SubprocessoSituacaoDto obterSituacao(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso
                 .findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        return SubprocessoStatusDto.builder()
+        return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
                 .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null)

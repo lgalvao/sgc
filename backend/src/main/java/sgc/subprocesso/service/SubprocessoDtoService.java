@@ -267,12 +267,12 @@ public class SubprocessoDtoService {
         }
 
         @Transactional(readOnly = true)
-        public SubprocessoStatusDto obterStatus(Long codSubprocesso) {
+        public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
                 log.debug("Obtendo status para o subprocesso {}", codSubprocesso);
                 Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-                return SubprocessoStatusDto.builder()
+                return SubprocessoSituacaoDto.builder()
                                 .codigo(sp.getCodigo())
                                 .situacao(sp.getSituacao())
                                 .situacaoLabel(sp.getSituacao().getDescricao())

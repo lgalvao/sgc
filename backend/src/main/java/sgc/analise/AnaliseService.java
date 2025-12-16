@@ -56,13 +56,9 @@ public class AnaliseService {
      */
     @Transactional
     public Analise criarAnalise(CriarAnaliseRequest req) {
-        Subprocesso sp =
-                codSubprocesso
-                        .findById(req.getCodSubprocesso())
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Subprocesso", req.getCodSubprocesso()));
+        Subprocesso sp = codSubprocesso
+                .findById(req.getCodSubprocesso())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", req.getCodSubprocesso()));
 
         Unidade unidade = null;
         if (req.getSiglaUnidade() != null) {
@@ -70,17 +66,16 @@ public class AnaliseService {
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", req.getSiglaUnidade()));
         }
 
-        Analise analise =
-                Analise.builder()
-                        .subprocesso(sp)
-                        .dataHora(LocalDateTime.now())
-                        .observacoes(req.getObservacoes())
-                        .tipo(req.getTipo())
-                        .acao(req.getAcao())
-                        .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
-                        .usuarioTitulo(req.getTituloUsuario())
-                        .motivo(req.getMotivo())
-                        .build();
+        Analise analise = Analise.builder()
+                .subprocesso(sp)
+                .dataHora(LocalDateTime.now())
+                .observacoes(req.getObservacoes())
+                .tipo(req.getTipo())
+                .acao(req.getAcao())
+                .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
+                .usuarioTitulo(req.getTituloUsuario())
+                .motivo(req.getMotivo())
+                .build();
 
         return analiseRepo.save(analise);
     }
@@ -97,8 +92,6 @@ public class AnaliseService {
      */
     public void removerPorSubprocesso(Long codSubprocesso) {
         List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
-        if (!analises.isEmpty()) {
-            analiseRepo.deleteAll(analises);
-        }
+        if (!analises.isEmpty()) analiseRepo.deleteAll(analises);
     }
 }

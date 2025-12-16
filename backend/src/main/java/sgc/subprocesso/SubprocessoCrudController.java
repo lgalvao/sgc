@@ -46,7 +46,7 @@ public class SubprocessoCrudController {
 
     @GetMapping("/{codigo}/status")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
-    public ResponseEntity<SubprocessoStatusDto> obterStatus(@PathVariable Long codigo) {
+    public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoDtoService.obterStatus(codigo));
     }
 

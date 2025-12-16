@@ -23,5 +23,5 @@ public class AtividadeOperacaoResponse {
      * Status atualizado do subprocesso após a operação.
      * Inclui situação, label e timestamp.
      */
-    private SubprocessoStatusDto subprocesso;
+    private SubprocessoSituacaoDto subprocesso;
 }

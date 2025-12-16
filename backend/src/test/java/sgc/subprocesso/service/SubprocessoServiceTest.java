@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -48,19 +46,19 @@ class SubprocessoServiceTest {
 
     @Test
     @DisplayName("obterStatus sucesso")
-    void obterStatus() {
+    void obterSituacao() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
 
-        assertThat(service.obterStatus(1L)).isNotNull();
+        assertThat(service.obterSituacao(1L)).isNotNull();
     }
 
     @Test
     @DisplayName("obterStatus falha")
-    void obterStatusFalha() {
+    void obterSituacaoFalha() {
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.obterStatus(1L))
+        assertThatThrownBy(() -> service.obterSituacao(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

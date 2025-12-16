@@ -101,7 +101,7 @@ public class SubprocessoMapaController {
     public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
         List<AtividadeVisualizacaoDto> atividades =
-                subprocessoService.listarAtividadesPorSubprocesso(codSubprocesso);
+                subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
         return ResponseEntity.ok(atividades);
     }
 

@@ -1,48 +1,97 @@
-import { test, expect } from '@playwright/test';
-import { login, USUARIOS } from './helpers/helpers-auth';
+import {expect, test} from './setup/fixtures';
+import {login, USUARIOS} from './helpers/helpers-auth';
+import {resetDatabase} from './hooks/hooks-limpeza';
 
+/**
+ * CDU-18: Visualizar mapa de competências
+ *
+ * Pré-condições do CDU-18:
+ * - Usuário logado com qualquer perfil
+ * - Processo de mapeamento ou de revisão iniciado ou finalizado
+ * - Subprocesso da unidade com mapa de competência já disponibilizado
+ *
+ * O seed contém:
+ * - Processo 99 (FINALIZADO) com mapa homologado para ASSESSORIA_12 (unidade 4)
+ * - Mapa 99 com competência "Competência Técnica Seed 99" vinculada às atividades
+ */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
-    test.beforeEach(async ({ page }) => {
-        // Admin login
-        await page.goto('/login');
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+    test.beforeAll(async ({request}) => {
+        await resetDatabase(request);
     });
 
-    test('Deve visualizar mapa de competências corretamente', async ({ page }) => {
-        // 1. Navigate to Panel
-        await page.goto('/painel');
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page}) => {
+        await test.step('1. Login como ADMIN', async () => {
+            await page.goto('/login');
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        });
 
-        // 2. Click on 'Processo em Andamento' (from seed)
-        // Wait for table row to appear
-        await page.getByRole('row', { name: 'Processo em Andamento' }).click();
+        await test.step('2. Navegar para processo finalizado com mapa', async () => {
+            // Clicar no processo Seed 99 que tem mapa homologado
+            await page.getByRole('row', {name: 'Processo Seed 99'}).click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+        });
 
-        // 3. Admin view: details of process.
-        // Wait for TreeTable to load and expand
-        // Look for 'ASSESSORIA_11'
-        await expect(page.getByText('ASSESSORIA_11')).toBeVisible();
-        await page.getByText('ASSESSORIA_11').click();
+        await test.step('3. Selecionar unidade ASSESSORIA_12', async () => {
+            // ADMIN vê TreeTable com unidades participantes
+            await expect(page.getByRole('cell', {name: 'ASSESSORIA_12', exact: true})).toBeVisible();
+            await page.getByRole('cell', {name: 'ASSESSORIA_12', exact: true}).click();
 
-        // 4. Subprocess view. Verify we are on Subprocess page.
-        // Title usually contains unit name
-        await expect(page.getByText('Detalhes do Subprocesso')).toBeVisible();
-        await expect(page.getByText('ASSESSORIA_11')).toBeVisible();
+            // Verificar navegação para detalhes do subprocesso
+            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);
+        });
 
-        // Click on 'Mapa de Competências'
-        // Likely a card or a button. "Mapa de Competências"
-        await page.getByText('Mapa de Competências').click();
 
-        // 5. Verify Map View
-        await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        // Check for unit name again
-        await expect(page.getByText('ASSESSORIA_11')).toBeVisible();
+        await test.step('4. Acessar mapa de competências via card', async () => {
+            // Verificar que card de mapa está disponível e acessível
+            await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
+            await page.getByTestId('card-subprocesso-mapa').click();
+        });
 
-        // Verify seeded content from import.sql
-        // Competencia: 'Competencia Técnica 1'
-        // Atividade: 'Atividade 1'
-        // Conhecimento: 'Conhecimento 1'
-        await expect(page.getByText('Competencia Técnica 1')).toBeVisible();
-        await expect(page.getByText('Atividade 1')).toBeVisible();
-        await expect(page.getByText('Conhecimento 1')).toBeVisible();
+        await test.step('5. Verificar visualização do mapa (CDU-18)', async () => {
+            // 5.1 Título "Mapa de competências técnicas"
+            await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+
+            // 5.2 Identificação da unidade (sigla e nome)
+            await expect(page.getByTestId('txt-header-unidade')).toContainText('ASSESSORIA_12');
+
+            // 5.3 Competência do seed
+            await expect(page.getByTestId('vis-mapa__card-competencia')).toBeVisible();
+            await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
+
+            // 5.4 Atividades da competência
+            await expect(page.getByText('Atividade Seed 1')).toBeVisible();
+            await expect(page.getByText('Atividade Seed 2')).toBeVisible();
+
+            // 5.5 Conhecimentos das atividades
+            await expect(page.getByText('Conhecimento Seed 1.1')).toBeVisible();
+            await expect(page.getByText('Conhecimento Seed 2.1')).toBeVisible();
+        });
+    });
+
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page}) => {
+        await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
+            await page.goto('/login');
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+        });
+
+        await test.step('2. Navegar para processo via painel', async () => {
+            // CHEFE vê processo no painel e clica
+            await page.getByRole('row', {name: 'Processo Seed 99'}).click();
+
+            // CHEFE vai direto para detalhes do subprocesso da sua unidade
+            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);
+        });
+
+        await test.step('3. Acessar mapa de competências', async () => {
+            await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
+            await page.getByTestId('card-subprocesso-mapa').click();
+        });
+
+        await test.step('4. Verificar visualização do mapa', async () => {
+            await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+            await expect(page.getByTestId('txt-header-unidade')).toContainText('ASSESSORIA_12');
+            await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
+        });
     });
 });

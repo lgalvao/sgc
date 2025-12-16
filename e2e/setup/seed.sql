@@ -199,7 +199,11 @@ VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO');
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
 VALUES (99, 99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 
+-- Vincular o mapa ao subprocesso (referência bidirecional)
+UPDATE sgc.subprocesso SET mapa_codigo = 99 WHERE codigo = 99;
+
 -- Vincular o mapa à unidade via tabela de associação
+
 INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
 VALUES (4, 99);
 
@@ -217,6 +221,16 @@ VALUES (9902, 'Atividade Seed 2', 99);
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
 VALUES (990201, 'Conhecimento Seed 2.1', 9902);
 
+-- Competências para o mapa 99 (ASSESSORIA_12)
+-- Necessário para testes de CDU-18 (Visualização de mapa)
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (99001, 'Competência Técnica Seed 99', 99);
+
+-- Vincular atividades à competência
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (9901, 99001);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (9902, 99001);
 
 
 -- Atualizar titulares das unidades depois da criação dos usuários (com matrícula e data inicio)
@@ -309,7 +323,11 @@ VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO');
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
 VALUES (200, 200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 
+-- Vincular o mapa ao subprocesso (referência bidirecional)
+UPDATE sgc.subprocesso SET mapa_codigo = 200 WHERE codigo = 200;
+
 -- Vincular o mapa à unidade
+
 INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
 VALUES (2, 200);
 
@@ -321,7 +339,17 @@ VALUES (2001, 'Atividade 1', 200);
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
 VALUES (200101, 'Conhecimento 1', 2001);
 
+-- Competência para o mapa 200 (SECRETARIA_1)
+-- Necessário para testes de CDU-18 (Visualização de mapa)
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (200001, 'Competência Técnica 1', 200);
+
+-- Vincular atividade à competência
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (2001, 200001);
+
 -- Unidade Isolada para Teste de Diagnóstico (Garante 100% de conclusão com Mock User)
+
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo)
 VALUES (99, 'Unit Test Diag', 'UNIT_TEST_DIAG', 'OPERACIONAL', 'ATIVA', 11);
 
