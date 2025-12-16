@@ -28,24 +28,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoMapaWorkflowService {
-    private final SubprocessoRepo repositorioSubprocesso;
-    private final CompetenciaRepo repositorioCompetencia;
+    private final SubprocessoRepo subprocessoRepo;
+    private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
     private final MapaService mapaService;
     private final CompetenciaService competenciaService;
     private final ApplicationEventPublisher publicadorDeEventos;
 
-    public MapaCompletoDto salvarMapaSubprocesso(
-            Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
-        log.info(
-                "Salvando mapa do subprocesso: codSubprocesso={}, usuario={}",
-                codSubprocesso,
-                tituloUsuario);
+    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
+        log.debug("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
+        boolean eraVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
@@ -55,30 +50,28 @@ public class SubprocessoMapaWorkflowService {
                 && subprocesso.getSituacao()
                 == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-            repositorioSubprocesso.save(subprocesso);
-            log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", codSubprocesso);
+            subprocessoRepo.save(subprocesso);
         }
 
         return mapaDto;
     }
 
-    public MapaCompletoDto adicionarCompetencia(
-            Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
+    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        
+
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
-        
+        boolean eraVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
+
         competenciaService.adicionarCompetencia(
-                subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds());
-        
+                subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds()
+        );
+
         // Alterar situação para MAPA_CRIADO se era vazio e passou a ter competências
         if (eraVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-            repositorioSubprocesso.save(subprocesso);
-            log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", codSubprocesso);
+            subprocessoRepo.save(subprocesso);
         }
-        
+
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
@@ -87,45 +80,43 @@ public class SubprocessoMapaWorkflowService {
             Long codCompetencia,
             CompetenciaReq request,
             String tituloUsuario) {
+
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(
                 codCompetencia, request.getDescricao(), request.getAtividadesIds());
+
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto removerCompetencia(
             Long codSubprocesso, Long codCompetencia, String tituloUsuario) {
+
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        
+
         Long codMapa = subprocesso.getMapa().getCodigo();
         competenciaService.removerCompetencia(codCompetencia);
-        
+
         // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
-        boolean ficouVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
+        boolean ficouVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            repositorioSubprocesso.save(subprocesso);
+            subprocessoRepo.save(subprocesso);
             log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
         }
-        
+
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
-        Subprocesso subprocesso =
-                repositorioSubprocesso
-                        .findById(codSubprocesso)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Subprocesso não encontrado: %d"
-                                                        .formatted(codSubprocesso)));
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
+                .orElseThrow(() ->
+                        new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
                 && situacao != SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
-                && situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA  // CDU-16
-                && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {      // CDU-16
+                && situacao != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                && situacao != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
             throw new ErroMapaEmSituacaoInvalida(
                     "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s"
                             .formatted(situacao));
@@ -137,12 +128,8 @@ public class SubprocessoMapaWorkflowService {
         return subprocesso;
     }
 
-    public void disponibilizarMapa(
-            Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.info(
-                "Disponibilizando mapa do subprocesso: codSubprocesso={}, usuario={}",
-                codSubprocesso,
-                usuario.getTituloEleitoral());
+    public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        log.info("Disponibilizando mapa do subprocesso: codSubprocesso={}", codSubprocesso);
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(subprocesso);
@@ -150,9 +137,10 @@ public class SubprocessoMapaWorkflowService {
         if (request.getDataLimite() == null) {
             throw new ErroValidacao("A data limite para validação é obrigatória.");
         }
+
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa2(request.getDataLimite().atStartOfDay());
-        repositorioSubprocesso.save(subprocesso);
+        subprocessoRepo.save(subprocesso);
 
         publicadorDeEventos.publishEvent(
                 EventoSubprocessoMapaDisponibilizado.builder()
@@ -162,43 +150,38 @@ public class SubprocessoMapaWorkflowService {
                         .unidadeDestino(subprocesso.getUnidade())
                         .build());
 
-        log.info(
-                "Subprocesso {} atualizado para MAPEAMENTO_MAPA_DISPONIBILIZADO e mapa"
-                        + " disponibilizado.",
-                codSubprocesso);
+        log.info("Subprocesso {} atualizado e mapa disponibilizado.", codSubprocesso);
     }
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
-        var competencias = repositorioCompetencia.findByMapaCodigo(codMapa);
+        var competencias = competenciaRepo.findByMapaCodigo(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
-            throw new ErroValidacao(
-                    "Todas as competências devem estar associadas a pelo menos uma atividade.");
+            throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
         }
 
-        var atividadesDoSubprocesso =
-                atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
-        var atividadesAssociadas =
-                competencias.stream()
-                        .flatMap(c -> c.getAtividades().stream())
-                        .map(Atividade::getCodigo)
-                        .collect(Collectors.toSet());
+        var atividadesDoSubprocesso = atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
 
-        var atividadesNaoAssociadas =
-                atividadesDoSubprocesso.stream()
-                        .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
-                        .toList();
+        var atividadesAssociadas = competencias.stream()
+                .flatMap(c -> c.getAtividades().stream())
+                .map(Atividade::getCodigo)
+                .collect(Collectors.toSet());
+
+        var atividadesNaoAssociadas = atividadesDoSubprocesso.stream()
+                .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
+                .toList();
 
         if (!atividadesNaoAssociadas.isEmpty()) {
-            String nomesAtividades =
-                    atividadesNaoAssociadas.stream()
-                            .map(Atividade::getDescricao)
-                            .collect(Collectors.joining(", "));
-            throw new ErroValidacao(
-                    "Todas as atividades devem estar associadas a pelo menos uma competência."
-                            + " Atividades pendentes: "
-                            + nomesAtividades);
+            String nomesAtividades = atividadesNaoAssociadas.stream()
+                    .map(Atividade::getDescricao)
+                    .collect(Collectors.joining(", "));
+
+            throw new ErroValidacao("""
+                    Todas as atividades devem estar associadas a pelo menos uma competência.
+                    Atividades pendentes: %s""".
+                    formatted(nomesAtividades)
+            );
         }
     }
 }

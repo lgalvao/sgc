@@ -4,37 +4,33 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sgc.comum.util.TokenSimuladoUtil;
+import sgc.sgrh.autenticacao.GerenciadorJwt;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
-    private final ObjectMapper objectMapper;
+    private final GerenciadorJwt gerenciadorJwt;
+    @Lazy
     private final UsuarioRepo usuarioRepo;
-
-    public FiltroAutenticacaoSimulado(ObjectMapper objectMapper, @Lazy UsuarioRepo usuarioRepo) {
-        this.objectMapper = objectMapper;
-        this.usuarioRepo = usuarioRepo;
-    }
+    @Lazy
+    private final sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     protected void doFilterInternal(
             HttpServletRequest request,
             @NonNull HttpServletResponse response,
@@ -44,42 +40,39 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            try {
-                String[] parts = token.split("\\.");
-                if (parts.length != 2 || !TokenSimuladoUtil.validar(parts[0], parts[1])) {
-                    throw new IllegalArgumentException("Token inválido ou assinatura incorreta");
-                }
-
-                // O token é apenas um Base64 de um JSON simulado
-                String json = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
-                JsonNode node = objectMapper.readTree(json);
-
-                if (node.has("tituloEleitoral")) {
-                    String titulo = node.get("tituloEleitoral").asString();
-                    String perfil = node.has("perfil") ? node.get("perfil").asString() : "USER";
-
-                    // Load Usuario entity from database to enable @AuthenticationPrincipal Usuario
-                    Optional<Usuario> usuarioOpt = usuarioRepo.findById(titulo);
-                    Object principal = usuarioOpt.isPresent() ? usuarioOpt.get() : titulo;
-
-                    // Cria autenticação com Usuario entity como principal
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    principal,
-                                    null,
-                                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + perfil))
-                            );
-
+            String jwtToken = authHeader.substring(7);
+            
+            gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
+                Optional<Usuario> usuarioOpt = usuarioRepo.findById(claims.tituloEleitoral());
+                
+                if (usuarioOpt.isPresent()) {
+                    Usuario usuario = usuarioOpt.get();
+                    
+                    // Carregar atribuições do banco
+                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
+                    usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
+                    
+                    log.debug("Carregando authorities para usuário {}", claims.tituloEleitoral());
+                    var authorities = usuario.getAuthorities();
+                    log.debug("Authorities carregadas: {}", authorities);
+                    
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            usuario,
+                            null,
+                            authorities
+                    );
+                    
                     SecurityContextHolder.getContext().setAuthentication(auth);
+                    log.debug("Usuário {} autenticado via JWT com authorities: {}", 
+                        claims.tituloEleitoral(), authorities);
+                } else {
+                    log.warn("Usuário {} do JWT não encontrado no SGRH", claims.tituloEleitoral());
                 }
-            } catch (Exception e) {
-                // Token inválido, ignora e deixa o SecurityContext vazio (vai dar 401 depois)
-                logger.warn("Falha ao validar token simulado", e);
-            }
+            });
         }
 
         filterChain.doFilter(request, response);
     }
 }
+
 

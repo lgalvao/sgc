@@ -1,10 +1,11 @@
 package sgc.sgrh;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.*;
 import sgc.sgrh.model.Perfil;
@@ -22,11 +23,24 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class SgrhService {
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
     private final sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private final sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt;
+
+    @Autowired(required = false)
+    private sgc.sgrh.autenticacao.AcessoAdClient acessoAdClient;
+
+    public SgrhService(UnidadeRepo unidadeRepo,
+                       UsuarioRepo usuarioRepo,
+                       sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo,
+                       sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt) {
+        this.unidadeRepo = unidadeRepo;
+        this.usuarioRepo = usuarioRepo;
+        this.usuarioPerfilRepo = usuarioPerfilRepo;
+        this.gerenciadorJwt = gerenciadorJwt;
+    }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
         return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
@@ -173,7 +187,7 @@ public class SgrhService {
                     carregarAtribuicoes(u);
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
-                            .map(a -> a.getUnidade().getCodigo())
+                            .map(UsuarioPerfil::getUnidadeCodigo)
                             .toList();
                 })
                 .orElse(Collections.emptyList());
@@ -186,9 +200,7 @@ public class SgrhService {
                     carregarAtribuicoes(u);
                     return u.getTodasAtribuicoes().stream()
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
-                                    && a.getUnidade()
-                                    .getCodigo()
-                                    .equals(unidadeCodigo));
+                                    && a.getUnidadeCodigo().equals(unidadeCodigo));
                 })
                 .orElse(false);
     }
@@ -252,8 +264,19 @@ public class SgrhService {
     }
 
     public boolean autenticar(String tituloEleitoral, String senha) {
-        log.debug("Simulando autenticação para usuário: {}", tituloEleitoral);
-        return true;
+        log.debug("Autenticando usuário no AD: {}", tituloEleitoral);
+
+        if (acessoAdClient == null) {
+            log.debug("AcessoAdClient não disponível (profile test/e2e). Simulando autenticação.");
+            return true;
+        }
+
+        try {
+            return acessoAdClient.autenticar(tituloEleitoral, senha);
+        } catch (ErroAutenticacao e) {
+            log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
+            return false;
+        }
     }
 
     public List<PerfilUnidade> autorizar(String tituloEleitoral) {
@@ -277,7 +300,7 @@ public class SgrhService {
                 pu.getSiglaUnidade());
     }
 
-    public void entrar(@NonNull EntrarReq request) {
+    public String entrar(@NonNull EntrarReq request) {
         Long codUnidade = request.getUnidadeCodigo();
 
         if (!unidadeRepo.existsById(codUnidade)) {
@@ -294,7 +317,16 @@ public class SgrhService {
                 });
 
         if (!autorizado) {
-            throw new ErroAccessoNegado("Usuário não ten permissão para acessar com perfil e unidade informados.");
+            throw new ErroAccessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
         }
+
+        String token = gerenciadorJwt.gerarToken(
+                request.getTituloEleitoral(),
+                Perfil.valueOf(request.getPerfil()),
+                codUnidade
+        );
+
+        log.debug("Usuário {} entrou com sucesso. JWT gerado.", request.getTituloEleitoral());
+        return token;
     }
 }

@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AlertaController.class)
 @Import(RestExceptionHandler.class)
 class AlertaControllerTest {
-
     @MockitoBean
     private AlertaService alertaService;
 
@@ -35,10 +34,9 @@ class AlertaControllerTest {
     @DisplayName("marcarComoLido_quandoSucesso_deveRetornarOk")
     @WithMockUser
     void marcarComoLido_quandoSucesso_deveRetornarOk() throws Exception {
-        mockMvc.perform(
-                        post("/api/alertas/1/marcar-como-lido")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(alertaService).marcarComoLido(anyString(), anyLong());
@@ -67,10 +65,9 @@ class AlertaControllerTest {
                 .when(alertaService)
                 .marcarComoLido(anyString(), anyLong());
 
-        mockMvc.perform(
-                        post("/api/alertas/1/marcar-como-lido")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -82,10 +79,9 @@ class AlertaControllerTest {
                 .when(alertaService)
                 .marcarComoLido(anyString(), anyLong());
 
-        mockMvc.perform(
-                        post("/api/alertas/1/marcar-como-lido")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/alertas/1/marcar-como-lido")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
 }

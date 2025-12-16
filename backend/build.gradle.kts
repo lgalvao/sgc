@@ -1,19 +1,10 @@
-import com.github.spotbugs.snom.Confidence
-import com.github.spotbugs.snom.Effort.MAX
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     java
-    checkstyle
-    pmd
     id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.spotbugs") version "6.4.7"
-    id("com.diffplug.spotless") version "8.1.0"
-    id("com.github.ben-manes.versions") version "0.53.0"
-    id("jacoco")
 }
 
 java {
@@ -24,6 +15,7 @@ java {
 
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
+extra["jjwt.version"] = "0.13.0"
 
 dependencies {
     // Spring
@@ -58,12 +50,14 @@ dependencies {
 
     // Segurança
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
 
     // Testes
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    testImplementation("net.jqwik:jqwik:1.9.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
@@ -76,72 +70,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
     implementation("ch.qos.logback:logback-classic:1.5.21")
     implementation("ch.qos.logback:logback-core:1.5.21")
-
-    spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 }
 
-spotless {
-    isEnforceCheck = false
-    java {
-        googleJavaFormat("1.33.0").aosp().reflowLongStrings()
-        leadingTabsToSpaces(2)
-        target("src/*/java/**/*.java")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-spotbugs {
-    toolVersion.set("4.9.8")
-    excludeFilter.set(file("config/spotbugs/exclude.xml"))
-    effort.set(MAX)
-    reportLevel.set(Confidence.HIGH)
-    ignoreFailures.set(true)
-}
-
-checkstyle {
-    toolVersion = "12.2.0"
-    configFile = file("config/checkstyle/checkstyle.xml")
-    maxWarnings = 0
-    isIgnoreFailures = true
-}
-
-pmd {
-    toolVersion = "7.19.0"
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-    isIgnoreFailures = true
-}
-
-tasks.register("qualityCheck") {
-    group = "quality"
-    description = "Runs all quality checks (tests, coverage, SpotBugs, Checkstyle, PMD)"
-
-    dependsOn(tasks.test)
-    dependsOn(tasks.checkstyleMain)
-    dependsOn(tasks.checkstyleTest)
-    dependsOn(tasks.pmdMain)
-    dependsOn(tasks.pmdTest)
-    dependsOn(tasks.spotbugsMain)
-    dependsOn(tasks.spotbugsTest)
-}
-
-tasks.register("qualityCheckFast") {
-    group = "quality"
-    description = "Runs only tests"
-    dependsOn(tasks.test)
-}
-
-tasks.named("check") {
-    setDependsOn(dependsOn.filter {
-        it != tasks.checkstyleMain &&
-                it != tasks.checkstyleTest &&
-                it != tasks.pmdMain &&
-                it != tasks.pmdTest &&
-                it != tasks.spotbugsMain &&
-                it != tasks.spotbugsTest
-    })
-}
 
 tasks.withType<BootJar> {
     enabled = true
@@ -150,7 +80,6 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
 
     testLogging {
         events("skipped", "failed")
@@ -180,22 +109,5 @@ tasks.withType<Test> {
         } else {
             logger.warn("byte-buddy-agent nao encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
-    }
-}
-
-tasks.withType<JavaCompile> {
-    options.apply {
-        isIncremental = true
-        isFork = true
-        encoding = "UTF-8"
-    }
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required.set(false)
-        csv.required.set(true)
-        html.required.set(true)
     }
 }
