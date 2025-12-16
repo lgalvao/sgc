@@ -14,8 +14,7 @@ import sgc.sgrh.model.Usuario;
  * Conforme CDU-07 do DRAFT-Diagnostico.md.
  */
 @Entity
-@Table(
-        name = "OCUPACAO_CRITICA",
+@Table(name = "OCUPACAO_CRITICA",
         schema = "sgc",
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {"diagnostico_codigo", "servidor_titulo", "competencia_codigo"}
@@ -26,7 +25,6 @@ import sgc.sgrh.model.Usuario;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OcupacaoCritica extends EntidadeBase {
-
     @ManyToOne
     @JoinColumn(name = "diagnostico_codigo", nullable = false)
     private Diagnostico diagnostico;

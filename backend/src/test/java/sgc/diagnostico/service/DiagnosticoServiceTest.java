@@ -3,15 +3,12 @@ package sgc.diagnostico.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,6 @@ import sgc.diagnostico.dto.DiagnosticoDto;
 import sgc.diagnostico.dto.OcupacaoCriticaDto;
 import sgc.diagnostico.dto.SalvarAvaliacaoRequest;
 import sgc.diagnostico.dto.SalvarOcupacaoRequest;
-import sgc.diagnostico.dto.ServidorDiagnosticoDto;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
 import sgc.diagnostico.model.Diagnostico;

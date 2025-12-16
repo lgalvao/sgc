@@ -12,7 +12,6 @@ import java.util.Optional;
  */
 @Repository
 public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, Long> {
-
     /**
      * Busca todas as avaliações de um diagnóstico.
      */

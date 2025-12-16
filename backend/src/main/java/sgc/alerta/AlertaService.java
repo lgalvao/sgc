@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static sgc.alerta.model.TipoAlerta.*;
+import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA;
+import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 
 /**
  * Serviço para gerenciar alertas do sistema.
@@ -75,9 +76,7 @@ public class AlertaService {
      * - Interoperacional: Recebe os dois alertas
      */
     @Transactional
-    public List<Alerta> criarAlertasProcessoIniciado(
-            Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
-
+    public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
         List<Alerta> alertasCriados = new ArrayList<>();
 
         for (Long codUnidade : codigosUnidades) {
@@ -134,8 +133,8 @@ public class AlertaService {
      * Cria alerta quando cadastro é devolvido para ajustes.
      */
     @Transactional
-    public void criarAlertaCadastroDevolvido(
-            Processo processo, Long codUnidadeDestino, String motivo) {
+    public void criarAlertaCadastroDevolvido(Processo processo, Long codUnidadeDestino, String motivo) {
+
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
                 .formatted(processo.getDescricao(), motivo);
 

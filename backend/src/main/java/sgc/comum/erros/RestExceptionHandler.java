@@ -50,7 +50,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         if (ex.getStatus().is4xxClientError()) {
             log.warn("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage());
         } else {
-            log.error("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage(), (Throwable) ex);
+            log.error("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage(), ex);
         }
 
         ErroApi erroApi = new ErroApi(

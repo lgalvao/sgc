@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 @Mapper(componentModel = "spring")
 public abstract class AlertaMapper {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    private static final DateTimeFormatter FORMATTER =         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
@@ -26,22 +26,15 @@ public abstract class AlertaMapper {
 
     @Named("formatDataHora")
     protected String formatDataHora(LocalDateTime dataHora) {
-        if (dataHora == null) {
-            return "";
-        }
-        return dataHora.format(FORMATTER);
+        return dataHora == null ? "" : dataHora.format(FORMATTER);
     }
 
     @Named("extractProcessoName")
     protected String extractProcessoName(String descricao) {
-        if (descricao == null) {
-            return "";
-        }
+        if (descricao == null) return "";
+
         Pattern pattern = Pattern.compile(".*processo '(.*?)'.*");
         Matcher matcher = pattern.matcher(descricao);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return "";
+        return matcher.find() ? matcher.group(1) : "";
     }
 }

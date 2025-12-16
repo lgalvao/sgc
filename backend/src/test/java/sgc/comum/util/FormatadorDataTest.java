@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class FormatadorDataTest {
-
     @Test
     void deveFormatarDataCorretamente() {
         LocalDateTime data = LocalDateTime.of(2025, 12, 7, 14, 30);
@@ -22,13 +21,13 @@ class FormatadorDataTest {
     }
 
     @Test
-    void deveRetornarNullQuandoDataNullEmFormatarData() {
-        assertNull(FormatadorData.formatarData(null));
+    void deveRetornarHifenQuandoDataNullEmFormatarData() {
+        assertEquals("-", FormatadorData.formatarData(null));
     }
 
     @Test
-    void deveRetornarNullQuandoDataNullEmFormatarDataHora() {
-        assertNull(FormatadorData.formatarDataHora(null));
+    void deveRetornarHifenQuandoDataNullEmFormatarDataHora() {
+        assertEquals("-", FormatadorData.formatarDataHora(null));
     }
 
     @Test

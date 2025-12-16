@@ -35,32 +35,31 @@ public class SgrhService {
         Usuario usuario = usuarioRepo
                 .findById(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
+
         carregarAtribuicoes(usuario);
         return usuario;
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {
         log.debug("Buscando responsável vigente para a sigla {}.", sigla);
-        Unidade unidade =
-                unidadeRepo
-                        .findBySigla(sigla)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+        Unidade unidade = unidadeRepo
+                .findBySigla(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
         return usuarioRepo
-                .findChefeByUnidadeCodigo(unidade.getCodigo())
+                .chefePorCodUnidade(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioRepo
                 .findById(titulo)
-                .map(
-                        usuario -> {
-                            carregarAtribuicoes(usuario);
-                            return usuario.getTodasAtribuicoes().stream()
-                                    .map(this::toPerfilDto)
-                                    .collect(Collectors.toList());
-                        })
+                .map(usuario -> {
+                    carregarAtribuicoes(usuario);
+                    return usuario.getTodasAtribuicoes().stream()
+                            .map(this::toPerfilDto)
+                            .toList();
+                })
                 .orElse(Collections.emptyList());
     }
 
@@ -114,8 +113,7 @@ public class SgrhService {
             }
         }
 
-        // Monta a árvore recursivamente (ou apenas associa os filhos já que temos o
-        // mapa)
+        // Monta a árvore recursivamente (ou apenas associa os filhos já que temos o mapa)
         for (UnidadeDto dto : dtoMap.values()) {
             List<UnidadeDto> filhos = subunidadesPorPai.get(dto.getCodigo());
             if (filhos != null) {
@@ -132,39 +130,26 @@ public class SgrhService {
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
-        if (chefes.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
+        return chefes.isEmpty()
+                ? Optional.empty()
+                : Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
     }
 
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
 
-        // Carregar atribuições para todos
         todosChefes.forEach(this::carregarAtribuicoes);
 
-        Map<Long, List<Usuario>> chefesPorUnidade =
-                todosChefes.stream()
-                        .flatMap(
-                                u ->
-                                        u.getTodasAtribuicoes().stream()
-                                                .filter(
-                                                        a ->
-                                                                a.getPerfil() == Perfil.CHEFE
-                                                                        && unidadesCodigos.contains(
-                                                                        a.getUnidade()
-                                                                                .getCodigo()))
-                                                .map(
-                                                        a ->
-                                                                new AbstractMap.SimpleEntry<>(
-                                                                        a.getUnidade().getCodigo(),
-                                                                        u)))
-                        .collect(
-                                Collectors.groupingBy(
-                                        Map.Entry::getKey,
-                                        Collectors.mapping(
-                                                Map.Entry::getValue, Collectors.toList())));
+        Map<Long, List<Usuario>> chefesPorUnidade = todosChefes.stream()
+                .flatMap(u -> u.getTodasAtribuicoes().stream()
+                        .filter(a -> a.getPerfil() == Perfil.CHEFE
+                                && unidadesCodigos.contains(
+                                a.getUnidadeCodigo()))
+                        .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList()))
+                );
 
         Map<Long, ResponsavelDto> resultado = new HashMap<>();
         for (Long codigo : unidadesCodigos) {
@@ -184,45 +169,40 @@ public class SgrhService {
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
         return usuarioRepo
                 .findById(titulo)
-                .map(
-                        u -> {
-                            carregarAtribuicoes(u);
-                            return u.getTodasAtribuicoes().stream()
-                                    .filter(a -> a.getPerfil() == Perfil.CHEFE)
-                                    .map(a -> a.getUnidade().getCodigo())
-                                    .collect(Collectors.toList());
-                        })
+                .map(u -> {
+                    carregarAtribuicoes(u);
+                    return u.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getPerfil() == Perfil.CHEFE)
+                            .map(a -> a.getUnidade().getCodigo())
+                            .toList();
+                })
                 .orElse(Collections.emptyList());
     }
 
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         return usuarioRepo
                 .findById(titulo)
-                .map(
-                        u -> {
-                            carregarAtribuicoes(u);
-                            return u.getTodasAtribuicoes().stream()
-                                    .anyMatch(
-                                            a ->
-                                                    a.getPerfil().name().equals(perfil)
-                                                            && a.getUnidade()
-                                                            .getCodigo()
-                                                            .equals(unidadeCodigo));
-                        })
+                .map(u -> {
+                    carregarAtribuicoes(u);
+                    return u.getTodasAtribuicoes().stream()
+                            .anyMatch(a -> a.getPerfil().name().equals(perfil)
+                                    && a.getUnidade()
+                                    .getCodigo()
+                                    .equals(unidadeCodigo));
+                })
                 .orElse(false);
     }
 
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         return usuarioRepo
                 .findById(titulo)
-                .map(
-                        u -> {
-                            carregarAtribuicoes(u);
-                            return u.getTodasAtribuicoes().stream()
-                                    .filter(a -> a.getPerfil().name().equals(perfil))
-                                    .map(a -> a.getUnidade().getCodigo())
-                                    .collect(Collectors.toList());
-                        })
+                .map(u -> {
+                    carregarAtribuicoes(u);
+                    return u.getTodasAtribuicoes().stream()
+                            .filter(a -> a.getPerfil().name().equals(perfil))
+                            .map(a -> a.getUnidade().getCodigo())
+                            .toList();
+                })
                 .orElse(Collections.emptyList());
     }
 
@@ -231,22 +211,18 @@ public class SgrhService {
                 .titulo(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .matricula(
-                        "MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no
-                // título
+                .matricula("MAT" + usuario.getTituloEleitoral()) // Simulação de matrícula baseada no  título
                 .build();
     }
-
 
     private UnidadeDto toUnidadeDto(Unidade unidade) {
         return UnidadeDto.builder()
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .codigoPai(
-                        unidade.getUnidadeSuperior() != null
-                                ? unidade.getUnidadeSuperior().getCodigo()
-                                : null)
+                .codigoPai(unidade.getUnidadeSuperior() != null
+                        ? unidade.getUnidadeSuperior().getCodigo()
+                        : null)
                 .tipo(unidade.getTipo().name())
                 .isElegivel(unidade.getTipo() != TipoUnidade.INTERMEDIARIA)
                 .build();
@@ -262,7 +238,7 @@ public class SgrhService {
     }
 
     private ResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
-        Usuario titular = chefes.get(0);
+        Usuario titular = chefes.getFirst();
         Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
 
         return ResponsavelDto.builder()

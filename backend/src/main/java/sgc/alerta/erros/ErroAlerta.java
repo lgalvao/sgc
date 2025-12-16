@@ -13,8 +13,4 @@ public class ErroAlerta extends ErroNegocioBase {
     public ErroAlerta(String message) {
         super(message, "ERRO_ALERTA", HttpStatus.CONFLICT);
     }
-
-    public ErroAlerta(String message, Throwable cause) {
-        super(message, "ERRO_ALERTA", HttpStatus.CONFLICT, cause);
-    }
 }

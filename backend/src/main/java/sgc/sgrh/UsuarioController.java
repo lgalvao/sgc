@@ -34,7 +34,6 @@ public class UsuarioController {
     @GetMapping
     public ResponseEntity<List<PerfilUnidade>> buscarTodosUsuarios() {
         // Para fins de simulação, retorna uma lista vazia
-        // Em um ambiente real, buscaria do SGRH ou banco de dados
         return ResponseEntity.ok(List.of());
     }
 
@@ -49,8 +48,7 @@ public class UsuarioController {
      */
     @PostMapping("/autenticar")
     public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request) {
-        boolean autenticado =
-                usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
+        boolean autenticado = usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
         return ResponseEntity.ok(autenticado);
     }
 
@@ -81,11 +79,10 @@ public class UsuarioController {
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
         usuarioService.entrar(request);
-        LoginResp response =
-                new LoginResp(
-                        request.getTituloEleitoral(),
-                        Perfil.valueOf(request.getPerfil()),
-                        request.getUnidadeCodigo());
+        LoginResp response = new LoginResp(
+                request.getTituloEleitoral(),
+                Perfil.valueOf(request.getPerfil()),
+                request.getUnidadeCodigo());
 
         // Gerar JWT simulado
         try {
@@ -100,7 +97,6 @@ public class UsuarioController {
             String assinatura = TokenSimuladoUtil.assinar(encodedClaims);
             response.setToken(encodedClaims + "." + assinatura);
         } catch (Exception e) {
-            // Logar o erro ou lançar uma exceção apropriada
             log.error("Erro ao gerar token simulado", e);
             response.setToken("erro_geracao_token"); // Token de fallback em caso de erro
         }

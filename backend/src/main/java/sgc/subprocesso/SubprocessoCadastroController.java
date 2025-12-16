@@ -53,6 +53,7 @@ public class SubprocessoCadastroController {
      * @return Uma {@link List} de {@link AnaliseHistoricoDto} com o histórico.
      */
     @GetMapping("/{codigo}/historico-cadastro")
+    @PreAuthorize("isAuthenticated()")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
         return analiseService.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
@@ -62,10 +63,13 @@ public class SubprocessoCadastroController {
     /**
      * Disponibiliza o cadastro de atividades de um subprocesso para a próxima etapa de análise.
      *
+     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-08).
+     *
      * @param codSubprocesso O código do subprocesso.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
      */
     @PostMapping("/{codigo}/cadastro/disponibilizar")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
@@ -97,6 +101,8 @@ public class SubprocessoCadastroController {
     /**
      * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de análise.
      *
+     * <p>Ação restrita a usuários com perfil 'CHEFE' (CDU-12).
+     *
      * <p>Antes de disponibilizar, o método valida se todas as atividades do subprocesso possuem
      * pelo menos um conhecimento associado.
      *
@@ -105,6 +111,7 @@ public class SubprocessoCadastroController {
      * @throws ErroValidacao se existirem atividades sem conhecimentos.
      */
     @PostMapping("/{codigo}/disponibilizar-revisao")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
@@ -139,6 +146,7 @@ public class SubprocessoCadastroController {
      * @return Um {@link SubprocessoCadastroDto} com os dados do cadastro.
      */
     @GetMapping("/{codigo}/cadastro")
+    @PreAuthorize("isAuthenticated()")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {
         return subprocessoDtoService.obterCadastro(codigo);
     }
@@ -147,10 +155,13 @@ public class SubprocessoCadastroController {
      * Devolve o cadastro de um subprocesso para o responsável pela unidade para que sejam feitos
      * ajustes.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
      */
     @PostMapping("/{codigo}/devolver-cadastro")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
             @PathVariable Long codigo,
@@ -166,10 +177,13 @@ public class SubprocessoCadastroController {
     /**
      * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo de trabalho.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-13).
+     *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
      */
     @PostMapping("/{codigo}/aceitar-cadastro")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long codigo,
@@ -185,10 +199,13 @@ public class SubprocessoCadastroController {
     /**
      * Homologa o cadastro de um subprocesso.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN' (CDU-13).
+     *
      * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
      */
     @PostMapping("/{codigo}/homologar-cadastro")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long codigo,
@@ -267,11 +284,14 @@ public class SubprocessoCadastroController {
     /**
      * Importa atividades de um subprocesso de origem para o subprocesso de destino.
      *
+     * <p>Ação restrita a usuários com perfil 'CHEFE'.
+     *
      * @param codigo  O código do subprocesso de destino.
      * @param request O DTO contendo o código do subprocesso de origem.
      * @return Um {@link Map} com uma mensagem de sucesso.
      */
     @PostMapping("/{codigo}/importar-atividades")
+    @PreAuthorize("hasRole('CHEFE')")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(

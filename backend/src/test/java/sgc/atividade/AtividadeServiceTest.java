@@ -355,8 +355,8 @@ class AtividadeServiceTest {
         Long ativId = 1L;
         Long conId = 2L;
         Long mapaId = 100L;
-        ConhecimentoDto dto = new ConhecimentoDto();
-        dto.setDescricao("Novo");
+
+        ConhecimentoDto dto = new ConhecimentoDto().setDescricao("Novo");
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(mapaId);

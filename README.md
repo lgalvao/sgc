@@ -226,8 +226,7 @@ Os relatórios são gerados em `backend/build/reports/`:
 
 ### 1. Processo
 
-Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Diagnóstico). Publica eventos de domínio para
-desacoplar módulos.
+Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Diagnóstico). Publica eventos de domínio para desacoplar módulos.
 
 ### 2. Subprocesso
 
@@ -386,40 +385,7 @@ it('deve buscar processos com sucesso', async () => { ... })
 it('deve tratar erro ao buscar processos', async () => { ... })
 ```
 
-### Contadores do Sistema
-
-| Categoria | Quantidade |
-|-----------|-----------|
-| **Backend** | |
-| Módulos | 15 |
-| Controllers | 14 |
-| Services | 30+ |
-| Repositórios | 22 |
-| Mappers (MapStruct) | 10 |
-| Eventos de Domínio | 23 |
-| Exceções Customizadas | 9+ |
-| Entidades JPA | 20+ |
-| DTOs | 50+ |
-| **Frontend** | |
-| Stores (Pinia) | 12 |
-| Services | 12 |
-| Mappers | 7 |
-| Components | 24 |
-| Views | 18 |
-| Types/Interfaces | 50+ |
-
 ---
-
-## 🎯 Princípios Arquiteturais
-
-1. **Separation of Concerns:** Cada camada tem responsabilidade única e bem definida
-2. **Single Responsibility:** Classes/componentes fazem uma coisa bem feita
-3. **DRY (Don't Repeat Yourself):** Código compartilhado em módulos `comum` (backend) ou `utils` (frontend)
-4. **KISS (Keep It Simple):** Soluções simples e diretas
-5. **Dependency Injection:** Spring IoC (backend), Pinia Stores (frontend)
-6. **Event-Driven:** Desacoplamento via eventos de domínio
-7. **Fail Fast:** Validações early, exceções específicas
-8. **Immutability:** Records para DTOs (backend), computed para getters (frontend)
 
 Para detalhes completos sobre os padrões e práticas, consulte:
 - [`AGENTS.md`](AGENTS.md) - Guia completo para desenvolvedores

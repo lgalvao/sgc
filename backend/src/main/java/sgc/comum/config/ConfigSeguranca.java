@@ -40,23 +40,20 @@ public class ConfigSeguranca {
      *
      * @param http o construtor {@link HttpSecurity} para configurar a segurança.
      * @return o {@link SecurityFilterChain} configurado.
-     * @throws Exception se ocorrer um erro durante a configuração.
      */
     @Bean("defaultSecurityFilterChain")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                        "/api/usuarios/autenticar",
-                                        "/api/usuarios/autorizar",
-                                        "/api/usuarios/entrar")
-                                .permitAll()
-                                // SENTINEL: Protege endpoints do Actuator (observabilidade) para apenas administradores
-                                .requestMatchers("/actuator/**")
-                                .hasRole("ADMIN")
-                                .requestMatchers("/api/**")
-                                .authenticated()
-                                .anyRequest()
-                                .permitAll())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                                "/api/usuarios/autenticar",
+                                "/api/usuarios/autorizar",
+                                "/api/usuarios/entrar")
+                        .permitAll()
+                        .requestMatchers("/actuator/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .anyRequest()
+                        .permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)

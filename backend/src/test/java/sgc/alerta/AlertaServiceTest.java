@@ -85,8 +85,7 @@ class AlertaServiceTest {
         p.setDescricao("Proc");
         Long unidadeId = 1L;
 
-        UnidadeDto uDto = new UnidadeDto();
-        uDto.setTipo(TipoUnidade.OPERACIONAL.name());
+        UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.OPERACIONAL.name()).build();
 
         when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
@@ -105,8 +104,7 @@ class AlertaServiceTest {
         p.setDescricao("Proc");
         Long unidadeId = 1L;
 
-        UnidadeDto uDto = new UnidadeDto();
-        uDto.setTipo(TipoUnidade.INTERMEDIARIA.name());
+        UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTERMEDIARIA.name()).build();
 
         when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
@@ -114,7 +112,6 @@ class AlertaServiceTest {
 
         service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
 
-        // Texto fixo conforme CDU-04/05
         verify(alertaRepo).save(argThat(a ->
                 "Início do processo em unidade(s) subordinada(s)".equals(a.getDescricao())));
     }
@@ -126,8 +123,7 @@ class AlertaServiceTest {
         p.setDescricao("Proc");
         Long unidadeId = 1L;
 
-        UnidadeDto uDto = new UnidadeDto();
-        uDto.setTipo(TipoUnidade.INTEROPERACIONAL.name());
+        UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTEROPERACIONAL.name()).build();
 
         when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
         when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));

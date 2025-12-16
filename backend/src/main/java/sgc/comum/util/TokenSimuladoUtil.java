@@ -16,12 +16,10 @@ import java.util.UUID;
  * a cada reinicialização do servidor.
  */
 public class TokenSimuladoUtil {
-
     private static final String ALGORITMO = "HmacSHA256";
     private static final String SEGREDO = UUID.randomUUID().toString();
 
     private TokenSimuladoUtil() {
-        // Classe utilitária
     }
 
     /**

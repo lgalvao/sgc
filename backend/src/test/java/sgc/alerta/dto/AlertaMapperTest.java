@@ -24,8 +24,8 @@ class AlertaMapperTest {
     @Test
     @DisplayName("formatDataHora returns formatted string")
     void formatDataHora() {
-        LocalDateTime dt = LocalDateTime.of(2023, 10, 25, 14, 30);
-        assertThat(mapper.formatDataHora(dt)).isEqualTo("25/10/2023 14:30");
+        LocalDateTime dt = LocalDateTime.of(2023, 10, 25, 14, 30, 15);
+        assertThat(mapper.formatDataHora(dt)).isEqualTo("25/10/2023 14:30:15");
     }
 
     @Test

@@ -12,7 +12,6 @@ import java.util.Optional;
  */
 @Repository
 public interface DiagnosticoRepo extends JpaRepository<Diagnostico, Long> {
-
     /**
      * Busca diagnóstico por código do subprocesso.
      */

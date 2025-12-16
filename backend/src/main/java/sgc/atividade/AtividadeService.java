@@ -87,30 +87,23 @@ public class AtividadeService {
             throw new ErroEntidadeNaoEncontrada("Mapa", "não informado");
         }
 
-        var subprocesso =
-                subprocessoRepo
-                        .findByMapaCodigo(atividadeDto.getMapaCodigo())
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Subprocesso não encontrado para o mapa com código %d"
-                                                        .formatted(atividadeDto.getMapaCodigo())));
+        var subprocesso = subprocessoRepo
+                .findByMapaCodigo(atividadeDto.getMapaCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d"
+                        .formatted(atividadeDto.getMapaCodigo())));
 
-        var usuario =
-                usuarioRepo
-                        .findById(tituloUsuario)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
+        var usuario = usuarioRepo
+                .findById(tituloUsuario)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
-        // Apesar da segurança estar configurada, mantemos esta verificação como proteção extra.
         if (subprocesso.getUnidade() == null) {
-            throw new ErroEntidadeNaoEncontrada(
-                    "Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
         }
+
         // Verifica se o usuário é o titular da unidade
         if (!usuario.getTituloEleitoral().equals(subprocesso.getUnidade().getTituloTitular())) {
-            throw new ErroAccessoNegado(
-                    "Usuário não autorizado a criar atividades para este subprocesso.");
+            throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
         }
 
         atualizarSituacaoSubprocessoSeNecessario(atividadeDto.getMapaCodigo());
@@ -122,6 +115,7 @@ public class AtividadeService {
 
         var entidade = atividadeMapper.toEntity(atividadeDto);
         entidade.setMapa(subprocesso.getMapa());
+
         var salvo = atividadeRepo.save(entidade);
 
         return atividadeMapper.toDto(salvo);
@@ -169,20 +163,16 @@ public class AtividadeService {
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
     public void excluir(Long codAtividade) {
-        atividadeRepo
-                .findById(codAtividade)
-                .ifPresentOrElse(
-                        atividade -> {
-                            atualizarSituacaoSubprocessoSeNecessario(
-                                    atividade.getMapa().getCodigo());
-                            var conhecimentos =
-                                    conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
-                            conhecimentoRepo.deleteAll(conhecimentos);
-                            atividadeRepo.delete(atividade);
-                        },
-                        () -> {
-                            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
-                        });
+        atividadeRepo.findById(codAtividade).ifPresentOrElse(
+                atividade -> {
+                    atualizarSituacaoSubprocessoSeNecessario(atividade.getMapa().getCodigo());
+                    var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+                    conhecimentoRepo.deleteAll(conhecimentos);
+                    atividadeRepo.delete(atividade);
+                },
+                () -> {
+                    throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
+                });
     }
 
     /**
@@ -268,14 +258,10 @@ public class AtividadeService {
     }
 
     private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
-        var subprocesso =
-                subprocessoRepo
-                        .findByMapaCodigo(mapaCodigo)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Subprocesso não encontrado para o mapa com código %d"
-                                                        .formatted(mapaCodigo)));
+        var subprocesso = subprocessoRepo
+                .findByMapaCodigo(mapaCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
 
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             if (subprocesso.getProcesso() == null) {

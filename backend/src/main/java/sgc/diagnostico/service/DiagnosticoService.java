@@ -46,7 +46,6 @@ public class DiagnosticoService {
         Subprocesso subprocesso = diagnostico.getSubprocesso();
 
         // Busca todos os servidores da unidade
-        // Assumindo que participam todos os servidores lotados na unidade do subprocesso
         List<Usuario> servidores = usuarioRepo.findByUnidadeLotacaoCodigo(subprocesso.getUnidade().getCodigo());
 
         // Busca todas as avaliações já realizadas
@@ -67,7 +66,7 @@ public class DiagnosticoService {
             totalCompetenciasMap = competenciaRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo()).size();
         }
 
-        final int totalCompetencias = totalCompetenciasMap; // final para uso no lambda
+        final int totalCompetencias = totalCompetenciasMap;
 
         // Monta DTOs dos servidores
         List<ServidorDiagnosticoDto> servidoresDto = servidores.stream()
@@ -106,6 +105,7 @@ public class DiagnosticoService {
             Long subprocessoCodigo,
             String servidorTitulo,
             SalvarAvaliacaoRequest request) {
+
         try {
             Diagnostico diagnostico = buscarOuCriarDiagnosticoEntidade(subprocessoCodigo);
 

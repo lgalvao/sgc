@@ -50,11 +50,12 @@ public class ImpactoMapaDto {
             List<AtividadeImpactadaDto> atividadesRemovidas,
             List<AtividadeImpactadaDto> atividadesAlteradas,
             List<CompetenciaImpactadaDto> competenciasImpactadas) {
-        boolean temImpactos =
-                !atividadesInseridas.isEmpty()
-                        || !atividadesRemovidas.isEmpty()
-                        || !atividadesAlteradas.isEmpty()
-                        || !competenciasImpactadas.isEmpty();
+
+        boolean temImpactos = !atividadesInseridas.isEmpty()
+                || !atividadesRemovidas.isEmpty()
+                || !atividadesAlteradas.isEmpty()
+                || !competenciasImpactadas.isEmpty();
+
         return ImpactoMapaDto.builder()
                 .temImpactos(temImpactos)
                 .totalAtividadesInseridas(atividadesInseridas.size())

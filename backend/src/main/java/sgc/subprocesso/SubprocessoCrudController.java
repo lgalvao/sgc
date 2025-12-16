@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
@@ -18,9 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-@Tag(
-        name = "Subprocessos",
-        description = "Endpoints para gerenciamento do workflow de subprocessos")
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCrudController {
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
@@ -33,18 +32,21 @@ public class SubprocessoCrudController {
      * @return DTO com as permissões calculadas.
      */
     @GetMapping("/{codigo}/permissoes")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
         SubprocessoPermissoesDto permissoes = subprocessoDtoService.obterPermissoes(codigo);
         return ResponseEntity.ok(permissoes);
     }
 
     @GetMapping("/{codigo}/validar-cadastro")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoDtoService.validarCadastro(codigo));
     }
 
     @GetMapping("/{codigo}/status")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoDtoService.obterStatus(codigo));
@@ -56,6 +58,7 @@ public class SubprocessoCrudController {
      * @return Uma {@link List} de {@link SubprocessoDto}.
      */
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<SubprocessoDto> listar() {
         return subprocessoDtoService.listar();
     }
@@ -69,6 +72,7 @@ public class SubprocessoCrudController {
      * @return Um {@link SubprocessoDetalheDto} com os detalhes do subprocesso.
      */
     @GetMapping("/{codigo}")
+    @PreAuthorize("isAuthenticated()")
     public SubprocessoDetalheDto obterPorCodigo(
             @PathVariable Long codigo,
             @RequestParam(required = false) sgc.sgrh.model.Perfil perfil,
@@ -84,6 +88,7 @@ public class SubprocessoCrudController {
      * @return O {@link SubprocessoDto} encontrado.
      */
     @GetMapping("/buscar")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SubprocessoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
@@ -95,11 +100,14 @@ public class SubprocessoCrudController {
     /**
      * Cria um novo subprocesso.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     *
      * @param subprocessoDto O DTO com os dados do subprocesso a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo subprocesso e o
      * {@link SubprocessoDto} criado no corpo da resposta.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
         var salvo = subprocessoService.criar(subprocessoDto);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
@@ -109,11 +117,14 @@ public class SubprocessoCrudController {
     /**
      * Atualiza um subprocesso existente.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     *
      * @param codigo         O código do subprocesso a ser atualizado.
      * @param subprocessoDto O DTO com os novos dados do subprocesso.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody SubprocessoDto subprocessoDto) {
         var atualizado = subprocessoService.atualizar(codigo, subprocessoDto);
@@ -123,10 +134,13 @@ public class SubprocessoCrudController {
     /**
      * Exclui um subprocesso.
      *
+     * <p>Ação restrita a usuários com perfil 'ADMIN'.
+     *
      * @param codigo O código do subprocesso a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codigo}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
         subprocessoService.excluir(codigo);
         return ResponseEntity.noContent().build();

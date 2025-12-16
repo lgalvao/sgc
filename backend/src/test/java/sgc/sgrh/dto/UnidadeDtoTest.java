@@ -12,7 +12,14 @@ class UnidadeDtoTest {
     @Test
     void testUnidadeDtoConstructorWithSubunidades() {
         // Test record constructor with subunidades
-        UnidadeDto dto = new UnidadeDto(1L, TEST_UNIT, "TU", null, TIPO, false);
+        UnidadeDto dto = UnidadeDto.builder()
+                .codigo(1L)
+                .nome(TEST_UNIT)
+                .sigla("TU")
+                .codigoPai(null)
+                .tipo(TIPO)
+                .isElegivel(false)
+                .build();
 
         // Test getters (record provides accessors)
         assertEquals(1L, dto.getCodigo());
@@ -26,7 +33,14 @@ class UnidadeDtoTest {
     @Test
     void testUnidadeDtoConstructorWithoutSubunidades() {
         // Test constructor without subunidades (the custom one)
-        UnidadeDto dto = new UnidadeDto(1L, TEST_UNIT, "TU", null, TIPO, false);
+        UnidadeDto dto = UnidadeDto.builder()
+                .codigo(1L)
+                .nome(TEST_UNIT)
+                .sigla("TU")
+                .codigoPai(null)
+                .tipo(TIPO)
+                .isElegivel(false)
+                .build();
 
         // Test getters
         assertEquals(1L, dto.getCodigo());

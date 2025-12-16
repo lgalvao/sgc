@@ -68,8 +68,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("buscarPorProcessoEUnidade deve retornar DTO")
     @WithMockUser
     void buscarPorProcessoEUnidade() throws Exception {
-        UnidadeDto uDto = new UnidadeDto();
-        uDto.setCodigo(10L);
+        UnidadeDto uDto = UnidadeDto.builder().codigo(10L).build();
 
         when(unidadeService.buscarPorSigla("U1")).thenReturn(uDto);
         when(subprocessoDtoService.obterPorProcessoEUnidade(1L, 10L))

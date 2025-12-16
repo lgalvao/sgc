@@ -14,6 +14,5 @@ public interface ErroNegocio {
     HttpStatus getStatus();
     default Map<String, ?> getDetails() { return null; }
 
-    // Método getMessage já existe em Throwable, mas é bom explicitar
     String getMessage();
 }

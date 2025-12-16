@@ -214,7 +214,6 @@ public class AtividadeController {
         return obterCodigoSubprocessoPorMapa(atividade.getMapa().getCodigo());
     }
 
-    // Convenience helpers to reduce repeated code in endpoints
     private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {
         Long codSubprocesso = obterCodigoSubprocessoPorAtividade(codigoAtividade);
         return criarRespostaOperacao(codSubprocesso, codigoAtividade, true);
@@ -225,7 +224,6 @@ public class AtividadeController {
         return criarRespostaOperacao(codSubprocesso, codigoAtividade, incluirAtividade);
     }
 
-    // Helper to centralize repeated logic: obtain subprocesso situacao and optionally the atividade visualizacao
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto status = subprocessoService.obterSituacao(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = null;

@@ -110,7 +110,7 @@ class UnidadeControllerTest {
     @DisplayName("buscarUnidadePorSigla deve retornar unidade")
     @WithMockUser
     void buscarUnidadePorSigla() throws Exception {
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(new UnidadeDto());
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(UnidadeDto.builder().build());
 
         mockMvc.perform(get("/api/unidades/sigla/SIGLA")).andExpect(status().isOk());
     }
@@ -119,7 +119,7 @@ class UnidadeControllerTest {
     @DisplayName("buscarUnidadePorId deve retornar unidade")
     @WithMockUser
     void buscarUnidadePorId() throws Exception {
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(new UnidadeDto());
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(UnidadeDto.builder().build());
 
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());
     }

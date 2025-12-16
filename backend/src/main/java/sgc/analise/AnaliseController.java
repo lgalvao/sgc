@@ -22,10 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/subprocessos/{codSubprocesso}")
 @RequiredArgsConstructor
-@Tag(
-        name = "Análises",
-        description =
-                "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
+@Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
 public class AnaliseController {
     private final AnaliseService analiseService;
 
@@ -55,9 +52,9 @@ public class AnaliseController {
     @PostMapping("/analises-cadastro")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova análise de cadastro")
-    public Analise criarAnaliseCadastro(
-            @PathVariable("codSubprocesso") Long codSubprocesso,
-            @RequestBody(required = false) Map<String, String> corpo) {
+    public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
+                                        @RequestBody(required = false) Map<String, String> corpo) {
+
         return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.CADASTRO);
     }
 
@@ -69,8 +66,7 @@ public class AnaliseController {
      */
     @GetMapping("/analises-validacao")
     @Operation(summary = "Lista o histórico de análises de validação")
-    public List<Analise> listarAnalisesValidacao(
-            @PathVariable("codSubprocesso") Long codSubprocesso) {
+    public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         return analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
@@ -88,9 +84,9 @@ public class AnaliseController {
     @PostMapping("/analises-validacao")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova análise de validação")
-    public Analise criarAnaliseValidacao(
-            @PathVariable Long codSubprocesso,
-            @RequestBody(required = false) Map<String, String> corpo) {
+    public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso,
+                                         @RequestBody(required = false) Map<String, String> corpo) {
+
         return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.VALIDACAO);
     }
 

@@ -2,37 +2,41 @@ package sgc.mapa.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.atividade.model.Atividade;
+import org.mapstruct.Named;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MapaCompletoMapper {
+    default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
+        return MapaCompletoDto.builder()
+                .codigo(mapa == null ? null : mapa.getCodigo())
+                .subprocessoCodigo(codSubprocesso)
+                .observacoes(mapa == null ? null : mapa.getObservacoesDisponibilizacao())
+                .competencias(competencias == null ? null : competencias.stream().map(this::toDto).toList())
+                .build();
+    }
 
-    @Mapping(target = "codigo", source = "mapa.codigo")
-    @Mapping(target = "subprocessoCodigo", source = "subprocessoCodigo")
-    @Mapping(target = "observacoes", source = "mapa.observacoesDisponibilizacao")
-    @Mapping(target = "competencias", source = "competencias")
-    MapaCompletoDto toDto(Mapa mapa, Long subprocessoCodigo, List<Competencia> competencias);
+    @Mapping(target = "codigo", source = "codigo")
+    @Mapping(target = "descricao", source = "descricao")
+    @Mapping(target = "atividadesCodigos", source = "atividades", qualifiedByName = "mapAtividadesCodigos")
+    CompetenciaMapaDto toDto(Competencia competencia);
 
-    @Mapping(target = "codigo", source = "competencia.codigo")
-    @Mapping(target = "descricao", source = "competencia.descricao")
-    @Mapping(target = "atividadesCodigos", expression = "java(mapAtividades(competencia.getAtividades()))")
-    CompetenciaMapaDto toCompetenciaDto(Competencia competencia);
+    @Named("mapAtividadesCodigos")
+    @SuppressWarnings("unused")
+    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.model.Atividade> atividades) {
+        if (atividades == null) return null;
 
-    default List<Long> mapAtividades(Set<Atividade> atividades) {
-        if (atividades == null) {
-            return Collections.emptyList();
-        }
         return atividades.stream()
-                .map(Atividade::getCodigo)
+                .filter(Objects::nonNull)
+                .map(sgc.atividade.model.Atividade::getCodigo)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

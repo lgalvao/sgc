@@ -30,22 +30,17 @@ public class UsuarioService {
 
     public List<PerfilUnidade> autorizar(String tituloEleitoral) {
         log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
-        Usuario usuario =
-                usuarioRepo
-                        .findById(tituloEleitoral)
-                        .orElseThrow(
-                                () -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
+        Usuario usuario = usuarioRepo
+                .findById(tituloEleitoral)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         // Carregar atribuições da VIEW
         var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloEleitoral);
         usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
 
-        return usuario.getTodasAtribuicoes().stream()
-                .map(
-                        atribuicao ->
-                                new PerfilUnidade(
-                                        atribuicao.getPerfil(),
-                                        toUnidadeDto(atribuicao.getUnidade())))
+        return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidade(
+                        atribuicao.getPerfil(),
+                        toUnidadeDto(atribuicao.getUnidade())))
                 .toList();
     }
 
@@ -54,18 +49,16 @@ public class UsuarioService {
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .codigoPai(
-                        unidade.getUnidadeSuperior() != null
-                                ? unidade.getUnidadeSuperior().getCodigo()
-                                : null)
+                .codigoPai(unidade.getUnidadeSuperior() != null
+                        ? unidade.getUnidadeSuperior().getCodigo()
+                        : null)
                 .tipo(unidade.getTipo().name())
                 .isElegivel(false)
                 .build();
     }
 
     public void entrar(String tituloEleitoral, PerfilUnidade pu) {
-        log.debug(
-                "Usuário {} entrou. Perfil: {}, Unidade: {}",
+        log.debug("Usuário {} entrou. Perfil: {}, Unidade: {}",
                 tituloEleitoral,
                 pu.getPerfil(),
                 pu.getSiglaUnidade());
@@ -74,24 +67,20 @@ public class UsuarioService {
     public void entrar(EntrarReq request) {
         if (!unidadeRepo.existsById(request.getUnidadeCodigo())) {
             throw new ErroEntidadeNaoEncontrada(
-                    "Unidade não encontrada, código: " + request.getUnidadeCodigo());
+                    "Unidade não encontrada, código: %d".formatted(request.getUnidadeCodigo())
+            );
         }
 
-        // SENTINEL: Verifica se o usuário realmente tem permissão para o perfil/unidade solicitados
-        // Previne escalonamento de privilégios (Authorization Bypass)
         List<PerfilUnidade> autorizacoes = autorizar(request.getTituloEleitoral());
-        boolean autorizado =
-                autorizacoes.stream()
-                        .anyMatch(
-                                pu ->
-                                        pu.getPerfil().name().equals(request.getPerfil())
-                                                && pu.getUnidade()
-                                                        .getCodigo()
-                                                        .equals(request.getUnidadeCodigo()));
+        boolean autorizado = autorizacoes.stream()
+                .anyMatch(pu -> pu.getPerfil().name().equals(request.getPerfil())
+                        && pu.getUnidade().getCodigo().equals(request.getUnidadeCodigo())
+                );
 
         if (!autorizado) {
             throw new ErroAccessoNegado(
-                    "Usuário não possui permissão para acessar com o perfil e unidade informados.");
+                    "Usuário não possui permissão para acessar com o perfil e unidade informados."
+            );
         }
 
         log.debug(

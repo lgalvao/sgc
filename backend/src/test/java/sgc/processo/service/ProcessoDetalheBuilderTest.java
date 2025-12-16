@@ -78,7 +78,7 @@ class ProcessoDetalheBuilderTest {
         assertThat(dto.getDescricao()).isEqualTo("Processo Teste");
         assertThat(dto.getUnidades()).hasSize(1);
 
-        ProcessoDetalheDto.UnidadeParticipanteDto uDto = dto.getUnidades().get(0);
+        ProcessoDetalheDto.UnidadeParticipanteDto uDto = dto.getUnidades().getFirst();
         assertThat(uDto.getCodUnidade()).isEqualTo(10L);
         assertThat(uDto.getSigla()).isEqualTo("U1");
         assertThat(uDto.getCodSubprocesso()).isEqualTo(100L);
@@ -98,7 +98,7 @@ class ProcessoDetalheBuilderTest {
         SecurityContext securityContext = mock(SecurityContext.class);
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
-        when(auth.getAuthorities()).thenReturn((List) List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        org.mockito.Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
         when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
 

@@ -110,14 +110,14 @@ class UsuarioServiceTest {
     @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
         String tituloEleitoral = "123456789";
-        UnidadeDto unidadeDtoMock =
-                new UnidadeDto(
-                        unidadeMock.getCodigo(),
-                        unidadeMock.getNome(),
-                        unidadeMock.getSigla(),
-                        null,
-                        unidadeMock.getTipo().name(),
-                        false);
+        UnidadeDto unidadeDtoMock = UnidadeDto.builder()
+                .codigo(unidadeMock.getCodigo())
+                .nome(unidadeMock.getNome())
+                .sigla(unidadeMock.getSigla())
+                .codigoPai(null)
+                .tipo(unidadeMock.getTipo().name())
+                .isElegivel(false)
+                .build();
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 
         assertThatCode(() -> usuarioService.entrar(tituloEleitoral, perfilUnidade))

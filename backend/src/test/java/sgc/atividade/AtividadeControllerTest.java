@@ -122,7 +122,6 @@ class AtividadeControllerTest {
     @Nested
     @DisplayName("Testes para obter atividade por código")
     class ObterAtividadePorId {
-
         @Test
         @DisplayName("Deve retornar uma atividade com status 200 OK")
         @WithMockUser
@@ -149,7 +148,6 @@ class AtividadeControllerTest {
     @Nested
     @DisplayName("Testes para criar atividade")
     class CriarAtividade {
-
         @Test
         @DisplayName("Deve criar uma atividade e retornar 201 Created")
         @WithMockUser
@@ -188,11 +186,8 @@ class AtividadeControllerTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
 
-            mockMvc.perform(
-                            post(API_ATIVIDADES)
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(atividadeDto)))
+            mockMvc.perform(post(API_ATIVIDADES).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -213,9 +208,11 @@ class AtividadeControllerTest {
             // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
             Atividade atividadeMock = new Atividade();
             atividadeMock.setCodigo(1L);
+
             Mapa mapaMock = new Mapa();
             mapaMock.setCodigo(10L);
             atividadeMock.setMapa(mapaMock);
+
             when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
 
             // Mock específico para este teste, para que a atividade retorne a descrição correta.
@@ -226,8 +223,7 @@ class AtividadeControllerTest {
                     .build();
             when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeAtualizadaVis));
 
-            mockMvc.perform(
-                            post("/api/atividades/1/atualizar")
+            mockMvc.perform(post("/api/atividades/1/atualizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
@@ -246,8 +242,7 @@ class AtividadeControllerTest {
             when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class)))
                     .thenThrow(new ErroEntidadeNaoEncontrada(""));
 
-            mockMvc.perform(
-                            post("/api/atividades/99/atualizar")
+            mockMvc.perform(post("/api/atividades/99/atualizar")
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(atividadeDto)))
@@ -258,7 +253,6 @@ class AtividadeControllerTest {
     @Nested
     @DisplayName("Testes para excluir atividade")
     class ExcluirAtividade {
-
         @Test
         @DisplayName("Deve excluir uma atividade e retornar 204 No Content")
         @WithMockUser
@@ -266,9 +260,11 @@ class AtividadeControllerTest {
             // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso antes da exclusão
             Atividade atividadeMock = new Atividade();
             atividadeMock.setCodigo(1L);
+
             Mapa mapaMock = new Mapa();
             mapaMock.setCodigo(10L);
             atividadeMock.setMapa(mapaMock);
+
             when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
 
             doNothing().when(atividadeService).excluir(1L);
@@ -302,10 +298,8 @@ class AtividadeControllerTest {
     class ConhecimentoEndpoints {
         private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
         private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
-        private static final String API_CONHECIMENTOS_1_ATUALIZAR =
-                "/api/atividades/1/conhecimentos/1/atualizar";
-        private static final String API_CONHECIMENTOS_1_EXCLUIR =
-                "/api/atividades/1/conhecimentos/1/excluir";
+        private static final String API_CONHECIMENTOS_1_ATUALIZAR = "/api/atividades/1/conhecimentos/1/atualizar";
+        private static final String API_CONHECIMENTOS_1_EXCLUIR = "/api/atividades/1/conhecimentos/1/excluir";
         private static final String NOVO_CONHECIMENTO = "Novo Conhecimento";
 
         @Test
@@ -343,17 +337,14 @@ class AtividadeControllerTest {
             AtividadeVisualizacaoDto atividadeComConhecimento = AtividadeVisualizacaoDto.builder()
                     .codigo(1L)
                     .descricao(ATIVIDADE_TESTE)
-                    .conhecimentos(List.of(
-                            ConhecimentoVisualizacaoDto.builder()
-                                    .codigo(1L)
-                                    .descricao(NOVO_CONHECIMENTO)
-                                    .build()
-                    ))
+                    .conhecimentos(List.of(ConhecimentoVisualizacaoDto.builder()
+                            .codigo(1L)
+                            .descricao(NOVO_CONHECIMENTO)
+                            .build()))
                     .build();
             when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimento));
 
-            mockMvc.perform(
-                            post(API_CONHECIMENTOS)
+            mockMvc.perform(post(API_CONHECIMENTOS)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
@@ -384,18 +375,18 @@ class AtividadeControllerTest {
             // Mock específico para este teste
             AtividadeVisualizacaoDto atividadeComConhecimentoAtualizado = AtividadeVisualizacaoDto.builder()
                     .codigo(1L)
-                    .descricao(ATIVIDADE_TESTE) // ou outra descrição relevante
-                    .conhecimentos(List.of(
-                            ConhecimentoVisualizacaoDto.builder()
+                    .descricao(ATIVIDADE_TESTE) 
+                    .conhecimentos(List.of(ConhecimentoVisualizacaoDto.builder()
                                     .codigo(1L)
                                     .descricao("Atualizado")
                                     .build()
                     ))
                     .build();
-            when(subprocessoService.listarAtividadesSubprocesso(100L)).thenReturn(List.of(atividadeComConhecimentoAtualizado));
 
-            mockMvc.perform(
-                            post(API_CONHECIMENTOS_1_ATUALIZAR)
+            when(subprocessoService.listarAtividadesSubprocesso(100L))
+                    .thenReturn(List.of(atividadeComConhecimentoAtualizado));
+
+            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
@@ -414,9 +405,11 @@ class AtividadeControllerTest {
             // Mock da entidade Atividade para recuperar o Mapa e o Subprocesso
             Atividade atividadeMock = new Atividade();
             atividadeMock.setCodigo(1L);
+
             Mapa mapaMock = new Mapa();
             mapaMock.setCodigo(10L);
             atividadeMock.setMapa(mapaMock);
+
             when(atividadeService.obterEntidadePorCodigo(1L)).thenReturn(atividadeMock);
 
             // Mock específico para este teste, para simular a remoção do conhecimento

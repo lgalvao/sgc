@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-@Tag(
-        name = "Subprocessos",
-        description = "Endpoints para gerenciamento do workflow de subprocessos")
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoMapaController {
     private final SubprocessoMapaService subprocessoMapaService;
     private final MapaService mapaService;
@@ -53,12 +52,17 @@ public class SubprocessoMapaController {
      * @return Um {@link ImpactoMapaDto} com o detalhamento dos impactos.
      */
     @GetMapping("/{codigo}/impactos-mapa")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
+
         String tituloUsuario = extractTituloUsuario(principal);
-        if (tituloUsuario == null)
+
+        if (tituloUsuario == null) {
             throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
+        }
+
         Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
@@ -70,6 +74,7 @@ public class SubprocessoMapaController {
      * @return Um {@link MapaCompletoDto} com as competências e atividades do mapa.
      */
     @GetMapping("/{codigo}/mapa")
+    @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
@@ -83,6 +88,7 @@ public class SubprocessoMapaController {
      * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
      */
     @GetMapping("/{codigo}/mapa-visualizacao")
+    @PreAuthorize("isAuthenticated()")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
     }
@@ -97,6 +103,7 @@ public class SubprocessoMapaController {
      * @return Uma lista de {@link AtividadeVisualizacaoDto} com as atividades e conhecimentos.
      */
     @GetMapping("/{codSubprocesso}/atividades")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todas as atividades de um subprocesso")
     public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
@@ -113,6 +120,7 @@ public class SubprocessoMapaController {
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
     @PostMapping("/{codigo}/mapa/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public MapaCompletoDto salvarMapa(
             @PathVariable Long codigo,
@@ -129,6 +137,7 @@ public class SubprocessoMapaController {
      * @return Um {@link MapaAjusteDto} com os dados necessários para o ajuste.
      */
     @GetMapping("/{codigo}/mapa-ajuste")
+    @PreAuthorize("hasRole('ADMIN')")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
         return subprocessoDtoService.obterMapaParaAjuste(codigo);
     }
@@ -140,6 +149,7 @@ public class SubprocessoMapaController {
      * @param request O DTO contendo as competências ajustadas.
      */
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void salvarAjustesMapa(
             @PathVariable Long codigo,
@@ -153,12 +163,11 @@ public class SubprocessoMapaController {
      * Obtém a estrutura completa de um mapa, incluindo competências e as atividades associadas a
      * cada uma.
      *
-     * <p>Corresponde ao CDU-15.
-     *
      * @param codigo código do subprocesso.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto}.
      */
     @GetMapping("/{codigo}/mapa-completo")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
@@ -171,26 +180,27 @@ public class SubprocessoMapaController {
      * Salva a estrutura completa de um mapa, incluindo a criação/edição de competências e a
      * atualização de seus vínculos com atividades.
      *
-     * <p>Corresponde ao CDU-15.
-     *
      * @param codigo  O código do subprocesso.
      * @param request O DTO com a estrutura completa do mapa a ser salvo.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
     @PostMapping("/{codigo}/mapa-completo/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Operation(summary = "Salva um mapa completo com competências e atividades")
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
             @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.salvarMapaSubprocesso(
-                        codigo, request, extractTituloUsuario(principal));
+
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(
+                codigo, request, extractTituloUsuario(principal));
+
         return ResponseEntity.ok(mapa);
     }
 
     @PostMapping("/{codigo}/competencias")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Operation(summary = "Adiciona uma nova competência a um mapa")
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
@@ -204,6 +214,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/competencias/{codCompetencia}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Operation(summary = "Atualiza uma competência existente em um mapa")
     public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
@@ -211,30 +222,34 @@ public class SubprocessoMapaController {
             @PathVariable Long codCompetencia,
             @RequestBody @Valid CompetenciaReq request,
             @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.atualizarCompetencia(
-                        codigo, codCompetencia, request, extractTituloUsuario(principal));
+
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(
+                codigo, codCompetencia, request, extractTituloUsuario(principal));
+
         return ResponseEntity.ok(mapa);
     }
 
     @PostMapping("/{codigo}/competencias/{codCompetencia}/remover")
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Operation(summary = "Remove uma competência de um mapa")
     public ResponseEntity<MapaCompletoDto> removerCompetencia(
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
             @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa =
-                subprocessoMapaWorkflowService.removerCompetencia(
-                        codigo, codCompetencia, extractTituloUsuario(principal));
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(
+                codigo, codCompetencia, extractTituloUsuario(principal));
+
         return ResponseEntity.ok(mapa);
     }
 
-
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;
-        if (principal instanceof sgc.sgrh.model.Usuario)
+
+        if (principal instanceof sgc.sgrh.model.Usuario) {
             return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        }
+
         return principal != null ? principal.toString() : null;
     }
 }

@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Diagnostico extends EntidadeBase {
-
     @OneToOne
     @JoinColumn(name = "subprocesso_codigo", unique = true, nullable = false)
     private Subprocesso subprocesso;
