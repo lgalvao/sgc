@@ -2,6 +2,7 @@
   "name": "sgc-e2e",
   "version": "1.0.0",
   "scripts": {
+    "test": "npm test --prefix frontend",
     "test:e2e": "playwright test",
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "test:e2e:captura:headed": "playwright test e2e/captura-telas.spec.ts --headed",
