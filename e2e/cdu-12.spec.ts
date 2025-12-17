@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/base';
+import {Page} from '@playwright/test';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
@@ -13,6 +14,7 @@ import {
 } from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
+
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
 }
@@ -23,10 +25,15 @@ async function fazerLogout(page: Page) {
 }
 
 async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
-    await page.getByText(descricaoProcesso).click();
+    const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
+    await expect(linhaProcesso).toBeVisible();
+    await linhaProcesso.click({force: true});
+    await expect(page).toHaveURL(/\/processo\/\d+/);
+    
     // Se cair na lista de unidades, clica na unidade do Chefe
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();    }
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
+    }
 }
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
@@ -69,8 +76,10 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
+        await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
-        codProcessoMapeamento = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        codProcessoMapeamento = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (codProcessoMapeamento > 0) cleanup.registrar(codProcessoMapeamento);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -100,8 +109,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 3. Admin homologa cadastro
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByText(descProcessoMapeamento).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -150,14 +162,18 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByText(descProcessoMapeamento).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
+        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         // Finalizar Processo
         await page.goto('/painel');
-        await page.getByText(descProcessoMapeamento).click();
+        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
@@ -174,8 +190,10 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
+        await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
-        processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        processoRevisaoId = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -289,8 +307,10 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Admin acessa
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByText(descProcessoRevisao).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await expect(page.locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
+        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Acessar visualização
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 

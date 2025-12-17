@@ -34,8 +34,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('3. Selecionar unidade ASSESSORIA_12', async () => {
             // ADMIN vê TreeTable com unidades participantes
-            await expect(page.getByRole('cell', {name: 'ASSESSORIA_12', exact: true})).toBeVisible();
-            await page.getByRole('cell', {name: 'ASSESSORIA_12', exact: true}).click();
+            const linhaUnidade = page.getByRole('row', {name: /ASSESSORIA_12/});
+            await expect(linhaUnidade).toBeVisible();
+            await linhaUnidade.click();
 
             // Verificar navegação para detalhes do subprocesso
             await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);

@@ -104,7 +104,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -121,9 +122,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
 
         // Navegar para a unidade
-            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
 
@@ -180,9 +182,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // ADMIN após login está no Painel
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
 
         // Navegar para a unidade
-            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -337,7 +340,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
-                    await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         // Entrar na visualização de atividades
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -399,7 +404,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
-                    await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+/);
+        await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
@@ -432,7 +439,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByRole('table')).toBeVisible();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
-                    await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
@@ -465,7 +474,9 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByRole('table')).toBeVisible();
 
         // CDU-14 Passo 3: Admin clica na unidade subordinada
-                    await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();            await page.getByRole('row', {name: 'SECAO_221'}).click();
+        // CDU-14 Passo 3: Admin clica na unidade subordinada
+        await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
 
         // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();

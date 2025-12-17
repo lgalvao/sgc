@@ -110,7 +110,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
-        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Abrir histórico
@@ -127,7 +127,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
-        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Devolver com observação
@@ -164,7 +164,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
-        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Cancelar devolução
@@ -178,7 +178,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
-        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar com observação
@@ -190,7 +190,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         await devolverCadastroMapeamento(page, 'Pequeno ajuste necessário');
@@ -211,7 +211,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
-        await acessarSubprocessoGestor(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Aceitar sem observação
@@ -222,7 +222,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Abrir histórico
@@ -251,7 +251,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Cancelar homologação
@@ -265,7 +265,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await acessarSubprocessoAdmin(page, descProcesso, 'Seção 221');
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Homologar
