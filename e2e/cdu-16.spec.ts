@@ -17,6 +17,7 @@ import {
     homologarCadastroRevisao
 } from './helpers/helpers-analise';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();

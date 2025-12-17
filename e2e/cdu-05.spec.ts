@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page, Response } from '@playwright/test';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -102,7 +103,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('card-subprocesso-atividades').click();
         await page.getByTestId('inp-nova-atividade').fill(`Atividade Teste ${timestamp}`);
 
-        const promessaAtividade = page.waitForResponse(resp => resp.url().includes('/atividades') && resp.status() === 201);
+        const promessaAtividade = page.waitForResponse((resp: Response) => resp.url().includes('/atividades') && resp.status() === 201);
         await page.getByTestId('btn-adicionar-atividade').click();
         await promessaAtividade;
 
@@ -114,7 +115,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         const cardAtividade = page.locator('.atividade-card').filter({hasText: descAtividade});
         await cardAtividade.getByTestId('inp-novo-conhecimento').fill('Conhecimento Teste');
 
-        const promessaConhecimento = page.waitForResponse(resp => resp.url().includes('/conhecimentos') && resp.status() === 201);
+        const promessaConhecimento = page.waitForResponse((resp: Response) => resp.url().includes('/conhecimentos') && resp.status() === 201);
         await cardAtividade.getByTestId('btn-adicionar-conhecimento').click();
         await promessaConhecimento;
 

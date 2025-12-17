@@ -6,6 +6,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import * as path from 'path';
 import * as fs from 'fs';
+import { Page } from '@playwright/test';
 
 /**
  * Suite de testes dedicada a capturar screenshots de todas as telas do sistema
