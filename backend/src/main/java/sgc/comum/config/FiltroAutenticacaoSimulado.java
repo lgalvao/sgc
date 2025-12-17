@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Component
+@Profile({"!test", "secure-test"})
 @RequiredArgsConstructor
 @Slf4j
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {

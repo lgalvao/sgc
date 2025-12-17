@@ -1,5 +1,6 @@
 package sgc.sgrh.autenticacao;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import sgc.comum.erros.ErroAutenticacao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Requer ambiente com AD configurado")
 @SpringBootTest
 @DisplayName("Integração com Acesso AD de desenvolvimento")
 public class AcessoAdIntegrationTest {

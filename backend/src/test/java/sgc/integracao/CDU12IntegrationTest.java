@@ -108,14 +108,20 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);
 
-        mapaSubprocesso = mapaRepo.save(new Mapa());
         subprocessoRevisao =
                 new Subprocesso(
                         processoRevisao,
                         unidade,
-                        mapaSubprocesso,
+                        null,
                         SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
                         processoRevisao.getDataLimite());
+        subprocessoRepo.save(subprocessoRevisao);
+
+        mapaSubprocesso = new Mapa();
+        mapaSubprocesso.setSubprocesso(subprocessoRevisao);
+        mapaRepo.save(mapaSubprocesso);
+
+        subprocessoRevisao.setMapa(mapaSubprocesso);
         subprocessoRepo.save(subprocessoRevisao);
     }
 
