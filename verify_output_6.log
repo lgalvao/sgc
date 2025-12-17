@@ -1,0 +1,442 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar histórico de análise corretamente FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarHistoricoDeAnalise(CDU14IntegrationTest.java:400)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar impactos no mapa corretamente FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarImpactosNoMapa(CDU14IntegrationTest.java:428)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:337)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:337)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > Não pode homologar em estado inválido FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.naoPodeHomologarEmEstadoInvalido(CDU14IntegrationTest.java:486)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Falhas e Segurança > CHEFE não pode homologar revisão FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.chefeNaoPodeHomologar(CDU14IntegrationTest.java:460)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$Aceite.gestorAceitaRevisao(CDU14IntegrationTest.java:305)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros FAILED
+    org.hibernate.exception.ConstraintViolationException: could not execute statement [Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+    delete from sgc.mapa where codigo=? [23503-240]] [delete from sgc.mapa where codigo=?]
+        at app//org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$1(H2Dialect.java:853)
+        at app//org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+        at app//org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+        at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:193)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:148)
+        at app//org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:53)
+        at app//org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.doStaticDelete(AbstractDeleteCoordinator.java:275)
+        at app//org.hibernate.persister.entity.mutation.AbstractDeleteCoordinator.delete(AbstractDeleteCoordinator.java:84)
+        at app//org.hibernate.action.internal.EntityDeleteAction.execute(EntityDeleteAction.java:136)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:646)
+        at app//org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:513)
+        at app//org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:378)
+        at app//org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:39)
+        at app//org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:140)
+        at app//org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1447)
+        at app//org.hibernate.internal.SessionImpl.flush(SessionImpl.java:1436)
+        at java.base@21.0.8/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base@21.0.8/java.lang.reflect.Method.invoke(Method.java:580)
+        at app//org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:317)
+        at app/jdk.proxy3/jdk.proxy3.$Proxy232.flush(Unknown Source)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEIniciarProcessoDeRevisao(CDU14IntegrationTest.java:252)
+        at app//sgc.integracao.CDU14IntegrationTest.criarEComecarProcessoDeRevisao(CDU14IntegrationTest.java:183)
+        at app//sgc.integracao.CDU14IntegrationTest$Devolucao.gestorDevolveRevisao(CDU14IntegrationTest.java:271)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "FK_ATIVIDADE_MAPA: SGC.ATIVIDADE FOREIGN KEY(MAPA_CODIGO) REFERENCES SGC.MAPA(CODIGO) (CAST(1 AS BIGINT))"; SQL statement:
+        delete from sgc.mapa where codigo=? [23503-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:363)
+            at app//org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:380)
+            at app//org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:254)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireAfterRow(Table.java:1226)
+            at app//org.h2.command.dml.Delete.update(Delete.java:81)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+            at app//org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+            at app//com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+            at app//com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+            at app//org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:190)
+            ... 20 more
+
+11 tests completed, 8 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 31s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.

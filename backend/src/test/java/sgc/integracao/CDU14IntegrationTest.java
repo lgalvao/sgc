@@ -29,6 +29,8 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.model.UnidadeMapa;
+import sgc.unidade.model.UnidadeMapaRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -80,6 +82,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private jakarta.persistence.EntityManager entityManager;
     @Autowired
     private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
     @MockitoBean
     private SgrhService sgrhService;
 
@@ -162,6 +166,13 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 .unidade(unidade)
                 .build());
         chefe.setAtribuicoes(chefeAttrs);
+
+        // Ensure UnidadeMapa exists for unit 102
+        Mapa mapa201 = mapaRepo.findById(201L).orElseThrow();
+        if (unidadeMapaRepo.findById(unidade.getCodigo()).isEmpty()) {
+            UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapa201);
+            unidadeMapaRepo.save(unidadeMapa);
+        }
     }
 
     // Métodos de setup
@@ -221,13 +232,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        Subprocesso sp =
-                subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream()
-                        .findFirst()
-                        .orElseThrow();
-        Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
-        sp.setMapa(mapaRevisao);
-        subprocessoRepo.save(sp);
+        // O processo de iniciar revisão já cria uma cópia do mapa vigente e associa ao subprocesso.
+        // Não é necessário sobrescrever o mapa manualmente.
 
         return processoDto;
     }
