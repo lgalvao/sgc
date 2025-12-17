@@ -17,7 +17,7 @@ Os testes E2E do sistema SGC apresentam **boa cobertura funcional** e estrutura 
 - **1 sistema de hooks** (limpeza de dados)
 - **2 fixtures** (base + processos)
 - **Maior teste:** cdu-10.spec.ts (530 linhas)
-- **Tempo de setup:** ~5 minutos (build backend + frontend)
+- **Tempo de setup:** ~1 minuto (build e execucao de backend + frontend)
 
 ---
 
@@ -93,6 +93,9 @@ export async function verificarPaginaSubprocesso(
 
 #### Problema
 Múltiplos arquivos usam `test.describe.serial()` com testes gigantes que dependem de estado compartilhado:
+
+NO ENTANTO: devido à complexidade da preparacao de dados e interferencias no estado do BD, isso foi essencial no inicio. 
+Talvez agora seja mais facil, mas prevejo muitos problemas de interferencia de dados.
 
 **Exemplo:** `cdu-05.spec.ts` (322 linhas)
 ```typescript
@@ -181,7 +184,7 @@ test('CT-01: Admin homologa revisão', async ({ page, request }) => {
 });
 ```
 
-**Prioridade:** 🔴 Alta - Reduz tempo de execução em 60%+
+**Prioridade:** 🔴 Alta - Reduz tempo de execução
 
 ---
 
@@ -399,6 +402,7 @@ Três estratégias diferentes de espera são usadas inconsistentemente:
 const promessaAtividade = page.waitForResponse(
     resp => resp.url().includes('/atividades') && resp.status() === 201
 );
+
 await page.getByTestId('btn-adicionar-atividade').click();
 await promessaAtividade;
 
@@ -408,11 +412,13 @@ await page.waitForLoadState('networkidle'); // Espera TODOS os requests!
 // Estratégia 3: waitForTimeout (ANTI-PATTERN!)
 await page.waitForTimeout(500); // Captura-telas.spec.ts linha 64, 72
 ```
+NO ENTANTO: Os testes e2e devem replicar ao maximo as operacoes dos usuarios, e chamadas a endpoints não são
+representativas
 
 **Problemas:**
 - `waitForTimeout`: Arbitrário, não garante nada
 - `networkidle`: Desnecessariamente lento
-- Falta padronização: Equipe não sabe qual usar
+- Falta padronização
 
 #### Recomendação
 ```typescript
@@ -490,6 +496,8 @@ export async function login(page: Page, usuario: string, senha: string) {
     // Deveria aceitar USUARIOS[keyof typeof USUARIOS] ❌
 }
 ```
+NO ENTANTO: São dezenas de unidades -- não vejo como criar um tipo incluindo todas elas. Usuarios serao Centenas!
+
 
 #### Recomendação
 ```typescript
@@ -544,74 +552,6 @@ export async function loginComoUsuario(
 **Severidade:** Importante  
 **Impacto:** Debugging, Signal-to-Noise Ratio
 
-#### Problema
-Sistema de log filtra algumas mensagens mas ainda é muito verboso:
-
-**lifecycle.js (linhas 28-63):**
-```javascript
-const LOG_FILTERS = [
-    /WARNING:/,
-    /^> Task :/,
-    // ... 10+ padrões
-];
-```
-
-**Mas ainda loga:**
-- Todos os erros HTTP (incluindo 404 esperados)
-- Queries SQL do Hibernate
-- Stacktraces completos de exceções de negócio esperadas
-
-**fixtures/base.ts (linhas 6-14):**
-```typescript
-page.on('console', msg => {
-    const text = msg.text();
-    if (text.includes('[vite] connecting...')) return; // Filtra apenas Vite
-    console.log(`[BROWSER ${type.toUpperCase()}] ${text}`);
-});
-```
-
-#### Recomendação
-```typescript
-// fixtures/base.ts - Melhorar filtros
-const BROWSER_LOG_FILTERS = [
-    /\[vite\]/,
-    /Download the Vue Devtools/,
-    /webpack/,
-    /HMR/,
-    // Adicionar mais padrões comuns de ruído
-];
-
-page.on('console', msg => {
-    const text = msg.text();
-    const type = msg.type();
-    
-    // Filtrar ruído
-    if (BROWSER_LOG_FILTERS.some(p => p.test(text))) return;
-    
-    // Colorir por tipo
-    const prefix = type === 'error' ? '❌' : 
-                   type === 'warning' ? '⚠️' : 'ℹ️';
-    console.log(`${prefix} [BROWSER] ${text}`);
-});
-
-// lifecycle.js - Adicionar modo silencioso para CI
-const SILENT_MODE = process.env.CI === 'true';
-
-function log(prefix, data) {
-    if (SILENT_MODE && !data.toString().includes('ERROR')) {
-        return; // No CI, só loga erros
-    }
-    // ... resto do código
-}
-```
-
-**Adicionar variável de ambiente:**
-```bash
-# .env.e2e
-CI=false
-E2E_LOG_LEVEL=info # debug | info | warn | error
-```
-
 **Prioridade:** 🟡 Média - Melhora experiência de debugging
 
 ---
@@ -635,6 +575,8 @@ Três convenções diferentes de nomenclatura:
 // Convenção 2: PascalCase com underscores (inconsistente!)
 'subprocesso-header__txt-badge-situacao'
 'cad-atividades__txt-badge-situacao'
+
+NO ENTANTO: Esses exemplos acima não são kebak case (subprocesso é uma palavra unica)
 
 // Convenção 3: Sem prefixo
 'btn-logout'
@@ -665,6 +607,9 @@ Exemplos:
 - ❌ `subprocesso-header__txt-badge-situacao` (evitar __)
 - ❌ `btnLogout` (evitar camelCase)
 ```
+
+NO ENTANTO: em muitos casos, esse padrao recomendado geraria testids identicos, dai a necessidade de prefixar
+o contexto. 
 
 **Prioridade:** 🔵 Baixa - Refatoração oportunística
 
@@ -751,7 +696,7 @@ export async function adicionarAtividade(page: Page, descricao: string) {
 
 ### 11. **Criar Suite de Testes de Smoke**
 
-**Descrição:** Subset de testes críticos que roda em <5 min
+**Descrição:** Subset de testes críticos que roda em <1 min
 
 ```typescript
 // e2e/smoke/smoke.spec.ts
@@ -779,7 +724,7 @@ test.describe('Smoke Tests', () => {
 # .github/workflows/ci.yml
 - name: Smoke Tests
   run: npx playwright test smoke/
-  timeout-minutes: 5
+  timeout-minutes: 1
 ```
 
 ---
