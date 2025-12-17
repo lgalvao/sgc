@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
-import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
@@ -53,7 +52,6 @@ public class ImpactoMapaService {
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final AtividadeRepo atividadeRepo;
-    private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaRepo competenciaRepo;
 
     /**
@@ -216,7 +214,7 @@ public class ImpactoMapaService {
                                 .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
                                 .descricaoAnterior(null)
                                 .competenciasVinculadas(
-                                        obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente))
+                                        obterCompetenciasDaAtividade(vigente, mapaVigente))
                                 .build();
 
                 removidas.add(atividadeImpactadaDto);
@@ -233,10 +231,10 @@ public class ImpactoMapaService {
         for (Atividade atual : atuais) {
             if (vigentesMap.containsKey(atual.getDescricao())) {
                 Atividade vigente = vigentesMap.get(atual.getDescricao());
-                List<Conhecimento> conhecimentosAtuais =
-                        conhecimentoRepo.findByAtividadeCodigo(atual.getCodigo());
-                List<Conhecimento> conhecimentosVigentes =
-                        conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
+
+                // Optimização: Usar listas já carregadas em memória para evitar N+1 queries
+                List<Conhecimento> conhecimentosAtuais = atual.getConhecimentos();
+                List<Conhecimento> conhecimentosVigentes = vigente.getConhecimentos();
 
                 if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
                     alteradas.add(
@@ -247,7 +245,7 @@ public class ImpactoMapaService {
                                     .descricaoAnterior(
                                             "Descrição ou conhecimentos associados alterados.")
                                     .competenciasVinculadas(
-                                            obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente))
+                                            obterCompetenciasDaAtividade(atual, mapaVigente))
                                     .build());
                 }
             }
@@ -281,12 +279,11 @@ public class ImpactoMapaService {
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
             if (atividadeDto.getCodigo() == null) continue;
-            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
-            if (atividade == null) continue;
+            // Otimização: Não buscar atividade no DB apenas para pegar ID, que já temos no DTO.
 
             for (Competencia comp : competenciasDoMapa) {
                 if (comp.getAtividades().stream()
-                        .anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
+                        .anyMatch(a -> a.getCodigo().equals(atividadeDto.getCodigo()))) {
                     CompetenciaImpactoAcumulador acumulador =
                             mapaImpactos.computeIfAbsent(
                                     comp.getCodigo(),
@@ -340,11 +337,10 @@ public class ImpactoMapaService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private List<String> obterCompetenciasDaAtividade(Long codAtividade, Mapa mapaVigente) {
-        if (codAtividade == null) return Collections.emptyList();
-        Atividade atividade = atividadeRepo.findById(codAtividade).orElse(null);
+    private List<String> obterCompetenciasDaAtividade(Atividade atividade, Mapa mapaVigente) {
         if (atividade == null) return Collections.emptyList();
 
+        // Otimização: Recebe a entidade já carregada para evitar busca redundante por ID
         return atividade.getCompetencias().stream()
                 .filter(c -> c.getMapa().getCodigo().equals(mapaVigente.getCodigo()))
                 .map(Competencia::getDescricao)
