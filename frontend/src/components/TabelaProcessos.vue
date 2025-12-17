@@ -1,39 +1,8 @@
-<template>
-  <div>
-    <BTable
-        :fields="fields"
-        :items="processos"
-        :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
-        :sort-desc="[!direcaoOrdenacaoAsc]"
-        :tbody-tr-class="rowClass"
-        data-testid="tbl-processos"
-        hover
-        responsive
-        show-empty
-        @row-clicked="handleSelecionarProcesso"
-        @sort-changed="handleSortChange"
-    >
-      <template #empty>
-        <div class="text-center text-muted">
-          Nenhum processo encontrado.
-        </div>
-      </template>
-
-      <template #cell(situacao)="data">
-        {{ formatarSituacao(data.value as string) }}
-      </template>
-
-      <template #cell(tipo)="data">
-        {{ formatarTipo(data.value as string) }}
-      </template>
-    </BTable>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import {BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
+import { formatarSituacaoProcesso, formatarTipoProcesso } from "@/utils/formatters";
 
 const props = defineProps<{
   processos: ProcessoResumo[];
@@ -92,24 +61,6 @@ const handleSelecionarProcesso = (processo: ProcessoResumo) => {
   emit("selecionarProcesso", processo);
 };
 
-function formatarSituacao(situacao: string): string {
-  const mapa: Record<string, string> = {
-    EM_ANDAMENTO: "Em andamento",
-    FINALIZADO: "Finalizado",
-    CRIADO: "Criado",
-  };
-  return mapa[situacao] || situacao;
-}
-
-function formatarTipo(tipo: string): string {
-  const mapa: Record<string, string> = {
-    MAPEAMENTO: "Mapeamento",
-    REVISAO: "Revisão",
-    DIAGNOSTICO: "Diagnóstico",
-  };
-  return mapa[tipo] || tipo;
-}
-
 const rowClass = (item: ProcessoResumo | null, type: string) => {
   if (item && type === 'row') {
     return `row-processo-${item.codigo}`;
@@ -117,3 +68,35 @@ const rowClass = (item: ProcessoResumo | null, type: string) => {
   return '';
 };
 </script>
+
+<template>
+  <div>
+    <BTable
+        :fields="fields"
+        :items="processos"
+        :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
+        :sort-desc="[!direcaoOrdenacaoAsc]"
+        :tbody-tr-class="rowClass"
+        data-testid="tbl-processos"
+        hover
+        responsive
+        show-empty
+        @row-clicked="handleSelecionarProcesso"
+        @sort-changed="handleSortChange"
+    >
+      <template #empty>
+        <div class="text-center text-muted">
+          Nenhum processo encontrado.
+        </div>
+      </template>
+
+      <template #cell(situacao)="data">
+        {{ formatarSituacaoProcesso(data.value as string) }}
+      </template>
+
+      <template #cell(tipo)="data">
+        {{ formatarTipoProcesso(data.value as string) }}
+      </template>
+    </BTable>
+  </div>
+</template>

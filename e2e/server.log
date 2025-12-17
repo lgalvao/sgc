@@ -1,0 +1,44 @@
+[BACKEND] Calculating task graph as configuration cache cannot be reused because system property 'idea.io.use.nio2' has changed.
+[BACKEND] Perfil Spring ativado: test
+[BACKEND] Carregando configurações de: .env.test
+[FRONTEND]   [32m[1mVITE[22m v7.2.7[39m  [2mready in [0m[1m2086[22m[2m[0m ms[22m
+[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - [f3babee7-093f-4ec9-ae58-c2251656711c] Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 111111 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 1 criado.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 222222 com perfil GESTOR na unidade 5
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 101010 com perfil CHEFE na unidade 15
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 2 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:282 - Processo de mapeamento 2 iniciado para 1 unidades.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.c.erros.RestExceptionHandler.handleMethodArgumentNotValid:88 - Erro de validação de argumento
+[BACKEND] INFO  s.c.erros.RestExceptionHandler.handleMethodArgumentNotValid:88 - Erro de validação de argumento
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 3 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:282 - Processo de mapeamento 3 iniciado para 1 unidades.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 101010 com perfil CHEFE na unidade 15
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 4 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:282 - Processo de mapeamento 4 iniciado para 1 unidades.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 181818 com perfil CHEFE na unidade 16
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 5 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoMapeamento:282 - Processo de mapeamento 5 iniciado para 1 unidades.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 171717 com perfil CHEFE na unidade 10
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 6 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:165 - Processo 7 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoRevisao:292 - Iniciando processo de revisão para código 7 com unidades [4]
+[BACKEND] INFO  s.p.service.ProcessoService.criarSubprocessoParaRevisao:503 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.service.ProcessoService.iniciarProcessoRevisao:325 - Processo de revisão 7 iniciado para 1 unidades.
+[BACKEND] INFO  s.s.a.GerenciadorJwt.gerarToken:46 - JWT gerado para usuário 191919 com perfil ADMIN na unidade 1

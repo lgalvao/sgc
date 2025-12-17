@@ -28,8 +28,7 @@ async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
     // Se cair na lista de unidades, clica na unidade do Chefe
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-    }
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();    }
 }
 
 test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
@@ -121,8 +120,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -134,8 +132,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         await navegarParaMapa(page);
 
         // Criar três competências, uma para cada atividade
@@ -169,8 +166,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -180,8 +176,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Navegar de volta para verificar situação atualizada
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
 
         // Finalizar processo
         await page.goto('/painel');
@@ -253,8 +248,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -282,8 +276,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Passo 2-3: Sistema mostra Detalhes do processo, ADMIN clica na unidade
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Passo 4: Sistema mostra Detalhes do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
             .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
@@ -312,8 +305,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Passo 7: ADMIN clica em Impactos no mapa
         await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
@@ -347,8 +339,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Verificar que a competência existe
         await expect(page.getByText(competencia1)).toBeVisible();
@@ -376,8 +367,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Criar nova competência com a atividade nova da revisão
         const novaCompetencia = `Competência Nova Ajuste ${timestamp}`;

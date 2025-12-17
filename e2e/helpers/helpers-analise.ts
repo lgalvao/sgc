@@ -51,7 +51,7 @@ export async function acessarSubprocessoChefe(page: Page, descricaoProcesso: str
 
     // Se cair na lista de unidades (caso múltiplas), clica na unidade
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: /Seção 221/i}).click();
+        await page.getByRole('row', {name: /SECAO_221/i}).click();
     }
 }
 

@@ -21,8 +21,7 @@ async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
     // Se cair na lista de unidades, clica na unidade do Chefe
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-    }
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();    }
 }
 
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
@@ -142,8 +141,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 

@@ -122,8 +122,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByText(descProcessoMapeamento).click();
 
         // Passo 2.2: Clicar na unidade subordinada
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Passo 2.3: Verificar visualização
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
@@ -183,8 +182,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Aceitar cadastro
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -234,8 +232,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -253,8 +250,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Clicar na linha da unidade
-        const linhaUnidade = page.getByRole('row', {name: 'Seção 221'});
-        await expect(linhaUnidade).toBeVisible();
+                    const linhaUnidade = page.getByRole('row', {name: 'SECAO_221'});        await expect(linhaUnidade).toBeVisible();
         await linhaUnidade.click();
 
         // Esperar navegação para o subprocesso

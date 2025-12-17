@@ -96,8 +96,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -109,8 +108,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         await navegarParaMapa(page);
 
         await criarCompetencia(page, competencia1, [atividade1]);
@@ -142,8 +140,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         const modal = page.getByRole('dialog');
@@ -158,8 +155,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         const modal = page.getByRole('dialog');
@@ -170,8 +166,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         // Verificar que mapa foi homologado
         await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
             .toHaveText(/Mapa homologado/i);
     });
 

@@ -42,8 +42,8 @@ test.describe('CDU-06 - Detalhar processo', () => {
         // Verificar detalhes do processo (usando caixa alta conforme observado em reviews)
         await verificarDetalhesProcesso(page, {
             descricao,
-            tipo: 'MAPEAMENTO',
-            situacao: 'EM_ANDAMENTO'
+            tipo: 'Mapeamento',
+            situacao: 'Em andamento'
         });
 
         // Verificar unidade participante
@@ -90,8 +90,8 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         await verificarDetalhesProcesso(page, {
             descricao,
-            tipo: 'MAPEAMENTO',
-            situacao: 'EM_ANDAMENTO'
+            tipo: 'Mapeamento',
+            situacao: 'Em andamento'
         });
 
         await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();

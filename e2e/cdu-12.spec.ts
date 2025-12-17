@@ -26,8 +26,7 @@ async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
     // Se cair na lista de unidades, clica na unidade do Chefe
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-    }
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();    }
 }
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
@@ -102,8 +101,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -153,8 +151,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -293,8 +290,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'Seção 221'}).click();
-
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Acessar visualização
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
