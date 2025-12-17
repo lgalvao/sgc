@@ -14,8 +14,8 @@
       {{ descricao }}
     </h2>
     <div class="mb-4 mt-3">
-      <strong>Tipo:</strong> {{ tipo }}<br>
-      <strong>Situação:</strong> {{ situacao }}<br>
+      <strong>Tipo:</strong> {{ formatarTipoProcesso(tipo) }}<br>
+      <strong>Situação:</strong> {{ formatarSituacaoProcesso(situacao) }}<br>
     </div>
   </div>
 </template>
@@ -23,6 +23,7 @@
 <script lang="ts" setup>
 import {BBadge} from "bootstrap-vue-next";
 import type {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import { formatarSituacaoProcesso, formatarTipoProcesso } from "@/utils/formatters";
 
 defineProps<{
   descricao: string;

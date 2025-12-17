@@ -82,7 +82,7 @@ const shouldShowNavBarExtras = computed(() => {
       </div>
     </div>
 
-    <main class="flex-grow-1">
+    <main class="flex-grow-1 pb-3">
       <router-view/>
     </main>
 
@@ -90,7 +90,7 @@ const shouldShowNavBarExtras = computed(() => {
         v-if="route.path !== '/login'"
         class="bg-light text-muted border-top mt-auto"
     >
-      <div class="container py-2 small d-flex justify-content-between align-items-center">
+      <div class="container-fluid py-2 small d-flex justify-content-between align-items-center">
         <span>Versão {{ version }}</span>
         <span>© SESEL/COSIS/TRE-PE</span>
       </div>

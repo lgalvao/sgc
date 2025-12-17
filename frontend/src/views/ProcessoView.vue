@@ -142,7 +142,7 @@ function formatarDadosParaArvore(
   if (!dados) return [];
   return dados.map((item) => ({
     id: item.codUnidade,
-    nome: `${item.sigla} - ${item.nome}`,
+    nome: item.sigla,
     situacao: item.situacaoSubprocesso || "Não iniciado",
     dataLimite: formatarData(item.dataLimite || null),
     unidadeAtual: item.sigla,
