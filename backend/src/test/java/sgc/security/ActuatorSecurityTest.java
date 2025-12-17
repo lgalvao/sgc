@@ -1,5 +1,6 @@
 package sgc.security;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +8,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.autenticacao.GerenciadorJwt;
 import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioPerfilRepo;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("secure-test")
+@Transactional
 @DisplayName("Testes de Segurança do Actuator")
 class ActuatorSecurityTest {
 
@@ -25,11 +34,44 @@ class ActuatorSecurityTest {
     @Autowired
     private GerenciadorJwt gerenciadorJwt;
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @BeforeEach
+    void setup() {
+        Unidade unidade = unidadeRepo.findAll().stream().findFirst()
+                .orElseGet(() -> unidadeRepo.save(new Unidade("Unidade Teste", "TESTE")));
+
+        criarUsuario("123456789", Perfil.ADMIN, unidade);
+        criarUsuario("987654321", Perfil.SERVIDOR, unidade);
+    }
+
+    private void criarUsuario(String titulo, Perfil perfil, Unidade unidade) {
+        if (usuarioRepo.existsById(titulo)) return;
+
+        Usuario usuario = new Usuario(titulo, "Usuario " + perfil, "email@test.com", "1234", unidade);
+        usuarioRepo.save(usuario);
+
+        UsuarioPerfil usuarioPerfil = new UsuarioPerfil();
+        usuarioPerfil.setUsuarioTitulo(titulo);
+        usuarioPerfil.setUsuario(usuario);
+        usuarioPerfil.setUnidadeCodigo(unidade.getCodigo());
+        usuarioPerfil.setUnidade(unidade);
+        usuarioPerfil.setPerfil(perfil);
+        usuarioPerfilRepo.save(usuarioPerfil);
+    }
+
     @Test
     @DisplayName("Deve negar acesso anônimo ao Actuator")
     void deveNegarAcessoAnonimoAoActuator() throws Exception {
         mockMvc.perform(get("/actuator/health"))
-                .andExpect(status().isUnauthorized()); // Expect 401
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -49,6 +91,6 @@ class ActuatorSecurityTest {
 
         mockMvc.perform(get("/actuator/health")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden()); // Expect 403
+                .andExpect(status().isForbidden());
     }
 }

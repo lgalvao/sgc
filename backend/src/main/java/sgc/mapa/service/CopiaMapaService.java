@@ -58,6 +58,7 @@ public class CopiaMapaService {
                             .setAtividade(atividadeSalva)
                             .setDescricao(conhecimentoFonte.getDescricao());
 
+                    atividadeSalva.getConhecimentos().add(novoConhecimento);
                     novosConhecimentos.add(novoConhecimento);
                 }
                 conhecimentoRepo.saveAll(novosConhecimentos);
@@ -73,7 +74,9 @@ public class CopiaMapaService {
 
                 Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
                 for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
-                    novasAtividadesAssociadas.add(mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
+                    Atividade novaAtividade = mapaDeAtividades.get(atividadeFonteAssociada.getCodigo());
+                    novasAtividadesAssociadas.add(novaAtividade);
+                    novaAtividade.getCompetencias().add(novaCompetencia);
                 }
                 novaCompetencia.setAtividades(novasAtividadesAssociadas);
 
