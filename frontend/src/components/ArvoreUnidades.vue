@@ -69,7 +69,6 @@ const maps = computed(() => {
 });
 
 const parentMap = computed(() => maps.value.parentMap);
-const unitMap = computed(() => maps.value.unitMap);
 
 // Filtrar unidades pela função customizada e ocultar Raiz se configurado
 const unidadesExibidas = computed(() => {
@@ -87,10 +86,7 @@ const unidadesExibidas = computed(() => {
   return lista;
 });
 
-// Busca uma unidade por código de forma otimizada O(1)
-function findUnidadeById(codigo: number): Unidade | undefined {
-  return unitMap.value.get(codigo);
-}
+
 
 // Obtém todas subunidades recursivamente (retorna objetos para evitar lookups)
 // Bolt Optimization: Return Unidade objects directly to avoid O(N) lookup for each child

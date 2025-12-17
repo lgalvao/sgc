@@ -19,6 +19,7 @@ vi.mock("vue-router", () => ({
         afterEach: vi.fn(),
     })),
     createWebHistory: vi.fn(),
+    createMemoryHistory: vi.fn(),
 }));
 
 // Helper to create mock routes

@@ -43,7 +43,7 @@ public class GerenciadorJwt {
                 .signWith(getSigningKey())
                 .compact();
 
-        log.info("JWT gerado para usuário {} com perfil {} na unidade {}", 
+        log.debug("JWT gerado para usuário {} com perfil {} na unidade {}", 
             tituloEleitoral, perfil, unidadeCodigo);
         
         return token;

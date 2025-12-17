@@ -291,16 +291,18 @@ const processosFiltrados = computed(() => {
 
 const mapasVigentes = computed(() => {
   // Filtrar mapas vigentes (aqueles com processos finalizados)
+  const mapa = mapasStore.mapaCompleto as any;
   if (
-      mapasStore.mapaCompleto &&
-      mapasStore.mapaCompleto.competencias &&
-      mapasStore.mapaCompleto.competencias.length > 0
+      mapa &&
+      mapa.competencias &&
+      mapa.competencias.length > 0 &&
+      mapa.unidade
   ) {
     return [
       {
-        ...(mapasStore.mapaCompleto as any),
-        unidade: (mapasStore.mapaCompleto as any).unidade.sigla,
-        id: mapasStore.mapaCompleto.codigo,
+        ...mapa,
+        unidade: mapa.unidade.sigla || 'N/A',
+        id: mapa.codigo,
       },
     ];
   }

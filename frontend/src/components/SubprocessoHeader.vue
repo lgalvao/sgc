@@ -32,7 +32,7 @@
         <i class="bi bi-envelope-fill ms-3 me-2"/>{{ titularEmail }}
       </p>
 
-      <template v-if="responsavelNome">
+      <template v-if="responsavelNome && responsavelNome !== titularNome">
         <p><strong>Responsável:</strong> {{ responsavelNome }}</p>
         <p class="ms-3">
           <i class="bi bi-telephone-fill me-2"/>{{ responsavelRamal }}

@@ -726,7 +726,6 @@ sgc/{modulo}/
 2. **subprocesso**: Máquina de estados e workflow
 3. **mapa**: Gestão de mapas de competências
 4. **atividade**: CRUD de atividades e conhecimentos
-5. **diagnostico**: Diagnóstico e ocupações críticas
 
 **Módulos de Suporte:**
 6. **analise**: Trilha de auditoria

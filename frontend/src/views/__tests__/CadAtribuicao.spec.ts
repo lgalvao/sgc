@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/CadAtribuicao.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
-import {buscarUnidadePorSigla} from '@/services/unidadesService';
+import {buscarUnidadePorCodigo} from '@/services/unidadesService';
 import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
 
 // Mocks
@@ -17,7 +17,7 @@ vi.mock('@/services/atribuicaoTemporariaService', () => ({
   criarAtribuicaoTemporaria: vi.fn(),
 }));
 vi.mock('@/services/unidadesService', () => ({
-  buscarUnidadePorSigla: vi.fn(),
+  buscarUnidadePorCodigo: vi.fn(),
 }));
 vi.mock('@/services/usuarioService', () => ({
   buscarUsuariosPorUnidade: vi.fn(),
@@ -33,20 +33,20 @@ describe('CadAtribuicao.vue', () => {
   };
 
   const mockUsuarios = [
-    { codigo: '111', nome: 'Servidor 1', tituloEleitoral: '111' },
-    { codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222' }
+    {codigo: '111', nome: 'Servidor 1', tituloEleitoral: '111' },
+    {codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222' }
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    (buscarUnidadePorSigla as any).mockResolvedValue(mockUnidade);
+    (buscarUnidadePorCodigo as any).mockResolvedValue(mockUnidade);
     (buscarUsuariosPorUnidade as any).mockResolvedValue(mockUsuarios);
 
     wrapper = mount(CadAtribuicao, {
       props: {
-        sigla: 'TEST'
+        codUnidade: 1
       },
       global: {
         stubs: {
@@ -75,7 +75,7 @@ describe('CadAtribuicao.vue', () => {
   });
 
   it('fetches data on mount', async () => {
-    expect(buscarUnidadePorSigla).toHaveBeenCalledWith('TEST');
+    expect(buscarUnidadePorCodigo).toHaveBeenCalledWith(1);
     
     await flushPromises();
     
@@ -128,6 +128,6 @@ describe('CadAtribuicao.vue', () => {
     const btn = wrapper.find('[data-testid="btn-cancelar-atribuicao"]');
     await btn.trigger('click');
     
-    expect(mockPush).toHaveBeenCalledWith('/unidade/TEST');
+    expect(mockPush).toHaveBeenCalledWith('/unidade/1');
   });
 });

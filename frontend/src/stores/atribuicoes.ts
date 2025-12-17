@@ -41,14 +41,23 @@ export const useAtribuicaoTemporariaStore = defineStore(
             lastError.value = null;
             try {
                 const response = await buscarTodasAtribuicoes();
-                atribuicoes.value = (response as any).data.map((a: any) => ({
-                    ...a,
-                    dataInicio: new Date(a.dataInicio).toISOString(),
-                    dataFim: new Date(a.dataTermino).toISOString(),
-                    dataTermino: new Date(a.dataTermino).toISOString(),
-                    servidor: a.servidor,
-                    unidade: a.unidade,
-                })) as AtribuicaoTemporaria[];
+                // response is the array directly from the service
+                const data = Array.isArray(response) ? response : (response as any).data;
+                
+                if (Array.isArray(data)) {
+                    atribuicoes.value = data.map((a: any) => ({
+                        codigo: a.id,
+                        dataInicio: new Date(a.dataInicio).toISOString(),
+                        dataFim: new Date(a.dataTermino).toISOString(),
+                        dataTermino: new Date(a.dataTermino).toISOString(),
+                        servidor: a.usuario || a.servidor, // Handle both just in case
+                        unidade: a.unidade,
+                        justificativa: a.justificativa
+                    })) as AtribuicaoTemporaria[];
+                } else {
+                    console.error("Expected array but got:", data);
+                    atribuicoes.value = [];
+                }
             } catch (err: any) {
                 lastError.value = normalizeError(err);
                 error.value = lastError.value.message;

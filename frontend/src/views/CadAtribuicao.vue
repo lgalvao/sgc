@@ -76,7 +76,7 @@
               data-testid="btn-cancelar-atribuicao"
               type="button"
               variant="secondary"
-              @click="router.push(`/unidade/${sigla}`)"
+              @click="router.push(`/unidade/${codUnidade}`)"
           >
             Cancelar
           </BButton>
@@ -121,14 +121,14 @@ import {
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
-import {buscarUnidadePorSigla} from "@/services/unidadesService";
+import {buscarUnidadePorCodigo} from "@/services/unidadesService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import type {Unidade, Usuario} from "@/types/tipos";
 
-const props = defineProps<{ sigla: string }>();
+const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
-const sigla = computed(() => props.sigla);
+const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
 const servidores = ref<Usuario[]>([]);
@@ -142,7 +142,7 @@ const erroApi = ref("");
 
 onMounted(async () => {
   try {
-    unidade.value = await buscarUnidadePorSigla(sigla.value);
+    unidade.value = await buscarUnidadePorCodigo(codUnidade.value);
     if (unidade.value) {
       servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }

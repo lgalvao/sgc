@@ -22,26 +22,8 @@ spring:
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
-      mail:
-        smtp:
-          auth: false
-          starttls.enable: false
-server:
-  port: 10000
-aplicacao:
-  ambiente-testes: true
-  url-acesso-hom: https://sedesenvdev01.tre-pe.gov.br/acessoAD
-  url-acesso-prod: https://acesso.tre-pe.jus.br/acessoAD
-  acesso-ad:
-    base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
-    codigo-sistema: SGC
-  jwt:
-    secret: ${JWT_SECRET:sgc-secret-key-change-this-in-production-minimum-32-chars}
-    expiracao-minutos: 120
-  email:
-    remetente: sgc@tre-pe.jus.br
-    remetente-nome: "Sistema de Gestão de Competências"
-    assunto-prefixo: "[SGC]"
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 springdoc:
   api-docs.enabled: false
   swagger-ui.enabled: false
@@ -51,7 +33,8 @@ springdoc:
     title: SGC - Sistema de Gestão de Competências API
     version: v1
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
-
+server:
+  port: 10000
 logging:
   pattern:
     console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
@@ -65,3 +48,15 @@ logging:
     org.springframework: ERROR
     org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO
+aplicacao:
+  ambiente-testes: true
+  acesso-ad:
+    base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
+    codigo-sistema: SGC
+  jwt:
+    secret: ${JWT_SECRET:sgc-secret-key-change-this-in-production-minimum-32-chars}
+    expiracao-minutos: 120
+  email:
+    remetente: sgc@tre-pe.jus.br
+    remetente-nome: "Sistema de Gestão de Competências"
+    assunto-prefixo: "[SGC]"

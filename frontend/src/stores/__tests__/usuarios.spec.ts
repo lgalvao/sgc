@@ -6,6 +6,7 @@ import {useUsuariosStore} from "../usuarios";
 
 const mockUsuarios: Usuario[] = [
     {
+        codigo: 1,
         nome: "Ana Paula Souza",
         unidade: {codigo: 1, nome: "Seção de Seleção", sigla: "SESEL"},
         email: "ana.souza@tre-pe.jus.br",
@@ -13,6 +14,7 @@ const mockUsuarios: Usuario[] = [
         tituloEleitoral: "123456789",
     },
     {
+        codigo: 2,
         nome: "Carlos Henrique Lima",
         unidade: {codigo: 2, nome: "Seção de Gestão de Pessoas", sigla: "SGP"},
         email: "carlos.lima@tre-pe.jus.br",
@@ -67,6 +69,18 @@ describe("useUsuariosStore", () => {
 
         it("obterUsuarioPorTitulo should return undefined if no matching usuario is found", () => {
             const usuario = usuariosStore.obterUsuarioPorTitulo("999999999");
+            expect(usuario).toBeUndefined();
+        });
+
+        it("obterUsuarioPorId should return the correct usuario by id", () => {
+            const usuario = usuariosStore.obterUsuarioPorId(1);
+            expect(usuario).toBeDefined();
+            expect(usuario?.codigo).toBe(1);
+            expect(usuario?.nome).toBe("Ana Paula Souza");
+        });
+
+        it("obterUsuarioPorId should return undefined if no matching usuario is found", () => {
+            const usuario = usuariosStore.obterUsuarioPorId(999);
             expect(usuario).toBeUndefined();
         });
     });

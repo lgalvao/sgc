@@ -2,9 +2,33 @@ import {expect, type Page} from '@playwright/test';
 
 export async function navegarParaAtividades(page: Page) {
     const testId = 'card-subprocesso-atividades';
+    
+    // Capturar logs do console para debug
+    page.on('console', msg => {
+        if (msg.text().includes('SubprocessoCards')) {
+            console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
+        }
+    });
+    
     await expect(page.getByTestId(testId)).toBeVisible();
+    
+    // Capturar URL antes do clique
+    const urlAntes = page.url();
+    console.log('[E2E] URL antes do clique:', urlAntes);
+    
+    // Clicar no card
     await page.getByTestId(testId).click();
-    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+    
+    // Aguardar navegação - a URL deve mudar para incluir /cadastro
+    await page.waitForURL(/\/cadastro$/, {timeout: 10000});
+    
+    console.log('[E2E] URL após clique:', page.url());
+    
+    // Verificar que estamos na página de cadastro (heading level 1, não level 4 do card)
+    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 1})).toBeVisible();
+    
+    // Verificar que o input de nova atividade existe (só existe na página de cadastro)
+    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {

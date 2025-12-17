@@ -12,6 +12,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.SgrhMapper;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.dto.AtribuicaoTemporariaDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
@@ -35,6 +36,12 @@ public class UnidadeService {
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
         return montarHierarquia(todasUnidades);
+    }
+
+    public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
+        return atribuicaoTemporariaRepo.findAll().stream()
+                .map(sgrhMapper::toAtribuicaoTemporariaDto)
+                .toList();
     }
 
     public List<UnidadeDto> buscarArvoreComElegibilidade(

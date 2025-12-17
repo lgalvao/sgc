@@ -210,7 +210,7 @@ const navegarPara = (routeName: string) => {
     params: {
       codProcesso: props.codProcesso,
       siglaUnidade: props.siglaUnidade
-    },
+    }
   });
 };
 

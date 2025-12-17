@@ -22,6 +22,9 @@ public class UnidadeDto {
     private String tipo;
     private List<UnidadeDto> subunidades; // Para árvore hierárquica
 
+    @JsonProperty("tituloTitular")
+    private String tituloTitular;
+
     @JsonProperty("isElegivel")
     private boolean isElegivel;
 }

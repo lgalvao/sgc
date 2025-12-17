@@ -32,6 +32,7 @@ vi.mock("vue-router", () => ({
         afterEach: vi.fn(),
     }),
     createWebHistory: () => ({}),
+    createMemoryHistory: () => ({}),
 }));
 
 // Mock usePerfil

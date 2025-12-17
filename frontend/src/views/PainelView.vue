@@ -54,7 +54,7 @@ import TabelaProcessos from "@/components/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
-import type {Alerta, ProcessoResumo} from "@/types/tipos";
+import type {ProcessoResumo} from "@/types/tipos";
 
 const perfil = usePerfilStore();
 const processosStore = useProcessosStore();

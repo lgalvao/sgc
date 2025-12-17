@@ -12,6 +12,8 @@ import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
 
+import sgc.sgrh.dto.UsuarioDto;
+
 import java.util.List;
 
 @RestController
@@ -20,6 +22,19 @@ import java.util.List;
 @Slf4j
 public class SgrhController {
     private final SgrhService sgrhService;
+
+    /**
+     * Busca um usuário pelo título de eleitor.
+     *
+     * @param titulo O título de eleitor.
+     * @return O DTO do usuário, se encontrado.
+     */
+    @GetMapping("/{titulo}")
+    public ResponseEntity<UsuarioDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
+        return sgrhService.buscarUsuarioPorTitulo(titulo)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     /**
      * Autentica um usuário com base no título de eleitor e senha.

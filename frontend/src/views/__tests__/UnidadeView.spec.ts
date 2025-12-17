@@ -7,6 +7,7 @@ import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
 import {useUsuariosStore} from '@/stores/usuarios';
 import {useMapasStore} from '@/stores/mapas';
+import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 
 // Mocks
 const mockPush = vi.fn();
@@ -18,6 +19,14 @@ vi.mock('vue-router', async (importOriginal) => {
       push: mockPush,
     }),
   };
+});
+
+vi.mock('@/services/usuarioService', async (importOriginal) => {
+    const actual: any = await importOriginal();
+    return {
+        ...actual,
+        buscarUsuarioPorTitulo: vi.fn(),
+    }
 });
 
 const TreeTableStub = {
@@ -39,6 +48,7 @@ describe('UnidadeView.vue', () => {
     sigla: 'TEST',
     nome: 'Unidade Teste',
     idServidorTitular: 10,
+    tituloTitular: '123456',
     filhas: [
       { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },
       { codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: [] }
@@ -59,9 +69,7 @@ describe('UnidadeView.vue', () => {
       ramal: '456'
   }
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-
+  const setupWrapper = (initialStateOverride = {}) => {
     wrapper = mount(UnidadeView, {
       props: {
         codUnidade: 1
@@ -81,11 +89,12 @@ describe('UnidadeView.vue', () => {
                 perfilSelecionado: 'USER',
               },
               usuarios: {
-                usuarios: [], // We might need to mock obterUsuarioPorId behavior or populate this list if the store uses it
+                usuarios: [],
               },
               mapas: {
                 mapaCompleto: null,
-              }
+              },
+              ...initialStateOverride
             },
           }),
         ],
@@ -105,7 +114,12 @@ describe('UnidadeView.vue', () => {
     usuariosStore = useUsuariosStore();
     mapasStore = useMapasStore();
     
-    // Setup default mock behaviors
+    // Setup default mock behaviors if not already set by initialState or need specific returns
+    if (!unidadesStore.buscarArvoreUnidade.mock) {
+        // If it was already mocked by pinia testing, we can adjust it. 
+        // But createTestingPinia with stubActions: true (default) mocks all actions.
+    }
+    
     unidadesStore.buscarArvoreUnidade.mockResolvedValue(null);
     atribuicaoStore.buscarAtribuicoes.mockResolvedValue(null);
     atribuicaoStore.obterAtribuicoesPorUnidade = vi.fn().mockReturnValue([]);
@@ -114,22 +128,35 @@ describe('UnidadeView.vue', () => {
         if (id === 20) return mockUsuarioResponsavel;
         return null;
     });
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUsuario);
   });
 
   it('fetches data on mount', async () => {
+    setupWrapper();
     expect(unidadesStore.buscarArvoreUnidade).toHaveBeenCalledWith(1);
     expect(atribuicaoStore.buscarAtribuicoes).toHaveBeenCalled();
   });
 
   it('renders unit details correctly', async () => {
-    unidadesStore.unidade = mockUnidade;
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
+    
     await wrapper.vm.$nextTick();
+    await flushPromises();
 
     expect(wrapper.text()).toContain('TEST - Unidade Teste');
     expect(wrapper.text()).toContain('Titular: Titular Teste');
   });
 
   it('renders "Criar atribuição" button only for ADMIN', async () => {
+    setupWrapper();
     perfilStore.perfilSelecionado = 'ADMIN';
     await wrapper.vm.$nextTick();
     expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(true);
@@ -140,6 +167,7 @@ describe('UnidadeView.vue', () => {
   });
   
   it('navigates to create assignment', async () => {
+    setupWrapper();
     perfilStore.perfilSelecionado = 'ADMIN';
     await wrapper.vm.$nextTick();
     
@@ -148,7 +176,11 @@ describe('UnidadeView.vue', () => {
   });
 
   it('calculates dynamic responsible person correctly', async () => {
-    unidadesStore.unidade = mockUnidade;
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     
     const today = new Date();
     const tomorrow = new Date(today);
@@ -167,21 +199,29 @@ describe('UnidadeView.vue', () => {
     
     // Force re-computation
     await wrapper.vm.$nextTick();
+    await flushPromises();
 
     expect(wrapper.text()).toContain('Responsável: Responsavel Teste');
   });
 
   it('renders subordinate units tree table', async () => {
-    unidadesStore.unidade = mockUnidade;
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     await wrapper.vm.$nextTick();
 
     const treeTable = wrapper.findComponent(TreeTableStub);
     expect(treeTable.exists()).toBe(true);
-    // You might want to check props passed to TreeTable if needed
   });
 
   it('navigates to subordinate unit on row click', async () => {
-    unidadesStore.unidade = mockUnidade;
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     await wrapper.vm.$nextTick();
 
     const treeTable = wrapper.findComponent(TreeTableStub);
@@ -191,7 +231,11 @@ describe('UnidadeView.vue', () => {
   });
 
   it('renders and clicks "Mapa vigente" button when map exists', async () => {
-    unidadesStore.unidade = mockUnidade;
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     mapasStore.mapaCompleto = { subprocessoCodigo: 99 };
     await wrapper.vm.$nextTick();
 
@@ -205,3 +249,8 @@ describe('UnidadeView.vue', () => {
     });
   });
 });
+
+// Helper to flush promises
+async function flushPromises() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}

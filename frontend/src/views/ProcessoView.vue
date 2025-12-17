@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BContainer} from "bootstrap-vue-next";
+import {BAlert, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";

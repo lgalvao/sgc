@@ -52,3 +52,10 @@ export async function buscarUsuariosPorUnidade(
     const response = await apiClient.get(`/unidades/${codigoUnidade}/usuarios`);
     return response.data;
 }
+
+export async function buscarUsuarioPorTitulo(
+    titulo: string,
+): Promise<Usuario> {
+    const response = await apiClient.get(`/usuarios/${titulo}`);
+    return response.data;
+}

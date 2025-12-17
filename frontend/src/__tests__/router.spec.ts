@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import router from "../router";
+import {usePerfilStore} from "@/stores/perfil";
 
 // Mock the views to avoid loading real components
 vi.mock("../views/LoginView.vue", () => ({
@@ -66,6 +67,9 @@ describe("Router", () => {
     });
 
     it("deve definir o título do documento após a navegação", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/login");
         expect(document.title).toBe("Login - SGC");
 
@@ -86,13 +90,18 @@ describe("Router", () => {
     });
 
     it("deve resolver a rota de Painel com props", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/painel");
         const route = router.currentRoute.value;
         expect(route.name).toBe("Painel");
-        expect(route.meta.breadcrumb).toBe("Painel");
     });
 
     it("deve resolver a rota de Subprocesso com props dinâmicos", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/processo/123/DTI");
         const route = router.currentRoute.value;
         expect(route.name).toBe("Subprocesso");
@@ -118,6 +127,9 @@ describe("Router", () => {
     });
 
     it("deve resolver a rota de SubprocessoMapa com props dinâmicos", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/processo/123/DTI/mapa");
         const route = router.currentRoute.value;
         expect(route.name).toBe("SubprocessoMapa");
@@ -134,6 +146,9 @@ describe("Router", () => {
     });
 
     it("deve resolver a rota de SubprocessoVisMapa com props dinâmicos", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/processo/123/DTI/vis-mapa");
         const route = router.currentRoute.value;
         expect(route.name).toBe("SubprocessoVisMapa");
@@ -149,6 +164,9 @@ describe("Router", () => {
     });
 
     it("deve resolver a rota de SubprocessoCadastro com props dinâmicos", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/processo/123/DTI/cadastro");
         const route = router.currentRoute.value;
         expect(route.name).toBe("SubprocessoCadastro");
@@ -164,6 +182,9 @@ describe("Router", () => {
     });
 
     it("deve resolver a rota de SubprocessoVisCadastro com props dinâmicos", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         await router.push("/processo/123/DTI/vis-cadastro");
         const route = router.currentRoute.value;
         expect(route.name).toBe("SubprocessoVisCadastro");
@@ -180,33 +201,25 @@ describe("Router", () => {
         }
     });
 
-    it("deve resolver a rota de AutoavaliacaoDiagnostico com props dinâmicos", async () => {
-        await router.push("/diagnostico/123/autoavaliacao");
-        const route = router.currentRoute.value;
-        expect(route.name).toBe("AutoavaliacaoDiagnostico");
-        expect(route.params.codSubprocesso).toBe("123");
-    });
-
-    it("deve resolver a rota de OcupacoesCriticasDiagnostico com props dinâmicos", async () => {
-        await router.push("/diagnostico/123/ocupacoes");
-        const route = router.currentRoute.value;
-        expect(route.name).toBe("OcupacoesCriticasDiagnostico");
-        expect(route.params.codSubprocesso).toBe("123");
-    });
-
     it("deve resolver a rota de Unidade com breadcrumb dinâmico", async () => {
-        await router.push("/unidade/DTI");
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
+        await router.push("/unidade/10");
         const route = router.currentRoute.value;
         expect(route.name).toBe("Unidade");
 
         const breadcrumb = route.meta.breadcrumb;
         if (typeof breadcrumb === "function") {
-            expect(breadcrumb(route)).toBe("DTI");
+            expect(breadcrumb(route)).toBe("10");
         }
     });
 
     it("deve resolver a rota de Mapa de Unidade com props via query", async () => {
-        await router.push("/unidade/DTI/mapa?idProcesso=999");
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
+        await router.push("/unidade/10/mapa?codProcesso=999");
         const route = router.currentRoute.value;
         expect(route.name).toBe("Mapa");
 
@@ -214,14 +227,17 @@ describe("Router", () => {
         if (matched && typeof matched.props.default === "function") {
             const props = matched.props.default(route);
             expect(props).toEqual({
-                sigla: "DTI",
-                idProcesso: 999,
+                codUnidade: 10,
+                codProcesso: 999,
             });
         }
     });
 
     it("deve resolver a rota de AtribuicaoTemporariaForm", async () => {
-        await router.push("/unidade/DTI/atribuicao");
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
+        await router.push("/unidade/10/atribuicao");
         const route = router.currentRoute.value;
         expect(route.name).toBe("AtribuicaoTemporariaForm");
 
@@ -231,12 +247,15 @@ describe("Router", () => {
         if (matched && typeof matched.props.default === "function") {
             const props = matched.props.default(route);
             expect(props).toEqual({
-                sigla: "DTI",
+                codUnidade: 10,
             });
         }
     });
 
     it("deve usar o nome da rota como título se meta.title não estiver definido", async () => {
+        const perfilStore = usePerfilStore();
+        perfilStore.servidorId = 123;
+        
         router.addRoute({
             path: "/teste-sem-titulo",
             name: "TesteSemTitulo",

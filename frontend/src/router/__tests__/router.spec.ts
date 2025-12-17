@@ -4,7 +4,6 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 import mainRoutes from '../main.routes';
 import processoRoutes from '../processo.routes';
 import unidadeRoutes from '../unidade.routes';
-import diagnosticoRoutes from '../diagnostico.routes';
 
 vi.mock('@/stores/perfil', () => ({
   usePerfilStore: vi.fn(),
@@ -14,7 +13,6 @@ const routes = [
     ...mainRoutes,
     ...processoRoutes,
     ...unidadeRoutes,
-    ...diagnosticoRoutes,
     { path: '/login', component: { template: '<div>Login</div>' } }, // Mock login component
     { path: '/painel', component: { template: '<div>Painel</div>' } } // Mock painel component if needed
 ];
@@ -87,36 +85,36 @@ describe('Router Guards', () => {
 describe('Route Props Logic', () => {
   it('Processo routes props transformation', () => {
     const subprocessoRoute = processoRoutes.find(r => r.name === 'Subprocesso');
-    const propsFn = subprocessoRoute?.props as Function;
+    const propsFn = subprocessoRoute?.props as (...args: any[]) => any;
     expect(propsFn({ params: { codProcesso: '10', siglaUnidade: 'TIC' } }))
       .toEqual({ codProcesso: 10, siglaUnidade: 'TIC' });
 
     const mapaRoute = processoRoutes.find(r => r.name === 'SubprocessoMapa');
-    const mapaProps = (mapaRoute?.props as Function)({ params: { codProcesso: '11', siglaUnidade: 'DIP' } });
+    const mapaProps = (mapaRoute?.props as (...args: any[]) => any)({ params: { codProcesso: '11', siglaUnidade: 'DIP' } });
     expect(mapaProps).toEqual({ codProcesso: 11, sigla: 'DIP' });
 
     const visMapaRoute = processoRoutes.find(r => r.name === 'SubprocessoVisMapa');
-    const visMapaProps = (visMapaRoute?.props as Function)({ params: { codProcesso: '12', siglaUnidade: 'ABC' } });
+    const visMapaProps = (visMapaRoute?.props as (...args: any[]) => any)({ params: { codProcesso: '12', siglaUnidade: 'ABC' } });
     expect(visMapaProps).toEqual({ codProcesso: 12, sigla: 'ABC' });
 
     const cadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoCadastro');
-    const cadastroProps = (cadastroRoute?.props as Function)({ params: { codProcesso: '13', siglaUnidade: 'XYZ' } });
+    const cadastroProps = (cadastroRoute?.props as (...args: any[]) => any)({ params: { codProcesso: '13', siglaUnidade: 'XYZ' } });
     expect(cadastroProps).toEqual({ codProcesso: 13, sigla: 'XYZ' });
 
     const visCadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoVisCadastro');
-    const visCadastroProps = (visCadastroRoute?.props as Function)({ params: { codProcesso: '14', siglaUnidade: 'TEST' } });
+    const visCadastroProps = (visCadastroRoute?.props as (...args: any[]) => any)({ params: { codProcesso: '14', siglaUnidade: 'TEST' } });
     expect(visCadastroProps).toEqual({ codProcesso: 14, sigla: 'TEST' });
   });
 
   it('Unidade routes props transformation', () => {
     const mapaRoute = unidadeRoutes.find(r => r.name === 'Mapa');
-    const propsFn = mapaRoute?.props as Function;
+    const propsFn = mapaRoute?.props as (...args: any[]) => any;
     // Mapa route uses query param for codProcesso and params for codUnidade
     expect(propsFn({ params: { codUnidade: '10' }, query: { codProcesso: '99' } }))
       .toEqual({ codUnidade: 10, codProcesso: 99 });
 
     const atribuicaoRoute = unidadeRoutes.find(r => r.name === 'AtribuicaoTemporariaForm');
-    const atribProps = (atribuicaoRoute?.props as Function)({ params: { codUnidade: '20' } });
+    const atribProps = (atribuicaoRoute?.props as (...args: any[]) => any)({ params: { codUnidade: '20' } });
     expect(atribProps).toEqual({ codUnidade: 20 });
   });
 });

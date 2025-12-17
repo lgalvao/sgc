@@ -33,10 +33,10 @@
             unidadeComResponsavelDinamico.responsavel.codigo &&
             unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.idServidorTitular"
         >
-          <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
+          <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
           <p class="ms-3">
-            <i class="bi bi-telephone-fill me-2"/>{{ responsavelDetalhes?.ramal }}
-            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelDetalhes?.email }}
+            <i class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
+            <i class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
           </p>
         </template>
         <BButton
@@ -72,13 +72,13 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useUsuariosStore} from "@/stores/usuarios";
+import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 
@@ -88,15 +88,24 @@ const router = useRouter();
 const codigo = computed(() => props.codUnidade);
 const unidadesStore = useUnidadesStore();
 const perfilStore = usePerfilStore();
-const usuariosStore = useUsuariosStore();
 const mapasStore = useMapasStore();
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
+
+const titular = ref<Usuario | null>(null);
 
 onMounted(async () => {
   await Promise.all([
     unidadesStore.buscarArvoreUnidade(codigo.value),
     atribuicaoTemporariaStore.buscarAtribuicoes(),
   ]);
+
+  if (unidadesStore.unidade?.tituloTitular) {
+    try {
+      titular.value = await buscarUsuarioPorTitulo(unidadesStore.unidade.tituloTitular);
+    } catch (e) {
+      console.error("Erro ao buscar titular:", e);
+    }
+  }
 });
 
 const unidadeOriginal = computed<Unidade | null>(
@@ -145,28 +154,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   return unidade;
 });
 const titularDetalhes = computed<Usuario | null>(() => {
-  if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
-    return (
-        usuariosStore.obterUsuarioPorId(unidadeOriginal.value.idServidorTitular) ||
-        null
-    );
-  }
-  return null;
-});
-
-const responsavelDetalhes = computed<Usuario | null>(() => {
-  if (
-      !unidadeComResponsavelDinamico.value ||
-      !unidadeComResponsavelDinamico.value.responsavel ||
-      !unidadeComResponsavelDinamico.value.responsavel.codigo
-  ) {
-    return null;
-  }
-  return (
-      usuariosStore.obterUsuarioPorId(
-          unidadeComResponsavelDinamico.value.responsavel.codigo,
-      ) || null
-  );
+  return titular.value;
 });
 
 const mapaVigente = computed<MapaCompleto | null>(() => {

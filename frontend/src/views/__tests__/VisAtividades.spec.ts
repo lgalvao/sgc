@@ -20,6 +20,7 @@ vi.mock("vue-router", () => ({
         afterEach: vi.fn(),
     }),
     createWebHistory: () => ({}),
+    createMemoryHistory: () => ({}),
 }));
 
 vi.mock("@/services/mapaService", () => ({

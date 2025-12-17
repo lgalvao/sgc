@@ -2,6 +2,8 @@ package sgc.sgrh.dto;
 
 import org.mapstruct.Mapper;
 import sgc.sgrh.model.Usuario;
+import sgc.unidade.dto.AtribuicaoTemporariaDto;
+import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.Unidade;
 
 @Mapper(componentModel = "spring")
@@ -22,7 +24,8 @@ public interface SgrhMapper {
                 .setCodigoPai(unidadeSuperior != null ? unidadeSuperior.getCodigo() : null)
                 .setTipo(unidade.getTipo() != null ? unidade.getTipo().name() : null)
                 .setSubunidades(new java.util.ArrayList<>())
-                .setElegivel(isElegivel);
+                .setElegivel(isElegivel)
+                .setTituloTitular(unidade.getTituloTitular());
 
         return dto;
     }
@@ -51,6 +54,27 @@ public interface SgrhMapper {
                 .email(usuario.getEmail())
                 .matricula(usuario.getMatricula())
                 .unidadeCodigo(usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : null)
+                .build();
+    }
+
+    /**
+     * Converte uma entidade AtribuicaoTemporaria para AtribuicaoTemporariaDto.
+     *
+     * @param atribuicao A entidade de atribuição temporária.
+     * @return O DTO de atribuição temporária.
+     */
+    default AtribuicaoTemporariaDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria atribuicao) {
+        if (atribuicao == null) {
+            return null;
+        }
+
+        return AtribuicaoTemporariaDto.builder()
+                .id(atribuicao.getCodigo())
+                .unidade(toUnidadeDto(atribuicao.getUnidade()))
+                .usuario(toUsuarioDto(atribuicao.getUsuario()))
+                .dataInicio(atribuicao.getDataInicio())
+                .dataTermino(atribuicao.getDataTermino())
+                .justificativa(atribuicao.getJustificativa())
                 .build();
     }
 }

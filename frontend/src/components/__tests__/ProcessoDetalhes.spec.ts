@@ -21,8 +21,8 @@ describe("ProcessoDetalhes.vue", () => {
         expect(wrapper.find('[data-testid="processo-info"]').text()).toBe(
             "Processo de Teste",
         );
-        expect(wrapper.text()).toContain("Tipo: REVISAO");
-        expect(wrapper.text()).toContain("Situação: EM_ANDAMENTO");
+        expect(wrapper.text()).toContain("Tipo: Revisão");
+        expect(wrapper.text()).toContain("Situação: Em andamento");
         expect(wrapper.findComponent(BBadge).exists()).toBe(true);
     });
 });

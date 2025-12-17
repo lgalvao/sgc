@@ -4,13 +4,11 @@ import {usePerfilStore} from "@/stores/perfil";
 import mainRoutes from "./main.routes";
 import processoRoutes from "./processo.routes";
 import unidadeRoutes from "./unidade.routes";
-import diagnosticoRoutes from "./diagnostico.routes";
 
 const routes: RouteRecordRaw[] = [
     ...mainRoutes,
     ...processoRoutes,
-    ...unidadeRoutes,
-    ...diagnosticoRoutes,
+    ...unidadeRoutes
 ];
 
 const router = createRouter({

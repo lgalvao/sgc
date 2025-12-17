@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.unidade.dto.AtribuicaoTemporariaDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.service.UnidadeService;
 
@@ -34,6 +35,16 @@ public class UnidadeController {
             @PathVariable Long codUnidade, @RequestBody CriarAtribuicaoTemporariaReq request) {
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * Busca todas as atribuições temporárias.
+     *
+     * @return Lista de atribuições temporárias.
+     */
+    @GetMapping("/atribuicoes")
+    public ResponseEntity<List<AtribuicaoTemporariaDto>> buscarTodasAtribuicoes() {
+        return ResponseEntity.ok(unidadeService.buscarTodasAtribuicoes());
     }
 
     /**

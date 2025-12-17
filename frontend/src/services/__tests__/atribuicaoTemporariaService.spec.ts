@@ -11,7 +11,7 @@ describe("atribuicaoTemporariaService", () => {
 
         const result = await buscarTodasAtribuicoes();
 
-        expect(apiClient.get).toHaveBeenCalledWith("/atribuicoes");
+        expect(apiClient.get).toHaveBeenCalledWith("/unidades/atribuicoes");
         expect(result).toEqual(mockData);
     });
 

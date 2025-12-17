@@ -37,6 +37,7 @@ export interface Unidade {
     filhas?: Unidade[];
     tipo?: string;
     idServidorTitular?: number;
+    tituloTitular?: string;
     isElegivel?: boolean;
     responsavel?: Responsavel | null;
 }
@@ -158,6 +159,7 @@ export interface Subprocesso {
 }
 
 export interface Usuario {
+    codigo: number;
     nome: string;
     tituloEleitoral: string;
     unidade: Unidade;

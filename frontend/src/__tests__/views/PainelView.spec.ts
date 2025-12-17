@@ -156,7 +156,7 @@ describe("PainelView.vue", () => {
 
         // Aguarda onMounted/onActivated
         await wrapper.vm.$nextTick();
-        await new Promise(resolve => setTimeout(resolve, 0)); // Flush promises
+        await flushPromises();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
 
