@@ -345,6 +345,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             .findFirst()
                             .orElseThrow();
             atividadeRepo.delete(atividadeExistente);
+            entityManager.flush();
+            entityManager.clear();
 
             mockMvc.perform(
                             post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
@@ -402,6 +404,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             .findFirst()
                             .orElseThrow();
             atividadeRepo.delete(atividadeExistente);
+            entityManager.flush();
+            entityManager.clear();
 
             mockMvc.perform(
                             get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
