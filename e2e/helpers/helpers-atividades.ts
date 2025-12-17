@@ -3,31 +3,15 @@ import {expect, type Page} from '@playwright/test';
 export async function navegarParaAtividades(page: Page) {
     const testId = 'card-subprocesso-atividades';
     
-    // Capturar logs do console para debug
     page.on('console', msg => {
-        if (msg.text().includes('SubprocessoCards')) {
-            console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
-        }
+        console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
     });
     
     await expect(page.getByTestId(testId)).toBeVisible();
-    
-    // Capturar URL antes do clique
-    const urlAntes = page.url();
-    console.log('[E2E] URL antes do clique:', urlAntes);
-    
-    // Clicar no card
     await page.getByTestId(testId).click();
-    
-    // Aguardar navegação - a URL deve mudar para incluir /cadastro
-    await page.waitForURL(/\/cadastro$/, {timeout: 10000});
-    
-    console.log('[E2E] URL após clique:', page.url());
-    
-    // Verificar que estamos na página de cadastro (heading level 1, não level 4 do card)
+    await page.waitForURL(/\/cadastro$/);
+
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 1})).toBeVisible();
-    
-    // Verificar que o input de nova atividade existe (só existe na página de cadastro)
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
 }
 
@@ -62,9 +46,7 @@ export async function editarAtividade(page: Page, descricaoAtual: string, novaDe
     const row = card.locator('.atividade-hover-row');
     const editButton = card.getByTestId('btn-editar-atividade');
 
-    // Hover on the row to trigger CSS hover state
     await row.hover();
-    // Wait for button to become visible (CSS transition: opacity 0.2s)
     await expect(editButton).toBeVisible();
     await editButton.click();
 
@@ -113,10 +95,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 }
 
 export async function disponibilizarCadastro(page: Page) {
-    // Clica no botão que abre o modal de confirmação
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-
-    // Modal confirmation
     await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
     await page.getByTestId('btn-confirmar-disponibilizacao').click();
 }

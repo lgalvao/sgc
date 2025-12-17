@@ -21,10 +21,10 @@
         {{ formatDateTimeBR(data.item.dataHora) }}
       </template>
       <template #cell(unidadeOrigem)="data">
-        {{ data.item.unidadeOrigem.sigla }}
+        {{ data.item.unidadeOrigem?.sigla || '-' }}
       </template>
       <template #cell(unidadeDestino)="data">
-        {{ data.item.unidadeDestino.sigla }}
+        {{ data.item.unidadeDestino?.sigla || '-' }}
       </template>
     </BTable>
   </div>

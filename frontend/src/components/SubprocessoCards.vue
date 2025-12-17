@@ -15,16 +15,18 @@
             @keydown.enter.prevent="navegarPara('SubprocessoCadastro')"
             @keydown.space.prevent="navegarPara('SubprocessoCadastro')"
         >
-          <BCardTitle>
-            Atividades e conhecimentos
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Cadastro de atividades e conhecimentos da unidade
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Atividades e conhecimentos
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Cadastro de atividades e conhecimentos da unidade
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
         <BCard
             v-else-if="permissoes.podeVisualizarMapa"
@@ -36,16 +38,18 @@
             @keydown.enter.prevent="navegarPara('SubprocessoVisCadastro')"
             @keydown.space.prevent="navegarPara('SubprocessoVisCadastro')"
         >
-          <BCardTitle>
-            Atividades e conhecimentos
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Visualização das atividades e conhecimentos da unidade
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Atividades e conhecimentos
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Visualização das atividades e conhecimentos da unidade
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
       </BCol>
 
@@ -65,16 +69,18 @@
             @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
             @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
         >
-          <BCardTitle>
-            Mapa de Competências
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Mapa de competências técnicas da unidade
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Mapa de Competências
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Mapa de competências técnicas da unidade
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
         <BCard
             v-else-if="permissoes.podeVisualizarMapa"
@@ -88,16 +94,18 @@
             @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
             @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
         >
-          <BCardTitle>
-            Mapa de Competências
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Visualização do mapa de competências técnicas
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Mapa de Competências
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Visualização do mapa de competências técnicas
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
       </BCol>
     </template>
@@ -117,16 +125,18 @@
             @keydown.enter.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
             @keydown.space.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
         >
-          <BCardTitle>
-            Autoavaliação
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Realize sua autoavaliação de competências
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Autoavaliação
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Realize sua autoavaliação de competências
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
       </BCol>
 
@@ -143,16 +153,18 @@
             @keydown.enter.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
             @keydown.space.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
         >
-          <BCardTitle>
-            Ocupações Críticas
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Identificação das ocupações críticas da unidade
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Ocupações Críticas
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Identificação das ocupações críticas da unidade
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
       </BCol>
       <BCol
@@ -168,16 +180,18 @@
             @keydown.enter.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
             @keydown.space.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
         >
-          <BCardTitle>
-            Monitoramento
-          </BCardTitle>
-          <BCardText class="text-muted">
-            Acompanhamento e conclusão do diagnóstico da unidade
-          </BCardText>
-          <span
-              :class="badgeClass(situacao)"
-              class="badge"
-          >{{ situacaoLabel(situacao) }}</span>
+          <div class="card-click-area">
+            <BCardTitle>
+              Monitoramento
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Acompanhamento e conclusão do diagnóstico da unidade
+            </BCardText>
+            <span
+                :class="badgeClass(situacao)"
+                class="badge"
+            >{{ situacaoLabel(situacao) }}</span>
+          </div>
         </BCard>
       </BCol>
     </template>
@@ -250,5 +264,9 @@ const navegarParaDiag = (routeName: string) => {
 .card-actionable:focus-visible {
   outline: 2px solid var(--bs-primary);
   outline-offset: 2px;
+}
+
+.card-click-area {
+  height: 100%;
 }
 </style>

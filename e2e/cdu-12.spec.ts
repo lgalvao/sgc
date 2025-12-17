@@ -1,4 +1,4 @@
-import {expect, Page, test} from '@playwright/test';
+import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {

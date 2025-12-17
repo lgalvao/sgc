@@ -1,4 +1,4 @@
-import {expect, test} from '@playwright/test';
+import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';

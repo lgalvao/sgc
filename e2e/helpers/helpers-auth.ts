@@ -20,29 +20,17 @@ export const USUARIOS = {
     INVALIDO: {titulo: '00000000000', senha: 'senhaerrada'}
 } as const;
 
-/**
- * Preenche os campos de login e clica no botão entrar
- */
 export async function autenticar(page: Page, usuario: string, senha: string) {
     await page.getByTestId('inp-login-usuario').fill(usuario);
     await page.getByTestId('inp-login-senha').fill(senha);
     await page.getByTestId('btn-login-entrar').click();
 }
 
-/**
- * Realiza login com sucesso para usuário com perfil único
- * Verifica que o login foi bem-sucedido navegando para /painel
- */
 export async function login(page: Page, usuario: string, senha: string) {
     await autenticar(page, usuario, senha);
     await page.waitForURL('/painel');
 }
 
-/**
- * Realiza login para usuários com múltiplos perfis
- * Aguarda a seção de seleção de perfil, escolhe o perfil especificado
- * e verifica que o login foi bem-sucedido navegando para /painel
- */
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});

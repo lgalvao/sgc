@@ -1,4 +1,4 @@
-import {expect, test} from './setup/fixtures';
+import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import * as AtividadeHelpers from './helpers/helpers-atividades';

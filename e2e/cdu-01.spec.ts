@@ -1,4 +1,4 @@
-import {expect, test} from '@playwright/test';
+import {expect, test} from './fixtures/base';
 import {autenticar, login, loginComPerfil, USUARIOS} from './helpers/helpers-auth';
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
