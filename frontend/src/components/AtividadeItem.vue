@@ -21,6 +21,7 @@
               data-testid="btn-salvar-edicao-atividade"
               size="sm"
               title="Salvar"
+              aria-label="Salvar edição da atividade"
               variant="outline-success"
               @click="salvarEdicaoAtividade"
           >
@@ -31,6 +32,7 @@
               data-testid="btn-cancelar-edicao-atividade"
               size="sm"
               title="Cancelar"
+              aria-label="Cancelar edição"
               variant="outline-secondary"
               @click="cancelarEdicaoAtividade"
           >
@@ -54,6 +56,7 @@
             data-testid="btn-editar-atividade"
             size="sm"
             title="Editar"
+            :aria-label="'Editar atividade: ' + atividade.descricao"
             variant="outline-primary"
             @click="iniciarEdicaoAtividade"
         >
@@ -64,6 +67,7 @@
             data-testid="btn-remover-atividade"
             size="sm"
             title="Remover"
+            :aria-label="'Remover atividade: ' + atividade.descricao"
             variant="outline-danger"
             @click="$emit('remover-atividade')"
         >
@@ -107,6 +111,7 @@
                 data-testid="btn-salvar-edicao-conhecimento"
                 size="sm"
                 title="Salvar"
+                aria-label="Salvar edição do conhecimento"
                 variant="outline-success"
                 @click="salvarEdicaoConhecimento(conhecimento.id)"
             >
@@ -117,6 +122,7 @@
                 data-testid="btn-cancelar-edicao-conhecimento"
                 size="sm"
                 title="Cancelar"
+                aria-label="Cancelar edição"
                 variant="outline-secondary"
                 @click="cancelarEdicaoConhecimento"
             >
@@ -134,6 +140,7 @@
                   data-testid="btn-editar-conhecimento"
                   size="sm"
                   title="Editar"
+                  :aria-label="'Editar conhecimento: ' + conhecimento.descricao"
                   variant="outline-primary"
                   @click="iniciarEdicaoConhecimento(conhecimento)"
               >
@@ -144,6 +151,7 @@
                   data-testid="btn-remover-conhecimento"
                   size="sm"
                   title="Remover"
+                  :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
                   variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.id)"
               >
@@ -302,9 +310,11 @@ function adicionarConhecimento() {
   z-index: 1;
 }
 
-/* Show buttons when card is hovered */
+/* Show buttons when card is hovered or has focus */
 .atividade-card:hover .botoes-acao-atividade,
-.conhecimento-hover-row:hover .botoes-acao {
+.atividade-card:focus-within .botoes-acao-atividade,
+.conhecimento-hover-row:hover .botoes-acao,
+.conhecimento-hover-row:focus-within .botoes-acao {
   opacity: 1;
   pointer-events: auto;
 }
