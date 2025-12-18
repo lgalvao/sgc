@@ -34,7 +34,7 @@ describe("usePerfil", () => {
 
     it("deve retornar o servidor logado com os dados corretos", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
-            servidorId: 1,
+            usuarioCodigo: 1,
             perfilSelecionado: Perfil.GESTOR,
             unidadeSelecionada: 456,
         } as any);

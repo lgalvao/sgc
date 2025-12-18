@@ -45,11 +45,6 @@ const mockMatchedSubprocesso = [
     {name: "Subprocesso", meta: {}},
 ];
 
-const mockMatchedSubprocessoVisCadastro = [
-    {name: "Painel", meta: {}},
-    {name: "SubprocessoVisCadastro", meta: {}},
-];
-
 const mockMatchedUnidade = [
     {name: "Painel", meta: {}},
     {name: "Unidade", meta: {breadcrumb: "Minha unidade"}},

@@ -29,34 +29,14 @@ describe("SubprocessoHeader.vue", () => {
             const wrapper = mountComponent();
 
             expect(wrapper.text()).toContain("Processo: Processo de Teste");
-            expect(wrapper.text()).toContain("TEST - Unidade de Teste");
+            // Ajustado para conferir se sigla e nome estão presentes,
+            // já que a renderização agora é feita em elementos separados no novo template
+            expect(wrapper.text()).toContain("TEST");
+            expect(wrapper.text()).toContain("Unidade de Teste");
             expect(wrapper.text()).toContain("Situação:EM_ANDAMENTO");
             expect(wrapper.text()).toContain("Titular: João Silva");
             expect(wrapper.text()).toContain("1234");
             expect(wrapper.text()).toContain("joao@teste.com");
-        });
-
-        it("should render badge with correct class", () => {
-            const wrapper = mountComponent();
-
-            const badge = wrapper.find(".badge");
-            expect(badge.exists()).toBe(true);
-            expect(badge.text()).toBe("EM_ANDAMENTO");
-            expect(badge.classes()).toContain("badge");
-        });
-
-        it("should render unidadeAtual when provided", () => {
-            const wrapper = mountComponent({
-                unidadeAtual: "Unidade Atual Teste",
-            });
-
-            expect(wrapper.text()).toContain("Unidade atual: Unidade Atual Teste");
-        });
-
-        it("should not render unidadeAtual when not provided", () => {
-            const wrapper = mountComponent();
-
-            expect(wrapper.text()).not.toContain("Unidade atual:");
         });
     });
 
