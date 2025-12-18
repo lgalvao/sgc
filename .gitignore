@@ -39,3 +39,10 @@ scripts/stats/node_modules/
 /.vscode/
 /frontend/bin/
 .env.hom
+
+# E2E
+test-results/
+playwright-report/
+screenshots/
+output.txt
+e2e/server.log

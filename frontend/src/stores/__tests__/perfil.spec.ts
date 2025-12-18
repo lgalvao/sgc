@@ -32,7 +32,7 @@ describe("usePerfilStore", () => {
     beforeEach(() => {
         // Clear the mock localStorage before each test
         mockLocalStorage.clear();
-        mockLocalStorage.setItem("idServidor", "9"); // Set default for initial state
+        mockLocalStorage.setItem("usuarioCodigo", "9"); // Set default for initial state
 
         initPinia();
         perfilStore = usePerfilStore();
@@ -43,13 +43,13 @@ describe("usePerfilStore", () => {
     });
 
     it("should initialize with default values if localStorage is empty", () => {
-        expect(perfilStore.servidorId).toBe(9);
+        expect(perfilStore.usuarioCodigo).toBe(9);
         expect(perfilStore.perfilSelecionado).toBeNull();
         expect(perfilStore.unidadeSelecionada).toBeNull();
     });
 
     it("should initialize with values from localStorage if available", () => {
-        mockLocalStorage.setItem("idServidor", "10");
+        mockLocalStorage.setItem("usuarioCodigo", "10");
         mockLocalStorage.setItem("perfilSelecionado", "USER");
         mockLocalStorage.setItem("unidadeSelecionada", "123");
         mockLocalStorage.setItem("unidadeSelecionadaSigla", "U10"); // Add this
@@ -58,7 +58,7 @@ describe("usePerfilStore", () => {
         setActivePinia(createPinia()); // Re-activate Pinia with a fresh instance
         const newPerfilStore = usePerfilStore(); // Get a fresh store instance
 
-        expect(newPerfilStore.servidorId).toBe(10);
+        expect(newPerfilStore.usuarioCodigo).toBe(10);
         expect(newPerfilStore.perfilSelecionado).toBe("USER");
         expect(newPerfilStore.unidadeSelecionada).toBe(123);
         expect(newPerfilStore.unidadeSelecionadaSigla).toBe("U10"); // Add this
@@ -67,10 +67,10 @@ describe("usePerfilStore", () => {
     describe("actions", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
-        it("definirServidorId should update idServidor and store it in localStorage", () => {
-            perfilStore.definirServidorId(15);
-            expect(perfilStore.servidorId).toBe(15);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("idServidor", "15");
+        it("definirUsuarioCodigo should update usuarioCodigo and store it in localStorage", () => {
+            perfilStore.definirUsuarioCodigo(15);
+            expect(perfilStore.usuarioCodigo).toBe(15);
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", "15");
         });
 
         it("definirPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
@@ -181,7 +181,7 @@ describe("usePerfilStore", () => {
             expect(perfilStore.perfilSelecionado).toBe(Perfil.GESTOR);
             expect(perfilStore.unidadeSelecionada).toBe(2);
             expect(perfilStore.unidadeSelecionadaSigla).toBe("XYZ"); // Add this
-            expect(perfilStore.servidorId).toBe(456);
+            expect(perfilStore.usuarioCodigo).toBe(456);
         });
 
         it("should handle error in loginCompleto", async () => {
@@ -213,7 +213,7 @@ describe("usePerfilStore", () => {
 
         it("should logout correctly", () => {
             perfilStore.logout();
-            expect(perfilStore.servidorId).toBeNull();
+            expect(perfilStore.usuarioCodigo).toBeNull();
             expect(perfilStore.perfilSelecionado).toBeNull();
             expect(perfilStore.unidadeSelecionada).toBeNull();
             expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(7);

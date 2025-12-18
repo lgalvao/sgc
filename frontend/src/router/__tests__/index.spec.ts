@@ -23,7 +23,7 @@ describe("router/index.ts", () => {
 
     it("deve redirecionar para /login se não autenticado e rota requer auth", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = null; // Não autenticado
+        perfilStore.usuarioCodigo = null; // Não autenticado
 
         router.addRoute({
             path: "/rota-protegida",
@@ -51,7 +51,7 @@ describe("router/index.ts", () => {
 
     it("deve permitir navegação se autenticado", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123; // Autenticado
+        perfilStore.usuarioCodigo = 123; // Autenticado
 
         router.addRoute({
             path: "/rota-permitida",
@@ -65,7 +65,7 @@ describe("router/index.ts", () => {
 
     it("deve atualizar o título da página após navegação", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123; // Autenticado para evitar redirecionamento
+        perfilStore.usuarioCodigo = 123; // Autenticado para evitar redirecionamento
 
         router.addRoute({
             path: "/titulo",
@@ -83,7 +83,7 @@ describe("router/index.ts", () => {
 
     it("deve usar o nome da rota como título se meta.title não existir", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123; // Autenticado
+        perfilStore.usuarioCodigo = 123; // Autenticado
 
         router.addRoute({
             path: "/nome-titulo",

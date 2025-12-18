@@ -68,7 +68,7 @@ describe("Router", () => {
 
     it("deve definir o título do documento após a navegação", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/login");
         expect(document.title).toBe("Login - SGC");
@@ -91,7 +91,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de Painel com props", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/painel");
         const route = router.currentRoute.value;
@@ -100,7 +100,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de Subprocesso com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/processo/123/DTI");
         const route = router.currentRoute.value;
@@ -128,7 +128,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de SubprocessoMapa com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/processo/123/DTI/mapa");
         const route = router.currentRoute.value;
@@ -147,7 +147,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de SubprocessoVisMapa com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/processo/123/DTI/vis-mapa");
         const route = router.currentRoute.value;
@@ -165,7 +165,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de SubprocessoCadastro com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/processo/123/DTI/cadastro");
         const route = router.currentRoute.value;
@@ -183,7 +183,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de SubprocessoVisCadastro com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/processo/123/DTI/vis-cadastro");
         const route = router.currentRoute.value;
@@ -203,7 +203,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de Unidade com breadcrumb dinâmico", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/unidade/10");
         const route = router.currentRoute.value;
@@ -217,7 +217,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de Mapa de Unidade com props via query", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/unidade/10/mapa?codProcesso=999");
         const route = router.currentRoute.value;
@@ -235,7 +235,7 @@ describe("Router", () => {
 
     it("deve resolver a rota de AtribuicaoTemporariaForm", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         await router.push("/unidade/10/atribuicao");
         const route = router.currentRoute.value;
@@ -254,7 +254,7 @@ describe("Router", () => {
 
     it("deve usar o nome da rota como título se meta.title não estiver definido", async () => {
         const perfilStore = usePerfilStore();
-        perfilStore.servidorId = 123;
+        perfilStore.usuarioCodigo = 123;
         
         router.addRoute({
             path: "/teste-sem-titulo",
