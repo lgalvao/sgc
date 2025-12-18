@@ -3,6 +3,7 @@ package sgc.sgrh;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
@@ -31,6 +32,9 @@ public class SgrhService {
 
     @Autowired(required = false)
     private sgc.sgrh.autenticacao.AcessoAdClient acessoAdClient;
+
+    @Value("${aplicacao.ambiente-testes:false}")
+    private boolean ambienteTestes;
 
     public SgrhService(UnidadeRepo unidadeRepo,
                        UsuarioRepo usuarioRepo,
@@ -267,8 +271,13 @@ public class SgrhService {
         log.debug("Autenticando usuário no AD: {}", tituloEleitoral);
 
         if (acessoAdClient == null) {
-            log.debug("AcessoAdClient não disponível (profile test/e2e). Simulando autenticação.");
-            return true;
+            if (ambienteTestes) {
+                log.debug("Ambiente de testes: Simulando autenticação com sucesso.");
+                return true;
+            } else {
+                log.error("ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}", tituloEleitoral);
+                return false;
+            }
         }
 
         try {
