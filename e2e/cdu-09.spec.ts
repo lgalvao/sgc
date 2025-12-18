@@ -3,6 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -132,7 +133,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         // Verificar status no subprocesso
         await acessarSubprocessoChefe(page, descProcesso);
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Cadastro disponibilizado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
     test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
@@ -162,7 +163,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await acessarSubprocessoChefe(page, descProcesso);
 
         // Verificar situação 'Cadastro em andamento'
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
         await navegarParaAtividades(page);
 

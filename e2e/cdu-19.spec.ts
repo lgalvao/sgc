@@ -4,6 +4,7 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
@@ -129,7 +130,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByText(descProcesso).click();
 
         // Verificar situação do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa disponibilizado/i);
 
         // Passo 1: Clica no card Mapa de competências
@@ -191,7 +192,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
         // Verificar mudança de situação (Passo 5.3)
         await page.getByText(descProcesso).click();
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa validado/i);
     });
 });

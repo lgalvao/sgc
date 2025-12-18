@@ -17,6 +17,7 @@ import {
     homologarCadastroRevisao
 } from './helpers/helpers-analise';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -174,7 +175,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Navegar de volta para verificar situação atualizada
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa homologado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
         // Finalizar processo
         await page.goto('/painel');
@@ -254,7 +255,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
         // Verificar situação é "Revisão do cadastro homologada"
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
     });
 
@@ -274,7 +275,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
         
         // Sistema mostra Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
 
         // Passo 5-6: ADMIN clica no card Mapa de Competências

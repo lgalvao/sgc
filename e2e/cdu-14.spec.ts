@@ -138,7 +138,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         
         // Navegar novamente ao subprocesso para verificar situação
         await page.getByText(descMapeamento).click();
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Mapa validado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
 
         // Passo 7: ADMIN homologa mapa
         await fazerLogout(page);
@@ -267,7 +267,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await acessarSubprocessoChefe(page, descProcesso);
 
         // Verificar situação
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revisão de Cadastro em Andamento/i);
 
         await navegarParaAtividades(page);

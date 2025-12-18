@@ -141,7 +141,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoChefe(page, descProcesso);
 
         // Verificar situação
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Cadastro em andamento/i);
 
         await navegarParaAtividades(page);

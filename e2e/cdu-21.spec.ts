@@ -4,6 +4,7 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
@@ -166,7 +167,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         // Verificar que mapa foi homologado
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa homologado/i);
     });
 

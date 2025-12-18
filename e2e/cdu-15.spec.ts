@@ -111,7 +111,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await homologarCadastroMapeamento(page);
 
         // Agora deve estar em "Cadastro homologado"
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Cadastro homologado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
     test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page}) => {

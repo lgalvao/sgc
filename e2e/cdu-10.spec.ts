@@ -3,6 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function fazerLogout(page: Page) {
     await page.getByTestId('btn-logout').click();
@@ -240,7 +241,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Verificar situação inicial - deve ser "Não Iniciado" (antes de qualquer alteração)
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Não Iniciado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Não Iniciado/i);
 
         await navegarParaAtividades(page);
 
@@ -256,7 +257,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-cad-atividades-voltar').click();
 
         // Agora a situação deve ser "Revisão do cadastro em andamento"
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
     });
 
     // ========================================================================
@@ -328,7 +329,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
                 await page.getByRole('row', {name: 'SECAO_221'}).click();
         }
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
     });
 
     test('Cenario 3: Devolução e Histórico de Análise', async ({page}) => {
@@ -364,7 +365,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
 
         // Verificar situação voltou para 'em andamento'
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
 
         await navegarParaAtividades(page);
 

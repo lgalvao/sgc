@@ -4,6 +4,7 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
@@ -141,7 +142,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
                     await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Passo 4: Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa criado/i);
 
         // Passo 5-6: Clica no card Mapa de Competências
@@ -208,7 +209,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Verificar mudança de situação (Passo 14)
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa disponibilizado/i);
     });
 });

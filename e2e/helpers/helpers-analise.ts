@@ -243,7 +243,7 @@ export async function homologarCadastroRevisao(page: Page) {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
         // Verificar situação após homologação
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa homologado/i);
     } else {
         // Caminho COM impactos (CDU-14 passo 12.3)
@@ -255,7 +255,7 @@ export async function homologarCadastroRevisao(page: Page) {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
         // Verificar situação após homologação
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revisão de Cadastro Homologada/i);
     }
 }

@@ -4,6 +4,7 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
+import { Page } from '@playwright/test';
 
 async function verificarPaginaPainel(page: Page) {
     await expect(page).toHaveURL(/\/painel/);
@@ -152,7 +153,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         // Passo 1: Clica na unidade com situação 'Mapa validado'
                     await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Passo 2: Tela Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa validado/i);
 
         // Passo 3: Clica no card Mapa de Competências
@@ -210,7 +211,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         // Verificar que o mapa avançou para ADMIN analisar
         await page.getByText(descProcesso).click();
                     await page.getByRole('row', {name: 'SECAO_221'}).click();        // Após aceite do GESTOR, o mapa ainda está validado mas agora no nível do ADMIN
-        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa validado/i);
     });
 
@@ -237,7 +238,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         // Passo 10.5: Verificar situação alterada para 'Mapa homologado'
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-badge-situacao'))
+                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa homologado/i);
     });
 });
