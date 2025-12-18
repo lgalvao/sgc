@@ -21,7 +21,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
             () =>
                 (usuarioCodigo: number): AtribuicaoTemporaria[] => {
                     return atribuicoes.value.filter(
-                        (a) => a.servidor.codigo === usuarioCodigo,
+                        (a) => a.usuario.codigo === usuarioCodigo,
                     );
                 },
         );
@@ -50,7 +50,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                         dataInicio: new Date(a.dataInicio).toISOString(),
                         dataFim: new Date(a.dataTermino).toISOString(),
                         dataTermino: new Date(a.dataTermino).toISOString(),
-                        servidor: a.usuario || a.servidor, // Handle both just in case
+                        usuario: a.usuario || a.servidor, // Handle both just in case
                         unidade: a.unidade,
                         justificativa: a.justificativa
                     })) as AtribuicaoTemporaria[];

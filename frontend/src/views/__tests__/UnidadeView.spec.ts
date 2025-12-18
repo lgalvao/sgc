@@ -189,7 +189,7 @@ describe('UnidadeView.vue', () => {
     yesterday.setDate(today.getDate() - 1);
 
     const mockAtribuicao = {
-      servidor: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
+      usuario: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
       unidade: { codigo: 1 },
       dataInicio: yesterday.toISOString(),
       dataTermino: tomorrow.toISOString(),

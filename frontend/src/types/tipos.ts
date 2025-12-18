@@ -215,7 +215,7 @@ export interface AnaliseCadastro {
 
 export interface AtribuicaoTemporaria {
     codigo: number;
-    servidor: Usuario;
+    usuario: Usuario;
     unidade: Unidade;
     dataInicio: string;
     dataFim: string;

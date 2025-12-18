@@ -8,7 +8,7 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {
         codigo: 1,
         unidade: {codigo: 1, nome: "A", sigla: "A"},
-        servidor: {
+        usuario: {
             codigo: 1,
             nome: "Servidor 1",
             tituloEleitoral: "123",
@@ -24,7 +24,7 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {
         codigo: 2,
         unidade: {codigo: 2, nome: "B", sigla: "B"},
-        servidor: {
+        usuario: {
             codigo: 2,
             nome: "Servidor 2",
             tituloEleitoral: "456",
@@ -40,7 +40,7 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {
         codigo: 3,
         unidade: {codigo: 3, nome: "C", sigla: "C"},
-        servidor: {
+        usuario: {
             codigo: 1,
             nome: "Servidor 1",
             tituloEleitoral: "123",

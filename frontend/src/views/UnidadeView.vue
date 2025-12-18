@@ -126,15 +126,15 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 
   if (atribuicaoVigente) {
     const responsavel: Responsavel = {
-      codigo: atribuicaoVigente.servidor.codigo,
-      nome: atribuicaoVigente.servidor.nome,
-      tituloEleitoral: atribuicaoVigente.servidor.tituloEleitoral,
-      unidade: atribuicaoVigente.servidor.unidade,
-      email: atribuicaoVigente.servidor.email,
-      ramal: atribuicaoVigente.servidor.ramal,
-      usuarioTitulo: atribuicaoVigente.servidor.nome,
+      codigo: atribuicaoVigente.usuario.codigo,
+      nome: atribuicaoVigente.usuario.nome,
+      tituloEleitoral: atribuicaoVigente.usuario.tituloEleitoral,
+      unidade: atribuicaoVigente.usuario.unidade,
+      email: atribuicaoVigente.usuario.email,
+      ramal: atribuicaoVigente.usuario.ramal,
+      usuarioTitulo: atribuicaoVigente.usuario.nome,
       unidadeCodigo: atribuicaoVigente.unidade.codigo,
-      usuarioCodigo: atribuicaoVigente.servidor.codigo,
+      usuarioCodigo: atribuicaoVigente.usuario.codigo,
       tipo: "TEMPORARIO",
       dataInicio: atribuicaoVigente.dataInicio,
       dataFim: atribuicaoVigente.dataFim,
