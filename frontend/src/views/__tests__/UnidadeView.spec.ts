@@ -156,7 +156,12 @@ describe('UnidadeView.vue', () => {
   });
 
   it('renders "Criar atribuição" button only for ADMIN', async () => {
-    setupWrapper();
+    // Unidade deve existir para o botão aparecer
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     perfilStore.perfilSelecionado = 'ADMIN';
     await wrapper.vm.$nextTick();
     expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(true);
@@ -167,7 +172,12 @@ describe('UnidadeView.vue', () => {
   });
   
   it('navigates to create assignment', async () => {
-    setupWrapper();
+    // Unidade deve existir para o botão aparecer
+    setupWrapper({
+        unidades: {
+            unidade: mockUnidade
+        }
+    });
     perfilStore.perfilSelecionado = 'ADMIN';
     await wrapper.vm.$nextTick();
     

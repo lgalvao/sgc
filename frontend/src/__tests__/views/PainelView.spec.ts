@@ -33,7 +33,7 @@ describe("PainelView.vue", () => {
         perfil: {
             perfilSelecionado: "ADMIN",
             unidadeSelecionada: 1,
-            servidorId: 100,
+            usuarioCodigo: 100,
             perfis: [] as string[]
         },
         processos: {

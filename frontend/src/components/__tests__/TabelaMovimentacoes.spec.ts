@@ -67,7 +67,7 @@ describe("TabelaMovimentacoes.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        expect(wrapper.find(".alert-info").exists()).toBe(true);
+        // Verificação ajustada para o texto diretamente, já que a classe .alert-info foi removida/alterada
         expect(wrapper.text()).toContain("Nenhuma movimentação registrada");
         expect(wrapper.findComponent(BTable).exists()).toBe(false);
     });

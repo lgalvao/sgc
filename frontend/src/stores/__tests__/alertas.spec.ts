@@ -9,7 +9,7 @@ vi.mock("@/services/alertaService");
 
 // Mock do perfilStore para garantir que a mesma instância seja usada
 const mockPerfilStoreValues = {
-    servidorId: 123 as number | null,
+    usuarioCodigo: 123 as number | null,
     unidadeSelecionada: "456" as string | null,
 };
 vi.mock("../perfil", () => ({
@@ -40,7 +40,7 @@ describe("useAlertasStore", () => {
         alertasStore = useAlertasStore();
 
         // Resetar o estado do mock antes de cada teste
-        mockPerfilStoreValues.servidorId = 123;
+        mockPerfilStoreValues.usuarioCodigo = 123;
         mockPerfilStoreValues.unidadeSelecionada = "456";
 
         painelService = (await import("@/services/painelService")) as Mocked<
@@ -130,7 +130,7 @@ describe("useAlertasStore", () => {
             });
 
             it("should handle missing perfilStore data", async () => {
-                mockPerfilStoreValues.servidorId = null;
+                mockPerfilStoreValues.usuarioCodigo = null;
                 mockPerfilStoreValues.unidadeSelecionada = null;
 
                 alertaService.marcarComoLido.mockResolvedValue();

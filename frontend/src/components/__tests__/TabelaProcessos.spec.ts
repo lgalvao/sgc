@@ -235,7 +235,7 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            const table = wrapper.findComponent(BTable);
+            const table = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
             const fields = (table.props("fields") as any[]);
             const desc = fields.find(f => f.key === "descricao");
             expect(desc.sortable).toBe(true);

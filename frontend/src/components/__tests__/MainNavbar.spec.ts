@@ -87,8 +87,10 @@ describe("MainNavbar.vue", () => {
         const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
 
-        const userInfo = wrapper.find("span.nav-link");
-        expect(userInfo.text()).toContain("CHEFE - TRE-PR");
+        // Procura pelo item que contém a classe user-profile-item
+        const userItem = wrapper.find(".user-profile-item");
+        expect(userItem.exists()).toBe(true);
+        expect(userItem.text()).toContain("CHEFE - TRE-PR");
     });
 
     it("deve exibir e navegar pelo ícone de configurações para o perfil ADMIN", async () => {
