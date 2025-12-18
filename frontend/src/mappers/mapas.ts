@@ -1,5 +1,4 @@
-import type {AtividadeImpactada, CompetenciaImpactada, ImpactoMapa,} from "@/types/impacto";
-import type {Mapa, MapaAjuste, MapaCompleto,} from "@/types/tipos";
+import type {AtividadeImpactada, CompetenciaImpactada, ImpactoMapa, Mapa, MapaAjuste, MapaCompleto,} from "@/types/tipos";
 
 export function mapMapaDtoToModel(dto: any): Mapa {
     return {

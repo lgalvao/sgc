@@ -94,6 +94,9 @@ describe("usePerfilStore", () => {
                 "unidadeSelecionadaSigla",
                 unidadeSigla,
             );
+            perfilStore.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
+            expect(perfilStore.usuarioNome).toBe("Nome Teste");
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", "Nome Teste");
         });
 
         it("loginCompleto should authenticate, fetch profiles, and auto-select if one profile", async () => {
@@ -107,6 +110,7 @@ describe("usePerfilStore", () => {
                 unidadeCodigo: 1,
                 tituloEleitoral: 123,
                 token: "fake-token",
+                nome: "João da Silva",
             };
 
             mockUsuarioService.autenticar.mockResolvedValue(true);
@@ -163,6 +167,7 @@ describe("usePerfilStore", () => {
                 unidadeCodigo: 2,
                 tituloEleitoral: 456,
                 token: "fake-token",
+                nome: "Maria Oliveira",
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
@@ -211,7 +216,7 @@ describe("usePerfilStore", () => {
             expect(perfilStore.servidorId).toBeNull();
             expect(perfilStore.perfilSelecionado).toBeNull();
             expect(perfilStore.unidadeSelecionada).toBeNull();
-            expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(6);
+            expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(7);
         });
 
         it("should clear error", () => {

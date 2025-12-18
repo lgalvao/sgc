@@ -22,6 +22,9 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeSelecionadaSigla = ref<string | null>(
         (localStorage.getItem("unidadeSelecionadaSigla") || null) as string | null,
     );
+    const usuarioNome = ref<string | null>(
+        (localStorage.getItem("usuarioNome") || null) as string | null,
+    );
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const perfis = ref<Perfil[]>(
         (JSON.parse(localStorage.getItem("perfis") || "[]")) as Perfil[],
@@ -40,13 +43,17 @@ export const usePerfilStore = defineStore("perfil", () => {
         localStorage.setItem("idServidor", String(novoId));
     }
 
-    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string) {
+    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
         perfilSelecionado.value = perfil;
         unidadeSelecionada.value = unidadeCodigo;
         unidadeSelecionadaSigla.value = unidadeSigla;
         localStorage.setItem("perfilSelecionado", perfil);
         localStorage.setItem("unidadeSelecionada", unidadeCodigo.toString());
         localStorage.setItem("unidadeSelecionadaSigla", unidadeSigla);
+        if (nome) {
+            usuarioNome.value = nome;
+            localStorage.setItem("usuarioNome", nome);
+        }
     }
 
     function definirToken(token: string) {
@@ -90,6 +97,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                         loginResponse.perfil as unknown as Perfil,
                         loginResponse.unidadeCodigo,
                         perfilUnidadeSelecionado.unidade.sigla,
+                        loginResponse.nome,
                     );
                     definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
                     definirToken(loginResponse.token); // Adicionar esta linha
@@ -97,9 +105,14 @@ export const usePerfilStore = defineStore("perfil", () => {
                 return true;
             }
             return false;
-        } catch (error) {
+        } catch (error: any) {
+            console.error("Erro durante loginCompleto:", error);
             lastError.value = normalizeError(error);
-            // It was implicitly rethrowing before, so we rethrow now to let the component handle it (e.g. show error message on login form)
+            // Se for um erro 404 de autorização, ou qualquer erro de autorização/autenticação específico,
+            // retornamos false para exibir a mensagem de "Título ou senha inválidos"
+            if (error?.response?.status === 404 || error?.response?.status === 401) {
+                return false;
+            }
             throw error;
         }
     }
@@ -119,6 +132,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 loginResponse.perfil as unknown as Perfil,
                 loginResponse.unidadeCodigo,
                 perfilUnidade.unidade.sigla,
+                loginResponse.nome,
             );
             definirServidorId(loginResponse.tituloEleitoral);
             definirToken(loginResponse.token);
@@ -133,12 +147,14 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
         unidadeSelecionadaSigla.value = null;
+        usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
         localStorage.removeItem("idServidor");
         localStorage.removeItem("perfilSelecionado");
         localStorage.removeItem("unidadeSelecionada");
         localStorage.removeItem("unidadeSelecionadaSigla");
+        localStorage.removeItem("usuarioNome");
         localStorage.removeItem("jwtToken");
         localStorage.removeItem("perfis");
     }
@@ -148,6 +164,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfilSelecionado,
         unidadeSelecionada,
         unidadeSelecionadaSigla,
+        usuarioNome,
         perfisUnidades,
         perfis,
         isAdmin,

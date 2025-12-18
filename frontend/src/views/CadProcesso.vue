@@ -43,7 +43,7 @@
         <BFormSelect
             id="tipo"
             v-model="tipo"
-            :options="Object.values(TipoProcessoEnum)"
+            :options="tipoOptions"
             :state="fieldErrors.tipo ? false : null"
             data-testid="sel-processo-tipo"
         />
@@ -92,38 +92,44 @@
         </BFormInvalidFeedback>
       </BFormGroup>
 
-      <BButton
-          data-testid="btn-processo-salvar"
-          type="button"
-          variant="primary"
-          @click="salvarProcesso"
-      >
-        Salvar
-      </BButton>
-      <BButton
-          class="ms-2"
-          data-testid="btn-processo-iniciar"
-          variant="success"
-          @click="abrirModalConfirmacao"
-      >
-        Iniciar processo
-      </BButton>
-      <BButton
-          v-if="processoEditando"
-          class="ms-2"
-          data-testid="btn-processo-remover"
-          variant="danger"
-          @click="abrirModalRemocao"
-      >
-        Remover
-      </BButton>
-      <BButton
-          class="ms-2"
-          to="/painel"
-          variant="secondary"
-      >
-        Cancelar
-      </BButton>
+      <div class="d-flex justify-content-between">
+        <div>
+          <BButton
+              :disabled="isFormInvalid"
+              data-testid="btn-processo-iniciar"
+              variant="success"
+              @click="abrirModalConfirmacao"
+          >
+            <i class="bi bi-play-fill me-1"/> Iniciar processo
+          </BButton>
+          <BButton
+              :disabled="isFormInvalid"
+              class="ms-2"
+              data-testid="btn-processo-salvar"
+              type="button"
+              variant="outline-primary"
+              @click="salvarProcesso"
+          >
+            <i class="bi bi-save me-1"/> Salvar
+          </BButton>
+          <BButton
+              v-if="processoEditando"
+              class="ms-2"
+              data-testid="btn-processo-remover"
+              variant="outline-danger"
+              @click="abrirModalRemocao"
+          >
+            <i class="bi bi-trash me-1"/> Remover
+          </BButton>
+        </div>
+        <BButton
+            class="text-secondary"
+            to="/painel"
+            variant="link"
+        >
+          Cancelar
+        </BButton>
+      </div>
     </BForm>
 
     <!-- Modal de confirmação CDU-05 -->
@@ -193,7 +199,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BModal} from "bootstrap-vue-next";
-import {nextTick, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
@@ -203,7 +209,11 @@ import {useUnidadesStore} from "@/stores/unidades";
 import {useFeedbackStore} from "@/stores/feedback";
 import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
 
-const TipoProcessoEnum = TipoProcesso;
+const tipoOptions = [
+  { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
+  { value: TipoProcesso.REVISAO, text: 'Revisão' },
+  { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' }
+];
 
 const unidadesSelecionadas = ref<number[]>([]);
 const descricao = ref<string>("");
@@ -230,6 +240,13 @@ watch(unidadesSelecionadas, () => fieldErrors.value.unidades = '');
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
+
+const isFormInvalid = computed(() => {
+  return !descricao.value.trim() ||
+      !tipo.value ||
+      !dataLimite.value ||
+      unidadesSelecionadas.value.length === 0;
+});
 
 interface AlertState {
   show: boolean;

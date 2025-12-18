@@ -48,9 +48,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = UUID.randomUUID().toString();
 
         if (ex.getStatus().is4xxClientError()) {
-            log.warn("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage());
+            log.warn("Erro de negócio ({}): {}", ex.getCode(), ex.getMessage());
         } else {
-            log.error("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage(), ex);
+            log.error("Erro de negócio ({}): {}", ex.getCode(), ex.getMessage(), ex);
         }
 
         ErroApi erroApi = new ErroApi(

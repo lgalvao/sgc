@@ -15,6 +15,7 @@ import sgc.sgrh.model.Perfil;
 @AllArgsConstructor
 public class LoginResp {
     private String tituloEleitoral;
+    private String nome;
     private Perfil perfil;
     private Long unidadeCodigo;
     private String token;

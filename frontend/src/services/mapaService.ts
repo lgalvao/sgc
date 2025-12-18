@@ -1,6 +1,5 @@
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from "@/mappers/mapas";
-import type {ImpactoMapa} from "@/types/impacto";
-import type {DisponibilizarMapaRequest, MapaAjuste, MapaCompleto, MapaVisualizacao,} from "@/types/tipos";
+import type {DisponibilizarMapaRequest, ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao,} from "@/types/tipos";
 import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";
 

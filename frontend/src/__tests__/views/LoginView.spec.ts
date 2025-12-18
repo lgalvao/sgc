@@ -121,7 +121,7 @@ describe("LoginView.vue", () => {
 
         expect(perfilStore.loginCompleto).toHaveBeenCalled();
         expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Falha na autenticação",
+            "Erro no login",
             "Título ou senha inválidos.",
             "danger"
         );

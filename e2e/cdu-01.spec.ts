@@ -8,7 +8,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
     test('Deve exibir erro com credenciais inválidas', async ({page}) => {
         await autenticar(page, USUARIOS.INVALIDO.titulo, USUARIOS.INVALIDO.senha);
-        await expect(page.getByText('Ocorreu um erro ao tentar realizar o login.')).toBeVisible();
+        await expect(page.getByText('Título ou senha inválidos.')).toBeVisible();
     });
 
     test('Deve realizar login com sucesso (Perfil Único)', async ({page}) => {

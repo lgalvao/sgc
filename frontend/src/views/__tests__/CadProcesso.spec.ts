@@ -109,6 +109,35 @@ describe('CadProcesso.vue', () => {
     expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
   });
 
+  it('disables action buttons when form is incomplete and enables when complete', async () => {
+    const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
+    const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
+
+    // Initially disabled (empty fields)
+    expect(salvarBtn.element.disabled).toBe(true);
+    expect(iniciarBtn.element.disabled).toBe(true);
+
+    // Fill description
+    await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
+    expect(salvarBtn.element.disabled).toBe(true);
+
+    // Fill date
+    await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue('2023-12-31');
+    expect(salvarBtn.element.disabled).toBe(true);
+
+    // Select units (modelValue for ArvoreUnidades)
+    wrapper.vm.unidadesSelecionadas = [1];
+    await nextTick();
+
+    // Now it should be enabled (tipo has default 'MAPEAMENTO')
+    expect(salvarBtn.element.disabled).toBe(false);
+    expect(iniciarBtn.element.disabled).toBe(false);
+    
+    // Clear description again
+    await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('');
+    expect(salvarBtn.element.disabled).toBe(true);
+  });
+
   it('loads process data for editing', async () => {
     mockRoute.query = { codProcesso: '123' };
     const mockProcesso = {
@@ -187,6 +216,7 @@ describe('CadProcesso.vue', () => {
 
     // Simulate unit selection
     wrapper.vm.unidadesSelecionadas = [1, 2];
+    await nextTick();
 
     const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
     await salvarBtn.trigger('click');
@@ -207,6 +237,11 @@ describe('CadProcesso.vue', () => {
     processosStore.lastError = { message: 'Erro validacao', subErrors: [] };
 
     wrapper.vm.descricao = 'Teste';
+    wrapper.vm.tipo = 'MAPEAMENTO';
+    wrapper.vm.dataLimite = '2023-12-31';
+    wrapper.vm.unidadesSelecionadas = [1];
+    await nextTick();
+    
     await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
     await flushPromises();
 
@@ -221,6 +256,7 @@ describe('CadProcesso.vue', () => {
     wrapper.vm.tipo = 'MAPEAMENTO';
     wrapper.vm.dataLimite = '2023-12-31';
     wrapper.vm.unidadesSelecionadas = [1];
+    await nextTick();
 
     await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
 
@@ -236,14 +272,16 @@ describe('CadProcesso.vue', () => {
   });
 
   it('initiates a process (confirmation flow)', async () => {
-    // Open modal
-    await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
-    expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-    
     // Setup data
     wrapper.vm.descricao = 'Iniciar Teste';
     wrapper.vm.tipo = 'MAPEAMENTO';
+    wrapper.vm.dataLimite = '2023-12-31';
     wrapper.vm.unidadesSelecionadas = [1];
+    await nextTick();
+
+    // Open modal
+    await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+    expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
     
     processosStore.criarProcesso.mockResolvedValue({ codigo: 999 });
 
@@ -259,10 +297,14 @@ describe('CadProcesso.vue', () => {
   it('initiates an existing process', async () => {
     wrapper.vm.processoEditando = { codigo: 123 };
     wrapper.vm.descricao = 'Existente';
+    wrapper.vm.tipo = 'MAPEAMENTO';
+    wrapper.vm.dataLimite = '2023-12-31';
     wrapper.vm.unidadesSelecionadas = [1];
+    await nextTick();
 
     // Open modal and confirm
-    wrapper.vm.mostrarModalConfirmacao = true;
+    await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+    expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
     await nextTick(); // Update DOM to show modal content
 
     await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');

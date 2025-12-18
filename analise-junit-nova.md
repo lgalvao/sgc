@@ -51,16 +51,19 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ### 3.1 Consistência
 
 **C1 — Nomenclatura inconsistente de métodos de teste**
+
 - Coexistem 3+ padrões (método curto + `@DisplayName`, método descritivo sem `@DisplayName`, nomes com underscore).
 - **Impacto:** leitura e relatórios inconsistentes, maior custo de manutenção.
 
 **Recomendação (padrão único):**
+
 - Método: `deve{Acao}Quando{Condicao}` (camelCase, português)
 - `@DisplayName`: frase curta e clara em português
 
 ---
 
 **C2 — Uso inconsistente de `@DisplayName`**
+
 - Parte dos testes tem `@DisplayName`, outros não.
 - **Impacto:** relatórios menos úteis; menor “documentação viva”.
 
@@ -69,6 +72,7 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ---
 
 **C3 — Organização desigual com `@Nested`**
+
 - Classes com muitos testes sem agrupamento.
 - **Impacto:** difícil localizar cenários e manter AAA.
 
@@ -79,6 +83,7 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ### 3.2 Robustez
 
 **R1 — `MockitoSettings(strictness = LENIENT)` mascarando problemas**
+
 - `LENIENT` permite stubs não usados e arranges excessivos.
 - **Impacto:** testes passam “por acidente”; baixa qualidade de sinal.
 
@@ -87,16 +92,19 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ---
 
 **R2 — Dados hardcoded e magic numbers**
+
 - IDs como `99L` e credenciais/identificadores fixos.
 - Integração acoplada a dados de seed (`data.sql`).
 
 **Recomendação:**
+
 - Unit: constantes/fixtures/builders.
 - Integração: **dados por teste** (setup programático ou `@Sql` por classe/teste).
 
 ---
 
 **R3 — Asserções de estado incompletas**
+
 - Verifica só 1 atributo e o `save`, sem garantir invariantes.
 
 **Recomendação:** asserts mais completos, validando invariantes relevantes (tipo/situação/relacionamentos).
@@ -104,6 +112,7 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ---
 
 **R4 — Testes de exceção incompletos**
+
 - Verificam apenas o tipo da exceção.
 
 **Recomendação:** verificar também mensagem e/ou campos relevantes (`hasMessageContaining`, causa, códigos).
@@ -113,15 +122,18 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ### 3.3 Clareza
 
 **L1 — Setup duplicado e ausência de AAA**
+
 - Arranges repetidos e testes com mistura de fases.
 
 **Recomendação:**
+
 - `@BeforeEach` + helpers privados.
 - AAA explícito (`// Arrange`, `// Act`, `// Assert`).
 
 ---
 
 **L2 — Testes de getters/setters (DTO/Model) sem valor agregado**
+
 - Testam Lombok/boilerplate.
 - **Impacto:** cobertura artificial, tempo de execução, ruído.
 
@@ -130,6 +142,7 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 ---
 
 **L3 — Cenários complexos sem documentação**
+
 - Workflows e hierarquias configuradas sem explicação.
 
 **Recomendação:** comentários curtos de intenção e `@DisplayName` orientado ao comportamento.
@@ -165,10 +178,12 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** garantir medições e diagnóstico rápido.
 
 **Tarefas**
+
 - Garantir pipeline rodando testes e publicando relatórios.
 - Documentar comandos de execução.
 
 **Aceite**
+
 - CI executa testes e falha se houver erro.
 
 ---
@@ -178,10 +193,12 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** reduzir ruído e cobertura artificial.
 
 **Tarefas**
+
 - Remover testes de getters/setters e builders sem regra.
 - Manter apenas testes onde exista validação/regra.
 
 **Aceite**
+
 - Testes passam.
 - Redução objetiva de arquivos/linhas de testes inúteis.
 
@@ -192,10 +209,12 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** aumentar qualidade do sinal dos testes unitários.
 
 **Tarefas**
+
 - Remover `@MockitoSettings(strictness = LENIENT)`.
 - Corrigir stubs não usados e arranges excessivos.
 
 **Aceite**
+
 - `grep -R "Strictness.LENIENT" -n` sem resultados.
 - Suíte passa.
 
@@ -206,10 +225,12 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** reduzir duplicação e magic numbers.
 
 **Tarefas**
+
 - Criar pacote `fixture`/`testdata` com builders reutilizáveis.
 - Extrair setup comum para `@BeforeEach`.
 
 **Aceite**
+
 - Redução de duplicação em classes alvo.
 
 ---
@@ -219,12 +240,14 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** consistência e legibilidade.
 
 **Tarefas**
+
 - Renomear métodos para `deve{Acao}Quando{Condicao}`.
 - Garantir `@DisplayName` em testes relevantes.
 - Introduzir `@Nested` em classes grandes.
 - AAA explícito.
 
 **Aceite**
+
 - Testes passam.
 - Diferença de estilo reduzida (pelo menos em N classes por PR).
 
@@ -237,12 +260,15 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Estratégias possíveis (escolher 1 e aplicar consistentemente)**
 
 **Estratégia A — `@Sql` por classe/teste**
+
 - Criar datasets mínimos e explícitos.
 
 **Estratégia B — Setup programático via repositórios + fixtures**
+
 - Criar entidades no `@BeforeEach`.
 
 **Aceite**
+
 - Nenhum CDU depende de identificadores globais hardcoded sem criação no próprio teste.
 
 ---
@@ -252,11 +278,13 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** medir e evitar regressões.
 
 **Tarefas**
+
 - Integrar JaCoCo.
 - Publicar relatório no CI.
 - Gate inicial brando (não reduzir baseline).
 
 **Aceite**
+
 - Relatórios gerados.
 
 ---
@@ -266,11 +294,13 @@ A recomendação é executar refatorações em ondas curtas, com guardrails e va
 **Objetivo:** elevar robustez real.
 
 **Tarefas**
+
 - Parametrizar testes repetitivos.
 - Completar asserts de exceção.
 - Testar efeitos colaterais de eventos assíncronos (quando existirem listeners).
 
 **Aceite**
+
 - Menos duplicação.
 - Mais verificação de comportamento real.
 

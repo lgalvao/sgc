@@ -145,7 +145,7 @@ import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {ref, watch} from "vue";
 import {useMapasStore} from "@/stores/mapas";
-import {TipoImpactoCompetencia} from "@/types/impacto";
+import {TipoImpactoCompetencia} from "@/types/tipos";
 
 const props = defineProps<{
   mostrar: boolean;

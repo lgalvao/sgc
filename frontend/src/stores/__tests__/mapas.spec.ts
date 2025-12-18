@@ -2,8 +2,7 @@ import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {ImpactoMapa} from "@/types/impacto";
-import type {MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
+import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
 import {useMapasStore} from "../mapas";
 
 vi.mock("@/services/mapaService", () => ({

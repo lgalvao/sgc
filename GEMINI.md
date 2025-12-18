@@ -1,13 +1,19 @@
-# Instruções para o Agente Gemini
+# Instruções para o Agente Gemini - SGC
 
-Bem-vindo ao projeto SGC. Para começar, por favor siga estas instruções:
+Este arquivo contém as diretrizes operacionais para assistentes de IA no projeto SGC.
 
-1. **Leia o `AGENTS.md`**: Este arquivo contém diretrizes essenciais e boas práticas para o desenvolvimento neste
-   projeto.
-2. **Explore a Documentação**:
-    * Existe um `README.md` na raiz do repositório que fornece uma visão geral do sistema.
-    * Existem arquivos `README.md` na raiz de cada módulo (backend e frontend) com uma visão geral desses módulos.
+## 1. Primeiros passos
 
-    * Existem vários arquivos `README.md` específicos de contexto (por exemplo, dentro de pacotes backend e diretórios
-      frontend) que detalham a arquitetura e responsabilidades de cada parte do sistema.
-    * Utilize esses documentos para obter um entendimento aprofundado da base de código.
+1. **Leia o [AGENTS.md](file:///c:/sgc/AGENTS.md)**: Contém as regras de codificação, idioma e arquitetura.
+2. **Explore os READMEs**:
+   - Raiz: Visão geral.
+   - `backend/` e `frontend/`: Visão dos módulos.
+   - READMEs internos: Detalhes de pacotes e componentes.
+
+## 2. Regras operacionais (Ambiente local)
+
+O ambiente de desenvolvimento é **Windows**.
+
+## 3. Idioma
+
+Toda a comunicação, código, mensagens e documentação deve ser estritamente em **Português Brasileiro**

@@ -16,7 +16,7 @@ Ator: Usuário (todos os perfis)
 
     - `Descrição`: Descrição dada ao processo no momento do seu cadastro
     - `Tipo`: Tipo do processo ('Mapeamento', 'Revisão' ou 'Diagnóstico')
-    - `Unidades Participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da unidade raiz que possuam todas as suas unidades subordinadas participando do processo. Por exemplo, para uma secretaria com duas coordenadorias A e B, se apenas as seções da coordenadoria B participarem do processo, deverá aparecer apenas o nome da coordenadoria B.
+    - `Unidades participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da unidade raiz que possuam todas as suas unidades subordinadas participando do processo. Por exemplo, para uma secretaria com duas coordenadorias A e B, se apenas as seções da coordenadoria B participarem do processo, deverá aparecer apenas o nome da coordenadoria B.
     - `Situação`: Situação do processo ('Criado', 'Em andamento' ou 'Finalizado').
 
    2.2. Regras de exibição e funcionamento:

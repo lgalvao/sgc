@@ -63,6 +63,7 @@ export function mapUsuarioToFrontend(usuarioDto: any): Usuario {
 
 export interface LoginResponse {
     tituloEleitoral: number;
+    nome: string;
     perfil: Perfil; // Usando o tipo Perfil já definido
     unidadeCodigo: number;
     token: string;
@@ -71,6 +72,7 @@ export interface LoginResponse {
 export function LoginResponseToFrontend(response: any): LoginResponse {
     return {
         tituloEleitoral: response.tituloEleitoral,
+        nome: response.nome,
         perfil: response.perfil,
         unidadeCodigo: response.unidadeCodigo,
         token: response.token,

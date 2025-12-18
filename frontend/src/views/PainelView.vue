@@ -19,6 +19,7 @@
         </BButton>
       </div>
       <TabelaProcessos
+          :compacto="true"
           :criterio-ordenacao="criterio"
           :direcao-ordenacao-asc="asc"
           :processos="processosOrdenados"

@@ -12,6 +12,7 @@
 Os testes E2E do sistema SGC apresentam **boa cobertura funcional** e estrutura organizada com helpers reutilizáveis. No entanto, foram identificados **problemas significativos de dívida técnica** que impactam manutenibilidade, robustez e clareza. Esta análise categoriza os problemas em **Críticos**, **Importantes** e **Menores**, com recomendações prioritárias de correção.
 
 ### Métricas Gerais
+
 - **22 arquivos de teste** (5.193 linhas totais)
 - **5 helpers** especializados (auth, processos, mapas, atividades, analise)
 - **1 sistema de hooks** (limpeza de dados)
@@ -29,6 +30,7 @@ Os testes E2E do sistema SGC apresentam **boa cobertura funcional** e estrutura 
 **Impacto:** Manutenção, Consistência, Risco de bugs
 
 #### Problema
+
 Funções auxiliares idênticas são redefinidas localmente em múltiplos arquivos de teste:
 
 ```typescript
@@ -48,18 +50,21 @@ async function verificarPaginaSubprocesso(page: Page, unidade?: string) {
 ```
 
 **Ocorrências identificadas:**
+
 - `fazerLogout`: 6 arquivos
 - `verificarPaginaPainel`: 8 arquivos
 - `verificarPaginaSubprocesso`: 5 arquivos (com variações)
 - `acessarSubprocessoChefe`: 3 arquivos (já existe em helpers-analise!)
 
 #### Consequências
+
 - **Inconsistência**: Diferentes implementações da mesma função
 - **Bugs Silenciosos**: Correções não são propagadas entre arquivos
 - **Refatoração Cara**: Mudanças requerem edição de múltiplos arquivos
 - **Testes de Revisão**: Equipe não sabe qual versão usar
 
 #### Recomendação
+
 ```typescript
 // Criar: e2e/helpers/helpers-navegacao.ts
 export async function fazerLogout(page: Page) {
@@ -92,12 +97,14 @@ export async function verificarPaginaSubprocesso(
 **Impacto:** Debugging, Paralelização, Tempo de execução
 
 #### Problema
+
 Múltiplos arquivos usam `test.describe.serial()` com testes gigantes que dependem de estado compartilhado:
 
-NO ENTANTO: devido à complexidade da preparacao de dados e interferencias no estado do BD, isso foi essencial no inicio. 
+NO ENTANTO: devido à complexidade da preparacao de dados e interferencias no estado do BD, isso foi essencial no inicio.
 Talvez agora seja mais facil, mas prevejo muitos problemas de interferencia de dados.
 
 **Exemplo:** `cdu-05.spec.ts` (322 linhas)
+
 ```typescript
 test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     // Estado compartilhado entre testes
@@ -120,11 +127,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 ```
 
 **Exemplo:** `cdu-10.spec.ts` (530 linhas)
+
 - **8 testes de preparação** sequenciais
 - **5 testes principais** que dependem da preparação
 - Se o 3º teste de preparação falha, os 10 testes seguintes também falham
 
 #### Consequências
+
 1. **Falhas em cascata**: Um erro contamina todos os testes subsequentes
 2. **Debugging infernal**: Qual teste realmente falhou?
 3. **Sem paralelização**: `workers: 1` obrigatório
@@ -132,7 +141,9 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 5. **Impossível rodar teste isolado**: Viola regras do próprio projeto (e2e_regras.md linha 26)
 
 #### Recomendação
+
 **Opção A - Fixtures Tipados (Recomendado)**
+
 ```typescript
 // e2e/fixtures/fixtures-processos.ts
 export const processoMapeamentoFixture = base.extend<{
@@ -167,6 +178,7 @@ test('CT-01: Admin homologa revisão', async ({
 ```
 
 **Opção B - Testes Atômicos com Seed API**
+
 ```typescript
 // Cada teste é independente
 test('CT-01: Admin homologa revisão', async ({ page, request }) => {
@@ -194,6 +206,7 @@ test('CT-01: Admin homologa revisão', async ({ page, request }) => {
 **Impacto:** Falhas silenciosas, Cleanup incompleto
 
 #### Problema
+
 Extração de IDs de processos é inconsistente e não valida sucesso:
 
 ```typescript
@@ -209,6 +222,7 @@ if (processoId > 0) cleanup.registrar(processoId);
 ```
 
 **Variações encontradas:**
+
 ```typescript
 // Variação 1 (cdu-02.spec.ts linha 49)
 /codProcesso=(\d+)/
@@ -221,6 +235,7 @@ page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1]
 ```
 
 #### Recomendação
+
 ```typescript
 // helpers/helpers-processos.ts
 export async function extrairProcessoId(page: Page): Promise<number> {
@@ -271,6 +286,7 @@ test('Deve criar processo', async ({ page }) => {
 **Impacto:** Legibilidade, Reusabilidade
 
 #### Problema
+
 Fluxos complexos (mapeamento completo, revisão completa) são repetidos inline em múltiplos testes:
 
 ```typescript
@@ -315,6 +331,7 @@ test('Preparação: Criar processo de mapeamento', async ({ page }) => {
 ```
 
 #### Recomendação
+
 ```typescript
 // helpers/helpers-workflows.ts
 export interface ProcessoMapeamentoOpts {
@@ -395,6 +412,7 @@ test('Deve permitir revisão de mapa', async ({ page }) => {
 **Impacto:** Flakiness, Previsibilidade
 
 #### Problema
+
 Três estratégias diferentes de espera são usadas inconsistentemente:
 
 ```typescript
@@ -412,15 +430,18 @@ await page.waitForLoadState('networkidle'); // Espera TODOS os requests!
 // Estratégia 3: waitForTimeout (ANTI-PATTERN!)
 await page.waitForTimeout(500); // Captura-telas.spec.ts linha 64, 72
 ```
+
 NO ENTANTO: Os testes e2e devem replicar ao maximo as operacoes dos usuarios, e chamadas a endpoints não são
 representativas
 
 **Problemas:**
+
 - `waitForTimeout`: Arbitrário, não garante nada
 - `networkidle`: Desnecessariamente lento
 - Falta padronização
 
 #### Recomendação
+
 ```typescript
 // helpers/helpers-wait.ts
 export const waitStrategies = {
@@ -456,6 +477,7 @@ export const waitStrategies = {
 ```
 
 **Documentar no e2e_regras.md:**
+
 ```markdown
 ## Estratégias de Espera
 
@@ -476,6 +498,7 @@ export const waitStrategies = {
 **Impacto:** Type Safety, Developer Experience
 
 #### Problema
+
 Muitos helpers aceitam `string` onde deveriam aceitar enums/unions:
 
 ```typescript
@@ -496,10 +519,11 @@ export async function login(page: Page, usuario: string, senha: string) {
     // Deveria aceitar USUARIOS[keyof typeof USUARIOS] ❌
 }
 ```
+
 NO ENTANTO: São dezenas de unidades -- não vejo como criar um tipo incluindo todas elas. Usuarios serao Centenas!
 
-
 #### Recomendação
+
 ```typescript
 // types/e2e-types.ts
 export enum UnidadeSigla {
@@ -564,6 +588,7 @@ export async function loginComoUsuario(
 **Impacto:** Padrões de código
 
 #### Problema
+
 Três convenções diferentes de nomenclatura:
 
 ```typescript
@@ -584,7 +609,9 @@ NO ENTANTO: Esses exemplos acima não são kebak case (subprocesso é uma palavr
 ```
 
 #### Recomendação
+
 **Documentar padrão único:**
+
 ```markdown
 ## Convenção de Test IDs
 
@@ -609,7 +636,7 @@ Exemplos:
 ```
 
 NO ENTANTO: em muitos casos, esse padrao recomendado geraria testids identicos, dai a necessidade de prefixar
-o contexto. 
+o contexto.
 
 **Prioridade:** 🔵 Baixa - Refatoração oportunística
 
@@ -621,6 +648,7 @@ o contexto.
 **Impacto:** Manutenibilidade
 
 #### Problema
+
 ```typescript
 // Encontrado em múltiplos arquivos
 await page.getByTestId('inp-processo-data-limite').fill('2030-12-31');
@@ -629,6 +657,7 @@ await page.waitForTimeout(500); // Por que 500ms?
 ```
 
 #### Recomendação
+
 ```typescript
 // constants/e2e-constants.ts
 export const E2E_CONSTANTS = {
@@ -655,6 +684,7 @@ export const E2E_CONSTANTS = {
 **Impacto:** Mensagens de erro
 
 #### Problema
+
 Helpers não validam estado antes de executar:
 
 ```typescript
@@ -666,6 +696,7 @@ export async function adicionarAtividade(page: Page, descricao: string) {
 ```
 
 #### Recomendação
+
 ```typescript
 export async function adicionarAtividade(page: Page, descricao: string) {
     // Validar pré-condição
@@ -720,6 +751,7 @@ test.describe('Smoke Tests', () => {
 ```
 
 **Executar no CI:**
+
 ```yaml
 # .github/workflows/ci.yml
 - name: Smoke Tests
@@ -765,6 +797,7 @@ test('Deve exibir processo', async ({ page }) => {
 ```
 
 **Aplicar apenas para:**
+
 - ✅ Tabela de Processos
 - ✅ Árvore de Unidades (seletor complexo)
 - ✅ Modal de Competências
@@ -823,6 +856,7 @@ test('Login deve ser rápido', async ({ page, performance }) => {
 **Problema atual:** Helpers têm pouca ou nenhuma documentação
 
 **Exemplo atual:**
+
 ```typescript
 export async function criarCompetencia(page: Page, descricao: string, atividades: string[]) {
     // Sem docs
@@ -830,6 +864,7 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
 ```
 
 **Recomendação:**
+
 ```typescript
 /**
  * Cria uma nova competência no mapa da unidade atual
@@ -860,6 +895,7 @@ export async function criarCompetencia(
 ```
 
 **Gerar documentação:**
+
 ```bash
 npm install --save-dev typedoc
 npx typedoc --out docs/e2e-helpers e2e/helpers
@@ -885,10 +921,12 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
 ```
 
 **Prós:**
+
 - Detecta regressões visuais não cobertas por testes funcionais
 - Útil para componentes de UI complexos
 
 **Contras:**
+
 - Adiciona dependência externa (Percy/Chromatic)
 - Aumenta tempo de build
 - Pode gerar falsos positivos
@@ -900,22 +938,24 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
 ## 📋 Plano de Ação Prioritário
 
 ### Sprint 1 - Correções Críticas (2-3 semanas)
+
 1. ✅ **Eliminar duplicação de código**
    - Criar `helpers-navegacao.ts`
    - Consolidar funções de logout/verificação de página
    - Remover funções locais duplicadas
-   
+
 2. ✅ **Implementar extração robusta de IDs**
    - Criar `extrairProcessoId()` com validação
    - Adicionar testes unitários para regex
    - Substituir todas as 12+ ocorrências
-   
+
 3. ✅ **Refatorar testes seriais**
    - Começar com `cdu-10.spec.ts` (mais complexo)
    - Criar fixtures para estados complexos
    - Documentar padrão em `e2e_regras.md`
 
 ### Sprint 2 - Melhorias Importantes (2 semanas)
+
 4. ✅ **Criar helpers de workflow**
    - `criarProcessoMapeamentoCompleto()`
    - `criarProcessoRevisaoCompleto()`
@@ -932,6 +972,7 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
    - Type unions para TipoProcesso
 
 ### Sprint 3 - Qualidade de Vida (1 semana)
+
 7. ✅ **Melhorar sistema de logs**
    - Adicionar níveis de log
    - Colorir saída no terminal
@@ -952,6 +993,7 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
 ## 📊 Métricas de Sucesso
 
 ### Antes (Estado Atual)
+
 - ⏱️ Tempo de execução: ~30 minutos
 - 🔧 Workers: 1 (sem paralelização)
 - 📏 Linhas duplicadas: ~300+ linhas
@@ -959,6 +1001,7 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
 - 📖 Documentação: Limitada
 
 ### Depois (Meta)
+
 - ⏱️ Tempo de execução: <15 minutos
 - 🔧 Workers: 4+ (paralelização parcial)
 - 📏 Linhas duplicadas: <50 linhas
@@ -973,19 +1016,23 @@ test('Tabela de processos - Layout consistente', async ({ page }) => {
 A suite de testes E2E do SGC tem **boa cobertura funcional** e **estrutura organizada**, mas sofre de **dívida técnica significativa** que impede escalabilidade. Os principais pontos são:
 
 ### ✅ Pontos Fortes
+
 1. **Cobertura abrangente**: 22 CDUs testados
 2. **Helpers bem organizados**: Separação lógica por domínio
 3. **Cleanup automático**: Hook `useProcessoCleanup` funciona bem
 4. **Documentação do setup**: `lifecycle.js` bem estruturado
 
 ### ❌ Pontos Fracos Críticos
+
 1. **Duplicação massiva de código** (300+ linhas)
 2. **Testes seriais frágeis** (impossíveis de rodar isolados)
 3. **Extração de IDs sem validação** (falhas silenciosas)
 4. **Falta de workflows de alto nível** (legibilidade prejudicada)
 
 ### 🎯 Recomendação Prioritária
+
 **Começar pelo Sprint 1** focando em:
+
 1. Consolidar funções duplicadas
 2. Implementar extração robusta de IDs
 3. Refatorar 2-3 testes mais complexos como exemplo
@@ -995,6 +1042,7 @@ Isso **desbloqueará** as melhorias subsequentes e **reduzirá tempo de execuç�
 ---
 
 **Próximos Passos:**
+
 1. Revisar este documento com a equipe
 2. Priorizar itens do Sprint 1
 3. Criar issues no GitHub para rastreamento

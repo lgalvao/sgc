@@ -51,7 +51,7 @@ describe("TabelaProcessos.vue", () => {
         const headers = table.findAll("th");
         expect(headers[0].text()).toContain("Descrição");
         expect(headers[1].text()).toContain("Tipo");
-        expect(headers[2].text()).toContain("Unidades Participantes");
+        expect(headers[2].text()).toContain("Unidades participantes");
         expect(headers[3].text()).toContain("Situação");
     });
 
@@ -206,5 +206,65 @@ describe("TabelaProcessos.vue", () => {
         // BTable renders empty slot when items is empty.
         // We might need to check if the text exists.
         expect(wrapper.text()).toContain("Nenhum processo encontrado.");
+    });
+
+    describe("Modo Compacto", () => {
+        it("deve exibir o rótulo reduzido 'Unidades' quando compacto é true", async () => {
+            const wrapper = mount(TabelaProcessos, {
+                props: {
+                    processos: [],
+                    criterioOrdenacao: "descricao",
+                    direcaoOrdenacaoAsc: true,
+                    compacto: true,
+                },
+            });
+
+            await wrapper.vm.$nextTick();
+            const headers = wrapper.findAll("th");
+            expect(headers.some(h => h.text() === "Unidades")).toBe(true);
+            expect(headers.some(h => h.text() === "Unidades participantes")).toBe(false);
+        });
+
+        it("deve manter sortable: true mesmo em modo compacto", async () => {
+            const wrapper = mount(TabelaProcessos, {
+                props: {
+                    processos: [],
+                    criterioOrdenacao: "descricao",
+                    direcaoOrdenacaoAsc: true,
+                    compacto: true,
+                },
+            });
+
+            const table = wrapper.findComponent(BTable);
+            const fields = (table.props("fields") as any[]);
+            const desc = fields.find(f => f.key === "descricao");
+            expect(desc.sortable).toBe(true);
+        });
+
+        it("deve emitir evento de ordenação ao clicar no cabeçalho em modo compacto", async () => {
+            const wrapper = mount(TabelaProcessos, {
+                props: {
+                    processos: [],
+                    criterioOrdenacao: "descricao",
+                    direcaoOrdenacaoAsc: true,
+                    compacto: true,
+                },
+                global: {
+                    stubs: {
+                        BTable: {
+                            template: "<table><slot></slot></table>",
+                            emits: ["sort-changed"],
+                        },
+                    },
+                },
+            });
+
+            await (
+                wrapper.findComponent(BTable) as unknown as VueWrapper<any>
+            ).vm.$emit("sort-changed", {sortBy: "tipo"});
+
+            expect(wrapper.emitted("ordenar")).toBeTruthy();
+            expect(wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
+        });
     });
 });

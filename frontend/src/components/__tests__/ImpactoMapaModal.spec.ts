@@ -2,7 +2,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
-import {TipoImpactoCompetencia} from "@/types/impacto";
+import {TipoImpactoCompetencia} from "@/types/tipos";
 import {useMapasStore} from "@/stores/mapas";
 
 describe("ImpactoMapaModal.vue", () => {

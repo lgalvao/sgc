@@ -75,7 +75,8 @@
                   <BButton
                       :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
                       :disabled="loginStep > 1"
-                      variant="outline-secondary"
+                      variant="link"
+                      class="text-secondary border-0"
                       @click="showPassword = !showPassword"
                   >
                     <i
@@ -97,7 +98,7 @@
                   data-testid="lbl-login-perfil"
                   for="par"
               >
-                Selecione o Perfil e a Unidade
+                Selecione o perfil e a unidade
               </label>
               <BFormSelect
                   id="par"
@@ -213,7 +214,7 @@ const handleLogin = async () => {
           feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
         }
       } else {
-        feedbackStore.show("Falha na autenticação", "Título ou senha inválidos.", "danger");
+        feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
       }
     } catch (error) {
       console.error("Erro no login:", error);

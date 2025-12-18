@@ -22,7 +22,7 @@ Fluxo principal:
 5. Caso o usuário não seja autenticado com as credenciais fornecidas, sistema mostra a mensagem
    `Título ou senha inválidos.`
 
-6. Caso o usuário seja autenticado, o sistema consulta perfis e unidades do usuário nas views conectadas ao ba.
+6. Caso o usuário seja autenticado, o sistema consulta perfis e unidades do usuário nas views do banco de dados.
    Importante: Um usuário pode estar
    em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um perfil.
 
@@ -63,11 +63,10 @@ Fluxo principal:
 
     9.1.2. Itens adicionais, alinhados à direita:
     - Para todos os perfis:
-        - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`). Se perfil for ADMIN,
-          não mostrar sigla da unidade, apenas o perfil: `ADMIN`.
-        - `Ícone de logout` - faz logout e mostra tela Login
+        - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`).
+        - `Ícone de logout` - faz logout e mostra tela `Login`
     - Se perfil ADMIN:
-        - Mostrar `Ícone de engrenagem` para acesso à tela `Configurações`
+        - Mostrar adicionalmente o `ícone de engrenagem` para acesso à tela `Configurações`
 
     9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
 

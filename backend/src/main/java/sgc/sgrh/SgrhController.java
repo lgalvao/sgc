@@ -12,6 +12,7 @@ import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.model.Perfil;
 
+import sgc.sgrh.model.Usuario;
 import sgc.sgrh.dto.UsuarioDto;
 
 import java.util.List;
@@ -70,9 +71,11 @@ public class SgrhController {
     @PostMapping("/entrar")
     public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
         String token = sgrhService.entrar(request);
+        Usuario usuario = sgrhService.buscarUsuarioPorLogin(request.getTituloEleitoral());
         
         LoginResp response = LoginResp.builder()
                 .tituloEleitoral(request.getTituloEleitoral())
+                .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.getPerfil()))
                 .unidadeCodigo(request.getUnidadeCodigo())
                 .token(token)

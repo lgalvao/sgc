@@ -3,10 +3,10 @@ import {ref} from "vue";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useFeedbackStore} from "@/stores/feedback";
-import type {ImpactoMapa} from "@/types/impacto";
 import type {
     Competencia,
     DisponibilizarMapaRequest,
+    ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,

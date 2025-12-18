@@ -9,10 +9,11 @@ const props = defineProps<{
   criterioOrdenacao: keyof ProcessoResumo | "dataFinalizacao";
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
+  compacto?: boolean;
 }>();
 
 /**
- * TabelaProcessos - Componente de apresentação "burro"
+ * TabelaProcessos - Componente de apresentação "leve"
  *
  * IMPORTANTE: Este componente NÃO ordena dados localmente.
  * A ordenação é SERVER-SIDE e funciona da seguinte forma:
@@ -27,6 +28,8 @@ const props = defineProps<{
  *
  * Props 'criterioOrdenacao' e 'direcaoOrdenacaoAsc' são usadas apenas
  * para indicar visualmente qual coluna está ordenada (setas na UI).
+ *
+ * Em modo 'compacto', a ordenação visual e funcional é desativada.
  */
 const emit = defineEmits<{
   (e: "ordenar", campo: keyof ProcessoResumo | "dataFinalizacao"): void;
@@ -34,10 +37,12 @@ const emit = defineEmits<{
 }>();
 
 const fields = computed(() => {
+  const unidadesLabel = props.compacto ? "Unidades" : "Unidades participantes";
+
   const baseFields = [
     {key: "descricao", label: "Descrição", sortable: true},
     {key: "tipo", label: "Tipo", sortable: true},
-    {key: "unidadesParticipantes", label: "Unidades Participantes", sortable: false},
+    {key: "unidadesParticipantes", label: unidadesLabel, sortable: false},
   ];
 
   if (props.showDataFinalizacao) {

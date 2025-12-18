@@ -16,7 +16,7 @@ export async function criarProcesso(page: Page, options: {
     descricao: string;
     tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO';
     diasLimite: number;
-    unidade: string;
+    unidade: string | string[];
     expandir?: string[];
     iniciar?: boolean;
 }): Promise<void> {
@@ -34,7 +34,11 @@ export async function criarProcesso(page: Page, options: {
         }
     }
 
-    await page.getByTestId(`chk-arvore-unidade-${options.unidade}`).check();
+    const unidades = Array.isArray(options.unidade) ? options.unidade : [options.unidade];
+    for (const u of unidades) {
+        await page.getByTestId(`chk-arvore-unidade-${u}`).check();
+    }
+
     if (options.iniciar) {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

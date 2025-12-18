@@ -22,14 +22,26 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-        // Tenta salvar vazio -> Erro de descrição
-        await page.getByTestId('btn-processo-salvar').click();
-        await expect(page.getByText('Preencha a descrição')).toBeVisible();
+        // Verifica que botões estão desativados quando formulário está vazio
+        await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+        await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
 
-        // Preenche descrição e tenta salvar -> Erro de unidade
+        // Preenche descrição - botões ainda devem estar desativados (falta data e unidade)
         await page.getByTestId('inp-processo-descricao').fill('Descrição Teste');
-        await page.getByTestId('btn-processo-salvar').click();
-        await expect(page.getByText('Pelo menos uma unidade participante deve ser incluída.')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+
+        // Preenche data limite - botões ainda devem estar desativados (falta unidade)
+        const dataLimite = new Date();
+        dataLimite.setDate(dataLimite.getDate() + 30);
+        await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
+        await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+
+        // Seleciona unidade - agora botões devem estar habilitados
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
+        await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
+        await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
 
     test('Deve editar um processo existente', async ({page}) => {
