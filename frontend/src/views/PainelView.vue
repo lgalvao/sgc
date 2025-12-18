@@ -77,12 +77,15 @@ async function carregarDados() {
         0,
         10,
     ); // Paginação inicial
-    await alertasStore.buscarAlertas(
-        Number(perfil.servidorId) || 0,
-        Number(perfil.unidadeSelecionada),
-        0,
-        10,
-    ); // Paginação inicial
+
+    if (perfil.usuarioCodigo) {
+      await alertasStore.buscarAlertas(
+          Number(perfil.usuarioCodigo),
+          Number(perfil.unidadeSelecionada),
+          0,
+          10,
+      ); // Paginação inicial
+    }
   }
 }
 
@@ -130,13 +133,15 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaCriterio.value = campo;
     alertaAsc.value = campo !== "data";
   }
-  alertasStore.buscarAlertas(
-      Number(perfil.servidorId) || 0,
-      Number(perfil.unidadeSelecionada),
-      0,
-      10,
-      alertaCriterio.value,
-      alertaAsc.value ? "asc" : "desc",
-  );
+  if (perfil.usuarioCodigo) {
+    alertasStore.buscarAlertas(
+        Number(perfil.usuarioCodigo),
+        Number(perfil.unidadeSelecionada),
+        0,
+        10,
+        alertaCriterio.value,
+        alertaAsc.value ? "asc" : "desc",
+    );
+  }
 }
 </script>

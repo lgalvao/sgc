@@ -6,9 +6,9 @@ import * as usuarioService from "../services/usuarioService";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const usePerfilStore = defineStore("perfil", () => {
-    const servidorId = ref<number | null>(
-        localStorage.getItem("idServidor")
-            ? Number(localStorage.getItem("idServidor"))
+    const usuarioCodigo = ref<number | null>(
+        localStorage.getItem("usuarioCodigo")
+            ? Number(localStorage.getItem("usuarioCodigo"))
             : null,
     );
     const perfilSelecionado = ref<Perfil | null>(
@@ -38,9 +38,9 @@ export const usePerfilStore = defineStore("perfil", () => {
         lastError.value = null;
     }
 
-    function definirServidorId(novoId: string | number) {
-        servidorId.value = Number(novoId);
-        localStorage.setItem("idServidor", String(novoId));
+    function definirUsuarioCodigo(novoId: string | number) {
+        usuarioCodigo.value = Number(novoId);
+        localStorage.setItem("usuarioCodigo", String(novoId));
     }
 
     function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
@@ -99,7 +99,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                         perfilUnidadeSelecionado.unidade.sigla,
                         loginResponse.nome,
                     );
-                    definirServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
+                    definirUsuarioCodigo(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
                     definirToken(loginResponse.token); // Adicionar esta linha
                 }
                 return true;
@@ -134,7 +134,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 perfilUnidade.unidade.sigla,
                 loginResponse.nome,
             );
-            definirServidorId(loginResponse.tituloEleitoral);
+            definirUsuarioCodigo(loginResponse.tituloEleitoral);
             definirToken(loginResponse.token);
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -143,14 +143,14 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function logout() {
-        servidorId.value = null;
+        usuarioCodigo.value = null;
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
         unidadeSelecionadaSigla.value = null;
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-        localStorage.removeItem("idServidor");
+        localStorage.removeItem("usuarioCodigo");
         localStorage.removeItem("perfilSelecionado");
         localStorage.removeItem("unidadeSelecionada");
         localStorage.removeItem("unidadeSelecionadaSigla");
@@ -160,7 +160,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     return {
-        servidorId,
+        usuarioCodigo,
         perfilSelecionado,
         unidadeSelecionada,
         unidadeSelecionadaSigla,
@@ -171,7 +171,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         isGestor,
         lastError,
         clearError,
-        definirServidorId,
+        definirUsuarioCodigo,
         definirPerfilUnidade,
         loginCompleto,
         selecionarPerfilUnidade,

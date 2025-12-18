@@ -22,7 +22,7 @@ export function usePerfil() {
     const unidadesFlat = computed<Unidade[]>(() => flattenUnidades(unidadesStore.unidades),);
 
     const servidorLogado = computed(() => {
-        const usuario = usuariosStore.obterUsuarioPorId(perfilStore.servidorId);
+        const usuario = usuariosStore.obterUsuarioPorId(perfilStore.usuarioCodigo);
         if (!usuario) return null;
         return {
             ...usuario,

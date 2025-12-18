@@ -17,7 +17,7 @@ export const useAlertasStore = defineStore("alertas", () => {
     }
 
     async function buscarAlertas(
-        usuarioTitulo: number,
+        usuarioCodigo: number,
         unidade: number,
         page: number,
         size: number,
@@ -27,7 +27,7 @@ export const useAlertasStore = defineStore("alertas", () => {
         lastError.value = null;
         try {
             const response = await painelService.listarAlertas(
-                usuarioTitulo,
+                usuarioCodigo,
                 unidade,
                 page,
                 size,
@@ -47,9 +47,9 @@ export const useAlertasStore = defineStore("alertas", () => {
         try {
             await alertaService.marcarComoLido(idAlerta);
             const perfilStore = usePerfilStore();
-            if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
+            if (perfilStore.usuarioCodigo && perfilStore.unidadeSelecionada) {
                 await buscarAlertas(
-                    Number(perfilStore.servidorId),
+                    Number(perfilStore.usuarioCodigo),
                     Number(perfilStore.unidadeSelecionada),
                     0,
                     20,

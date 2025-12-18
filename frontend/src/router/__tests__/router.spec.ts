@@ -26,7 +26,7 @@ describe('Router Guards', () => {
 
     // Setup Store Mock
     perfilStoreMock = {
-      servidorId: null,
+      usuarioCodigo: null,
     };
     (usePerfilStore as any).mockReturnValue(perfilStoreMock);
 
@@ -39,7 +39,7 @@ describe('Router Guards', () => {
     // Copying logic from router/index.ts for testing
     router.beforeEach((to: any, from: any, next: any) => {
         const perfilStore = usePerfilStore();
-        const isAuthenticated = perfilStore.servidorId;
+        const isAuthenticated = perfilStore.usuarioCodigo;
         const publicPages = ["/login"];
         const authRequired = !publicPages.includes(to.path);
 
@@ -58,25 +58,25 @@ describe('Router Guards', () => {
   });
 
   it('redirects to login if not authenticated and trying to access private route', async () => {
-    perfilStoreMock.servidorId = null;
+    perfilStoreMock.usuarioCodigo = null;
     await router.push('/painel');
     expect(router.currentRoute.value.path).toBe('/login');
   });
 
   it('allows access to login if not authenticated', async () => {
-    perfilStoreMock.servidorId = null;
+    perfilStoreMock.usuarioCodigo = null;
     await router.push('/login');
     expect(router.currentRoute.value.path).toBe('/login');
   });
 
   it('allows access to private route if authenticated', async () => {
-    perfilStoreMock.servidorId = 123;
+    perfilStoreMock.usuarioCodigo = 123;
     await router.push('/painel');
     expect(router.currentRoute.value.path).toBe('/painel');
   });
 
    it('updates document title', async () => {
-    perfilStoreMock.servidorId = 123;
+    perfilStoreMock.usuarioCodigo = 123;
     await router.push('/processo/cadastro');
     expect(document.title.toLowerCase()).toContain('novo processo - sgc');
   });
