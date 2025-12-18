@@ -77,7 +77,7 @@ const shouldShowNavBarExtras = computed(() => {
         v-if="shouldShowNavBarExtras"
         class="bg-light border-bottom"
     >
-      <div class="container py-2">
+      <div class="container pt-1 pb-2">
         <BarraNavegacao/>
       </div>
     </div>

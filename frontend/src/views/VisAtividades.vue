@@ -3,7 +3,6 @@
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
-      <span class="text-xs text-muted">Debug: {{ codSubprocesso }} | {{ isRevisao }} | {{ perfilSelecionado }}</span>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">

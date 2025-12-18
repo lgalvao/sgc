@@ -4,17 +4,17 @@
         v-if="shouldShowBackButton"
         v-b-tooltip.hover="'Voltar'"
         variant="outline-secondary"
-        size="sm"
         class="btn-voltar"
+        size="lg"
         data-testid="btn-nav-voltar"
         @click="goBack"
     >
-      <i class="bi bi-arrow-left"/>
+      <i class="bi bi-arrow-left-circle"/>
     </BButton>
 
     <BBreadcrumb
         v-if="shouldShowBreadcrumbs"
-        class="mb-0 breadcrumb-compacto"
+        class="py-0 mb-0 breadcrumb-compacto"
         data-testid="nav-breadcrumbs"
     >
       <BBreadcrumbItem
@@ -146,11 +146,10 @@ const crumbs = computed((): Breadcrumb[] => {
 .barra-navegacao {
   font-size: 0.85rem;
   line-height: 1;
-  min-height: 32px;
 }
 
 .btn-voltar {
-  padding: 0.1rem 0.35rem;
+  padding: 0.4rem;
   font-size: 0.75rem;
   border-color: #dee2e6;
   color: #6c757d;
@@ -158,6 +157,7 @@ const crumbs = computed((): Breadcrumb[] => {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 4px;
 }
 
 .btn-voltar:hover {
@@ -168,11 +168,15 @@ const crumbs = computed((): Breadcrumb[] => {
 
 .breadcrumb-compacto {
   --bs-breadcrumb-divider: '›';
-  margin: 0;
   padding: 0;
   background: transparent;
   display: flex;
   align-items: center;
+  margin: 3px 0 0;
+}
+
+:deep(.breadcrumb) {
+  margin-bottom: 0 !important;
 }
 
 :deep(.breadcrumb-item) {
@@ -200,7 +204,7 @@ const crumbs = computed((): Breadcrumb[] => {
   content: var(--bs-breadcrumb-divider, '›') !important;
   color: #adb5bd;
   padding: 0 0.5rem;
-  line-height: 1;
+  line-height: normal;
 }
 
 :deep(.bi-house-door) {
