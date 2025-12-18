@@ -1,21 +1,21 @@
-import type {Servidor} from "@/types/tipos";
+import type {Usuario} from "@/types/tipos";
 
 /**
- * src/mappers/servidores.ts
+ * src/mappers/usuarios.ts
  *
  * Mappers para converter objeto VW_USUARIO / JSON do backend para o tipo
- * frontend `Servidor`.
+ * frontend `Usuario`.
  *
  * Observações:
  * - O backend pode expor `titulo` (string) como identificador do usuário
  *   (`usuario_titulo`). Quando `titulo` for numérico, será convertido para
- *   `id` numérico. Caso contrário, tenta usar `id` fornecido; se nenhum
- *   identificador numérico estiver disponível, retorna `id = 0` (considere
+ *   `codigo` numérico. Caso contrário, tenta usar `codigo` fornecido; se nenhum
+ *   identificador numérico estiver disponível, retorna `codigo = 0` (considere
  *   ajustar para sua estratégia de identificação real).
  * - Campos alternativos são suportados (nome_completo, unidade_codigo, etc).
  */
 
-export function mapVWUsuarioToServidor(vw: any): Servidor {
+export function mapVWUsuarioToUsuario(vw: any): Usuario {
     const candidateId =
         vw?.id ??
         vw?.codigo ??
@@ -35,6 +35,6 @@ export function mapVWUsuarioToServidor(vw: any): Servidor {
     };
 }
 
-export function mapVWUsuariosArray(arr: any[] = []): Servidor[] {
-    return arr.map(mapVWUsuarioToServidor);
+export function mapVWUsuariosArray(arr: any[] = []): Usuario[] {
+    return arr.map(mapVWUsuarioToUsuario);
 }

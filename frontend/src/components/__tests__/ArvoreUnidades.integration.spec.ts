@@ -21,7 +21,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
             nome: 'Secretaria 1',
             tipo: 'INTEROPERACIONAL',
             isElegivel: true,
-            idServidorTitular: 0,
+            usuarioCodigo: 0,
             responsavel: null,
             filhas: [
                 {
@@ -30,7 +30,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                     nome: 'Assessoria 11',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -40,7 +40,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                     nome: 'Assessoria 12',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -50,7 +50,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                     nome: 'Coordenadoria 11',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: [
                         {
@@ -59,7 +59,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                             nome: 'Seção 111',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -69,7 +69,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                             nome: 'Seção 112',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -79,7 +79,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                             nome: 'Seção 113',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         }
@@ -91,7 +91,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                     nome: 'Coordenadoria 12',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: [
                         {
@@ -100,7 +100,7 @@ describe('ArvoreUnidades - Testes de Integração (TERIAM PEGADO OS BUGS)', () =
                             nome: 'Seção 121',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         }

@@ -7,7 +7,7 @@ import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
  * para os tipos frontend `Unidade` e `UnidadeSnapshot`.
  *
  * Regras:
- * - aceita campos alternativos: codigo/id, sigla, nome, idServidorTitular / titular_titulo
+ * - aceita campos alternativos: codigo/id, sigla, nome, usuarioCodigo / idServidorTitular / titular_titulo
  * - responsavel pode vir com chaves diferentes; mapeia para `Responsavel` com datas convertidas
  * - filhas (children) são mapeadas recursivamente
  */
@@ -30,8 +30,8 @@ export function mapUnidade(obj: any): Unidade {
         tipo: obj.tipo ?? obj.tipo_unidade ?? "",
         nome: obj.nome ?? obj.nome_unidade ?? "",
         isElegivel: obj.isElegivel,
-        idServidorTitular:
-            obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
+        usuarioCodigo:
+            obj.usuarioCodigo ?? obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
         responsavel: obj.responsavel
             ? {
                 codigo: obj.responsavel.codigo ?? 0,
@@ -42,7 +42,7 @@ export function mapUnidade(obj: any): Unidade {
                 ramal: obj.responsavel.ramal ?? "",
                 usuarioTitulo: obj.responsavel.usuarioTitulo ?? "",
                 unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
-                idServidor: obj.responsavel.idServidorResponsavel ?? 0,
+                usuarioCodigo: obj.responsavel.usuarioCodigo ?? obj.responsavel.idServidorResponsavel ?? 0,
                 tipo: obj.responsavel.tipo ?? "",
                 dataInicio: obj.responsavel.dataInicio ?? "",
                 dataFim: obj.responsavel.dataFim ?? null,
