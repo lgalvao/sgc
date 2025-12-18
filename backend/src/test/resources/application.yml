@@ -35,6 +35,7 @@ aplicacao:
   jwt:
     secret: sgc-secret-key-for-tests-only-do-not-use-in-prod-must-be-32-chars
     expiracao-minutos: 60
+  ambiente-testes: true
   email:
     remetente: test@example.com
     remetente-nome: Test

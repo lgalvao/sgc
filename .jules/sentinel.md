@@ -7,3 +7,8 @@
 **Vulnerability:** Missing length limits on authentication DTOs (`AutenticacaoReq`, `EntrarReq`) allowed potentially large payloads, posing a Denial of Service risk.
 **Learning:** Even simulated or internal-facing endpoints should validate input size to prevent resource exhaustion or unexpected behavior in the persistence layer.
 **Prevention:** Always apply `@Size` constraints to String fields in DTOs, especially those used in public endpoints.
+
+## 2025-05-23 - [Insecure Default in Authentication]
+**Vulnerability:** `SgrhService.autenticar` defaulted to returning `true` (bypass) if the AD Client bean was missing, assuming this meant a test environment. In production, a configuration error preventing bean creation would leave the system wide open.
+**Learning:** Implicit "fail-open" logic based on bean presence is dangerous. Security controls must explicitly verify the environment before bypassing checks.
+**Prevention:** Explicitly check configuration properties (e.g., `ambiente-testes`) and default to "Fail Closed" (deny access) if the environment is not explicitly safe.
