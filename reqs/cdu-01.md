@@ -13,18 +13,16 @@ Fluxo principal:
 
 1. O usuário acessa o sistema
 
-2. O sistema exibe a tela de Login
+2. O sistema exibe a tela `Login`
 
 3. O usuário informa suas credenciais: número do título de eleitor e senha
 
-4. O sistema verifica título/senha através da API do Sistema Acesso do TRE-PE
+4. O sistema verifica título e a senha (autenticação simples) através da API do Sistema 'Acesso AD' do TRE-PE
 
 5. Caso o usuário não seja autenticado com as credenciais fornecidas, sistema mostra a mensagem
    `Título ou senha inválidos.`
 
-6. Caso o usuário seja autenticado, o sistema consulta perfis e unidades do usuário nas views do banco de dados.
-   Importante: Um usuário pode estar
-   em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um perfil.
+6. Caso o usuário seja autenticado, o sistema consulta os perfis e as unidades do usuário nas views do banco de dados. Importante: Um usuário pode estar em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um perfil.
 
 7. O sistema determina os perfis disponíveis para o usuário, seguindo estas regras, não exclusivas:
     - ADMIN: Se usuário estiver cadastrado como administrador do sistema.
