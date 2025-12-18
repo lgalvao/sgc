@@ -13,6 +13,16 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Garantir que tabelas clicáveis sempre mostrem o cursor de ponteiro */
+.table-hover tbody tr {
+    cursor: pointer;
+}
+
+.table-hover tbody tr td {
+    cursor: pointer;
+    user-select: none;
+}
+
 @media (prefers-color-scheme: light) {
     :root {
         color: #213547;

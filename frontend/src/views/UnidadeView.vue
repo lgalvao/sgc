@@ -1,18 +1,5 @@
 <template>
   <BContainer class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <BButton
-            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            data-testid="unidade-view__btn-criar-atribuicao"
-            variant="outline-primary"
-            @click="irParaCriarAtribuicao"
-        >
-          Criar atribuição
-        </BButton>
-      </div>
-    </div>
-
     <BCard
         v-if="unidadeComResponsavelDinamico"
         class="mb-4"
@@ -48,6 +35,15 @@
           <i
               class="bi bi-file-earmark-spreadsheet me-2"
           />Mapa vigente
+        </BButton>
+        <BButton
+            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            class="ms-2"
+            data-testid="unidade-view__btn-criar-atribuicao"
+            variant="outline-primary"
+            @click="irParaCriarAtribuicao"
+        >
+          Criar atribuição
         </BButton>
       </BCardBody>
     </BCard>

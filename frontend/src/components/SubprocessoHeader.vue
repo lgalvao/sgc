@@ -11,18 +11,21 @@
       >
         Processo: {{ processoDescricao }}
       </p>
-      <h2
-          class="display-6 mb-3"
-          data-testid="subprocesso-header__txt-header-unidade"
-      >
-        {{ unidadeSigla }} - {{ unidadeNome }}
-      </h2>
+      <div class="mb-3">
+        <h2
+            class="display-6 mb-0"
+            data-testid="subprocesso-header__txt-header-unidade"
+        >
+          {{ unidadeSigla }}
+        </h2>
+        <div class="text-muted">
+          {{ unidadeNome }}
+        </div>
+      </div>
       <p>
         <span class="fw-bold me-1">Situação:</span>
         <span
-            :class="badgeClass(situacao)"
-            class="badge"
-            data-testid="subprocesso-header__txt-badge-situacao"
+            data-testid="subprocesso-header__txt-situacao"
         >{{ situacao }}</span>
       </p>
 
@@ -39,10 +42,6 @@
           <i class="bi bi-envelope-fill ms-3 me-2"/>{{ responsavelEmail }}
         </p>
       </template>
-
-      <p v-if="unidadeAtual">
-        <strong>Unidade atual:</strong> {{ unidadeAtual }}
-      </p>
 
       <!-- Botão para alterar data limite -->
       <div
@@ -64,7 +63,6 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody} from "bootstrap-vue-next";
-import {badgeClass} from "@/utils";
 
 interface Props {
   processoDescricao: string;
@@ -77,7 +75,6 @@ interface Props {
   responsavelNome?: string;
   responsavelRamal?: string;
   responsavelEmail?: string;
-  unidadeAtual?: string;
   podeAlterarDataLimite: boolean;
 }
 

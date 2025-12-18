@@ -12,7 +12,10 @@ const processoRoutes: RouteRecordRaw[] = [
         name: "Processo",
         component: () => import("@/views/ProcessoView.vue"),
         props: true,
-        meta: {title: "Unidades do Processo"},
+        meta: {
+            title: "Unidades do Processo",
+            breadcrumb: "Detalhes do processo",
+        },
     },
     {
         path: "/processo/:codProcesso/:siglaUnidade",
@@ -22,7 +25,10 @@ const processoRoutes: RouteRecordRaw[] = [
             codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade,
         }),
-        meta: {title: "Processos da Unidade"},
+        meta: {
+            title: "Processos da Unidade",
+            breadcrumb: (route: RouteLocationNormalized) => route.params.siglaUnidade as string,
+        },
     },
     {
         path: "/processo/:codProcesso/:siglaUnidade/mapa",

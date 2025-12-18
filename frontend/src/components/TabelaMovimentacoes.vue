@@ -3,7 +3,7 @@
     <h4>Movimentações</h4>
     <div
         v-if="movimentacoes.length === 0"
-        class="alert alert-info"
+        class="text-muted small mt-2 mb-4"
     >
       Nenhuma movimentação registrada.
     </div>

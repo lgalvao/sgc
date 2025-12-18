@@ -22,10 +22,6 @@
             <BCardText class="text-muted">
               Cadastro de atividades e conhecimentos da unidade
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
         <BCard
@@ -45,10 +41,6 @@
             <BCardText class="text-muted">
               Visualização das atividades e conhecimentos da unidade
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
       </BCol>
@@ -76,10 +68,6 @@
             <BCardText class="text-muted">
               Mapa de competências técnicas da unidade
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
         <BCard
@@ -101,10 +89,6 @@
             <BCardText class="text-muted">
               Visualização do mapa de competências técnicas
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
       </BCol>
@@ -132,10 +116,6 @@
             <BCardText class="text-muted">
               Realize sua autoavaliação de competências
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
       </BCol>
@@ -160,10 +140,6 @@
             <BCardText class="text-muted">
               Identificação das ocupações críticas da unidade
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
       </BCol>
@@ -187,10 +163,6 @@
             <BCardText class="text-muted">
               Acompanhamento e conclusão do diagnóstico da unidade
             </BCardText>
-            <span
-                :class="badgeClass(situacao)"
-                class="badge"
-            >{{ situacaoLabel(situacao) }}</span>
           </div>
         </BCard>
       </BCol>
@@ -202,7 +174,6 @@
 import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {type Mapa, type MapaCompleto, SubprocessoPermissoes, TipoProcesso,} from "@/types/tipos";
-import {badgeClass, situacaoLabel} from "@/utils";
 
 const TipoProcessoEnum = TipoProcesso;
 

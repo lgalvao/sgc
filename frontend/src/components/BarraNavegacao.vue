@@ -1,18 +1,20 @@
 <template>
-  <div class="d-flex align-items-center gap-3">
+  <div class="barra-navegacao d-flex align-items-center gap-2">
     <BButton
         v-if="shouldShowBackButton"
-        variant="primary"
+        v-b-tooltip.hover="'Voltar'"
+        variant="outline-secondary"
         size="sm"
+        class="btn-voltar"
         data-testid="btn-nav-voltar"
         @click="goBack"
     >
-      <i class="bi bi-arrow-left"/> Voltar
+      <i class="bi bi-arrow-left"/>
     </BButton>
 
     <BBreadcrumb
         v-if="shouldShowBreadcrumbs"
-        class="mb-0"
+        class="mb-0 breadcrumb-compacto"
         data-testid="nav-breadcrumbs"
     >
       <BBreadcrumbItem
@@ -34,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BBreadcrumb, BBreadcrumbItem, BButton} from "bootstrap-vue-next";
+import {BBreadcrumb, BBreadcrumbItem, BButton, vBTooltip} from "bootstrap-vue-next";
 import {computed} from "vue";
 import {type RouteLocationNamedRaw, useRoute, useRouter} from "vue-router";
 import {usePerfilStore} from "@/stores/perfil";
@@ -69,41 +71,71 @@ const crumbs = computed((): Breadcrumb[] => {
   // Add home breadcrumb
   breadcrumbs.push({label: "Painel", to: {name: "Painel"}, isHome: true});
 
-  // Iterate over matched routes to build breadcrumbs
-  route.matched.forEach((routeRecord) => {
-    const {meta, name} = routeRecord;
+  const routeName = route.name as string;
+  const codProcesso = route.params.codProcesso as string;
+  const siglaUnidade = route.params.siglaUnidade as string;
 
-    const shouldAddCrumb = () => {
-      return !(
-          name === "Processo" &&
-          (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR)
-      );
-    };
+  // Verifica se é uma rota de processo ou subprocesso
+  const isProcessoRoute = routeName === "Processo";
+  const isSubprocessoRoute = [
+    "Subprocesso",
+    "SubprocessoMapa",
+    "SubprocessoVisMapa",
+    "SubprocessoCadastro",
+    "SubprocessoVisCadastro",
+  ].includes(routeName);
 
-    if (meta.breadcrumb && shouldAddCrumb()) {
-      const label =
-          typeof meta.breadcrumb === "function"
-              ? meta.breadcrumb(route)
-              : (meta.breadcrumb as string);
+  // Para CHEFE e SERVIDOR, não mostra "Detalhes do processo"
+  const shouldShowProcessoCrumb =
+      perfilUsuario !== Perfil.CHEFE && perfilUsuario !== Perfil.SERVIDOR;
 
-      if (label) {
-        // Add breadcrumb if it doesn't already exist as the last one
-        if (
-            breadcrumbs.length === 0 ||
-            breadcrumbs[breadcrumbs.length - 1].label !== label
-        ) {
-          breadcrumbs.push({
-            label,
-            to: {name: name as string, params: route.params},
-          });
+  // Adiciona breadcrumb de "Detalhes do processo" se aplicável
+  if (codProcesso && (isProcessoRoute || isSubprocessoRoute)) {
+    if (shouldShowProcessoCrumb) {
+      breadcrumbs.push({
+        label: "Detalhes do processo",
+        to: isProcessoRoute ? undefined : {name: "Processo", params: {codProcesso}},
+      });
+    }
+  }
+
+  // Adiciona breadcrumb do subprocesso (sigla da unidade)
+  if (siglaUnidade && isSubprocessoRoute) {
+    breadcrumbs.push({
+      label: siglaUnidade,
+      to: routeName === "Subprocesso" ? undefined : {name: "Subprocesso", params: {codProcesso, siglaUnidade}},
+    });
+  }
+
+  // Para outras rotas, usa a lógica padrão baseada em meta.breadcrumb
+  if (!isProcessoRoute && !isSubprocessoRoute) {
+    route.matched.forEach((routeRecord) => {
+      const {meta, name} = routeRecord;
+
+      if (meta.breadcrumb) {
+        const label =
+            typeof meta.breadcrumb === "function"
+                ? meta.breadcrumb(route)
+                : (meta.breadcrumb as string);
+
+        if (label) {
+          if (
+              breadcrumbs.length === 0 ||
+              breadcrumbs[breadcrumbs.length - 1].label !== label
+          ) {
+            breadcrumbs.push({
+              label,
+              to: {name: name as string, params: route.params},
+            });
+          }
         }
       }
-    }
-  });
+    });
 
-  // Remove link from the last breadcrumb
-  if (breadcrumbs.length > 0) {
-    breadcrumbs[breadcrumbs.length - 1].to = undefined;
+    // Remove link from the last breadcrumb
+    if (breadcrumbs.length > 0) {
+      breadcrumbs[breadcrumbs.length - 1].to = undefined;
+    }
   }
 
   return breadcrumbs;
@@ -111,15 +143,70 @@ const crumbs = computed((): Breadcrumb[] => {
 </script>
 
 <style scoped>
-.breadcrumb {
+.barra-navegacao {
+  font-size: 0.85rem;
+  line-height: 1;
+  min-height: 32px;
+}
+
+.btn-voltar {
+  padding: 0.1rem 0.35rem;
+  font-size: 0.75rem;
+  border-color: #dee2e6;
+  color: #6c757d;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-voltar:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+}
+
+.breadcrumb-compacto {
   --bs-breadcrumb-divider: '›';
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
 }
 
-.breadcrumb-item a {
-  text-decoration: none;
+:deep(.breadcrumb-item) {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
 }
 
-.breadcrumb-item.active {
-  font-weight: bold;
+:deep(.breadcrumb-item a) {
+  text-decoration: none !important;
+  color: #6c757d !important;
+  transition: color 0.2s;
+}
+
+:deep(.breadcrumb-item a:hover) {
+  color: #212529 !important;
+}
+
+:deep(.breadcrumb-item.active) {
+  color: #212529 !important;
+  font-weight: 400;
+}
+
+:deep(.breadcrumb-item + .breadcrumb-item::before) {
+  content: var(--bs-breadcrumb-divider, '›') !important;
+  color: #adb5bd;
+  padding: 0 0.5rem;
+  line-height: 1;
+}
+
+:deep(.bi-house-door) {
+  color: #6c757d;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  margin-top: -2px;
 }
 </style>

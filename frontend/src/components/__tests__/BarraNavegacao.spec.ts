@@ -23,11 +23,11 @@ vi.mock("vue-router", () => ({
 }));
 
 // Helper to create mock routes
-const createMockRoute = (path: string, matched: any[]) => ({
+const createMockRoute = (path: string, matched: any[], routeName = "", params: Record<string, string> = {}) => ({
     path,
     matched,
-    params: {id: "123"},
-    name: "",
+    params,
+    name: routeName,
     fullPath: path,
     query: {},
     hash: "",
@@ -35,10 +35,19 @@ const createMockRoute = (path: string, matched: any[]) => ({
     redirectedFrom: undefined,
 });
 
-const mockMatchedDefault = [
+const mockMatchedProcesso = [
     {name: "Painel", meta: {}},
-    {name: "Processo", meta: {breadcrumb: "Processos"}},
-    {name: "Subprocesso", meta: {breadcrumb: "Detalhes"}},
+    {name: "Processo", meta: {}},
+];
+
+const mockMatchedSubprocesso = [
+    {name: "Painel", meta: {}},
+    {name: "Subprocesso", meta: {}},
+];
+
+const mockMatchedUnidade = [
+    {name: "Painel", meta: {}},
+    {name: "Unidade", meta: {breadcrumb: "Minha unidade"}},
 ];
 
 const getMountOptions = (pinia: any) => ({
@@ -79,7 +88,7 @@ describe("BarraNavegacao.vue", () => {
 
         it("deve exibir o botão de voltar e os breadcrumbs em outras páginas", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
             const wrapper = mount(
                 BarraNavegacao,
@@ -91,9 +100,9 @@ describe("BarraNavegacao.vue", () => {
     });
 
     describe("Renderização dos Breadcrumbs", () => {
-        it("deve renderizar os breadcrumbs corretamente a partir da rota", () => {
+        it("deve renderizar breadcrumbs para rota de Processo", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
             const pinia = createTestingPinia({createSpy: vi.fn});
             const perfilStore = usePerfilStore(pinia);
@@ -101,32 +110,52 @@ describe("BarraNavegacao.vue", () => {
             const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(3);
-            expect(
-                items[0].find('[data-testid="btn-nav-home"]').exists(),
-            ).toBe(true);
-            expect(items[1].text()).toBe("Processos");
-            expect(items[2].text()).toBe("Detalhes");
+            expect(items).toHaveLength(2); // Home + "Detalhes do processo"
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+            expect(items[1].text()).toBe("Detalhes do processo");
         });
 
-        it("o último breadcrumb não deve ser um link", () => {
+        it("deve renderizar breadcrumbs para rota de Subprocesso", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute(
+                    "/processo/123/ASSESSORIA_12",
+                    mockMatchedSubprocesso,
+                    "Subprocesso",
+                    {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
+                ),
             );
-            const wrapper = mount(
-                BarraNavegacao,
-                getMountOptions(createTestingPinia({createSpy: vi.fn})),
-            );
+            const pinia = createTestingPinia({createSpy: vi.fn});
+            const perfilStore = usePerfilStore(pinia);
+            perfilStore.perfilSelecionado = Perfil.ADMIN;
+            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items[2].findComponent(RouterLinkStub).exists()).toBe(false);
-            expect(items[2].find("span").exists()).toBe(true);
+            expect(items).toHaveLength(3); // Home + "Detalhes do processo" + sigla
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+            expect(items[1].text()).toBe("Detalhes do processo");
+            expect(items[2].text()).toBe("ASSESSORIA_12");
+        });
+
+        it("deve renderizar breadcrumbs para outras rotas", () => {
+            vi.mocked(useRoute).mockReturnValue(
+                createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {id: "1"}),
+            );
+            const pinia = createTestingPinia({createSpy: vi.fn});
+            const perfilStore = usePerfilStore(pinia);
+            perfilStore.perfilSelecionado = Perfil.ADMIN;
+            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+
+            const items = wrapper.findAllComponents(BBreadcrumbItem);
+            expect(items).toHaveLength(2); // Home + "Minha unidade"
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+            expect(items[1].text()).toBe("Minha unidade");
         });
     });
 
     describe("Lógica de Perfil", () => {
-        it("deve omitir o breadcrumb de Processo para o perfil CHEFE", () => {
+        it("deve omitir o breadcrumb 'Detalhes do processo' para o perfil CHEFE", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
             const pinia = createTestingPinia({createSpy: vi.fn});
             const perfilStore = usePerfilStore(pinia);
@@ -135,16 +164,13 @@ describe("BarraNavegacao.vue", () => {
             const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(2);
-            expect(
-                items[0].find('[data-testid="btn-nav-home"]').exists(),
-            ).toBe(true);
-            expect(items[1].text()).toBe("Detalhes");
+            expect(items).toHaveLength(1); // Apenas Home
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
         });
 
-        it("deve omitir o breadcrumb de Processo para o perfil SERVIDOR", () => {
+        it("deve omitir o breadcrumb 'Detalhes do processo' para o perfil SERVIDOR", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
             const pinia = createTestingPinia({createSpy: vi.fn});
             const perfilStore = usePerfilStore(pinia);
@@ -153,18 +179,36 @@ describe("BarraNavegacao.vue", () => {
             const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(2);
-            expect(
-                items[0].find('[data-testid="btn-nav-home"]').exists(),
-            ).toBe(true);
-            expect(items[1].text()).toBe("Detalhes");
+            expect(items).toHaveLength(1); // Apenas Home
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+        });
+
+        it("deve mostrar sigla da unidade para CHEFE em Subprocesso", () => {
+            vi.mocked(useRoute).mockReturnValue(
+                createMockRoute(
+                    "/processo/123/ASSESSORIA_12",
+                    mockMatchedSubprocesso,
+                    "Subprocesso",
+                    {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
+                ),
+            );
+            const pinia = createTestingPinia({createSpy: vi.fn});
+            const perfilStore = usePerfilStore(pinia);
+            perfilStore.perfilSelecionado = Perfil.CHEFE;
+
+            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+
+            const items = wrapper.findAllComponents(BBreadcrumbItem);
+            expect(items).toHaveLength(2); // Home + sigla (sem "Detalhes do processo")
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+            expect(items[1].text()).toBe("ASSESSORIA_12");
         });
     });
 
     describe("Funcionalidade", () => {
         it("deve chamar router.back() ao clicar no botão de voltar", async () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedDefault),
+                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
             const wrapper = mount(
                 BarraNavegacao,

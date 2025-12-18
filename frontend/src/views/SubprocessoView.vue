@@ -11,7 +11,6 @@
         :titular-email="subprocesso.titular?.email || ''"
         :titular-nome="subprocesso.titular?.nome || ''"
         :titular-ramal="subprocesso.titular?.ramal || ''"
-        :unidade-atual="subprocesso.unidade.sigla"
         :unidade-nome="subprocesso.unidade.nome"
         :unidade-sigla="subprocesso.unidade.sigla"
         @alterar-data-limite="abrirModalAlterarDataLimite"
