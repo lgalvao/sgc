@@ -121,8 +121,22 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
 
-        // Passo 2.2: Clicar na unidade subordinada
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        // Aguardar página de Detalhes do processo carregar
+        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        
+        // Passo 2.2: Clicar na unidade subordinada - esperar a tabela de dados carregar
+        const tabela = page.getByTestId('tbl-tree');
+        await expect(tabela).toBeVisible();
+        
+        // Clicar na célula SECAO_221 dentro da tabela de unidades
+        const celula = tabela.getByRole('cell', {name: 'SECAO_221'}).first();
+        await expect(celula).toBeVisible();
+        await celula.click();
+        
+        // Aguardar navegação para Detalhes do subprocesso
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        
         // Passo 2.3: Verificar visualização
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
@@ -163,7 +177,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
         // Verificar sigla da unidade
-        await expect(page.getByRole('heading', {name: /Seção 221/})).toBeVisible();
+        await expect(page.getByText('Seção 221')).toBeVisible();
 
         // Verificar atividades aparecem como tabelas com descrição
         await expect(page.getByText(atividadeA)).toBeVisible();
