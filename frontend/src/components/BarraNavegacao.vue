@@ -40,6 +40,7 @@ import {BBreadcrumb, BBreadcrumbItem, BButton, vBTooltip} from "bootstrap-vue-ne
 import {computed} from "vue";
 import {type RouteLocationNamedRaw, useRoute, useRouter} from "vue-router";
 import {usePerfilStore} from "@/stores/perfil";
+import {useUnidadesStore} from "@/stores/unidades";
 import {Perfil} from "@/types/tipos";
 
 const route = useRoute();
@@ -66,6 +67,7 @@ const shouldShowBreadcrumbs = computed(
 const crumbs = computed((): Breadcrumb[] => {
   const breadcrumbs: Breadcrumb[] = [];
   const perfil = usePerfilStore();
+  const unidadesStore = useUnidadesStore();
   const perfilUsuario = perfil.perfilSelecionado;
 
   // Add home breadcrumb
@@ -74,6 +76,7 @@ const crumbs = computed((): Breadcrumb[] => {
   const routeName = route.name as string;
   const codProcesso = route.params.codProcesso as string;
   const siglaUnidade = route.params.siglaUnidade as string;
+  const codUnidade = route.params.codUnidade as string;
 
   // Verifica se é uma rota de processo ou subprocesso
   const isProcessoRoute = routeName === "Processo";
@@ -83,6 +86,13 @@ const crumbs = computed((): Breadcrumb[] => {
     "SubprocessoVisMapa",
     "SubprocessoCadastro",
     "SubprocessoVisCadastro",
+  ].includes(routeName);
+  
+  // Verifica se é uma rota de unidade
+  const isUnidadeRoute = [
+    "Unidade",
+    "Mapa",
+    "AtribuicaoTemporariaForm",
   ].includes(routeName);
 
   // Para CHEFE e SERVIDOR, não mostra "Detalhes do processo"
@@ -105,10 +115,50 @@ const crumbs = computed((): Breadcrumb[] => {
       label: siglaUnidade,
       to: routeName === "Subprocesso" ? undefined : {name: "Subprocesso", params: {codProcesso, siglaUnidade}},
     });
+
+    // Adiciona breadcrumb final para páginas específicas do subprocesso
+    const pageTitles: Record<string, string> = {
+      SubprocessoMapa: "Mapa de competências",
+      SubprocessoVisMapa: "Visualizar mapa",
+      SubprocessoCadastro: "Atividades e conhecimentos",
+      SubprocessoVisCadastro: "Atividades e conhecimentos",
+    };
+
+    const pageTitle = pageTitles[routeName];
+    if (pageTitle) {
+      breadcrumbs.push({
+        label: pageTitle,
+      });
+    }
+  }
+
+  // Adiciona breadcrumbs para rotas de unidade
+  if (codUnidade && isUnidadeRoute) {
+    // Obtém a sigla da unidade do store (se carregada)
+    const siglaUnidadeStore = unidadesStore.unidade?.sigla;
+    
+    breadcrumbs.push({
+      label: siglaUnidadeStore || `Unidade ${codUnidade}`,
+      to: routeName === "Unidade" ? undefined : {name: "Unidade", params: {codUnidade}},
+    });
+
+    // Adiciona breadcrumb final para páginas específicas de unidade
+    const unidadePageTitles: Record<string, string> = {
+      Unidade: "Minha unidade",
+      Mapa: "Mapa de competências",
+      AtribuicaoTemporariaForm: "Atribuição temporária",
+    };
+
+    const unidadePageTitle = unidadePageTitles[routeName];
+    if (unidadePageTitle) {
+      breadcrumbs.push({
+        label: unidadePageTitle,
+      });
+    }
   }
 
   // Para outras rotas, usa a lógica padrão baseada em meta.breadcrumb
-  if (!isProcessoRoute && !isSubprocessoRoute) {
+  if (!isProcessoRoute && !isSubprocessoRoute && !isUnidadeRoute) {
     route.matched.forEach((routeRecord) => {
       const {meta, name} = routeRecord;
 

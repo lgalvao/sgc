@@ -45,6 +45,11 @@ const mockMatchedSubprocesso = [
     {name: "Subprocesso", meta: {}},
 ];
 
+const mockMatchedSubprocessoVisCadastro = [
+    {name: "Painel", meta: {}},
+    {name: "SubprocessoVisCadastro", meta: {}},
+];
+
 const mockMatchedUnidade = [
     {name: "Painel", meta: {}},
     {name: "Unidade", meta: {breadcrumb: "Minha unidade"}},
@@ -136,9 +141,9 @@ describe("BarraNavegacao.vue", () => {
             expect(items[2].text()).toBe("ASSESSORIA_12");
         });
 
-        it("deve renderizar breadcrumbs para outras rotas", () => {
+        it("deve renderizar breadcrumbs para rotas de unidade", () => {
             vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {id: "1"}),
+                createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
             const pinia = createTestingPinia({createSpy: vi.fn});
             const perfilStore = usePerfilStore(pinia);
@@ -146,9 +151,11 @@ describe("BarraNavegacao.vue", () => {
             const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(2); // Home + "Minha unidade"
+            expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("Minha unidade");
+            // Sem unidade carregada no store, mostra "Unidade X"
+            expect(items[1].text()).toBe("Unidade 1");
+            expect(items[2].text()).toBe("Minha unidade");
         });
     });
 
