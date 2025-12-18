@@ -36,7 +36,7 @@ export interface Unidade {
     unidadeSuperiorCodigo?: number;
     filhas?: Unidade[];
     tipo?: string;
-    idServidorTitular?: number;
+    usuarioCodigo?: number;
     tituloTitular?: string;
     isElegivel?: boolean;
     responsavel?: Responsavel | null;
@@ -51,7 +51,7 @@ export interface Responsavel {
     ramal: string;
     usuarioTitulo: string;
     unidadeCodigo: number;
-    idServidor: number;
+    usuarioCodigo: number;
     tipo: string;
     dataInicio: string;
     dataFim: string | null;
@@ -387,14 +387,7 @@ export interface SubprocessoElegivel {
     situacao: SituacaoSubprocesso;
 }
 
-export interface Servidor {
-    codigo: number;
-    nome: string;
-    tituloEleitoral: string;
-    unidade: Unidade;
-    email: string;
-    ramal: string;
-}
+
 
 /**
  * Permissões do usuário para um subprocesso.

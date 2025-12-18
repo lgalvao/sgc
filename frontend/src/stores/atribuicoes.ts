@@ -19,9 +19,9 @@ export const useAtribuicaoTemporariaStore = defineStore(
 
         const obterAtribuicoesPorServidor = computed(
             () =>
-                (servidorId: number): AtribuicaoTemporaria[] => {
+                (usuarioCodigo: number): AtribuicaoTemporaria[] => {
                     return atribuicoes.value.filter(
-                        (a) => a.servidor.codigo === servidorId,
+                        (a) => a.servidor.codigo === usuarioCodigo,
                     );
                 },
         );

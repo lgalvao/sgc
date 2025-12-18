@@ -47,7 +47,7 @@ describe('UnidadeView.vue', () => {
     codigo: 1,
     sigla: 'TEST',
     nome: 'Unidade Teste',
-    idServidorTitular: 10,
+    usuarioCodigo: 10,
     tituloTitular: '123456',
     filhas: [
       { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },

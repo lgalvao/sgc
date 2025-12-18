@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {mapVWUsuariosArray, mapVWUsuarioToServidor,} from "@/mappers/servidores";
+import {mapVWUsuariosArray, mapVWUsuarioToUsuario,} from "@/mappers/usuarios";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
 import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
@@ -240,8 +240,8 @@ describe("mappers/sgrh", () => {
     });
 });
 
-describe("mappers/servidores", () => {
-    it("mapVWUsuarioToServidor maps numeric titulo to codigo and fields", () => {
+describe("mappers/usuarios", () => {
+    it("mapVWUsuarioToUsuario maps numeric titulo to codigo and fields", () => {
         const vw = {
             titulo: "42",
             nome: "Fulano",
@@ -249,7 +249,7 @@ describe("mappers/servidores", () => {
             email: "f@t.br",
             ramal: "123",
         };
-        const s = mapVWUsuarioToServidor(vw);
+        const s = mapVWUsuarioToUsuario(vw);
         expect(s.codigo).toBe(42);
         expect(s.nome).toBe("Fulano");
         expect(s.unidade).toBe("SESEL");
@@ -257,9 +257,9 @@ describe("mappers/servidores", () => {
         expect(s.ramal).toBe("123");
     });
 
-    it("mapVWUsuarioToServidor uses codigo when provided and defaults missing fields", () => {
+    it("mapVWUsuarioToUsuario uses codigo when provided and defaults missing fields", () => {
         const vw = {codigo: 7, nome: "Beltrano"};
-        const s = mapVWUsuarioToServidor(vw);
+        const s = mapVWUsuarioToUsuario(vw);
         expect(s.codigo).toBe(7);
         expect(s.nome).toBe("Beltrano");
         expect(s.unidade).toBe("");
@@ -284,7 +284,7 @@ describe("mappers/unidades", () => {
             sigla: "SETEST",
             nome: "Seção Teste",
             tipo: "OPERACIONAL",
-            idServidorTitular: 99,
+            usuarioCodigo: 99,
             responsavel: {
                 idServidorResponsavel: 100,
                 tipo: "Substituição",
@@ -306,9 +306,9 @@ describe("mappers/unidades", () => {
         expect(mapped.codigo).toBe(10);
         expect(mapped.sigla).toBe("SETEST");
         expect(mapped.nome).toBe("Seção Teste");
-        expect(mapped.idServidorTitular).toBe(99);
+        expect(mapped.usuarioCodigo).toBe(99);
         expect(mapped.responsavel).not.toBeNull();
-        expect((mapped.responsavel as any)!.idServidor).toBe(100);
+        expect((mapped.responsavel as any)!.usuarioCodigo).toBe(100);
         expect(Array.isArray(mapped.filhas)).toBe(true);
         expect(mapped.filhas[0].codigo).toBe(11);
     });

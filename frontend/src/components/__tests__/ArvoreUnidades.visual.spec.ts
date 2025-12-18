@@ -12,7 +12,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             nome: 'Secretaria 1',
             tipo: 'INTEROPERACIONAL',
             isElegivel: true,
-            idServidorTitular: 0,
+            usuarioCodigo: 0,
             responsavel: null,
             filhas: [
                 {
@@ -21,7 +21,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                     nome: 'Assessoria 11',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -31,7 +31,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                     nome: 'Assessoria 12',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -41,7 +41,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                     nome: 'Coordenadoria 11',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: [
                         {
@@ -50,7 +50,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                             nome: 'Seção 111',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -60,7 +60,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                             nome: 'Seção 112',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -70,7 +70,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                             nome: 'Seção 113',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         }
@@ -82,7 +82,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                     nome: 'Coordenadoria 12',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 }
@@ -241,7 +241,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                     nome: 'Coord sem filhas elegíveis',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: [
                         {
@@ -250,7 +250,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                             nome: 'Seção não elegível',
                             tipo: 'OPERACIONAL',
                             isElegivel: false, // Não elegível
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         }

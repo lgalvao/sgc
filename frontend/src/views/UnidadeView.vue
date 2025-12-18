@@ -18,7 +18,7 @@
         <template
             v-if="unidadeComResponsavelDinamico.responsavel &&
             unidadeComResponsavelDinamico.responsavel.codigo &&
-            unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.idServidorTitular"
+            unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.usuarioCodigo"
         >
           <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
           <p class="ms-3">
@@ -134,7 +134,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
       ramal: atribuicaoVigente.servidor.ramal,
       usuarioTitulo: atribuicaoVigente.servidor.nome,
       unidadeCodigo: atribuicaoVigente.unidade.codigo,
-      idServidor: atribuicaoVigente.servidor.codigo,
+      usuarioCodigo: atribuicaoVigente.servidor.codigo,
       tipo: "TEMPORARIO",
       dataInicio: atribuicaoVigente.dataInicio,
       dataFim: atribuicaoVigente.dataFim,

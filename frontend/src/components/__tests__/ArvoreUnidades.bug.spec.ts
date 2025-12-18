@@ -11,7 +11,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
             nome: 'Secretaria 1',
             tipo: 'INTEROPERACIONAL',
             isElegivel: true,
-            idServidorTitular: 0,
+            usuarioCodigo: 0,
             responsavel: null,
             filhas: [
                 {
@@ -20,7 +20,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                     nome: 'Assessoria 11',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -30,7 +30,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                     nome: 'Assessoria 12',
                     tipo: 'OPERACIONAL',
                     isElegivel: true,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: []
                 },
@@ -40,7 +40,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                     nome: 'Coordenadoria 11',
                     tipo: 'INTERMEDIARIA',
                     isElegivel: false,
-                    idServidorTitular: 0,
+                    usuarioCodigo: 0,
                     responsavel: null,
                     filhas: [
                         {
@@ -49,7 +49,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                             nome: 'Seção 111',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -59,7 +59,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                             nome: 'Seção 112',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         },
@@ -69,7 +69,7 @@ describe('ArvoreUnidades - Bug do usuário: COORD_11 desmarcada com filhas marca
                             nome: 'Seção 113',
                             tipo: 'OPERACIONAL',
                             isElegivel: true,
-                            idServidorTitular: 0,
+                            usuarioCodigo: 0,
                             responsavel: null,
                             filhas: []
                         }
