@@ -3,6 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -105,6 +106,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // Relatório é gerado após os testes
 
     testLogging {
         events("skipped", "failed")
@@ -134,5 +136,14 @@ tasks.withType<Test> {
         } else {
             logger.warn("byte-buddy-agent nao encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
     }
 }
