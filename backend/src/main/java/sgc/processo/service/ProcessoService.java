@@ -104,18 +104,39 @@ public class ProcessoService {
     }
 
     private List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Long> resultado = new ArrayList<>();
-        resultado.add(codUnidade);
-        buscarDescendentesRecursivo(codUnidade, resultado);
-        return resultado;
-    }
+        // Bolt Optimization: Replace N+1 recursive database queries with a single query + in-memory traversal
+        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
 
-    private void buscarDescendentesRecursivo(Long codUnidadeSuperior, List<Long> resultado) {
-        List<Unidade> filhos = unidadeRepo.findByUnidadeSuperiorCodigo(codUnidadeSuperior);
-        for (Unidade filho : filhos) {
-            resultado.add(filho.getCodigo());
-            buscarDescendentesRecursivo(filho.getCodigo(), resultado);
+        Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
+        for (Unidade u : todasUnidades) {
+            if (u.getUnidadeSuperior() != null) {
+                mapaPorPai.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>()).add(u);
+            }
         }
+
+        List<Long> resultado = new ArrayList<>();
+        Queue<Long> fila = new LinkedList<>();
+        Set<Long> visitados = new HashSet<>();
+
+        fila.add(codUnidade);
+        visitados.add(codUnidade);
+
+        while (!fila.isEmpty()) {
+            Long atual = fila.poll();
+            resultado.add(atual);
+
+            List<Unidade> filhos = mapaPorPai.get(atual);
+            if (filhos != null) {
+                for (Unidade filho : filhos) {
+                    if (!visitados.contains(filho.getCodigo())) {
+                        visitados.add(filho.getCodigo());
+                        fila.add(filho.getCodigo());
+                    }
+                }
+            }
+        }
+
+        return resultado;
     }
 
     @Transactional
