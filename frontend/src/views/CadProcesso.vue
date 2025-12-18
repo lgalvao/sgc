@@ -95,7 +95,7 @@
       <div class="d-flex justify-content-between">
         <div>
           <BButton
-              :disabled="isFormInvalid"
+              :disabled="isFormInvalid || isLoading"
               data-testid="btn-processo-iniciar"
               variant="success"
               @click="abrirModalConfirmacao"
@@ -103,17 +103,19 @@
             <i class="bi bi-play-fill me-1"/> Iniciar processo
           </BButton>
           <BButton
-              :disabled="isFormInvalid"
+              :disabled="isFormInvalid || isLoading"
               class="ms-2"
               data-testid="btn-processo-salvar"
               type="button"
               variant="outline-primary"
               @click="salvarProcesso"
           >
-            <i class="bi bi-save me-1"/> Salvar
+            <BSpinner v-if="isLoading" small class="me-1" />
+            <i v-else class="bi bi-save me-1"/> Salvar
           </BButton>
           <BButton
               v-if="processoEditando"
+              :disabled="isLoading"
               class="ms-2"
               data-testid="btn-processo-remover"
               variant="outline-danger"
@@ -123,6 +125,7 @@
           </BButton>
         </div>
         <BButton
+            :disabled="isLoading"
             class="text-secondary"
             to="/painel"
             variant="link"
@@ -152,6 +155,7 @@
       </template>
       <template #footer>
         <BButton
+            :disabled="isLoading"
             data-testid="btn-iniciar-processo-cancelar"
             variant="secondary"
             @click="fecharModalConfirmacao"
@@ -159,11 +163,13 @@
           Cancelar
         </BButton>
         <BButton
+            :disabled="isLoading"
             data-testid="btn-iniciar-processo-confirmar"
             variant="primary"
             @click="confirmarIniciarProcesso"
         >
-          Confirmar
+          <BSpinner v-if="isLoading" small class="me-1" />
+          <span v-else>Confirmar</span>
         </BButton>
       </template>
     </BModal>
@@ -181,16 +187,19 @@
       </template>
       <template #footer>
         <BButton
+            :disabled="isLoading"
             variant="secondary"
             @click="fecharModalRemocao"
         >
           Cancelar
         </BButton>
         <BButton
+            :disabled="isLoading"
             variant="danger"
             @click="confirmarRemocao"
         >
-          Remover
+          <BSpinner v-if="isLoading" small class="me-1" />
+          <span v-else>Remover</span>
         </BButton>
       </template>
     </BModal>
@@ -198,7 +207,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
@@ -219,6 +228,7 @@ const unidadesSelecionadas = ref<number[]>([]);
 const descricao = ref<string>("");
 const tipo = ref<string>("MAPEAMENTO");
 const dataLimite = ref<string>("");
+const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
@@ -365,6 +375,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
 async function salvarProcesso() {
   // Limpa erros antes de tentar salvar
   fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  isLoading.value = true;
   
   // Validações agora são feitas no backend via Bean Validation
   try {
@@ -394,6 +405,8 @@ async function salvarProcesso() {
     limparCampos();
   } catch (error) {
     handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -407,10 +420,9 @@ function fecharModalConfirmacao() {
 }
 
 async function confirmarIniciarProcesso() {
-  mostrarModalConfirmacao.value = false;
-  
   // Limpa erros
   fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  isLoading.value = true;
 
   let codigoProcesso = processoEditando.value?.codigo;
 
@@ -427,7 +439,9 @@ async function confirmarIniciarProcesso() {
       const novoProcesso = await processosStore.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
+      mostrarModalConfirmacao.value = false;
       handleApiErrors(error, "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+      isLoading.value = false;
       return;
     }
   }
@@ -439,9 +453,13 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
     await router.push("/painel");
+    mostrarModalConfirmacao.value = false;
     feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
   } catch (error) {
+    mostrarModalConfirmacao.value = false;
     handleApiErrors(error, "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -455,6 +473,7 @@ function fecharModalRemocao() {
 
 async function confirmarRemocao() {
   if (processoEditando.value) {
+    isLoading.value = true;
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
       await router.push("/painel");
@@ -462,10 +481,15 @@ async function confirmarRemocao() {
         // Only clear fields if it was a new process
         limparCampos();
       }
+      fecharModalRemocao();
     } catch (error) {
+      fecharModalRemocao();
       handleApiErrors(error, "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
+    } finally {
+      isLoading.value = false;
     }
+  } else {
+    fecharModalRemocao();
   }
-  fecharModalRemocao();
 }
 </script>
