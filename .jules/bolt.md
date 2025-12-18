@@ -5,3 +5,7 @@
 ## 2024-05-22 - WebMvcTest and Global Filters
 **Learning:** `WebMvcTest` scans `@Component` beans like global filters (`FiltroAutenticacaoSimulado`). If these filters have dependencies (e.g., `GerenciadorJwt`, Repositories), they must be mocked using `@MockitoBean` in the test class, otherwise the ApplicationContext fails to load.
 **Action:** When troubleshooting `ApplicationContext` failures in slicing tests, check for implicitly loaded beans like Filters and their dependencies.
+
+## 2025-02-18 - Recursive Queries vs Single Fetch
+**Learning:** Replacing recursive N+1 queries with a single `findAll` (or `JOIN FETCH`) plus in-memory processing is a significant performance win for hierarchical data, provided the dataset fits in memory (e.g., Org Charts).
+**Action:** Look for recursive logic in service methods and replace with "fetch-all + map" pattern.
