@@ -22,7 +22,7 @@ describe("painelService", () => {
     });
 
     describe("listarProcessos", () => {
-        it("should fetch and map processos", async () => {
+        it("deve buscar e mapear processos", async () => {
             const dtoList = [{id: 1, tipo: "MAPEAMENTO"}];
             const responseData = {
                 content: dtoList,
@@ -51,7 +51,7 @@ describe("painelService", () => {
             expect(result.totalPages).toBe(1);
         });
 
-        it("should handle different pagination", async () => {
+        it("deve lidar com paginação diferente", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
             await service.listarProcessos("GESTOR", undefined, 2, 10);
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
@@ -59,14 +59,14 @@ describe("painelService", () => {
             });
         });
 
-        it("should throw an error on failure", async () => {
+        it("deve lançar um erro em caso de falha", async () => {
             mockApi.get.mockRejectedValueOnce(new Error("Failed"));
             await expect(service.listarProcessos("CHEFE")).rejects.toThrow();
         });
     });
 
     describe("listarAlertas", () => {
-        it("should fetch and map alertas", async () => {
+        it("deve buscar e mapear alertas", async () => {
             const dtoList = [{id: 1, mensagem: "Alerta DTO"}];
             const responseData = {
                 content: dtoList,
@@ -93,7 +93,7 @@ describe("painelService", () => {
             expect(result.totalElements).toBe(1);
         });
 
-        it("should throw an error on failure", async () => {
+        it("deve lançar um erro em caso de falha", async () => {
             mockApi.get.mockRejectedValueOnce(new Error("Failed"));
             await expect(service.listarAlertas(123)).rejects.toThrow();
         });

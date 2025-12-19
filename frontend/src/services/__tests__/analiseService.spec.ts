@@ -7,7 +7,7 @@ vi.mock("@/axios-setup");
 
 describe("analiseService", () => {
     describe("listarAnalisesCadastro", () => {
-        it("should fetch analysis history for registration", async () => {
+        it("deve buscar o histórico de análise para cadastro", async () => {
             const subprocessoId = 1;
             const responseData: AnaliseCadastro[] = [
                 {
@@ -31,7 +31,7 @@ describe("analiseService", () => {
             expect(result).toEqual(responseData);
         });
 
-        it("should throw an error on failure", async () => {
+        it("deve lançar um erro em caso de falha", async () => {
             const subprocessoId = 1;
             const error = new Error("Request failed");
             vi.mocked(api.get).mockRejectedValue(error);
@@ -41,7 +41,7 @@ describe("analiseService", () => {
     });
 
     describe("listarAnalisesValidacao", () => {
-        it("should fetch analysis history for validation", async () => {
+        it("deve buscar o histórico de análise para validação", async () => {
             const subprocessoId = 1;
             const responseData: AnaliseValidacao[] = [
                 {
@@ -65,7 +65,7 @@ describe("analiseService", () => {
             expect(result).toEqual(responseData);
         });
 
-        it("should throw an error on failure", async () => {
+        it("deve lançar um erro em caso de falha", async () => {
             const subprocessoId = 1;
             const error = new Error("Request failed");
             vi.mocked(api.get).mockRejectedValue(error);

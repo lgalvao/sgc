@@ -66,13 +66,13 @@ describe("useUnidadesStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with mock unidades", () => {
+    it("deve inicializar com unidades simuladas", () => {
         expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         expect(unidadesStore.unidades[0].sigla).toBeDefined();
     });
 
     describe("actions", () => {
-        it("should fetch and set unidades", async () => {
+        it("deve buscar e definir unidades", async () => {
             unidadesStore.unidades = [];
             await unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO");
             expect(
@@ -81,7 +81,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         });
 
-        it("should handle error in buscarUnidadesParaProcesso", async () => {
+        it("deve lidar com erro em buscarUnidadesParaProcesso", async () => {
             vi.mocked(
                 unidadesService.buscarArvoreComElegibilidade,
             ).mockRejectedValueOnce(new Error("API Error"));
@@ -91,7 +91,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.error).toContain("API Error");
         });
 
-        it("buscarUnidade should set unidade state", async () => {
+        it("buscarUnidade deve definir estado da unidade", async () => {
             const mockUnit = {sigla: "TEST", nome: "Test Unit"};
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue(
                 mockUnit as any,
@@ -105,7 +105,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.unidade).toEqual(mockUnit);
         });
 
-        it("buscarUnidade should handle error", async () => {
+        it("buscarUnidade deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockRejectedValue(
                 new Error("Fail"),
             );
@@ -115,7 +115,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.error).toContain("Fail");
         });
 
-        it("buscarUnidadePorCodigo should set unidade state", async () => {
+        it("buscarUnidadePorCodigo deve definir estado da unidade", async () => {
             const mockUnit = {codigo: 123, nome: "Test Unit"};
             vi.mocked(unidadesService.buscarUnidadePorCodigo).mockResolvedValue(
                 mockUnit as any,
@@ -129,7 +129,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.unidade).toEqual(mockUnit);
         });
 
-        it("buscarUnidadePorCodigo should handle error", async () => {
+        it("buscarUnidadePorCodigo deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarUnidadePorCodigo).mockRejectedValue(
                 new Error("Fail"),
             );
@@ -139,7 +139,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.error).toContain("Fail");
         });
 
-        it("buscarArvoreUnidade should call service and set unidade", async () => {
+        it("buscarArvoreUnidade deve chamar serviço e definir unidade", async () => {
             const mockUnit = {codigo: 1, filhas: []};
             vi.mocked(unidadesService.buscarArvoreUnidade).mockResolvedValue(
                 mockUnit as any,
@@ -151,7 +151,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.unidade).toEqual(mockUnit);
         });
 
-        it("buscarArvoreUnidade should handle error", async () => {
+        it("buscarArvoreUnidade deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(
                 new Error("Fail"),
             );
@@ -161,7 +161,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.error).toContain("Fail");
         });
 
-        it("obterUnidadesSubordinadas should call service", async () => {
+        it("obterUnidadesSubordinadas deve chamar serviço", async () => {
             const mockSubordinadas = ["A", "B"];
             vi.mocked(unidadesService.buscarSubordinadas).mockResolvedValue(
                 mockSubordinadas,
@@ -175,7 +175,7 @@ describe("useUnidadesStore", () => {
             expect(result).toEqual(mockSubordinadas);
         });
 
-        it("obterUnidadesSubordinadas should handle error", async () => {
+        it("obterUnidadesSubordinadas deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarSubordinadas).mockRejectedValue(
                 new Error("Fail"),
             );
@@ -185,7 +185,7 @@ describe("useUnidadesStore", () => {
             expect(unidadesStore.error).toContain("Fail");
         });
 
-        it("obterUnidadeSuperior should call service", async () => {
+        it("obterUnidadeSuperior deve chamar serviço", async () => {
             const mockSuperior = "SUP";
             vi.mocked(unidadesService.buscarSuperior).mockResolvedValue(
                 mockSuperior,
@@ -197,7 +197,7 @@ describe("useUnidadesStore", () => {
             expect(result).toEqual(mockSuperior);
         });
 
-        it("obterUnidadeSuperior should handle error", async () => {
+        it("obterUnidadeSuperior deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarSuperior).mockRejectedValue(
                 new Error("Fail"),
             );
