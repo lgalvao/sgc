@@ -2,8 +2,11 @@ import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
 import {badgeClass} from "@/utils";
 import SubprocessoHeader from "../SubprocessoHeader.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 describe("SubprocessoHeader.vue", () => {
+    const context = setupComponentTest();
+
     const defaultProps = {
         processoDescricao: "Processo de Teste",
         unidadeSigla: "TEST",
@@ -16,12 +19,15 @@ describe("SubprocessoHeader.vue", () => {
     };
 
     const mountComponent = (props = {}) => {
-        return mount(SubprocessoHeader, {
+        const mountOptions = getCommonMountOptions();
+        context.wrapper = mount(SubprocessoHeader, {
+            ...mountOptions,
             props: {
                 ...defaultProps,
                 ...props,
             },
         });
+        return context.wrapper;
     };
 
     describe("renderização das props", () => {

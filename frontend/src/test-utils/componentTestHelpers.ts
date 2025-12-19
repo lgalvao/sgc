@@ -24,13 +24,14 @@ export function setupComponentTest(): ComponentTestContext {
 /**
  * Retorna opções comuns de montagem com Pinia e Router
  */
-export function getCommonMountOptions(initialState = {}, additionalStubs = {}) {
+export function getCommonMountOptions(initialState = {}, additionalStubs = {}, piniaOptions = {}) {
     return {
         global: {
             plugins: [
                 createTestingPinia({
                     createSpy: vi.fn,
                     initialState,
+                    ...piniaOptions,
                 }),
             ],
             stubs: {

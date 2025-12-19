@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 19 de Dezembro de 2025
-**Versão:** 1.8
+**Versão:** 1.9
 **Status dos Testes:** ✅ 894 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -81,6 +81,12 @@ Refatorações realizadas (Componentes):
 - `components/__tests__/ImportarAtividadesModal.spec.ts`
 - `components/__tests__/ModalFinalizacao.spec.ts`
 - `components/__tests__/SubprocessoModal.spec.ts`
+- `components/__tests__/AtividadeItem.spec.ts`
+- `components/__tests__/ModalAcaoBloco.spec.ts`
+- `components/__tests__/ProcessoAcoes.spec.ts`
+- `components/__tests__/ProcessoDetalhes.spec.ts`
+- `components/__tests__/SubprocessoCards.spec.ts`
+- `components/__tests__/SubprocessoHeader.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Concluído (Services).
@@ -101,7 +107,8 @@ Refatorações realizadas (Componentes):
 
 #### Ação 2.3: Padronizar Setup/Teardown
 **Status:** Em Andamento.
-- `componentTestHelpers.ts` atualizado e aplicado em:
+- `componentTestHelpers.ts` atualizado para suportar opções de configuração do Pinia (`piniaOptions`).
+- Aplicado em:
   - `BarraNavegacao.spec.ts`
   - `AceitarMapaModal.spec.ts`
   - `CriarCompetenciaModal.spec.ts`
@@ -112,6 +119,12 @@ Refatorações realizadas (Componentes):
   - `ImportarAtividadesModal.spec.ts`
   - `ModalFinalizacao.spec.ts`
   - `SubprocessoModal.spec.ts`
+  - `AtividadeItem.spec.ts`
+  - `ModalAcaoBloco.spec.ts`
+  - `ProcessoAcoes.spec.ts`
+  - `ProcessoDetalhes.spec.ts`
+  - `SubprocessoCards.spec.ts`
+  - `SubprocessoHeader.spec.ts`
 - `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---

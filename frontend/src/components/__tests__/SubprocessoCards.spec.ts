@@ -1,8 +1,8 @@
-import {createTestingPinia} from "@pinia/testing";
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {type Mapa, type SubprocessoPermissoes, TipoProcesso, type Unidade,} from "@/types/tipos";
 import SubprocessoCards from "../SubprocessoCards.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 const pushMock = vi.fn();
 
@@ -13,6 +13,8 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("SubprocessoCards.vue", () => {
+    const context = setupComponentTest();
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -31,7 +33,10 @@ describe("SubprocessoCards.vue", () => {
     };
 
     const createWrapper = (propsOverride: any = {}) => {
-        return mount(SubprocessoCards, {
+        const mountOptions = getCommonMountOptions({}, {}, { stubActions: false });
+
+        context.wrapper = mount(SubprocessoCards, {
+            ...mountOptions,
             props: {
                 permissoes: defaultPermissoes,
                 codProcesso: 1,
@@ -41,10 +46,8 @@ describe("SubprocessoCards.vue", () => {
                 mapa: null,
                 ...propsOverride,
             },
-            global: {
-                plugins: [createTestingPinia({stubActions: false})],
-            },
         });
+        return context.wrapper;
     };
 
     const mockMapa: Mapa = {
