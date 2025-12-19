@@ -31,7 +31,6 @@ backend/bin/
 *.class
 /frontend/tsconfig.tsbuildinfo
 /node_modules/
-!backend/build/reports/tests/test/index.html
 /backend/target/
 .DS_Store
 /backend/.jqwik-database
@@ -46,6 +45,8 @@ playwright-report/
 screenshots/
 output.txt
 e2e/server.log
-
-!frontend/coverage/coverage-final.json
 /dados/
+
+Reports de testes
+!backend/build/reports/tests/test/index.html
+!frontend/coverage/coverage-final.json
