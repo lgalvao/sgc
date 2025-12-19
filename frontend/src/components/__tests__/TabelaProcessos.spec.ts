@@ -3,6 +3,7 @@ import {BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
@@ -34,8 +35,12 @@ const mockProcessos: ProcessoResumo[] = [
 ];
 
 describe("TabelaProcessos.vue", () => {
+    const context = setupComponentTest();
+
     it("deve renderizar a tabela e os cabeçalhos corretamente", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        // Do not stub BTable so we can check headers rendered by it
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: [],
                 criterioOrdenacao: "descricao",
@@ -43,12 +48,13 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        const table = wrapper.findComponent(BTable);
+        const table = context.wrapper.findComponent(BTable);
         expect(table.exists()).toBe(true);
 
-        await wrapper.vm.$nextTick();
+        await context.wrapper.vm.$nextTick();
 
         const headers = table.findAll("th");
+        expect(headers.length).toBeGreaterThan(0);
         expect(headers[0].text()).toContain("Descrição");
         expect(headers[1].text()).toContain("Tipo");
         expect(headers[2].text()).toContain("Unidades participantes");
@@ -56,7 +62,8 @@ describe("TabelaProcessos.vue", () => {
     });
 
     it("deve exibir os processos passados via prop", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: mockProcessos,
                 criterioOrdenacao: "descricao",
@@ -64,9 +71,9 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await context.wrapper.vm.$nextTick();
 
-        const rows = wrapper.findAll("tbody tr");
+        const rows = context.wrapper.findAll("tbody tr");
         expect(rows.length).toBe(mockProcessos.length);
 
         const cells = rows[0].findAll("td");
@@ -83,32 +90,32 @@ describe("TabelaProcessos.vue", () => {
     });
 
     it("deve emitir o evento ordenar ao receber o evento sort-changed", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        // Here we stub BTable to easily trigger sort-changed
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions({}, {
+                BTable: {
+                    template: "<table><slot></slot></table>",
+                    emits: ["sort-changed"],
+                }
+            }),
             props: {
                 processos: [],
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
             },
-            global: {
-                stubs: {
-                    BTable: {
-                        template: "<table><slot></slot></table>",
-                        emits: ["sort-changed"],
-                    },
-                },
-            },
         });
 
         await (
-            wrapper.findComponent(BTable) as unknown as VueWrapper<any>
+            context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>
         ).vm.$emit("sort-changed", {sortBy: "tipo"});
 
-        expect(wrapper.emitted("ordenar")).toBeTruthy();
-        expect(wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
+        expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+        expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
     });
 
     it("deve emitir o evento selecionarProcesso ao clicar em uma linha", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: mockProcessos,
                 criterioOrdenacao: "descricao",
@@ -116,19 +123,20 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await context.wrapper.vm.$nextTick();
 
-        const rows = wrapper.findAll("tbody tr");
+        const rows = context.wrapper.findAll("tbody tr");
         await rows[0].trigger("click");
 
-        expect(wrapper.emitted("selecionarProcesso")).toBeTruthy();
-        expect(wrapper.emitted("selecionarProcesso")![0]).toEqual([
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
             mockProcessos[0],
         ]);
     });
 
     it("deve exibir a coluna Finalizado em quando showDataFinalizacao é true", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: mockProcessos,
                 criterioOrdenacao: "descricao",
@@ -137,12 +145,12 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await context.wrapper.vm.$nextTick();
 
-        const headers = wrapper.findAll("th");
+        const headers = context.wrapper.findAll("th");
         expect(headers.some((h) => h.text() === "Finalizado em")).toBe(true);
 
-        const rows = wrapper.findAll("tbody tr");
+        const rows = context.wrapper.findAll("tbody tr");
         expect(rows[1].text()).toContain("26/08/2024");
     });
 
@@ -162,7 +170,8 @@ describe("TabelaProcessos.vue", () => {
             }
         ];
 
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: processosVariados,
                 criterioOrdenacao: "descricao",
@@ -170,8 +179,8 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
-        const rows = wrapper.findAll("tbody tr");
+        await context.wrapper.vm.$nextTick();
+        const rows = context.wrapper.findAll("tbody tr");
 
         const cells3 = rows[0].findAll("td");
         expect(cells3[1].text()).toBe("Diagnóstico");
@@ -183,34 +192,37 @@ describe("TabelaProcessos.vue", () => {
     });
 
     it("deve aplicar atributos nas linhas", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: mockProcessos,
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
             },
         });
-        await wrapper.vm.$nextTick();
-        const row = wrapper.find(`.row-processo-${mockProcessos[0].codigo}`);
+        await context.wrapper.vm.$nextTick();
+        const row = context.wrapper.find(`.row-processo-${mockProcessos[0].codigo}`);
         expect(row.exists()).toBe(true);
     });
 
     it("deve exibir mensagem de vazio quando não houver processos", async () => {
-        const wrapper = mount(TabelaProcessos, {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
             props: {
                 processos: [],
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
             },
         });
-        // BTable renders empty slot when items is empty.
-        // We might need to check if the text exists.
-        expect(wrapper.text()).toContain("Nenhum processo encontrado.");
+
+        expect(context.wrapper.text()).toContain("Nenhum processo encontrado.");
     });
 
     describe("Modo Compacto", () => {
         it("deve exibir o rótulo reduzido 'Unidades' quando compacto é true", async () => {
-            const wrapper = mount(TabelaProcessos, {
+            // Need real BTable to check headers
+            context.wrapper = mount(TabelaProcessos, {
+                ...getCommonMountOptions(),
                 props: {
                     processos: [],
                     criterioOrdenacao: "descricao",
@@ -219,14 +231,15 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            await wrapper.vm.$nextTick();
-            const headers = wrapper.findAll("th");
+            await context.wrapper.vm.$nextTick();
+            const headers = context.wrapper.findAll("th");
             expect(headers.some(h => h.text() === "Unidades")).toBe(true);
             expect(headers.some(h => h.text() === "Unidades participantes")).toBe(false);
         });
 
         it("deve manter sortable: true mesmo em modo compacto", async () => {
-            const wrapper = mount(TabelaProcessos, {
+            context.wrapper = mount(TabelaProcessos, {
+                ...getCommonMountOptions(),
                 props: {
                     processos: [],
                     criterioOrdenacao: "descricao",
@@ -235,36 +248,34 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            const table = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+            const table = context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
             const fields = (table.props("fields") as any[]);
             const desc = fields.find(f => f.key === "descricao");
             expect(desc.sortable).toBe(true);
         });
 
         it("deve emitir evento de ordenação ao clicar no cabeçalho em modo compacto", async () => {
-            const wrapper = mount(TabelaProcessos, {
+            context.wrapper = mount(TabelaProcessos, {
+                ...getCommonMountOptions({}, {
+                    BTable: {
+                        template: "<table><slot></slot></table>",
+                        emits: ["sort-changed"],
+                    }
+                }),
                 props: {
                     processos: [],
                     criterioOrdenacao: "descricao",
                     direcaoOrdenacaoAsc: true,
                     compacto: true,
                 },
-                global: {
-                    stubs: {
-                        BTable: {
-                            template: "<table><slot></slot></table>",
-                            emits: ["sort-changed"],
-                        },
-                    },
-                },
             });
 
             await (
-                wrapper.findComponent(BTable) as unknown as VueWrapper<any>
+                context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>
             ).vm.$emit("sort-changed", {sortBy: "tipo"});
 
-            expect(wrapper.emitted("ordenar")).toBeTruthy();
-            expect(wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
+            expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+            expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
         });
     });
 });

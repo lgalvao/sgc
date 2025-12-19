@@ -1,12 +1,12 @@
-import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 // Mock services
 import * as processoService from "@/services/processoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
+import {useFeedbackStore} from "@/stores/feedback";
 import ProcessoView from "@/views/ProcessoView.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};
@@ -73,43 +73,8 @@ const TreeTableStub = {
     emits: ["row-click"],
 };
 
-// Função fábrica para criar o wrapper
-const createWrapper = (customState = {}) => {
-    const wrapper = mount(ProcessoView, {
-        global: {
-            plugins: [
-                createTestingPinia({
-                    stubActions: false,
-                    initialState: {
-                        perfil: {
-                            perfilSelecionado: "ADMIN",
-                            unidadeSelecionada: 99,
-                        },
-                        ...customState,
-                    },
-                }),
-            ],
-            stubs: {
-                ProcessoDetalhes: ProcessoDetalhesStub,
-                ProcessoAcoes: ProcessoAcoesStub,
-                ModalFinalizacao: ModalFinalizacaoStub,
-                ModalAcaoBloco: ModalAcaoBlocoStub,
-                TreeTable: TreeTableStub,
-                BContainer: {template: "<div><slot /></div>"},
-                BAlert: {template: "<div><slot /></div>"},
-            },
-        },
-    });
-
-    const processosStore = useProcessosStore();
-    const perfilStore = usePerfilStore();
-    const feedbackStore = useFeedbackStore(); // Get feedback store
-
-    return {wrapper, processosStore, perfilStore, feedbackStore};
-};
-
 describe("ProcessoView.vue", () => {
-    let wrapper: ReturnType<typeof createWrapper>["wrapper"];
+    const context = setupComponentTest();
 
     const mockProcesso = {
         codigo: 1,
@@ -138,6 +103,41 @@ describe("ProcessoView.vue", () => {
         },
     ];
 
+    const additionalStubs = {
+        ProcessoDetalhes: ProcessoDetalhesStub,
+        ProcessoAcoes: ProcessoAcoesStub,
+        ModalFinalizacao: ModalFinalizacaoStub,
+        ModalAcaoBloco: ModalAcaoBlocoStub,
+        TreeTable: TreeTableStub,
+        BContainer: {template: "<div><slot /></div>"},
+        BAlert: {template: "<div><slot /></div>"},
+    };
+
+    // Função fábrica para criar o wrapper
+    const createWrapper = (customState = {}) => {
+        context.wrapper = mount(ProcessoView, {
+            ...getCommonMountOptions(
+                {
+                    perfil: {
+                        perfilSelecionado: "ADMIN",
+                        unidadeSelecionada: 99,
+                    },
+                    ...customState,
+                },
+                additionalStubs,
+                {
+                    stubActions: false
+                }
+            )
+        });
+
+        const processosStore = useProcessosStore();
+        const perfilStore = usePerfilStore();
+        const feedbackStore = useFeedbackStore();
+
+        return {wrapper: context.wrapper, processosStore, perfilStore, feedbackStore};
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
@@ -148,13 +148,8 @@ describe("ProcessoView.vue", () => {
         );
     });
 
-    afterEach(() => {
-        wrapper?.unmount();
-    });
-
     it("deve renderizar detalhes do processo e buscar dados no mount", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
@@ -165,8 +160,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve mostrar botões de ação quando houver subprocessos elegíveis", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
@@ -187,8 +181,7 @@ describe("ProcessoView.vue", () => {
         ];
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(mockProcessoNullDate as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -197,10 +190,9 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve navegar para detalhes da unidade ao clicar na tabela (ADMIN)", async () => {
-        const {wrapper: w} = createWrapper({
+        const {wrapper} = createWrapper({
             perfil: {perfilSelecionado: "ADMIN", unidadeSelecionada: 99},
         });
-        wrapper = w;
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -217,8 +209,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve abrir modal de finalização", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
@@ -231,8 +222,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve confirmar finalização", async () => {
-        const {wrapper: w, feedbackStore} = createWrapper();
-        wrapper = w;
+        const {wrapper, feedbackStore} = createWrapper();
         await flushPromises();
 
         vi.spyOn(feedbackStore, "show");
@@ -247,8 +237,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve abrir modal de ação em bloco", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
@@ -261,8 +250,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve confirmar ação em bloco", async () => {
-        const {wrapper: w, feedbackStore} = createWrapper();
-        wrapper = w;
+        const {wrapper, feedbackStore} = createWrapper();
         await flushPromises();
 
         vi.spyOn(feedbackStore, "show");
@@ -285,10 +273,9 @@ describe("ProcessoView.vue", () => {
     });
 
     it("deve navegar para detalhes da unidade se perfil for CHEFE e unidade corresponder", async () => {
-        const {wrapper: w} = createWrapper({
+        const {wrapper} = createWrapper({
             perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 10},
         });
-        wrapper = w;
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -302,10 +289,9 @@ describe("ProcessoView.vue", () => {
     });
 
     it("não deve navegar para detalhes da unidade se perfil for CHEFE e unidade não corresponder", async () => {
-        const {wrapper: w} = createWrapper({
+        const {wrapper} = createWrapper({
             perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 99},
         });
-        wrapper = w;
         await flushPromises();
         // Reset push mock to ensure no previous calls
         pushMock.mockClear();
@@ -318,8 +304,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("confirmarAcaoBloco deve mostrar erro se nenhuma unidade selecionada", async () => {
-        const {wrapper: w, feedbackStore} = createWrapper();
-        wrapper = w;
+        const {wrapper, feedbackStore} = createWrapper();
         await flushPromises();
         vi.spyOn(feedbackStore, "show");
 
@@ -336,8 +321,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("executarFinalizacao deve mostrar erro se falhar", async () => {
-        const {wrapper: w, processosStore} = createWrapper();
-        wrapper = w;
+        const {wrapper, processosStore} = createWrapper();
         await flushPromises();
         vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Fail"));
 
@@ -350,8 +334,7 @@ describe("ProcessoView.vue", () => {
     });
 
     it("confirmarAcaoBloco deve mostrar erro se falhar", async () => {
-        const {wrapper: w, processosStore} = createWrapper();
-        wrapper = w;
+        const {wrapper, processosStore} = createWrapper();
         await flushPromises();
         vi.mocked(processoService.processarAcaoEmBloco).mockRejectedValue(new Error("Fail"));
 

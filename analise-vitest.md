@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 19 de Dezembro de 2025
-**Versão:** 1.9
+**Versão:** 2.0
 **Status dos Testes:** ✅ 894 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -73,7 +73,7 @@ Refatorações realizadas (Services e Stores):
 - `services/__tests__/processoService.spec.ts`
 - `stores/__tests__/feedback.spec.ts`
 
-Refatorações realizadas (Componentes):
+Refatorações realizadas (Componentes e Views):
 - `components/__tests__/BarraNavegacao.spec.ts`
 - `components/__tests__/MainNavbar.spec.ts`
 - `components/__tests__/HistoricoAnaliseModal.spec.ts`
@@ -87,6 +87,14 @@ Refatorações realizadas (Componentes):
 - `components/__tests__/ProcessoDetalhes.spec.ts`
 - `components/__tests__/SubprocessoCards.spec.ts`
 - `components/__tests__/SubprocessoHeader.spec.ts`
+- `components/__tests__/TabelaAlertas.spec.ts`
+- `components/__tests__/TabelaMovimentacoes.spec.ts`
+- `components/__tests__/TabelaProcessos.spec.ts`
+- `components/__tests__/TreeRowItem.spec.ts`
+- `components/__tests__/TreeTableView.spec.ts`
+- `components/__tests__/UnidadeTreeNode.spec.ts`
+- `views/__tests__/ProcessoView.spec.ts`
+- `views/__tests__/SubprocessoView.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Concluído (Services).
@@ -125,6 +133,14 @@ Refatorações realizadas (Componentes):
   - `ProcessoDetalhes.spec.ts`
   - `SubprocessoCards.spec.ts`
   - `SubprocessoHeader.spec.ts`
+  - `TabelaAlertas.spec.ts`
+  - `TabelaMovimentacoes.spec.ts`
+  - `TabelaProcessos.spec.ts`
+  - `TreeRowItem.spec.ts`
+  - `TreeTableView.spec.ts`
+  - `UnidadeTreeNode.spec.ts`
+  - `ProcessoView.spec.ts`
+  - `SubprocessoView.spec.ts`
 - `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---
@@ -140,5 +156,6 @@ Foi criada a função `setupServiceTest` em `test-utils/serviceTestHelpers.ts` p
 Arquivos refatorados cobrem a maioria dos Stores e Services principais do sistema.
 
 **Próximos passos:**
-- Continuar a refatoração para componentes (Actions/Stores usados em componentes).
+- Continuar a refatoração para componentes restantes (Actions/Stores usados em componentes).
+- Completar refatoração de View Tests restantes.
 - Focar em testes de edge cases e tratamento de erros mais robustos usando `testErrorHandling`.
