@@ -199,6 +199,33 @@ describe("useMapasStore", () => {
             expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
+        it("deve recarregar mapa se competencia retornada não tiver ID (problema de sincronia)", async () => {
+             const competencia = {
+                descricao: "Nova Competencia",
+                codigo: 0,
+                atividadesAssociadas: [],
+            };
+            // Mock retorna competencia com ID 0
+            const mockResponseInvalido: MapaCompleto = {
+                codigo: 1,
+                subprocessoCodigo: 1,
+                observacoes: "teste",
+                competencias: [
+                    { codigo: 0, descricao: "Nova", atividadesAssociadas: [] },
+                ],
+                situacao: "EM_ANDAMENTO",
+            };
+
+            vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(mockResponseInvalido);
+
+            // Mock da recarga
+            vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockResponseInvalido);
+
+            await context.store.adicionarCompetencia(codSubrocesso, competencia);
+
+            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
+        });
+
         it("deve lançar erro em caso de falha", async () => {
             const competencia = {
                 descricao: "Nova Competencia",
@@ -240,6 +267,19 @@ describe("useMapasStore", () => {
             expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
+        it("deve validar se competência tem ID antes de atualizar", async () => {
+            const competencia = {
+                codigo: 0, // ID Inválido
+                descricao: "Sem ID",
+                atividadesAssociadas: [],
+            };
+
+            await expect(context.store.atualizarCompetencia(codSubrocesso, competencia))
+                .rejects.toThrow("Código da competência inválido");
+
+            expect(subprocessoService.atualizarCompetencia).not.toHaveBeenCalled();
+        });
+
         it("deve lançar erro em caso de falha", async () => {
             const competencia = {
                 codigo: 1,
@@ -275,6 +315,13 @@ describe("useMapasStore", () => {
                 idCompetencia,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
+        });
+
+        it("deve validar ID da competência antes de remover", async () => {
+            await expect(context.store.removerCompetencia(codSubrocesso, 0))
+                .rejects.toThrow("Código da competência inválido");
+
+             expect(subprocessoService.removerCompetencia).not.toHaveBeenCalled();
         });
 
         it("deve lançar erro em caso de falha", async () => {
