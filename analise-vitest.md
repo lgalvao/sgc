@@ -55,6 +55,8 @@ Arquivos criados:
 Refatorações realizadas:
 - `stores/__tests__/processos.spec.ts` refatorado para usar `setupStoreTest`.
 - `services/__tests__/painelService.spec.ts` refatorado para usar `setupServiceTest`.
+- `stores/__tests__/alertas.spec.ts` refatorado para usar `setupStoreTest`.
+- `services/__tests__/alertaService.spec.ts` refatorado para usar `setupServiceTest`.
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Pendente.
@@ -81,6 +83,8 @@ Foi criada a função `setupServiceTest` em `test-utils/serviceTestHelpers.ts` p
 Arquivos refatorados com sucesso:
 - `stores/__tests__/processos.spec.ts`
 - `services/__tests__/painelService.spec.ts`
+- `stores/__tests__/alertas.spec.ts`
+- `services/__tests__/alertaService.spec.ts`
 
 **Próximos passos:**
 - Estender o uso de `setupStoreTest` para outras stores.
