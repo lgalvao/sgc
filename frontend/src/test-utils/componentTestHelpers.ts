@@ -1,4 +1,4 @@
-import { mount, type VueWrapper } from "@vue/test-utils";
+import { mount, type VueWrapper, RouterLinkStub } from "@vue/test-utils";
 import { createTestingPinia } from "@pinia/testing";
 import { vi, afterEach } from "vitest";
 
@@ -24,7 +24,7 @@ export function setupComponentTest(): ComponentTestContext {
 /**
  * Retorna opções comuns de montagem com Pinia e Router
  */
-export function getCommonMountOptions(initialState = {}) {
+export function getCommonMountOptions(initialState = {}, additionalStubs = {}) {
     return {
         global: {
             plugins: [
@@ -34,8 +34,9 @@ export function getCommonMountOptions(initialState = {}) {
                 }),
             ],
             stubs: {
-                RouterLink: true,
+                RouterLink: RouterLinkStub,
                 RouterView: true,
+                ...additionalStubs,
             },
         },
     };

@@ -139,4 +139,21 @@ describe("processoService", () => {
             await expect(service.criarProcesso(request)).rejects.toThrow();
         });
     });
+
+    describe("Casos de Borda e Erros", () => {
+        it("deve lidar com erro 404 ao buscar processo", async () => {
+             mockApi.get.mockRejectedValue({ response: { status: 404 } });
+             await expect(service.obterProcessoPorCodigo(999)).rejects.toHaveProperty("response.status", 404);
+        });
+
+        it("deve lidar com erro 500 ao iniciar processo", async () => {
+             mockApi.post.mockRejectedValue({ response: { status: 500 } });
+             await expect(service.iniciarProcesso(1, TipoProcesso.REVISAO, [])).rejects.toHaveProperty("response.status", 500);
+        });
+
+        it("deve lidar com erro de rede (sem response)", async () => {
+             mockApi.get.mockRejectedValue(new Error("Network Error"));
+             await expect(service.obterProcessoPorCodigo(1)).rejects.toThrow("Network Error");
+        });
+    });
 });
