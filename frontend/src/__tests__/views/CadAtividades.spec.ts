@@ -49,6 +49,7 @@ const AtividadeItemStub = {
 const ImportarAtividadesModalStub = { template: '<div>Importar</div>', props: ['mostrar'] };
 const ImpactoMapaModalStub = { template: '<div>Impacto</div>', props: ['mostrar'] };
 const ConfirmacaoDisponibilizacaoModalStub = { template: '<div>Confirmacao</div>', props: ['mostrar'], emits: ['confirmar'] };
+const ModalConfirmacaoStub = { template: '<div>ModalConfirmacao</div>', props: ['modelValue', 'titulo', 'mensagem', 'variant'], emits: ['update:modelValue', 'confirmar'] };
 const HistoricoAnaliseModalStub = { template: '<div>Historico</div>', props: ['mostrar'] };
 const BContainerStub = { template: '<div><slot></slot></div>' };
 const BButtonStub = { template: '<button @click="$emit(\'click\')"><slot></slot></button>', props: ['disabled'] };
@@ -108,6 +109,7 @@ describe('CadAtividades.vue', () => {
                     ImportarAtividadesModal: ImportarAtividadesModalStub,
                     ImpactoMapaModal: ImpactoMapaModalStub,
                     ConfirmacaoDisponibilizacaoModal: ConfirmacaoDisponibilizacaoModalStub,
+                    ModalConfirmacao: ModalConfirmacaoStub,
                     HistoricoAnaliseModal: HistoricoAnaliseModalStub,
                     BContainer: BContainerStub,
                     BButton: BButtonStub,
@@ -234,5 +236,40 @@ describe('CadAtividades.vue', () => {
         // but AtividadeItemStub props are reactive?
         // We can check if wrapper.vm.errosValidacao has values.
         expect((wrapper.vm as any).errosValidacao).toHaveLength(1);
+    });
+
+    it('deve remover atividade após confirmação', async () => {
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
+            codigo: 1,
+            descricao: 'Processo',
+            unidades: [
+                { sigla: 'TIC', codSubprocesso: 100, mapaCodigo: 200, situacaoSubprocesso: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', filhas: [] }
+            ],
+            resumoSubprocessos: []
+        } as any);
+
+        const wrapper = mountComponent();
+        const atividadesStore = useAtividadesStore();
+        atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([
+            { codigo: 1, descricao: 'Atv 1' }
+        ]);
+        await flushPromises();
+
+        // Trigger remove
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('remover-atividade');
+        await flushPromises();
+
+        // Assert Modal Open
+        const modal = wrapper.findComponent(ModalConfirmacaoStub);
+        expect(modal.exists()).toBe(true);
+        expect(modal.props('modelValue')).toBe(true);
+
+        // Confirm
+        atividadesStore.removerAtividade = vi.fn().mockResolvedValue('EM_ANDAMENTO');
+        await modal.vm.$emit('confirmar');
+        await flushPromises();
+
+        expect(atividadesStore.removerAtividade).toHaveBeenCalledWith(100, 1);
     });
 });
