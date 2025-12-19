@@ -1,11 +1,10 @@
-import {createTestingPinia} from "@pinia/testing";
-import {mount, RouterLinkStub} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {BBreadcrumbItem, BButton} from "bootstrap-vue-next";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useRoute} from "vue-router";
-import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../BarraNavegacao.vue";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock vue-router
 const mockRouter = {
@@ -50,17 +49,9 @@ const mockMatchedUnidade = [
     {name: "Unidade", meta: {breadcrumb: "Minha unidade"}},
 ];
 
-const getMountOptions = (pinia: any) => ({
-    global: {
-        plugins: [pinia],
-        stubs: {
-            RouterLink: RouterLinkStub,
-            BButton,
-        },
-    },
-});
-
 describe("BarraNavegacao.vue", () => {
+    setupComponentTest();
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -70,7 +61,7 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(createMockRoute("/login", []));
             const wrapper = mount(
                 BarraNavegacao,
-                getMountOptions(createTestingPinia({createSpy: vi.fn})),
+                getCommonMountOptions({}, {BButton}),
             );
             expect(wrapper.find("button").exists()).toBe(false);
             expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
@@ -80,7 +71,7 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(createMockRoute("/painel", []));
             const wrapper = mount(
                 BarraNavegacao,
-                getMountOptions(createTestingPinia({createSpy: vi.fn})),
+                getCommonMountOptions({}, {BButton}),
             );
             expect(wrapper.find("button").exists()).toBe(false);
             expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
@@ -92,7 +83,7 @@ describe("BarraNavegacao.vue", () => {
             );
             const wrapper = mount(
                 BarraNavegacao,
-                getMountOptions(createTestingPinia({createSpy: vi.fn})),
+                getCommonMountOptions({}, {BButton}),
             );
             expect(wrapper.find("button").exists()).toBe(true);
             expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(true);
@@ -104,10 +95,9 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.ADMIN;
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.ADMIN}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(2); // Home + "Detalhes do processo"
@@ -124,10 +114,9 @@ describe("BarraNavegacao.vue", () => {
                     {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
                 ),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.ADMIN;
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.ADMIN}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(3); // Home + "Detalhes do processo" + sigla
@@ -140,10 +129,9 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.ADMIN;
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.ADMIN}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
@@ -159,11 +147,10 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.CHEFE;
 
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.CHEFE}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(1); // Apenas Home
@@ -174,11 +161,10 @@ describe("BarraNavegacao.vue", () => {
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.SERVIDOR;
 
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.SERVIDOR}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(1); // Apenas Home
@@ -194,11 +180,10 @@ describe("BarraNavegacao.vue", () => {
                     {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
                 ),
             );
-            const pinia = createTestingPinia({createSpy: vi.fn});
-            const perfilStore = usePerfilStore(pinia);
-            perfilStore.perfilSelecionado = Perfil.CHEFE;
 
-            const wrapper = mount(BarraNavegacao, getMountOptions(pinia));
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.CHEFE}
+            }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(2); // Home + sigla (sem "Detalhes do processo")
@@ -214,7 +199,7 @@ describe("BarraNavegacao.vue", () => {
             );
             const wrapper = mount(
                 BarraNavegacao,
-                getMountOptions(createTestingPinia({createSpy: vi.fn})),
+                getCommonMountOptions({}, {BButton}),
             );
             await wrapper.findComponent(BButton).trigger("click");
             expect(mockRouter.back).toHaveBeenCalledTimes(1);

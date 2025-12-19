@@ -1,8 +1,8 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
-**Data da Análise:** 17 de Dezembro de 2025  
-**Versão:** 1.4
-**Status dos Testes:** ✅ 729 testes passando, 3 skipped (85 arquivos)
+**Data da Análise:** 18 de Dezembro de 2025
+**Versão:** 1.5
+**Status dos Testes:** ✅ 732 testes passando, 3 skipped (85 arquivos)
 
 ---
 
@@ -75,12 +75,17 @@ Refatorações realizadas:
 - `services/__tests__/subprocessoService.spec.ts`
 - `services/__tests__/diagnosticoService.spec.ts`
 - `services/__tests__/processoService.spec.ts`
+- `stores/__tests__/feedback.spec.ts`
+- `components/__tests__/BarraNavegacao.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
-**Status:** Pendente.
+**Status:** Em Andamento.
+- Adicionados testes de erro (404, 500, Network Error) em `services/__tests__/processoService.spec.ts`.
 
 #### Ação 2.3: Padronizar Setup/Teardown
-**Status:** Pendente (Parcialmente coberto pelos helpers).
+**Status:** Em Andamento.
+- `componentTestHelpers.ts` atualizado e aplicado em `BarraNavegacao.spec.ts`.
+- `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---
 
