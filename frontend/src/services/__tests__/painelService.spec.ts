@@ -1,10 +1,18 @@
 import {afterEach, describe, expect, it, type Mocked, vi} from "vitest";
-import api from "@/axios-setup";
+import { setupServiceTest } from "@/test-utils/serviceTestHelpers";
 import * as alertaMappers from "@/mappers/alertas";
 import * as processoMappers from "@/mappers/processos";
 import * as service from "../painelService";
 
-vi.mock("@/axios-setup");
+// Mock do axios no nível do arquivo ainda é necessário se a implementação importa diretamente
+// Mas como setupServiceTest mocka o modulo, e aqui mockamos também, pode haver conflito?
+// Se test-utils/serviceTestHelpers.ts faz vi.mock("@/axios-setup"), e este arquivo também faz...
+// O último a ser executado vence? Ou conflitam?
+// A recomendação é centralizar. Se eu uso setupServiceTest, deveria confiar nele.
+// Mas ele exporta mockApi.
+
+// Vamos usar o setupServiceTest que já mocka o axios-setup
+// Porém, precisamos mockar os mappers que são dependencias específicas deste service
 vi.mock("@/mappers/processos", () => ({
     mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
 }));
@@ -13,13 +21,11 @@ vi.mock("@/mappers/alertas", () => ({
 }));
 
 describe("painelService", () => {
-    const mockApi = api as Mocked<typeof api>;
+    // Usando helper centralizado
+    const { mockApi } = setupServiceTest();
+
     const mockProcessoMappers = vi.mocked(processoMappers);
     const mockAlertaMappers = vi.mocked(alertaMappers);
-
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
 
     describe("listarProcessos", () => {
         it("deve buscar e mapear processos", async () => {
