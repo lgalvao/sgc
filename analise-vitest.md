@@ -76,11 +76,16 @@ Refatorações realizadas:
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Em Andamento.
-- Adicionados testes de erro (404, 500, Network Error) em `services/__tests__/processoService.spec.ts`.
+- Criado helper `testErrorHandling` em `test-utils/serviceTestHelpers.ts`.
+- Refatorado `services/__tests__/processoService.spec.ts` para usar `testErrorHandling`.
 
 #### Ação 2.3: Padronizar Setup/Teardown
 **Status:** Em Andamento.
-- `componentTestHelpers.ts` atualizado e aplicado em `BarraNavegacao.spec.ts`.
+- `componentTestHelpers.ts` atualizado e aplicado em:
+  - `BarraNavegacao.spec.ts`
+  - `AceitarMapaModal.spec.ts`
+  - `CriarCompetenciaModal.spec.ts`
+  - `DisponibilizarMapaModal.spec.ts`
 - `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---

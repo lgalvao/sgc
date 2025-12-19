@@ -98,3 +98,26 @@ export function testDeleteEndpoint(
         expect(mockApi.delete).toHaveBeenCalledWith(url);
     });
 }
+
+/**
+ * Testa tratamento de erros comuns
+ */
+export function testErrorHandling(
+    action: () => Promise<any>,
+    method: 'get' | 'post' | 'put' | 'delete' = 'get'
+) {
+    it(`deve lidar com erro 404`, async () => {
+        mockApi[method].mockRejectedValue({ response: { status: 404 } });
+        await expect(action()).rejects.toHaveProperty("response.status", 404);
+    });
+
+    it(`deve lidar com erro 500`, async () => {
+        mockApi[method].mockRejectedValue({ response: { status: 500 } });
+        await expect(action()).rejects.toHaveProperty("response.status", 500);
+    });
+
+    it(`deve lidar com erro de rede`, async () => {
+        mockApi[method].mockRejectedValue(new Error("Network Error"));
+        await expect(action()).rejects.toThrow("Network Error");
+    });
+}

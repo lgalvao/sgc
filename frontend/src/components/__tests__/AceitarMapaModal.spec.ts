@@ -1,48 +1,52 @@
-import {createTestingPinia} from "@pinia/testing";
-import {mount} from "@vue/test-utils";
-import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
-import {describe, expect, it} from "vitest";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import { mount } from "@vue/test-utils";
+import { BButton, BFormTextarea, BModal } from "bootstrap-vue-next";
+import { describe, expect, it } from "vitest";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 
-// Função fábrica para criar o wrapper
-const createWrapper = (propsOverride = {}) => {
-    return mount(AceitarMapaModal, {
-        props: {
-            mostrarModal: true,
-            ...propsOverride,
-        },
-        global: {
-            plugins: [createTestingPinia({stubActions: false})],
-            components: {
-                BFormTextarea,
-                BButton,
-                BModal,
-            },
-            stubs: {
-                // Stubbing BModal para focar no conteúdo e eventos
-                BModal: {
-                    template: `
-                <div v-if="modelValue" data-testid="modal-stub">
-                    <slot />
-                    <slot name="footer" />
-                </div>
-            `,
-                    props: ["modelValue"],
-                    emits: ["update:modelValue", "hide"],
-                },
-            },
-        },
-    });
+const BModalStub = {
+    template: `
+        <div v-if="modelValue" data-testid="modal-stub">
+            <slot />
+            <slot name="footer" />
+        </div>
+    `,
+    props: ["modelValue"],
+    emits: ["update:modelValue", "hide"],
 };
 
 describe("AceitarMapaModal.vue", () => {
+    const context = setupComponentTest();
+
+    const createWrapper = (propsOverride = {}) => {
+        const options = getCommonMountOptions({}, { BModal: BModalStub });
+
+        context.wrapper = mount(AceitarMapaModal, {
+            ...options,
+            props: {
+                mostrarModal: true,
+                ...propsOverride,
+            },
+            global: {
+                ...options.global,
+                components: {
+                    BFormTextarea,
+                    BButton,
+                    BModal,
+                    ...(options.global.components || {})
+                }
+            },
+        });
+        return context.wrapper;
+    };
+
     it("não deve renderizar o modal quando mostrarModal for falso", () => {
-        const wrapper = createWrapper({mostrarModal: false});
+        const wrapper = createWrapper({ mostrarModal: false });
         expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal com o perfil padrão (não ADMIN)", () => {
-        const wrapper = createWrapper({perfil: "CHEFE"});
+        const wrapper = createWrapper({ perfil: "CHEFE" });
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
@@ -53,7 +57,7 @@ describe("AceitarMapaModal.vue", () => {
     });
 
     it("deve renderizar o modal com o perfil ADMIN", () => {
-        const wrapper = createWrapper({perfil: "ADMIN"});
+        const wrapper = createWrapper({ perfil: "ADMIN" });
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
