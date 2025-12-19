@@ -1,585 +1,420 @@
-import {beforeEach, describe, expect, it} from "vitest";
-import type {Unidade} from "@/types/tipos";
+import { describe, expect, it } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
+import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
+import type { Unidade } from '@/types/tipos';
+import { setupComponentTest } from '@/test-utils/componentTestHelpers';
 
-/**
- * Testes para o componente ArvoreUnidades
- *
- * Estrutura da árvore de teste:
- *
- * STIC (2) - INTEROPERACIONAL
- *   └─ COSIS (6) - INTERMEDIARIA
- *       ├─ SEDESENV (8) - OPERACIONAL
- *       ├─ SEDIA (9) - OPERACIONAL
- *       └─ SESEL (10) - OPERACIONAL
- *
- * SGP (200) - INTERMEDIARIA
- *   └─ CAS (201) - INTEROPERACIONAL (pode participar sem filhas!)
- *       └─ SAS (202) - OPERACIONAL
- */
+describe('ArvoreUnidades.vue', () => {
+    const context = setupComponentTest();
 
-describe("ArvoreUnidades - Seleção Hierárquica", () => {
-    let unidades: Unidade[];
-
-    beforeEach(() => {
-        // Mock da árvore de unidades
-        unidades = [
-            {
-                codigo: 2,
-                nome: "Secretaria de Informática e Comunicações",
-                sigla: "STIC",
-                tipo: "INTEROPERACIONAL",
-                filhas: [
-                    {
-                        codigo: 6,
-                        nome: "Coordenadoria de Sistemas",
-                        sigla: "COSIS",
-                        tipo: "INTERMEDIARIA",
-                        filhas: [
-                            {
-                                codigo: 8,
-                                nome: "Seção de Desenvolvimento de Sistemas",
-                                sigla: "SEDESENV",
-                                tipo: "OPERACIONAL",
-                                filhas: [],
-                            },
-                            {
-                                codigo: 9,
-                                nome: "Seção de Dados e Inteligência Artificial",
-                                sigla: "SEDIA",
-                                tipo: "OPERACIONAL",
-                                filhas: [],
-                            },
-                            {
-                                codigo: 10,
-                                nome: "Seção de Sistemas Eleitorais",
-                                sigla: "SESEL",
-                                tipo: "OPERACIONAL",
-                                filhas: [],
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                codigo: 200,
-                nome: "Secretaria de Gestao de Pessoas",
-                sigla: "SGP",
-                tipo: "INTERMEDIARIA",
-                filhas: [
-                    {
-                        codigo: 201,
-                        nome: "Coordenadoria de Atenção ao Servidor",
-                        sigla: "CAS",
-                        tipo: "INTEROPERACIONAL",
-                        filhas: [
-                            {
-                                codigo: 202,
-                                nome: "Seção de Atenção ao Servidor",
-                                sigla: "SAS",
-                                tipo: "OPERACIONAL",
-                                filhas: [],
-                            },
-                        ],
-                    },
-                ],
-            },
-        ];
-
-        // unidadesSelecionadasLocal = [];
-    });
-
-    // Funções auxiliares (copiadas do componente)
-    function getTodasSubunidades(unidade: Unidade): number[] {
-        let subunidades: number[] = [];
-        if (unidade.filhas) {
-            for (const filha of unidade.filhas) {
-                subunidades.push(filha.codigo);
-                subunidades = subunidades.concat(getTodasSubunidades(filha));
-            }
-        }
-        return subunidades;
-    }
-
-    function encontrarUnidade(
-        codigo: number,
-        unidadesArray: Unidade[],
-    ): Unidade | null {
-        for (const unidade of unidadesArray) {
-            if (unidade.codigo === codigo) {
-                return unidade;
-            }
-            if (unidade.filhas && unidade.filhas.length > 0) {
-                const encontrada = encontrarUnidade(codigo, unidade.filhas);
-                if (encontrada) return encontrada;
-            }
-        }
-        return null;
-    }
-
-    function isFolha(unidade: Unidade): boolean {
-        return !unidade.filhas || unidade.filhas.length === 0;
-    }
-
-    // Simula o comportamento do watcher
-    function processarSelecao(
-        selecionadasAnteriores: number[],
-        selecionadasNovas: number[],
-    ): number[] {
-        const adicionadas = selecionadasNovas.filter(
-            (c) => !selecionadasAnteriores.includes(c),
-        );
-        const removidas = selecionadasAnteriores.filter(
-            (c) => !selecionadasNovas.includes(c),
-        );
-
-        let novaSelecao = [...selecionadasNovas];
-
-        // Processar adicionadas
-        for (const codigo of adicionadas) {
-            const unidade = encontrarUnidade(codigo, unidades);
-            if (unidade) {
-                const subunidades = getTodasSubunidades(unidade);
-                for (const sub of subunidades) {
-                    if (!novaSelecao.includes(sub)) {
-                        novaSelecao.push(sub);
-                    }
-                }
-            }
-        }
-
-        // Processar removidas
-        // Só processar se foi UMA ÚNICA unidade removida (clique do usuário)
-        // Se várias foram removidas = cascata automática, não processar
-        if (removidas.length === 1) {
-            const codigo = removidas[0];
-            const unidade = encontrarUnidade(codigo, unidades);
-            if (unidade && !isFolha(unidade)) {
-                // É uma unidade com filhas
-                // Usuário clicou para desmarcar - remover todas as filhas
-                const subunidades = getTodasSubunidades(unidade);
-                novaSelecao = novaSelecao.filter((c) => !subunidades.includes(c));
-            }
-        }
-
-        // Verificar pais
-        function verificarPais(unidadesArray: Unidade[]) {
-            // Primeiro processar recursivamente as filhas
-            for (const unidade of unidadesArray) {
-                if (unidade.filhas && unidade.filhas.length > 0) {
-                    verificarPais(unidade.filhas);
-                }
-            }
-
-            // Depois processar este nível
-            for (const unidade of unidadesArray) {
-                if (!isFolha(unidade)) {
-                    // Verificar apenas as FILHAS DIRETAS, não todas as descendentes
-                    const filhasDirectas = unidade.filhas?.map((f) => f.codigo) || [];
-
-                    const selecionadas = filhasDirectas.filter((s) =>
-                        novaSelecao.includes(s),
-                    ).length;
-                    const total = filhasDirectas.length;
-
-                    if (selecionadas === total && total > 0) {
-                        if (!novaSelecao.includes(unidade.codigo)) {
-                            novaSelecao.push(unidade.codigo);
+    const criarUnidades = (): Unidade[] => [
+        {
+            codigo: 1,
+            sigla: 'SECRETARIA_1',
+            nome: 'Secretaria 1',
+            tipo: 'INTEROPERACIONAL',
+            isElegivel: true,
+            usuarioCodigo: 0,
+            responsavel: null,
+            filhas: [
+                {
+                    codigo: 11,
+                    sigla: 'ASSESSORIA_11',
+                    nome: 'Assessoria 11',
+                    tipo: 'OPERACIONAL',
+                    isElegivel: true,
+                    usuarioCodigo: 0,
+                    responsavel: null,
+                    filhas: []
+                },
+                {
+                    codigo: 12,
+                    sigla: 'ASSESSORIA_12',
+                    nome: 'Assessoria 12',
+                    tipo: 'OPERACIONAL',
+                    isElegivel: true,
+                    usuarioCodigo: 0,
+                    responsavel: null,
+                    filhas: []
+                },
+                {
+                    codigo: 13,
+                    sigla: 'COORD_11',
+                    nome: 'Coordenadoria 11',
+                    tipo: 'INTERMEDIARIA',
+                    isElegivel: false,
+                    usuarioCodigo: 0,
+                    responsavel: null,
+                    filhas: [
+                        {
+                            codigo: 131,
+                            sigla: 'SECAO_111',
+                            nome: 'Seção 111',
+                            tipo: 'OPERACIONAL',
+                            isElegivel: true,
+                            usuarioCodigo: 0,
+                            responsavel: null,
+                            filhas: []
+                        },
+                        {
+                            codigo: 132,
+                            sigla: 'SECAO_112',
+                            nome: 'Seção 112',
+                            tipo: 'OPERACIONAL',
+                            isElegivel: true,
+                            usuarioCodigo: 0,
+                            responsavel: null,
+                            filhas: []
+                        },
+                        {
+                            codigo: 133,
+                            sigla: 'SECAO_113',
+                            nome: 'Seção 113',
+                            tipo: 'OPERACIONAL',
+                            isElegivel: true,
+                            usuarioCodigo: 0,
+                            responsavel: null,
+                            filhas: []
                         }
-                    } else if (selecionadas === 0) {
-                        // Nenhuma selecionada → desmarcar o pai
-                        // EXCETO: INTEROPERACIONAL que estava explicitamente marcada antes
-                        const estaExplicitamenteMarcada = selecionadasAnteriores.includes(
-                            unidade.codigo,
-                        );
-                        if (
-                            unidade.tipo === "INTEROPERACIONAL" &&
-                            estaExplicitamenteMarcada
-                        ) {
-                            // Manter marcada
-                        } else {
-                            novaSelecao = novaSelecao.filter((c) => c !== unidade.codigo);
+                    ]
+                },
+                {
+                    codigo: 14,
+                    sigla: 'COORD_12',
+                    nome: 'Coordenadoria 12',
+                    tipo: 'INTERMEDIARIA',
+                    isElegivel: false,
+                    usuarioCodigo: 0,
+                    responsavel: null,
+                    filhas: [
+                        {
+                            codigo: 141,
+                            sigla: 'SECAO_121',
+                            nome: 'Seção 121',
+                            tipo: 'OPERACIONAL',
+                            isElegivel: true,
+                            usuarioCodigo: 0,
+                            responsavel: null,
+                            filhas: []
                         }
-                    } else {
-                        // Algumas selecionadas → estado indeterminate
-                        // EXCETO: INTEROPERACIONAL que estava explicitamente marcada antes
-                        const estaExplicitamenteMarcada = selecionadasAnteriores.includes(
-                            unidade.codigo,
-                        );
-                        if (
-                            unidade.tipo === "INTEROPERACIONAL" &&
-                            estaExplicitamenteMarcada
-                        ) {
-                            // Manter marcada
-                        } else {
-                            novaSelecao = novaSelecao.filter((c) => c !== unidade.codigo);
-                        }
-                    }
+                    ]
                 }
-            }
+            ]
         }
+    ];
 
-        verificarPais(unidades);
+    describe('Regras Básicas de Seleção', () => {
+        it('deve selecionar todas as filhas ao marcar um pai (COORD_11)', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
 
-        return novaSelecao;
-    }
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2]; // COORD_11
 
-    describe("Regra 1: Selecionar pai → seleciona todas filhas", () => {
-        it("deve selecionar todas filhas ao marcar COSIS", () => {
-            const antes: number[] = [];
-            const depois: number[] = [6]; // Marcar COSIS
+            // Simula toggle no pai
+            vm.toggle(coord11, true);
+            await flushPromises();
 
-            const resultado = processarSelecao(antes, depois);
+            const emitted = wrapper.emitted('update:modelValue');
+            const lastEmit = emitted![emitted!.length - 1][0] as number[];
 
-            expect(resultado).toContain(6); // COSIS
-            expect(resultado).toContain(8); // SEDESENV
-            expect(resultado).toContain(9); // SEDIA
-            expect(resultado).toContain(10); // SESEL
-            // STIC tem apenas uma filha (COSIS), então será marcada também
-            expect(resultado).toContain(2); // STIC
-            expect(resultado).toHaveLength(5);
+            // Todas as filhas elegíveis de COORD_11 (131, 132, 133) devem estar selecionadas
+            expect(lastEmit).toContain(131);
+            expect(lastEmit).toContain(132);
+            expect(lastEmit).toContain(133);
+            expect(lastEmit).toHaveLength(3); // COORD_11 não entra pois é INTERMEDIARIA (isElegivel: false)
         });
 
-        it("deve selecionar todas filhas e netas ao marcar STIC", () => {
-            const antes: number[] = [];
-            const depois: number[] = [2]; // Marcar STIC
+        it('deve desmarcar todas as filhas ao desmarcar um pai (COORD_11)', async () => {
+             const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [131, 132, 133] // Começa selecionado
+                }
+            });
+            context.wrapper = wrapper;
 
-            const resultado = processarSelecao(antes, depois);
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
 
-            expect(resultado).toContain(2); // STIC
-            expect(resultado).toContain(6); // COSIS
-            expect(resultado).toContain(8); // SEDESENV
-            expect(resultado).toContain(9); // SEDIA
-            expect(resultado).toContain(10); // SESEL
-            expect(resultado).toHaveLength(5);
-        });
-    });
+            vm.toggle(coord11, false);
+            await flushPromises();
 
-    describe("Regra 2: Desmarcar pai → desmarca todas filhas", () => {
-        it("deve desmarcar todas filhas ao desmarcar COSIS", () => {
-            const antes: number[] = [6, 8, 9, 10]; // Tudo marcado
-            const depois: number[] = []; // Desmarcar tudo via COSIS
+            const emitted = wrapper.emitted('update:modelValue');
+            const lastEmit = emitted![emitted!.length - 1][0] as number[];
 
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).toEqual([]);
-        });
-
-        it("deve desmarcar tudo ao desmarcar STIC", () => {
-            const antes: number[] = [2, 6, 8, 9, 10]; // Tudo marcado
-            const depois: number[] = []; // Desmarcar tudo via STIC
-
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).toEqual([]);
+            expect(lastEmit).not.toContain(131);
+            expect(lastEmit).not.toContain(132);
+            expect(lastEmit).not.toContain(133);
         });
     });
 
-    describe("Regra 3: Selecionar todas filhas → pai fica marcado", () => {
-        it("deve marcar COSIS quando todas as 3 filhas forem marcadas", () => {
-            const antes: number[] = [];
-            const depois: number[] = [8, 9, 10]; // Marcar as 3 filhas
+    describe('Estado dos Checkboxes (Visual)', () => {
+        it('Checkbox deve ter props model-value e indeterminate separadas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [132] // 1 de 3 filhas de COORD_11
+                }
+            });
+            context.wrapper = wrapper;
 
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).toContain(6); // COSIS deve estar marcada
-            expect(resultado).toContain(8); // SEDESENV
-            expect(resultado).toContain(9); // SEDIA
-            expect(resultado).toContain(10); // SESEL
-            // Nota: STIC (2) também será marcada porque COSIS está marcada
-            expect(resultado).toContain(2); // STIC
-            expect(resultado).toHaveLength(5);
-        });
-
-        it("deve marcar STIC e COSIS quando todas filhas/netas forem marcadas", () => {
-            const antes: number[] = [];
-            const depois: number[] = [8, 9, 10]; // Marcar as 3 netas
-
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).toContain(2); // STIC
-            expect(resultado).toContain(6); // COSIS
-            expect(resultado).toContain(8); // SEDESENV
-            expect(resultado).toContain(9); // SEDIA
-            expect(resultado).toContain(10); // SESEL
-            expect(resultado).toHaveLength(5);
-        });
-    });
-
-    describe("Regra 4: Desmarcar uma filha → pai fica indeterminate", () => {
-        it("deve remover COSIS da lista quando desmarcar SEDIA (indeterminate)", () => {
-            const antes: number[] = [6, 8, 9, 10]; // Tudo marcado
-            const depois: number[] = [6, 8, 10]; // Desmarcar SEDIA (9)
-
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).not.toContain(6); // COSIS não deve estar (indeterminate)
-            expect(resultado).toContain(8); // SEDESENV deve permanecer
-            expect(resultado).not.toContain(9); // SEDIA não deve estar
-            expect(resultado).toContain(10); // SESEL deve permanecer
-        });
-
-        it("deve manter outras filhas marcadas ao desmarcar uma", () => {
-            const antes: number[] = [2, 6, 8, 9, 10]; // Tudo marcado
-            const depois: number[] = [2, 6, 8, 10]; // Desmarcar SEDIA
-
-            const resultado = processarSelecao(antes, depois);
-
-            // SEDIA deve ser removida
-            expect(resultado).not.toContain(9);
-
-            // SEDESENV e SESEL devem permanecer
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(10);
-
-            // COSIS fica indeterminate (removida - é INTERMEDIARIA)
-            expect(resultado).not.toContain(6);
-
-            // STIC PERMANECE (é INTEROPERACIONAL)
-            expect(resultado).toContain(2);
-        });
-    });
-
-    describe("Regra 5: Desmarcar todas filhas → pai fica desmarcado", () => {
-        it("deve remover COSIS quando todas filhas forem desmarcadas", () => {
-            const antes: number[] = [6, 8, 9, 10]; // Tudo marcado
-            const depois: number[] = []; // Desmarcar tudo
-
-            const resultado = processarSelecao(antes, depois);
-
-            expect(resultado).toEqual([]);
-        });
-    });
-
-    describe("Cenários complexos", () => {
-        it("deve lidar com seleção incremental", () => {
-            // Passo 1: Marcar SEDESENV
-            let resultado = processarSelecao([], [8]);
-            expect(resultado).toEqual([8]);
-            expect(resultado).not.toContain(6); // COSIS não marcada
-
-            // Passo 2: Marcar SEDIA
-            resultado = processarSelecao(resultado, [...resultado, 9]);
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(9);
-            expect(resultado).not.toContain(6); // COSIS ainda não marcada
-
-            // Passo 3: Marcar SESEL
-            resultado = processarSelecao(resultado, [...resultado, 10]);
-            expect(resultado).toContain(6); // COSIS agora deve estar marcada
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(9);
-            expect(resultado).toContain(10);
-        });
-
-        it("cenário do bug: marcar STIC, depois desmarcar uma filha", () => {
-            // Passo 1: Marcar STIC
-            let resultado = processarSelecao([], [2]);
-            expect(resultado).toHaveLength(5); // 2, 6, 8, 9, 10
-
-            // Passo 2: Desmarcar SEDIA
-            const semSedia = resultado.filter((c) => c !== 9);
-            resultado = processarSelecao(resultado, semSedia);
-
-            // SEDIA deve estar removida
-            expect(resultado).not.toContain(9);
-
-            // SEDESENV e SESEL devem PERMANECER marcadas
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(10);
-
-            // COSIS fica indeterminate (removida - é INTERMEDIARIA)
-            expect(resultado).not.toContain(6);
-
-            // STIC PERMANECE (é INTEROPERACIONAL)
-            expect(resultado).toContain(2);
-
-            // Total: apenas 2, 8 e 10
-            expect(resultado).toHaveLength(3);
-            expect(resultado).toContain(2);
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(10);
-        });
-
-        it("deve marcar raiz quando todas filhas/netas estiverem marcadas", () => {
-            // Marcar manualmente todas as netas (8, 9, 10)
-            const resultado = processarSelecao([], [8, 9, 10]);
-
-            // Deve marcar COSIS (pai das netas)
-            expect(resultado).toContain(6);
-
-            // Deve marcar STIC (raiz)
-            expect(resultado).toContain(2);
-
-            // Deve conter todas as unidades
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(9);
-            expect(resultado).toContain(10);
-
-            // Total: 5 unidades (2, 6, 8, 9, 10)
-            expect(resultado).toHaveLength(5);
-        });
-
-        it("deve desmarcar todas filhas/netas ao desmarcar uma unidade pai", () => {
-            // Cenário: Marcar STIC (que marca tudo)
-            let resultado = processarSelecao([], [2]);
-            expect(resultado).toHaveLength(5); // 2, 6, 8, 9, 10
-
-            // Desmarcar STIC
-            resultado = processarSelecao(resultado, []);
-
-            // Todas unidades devem estar desmarcadas
-            expect(resultado).not.toContain(2); // STIC
-            expect(resultado).not.toContain(6); // COSIS
-            expect(resultado).not.toContain(8); // SEDESENV
-            expect(resultado).not.toContain(9); // SEDIA
-            expect(resultado).not.toContain(10); // SESEL
-
-            expect(resultado).toEqual([]);
-        });
-
-        it("deve desmarcar filhas ao desmarcar COSIS", () => {
-            // Cenário: Marcar COSIS (que marca suas 3 filhas)
-            let resultado = processarSelecao([], [6]);
-            expect(resultado).toHaveLength(5); // 2, 6, 8, 9, 10
-
-            // Desmarcar COSIS
-            resultado = processarSelecao(resultado, []);
-
-            // Todas unidades devem estar desmarcadas
-            expect(resultado).toEqual([]);
-        });
-
-        it("deve manter hierarquia ao marcar/desmarcar níveis intermediários", () => {
-            // Passo 1: Marcar SEDESENV e SEDIA (2 de 3)
-            let resultado = processarSelecao([], [8, 9]);
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(9);
-            expect(resultado).not.toContain(6); // COSIS não marcada (indeterminate)
-            expect(resultado).not.toContain(2); // STIC não marcada (indeterminate)
-
-            // Passo 2: Adicionar SESEL (agora todas as 3)
-            resultado = processarSelecao(resultado, [...resultado, 10]);
-            expect(resultado).toContain(6); // COSIS marcada
-            expect(resultado).toContain(2); // STIC marcada
-            expect(resultado).toHaveLength(5);
-
-            // Passo 3: Remover SESEL novamente
-            resultado = processarSelecao(
-                resultado,
-                resultado.filter((c) => c !== 10),
-            );
-            expect(resultado).not.toContain(10); // SESEL removida
-            expect(resultado).not.toContain(6); // COSIS volta a indeterminate (INTERMEDIARIA)
-            expect(resultado).toContain(2); // STIC PERMANECE (INTEROPERACIONAL)
-            expect(resultado).toContain(8); // SEDESENV permanece
-            expect(resultado).toContain(9); // SEDIA permanece
-            expect(resultado).toHaveLength(3);
-        });
-    });
-
-    describe("Unidades INTEROPERACIONAIS", () => {
-        it("deve permitir selecionar CAS independentemente de suas filhas", () => {
-            // CAS é INTEROPERACIONAL - pode ser selecionada sozinha
-            const resultado = processarSelecao([], [201]);
-
-            // CAS deve estar selecionada
-            expect(resultado).toContain(201);
-
-            // Filha SAS também deve ser selecionada (propagação normal)
-            expect(resultado).toContain(202);
-
-            // SGP deve estar marcada também (todas filhas diretas marcadas)
-            expect(resultado).toContain(200);
-
-            expect(resultado).toHaveLength(3);
-        });
-
-        it("CAS pode ficar marcada sem suas filhas (característica INTEROPERACIONAL)", () => {
-            // Passo 1: Marcar CAS (marca CAS e SAS)
-            let resultado = processarSelecao([], [201]);
-            expect(resultado).toContain(201);
-            expect(resultado).toContain(202);
-            expect(resultado).toContain(200);
-
-            // Passo 2: Desmarcar SAS
-            resultado = processarSelecao(
-                resultado,
-                resultado.filter((c) => c !== 202),
+            const treeNodes = wrapper.findAllComponents({ name: 'UnidadeTreeNode' });
+            const coord11Node = treeNodes.find(node =>
+                (node.props('unidade') as Unidade).sigla === 'COORD_11'
             );
 
-            // CAS deve PERMANECER marcada (INTEROPERACIONAL!)
-            expect(resultado).toContain(201);
+            expect(coord11Node).toBeTruthy();
 
-            // SAS não deve estar
-            expect(resultado).not.toContain(202);
-
-            // SGP permanece marcada (CAS ainda está marcada, e é filha de SGP)
-            expect(resultado).toContain(200);
-
-            // [201, 200]
-            expect(resultado).toHaveLength(2);
-            expect(resultado).toContain(201);
-            expect(resultado).toContain(200);
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
+            expect(vm.getEstadoSelecao(coord11)).toBe('indeterminate');
         });
 
-        it("STIC também pode ficar marcada sem todas as filhas", () => {
-            // Marcar STIC (marca tudo)
-            let resultado = processarSelecao([], [2]);
-            expect(resultado).toHaveLength(5); // [2, 6, 8, 9, 10]
+        it('Checkbox marcado quando todas filhas selecionadas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [131, 132, 133] // Todas filhas de COORD_11
+                }
+            });
+            context.wrapper = wrapper;
 
-            // Desmarcar SEDIA (9)
-            resultado = processarSelecao(
-                resultado,
-                resultado.filter((c) => c !== 9),
-            );
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
 
-            // STIC deve PERMANECER (INTEROPERACIONAL)
-            expect(resultado).toContain(2);
-
-            // COSIS não deve estar (é INTERMEDIARIA, fica indeterminate)
-            expect(resultado).not.toContain(6);
-
-            // Outras filhas permanecem
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(10);
-            expect(resultado).not.toContain(9);
-
-            // [2, 8, 10]
-            expect(resultado).toHaveLength(3);
+            expect(vm.getEstadoSelecao(coord11)).toBe(true);
         });
 
-        it("deve marcar CAS quando sua filha for selecionada", () => {
-            // Selecionar SAS
-            const resultado = processarSelecao([], [202]);
+        it('Checkbox desmarcado quando nenhuma filha selecionada', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
 
-            // SAS selecionada
-            expect(resultado).toContain(202);
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
 
-            // CAS deve ser marcada (todas filhas selecionadas)
-            expect(resultado).toContain(201);
+            expect(vm.getEstadoSelecao(coord11)).toBe(false);
+        });
+    });
 
-            // SGP deve estar marcada (todas filhas diretas marcadas)
-            expect(resultado).toContain(200);
+    describe('Reatividade e Sincronização', () => {
+        it('unidadesSelecionadasLocal sincroniza com props.modelValue', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
 
-            expect(resultado).toHaveLength(3);
+            const vm = wrapper.vm as any;
+            expect(vm.unidadesSelecionadasLocal).toEqual([]);
+
+            await wrapper.setProps({ modelValue: [131, 132, 133] });
+            await flushPromises();
+
+            expect(vm.unidadesSelecionadasLocal).toEqual([131, 132, 133]);
         });
 
-        it("deve comparar comportamento INTEROPERACIONAL vs INTERMEDIARIA", () => {
-            // STIC (INTEROPERACIONAL) com filhas
-            let resultado = processarSelecao([], [2]);
-            expect(resultado).toContain(2);
-            expect(resultado).toContain(6);
-            expect(resultado).toContain(8);
-            expect(resultado).toContain(9);
-            expect(resultado).toContain(10);
-            expect(resultado).toHaveLength(5);
+        it('Mudanças locais emitem update:modelValue', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
 
-            // CAS (INTEROPERACIONAL) com filha
-            resultado = processarSelecao([], [201]);
-            expect(resultado).toContain(201);
-            expect(resultado).toContain(202);
-            expect(resultado).toContain(200); // SGP marcada (comportamento normal)
-            expect(resultado).toHaveLength(3);
+            const vm = wrapper.vm as any;
+            vm.unidadesSelecionadasLocal = [131];
+            await flushPromises();
+
+            const emitted = wrapper.emitted('update:modelValue');
+            expect(emitted).toBeTruthy();
+            expect(emitted![emitted!.length - 1]).toEqual([[131]]);
+        });
+
+        it('Não deve causar loop infinito ao atualizar modelValue', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            await wrapper.setProps({ modelValue: [131] });
+            await wrapper.setProps({ modelValue: [131, 132] });
+            await wrapper.setProps({ modelValue: [131, 132, 133] });
+            await flushPromises();
+
+            const vm = wrapper.vm as any;
+            expect(vm.unidadesSelecionadasLocal).toEqual([131, 132, 133]);
+        });
+    });
+
+    describe('Expansão', () => {
+        it('Raízes devem inicializar expandidas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            expect(vm.expandedUnits.has(1)).toBe(true);
+        });
+
+        it('Raízes devem poder ser contraídas', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            vm.toggleExpand(criarUnidades()[0]);
+            await flushPromises();
+
+            expect(vm.expandedUnits.has(1)).toBe(false);
+        });
+    });
+
+    describe('Lógica de Seleção Complexa (Bugs Anteriores)', () => {
+        it('SECRETARIA_1 indeterminada com algumas filhas selecionadas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [11, 12] // Apenas ASSESSORIA_11 e ASSESSORIA_12
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            const secretaria = criarUnidades()[0];
+
+            const estado = vm.getEstadoSelecao(secretaria);
+            expect(estado).toBe('indeterminate');
+        });
+
+        it('SECRETARIA_1 marcada com todas filhas selecionadas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [1, 11, 12, 131, 132, 133, 141] // Todas elegíveis
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            const secretaria = criarUnidades()[0];
+
+            const estado = vm.getEstadoSelecao(secretaria);
+            expect(estado).toBe(true);
+        });
+
+        it('COORD_11 indeterminada com 2 de 3 filhas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [132, 133] // 2 de 3 filhas
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
+
+            const estado = vm.getEstadoSelecao(coord11);
+            expect(estado).toBe('indeterminate');
+        });
+    });
+
+    describe('Habilitação', () => {
+        it('INTERMEDIARIA com filhas elegíveis deve estar habilitada', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+            const coord11 = criarUnidades()[0].filhas![2];
+
+            expect(coord11.isElegivel).toBe(false);
+            expect(vm.isHabilitado(coord11)).toBe(true);
+        });
+
+        it('Checkbox de INTERMEDIARIA habilitada deve estar enabled', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            const coord11Checkbox = wrapper.find('[data-testid="chk-arvore-unidade-COORD_11"]');
+            expect(coord11Checkbox.attributes('disabled')).toBeUndefined();
+        });
+    });
+
+    describe('Cenário Completo: Fluxo de Seleção', () => {
+        it('Fluxo completo de seleção hierárquica', async () => {
+            const wrapper = mount(ArvoreUnidades, {
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: []
+                }
+            });
+            context.wrapper = wrapper;
+
+            const vm = wrapper.vm as any;
+
+            // 1. Seleciona SECAO_112
+            vm.toggle(criarUnidades()[0].filhas![2].filhas![1], true);
+            await flushPromises();
+
+            // COORD_11 deve estar indeterminada (1 de 3)
+            expect(vm.getEstadoSelecao(criarUnidades()[0].filhas![2])).toBe('indeterminate');
+
+            // 2. Seleciona SECAO_113
+            vm.toggle(criarUnidades()[0].filhas![2].filhas![2], true);
+            await flushPromises();
+
+            // COORD_11 ainda indeterminada (2 de 3)
+            expect(vm.getEstadoSelecao(criarUnidades()[0].filhas![2])).toBe('indeterminate');
+
+            // 3. Seleciona SECAO_111
+            vm.toggle(criarUnidades()[0].filhas![2].filhas![0], true);
+            await flushPromises();
+
+            // COORD_11 agora marcada (3 de 3)
+            expect(vm.getEstadoSelecao(criarUnidades()[0].filhas![2])).toBe(true);
+
+            // 4. Verifica que INTERMEDIARIA não está no modelValue
+            const emitted = wrapper.emitted('update:modelValue');
+            const lastEmit = emitted![emitted!.length - 1][0] as number[];
+            expect(lastEmit).toContain(131);
+            expect(lastEmit).toContain(132);
+            expect(lastEmit).toContain(133);
+            expect(lastEmit).not.toContain(13); // COORD_11 não deve estar
         });
     });
 });
