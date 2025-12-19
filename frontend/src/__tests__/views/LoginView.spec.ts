@@ -180,4 +180,116 @@ describe("LoginView.vue", () => {
         expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith(123, mockPerfis[0]);
         expect(routerPushMock).toHaveBeenCalledWith("/painel");
     });
+
+    it("deve tratar erro genérico durante o login (catch block)", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const feedbackStore = useFeedbackStore();
+
+        // Simula erro na chamada do store
+        perfilStore.loginCompleto = vi.fn().mockRejectedValue(new Error("Erro de rede"));
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Erro no sistema",
+            "Ocorreu um erro ao tentar realizar o login.",
+            "danger"
+        );
+    });
+
+    it("deve exibir erro se nenhum perfil estiver disponível (array vazio)", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const feedbackStore = useFeedbackStore();
+
+        perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
+        perfilStore.perfisUnidades = []; // Array vazio
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Perfis indisponíveis",
+            "Nenhum perfil/unidade disponível para este usuário.",
+            "danger"
+        );
+    });
+
+    it("deve tratar erro genérico durante seleção de perfil (step 2)", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const feedbackStore = useFeedbackStore();
+
+        perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
+        perfilStore.selecionarPerfilUnidade = vi.fn().mockRejectedValue(new Error("Erro ao selecionar"));
+        const mockPerfis = [
+            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
+            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
+        ];
+        perfilStore.perfisUnidades = mockPerfis;
+
+        // Passo 1
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+
+        // Passo 2 - Tentar selecionar
+        await wrapper.find('form').trigger('submit');
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Erro",
+            "Falha ao selecionar o perfil.",
+            "danger"
+        );
+    });
+
+    it("deve exibir erro se tentar submeter passo 2 sem seleção (caso edge)", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const feedbackStore = useFeedbackStore();
+
+        perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
+        const mockPerfis = [
+            {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
+            {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
+        ];
+        perfilStore.perfisUnidades = mockPerfis;
+
+        // Passo 1
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+
+        // Forçar parSelecionado a null para testar a validação
+        // Precisamos acessar a instancia do componente ou manipular via UI se possível.
+        // O watcher seleciona automaticamente o primeiro.
+        // Vamos tentar setar null diretamente na variável reativa interna se exposta ou mockar o watcher.
+        // Como é difícil via wrapper de integração, podemos simular que o watcher não rodou ou array veio vazio depois.
+        // Mas o watcher roda na mount.
+        // Alternativa: Setar perfisUnidadesDisponiveis para vazio momentaneamente?
+        // Ou melhor, apenas validar o else do "if (parSelecionado.value)".
+
+        // Verifica se mudou para o passo 2
+        expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
+
+        // Encontra o select pelo componente para emitir o evento
+        const select = wrapper.findComponent({ name: 'BFormSelect' });
+        if (select.exists()) {
+            await select.vm.$emit('update:modelValue', null);
+        } else {
+             await wrapper.find('[data-testid="sel-login-perfil"]').trigger('change');
+        }
+
+        await wrapper.find('form').trigger('submit');
+
+        expect(feedbackStore.show).toHaveBeenCalledWith(
+            "Seleção necessária",
+            "Por favor, selecione um perfil.",
+            "danger"
+        );
+    });
 });

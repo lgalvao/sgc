@@ -167,6 +167,26 @@ describe("SubprocessoCards.vue", () => {
                 },
             });
         });
+
+        it("deve navegar para MonitoramentoDiagnostico ao clicar no card de monitoramento", async () => {
+            const wrapper = createWrapper({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                mapa: null,
+                situacao: "Em andamento",
+                codSubprocesso: 10,
+            });
+
+            const card = wrapper.find('[data-testid="card-subprocesso-monitoramento"]');
+            await card.trigger("click");
+
+            expect(pushMock).toHaveBeenCalledWith({
+                name: "MonitoramentoDiagnostico",
+                params: {
+                    codSubprocesso: 10,
+                    siglaUnidade: "TEST",
+                },
+            });
+        });
     });
 
     describe("Lógica de Renderização", () => {
