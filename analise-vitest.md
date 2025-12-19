@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
-**Data da Análise:** 18 de Dezembro de 2025
-**Versão:** 1.5
+**Data da Análise:** 19 de Dezembro de 2025
+**Versão:** 1.6
 **Status dos Testes:** ✅ 732 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -48,7 +48,7 @@ Arquivos criados:
 - `test-utils/serviceTestHelpers.ts` (atualizado para suportar payload opcional)
 - `test-utils/componentTestHelpers.ts`
 
-Refatorações realizadas:
+Refatorações realizadas (Services e Stores):
 - `stores/__tests__/processos.spec.ts`
 - `services/__tests__/painelService.spec.ts`
 - `stores/__tests__/alertas.spec.ts`
@@ -72,12 +72,18 @@ Refatorações realizadas:
 - `services/__tests__/diagnosticoService.spec.ts`
 - `services/__tests__/processoService.spec.ts`
 - `stores/__tests__/feedback.spec.ts`
+
+Refatorações realizadas (Componentes):
 - `components/__tests__/BarraNavegacao.spec.ts`
+- `components/__tests__/MainNavbar.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Em Andamento.
 - Criado helper `testErrorHandling` em `test-utils/serviceTestHelpers.ts`.
 - Refatorado `services/__tests__/processoService.spec.ts` para usar `testErrorHandling`.
+- Refatorado `services/__tests__/usuarioService.spec.ts` para usar `testErrorHandling`.
+- Refatorado `services/__tests__/alertaService.spec.ts` para usar `testErrorHandling`.
+- Refatorado `services/__tests__/mapaService.spec.ts` para usar `testErrorHandling`.
 
 #### Ação 2.3: Padronizar Setup/Teardown
 **Status:** Em Andamento.
@@ -86,6 +92,7 @@ Refatorações realizadas:
   - `AceitarMapaModal.spec.ts`
   - `CriarCompetenciaModal.spec.ts`
   - `DisponibilizarMapaModal.spec.ts`
+  - `MainNavbar.spec.ts`
 - `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---

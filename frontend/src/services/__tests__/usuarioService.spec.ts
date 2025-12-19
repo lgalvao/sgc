@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testGetEndpoint, testPostEndpoint, testErrorHandling } from "../../test-utils/serviceTestHelpers";
 import * as mappers from "@/mappers/sgrh";
 import * as service from "../usuarioService";
 
@@ -22,18 +22,14 @@ describe("usuarioService", () => {
             expect(result).toBe(true);
         });
 
-        it("deve lançar erro em caso de falha", async () => {
-            const request = { tituloEleitoral: 123, senha: "123" };
-            mockApi.post.mockRejectedValueOnce(new Error("Failed"));
-            await expect(service.autenticar(request)).rejects.toThrow();
-        });
+        testErrorHandling(() => service.autenticar({ tituloEleitoral: 123, senha: "123" }), 'post');
     });
 
     describe("autorizar", () => {
         it("deve fazer POST, mapear e retornar resposta", async () => {
             const tituloEleitoral = 123;
             const responseDto = [{ perfil: "CHEFE", unidade: "UNIT" }];
-            mockApi.post.mockResolvedValueOnce({ data: responseDto });
+            mockApi.post.mockResolvedValue({ data: responseDto });
 
             const result = await service.autorizar(tituloEleitoral);
 
@@ -50,6 +46,8 @@ describe("usuarioService", () => {
             );
             expect(result[0]).toHaveProperty("mapped", true);
         });
+
+        testErrorHandling(() => service.autorizar(123), 'post');
     });
 
     describe("entrar", () => {
@@ -63,6 +61,8 @@ describe("usuarioService", () => {
             "/usuarios/entrar",
             request
         );
+
+        testErrorHandling(() => service.entrar(request), 'post');
     });
 
     describe("buscarTodosUsuarios", () => {
@@ -72,6 +72,8 @@ describe("usuarioService", () => {
             "/usuarios",
             mockUsuarios
         );
+
+        testErrorHandling(() => service.buscarTodosUsuarios(), 'get');
     });
 
     describe("buscarUsuariosPorUnidade", () => {
@@ -81,5 +83,7 @@ describe("usuarioService", () => {
             "/unidades/1/usuarios",
             mockUsuarios
         );
+
+        testErrorHandling(() => service.buscarUsuariosPorUnidade(1), 'get');
     });
 });
