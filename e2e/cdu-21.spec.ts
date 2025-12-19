@@ -3,12 +3,9 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-import { Page } from '@playwright/test';
-
-async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
+import {Page} from '@playwright/test';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByText(descProcesso).click();

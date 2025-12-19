@@ -12,17 +12,8 @@ import {
     removerAtividade,
     verificarBotaoImpacto
 } from './helpers/helpers-atividades';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-
-
-async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
-
-async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click();
-    await expect(page).toHaveURL(/\/login/);
-}
 
 async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});

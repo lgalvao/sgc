@@ -2,17 +2,9 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-import { Page } from '@playwright/test';
-
-async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click();
-    await expect(page).toHaveURL(/\/login/);
-}
-
-async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
+import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);

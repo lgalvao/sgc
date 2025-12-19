@@ -107,3 +107,33 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
     }
     await expect(page.getByText(dados.situacao).first()).toBeVisible();
 }
+
+/**
+ * Extrai o ID do processo da URL atual.
+ * Suporta múltiplos formatos de URL do sistema:
+ * - /processo/cadastro/{id}
+ * - codProcesso={id}
+ * - /processo/{id}
+ * 
+ * @throws {Error} Se não for possível extrair o ID da URL atual
+ */
+export async function extrairProcessoId(page: Page): Promise<number> {
+    const url = page.url();
+    
+    const patterns = [
+        /\/processo\/cadastro\/(\d+)/,
+        /codProcesso=(\d+)/,
+        /\/processo\/(\d+)/
+    ];
+    
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match?.[1]) {
+            return parseInt(match[1]);
+        }
+    }
+    
+    throw new Error(
+        `Não foi possível extrair ID do processo da URL: ${url}`
+    );
+}

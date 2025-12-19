@@ -16,17 +16,9 @@ import {
     homologarCadastroMapeamento,
     homologarCadastroRevisao
 } from './helpers/helpers-analise';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-import { Page } from '@playwright/test';
-
-async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click();
-    await expect(page).toHaveURL(/\/login/);
-}
-
-async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
+import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));

@@ -1,16 +1,9 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-
-async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click();
-    await expect(page).toHaveURL(/\/login/);
-}
-
-async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
+import type {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_21$/);

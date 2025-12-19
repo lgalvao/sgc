@@ -29,3 +29,39 @@ esses arquivos.
   saída (stdout e stderr) em um arquivo de texto.
 - **Use grep para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e analisar partes
   específicas da saída, como erros, logs do backend, ou mensagens específicas.
+
+## Helpers Disponíveis
+
+Os helpers estão organizados em arquivos especializados no diretório `e2e/helpers/`:
+
+| Arquivo | Responsabilidade |
+|---------|------------------|
+| `helpers-auth.ts` | Login, logout, credenciais de usuários (`USUARIOS`) |
+| `helpers-navegacao.ts` | Funções de navegação e verificação de páginas (`fazerLogout`, `verificarPaginaPainel`, `verificarPaginaSubprocesso`) |
+| `helpers-processos.ts` | Criar e verificar processos (`criarProcesso`, `calcularDataLimite`, `extrairProcessoId`) |
+| `helpers-atividades.ts` | Adicionar/editar atividades e conhecimentos |
+| `helpers-mapas.ts` | Criar competências e disponibilizar mapas |
+| `helpers-analise.ts` | Funções de análise de cadastro (aceite, devolução, homologação) |
+
+**IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
+
+## Boas Práticas
+
+### Extração de IDs de processos
+
+Use a função `extrairProcessoId(page)` de `helpers-processos.ts` que suporta múltiplos padrões de URL e lança erro explícito se a extração falhar.
+
+```typescript
+import { extrairProcessoId } from './helpers/helpers-processos';
+
+const processoId = await extrairProcessoId(page);
+cleanup.registrar(processoId);
+```
+
+### Estratégias de Espera
+
+- ✅ USE `waitForResponse()` para operações de API
+- ✅ USE `waitForURL()` para navegação
+- ✅ USE `waitFor()` para elementos do DOM
+- ✅ USE `expect().toHaveURL()` para verificar navegação
+- ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura-telas.spec.ts` para animações)
