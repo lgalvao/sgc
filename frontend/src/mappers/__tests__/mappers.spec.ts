@@ -19,7 +19,7 @@ import {
 } from "../sgrh";
 
 describe("mappers/alertas", () => {
-    it("mapAlertaDtoToFrontend should map all fields correctly", () => {
+    it("mapAlertaDtoToFrontend deve mapear todos os campos corretamente", () => {
         const dto = {
             codigo: 1,
             codProcesso: 10,
@@ -51,7 +51,7 @@ describe("mappers/alertas", () => {
 });
 
 describe("mappers/atividades", () => {
-    it("mapAtividadeDtoToModel should map correctly", () => {
+    it("mapAtividadeDtoToModel deve mapear corretamente", () => {
         const dto = {
             codigo: 1,
             descricao: "Atividade Teste",
@@ -64,21 +64,21 @@ describe("mappers/atividades", () => {
         expect(model.conhecimentos[0].id).toBe(101);
     });
 
-    it("mapConhecimentoDtoToModel should map correctly", () => {
+    it("mapConhecimentoDtoToModel deve mapear corretamente", () => {
         const dto = {id: 101, descricao: "Conhecimento Teste"};
         const model = mapConhecimentoDtoToModel(dto);
         expect(model.id).toBe(101);
         expect(model.descricao).toBe("Conhecimento Teste");
     });
 
-    it("mapCriarAtividadeRequestToDto should add codSubrocesso", () => {
+    it("mapCriarAtividadeRequestToDto deve adicionar codSubrocesso", () => {
         const request = {descricao: "Nova Atividade"};
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe("Nova Atividade");
         expect(dto.mapaCodigo).toBe(123);
     });
 
-    it("mapCriarConhecimentoRequestToDto should map correctly", () => {
+    it("mapCriarConhecimentoRequestToDto deve mapear corretamente", () => {
         const request = {descricao: "Novo Conhecimento"};
         const dto = mapCriarConhecimentoRequestToDto(request, 1);
         expect(dto.descricao).toBe("Novo Conhecimento");
@@ -86,7 +86,7 @@ describe("mappers/atividades", () => {
 });
 
 describe("mappers/mapas", () => {
-    it("mapMapaDtoToModel should map fields and handle dates", () => {
+    it("mapMapaDtoToModel deve mapear campos e tratar datas", () => {
         const dto = {
             codigo: 1,
             dataCriacao: "2025-01-01T00:00:00Z",
@@ -117,7 +117,7 @@ describe("mappers/mapas", () => {
     //     ).toBe(1000);
     // });
 
-    it("mapImpactoMapaDtoToModel should map impact fields including activity changes", () => {
+    it("mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade", () => {
         const dto = {
             temImpactos: true,
             competenciasImpactadas: [{codigo: 1, atividadesAfetadas: ["A1"]}],
@@ -140,7 +140,7 @@ describe("mappers/mapas", () => {
         expect(model.atividadesAlteradas[0].descricao).toBe("Changed");
     });
 
-    it("mapMapaAjusteDtoToModel should map ajuste fields", () => {
+    it("mapMapaAjusteDtoToModel deve mapear campos de ajuste", () => {
         const dto = {codigo: 1, descricao: "mapa", competencias: [1, 2]};
         const model: MapaAjuste = mapMapaAjusteDtoToModel(dto);
         expect(model.competencias).toHaveLength(2);
@@ -148,13 +148,13 @@ describe("mappers/mapas", () => {
 });
 
 describe("mappers/processos", () => {
-    it("mapProcessoResumoDtoToFrontend should copy all properties", () => {
+    it("mapProcessoResumoDtoToFrontend deve copiar todas as propriedades", () => {
         const dto = {codigo: 1, tipo: "MAPEAMENTO", situacao: "EM_ANDAMENTO"};
         const model = mapProcessoResumoDtoToFrontend(dto);
         expect(model).toEqual(dto);
     });
 
-    it("mapProcessoDtoToFrontend should copy all properties", () => {
+    it("mapProcessoDtoToFrontend deve copiar todas as propriedades", () => {
         const dto = {
             codigo: 1,
             tipo: "REVISAO",
@@ -165,7 +165,7 @@ describe("mappers/processos", () => {
         expect(model).toEqual(dto);
     });
 
-    it("mapProcessoDetalheDtoToFrontend should map nested structures", () => {
+    it("mapProcessoDetalheDtoToFrontend deve mapear estruturas aninhadas", () => {
         const dto = {
             codigo: 1,
             unidades: [{codigo: 10, filhos: [{codigo: 11}]}],
@@ -178,7 +178,7 @@ describe("mappers/processos", () => {
 });
 
 describe("mappers/sgrh", () => {
-    it("mapPerfilUnidadeToFrontend should map correctly", () => {
+    it("mapPerfilUnidadeToFrontend deve mapear corretamente", () => {
         const dto = {
             perfil: "CHEFE",
             unidade: {codigo: 1, nome: "Unidade Teste", sigla: "UT"},
@@ -190,7 +190,7 @@ describe("mappers/sgrh", () => {
         expect(model.siglaUnidade).toBe("UT");
     });
 
-    it("mapUsuarioToFrontend should map correctly", () => {
+    it("mapUsuarioToFrontend deve mapear corretamente", () => {
         const dto = {
             tituloEleitoral: 123,
             nome: "Usuário Teste",
@@ -206,7 +206,7 @@ describe("mappers/sgrh", () => {
         expect(model.perfis).toContain("CHEFE");
     });
 
-    it("LoginResponseToFrontend should map correctly", () => {
+    it("LoginResponseToFrontend deve mapear corretamente", () => {
         const dto = {
             tituloEleitoral: 123456,
             perfil: "GESTOR",
@@ -220,7 +220,7 @@ describe("mappers/sgrh", () => {
         expect(model.token).toBe("abc.def.ghi");
     });
 
-    it("perfisUnidadesParaDominio should map array correctly", () => {
+    it("perfisUnidadesParaDominio deve mapear array corretamente", () => {
         const backendData = [
             {
                 perfil: "GESTOR",
@@ -241,7 +241,7 @@ describe("mappers/sgrh", () => {
 });
 
 describe("mappers/usuarios", () => {
-    it("mapVWUsuarioToUsuario maps numeric titulo to codigo and fields", () => {
+    it("mapVWUsuarioToUsuario mapeia titulo numérico para codigo e campos", () => {
         const vw = {
             titulo: "42",
             nome: "Fulano",
@@ -257,7 +257,7 @@ describe("mappers/usuarios", () => {
         expect(s.ramal).toBe("123");
     });
 
-    it("mapVWUsuarioToUsuario uses codigo when provided and defaults missing fields", () => {
+    it("mapVWUsuarioToUsuario usa codigo quando fornecido e define valores padrão para campos ausentes", () => {
         const vw = {codigo: 7, nome: "Beltrano"};
         const s = mapVWUsuarioToUsuario(vw);
         expect(s.codigo).toBe(7);
@@ -265,7 +265,7 @@ describe("mappers/usuarios", () => {
         expect(s.unidade).toBe("");
     });
 
-    it("mapVWUsuariosArray maps array", () => {
+    it("mapVWUsuariosArray mapeia array", () => {
         const arr = [
             {codigo: 1, nome: "A"},
             {titulo: "2", nome: "B"},
@@ -278,7 +278,7 @@ describe("mappers/usuarios", () => {
 });
 
 describe("mappers/unidades", () => {
-    it("mapUnidade maps fields and responsavel, and recursive filhas", () => {
+    it("mapUnidade mapeia campos, responsavel e filhas recursivas", () => {
         const u = {
             codigo: 10,
             sigla: "SETEST",
@@ -313,7 +313,7 @@ describe("mappers/unidades", () => {
         expect(mapped.filhas[0].codigo).toBe(11);
     });
 
-    it("mapUnidadeSnapshot maps simple snapshot structure recursively", () => {
+    it("mapUnidadeSnapshot mapeia estrutura simples de snapshot recursivamente", () => {
         const s = {
             sigla: "ROOT",
             tipo: "OPERACIONAL",
@@ -325,7 +325,7 @@ describe("mappers/unidades", () => {
         expect(snap.filhas[0].sigla).toBe("C1");
     });
 
-    it("mapUnidadesArray maps arrays", () => {
+    it("mapUnidadesArray mapeia arrays", () => {
         const arr = [
             {codigo: 1, sigla: "A"},
             {codigo: 2, sigla: "B"},

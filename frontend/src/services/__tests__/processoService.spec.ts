@@ -41,7 +41,7 @@ describe("processoService", () => {
         vi.restoreAllMocks();
     });
 
-    it("iniciarProcesso should post with correct params", async () => {
+    it("iniciarProcesso deve enviar POST com os parâmetros corretos", async () => {
         mockApi.post.mockResolvedValue({});
         await service.iniciarProcesso(1, TipoProcesso.REVISAO, [10, 20]);
         expect(mockApi.post).toHaveBeenCalledWith(
@@ -53,31 +53,31 @@ describe("processoService", () => {
         );
     });
 
-    it("finalizarProcesso should post to the correct endpoint", async () => {
+    it("finalizarProcesso deve enviar POST para o endpoint correto", async () => {
         mockApi.post.mockResolvedValue({});
         await service.finalizarProcesso(1);
         expect(mockApi.post).toHaveBeenCalledWith("/processos/1/finalizar");
     });
 
-    it("excluirProcesso should call post", async () => {
+    it("excluirProcesso deve chamar o POST", async () => {
         mockApi.post.mockResolvedValue({});
         await service.excluirProcesso(1);
         expect(mockApi.post).toHaveBeenCalledWith("/processos/1/excluir");
     });
 
-    it("buscarProcessosFinalizados should get from the correct endpoint", async () => {
+    it("buscarProcessosFinalizados deve obter do endpoint correto", async () => {
         mockApi.get.mockResolvedValue({data: []});
         await service.buscarProcessosFinalizados();
         expect(mockApi.get).toHaveBeenCalledWith("/processos/finalizados");
     });
 
-    it("obterProcessoPorCodigo should get from the correct endpoint", async () => {
+    it("obterProcessoPorCodigo deve obter do endpoint correto", async () => {
         mockApi.get.mockResolvedValue({data: {}});
         await service.obterProcessoPorCodigo(1);
         expect(mockApi.get).toHaveBeenCalledWith("/processos/1");
     });
 
-    it("atualizarProcesso should post to the correct endpoint", async () => {
+    it("atualizarProcesso deve enviar POST para o endpoint correto", async () => {
         const request: AtualizarProcessoRequest = {
             codigo: 1,
             tipo: TipoProcesso.MAPEAMENTO,
@@ -93,13 +93,13 @@ describe("processoService", () => {
         );
     });
 
-    it("obterDetalhesProcesso should get from the correct endpoint", async () => {
+    it("obterDetalhesProcesso deve obter do endpoint correto", async () => {
         mockApi.get.mockResolvedValue({data: {}});
         await service.obterDetalhesProcesso(1);
         expect(mockApi.get).toHaveBeenCalledWith("/processos/1/detalhes");
     });
 
-    it("processarAcaoEmBloco should post to the correct endpoint", async () => {
+    it("processarAcaoEmBloco deve enviar POST para o endpoint correto", async () => {
         const payload = {
             codProcesso: 1,
             unidades: ["A"],
@@ -114,7 +114,7 @@ describe("processoService", () => {
         );
     });
 
-    it("buscarSubprocessosElegiveis should get from the correct endpoint", async () => {
+    it("buscarSubprocessosElegiveis deve obter do endpoint correto", async () => {
         mockApi.get.mockResolvedValue({data: []});
         await service.buscarSubprocessosElegiveis(1);
         expect(mockApi.get).toHaveBeenCalledWith(
@@ -122,7 +122,7 @@ describe("processoService", () => {
         );
     });
 
-    it("alterarDataLimiteSubprocesso should post to the correct endpoint", async () => {
+    it("alterarDataLimiteSubprocesso deve enviar POST para o endpoint correto", async () => {
         const payload = {novaData: "2026-01-01"};
         mockApi.post.mockResolvedValue({});
         await service.alterarDataLimiteSubprocesso(1, payload);
@@ -132,7 +132,7 @@ describe("processoService", () => {
         );
     });
 
-    it("apresentarSugestoes should post to the correct endpoint", async () => {
+    it("apresentarSugestoes deve enviar POST para o endpoint correto", async () => {
         const payload = {sugestoes: "sugestoes"};
         mockApi.post.mockResolvedValue({});
         await service.apresentarSugestoes(1, payload);
@@ -142,20 +142,20 @@ describe("processoService", () => {
         );
     });
 
-    it("validarMapa should post to the correct endpoint", async () => {
+    it("validarMapa deve enviar POST para o endpoint correto", async () => {
         mockApi.post.mockResolvedValue({});
         await service.validarMapa(1);
         expect(mockApi.post).toHaveBeenCalledWith("/subprocessos/1/validar-mapa");
     });
 
-    it("buscarSubprocessos should get from the correct endpoint", async () => {
+    it("buscarSubprocessos deve obter do endpoint correto", async () => {
         mockApi.get.mockResolvedValue({data: []});
         await service.buscarSubprocessos(1);
         expect(mockApi.get).toHaveBeenCalledWith("/processos/1/subprocessos");
     });
 
-    // Error handling
-    it("criarProcesso should throw error on failure", async () => {
+    // Tratamento de erros
+    it("criarProcesso deve lançar erro em caso de falha", async () => {
         const request: CriarProcessoRequest = {
             descricao: "teste",
             tipo: TipoProcesso.MAPEAMENTO,

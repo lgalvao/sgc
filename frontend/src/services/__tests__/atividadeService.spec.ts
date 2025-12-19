@@ -38,7 +38,7 @@ describe("atividadeService", () => {
         mockApi.delete.mockClear();
     });
 
-    it("listarAtividades should fetch and map atividades", async () => {
+    it("listarAtividades deve buscar e mapear atividades", async () => {
         const dtoList = [{id: 1, descricao: "Atividade DTO"}];
         mockApi.get.mockResolvedValue({data: dtoList});
 
@@ -52,7 +52,7 @@ describe("atividadeService", () => {
         expect(result[0]).toHaveProperty("mapped", true);
     });
 
-    it("obterAtividadePorCodigo should fetch and map an atividade", async () => {
+    it("obterAtividadePorCodigo deve buscar e mapear uma atividade", async () => {
         const dto = {id: 1, descricao: "Atividade DTO"};
         mockApi.get.mockResolvedValue({data: dto});
 
@@ -63,7 +63,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("mapped", true);
     });
 
-    it("criarAtividade should map request, post, and return AtividadeOperacaoResponse", async () => {
+    it("criarAtividade deve mapear a requisição, enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request = {descricao: "Nova Atividade"};
         const requestDto = {...request, mapped: true};
         const responseDto = {
@@ -83,7 +83,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    it("atualizarAtividade should post and return AtividadeOperacaoResponse", async () => {
+    it("atualizarAtividade deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request: Atividade = {
             codigo: 1,
             descricao: "Atividade Atualizada",
@@ -111,7 +111,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    it("excluirAtividade should call post and return AtividadeOperacaoResponse", async () => {
+    it("excluirAtividade deve chamar POST e retornar AtividadeOperacaoResponse", async () => {
         const responseDto = {
             atividade: null,
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
@@ -122,7 +122,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    it("listarConhecimentos should fetch and map conhecimentos", async () => {
+    it("listarConhecimentos deve buscar e mapear conhecimentos", async () => {
         const dtoList = [{id: 1, descricao: "Conhecimento DTO"}];
         mockApi.get.mockResolvedValue({data: dtoList});
 
@@ -136,7 +136,7 @@ describe("atividadeService", () => {
         expect(result[0]).toHaveProperty("mapped", true);
     });
 
-    it("criarConhecimento should map request, post, and return AtividadeOperacaoResponse", async () => {
+    it("criarConhecimento deve mapear a requisição, enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request = {descricao: "Novo Conhecimento"};
         const requestDto = {...request, mapped: true};
         const responseDto = {
@@ -159,7 +159,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    it("atualizarConhecimento should post and return AtividadeOperacaoResponse", async () => {
+    it("atualizarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request: Conhecimento = {
             id: 1,
             descricao: "Conhecimento Atualizado",
@@ -186,7 +186,7 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    it("excluirConhecimento should call post and return AtividadeOperacaoResponse", async () => {
+    it("excluirConhecimento deve chamar POST e retornar AtividadeOperacaoResponse", async () => {
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: []},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
@@ -199,18 +199,18 @@ describe("atividadeService", () => {
         expect(result).toHaveProperty("subprocesso");
     });
 
-    // Error handling tests
-    it("listarAtividades should throw error on failure", async () => {
+    // Testes de tratamento de erros
+    it("listarAtividades deve lançar erro em caso de falha", async () => {
         mockApi.get.mockRejectedValue(new Error("Failed"));
         await expect(service.listarAtividades()).rejects.toThrow("Failed");
     });
 
-    it("obterAtividadePorCodigo should throw error on failure", async () => {
+    it("obterAtividadePorCodigo deve lançar erro em caso de falha", async () => {
         mockApi.get.mockRejectedValue(new Error("Failed"));
         await expect(service.obterAtividadePorCodigo(1)).rejects.toThrow("Failed");
     });
 
-    it("criarAtividade should throw error on failure", async () => {
+    it("criarAtividade deve lançar erro em caso de falha", async () => {
         const request = {descricao: "Nova Atividade"};
         mockApi.post.mockRejectedValue(new Error("Failed"));
         await expect(service.criarAtividade(request, 123)).rejects.toThrow(
@@ -218,7 +218,7 @@ describe("atividadeService", () => {
         );
     });
 
-    it("atualizarAtividade should throw error on failure", async () => {
+    it("atualizarAtividade deve lançar erro em caso de falha", async () => {
         const request: Atividade = {
             codigo: 1,
             descricao: "Atividade Atualizada",
@@ -230,17 +230,17 @@ describe("atividadeService", () => {
         );
     });
 
-    it("excluirAtividade should throw error on failure", async () => {
+    it("excluirAtividade deve lançar erro em caso de falha", async () => {
         mockApi.post.mockRejectedValue(new Error("Failed"));
         await expect(service.excluirAtividade(1)).rejects.toThrow("Failed");
     });
 
-    it("listarConhecimentos should throw error on failure", async () => {
+    it("listarConhecimentos deve lançar erro em caso de falha", async () => {
         mockApi.get.mockRejectedValue(new Error("Failed"));
         await expect(service.listarConhecimentos(1)).rejects.toThrow("Failed");
     });
 
-    it("criarConhecimento should throw error on failure", async () => {
+    it("criarConhecimento deve lançar erro em caso de falha", async () => {
         const request = {descricao: "Novo Conhecimento"};
         mockApi.post.mockRejectedValue(new Error("Failed"));
         await expect(service.criarConhecimento(1, request)).rejects.toThrow(
@@ -248,7 +248,7 @@ describe("atividadeService", () => {
         );
     });
 
-    it("atualizarConhecimento should throw error on failure", async () => {
+    it("atualizarConhecimento deve lançar erro em caso de falha", async () => {
         const request: Conhecimento = {
             id: 1,
             descricao: "Conhecimento Atualizado",
@@ -259,7 +259,7 @@ describe("atividadeService", () => {
         );
     });
 
-    it("excluirConhecimento should throw error on failure", async () => {
+    it("excluirConhecimento deve lançar erro em caso de falha", async () => {
         mockApi.post.mockRejectedValue(new Error("Failed"));
         await expect(service.excluirConhecimento(1, 1)).rejects.toThrow("Failed");
     });
