@@ -53,13 +53,13 @@ describe("useAlertasStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with mock alerts and parsed dates", () => {
+    it("deve inicializar com alertas simulados e datas formatadas", () => {
         expect(alertasStore.alertas).toEqual([]);
         expect(alertasStore.alertasPage).toEqual({});
     });
 
     describe("actions", () => {
-        it("buscarAlertas should call painelService and update state", async () => {
+        it("buscarAlertas deve chamar painelService e atualizar o estado", async () => {
             const mockPage = {
                 content: [mockAlerta],
                 totalPages: 1,
@@ -87,7 +87,7 @@ describe("useAlertasStore", () => {
         });
 
         describe("marcarAlertaComoLido", () => {
-            it("should call alertaService and reload alerts on success", async () => {
+            it("deve chamar alertaService e recarregar alertas em caso de sucesso", async () => {
                 alertaService.marcarComoLido.mockResolvedValue();
                 const mockReloadPage = {
                     content: [
@@ -118,7 +118,7 @@ describe("useAlertasStore", () => {
                 expect(alertasStore.alertas).toEqual(mockReloadPage.content);
             });
 
-            it("should return false on service failure", async () => {
+            it("deve retornar falso em caso de falha do serviço", async () => {
                 alertaService.marcarComoLido.mockRejectedValue(
                     new Error("Falha no serviço"),
                 );
@@ -129,7 +129,7 @@ describe("useAlertasStore", () => {
                 expect(painelService.listarAlertas).not.toHaveBeenCalled();
             });
 
-            it("should handle missing perfilStore data", async () => {
+            it("deve lidar com dados faltantes do perfilStore", async () => {
                 mockPerfilStoreValues.usuarioCodigo = null;
                 mockPerfilStoreValues.unidadeSelecionada = null;
 

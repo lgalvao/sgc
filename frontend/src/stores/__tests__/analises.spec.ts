@@ -19,18 +19,18 @@ describe("useAnalisesStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with an empty map for analyses", () => {
+    it("deve inicializar com um mapa vazio para análises", () => {
         expect(store.analisesPorSubprocesso).toBeInstanceOf(Map);
         expect(store.analisesPorSubprocesso.size).toBe(0);
     });
 
     describe("getters", () => {
-        it("obterAnalisesPorSubprocesso should return an empty array if no analyses are present for the subprocess", () => {
+        it("obterAnalisesPorSubprocesso deve retornar uma lista vazia se nenhuma análise estiver presente para o subprocesso", () => {
             const result = store.obterAnalisesPorSubprocesso(123);
             expect(result).toEqual([]);
         });
 
-        it("obterAnalisesPorSubprocesso should return the correct analyses for a given subprocess", () => {
+        it("obterAnalisesPorSubprocesso deve retornar as análises corretas para um dado subprocesso", () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
                 {
                     codigo: 1,
@@ -88,7 +88,7 @@ describe("useAnalisesStore", () => {
             },
         ];
 
-        it("buscarAnalisesCadastro should call the service and update the state", async () => {
+        it("buscarAnalisesCadastro deve chamar o serviço e atualizar o estado", async () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(
                 mockAnalisesCadastro,
             );
@@ -103,7 +103,7 @@ describe("useAnalisesStore", () => {
             );
         });
 
-        it("buscarAnalisesValidacao should call the service and update the state", async () => {
+        it("buscarAnalisesValidacao deve chamar o serviço e atualizar o estado", async () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(
                 mockAnalisesValidacao,
             );
@@ -118,7 +118,7 @@ describe("useAnalisesStore", () => {
             );
         });
 
-        it("should merge results when fetching both cadastro and validacao analyses", async () => {
+        it("deve mesclar resultados ao buscar análises de cadastro e validação", async () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(
                 mockAnalisesCadastro,
             );
@@ -142,7 +142,7 @@ describe("useAnalisesStore", () => {
             expect(store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
         });
 
-        it("should handle error in buscarAnalisesCadastro", async () => {
+        it("deve lidar com erro em buscarAnalisesCadastro", async () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
                 new Error("Fail"),
             );
@@ -153,7 +153,7 @@ describe("useAnalisesStore", () => {
             expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
 
-        it("should handle error in buscarAnalisesValidacao", async () => {
+        it("deve lidar com erro em buscarAnalisesValidacao", async () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
                 new Error("Fail"),
             );

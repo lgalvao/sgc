@@ -73,13 +73,13 @@ describe("useAtribuicaoTemporariaStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with mock atribuicoes", () => {
+    it("deve inicializar com atribuições simuladas", () => {
         expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
         expect(atribuicaoTemporariaStore.atribuicoes[0].codigo).toBe(1);
     });
 
     describe("actions", () => {
-        it("buscarAtribuicoes should fetch and set atribuicoes", async () => {
+        it("buscarAtribuicoes deve buscar e definir atribuições", async () => {
             atribuicaoTemporariaStore.atribuicoes = [];
             await atribuicaoTemporariaStore.buscarAtribuicoes();
             expect(
@@ -88,7 +88,7 @@ describe("useAtribuicaoTemporariaStore", () => {
             expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
         });
 
-        it("buscarAtribuicoes should handle errors", async () => {
+        it("buscarAtribuicoes deve lidar com erros", async () => {
             (
                 atribuicaoTemporariaService.buscarTodasAtribuicoes as any
             ).mockRejectedValue(new Error("Failed"));
@@ -100,7 +100,7 @@ describe("useAtribuicaoTemporariaStore", () => {
     });
 
     describe("getters", () => {
-        it("obterAtribuicoesPorServidor should return the correct atribuicoes by servidor ID", () => {
+        it("obterAtribuicoesPorServidor deve retornar as atribuições corretas por ID do servidor", () => {
             const servidorAtribuicoes =
                 atribuicaoTemporariaStore.obterAtribuicoesPorServidor(1);
             expect(servidorAtribuicoes.length).toBe(2);
@@ -108,20 +108,20 @@ describe("useAtribuicaoTemporariaStore", () => {
             expect(servidorAtribuicoes[1].codigo).toBe(3);
         });
 
-        it("obterAtribuicoesPorServidor should return an empty array if no matching servidor is found", () => {
+        it("obterAtribuicoesPorServidor deve retornar uma lista vazia se nenhum servidor correspondente for encontrado", () => {
             const servidorAtribuicoes =
                 atribuicaoTemporariaStore.obterAtribuicoesPorServidor(999);
             expect(servidorAtribuicoes.length).toBe(0);
         });
 
-        it("obterAtribuicoesPorUnidade should return the correct atribuicoes by unidade sigla", () => {
+        it("obterAtribuicoesPorUnidade deve retornar as atribuições corretas pela sigla da unidade", () => {
             const unidadeAtribuicoes =
                 atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("A");
             expect(unidadeAtribuicoes.length).toBe(1);
             expect(unidadeAtribuicoes[0].codigo).toBe(1);
         });
 
-        it("obterAtribuicoesPorUnidade should return an empty array if no matching unidade is found", () => {
+        it("obterAtribuicoesPorUnidade deve retornar uma lista vazia se nenhuma unidade correspondente for encontrada", () => {
             const unidadeAtribuicoes =
                 atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("NONEXISTENT");
             expect(unidadeAtribuicoes.length).toBe(0);

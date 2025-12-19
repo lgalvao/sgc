@@ -37,20 +37,20 @@ describe("useUsuariosStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with mock usuarios", () => {
+    it("deve inicializar com usuários simulados", () => {
         expect(usuariosStore.usuarios.length).toBe(2);
         expect(usuariosStore.usuarios[0].tituloEleitoral).toBe("123456789");
     });
 
     describe("actions", () => {
-        it("buscarUsuarios should fetch and set usuarios", async () => {
+        it("buscarUsuarios deve buscar e definir usuários", async () => {
             usuariosStore.usuarios = [];
             await usuariosStore.buscarUsuarios();
             expect(usuarioService.buscarTodosUsuarios).toHaveBeenCalledTimes(1);
             expect(usuariosStore.usuarios.length).toBe(2);
         });
 
-        it("buscarUsuarios should handle errors", async () => {
+        it("buscarUsuarios deve lidar com erros", async () => {
             vi.mocked(usuarioService.buscarTodosUsuarios).mockRejectedValue(
                 new Error("Failed"),
             );
@@ -60,26 +60,26 @@ describe("useUsuariosStore", () => {
     });
 
     describe("getters", () => {
-        it("obterUsuarioPorTitulo should return the correct usuario by titulo", () => {
+        it("obterUsuarioPorTitulo deve retornar o usuário correto pelo título", () => {
             const usuario = usuariosStore.obterUsuarioPorTitulo("123456789");
             expect(usuario).toBeDefined();
             expect(usuario?.tituloEleitoral).toBe("123456789");
             expect(usuario?.nome).toBe("Ana Paula Souza");
         });
 
-        it("obterUsuarioPorTitulo should return undefined if no matching usuario is found", () => {
+        it("obterUsuarioPorTitulo deve retornar undefined se nenhum usuário correspondente for encontrado", () => {
             const usuario = usuariosStore.obterUsuarioPorTitulo("999999999");
             expect(usuario).toBeUndefined();
         });
 
-        it("obterUsuarioPorId should return the correct usuario by id", () => {
+        it("obterUsuarioPorId deve retornar o usuário correto pelo id", () => {
             const usuario = usuariosStore.obterUsuarioPorId(1);
             expect(usuario).toBeDefined();
             expect(usuario?.codigo).toBe(1);
             expect(usuario?.nome).toBe("Ana Paula Souza");
         });
 
-        it("obterUsuarioPorId should return undefined if no matching usuario is found", () => {
+        it("obterUsuarioPorId deve retornar undefined se nenhum usuário correspondente for encontrado", () => {
             const usuario = usuariosStore.obterUsuarioPorId(999);
             expect(usuario).toBeUndefined();
         });

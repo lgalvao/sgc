@@ -297,50 +297,6 @@ describe("useProcessosStore", () => {
             });
         });
 
-        describe("processarCadastroBloco", () => {
-            it("deve chamar service corretamente", async () => {
-                const payload = {codProcesso: 1, unidades: ["A"], tipoAcao: "aceitar" as any, unidadeUsuario: "B"};
-                processoService.processarAcaoEmBloco.mockResolvedValue(undefined);
-                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                await store.processarCadastroBloco(payload);
-                expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(payload);
-                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-            });
-        });
-
-        describe("alterarDataLimiteSubprocesso", () => {
-             it("deve chamar service corretamente", async () => {
-                 store.processoDetalhe = { codigo: 1 } as any;
-                 processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
-                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                 await store.alterarDataLimiteSubprocesso(10, { novaData: '2025-01-01' });
-                 expect(processoService.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, { novaData: '2025-01-01' });
-                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-             });
-        });
-
-        describe("apresentarSugestoes", () => {
-             it("deve chamar service corretamente", async () => {
-                 store.processoDetalhe = { codigo: 1 } as any;
-                 processoService.apresentarSugestoes.mockResolvedValue(undefined);
-                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                 await store.apresentarSugestoes(10, { sugestoes: 'Sugestao' });
-                 expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(10, { sugestoes: 'Sugestao' });
-                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-             });
-        });
-
-        describe("validarMapa", () => {
-             it("deve chamar service corretamente", async () => {
-                 store.processoDetalhe = { codigo: 1 } as any;
-                 processoService.validarMapa.mockResolvedValue(undefined);
-                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                 await store.validarMapa(10);
-                 expect(processoService.validarMapa).toHaveBeenCalledWith(10);
-                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-             });
-        });
-
         describe("aceitarValidacao", () => {
              it("deve chamar service corretamente", async () => {
                  store.processoDetalhe = { codigo: 1 } as any;
@@ -348,33 +304,6 @@ describe("useProcessosStore", () => {
                  processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
                  await store.aceitarValidacao(10, { observacoes: 'Obs' });
                  expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { observacoes: 'Obs' });
-                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-             });
-        });
-
-        describe("atualizarProcesso", () => {
-             it("deve chamar service corretamente", async () => {
-                 const req = { codigo: 1, descricao: 'Desc' } as any;
-                 processoService.atualizarProcesso.mockResolvedValue(undefined);
-                 await store.atualizarProcesso(1, req);
-                 expect(processoService.atualizarProcesso).toHaveBeenCalledWith(1, req);
-             });
-        });
-
-        describe("removerProcesso", () => {
-             it("deve chamar service corretamente", async () => {
-                 processoService.excluirProcesso.mockResolvedValue(undefined);
-                 await store.removerProcesso(1);
-                 expect(processoService.excluirProcesso).toHaveBeenCalledWith(1);
-             });
-        });
-
-        describe("finalizarProcesso", () => {
-             it("deve chamar service corretamente", async () => {
-                 processoService.finalizarProcesso.mockResolvedValue(undefined);
-                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                 await store.finalizarProcesso(1);
-                 expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
                  expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
              });
         });

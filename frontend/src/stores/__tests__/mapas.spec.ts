@@ -31,14 +31,14 @@ describe("useMapasStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with null values", () => {
+    it("deve inicializar com valores nulos", () => {
         expect(store.mapaCompleto).toBeNull();
         expect(store.mapaAjuste).toBeNull();
         expect(store.impactoMapa).toBeNull();
     });
 
     describe("buscarMapaCompleto", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaCompleto = {
                 codigo: 1,
                 subprocessoCodigo: 1,
@@ -54,7 +54,7 @@ describe("useMapasStore", () => {
             expect(store.mapaCompleto).toEqual(mockMapa);
         });
 
-        it("should set state to null on failure", async () => {
+        it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaCompleto).mockRejectedValue(
                 new Error("Failed"),
             );
@@ -67,7 +67,7 @@ describe("useMapasStore", () => {
     });
 
     describe("salvarMapa", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const request = {competencias: []};
             const mockResponse: MapaCompleto = {
                 codigo: 1,
@@ -89,7 +89,7 @@ describe("useMapasStore", () => {
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const request = {competencias: []};
             vi.mocked(mapaService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
@@ -98,7 +98,7 @@ describe("useMapasStore", () => {
     });
 
     describe("buscarMapaAjuste", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaAjuste = {
                 codigo: 1,
                 descricao: "teste",
@@ -112,7 +112,7 @@ describe("useMapasStore", () => {
             expect(store.mapaAjuste).toEqual(mockMapa);
         });
 
-        it("should set state to null on failure", async () => {
+        it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaAjuste).mockRejectedValue(new Error("Fail"));
             store.mapaAjuste = {} as any;
 
@@ -122,7 +122,7 @@ describe("useMapasStore", () => {
     });
 
     describe("salvarAjustes", () => {
-        it("should call service successfully", async () => {
+        it("deve chamar o serviço com sucesso", async () => {
             const request = {competencias: [], atividades: [], sugestoes: ""};
             vi.mocked(mapaService.salvarMapaAjuste).mockResolvedValue(undefined);
 
@@ -134,7 +134,7 @@ describe("useMapasStore", () => {
             );
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const request = {competencias: [], atividades: [], sugestoes: ""};
             vi.mocked(mapaService.salvarMapaAjuste).mockRejectedValue(new Error("Fail"));
 
@@ -143,7 +143,7 @@ describe("useMapasStore", () => {
     });
 
     describe("buscarImpactoMapa", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockImpacto: ImpactoMapa = {
                 temImpactos: true,
                 totalAtividadesInseridas: 0,
@@ -167,7 +167,7 @@ describe("useMapasStore", () => {
             expect(store.impactoMapa).toEqual(mockImpacto);
         });
 
-        it("should set state to null on failure", async () => {
+        it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.verificarImpactosMapa).mockRejectedValue(new Error("Fail"));
             store.impactoMapa = {} as any;
 
@@ -177,7 +177,7 @@ describe("useMapasStore", () => {
     });
 
     describe("adicionarCompetencia", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const competencia = {
                 descricao: "Nova Competencia",
                 codigo: 0,
@@ -205,7 +205,7 @@ describe("useMapasStore", () => {
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const competencia = {
                 descricao: "Nova Competencia",
                 codigo: 0,
@@ -218,7 +218,7 @@ describe("useMapasStore", () => {
     });
 
     describe("atualizarCompetencia", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const competencia = {
                 codigo: 1,
                 descricao: "Competencia Atualizada",
@@ -246,7 +246,7 @@ describe("useMapasStore", () => {
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const competencia = {
                 codigo: 1,
                 descricao: "Competencia Atualizada",
@@ -259,7 +259,7 @@ describe("useMapasStore", () => {
     });
 
     describe("removerCompetencia", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const idCompetencia = 1;
             const mockResponse: MapaCompleto = {
                 codigo: 1,
@@ -283,7 +283,7 @@ describe("useMapasStore", () => {
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const idCompetencia = 1;
             vi.mocked(subprocessoService.removerCompetencia).mockRejectedValue(new Error("Fail"));
 
@@ -292,7 +292,7 @@ describe("useMapasStore", () => {
     });
 
     describe("buscarMapaVisualizacao", () => {
-        it("should call service and update state on success", async () => {
+        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaVisualizacao = {
                 codigo: 1,
                 descricao: "Teste",
@@ -308,7 +308,7 @@ describe("useMapasStore", () => {
             expect(store.mapaVisualizacao).toEqual(mockMapa);
         });
 
-        it("should set state to null on failure", async () => {
+        it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaVisualizacao).mockRejectedValue(
                 new Error("Failed"),
             );
@@ -321,7 +321,7 @@ describe("useMapasStore", () => {
     });
 
     describe("disponibilizarMapa", () => {
-        it("should call service successfully", async () => {
+        it("deve chamar o serviço com sucesso", async () => {
             const request = {observacoes: "teste", dataLimite: "2025-12-31"};
             vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue(undefined);
 
@@ -333,7 +333,7 @@ describe("useMapasStore", () => {
             );
         });
 
-        it("should throw error on failure", async () => {
+        it("deve lançar erro em caso de falha", async () => {
             const request = {observacoes: "teste", dataLimite: "2025-12-31"};
             const error = {response: {data: {message: "Error"}}};
             vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);

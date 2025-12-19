@@ -42,13 +42,13 @@ describe("usePerfilStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with default values if localStorage is empty", () => {
+    it("deve inicializar com valores padrão se o localStorage estiver vazio", () => {
         expect(perfilStore.usuarioCodigo).toBe(9);
         expect(perfilStore.perfilSelecionado).toBeNull();
         expect(perfilStore.unidadeSelecionada).toBeNull();
     });
 
-    it("should initialize with values from localStorage if available", () => {
+    it("deve inicializar com valores do localStorage se disponíveis", () => {
         mockLocalStorage.setItem("usuarioCodigo", "10");
         mockLocalStorage.setItem("perfilSelecionado", "USER");
         mockLocalStorage.setItem("unidadeSelecionada", "123");
@@ -67,13 +67,13 @@ describe("usePerfilStore", () => {
     describe("actions", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
-        it("definirUsuarioCodigo should update usuarioCodigo and store it in localStorage", () => {
+        it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
             perfilStore.definirUsuarioCodigo(15);
             expect(perfilStore.usuarioCodigo).toBe(15);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", "15");
         });
 
-        it("definirPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage", () => {
+        it("definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage", () => {
             const unidadeCodigo = 123;
             const unidadeSigla = "TEST_SIGLA";
 
@@ -99,7 +99,7 @@ describe("usePerfilStore", () => {
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", "Nome Teste");
         });
 
-        it("loginCompleto should authenticate, fetch profiles, and auto-select if one profile", async () => {
+        it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.CHEFE,
                 unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
@@ -131,7 +131,7 @@ describe("usePerfilStore", () => {
             expect(result).toBe(true);
         });
 
-        it("loginCompleto should not auto-select if multiple profiles", async () => {
+        it("loginCompleto não deve selecionar automaticamente se houver múltiplos perfis", async () => {
             const perfis = [
                 {
                     perfil: Perfil.CHEFE,
@@ -156,7 +156,7 @@ describe("usePerfilStore", () => {
             expect(perfilStore.unidadeSelecionadaSigla).toBeNull(); // Add this
         });
 
-        it("selecionarPerfilUnidade should call entrar and set profile", async () => {
+        it("selecionarPerfilUnidade deve chamar entrar e definir o perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
                 unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
@@ -184,7 +184,7 @@ describe("usePerfilStore", () => {
             expect(perfilStore.usuarioCodigo).toBe(456);
         });
 
-        it("should handle error in loginCompleto", async () => {
+        it("deve lidar com erro em loginCompleto", async () => {
             mockUsuarioService.autenticar.mockRejectedValue(new Error("Fail"));
             await expect(perfilStore.loginCompleto("123", "pass")).rejects.toThrow(
                 "Fail",
@@ -192,7 +192,7 @@ describe("usePerfilStore", () => {
             expect(perfilStore.lastError).toBeTruthy();
         });
 
-        it("should handle error in selecionarPerfilUnidade", async () => {
+        it("deve lidar com erro em selecionarPerfilUnidade", async () => {
             mockUsuarioService.entrar.mockRejectedValue(new Error("Fail"));
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
@@ -205,13 +205,13 @@ describe("usePerfilStore", () => {
             expect(perfilStore.lastError).toBeTruthy();
         });
 
-        it("should return false if authentication fails in loginCompleto", async () => {
+        it("deve retornar falso se a autenticação falhar em loginCompleto", async () => {
             mockUsuarioService.autenticar.mockResolvedValue(false);
             const result = await perfilStore.loginCompleto("123", "pass");
             expect(result).toBe(false);
         });
 
-        it("should logout correctly", () => {
+        it("deve fazer logout corretamente", () => {
             perfilStore.logout();
             expect(perfilStore.usuarioCodigo).toBeNull();
             expect(perfilStore.perfilSelecionado).toBeNull();
@@ -219,7 +219,7 @@ describe("usePerfilStore", () => {
             expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(7);
         });
 
-        it("should clear error", () => {
+        it("deve limpar o erro", () => {
             perfilStore.lastError = { kind: "unexpected", message: "Error", subErrors: [] };
             perfilStore.clearError();
             expect(perfilStore.lastError).toBeNull();

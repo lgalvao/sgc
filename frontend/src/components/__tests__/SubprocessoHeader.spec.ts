@@ -24,8 +24,8 @@ describe("SubprocessoHeader.vue", () => {
         });
     };
 
-    describe("props rendering", () => {
-        it("should render all basic props correctly", () => {
+    describe("renderização das props", () => {
+        it("deve renderizar todas as props básicas corretamente", () => {
             const wrapper = mountComponent();
 
             expect(wrapper.text()).toContain("Processo: Processo de Teste");
@@ -40,8 +40,8 @@ describe("SubprocessoHeader.vue", () => {
         });
     });
 
-    describe("responsavel section", () => {
-        it("should render responsavel section when responsavelNome is provided", () => {
+    describe("seção do responsável", () => {
+        it("deve renderizar a seção do responsável quando responsavelNome é fornecido", () => {
             const wrapper = mountComponent({
                 responsavelNome: "Maria Santos",
                 responsavelRamal: "5678",
@@ -53,13 +53,13 @@ describe("SubprocessoHeader.vue", () => {
             expect(wrapper.text()).toContain("maria@teste.com");
         });
 
-        it("should not render responsavel section when responsavelNome is not provided", () => {
+        it("não deve renderizar a seção do responsável quando responsavelNome não é fornecido", () => {
             const wrapper = mountComponent();
 
             expect(wrapper.text()).not.toContain("Responsável:");
         });
 
-        it("should handle partial responsavel data", () => {
+        it("deve lidar com dados parciais do responsável", () => {
             const wrapper = mountComponent({
                 responsavelNome: "Maria Santos",
                 // responsavelRamal and responsavelEmail not provided
@@ -69,8 +69,8 @@ describe("SubprocessoHeader.vue", () => {
         });
     });
 
-    describe("alterar data limite button", () => {
-        it("should show button when podeAlterarDataLimite is true", () => {
+    describe("botão alterar data limite", () => {
+        it("deve mostrar o botão quando podeAlterarDataLimite for verdadeiro", () => {
             const wrapper = mountComponent({
                 podeAlterarDataLimite: true,
             });
@@ -81,7 +81,7 @@ describe("SubprocessoHeader.vue", () => {
             expect(button.classes()).toContain("btn-outline-primary");
         });
 
-        it("should not show button when podeAlterarDataLimite is false", () => {
+        it("não deve mostrar o botão quando podeAlterarDataLimite for falso", () => {
             const wrapper = mountComponent({
                 podeAlterarDataLimite: false,
             });
@@ -90,7 +90,7 @@ describe("SubprocessoHeader.vue", () => {
             expect(button.exists()).toBe(false);
         });
 
-        it("should emit alterarDataLimite when button is clicked", async () => {
+        it("deve emitir alterarDataLimite quando o botão for clicado", async () => {
             const wrapper = mountComponent({
                 podeAlterarDataLimite: true,
             });
@@ -102,7 +102,7 @@ describe("SubprocessoHeader.vue", () => {
     });
 
     describe("SubprocessoHeader.vue", () => {
-        it("should return correct badge class for known situacao", () => {
+        it("deve retornar a classe correta do badge para uma situação conhecida", () => {
             // Não precisamos montar o componente para testar uma função utilitária pura
             const result = badgeClass("EM_ANDAMENTO");
 
@@ -111,7 +111,7 @@ describe("SubprocessoHeader.vue", () => {
             expect(result.length).toBeGreaterThan(0);
         });
 
-        it("should return default class for any situacao", () => {
+        it("deve retornar a classe padrão para qualquer situação", () => {
             // Não precisamos montar o componente para testar uma função utilitária pura
             const result = badgeClass("UNKNOWN_SITUACAO");
 
@@ -119,15 +119,15 @@ describe("SubprocessoHeader.vue", () => {
         });
     });
 
-    describe("structure and styling", () => {
-        it("should have correct card structure", () => {
+    describe("estrutura e estilo", () => {
+        it("deve ter a estrutura correta do card", () => {
             const wrapper = mountComponent();
 
             expect(wrapper.find(".card").exists()).toBe(true);
             expect(wrapper.find(".card-body").exists()).toBe(true);
         });
 
-        it("should have correct text styling", () => {
+        it("deve ter o estilo de texto correto", () => {
             const wrapper = mountComponent();
 
             expect(wrapper.find(".text-muted").exists()).toBe(true);
@@ -135,7 +135,7 @@ describe("SubprocessoHeader.vue", () => {
             expect(wrapper.find(".fw-bold").exists()).toBe(true);
         });
 
-        it("should have correct icons", () => {
+        it("deve ter os ícones corretos", () => {
             const wrapper = mountComponent();
 
             const phoneIcons = wrapper.findAll(".bi-telephone-fill");
