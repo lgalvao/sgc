@@ -1,11 +1,10 @@
-import {flushPromises, mount, type VueWrapper} from "@vue/test-utils";
-import {BFormSelect} from "bootstrap-vue-next";
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
-// Mock data
-import {type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
+import { BFormSelect } from "bootstrap-vue-next";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ref } from "vue";
+import { type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso } from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
@@ -29,7 +28,6 @@ const mockAtividades: Atividade[] = [
     {codigo: 1, descricao: "Atividade A", conhecimentos: []},
 ];
 
-// Mock composable and stores
 const mockExecute = vi.fn();
 vi.mock("@/composables/useApi", () => ({
     useApi: () => ({
@@ -39,31 +37,30 @@ vi.mock("@/composables/useApi", () => ({
         clearError: vi.fn(),
     }),
 }));
-vi.mock("@/stores/processos", () => ({
-    useProcessosStore: () => ({
-        processosFinalizados: mockProcessos,
-        processoDetalhe: mockProcessoDetalhe,
-        buscarProcessosFinalizados: vi.fn(),
-        buscarProcessoDetalhe: vi.fn(),
-    }),
-}));
-vi.mock("@/stores/atividades", () => ({
-    useAtividadesStore: () => ({
-        obterAtividadesPorSubprocesso: () => mockAtividades,
-        buscarAtividadesParaSubprocesso: vi.fn(),
-        importarAtividades: vi.fn(),
-    }),
-}));
 
 describe("ImportarAtividadesModal", () => {
+    const context = setupComponentTest();
     let wrapper: VueWrapper<ImportarAtividadesModalVM>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
         vi.clearAllMocks();
-        wrapper = mount(ImportarAtividadesModal, {
+
+        const mapAtividades = new Map<number, Atividade[]>();
+        mapAtividades.set(100, mockAtividades);
+
+        context.wrapper = mount(ImportarAtividadesModal, {
+            ...getCommonMountOptions({
+                processos: {
+                    processosFinalizados: mockProcessos,
+                    processoDetalhe: mockProcessoDetalhe,
+                },
+                atividades: {
+                    atividadesPorSubprocesso: mapAtividades
+                }
+            }),
             props: {mostrar: true, codSubprocessoDestino: 999},
         });
+        wrapper = context.wrapper as VueWrapper<ImportarAtividadesModalVM>;
     });
 
     it('deve emitir "fechar" ao clicar em Cancelar', async () => {
@@ -137,6 +134,9 @@ describe("ImportarAtividadesModal", () => {
         await selects[0].setValue("1");
         await flushPromises();
         // BFormSelect/setValue might set it as string "1" even if bound to number
+        // Check if wrapper.vm.processoSelecionadoId is 1 or "1" depends on implementation and bootstrap-vue-next
+        // Original test expected "1". Since we mocked state with number 1, let's see.
+        // If setValue sets string, v-model becomes string.
         expect((wrapper.vm as any).processoSelecionadoId).toBe("1");
 
         await selects[0].setValue(""); // Select placeholder/empty

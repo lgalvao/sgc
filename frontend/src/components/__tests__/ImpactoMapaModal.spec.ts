@@ -1,40 +1,33 @@
-import {createTestingPinia} from "@pinia/testing";
-import {flushPromises, mount} from "@vue/test-utils";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import { flushPromises, mount } from "@vue/test-utils";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
-import {TipoImpactoCompetencia} from "@/types/tipos";
-import {useMapasStore} from "@/stores/mapas";
+import { TipoImpactoCompetencia } from "@/types/tipos";
+import { useMapasStore } from "@/stores/mapas";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 describe("ImpactoMapaModal.vue", () => {
-    let wrapper: any;
+    const context = setupComponentTest();
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
 
     function createWrapper(propsOverrides = {}, initialState = {}) {
-        return mount(ImpactoMapaModal, {
+        context.wrapper = mount(ImpactoMapaModal, {
+            ...getCommonMountOptions({
+                mapas: {
+                    impactoMapa: null,
+                    ...initialState
+                }
+            }),
             props: {
                 mostrar: true,
                 codSubprocesso: 123,
                 ...propsOverrides
             },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false,
-                        initialState: {
-                            mapas: {
-                                impactoMapa: null,
-                            },
-                            ...initialState
-                        },
-                    }),
-                ],
-            },
         });
+        return context.wrapper;
     }
-
-    afterEach(() => {
-        wrapper?.unmount();
-        vi.clearAllMocks();
-    });
 
     it("deve mostrar mensagem de nenhum impacto", async () => {
         const impacto = {
@@ -45,7 +38,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Nenhum impacto detectado no mapa.");
@@ -60,7 +53,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Inseridas");
@@ -77,7 +70,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Removidas");
@@ -100,7 +93,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Alteradas");
@@ -136,7 +129,7 @@ describe("ImpactoMapaModal.vue", () => {
             ],
         };
 
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Competências Impactadas");
@@ -152,23 +145,16 @@ describe("ImpactoMapaModal.vue", () => {
 
     it("deve carregar dados quando 'mostrar' mudar para true", async () => {
         // Inicia com mostrar: false
-        wrapper = mount(ImpactoMapaModal, {
+        const wrapper = mount(ImpactoMapaModal, {
+            ...getCommonMountOptions(),
             props: {
                 mostrar: false,
                 codSubprocesso: 123,
             },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false,
-                        initialState: {}
-                    }),
-                ],
-            },
         });
+        context.wrapper = wrapper;
 
         const mapasStore = useMapasStore();
-        mapasStore.buscarImpactoMapa = vi.fn();
 
         await wrapper.setProps({mostrar: true});
         await flushPromises();
@@ -184,7 +170,7 @@ describe("ImpactoMapaModal.vue", () => {
             atividadesAlteradas: [],
             competenciasImpactadas: []
         };
-        wrapper = createWrapper({}, {mapas: {impactoMapa: impacto}});
+        const wrapper = createWrapper({}, { impactoMapa: impacto });
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-fechar-impacto"]');
@@ -197,18 +183,15 @@ describe("ImpactoMapaModal.vue", () => {
         // Forçamos o estado de carregamento simulando a chamada
 
         // Recriar para pegar a transição de props
-        wrapper = mount(ImpactoMapaModal, {
+        const wrapper = mount(ImpactoMapaModal, {
+            ...getCommonMountOptions(),
             props: {mostrar: false, codSubprocesso: 123},
-            global: {
-                plugins: [createTestingPinia({
-                    initialState: {}
-                })]
-            }
         });
+        context.wrapper = wrapper;
 
-        // Mockar depois de montar, pois o pinia é criado no mount via plugins
+        // Mockar depois de montar
         const store = useMapasStore();
-        store.buscarImpactoMapa = vi.fn((_: number) => new Promise<void>(() => {})); // Promise que nunca resolve
+        (store.buscarImpactoMapa as any).mockImplementation((_: number) => new Promise<void>(() => {})); // Promise que nunca resolve
 
         await wrapper.setProps({mostrar: true});
         // Não damos flushPromises para manter o loading state

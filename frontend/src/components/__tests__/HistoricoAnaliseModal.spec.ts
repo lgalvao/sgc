@@ -1,8 +1,8 @@
-import {mount} from "@vue/test-utils";
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {formatDateBR} from "@/utils";
+import { mount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
+import { formatDateBR } from "@/utils";
 import HistoricoAnaliseModal from "../HistoricoAnaliseModal.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 const mockAnalises = [
     {
@@ -19,58 +19,61 @@ const mockAnalises = [
     },
 ];
 
-vi.mock("@/stores/analises", () => ({
-    useAnalisesStore: vi.fn(() => ({
-        obterAnalisesPorSubprocesso: (codSubprocesso: number) => {
-            return codSubprocesso === 1 ? mockAnalises : [];
-        },
-        buscarAnalisesCadastro: vi.fn().mockResolvedValue(undefined), // Adicionado o mock para buscarAnalisesCadastro
-        isLoading: false,
-        clearError: vi.fn(),
-    })),
-}));
-
 describe("HistoricoAnaliseModal", () => {
-    beforeEach(() => {
-        setActivePinia(createPinia());
-    });
+    const context = setupComponentTest();
 
     it("não deve renderizar o modal quando mostrar for falso", () => {
-        const wrapper = mount(HistoricoAnaliseModal, {
+        context.wrapper = mount(HistoricoAnaliseModal, {
+            ...getCommonMountOptions(),
             props: {
                 mostrar: false,
                 codSubprocesso: 1,
             },
         });
-        expect(wrapper.find('[data-testid="modal-historico-body"]').exists()).toBe(
+        expect(context.wrapper.find('[data-testid="modal-historico-body"]').exists()).toBe(
             false,
         );
     });
 
     it('deve renderizar a mensagem de "nenhuma análise" quando não houver análises', () => {
-        const wrapper = mount(HistoricoAnaliseModal, {
+        const mapAnalises = new Map();
+
+        context.wrapper = mount(HistoricoAnaliseModal, {
+            ...getCommonMountOptions({
+                analises: {
+                    analisesPorSubprocesso: mapAnalises,
+                }
+            }),
             props: {
                 mostrar: true,
                 codSubprocesso: 2,
             },
         });
 
-        expect(wrapper.find(".alert-info").text()).toContain(
+        expect(context.wrapper.find(".alert-info").text()).toContain(
             "Nenhuma análise registrada",
         );
     });
 
     it("deve renderizar a tabela com as análises", async () => {
-        const wrapper = mount(HistoricoAnaliseModal, {
+        const mapAnalises = new Map();
+        mapAnalises.set(1, mockAnalises);
+
+        context.wrapper = mount(HistoricoAnaliseModal, {
+            ...getCommonMountOptions({
+                analises: {
+                    analisesPorSubprocesso: mapAnalises,
+                }
+            }),
             props: {
                 mostrar: true,
                 codSubprocesso: 1,
             },
         });
 
-        await wrapper.vm.$nextTick(); // Aguarda a atualização do DOM
+        await context.wrapper.vm.$nextTick(); // Aguarda a atualização do DOM
 
-        const rows = wrapper.findAll("tbody tr");
+        const rows = context.wrapper.findAll("tbody tr");
         expect(rows.length).toBe(mockAnalises.length);
         const expectedDate = formatDateBR(new Date(mockAnalises[0].dataHora));
         expect(rows[0].text()).toContain(expectedDate);
@@ -80,14 +83,15 @@ describe("HistoricoAnaliseModal", () => {
     });
 
     it("deve emitir o evento fechar ao clicar no botão de fechar", async () => {
-        const wrapper = mount(HistoricoAnaliseModal, {
+        context.wrapper = mount(HistoricoAnaliseModal, {
+            ...getCommonMountOptions(),
             props: {
                 mostrar: true,
                 codSubprocesso: 1,
             },
         });
 
-        await wrapper.find('[data-testid="btn-modal-fechar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        await context.wrapper.find('[data-testid="btn-modal-fechar"]').trigger("click");
+        expect(context.wrapper.emitted("fechar")).toBeTruthy();
     });
 });
