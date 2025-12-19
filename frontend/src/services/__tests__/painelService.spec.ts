@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it, type Mocked, vi} from "vitest";
-import { setupServiceTest } from "@/test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling } from "@/test-utils/serviceTestHelpers";
 import * as alertaMappers from "@/mappers/alertas";
 import * as processoMappers from "@/mappers/processos";
 import * as service from "../painelService";
@@ -65,10 +65,7 @@ describe("painelService", () => {
             });
         });
 
-        it("deve lançar um erro em caso de falha", async () => {
-            mockApi.get.mockRejectedValueOnce(new Error("Failed"));
-            await expect(service.listarProcessos("CHEFE")).rejects.toThrow();
-        });
+        testErrorHandling(() => service.listarProcessos("CHEFE"));
     });
 
     describe("listarAlertas", () => {
@@ -99,9 +96,6 @@ describe("painelService", () => {
             expect(result.totalElements).toBe(1);
         });
 
-        it("deve lançar um erro em caso de falha", async () => {
-            mockApi.get.mockRejectedValueOnce(new Error("Failed"));
-            await expect(service.listarAlertas(123)).rejects.toThrow();
-        });
+        testErrorHandling(() => service.listarAlertas(123));
     });
 });

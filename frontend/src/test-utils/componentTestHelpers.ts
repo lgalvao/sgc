@@ -38,6 +38,7 @@ export function getCommonMountOptions(initialState = {}, additionalStubs = {}) {
                 RouterView: true,
                 ...additionalStubs,
             },
+            components: {} as Record<string, any>,
         },
     };
 }

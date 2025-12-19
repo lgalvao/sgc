@@ -1,4 +1,5 @@
-import {afterEach, describe, expect, it, vi, beforeEach} from "vitest";
+import {describe, expect, it, vi, beforeEach} from "vitest";
+import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import { createPinia, setActivePinia } from "pinia";
 import * as mappers from "@/mappers/atividades";
 import type {Atividade, Conhecimento} from "@/types/tipos";
@@ -13,37 +14,19 @@ vi.mock("@/mappers/atividades", () => ({
 }));
 
 describe("atividadeService", () => {
-    // We must mock @/axios-setup so that the real file (which has interceptors) is not used.
-    vi.mock("@/axios-setup", () => {
-        return {
-            default: {
-                get: vi.fn(),
-                post: vi.fn(),
-                put: vi.fn(),
-                delete: vi.fn(),
-            },
-        };
-    });
+    const { mockApi } = setupServiceTest();
 
-    let apiClient: any;
-
-    beforeEach(async () => {
+    beforeEach(() => {
         setActivePinia(createPinia());
-        vi.clearAllMocks();
-        apiClient = (await import("@/axios-setup")).default;
-    });
-
-    afterEach(() => {
-        vi.clearAllMocks();
     });
 
     it("listarAtividades deve buscar e mapear atividades", async () => {
         const dtoList = [{id: 1, descricao: "Atividade DTO"}];
-        apiClient.get.mockResolvedValue({data: dtoList});
+        mockApi.get.mockResolvedValue({data: dtoList});
 
         const result = await service.listarAtividades();
 
-        expect(apiClient.get).toHaveBeenCalledWith("/atividades");
+        expect(mockApi.get).toHaveBeenCalledWith("/atividades");
         expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalled();
         expect((mappers.mapAtividadeDtoToModel as any).mock.calls[0][0]).toEqual(
             dtoList[0],
@@ -53,11 +36,11 @@ describe("atividadeService", () => {
 
     it("obterAtividadePorCodigo deve buscar e mapear uma atividade", async () => {
         const dto = {id: 1, descricao: "Atividade DTO"};
-        apiClient.get.mockResolvedValue({data: dto});
+        mockApi.get.mockResolvedValue({data: dto});
 
         const result = await service.obterAtividadePorCodigo(1);
 
-        expect(apiClient.get).toHaveBeenCalledWith("/atividades/1");
+        expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
         expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(dto);
         expect(result).toHaveProperty("mapped", true);
     });
@@ -69,7 +52,7 @@ describe("atividadeService", () => {
             atividade: {id: 2, ...requestDto},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarAtividade(request, 123);
 
@@ -77,7 +60,7 @@ describe("atividadeService", () => {
             request,
             123,
         );
-        expect(apiClient.post).toHaveBeenCalledWith("/atividades", requestDto);
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades", requestDto);
         expect(result).toHaveProperty("atividade");
         expect(result).toHaveProperty("subprocesso");
     });
@@ -92,7 +75,7 @@ describe("atividadeService", () => {
             atividade: {...request},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.atualizarAtividade(request.codigo, request);
 
@@ -102,7 +85,7 @@ describe("atividadeService", () => {
             mapaCodigo: request.mapaCodigo,
         };
 
-        expect(apiClient.post).toHaveBeenCalledWith(
+        expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/${request.codigo}/atualizar`,
             expectedPayload,
         );
@@ -115,19 +98,19 @@ describe("atividadeService", () => {
             atividade: null,
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
         const result = await service.excluirAtividade(1);
-        expect(apiClient.post).toHaveBeenCalledWith("/atividades/1/excluir");
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/excluir");
         expect(result).toHaveProperty("subprocesso");
     });
 
     it("listarConhecimentos deve buscar e mapear conhecimentos", async () => {
         const dtoList = [{id: 1, descricao: "Conhecimento DTO"}];
-        apiClient.get.mockResolvedValue({data: dtoList});
+        mockApi.get.mockResolvedValue({data: dtoList});
 
         const result = await service.listarConhecimentos(1);
 
-        expect(apiClient.get).toHaveBeenCalledWith("/atividades/1/conhecimentos");
+        expect(mockApi.get).toHaveBeenCalledWith("/atividades/1/conhecimentos");
         expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalled();
         expect((mappers.mapConhecimentoDtoToModel as any).mock.calls[0][0]).toEqual(
             dtoList[0],
@@ -142,7 +125,7 @@ describe("atividadeService", () => {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{id: 2, ...requestDto}]},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarConhecimento(1, request);
 
@@ -150,7 +133,7 @@ describe("atividadeService", () => {
             request,
             1
         );
-        expect(apiClient.post).toHaveBeenCalledWith(
+        expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos",
             requestDto,
         );
@@ -167,7 +150,7 @@ describe("atividadeService", () => {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{...request}]},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.atualizarConhecimento(1, request.id, request);
 
@@ -177,7 +160,7 @@ describe("atividadeService", () => {
             descricao: request.descricao,
         };
 
-        expect(apiClient.post).toHaveBeenCalledWith(
+        expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.id}/atualizar`,
             expectedPayload,
         );
@@ -190,76 +173,23 @@ describe("atividadeService", () => {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: []},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
-        apiClient.post.mockResolvedValue({data: responseDto});
+        mockApi.post.mockResolvedValue({data: responseDto});
         const result = await service.excluirConhecimento(1, 1);
-        expect(apiClient.post).toHaveBeenCalledWith(
+        expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos/1/excluir",
         );
         expect(result).toHaveProperty("subprocesso");
     });
 
-    // Testes de tratamento de erros
-    it("listarAtividades deve lançar erro em caso de falha", async () => {
-        apiClient.get.mockRejectedValue(new Error("Failed"));
-        await expect(service.listarAtividades()).rejects.toThrow("Failed");
-    });
-
-    it("obterAtividadePorCodigo deve lançar erro em caso de falha", async () => {
-        apiClient.get.mockRejectedValue(new Error("Failed"));
-        await expect(service.obterAtividadePorCodigo(1)).rejects.toThrow("Failed");
-    });
-
-    it("criarAtividade deve lançar erro em caso de falha", async () => {
-        const request = {descricao: "Nova Atividade"};
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.criarAtividade(request, 123)).rejects.toThrow(
-            "Failed",
-        );
-    });
-
-    it("atualizarAtividade deve lançar erro em caso de falha", async () => {
-        const request: Atividade = {
-            codigo: 1,
-            descricao: "Atividade Atualizada",
-            conhecimentos: [],
-        };
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.atualizarAtividade(1, request)).rejects.toThrow(
-            "Failed",
-        );
-    });
-
-    it("excluirAtividade deve lançar erro em caso de falha", async () => {
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.excluirAtividade(1)).rejects.toThrow("Failed");
-    });
-
-    it("listarConhecimentos deve lançar erro em caso de falha", async () => {
-        apiClient.get.mockRejectedValue(new Error("Failed"));
-        await expect(service.listarConhecimentos(1)).rejects.toThrow("Failed");
-    });
-
-    it("criarConhecimento deve lançar erro em caso de falha", async () => {
-        const request = {descricao: "Novo Conhecimento"};
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.criarConhecimento(1, request)).rejects.toThrow(
-            "Failed",
-        );
-    });
-
-    it("atualizarConhecimento deve lançar erro em caso de falha", async () => {
-        const request: Conhecimento = {
-            id: 1,
-            descricao: "Conhecimento Atualizado",
-        };
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.atualizarConhecimento(1, 1, request)).rejects.toThrow(
-            "Failed",
-        );
-    });
-
-    it("excluirConhecimento deve lançar erro em caso de falha", async () => {
-        apiClient.post.mockRejectedValue(new Error("Failed"));
-        await expect(service.excluirConhecimento(1, 1)).rejects.toThrow("Failed");
+    describe("Tratamento de erros", () => {
+        testErrorHandling(() => service.listarAtividades());
+        testErrorHandling(() => service.obterAtividadePorCodigo(1));
+        testErrorHandling(() => service.criarAtividade({descricao: "Nova"}, 123), 'post');
+        testErrorHandling(() => service.atualizarAtividade(1, {codigo: 1} as any), 'post');
+        testErrorHandling(() => service.excluirAtividade(1), 'post');
+        testErrorHandling(() => service.listarConhecimentos(1));
+        testErrorHandling(() => service.criarConhecimento(1, {descricao: "Novo"}), 'post');
+        testErrorHandling(() => service.atualizarConhecimento(1, 1, {id: 1} as any), 'post');
+        testErrorHandling(() => service.excluirConhecimento(1, 1), 'post');
     });
 });

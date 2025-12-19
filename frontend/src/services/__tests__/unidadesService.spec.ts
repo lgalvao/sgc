@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { setupServiceTest, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
@@ -19,6 +19,7 @@ describe("unidadesService", () => {
             "/unidades",
             [{ id: 1 }]
         );
+        testErrorHandling(() => buscarTodasUnidades());
     });
 
     describe("buscarUnidadePorSigla", () => {
@@ -27,6 +28,7 @@ describe("unidadesService", () => {
             "/unidades/sigla/TESTE",
             { id: 1 }
         );
+        testErrorHandling(() => buscarUnidadePorSigla("TESTE"));
     });
 
     describe("buscarUnidadePorCodigo", () => {
@@ -35,6 +37,7 @@ describe("unidadesService", () => {
             "/unidades/1",
             { id: 1, nome: "Unit 1" }
         );
+        testErrorHandling(() => buscarUnidadePorCodigo(1));
     });
 
     describe("buscarArvoreComElegibilidade", () => {
@@ -61,6 +64,8 @@ describe("unidadesService", () => {
             );
             expect(result).toEqual(mockData);
         });
+
+        testErrorHandling(() => buscarArvoreComElegibilidade("MAPEAMENTO"));
     });
 
     describe("buscarArvoreUnidade", () => {
@@ -69,6 +74,7 @@ describe("unidadesService", () => {
             "/unidades/10/arvore",
             { id: 10, children: [] }
         );
+        testErrorHandling(() => buscarArvoreUnidade(10));
     });
 
     describe("buscarSubordinadas", () => {
@@ -77,6 +83,7 @@ describe("unidadesService", () => {
             "/unidades/sigla/SIGLA/subordinadas",
             [{ id: 11 }, { id: 12 }]
         );
+        testErrorHandling(() => buscarSubordinadas("SIGLA"));
     });
 
     describe("buscarSuperior", () => {
@@ -94,5 +101,7 @@ describe("unidadesService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/superior");
             expect(result).toBeNull();
         });
+
+        testErrorHandling(() => buscarSuperior("SIGLA"));
     });
 });

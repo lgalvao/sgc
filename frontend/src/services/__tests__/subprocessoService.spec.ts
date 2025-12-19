@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { setupServiceTest, testPostEndpoint, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling, testPostEndpoint, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
 import { mapMapaCompletoDtoToModel } from "@/mappers/mapas";
 import { mapAtividadeVisualizacaoToModel } from "@/mappers/atividades";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -10,7 +10,6 @@ vi.mock("@/mappers/atividades");
 
 describe("subprocessoService", () => {
     const { mockApi } = setupServiceTest();
-    const MOCK_ERROR = new Error("Service failed");
 
     describe("importarAtividades", () => {
         testPostEndpoint(
@@ -20,12 +19,7 @@ describe("subprocessoService", () => {
             {}
         );
 
-        it("deve lançar um erro em caso de falha", async () => {
-            mockApi.post.mockRejectedValue(MOCK_ERROR);
-            await expect(subprocessoService.importarAtividades(1, 2)).rejects.toThrow(
-                MOCK_ERROR,
-            );
-        });
+        testErrorHandling(() => subprocessoService.importarAtividades(1, 2), 'post');
     });
 
     describe("listarAtividades", () => {
@@ -39,6 +33,7 @@ describe("subprocessoService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1/atividades");
             expect(mapAtividadeVisualizacaoToModel).toHaveBeenCalledTimes(1);
         });
+        testErrorHandling(() => subprocessoService.listarAtividades(1));
     });
 
     describe("obterPermissoes", () => {
@@ -47,6 +42,7 @@ describe("subprocessoService", () => {
             "/subprocessos/1/permissoes",
             { podeEditar: true }
         );
+        testErrorHandling(() => subprocessoService.obterPermissoes(1));
     });
 
     describe("validarCadastro", () => {
@@ -55,6 +51,7 @@ describe("subprocessoService", () => {
             "/subprocessos/1/validar-cadastro",
             { valido: true }
         );
+        testErrorHandling(() => subprocessoService.validarCadastro(1));
     });
 
     describe("obterStatus", () => {
@@ -63,6 +60,7 @@ describe("subprocessoService", () => {
             "/subprocessos/1/status",
             { status: "EM_ANDAMENTO" }
         );
+        testErrorHandling(() => subprocessoService.obterStatus(1));
     });
 
     describe("buscarSubprocessoPorProcessoEUnidade", () => {
@@ -77,6 +75,7 @@ describe("subprocessoService", () => {
             });
             expect(result).toEqual(mockResponse);
         });
+        testErrorHandling(() => subprocessoService.buscarSubprocessoPorProcessoEUnidade(10, "UNID"));
     });
 
     describe("buscarSubprocessoDetalhe", () => {
@@ -87,6 +86,7 @@ describe("subprocessoService", () => {
                 params: { perfil: "perfil", unidadeUsuario: 123 },
             });
         });
+        testErrorHandling(() => subprocessoService.buscarSubprocessoDetalhe(1, "perfil", 123));
     });
 
     describe("Competencia Actions", () => {
@@ -146,5 +146,9 @@ describe("subprocessoService", () => {
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);
         });
+
+        testErrorHandling(() => subprocessoService.adicionarCompetencia(1, mockCompetencia), 'post');
+        testErrorHandling(() => subprocessoService.atualizarCompetencia(1, mockCompetencia), 'post');
+        testErrorHandling(() => subprocessoService.removerCompetencia(1, 1), 'post');
     });
 });

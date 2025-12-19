@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
 import { diagnosticoService } from "../diagnosticoService";
 
 describe("diagnosticoService", () => {
@@ -11,6 +11,7 @@ describe("diagnosticoService", () => {
             "/diagnosticos/123",
             { codigo: 1, subprocessoCodigo: 123, situacao: "EM_ANDAMENTO" }
         );
+        testErrorHandling(() => diagnosticoService.buscarDiagnostico(123));
     });
 
     describe("salvarAvaliacao", () => {
@@ -25,6 +26,7 @@ describe("diagnosticoService", () => {
             },
             { codigo: 1, competenciaCodigo: 10, importancia: "ALTA" }
         );
+        testErrorHandling(() => diagnosticoService.salvarAvaliacao(123, 10, "ALTA", "DOMINIO_TOTAL", "Obs"), 'post');
     });
 
     describe("buscarMinhasAvaliacoes", () => {
@@ -49,6 +51,8 @@ describe("diagnosticoService", () => {
             });
             expect(result).toEqual(mockAvaliacoes);
         });
+
+        testErrorHandling(() => diagnosticoService.buscarMinhasAvaliacoes(123));
     });
 
     describe("concluirAutoavaliacao", () => {
@@ -58,6 +62,7 @@ describe("diagnosticoService", () => {
             { justificativaAtraso: "Atraso" },
             {}
         );
+        testErrorHandling(() => diagnosticoService.concluirAutoavaliacao(123, "Atraso"), 'post');
     });
 
     describe("salvarOcupacao", () => {
@@ -71,6 +76,7 @@ describe("diagnosticoService", () => {
             },
             { codigo: 1, competenciaCodigo: 10 }
         );
+        testErrorHandling(() => diagnosticoService.salvarOcupacao(123, "12345678900", 10, "CRITICA"), 'post');
     });
 
     describe("buscarOcupacoes", () => {
@@ -79,6 +85,7 @@ describe("diagnosticoService", () => {
             "/diagnosticos/123/ocupacoes",
             [{ codigo: 1 }]
         );
+        testErrorHandling(() => diagnosticoService.buscarOcupacoes(123));
     });
 
     describe("concluirDiagnostico", () => {
@@ -88,5 +95,6 @@ describe("diagnosticoService", () => {
             { justificativa: "Justificativa" },
             { codigo: 1, situacao: "CONCLUIDO" }
         );
+        testErrorHandling(() => diagnosticoService.concluirDiagnostico(123, "Justificativa"), 'post');
     });
 });
