@@ -5,6 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -35,6 +36,19 @@ public class SgrhService {
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
+
+    @Transactional(readOnly = true)
+    public Usuario carregarUsuarioParaAutenticacao(String titulo) {
+        Usuario usuario = usuarioRepo.findById(titulo).orElse(null);
+        if (usuario != null) {
+            carregarAtribuicoes(usuario);
+            // Inicializa a coleção lazy
+            if (usuario.getAtribuicoesTemporarias() != null) {
+                usuario.getAtribuicoesTemporarias().size();
+            }
+        }
+        return usuario;
+    }
 
     public SgrhService(UnidadeRepo unidadeRepo,
                        UsuarioRepo usuarioRepo,
@@ -69,6 +83,7 @@ public class SgrhService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
     }
 
+    @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioRepo
                 .findById(titulo)
@@ -153,6 +168,7 @@ public class SgrhService {
                 : Optional.of(montarResponsavelDto(unidadeCodigo, chefes));
     }
 
+    @Transactional(readOnly = true)
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
 
@@ -184,6 +200,7 @@ public class SgrhService {
                 .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto));
     }
 
+    @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
         return usuarioRepo
                 .findById(titulo)
@@ -197,6 +214,7 @@ public class SgrhService {
                 .orElse(Collections.emptyList());
     }
 
+    @Transactional(readOnly = true)
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         return usuarioRepo
                 .findById(titulo)
@@ -209,6 +227,7 @@ public class SgrhService {
                 .orElse(false);
     }
 
+    @Transactional(readOnly = true)
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         return usuarioRepo
                 .findById(titulo)
@@ -288,6 +307,7 @@ public class SgrhService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<PerfilUnidade> autorizar(String tituloEleitoral) {
         log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo
