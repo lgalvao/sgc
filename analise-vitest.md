@@ -1,8 +1,8 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 19 de Dezembro de 2025
-**Versão:** 1.7
-**Status dos Testes:** ✅ 732 testes passando, 3 skipped (85 arquivos)
+**Versão:** 1.8
+**Status dos Testes:** ✅ 894 testes passando, 3 skipped (85 arquivos)
 
 ---
 
@@ -13,9 +13,9 @@ Esta análise aborda a qualidade, consistência e robustez da suíte de testes u
 ### 1.1. Métricas Gerais
 
 - **Total de arquivos de teste:** 85
-- **Total de testes:** 732 (729 passando + 3 skipped)
+- **Total de testes:** 897 (894 passando + 3 skipped)
 - **Cobertura configurada:** 95% (statements, branches, functions, lines)
-- **Duração da execução:** ~41 segundos
+- **Duração da execução:** ~53 segundos
 - **Total de linhas de código de teste:** ~13.499 linhas
 
 ### 1.2. Principais Problemas Identificados
@@ -25,7 +25,7 @@ Esta análise aborda a qualidade, consistência e robustez da suíte de testes u
 3. **Padrões de mock inconsistentes e frágeis** - **EM ANDAMENTO**
 4. **Testes superficiais focados apenas em "happy path"**
 5. **Falta de testes de integração adequados**
-6. **Setup e teardown inconsistentes**
+6. **Setup e teardown inconsistentes** - **EM ANDAMENTO**
 7. **Falta de organização hierárquica (describe aninhados)**
 8. **Comentários desnecessários ou vazios**
 
@@ -76,6 +76,11 @@ Refatorações realizadas (Services e Stores):
 Refatorações realizadas (Componentes):
 - `components/__tests__/BarraNavegacao.spec.ts`
 - `components/__tests__/MainNavbar.spec.ts`
+- `components/__tests__/HistoricoAnaliseModal.spec.ts`
+- `components/__tests__/ImpactoMapaModal.spec.ts`
+- `components/__tests__/ImportarAtividadesModal.spec.ts`
+- `components/__tests__/ModalFinalizacao.spec.ts`
+- `components/__tests__/SubprocessoModal.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Concluído (Services).
@@ -102,6 +107,11 @@ Refatorações realizadas (Componentes):
   - `CriarCompetenciaModal.spec.ts`
   - `DisponibilizarMapaModal.spec.ts`
   - `MainNavbar.spec.ts`
+  - `HistoricoAnaliseModal.spec.ts`
+  - `ImpactoMapaModal.spec.ts`
+  - `ImportarAtividadesModal.spec.ts`
+  - `ModalFinalizacao.spec.ts`
+  - `SubprocessoModal.spec.ts`
 - `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
 
 ---
