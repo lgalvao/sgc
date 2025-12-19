@@ -88,4 +88,81 @@ describe("TabelaMovimentacoes.vue", () => {
         expect(rowAttrFn(mockMovimentacoes[0], "row")).toEqual({'data-testid': 'row-movimentacao-1'});
         expect(rowAttrFn(null, "row")).toEqual({});
     });
+
+    it("deve renderizar conteúdo dos slots corretamente (formatação de data e sigla)", () => {
+        // Usar mount sem stub do BTable para renderizar slots pode ser pesado.
+        // Alternativa: Stub funcional que renderiza os slots.
+        const wrapper = mount(TabelaMovimentacoes, {
+            props: {movimentacoes: mockMovimentacoes},
+            global: {
+                stubs: {
+                    BTable: {
+                        props: ['items', 'fields'],
+                        template: `
+                          <table>
+                          <tbody>
+                          <tr v-for="item in items" :key="item.codigo">
+                            <td>
+                              <slot name="cell(dataHora)" :item="item" :value="item.dataHora"></slot>
+                            </td>
+                            <td>
+                              <slot name="cell(unidadeOrigem)" :item="item" :value="item.unidadeOrigem"></slot>
+                            </td>
+                            <td>
+                              <slot name="cell(unidadeDestino)" :item="item" :value="item.unidadeDestino"></slot>
+                            </td>
+                          </tr>
+                          </tbody>
+                          </table>
+                        `
+                    }
+                }
+            }
+        });
+
+        expect(wrapper.text()).toContain("Formatted 2024-01-01T10:00:00Z");
+        expect(wrapper.text()).toContain("ORG");
+        expect(wrapper.text()).toContain("DST");
+    });
+
+    it("deve renderizar hífen quando unidade for nula nos slots", () => {
+        const movSemUnidade: Movimentacao = {
+            ...mockMovimentacoes[0],
+            codigo: 2,
+            unidadeOrigem: null as any,
+            unidadeDestino: null as any
+        };
+
+        const wrapper = mount(TabelaMovimentacoes, {
+            props: {movimentacoes: [movSemUnidade]},
+            global: {
+                stubs: {
+                    BTable: {
+                        props: ['items'],
+                        template: `
+                          <table>
+                          <tbody>
+                          <tr v-for="item in items" :key="item.codigo">
+                            <td>
+                              <slot name="cell(unidadeOrigem)" :item="item" :value="item.unidadeOrigem"></slot>
+                            </td>
+                            <td>
+                              <slot name="cell(unidadeDestino)" :item="item" :value="item.unidadeDestino"></slot>
+                            </td>
+                          </tr>
+                          </tbody>
+                          </table>
+                        `
+                    }
+                }
+            }
+        });
+
+        // Verifica se renderizou dois hifens (um para origem, um para destino)
+        // O text() concatena tudo, então deve ter "- -" ou algo assim.
+        // Vamos buscar especificamente o texto gerado.
+        const cells = wrapper.findAll('td');
+        expect(cells[0].text()).toBe("-");
+        expect(cells[1].text()).toBe("-");
+    });
 });

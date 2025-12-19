@@ -108,7 +108,7 @@ function mapStatusToKind(status: number): ErrorKind {
 /**
  * Type guard para AxiosError
  */
-function isAxiosError(error: unknown): error is import('axios').AxiosError {
+export function isAxiosError(error: unknown): error is import('axios').AxiosError {
   return (
     error !== null &&
     typeof error === 'object' &&
