@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 17 de Dezembro de 2025  
-**Versão:** 1.2
+**Versão:** 1.3
 **Status dos Testes:** ✅ 729 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -57,6 +57,10 @@ Refatorações realizadas:
 - `services/__tests__/painelService.spec.ts` refatorado para usar `setupServiceTest`.
 - `stores/__tests__/alertas.spec.ts` refatorado para usar `setupStoreTest`.
 - `services/__tests__/alertaService.spec.ts` refatorado para usar `setupServiceTest`.
+- `stores/__tests__/analises.spec.ts` refatorado para usar `setupStoreTest`.
+- `services/__tests__/analiseService.spec.ts` refatorado para usar `setupServiceTest`.
+- `stores/__tests__/atividades.spec.ts` refatorado para usar `setupStoreTest`.
+- `services/__tests__/atividadeService.spec.ts` refatorado e corrigido para mockar `@/axios-setup` corretamente.
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Pendente.
@@ -85,6 +89,10 @@ Arquivos refatorados com sucesso:
 - `services/__tests__/painelService.spec.ts`
 - `stores/__tests__/alertas.spec.ts`
 - `services/__tests__/alertaService.spec.ts`
+- `stores/__tests__/analises.spec.ts`
+- `services/__tests__/analiseService.spec.ts`
+- `stores/__tests__/atividades.spec.ts`
+- `services/__tests__/atividadeService.spec.ts`
 
 **Próximos passos:**
 - Estender o uso de `setupStoreTest` para outras stores.

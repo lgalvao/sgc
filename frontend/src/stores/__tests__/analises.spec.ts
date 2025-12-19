@@ -1,32 +1,27 @@
-import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as analiseService from "@/services/analiseService";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {useAnalisesStore} from "../analises";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 
+// Mock do service
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
     listarAnalisesValidacao: vi.fn(),
 }));
 
-
 describe("useAnalisesStore", () => {
-    let store: ReturnType<typeof useAnalisesStore>;
-
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        store = useAnalisesStore();
-        vi.clearAllMocks();
-    });
+    // Inicializa a store usando o helper centralizado
+    const context = setupStoreTest(useAnalisesStore);
 
     it("deve inicializar com um mapa vazio para análises", () => {
-        expect(store.analisesPorSubprocesso).toBeInstanceOf(Map);
-        expect(store.analisesPorSubprocesso.size).toBe(0);
+        expect(context.store.analisesPorSubprocesso).toBeInstanceOf(Map);
+        expect(context.store.analisesPorSubprocesso.size).toBe(0);
     });
 
     describe("getters", () => {
         it("obterAnalisesPorSubprocesso deve retornar uma lista vazia se nenhuma análise estiver presente para o subprocesso", () => {
-            const result = store.obterAnalisesPorSubprocesso(123);
+            const result = context.store.obterAnalisesPorSubprocesso(123);
             expect(result).toEqual([]);
         });
 
@@ -54,9 +49,9 @@ describe("useAnalisesStore", () => {
                 },
             ];
             const codSubrocesso = 123;
-            store.analisesPorSubprocesso.set(codSubrocesso, mockAnalises);
+            context.store.analisesPorSubprocesso.set(codSubrocesso, mockAnalises);
 
-            const result = store.obterAnalisesPorSubprocesso(codSubrocesso);
+            const result = context.store.obterAnalisesPorSubprocesso(codSubrocesso);
             expect(result).toEqual(mockAnalises);
         });
     });
@@ -93,12 +88,12 @@ describe("useAnalisesStore", () => {
                 mockAnalisesCadastro,
             );
 
-            await store.buscarAnalisesCadastro(codSubrocesso);
+            await context.store.buscarAnalisesCadastro(codSubrocesso);
 
             expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesCadastro,
             );
         });
@@ -108,12 +103,12 @@ describe("useAnalisesStore", () => {
                 mockAnalisesValidacao,
             );
 
-            await store.buscarAnalisesValidacao(codSubrocesso);
+            await context.store.buscarAnalisesValidacao(codSubrocesso);
 
             expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesValidacao,
             );
         });
@@ -127,19 +122,19 @@ describe("useAnalisesStore", () => {
             );
 
             // Fetch cadastro first
-            await store.buscarAnalisesCadastro(codSubrocesso);
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            await context.store.buscarAnalisesCadastro(codSubrocesso);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 mockAnalisesCadastro,
             );
 
             // Then fetch validacao
-            await store.buscarAnalisesValidacao(codSubrocesso);
+            await context.store.buscarAnalisesValidacao(codSubrocesso);
 
             const expected = [...mockAnalisesCadastro, ...mockAnalisesValidacao];
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
                 expect.arrayContaining(expected),
             );
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
         });
 
         it("deve lidar com erro em buscarAnalisesCadastro", async () => {
@@ -147,10 +142,10 @@ describe("useAnalisesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                store.buscarAnalisesCadastro(codSubrocesso),
+                context.store.buscarAnalisesCadastro(codSubrocesso),
             ).rejects.toThrow("Fail");
-            // It just catches and logs toast, state remains or empty
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+            // Verifica se o estado permanece limpo ou inalterado em caso de erro inicial
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
 
         it("deve lidar com erro em buscarAnalisesValidacao", async () => {
@@ -158,9 +153,9 @@ describe("useAnalisesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                store.buscarAnalisesValidacao(codSubrocesso),
+                context.store.buscarAnalisesValidacao(codSubrocesso),
             ).rejects.toThrow("Fail");
-            expect(store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
         });
     });
 });
