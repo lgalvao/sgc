@@ -70,26 +70,26 @@ describe("axios-setup", () => {
         vi.restoreAllMocks();
     });
 
-    it("request interceptor should add token if exists", () => {
+    it("interceptor de requisição deve adicionar token se existir", () => {
         localStorage.setItem("jwtToken", "token123");
         const config = {headers: {}};
         const result = requestInterceptor(config);
         expect(result.headers.Authorization).toBe("Bearer token123");
     });
 
-    it("request interceptor should not add token if missing", () => {
+    it("interceptor de requisição não deve adicionar token se estiver faltando", () => {
         localStorage.removeItem("jwtToken");
         const config = {headers: {}};
         const result = requestInterceptor(config);
         expect(result.headers.Authorization).toBeUndefined();
     });
 
-    it("request error interceptor should reject promise", async () => {
+    it("interceptor de erro de requisição deve rejeitar a promessa", async () => {
         const error = new Error("Request error");
         await expect(requestErrorInterceptor(error)).rejects.toThrow("Request error");
     });
 
-    it("response error interceptor should redirect to login on 401", async () => {
+    it("interceptor de erro de resposta deve redirecionar para login em caso de 401", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -103,7 +103,7 @@ describe("axios-setup", () => {
         expect(router.push).toHaveBeenCalledWith("/login");
     });
 
-    it("response error interceptor should not show global error for 400, 404, 409, 422", async () => {
+    it("interceptor de erro de resposta não deve mostrar erro global para 400, 404, 409, 422", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -112,7 +112,7 @@ describe("axios-setup", () => {
         expect(feedbackStore.show).not.toHaveBeenCalled();
     });
 
-    it("response error interceptor should show unexpected error for 500 with message", async () => {
+    it("interceptor de erro de resposta deve mostrar erro inesperado para 500 com mensagem", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -125,7 +125,7 @@ describe("axios-setup", () => {
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
     });
 
-    it("response error interceptor should show generic error for 500 without message", async () => {
+    it("interceptor de erro de resposta deve mostrar erro genérico para 500 sem mensagem", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -141,7 +141,7 @@ describe("axios-setup", () => {
         );
     });
 
-    it("response error interceptor should show network error", async () => {
+    it("interceptor de erro de resposta deve mostrar erro de rede", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -155,7 +155,7 @@ describe("axios-setup", () => {
         );
     });
 
-    it("response error interceptor should show generic error with message property", async () => {
+    it("interceptor de erro de resposta deve mostrar erro genérico com propriedade de mensagem", async () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -167,7 +167,7 @@ describe("axios-setup", () => {
     // Keeping this test but I need to update axios-setup.ts to handle the exception if I want it to pass.
     // Or I can update expectation if I don't want to swallow the error.
     // I'll update axios-setup.ts to swallow the error.
-    it("response error interceptor should handle store errors gracefully", async () => {
+    it("interceptor de erro de resposta deve tratar erros da store graciosamente", async () => {
         const feedbackStore = useFeedbackStore();
         // Force an error in store.show
         vi.spyOn(feedbackStore, "show").mockImplementation(() => {

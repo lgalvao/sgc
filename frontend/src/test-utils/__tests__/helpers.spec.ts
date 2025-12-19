@@ -13,18 +13,18 @@ import {
 } from "../uiHelpers";
 
 describe("test-utils/helpers", () => {
-    it("getMockAtividadesData should return a non-empty array", () => {
+    it("getMockAtividadesData deve retornar um array não vazio", () => {
         const data = getMockAtividadesData();
         expect(Array.isArray(data)).toBe(true);
         expect(data.length).toBeGreaterThan(0);
     });
 
-    it("initPinia should initialize and return a pinia instance", () => {
+    it("initPinia deve inicializar e retornar uma instância do pinia", () => {
         const pinia = initPinia();
         expect(pinia).toBeDefined();
     });
 
-    it("prepareFreshAtividadesStore should return a store with data", async () => {
+    it("prepareFreshAtividadesStore deve retornar uma store com dados", async () => {
         const store = await prepareFreshAtividadesStore();
         expect(store).toBeDefined();
         expect(store.atividades.length).toBeGreaterThan(0);
@@ -53,7 +53,7 @@ describe("test-utils/uiHelpers", () => {
         },
     };
 
-    it("selecionarProcessoEUnidade should set select values", async () => {
+    it("selecionarProcessoEUnidade deve definir valores de seleção", async () => {
         const wrapper = mount(TestComponent);
         await selecionarProcessoEUnidade(wrapper, 1, 1);
         expect(
@@ -66,17 +66,17 @@ describe("test-utils/uiHelpers", () => {
         ).toBe("1");
     });
 
-    it("expectImportButtonDisabled should assert disabled attribute", () => {
+    it("expectImportButtonDisabled deve verificar atributo disabled", () => {
         const wrapper = mount(TestComponent, {props: {disabled: true}});
         expectImportButtonDisabled(wrapper);
     });
 
-    it("expectImportButtonEnabled should assert no disabled attribute", () => {
+    it("expectImportButtonEnabled deve verificar ausência de atributo disabled", () => {
         const wrapper = mount(TestComponent, {props: {disabled: false}});
         expectImportButtonEnabled(wrapper);
     });
 
-    it("selectFirstCheckbox should check the first checkbox", async () => {
+    it("selectFirstCheckbox deve marcar o primeiro checkbox", async () => {
         const wrapper = mount(TestComponent);
         await selectFirstCheckbox(wrapper);
         expect(
@@ -84,12 +84,12 @@ describe("test-utils/uiHelpers", () => {
         ).toBe(true);
     });
 
-    it("assertUnidadeOptions should check select options", () => {
+    it("assertUnidadeOptions deve verificar opções de seleção", () => {
         const wrapper = mount(TestComponent);
         assertUnidadeOptions(wrapper, ["Unidade 1"]);
     });
 
-    it("navigateAndAssertBreadcrumbs should work correctly", async () => {
+    it("navigateAndAssertBreadcrumbs deve funcionar corretamente", async () => {
         const routes = [{path: "/", component: TestComponent}];
         const router = createRouter({history: createMemoryHistory(), routes}); // <-- This line
         const mountFn = async () =>
@@ -97,7 +97,7 @@ describe("test-utils/uiHelpers", () => {
         await navigateAndAssertBreadcrumbs(router, mountFn, "/", ["Page"]);
     });
 
-    it("expectContainsAll should check if array contains all items", () => {
+    it("expectContainsAll deve verificar se o array contém todos os itens", () => {
         const array = ["a", "b", "c"];
         expectContainsAll(array, ["a", "c"]);
     });

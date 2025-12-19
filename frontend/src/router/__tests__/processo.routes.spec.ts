@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest';
 import processoRoutes from '@/router/processo.routes';
 
 describe('processo.routes.ts', () => {
-  it('should define routes correctly', () => {
+  it('deve definir as rotas corretamente', () => {
     expect(processoRoutes).toHaveLength(7);
     const paths = processoRoutes.map(r => r.path);
     expect(paths).toContain('/processo/cadastro');
@@ -10,7 +10,7 @@ describe('processo.routes.ts', () => {
     expect(paths).toContain('/processo/:codProcesso/:siglaUnidade');
   });
 
-  it('should handle route props correctly for Subprocesso', () => {
+  it('deve tratar corretamente as props da rota para Subprocesso', () => {
     const route = processoRoutes.find(r => r.name === 'Subprocesso');
     expect(route).toBeDefined();
 
@@ -20,11 +20,11 @@ describe('processo.routes.ts', () => {
       } as any);
       expect(props).toEqual({ codProcesso: 123, siglaUnidade: 'TEST' });
     } else {
-        throw new Error('Props should be a function');
+        throw new Error('Props deve ser uma função');
     }
   });
 
-  it('should handle route props correctly for SubprocessoMapa', () => {
+  it('deve tratar corretamente as props da rota para SubprocessoMapa', () => {
     const route = processoRoutes.find(r => r.name === 'SubprocessoMapa');
 
     if (route && typeof route.props === 'function') {
@@ -33,11 +33,11 @@ describe('processo.routes.ts', () => {
       } as any);
       expect(props).toEqual({ codProcesso: 456, sigla: 'ABC' });
     } else {
-        throw new Error('Props should be a function');
+        throw new Error('Props deve ser uma função');
     }
   });
 
-  it('should handle route props correctly for SubprocessoVisMapa', () => {
+  it('deve tratar corretamente as props da rota para SubprocessoVisMapa', () => {
     const route = processoRoutes.find(r => r.name === 'SubprocessoVisMapa');
     if (route && typeof route.props === 'function') {
       const props = route.props({
@@ -45,11 +45,11 @@ describe('processo.routes.ts', () => {
       } as any);
       expect(props).toEqual({ codProcesso: 789, sigla: 'XYZ' });
     } else {
-        throw new Error('Props should be a function');
+        throw new Error('Props deve ser uma função');
     }
   });
 
-  it('should handle route props correctly for SubprocessoCadastro', () => {
+  it('deve tratar corretamente as props da rota para SubprocessoCadastro', () => {
     const route = processoRoutes.find(r => r.name === 'SubprocessoCadastro');
     if (route && typeof route.props === 'function') {
       const props = route.props({
@@ -57,11 +57,11 @@ describe('processo.routes.ts', () => {
       } as any);
       expect(props).toEqual({ codProcesso: 101, sigla: 'CAD' });
     } else {
-        throw new Error('Props should be a function');
+        throw new Error('Props deve ser uma função');
     }
   });
 
-  it('should handle route props correctly for SubprocessoVisCadastro', () => {
+  it('deve tratar corretamente as props da rota para SubprocessoVisCadastro', () => {
     const route = processoRoutes.find(r => r.name === 'SubprocessoVisCadastro');
     if (route && typeof route.props === 'function') {
       const props = route.props({
@@ -69,11 +69,11 @@ describe('processo.routes.ts', () => {
       } as any);
       expect(props).toEqual({ codProcesso: 102, sigla: 'VIS' });
     } else {
-        throw new Error('Props should be a function');
+        throw new Error('Props deve ser uma função');
     }
   });
 
-  it('should lazy load components', async () => {
+  it('deve carregar componentes sob demanda (lazy load)', async () => {
     const cadProcesso = processoRoutes.find(r => r.name === 'CadProcesso');
     // @ts-expect-error - testing internal property
     const component = await cadProcesso?.component();
