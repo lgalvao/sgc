@@ -1,14 +1,13 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {flushPromises, mount} from '@vue/test-utils';
-import {nextTick} from 'vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import CadProcesso from '@/views/CadProcesso.vue';
-import {createTestingPinia} from '@pinia/testing';
-import {useProcessosStore} from '@/stores/processos';
-import {useUnidadesStore} from '@/stores/unidades';
+import { useProcessosStore } from '@/stores/processos';
+import { useUnidadesStore } from '@/stores/unidades';
 import * as processoService from "@/services/processoService";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 // Mock router
-// We need to use "vi.hoisted" to make variables available inside vi.mock factory
 const { mockPush, mockRoute } = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
@@ -35,350 +34,366 @@ vi.mock('vue-router', () => {
 
 // Mock child components
 const ArvoreUnidadesStub = {
-  template: '<div><slot /></div>',
-  props: ['unidades', 'modelValue'],
-  emits: ['update:modelValue']
+    template: '<div><slot /></div>',
+    props: ['unidades', 'modelValue'],
+    emits: ['update:modelValue']
 };
 
 describe('CadProcesso.vue', () => {
-  let wrapper: any;
-  let processosStore: any;
-  let unidadesStore: any;
+    const context = setupComponentTest();
+    let processosStore: any;
+    let unidadesStore: any;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockRoute.query = {};
-    
-    // Mock window.scrollTo
-    window.scrollTo = vi.fn();
-    
-    // Suppress console.error
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const createWrapper = (initialState = {}) => {
+        context.wrapper = mount(CadProcesso, {
+            ...getCommonMountOptions(
+                {
+                    unidades: {
+                        unidades: [],
+                        isLoading: false
+                    },
+                    processos: {
+                        processoDetalhe: null,
+                        lastError: null
+                    },
+                    ...initialState
+                },
+                {
+                    BContainer: { template: '<div><slot /></div>' },
+                    BAlert: { template: '<div><slot /></div>', props: ['modelValue', 'variant'] },
+                    BForm: { template: '<form @submit.prevent><slot /></form>' },
+                    BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
+                    BFormInput: {
+                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                        props: ['modelValue']
+                    },
+                    BFormSelect: {
+                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
+                        props: ['modelValue', 'options'],
+                        inheritAttrs: false
+                    },
+                    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
+                    BModal: {
+                        template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
+                        props: ['modelValue']
+                    },
+                    ArvoreUnidades: ArvoreUnidadesStub
+                }
+            )
+        });
 
-    wrapper = mount(CadProcesso, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              unidades: {
-                unidades: [],
-                isLoading: false
-              },
-              processos: {
-                processoDetalhe: null,
-                lastError: null
-              }
-            }
-          })
-        ],
-        components: {
-          ArvoreUnidades: ArvoreUnidadesStub
-        },
-        stubs: {
-          BContainer: { template: '<div><slot /></div>' },
-          BAlert: { template: '<div><slot /></div>', props: ['modelValue', 'variant'] },
-          BForm: { template: '<form @submit.prevent><slot /></form>' },
-          BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
-          BFormInput: {
-            template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-            props: ['modelValue']
-          },
-          BFormSelect: {
-            template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
-            props: ['modelValue', 'options'],
-            inheritAttrs: false
-          },
-          BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-          BModal: {
-            template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
-            props: ['modelValue']
-          }
-        }
-      }
-    });
+        processosStore = useProcessosStore();
+        unidadesStore = useUnidadesStore();
 
-    processosStore = useProcessosStore();
-    unidadesStore = useUnidadesStore();
-  });
-
-  it('renders correctly in creation mode', async () => {
-    expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
-    expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO');
-    expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
-  });
-
-  it('disables action buttons when form is incomplete and enables when complete', async () => {
-    const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
-    const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
-
-    // Initially disabled (empty fields)
-    expect(salvarBtn.element.disabled).toBe(true);
-    expect(iniciarBtn.element.disabled).toBe(true);
-
-    // Fill description
-    await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
-    expect(salvarBtn.element.disabled).toBe(true);
-
-    // Fill date
-    await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue('2023-12-31');
-    expect(salvarBtn.element.disabled).toBe(true);
-
-    // Select units (modelValue for ArvoreUnidades)
-    wrapper.vm.unidadesSelecionadas = [1];
-    await nextTick();
-
-    // Now it should be enabled (tipo has default 'MAPEAMENTO')
-    expect(salvarBtn.element.disabled).toBe(false);
-    expect(iniciarBtn.element.disabled).toBe(false);
-    
-    // Clear description again
-    await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('');
-    expect(salvarBtn.element.disabled).toBe(true);
-  });
-
-  it('loads process data for editing', async () => {
-    mockRoute.query = { codProcesso: '123' };
-    const mockProcesso = {
-      codigo: 123,
-      descricao: 'Processo Teste',
-      tipo: 'MAPEAMENTO',
-      situacao: 'CRIADO',
-      dataLimite: '2023-12-31T00:00:00',
-      unidades: [{ codUnidade: 1 }]
+        return { wrapper: context.wrapper, processosStore, unidadesStore };
     };
 
-    // We need to re-mount because onMounted runs on setup
-    processosStore.buscarProcessoDetalhe.mockImplementation(async () => {
-      processosStore.processoDetalhe = mockProcesso;
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockRoute.query = {};
+
+        // Mock window.scrollTo
+        window.scrollTo = vi.fn();
+
+        // Suppress console.error
+        vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
-    wrapper = mount(CadProcesso, {
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn })],
-        stubs: {
-           BContainer: { template: '<div><slot /></div>' },
-           BAlert: { template: '<div><slot /></div>' },
-           BForm: { template: '<form @submit.prevent><slot /></form>' },
-           BFormGroup: { template: '<div><slot /></div>' },
-           BFormInput: { template: '<input />', props: ['modelValue'] },
-           BFormSelect: { template: '<select />', props: ['modelValue', 'options'], inheritAttrs: false },
-           BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-           BModal: { template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue'] },
-           ArvoreUnidades: true
-        }
-      }
+    it('renders correctly in creation mode', async () => {
+        const { wrapper } = createWrapper();
+        expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
+        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO');
+        expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
 
-    // Manually trigger the store/route logic mock since re-mounting with complex mocks is tricky in unit tests
-    // or rely on the mock implementation above if using clean store
-  });
+    it('disables action buttons when form is incomplete and enables when complete', async () => {
+        const { wrapper } = createWrapper();
+        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
+        const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
 
-  it('redirects if process is not editable', async () => {
-    mockRoute.query = { codProcesso: '123' };
-    const mockProcesso = {
-      codigo: 123,
-      situacao: 'EM_ANDAMENTO' // Not CRIADO
-    };
+        // Initially disabled (empty fields)
+        expect(salvarBtn.element.disabled).toBe(true);
+        expect(iniciarBtn.element.disabled).toBe(true);
 
-    processosStore.buscarProcessoDetalhe.mockImplementation(async () => {
-        processosStore.processoDetalhe = mockProcesso;
+        // Fill description
+        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
+        expect(salvarBtn.element.disabled).toBe(true);
+
+        // Fill date
+        await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue('2023-12-31');
+        expect(salvarBtn.element.disabled).toBe(true);
+
+        // Select units (modelValue for ArvoreUnidades)
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        // Now it should be enabled (tipo has default 'MAPEAMENTO')
+        expect(salvarBtn.element.disabled).toBe(false);
+        expect(iniciarBtn.element.disabled).toBe(false);
+
+        // Clear description again
+        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('');
+        expect(salvarBtn.element.disabled).toBe(true);
     });
 
-    // Re-mount to trigger onMounted
-    wrapper = mount(CadProcesso, {
-        global: {
-          plugins: [createTestingPinia({ createSpy: vi.fn, initialState: { processos: { processoDetalhe: mockProcesso } } })],
-          stubs: {
-             BContainer: true, BAlert: true, BForm: true, BFormGroup: true, BFormInput: true, BFormSelect: true, BButton: true, BModal: true, ArvoreUnidades: true
-          }
-        }
+    it('loads process data for editing', async () => {
+        mockRoute.query = { codProcesso: '123' };
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'Processo Teste',
+            tipo: 'MAPEAMENTO',
+            situacao: 'CRIADO',
+            dataLimite: '2023-12-31T00:00:00',
+            unidades: [{ codUnidade: 1 }]
+        };
+
+        const { processosStore } = createWrapper();
+
+        // Mock implementation inside the test setup doesn't work well with onMounted if not set before mount
+        // Here we rely on the store mocking logic or implementation injection
+        // But since we use createWrapper which mounts immediately, we might miss the onMounted hook logic if we don't mock the store method return beforehand.
+        // However, Pinia actions are mocked as spies by default with createTestingPinia.
+        // We can manually call the onMounted logic or just check if it was called.
+
+        // Wait, the original test re-mounted. Here createWrapper mounts.
+        // We need to set up the mock BEFORE createWrapper if we want onMounted to use it?
+        // Actually, createTestingPinia mocks actions as spies. We can set mockImplementation on the spy.
+        // BUT, `useProcessosStore()` returns the store instance. If we want to mock the action behavior for onMounted, we need to do it before mount, or use initial state.
+
+        // The original test used:
+        // processosStore.buscarProcessoDetalhe.mockImplementation(...)
+        // wrapper = mount(...)
+
+        // With createWrapper, we mount inside. So we can't mock the store method on the *instance* before mount easily unless we pass a setup function or access the pinia instance.
+        // But createTestingPinia puts the store in the app.
+
+        // Better approach for this test: Just verify the call.
+        expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
     });
 
-    // Need to get the store from the new wrapper/pinia instance
-    processosStore = useProcessosStore();
+    it('redirects if process is not editable', async () => {
+        mockRoute.query = { codProcesso: '123' };
+        const mockProcesso = {
+            codigo: 123,
+            situacao: 'EM_ANDAMENTO' // Not CRIADO
+        };
 
-    await flushPromises();
-    expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
-    // Since we mocked the store state initially, the component sees the state immediately
-    // Wait for the next tick for the router push check
-    await flushPromises();
-    expect(mockPush).toHaveBeenCalledWith('/processo/123');
-  });
+        // We use initialState to simulate the store already having the data, or we mock the action to set it.
+        // In the component, onMounted calls `buscarProcessoDetalhe`.
+        // Then it checks `store.processoDetalhe`.
 
-  it('creates a new process', async () => {
-    const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
-    await descricaoInput.setValue('Novo Processo');
+        // Since `buscarProcessoDetalhe` is async, we can mock it to update the state.
+        // Or we can just set the state initially.
 
-    const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
-    await dataInput.setValue('2023-12-31');
+        const { processosStore } = createWrapper({
+            processos: { processoDetalhe: mockProcesso }
+        });
 
-    // Simulate unit selection
-    wrapper.vm.unidadesSelecionadas = [1, 2];
-    await nextTick();
+        // The component calls `buscarProcessoDetalhe`.
+        // Then it watchers or checks state.
+        // The component does:
+        // await processosStore.buscarProcessoDetalhe(cod);
+        // if (processosStore.processoDetalhe.situacao !== 'CRIADO') ...
 
-    const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
-    await salvarBtn.trigger('click');
+        // Since the action is mocked (spy), it won't actually fetch data. But we initialized the state.
+        // The component awaits the action. Even if it does nothing, the state is already there.
 
-    expect(processosStore.criarProcesso).toHaveBeenCalledWith({
-      descricao: 'Novo Processo',
-      tipo: 'MAPEAMENTO',
-      dataLimiteEtapa1: '2023-12-31T00:00:00',
-      unidades: [1, 2]
+        await flushPromises();
+        expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
+        expect(mockPush).toHaveBeenCalledWith('/processo/123');
     });
 
-    await flushPromises();
-    expect(mockPush).toHaveBeenCalledWith('/painel');
-  });
+    it('creates a new process', async () => {
+        const { wrapper, processosStore } = createWrapper();
 
-  it('handles creation error', async () => {
-    processosStore.criarProcesso.mockRejectedValue(new Error('Erro API'));
-    processosStore.lastError = { message: 'Erro validacao', subErrors: [] };
+        const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
+        await descricaoInput.setValue('Novo Processo');
 
-    wrapper.vm.descricao = 'Teste';
-    wrapper.vm.tipo = 'MAPEAMENTO';
-    wrapper.vm.dataLimite = '2023-12-31';
-    wrapper.vm.unidadesSelecionadas = [1];
-    await nextTick();
-    
-    await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
-    await flushPromises();
+        const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
+        await dataInput.setValue('2023-12-31');
 
-    expect(wrapper.vm.alertState.show).toBe(true);
-    expect(wrapper.vm.alertState.body).toContain('Erro validacao');
-  });
+        // Simulate unit selection
+        wrapper.vm.unidadesSelecionadas = [1, 2];
+        await nextTick();
 
-  it('updates an existing process', async () => {
-    // Setup component as editing
-    wrapper.vm.processoEditando = { codigo: 123 };
-    wrapper.vm.descricao = 'Editado';
-    wrapper.vm.tipo = 'MAPEAMENTO';
-    wrapper.vm.dataLimite = '2023-12-31';
-    wrapper.vm.unidadesSelecionadas = [1];
-    await nextTick();
+        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
+        await salvarBtn.trigger('click');
 
-    await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        expect(processosStore.criarProcesso).toHaveBeenCalledWith({
+            descricao: 'Novo Processo',
+            tipo: 'MAPEAMENTO',
+            dataLimiteEtapa1: '2023-12-31T00:00:00',
+            unidades: [1, 2]
+        });
 
-    expect(processosStore.atualizarProcesso).toHaveBeenCalledWith(123, {
-      codigo: 123,
-      descricao: 'Editado',
-      tipo: 'MAPEAMENTO',
-      dataLimiteEtapa1: '2023-12-31T00:00:00',
-      unidades: [1]
+        await flushPromises();
+        expect(mockPush).toHaveBeenCalledWith('/painel');
     });
-    await flushPromises();
-    expect(mockPush).toHaveBeenCalledWith('/painel');
-  });
 
-  it('initiates a process (confirmation flow)', async () => {
-    // Setup data
-    wrapper.vm.descricao = 'Iniciar Teste';
-    wrapper.vm.tipo = 'MAPEAMENTO';
-    wrapper.vm.dataLimite = '2023-12-31';
-    wrapper.vm.unidadesSelecionadas = [1];
-    await nextTick();
+    it('handles creation error', async () => {
+        const { wrapper, processosStore } = createWrapper();
 
-    // Open modal
-    await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
-    expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-    
-    processosStore.criarProcesso.mockResolvedValue({ codigo: 999 });
+        processosStore.criarProcesso.mockRejectedValue(new Error('Erro API'));
+        // We also need to set lastError because the component likely reads it
+        processosStore.lastError = { message: 'Erro validacao', subErrors: [] };
 
-    // Confirm
-    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
 
-    expect(processosStore.criarProcesso).toHaveBeenCalled(); // Should create first if no ID
-    await flushPromises();
-    expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(999, 'MAPEAMENTO', [1]);
-    expect(mockPush).toHaveBeenCalledWith('/painel');
-  });
+        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await flushPromises();
 
-  it('initiates an existing process', async () => {
-    wrapper.vm.processoEditando = { codigo: 123 };
-    wrapper.vm.descricao = 'Existente';
-    wrapper.vm.tipo = 'MAPEAMENTO';
-    wrapper.vm.dataLimite = '2023-12-31';
-    wrapper.vm.unidadesSelecionadas = [1];
-    await nextTick();
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.body).toContain('Erro validacao');
+    });
 
-    // Open modal and confirm
-    await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
-    expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-    await nextTick(); // Update DOM to show modal content
+    it('updates an existing process', async () => {
+        const { wrapper, processosStore } = createWrapper();
 
-    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-    
-    expect(processosStore.criarProcesso).not.toHaveBeenCalled();
-    expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [1]);
-  });
+        // Setup component as editing
+        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.descricao = 'Editado';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
 
-  it('removes a process', async () => {
-    // Mock the service explicitly since it's imported as *
-    vi.spyOn(processoService, 'excluirProcesso').mockResolvedValue(undefined);
-    
-    wrapper.vm.processoEditando = { codigo: 123 };
-    wrapper.vm.mostrarModalRemocao = true;
-    
-    // Trigger remove logic (simulating button click in modal footer)
-    await wrapper.vm.confirmarRemocao();
+        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
 
-    expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
-    expect(mockPush).toHaveBeenCalledWith('/painel');
-  });
+        expect(processosStore.atualizarProcesso).toHaveBeenCalledWith(123, {
+            codigo: 123,
+            descricao: 'Editado',
+            tipo: 'MAPEAMENTO',
+            dataLimiteEtapa1: '2023-12-31T00:00:00',
+            unidades: [1]
+        });
+        await flushPromises();
+        expect(mockPush).toHaveBeenCalledWith('/painel');
+    });
 
-  it('updates unit list when type changes', async () => {
-    wrapper.vm.tipo = 'REVISAO';
-    await nextTick();
-    expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('REVISAO', undefined);
-  });
+    it('initiates a process (confirmation flow)', async () => {
+        const { wrapper, processosStore } = createWrapper();
 
-  it('handles error when starting a new process (creation fail)', async () => {
-    wrapper.vm.processoEditando = null;
-    wrapper.vm.descricao = 'Novo Processo Fail';
-    wrapper.vm.tipo = 'MAPEAMENTO';
-    wrapper.vm.unidadesSelecionadas = [1];
+        // Setup data
+        wrapper.vm.descricao = 'Iniciar Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
 
-    wrapper.vm.mostrarModalConfirmacao = true;
-    await nextTick();
+        // Open modal
+        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
-    processosStore.criarProcesso.mockRejectedValue(new Error('Erro Criacao'));
-    // Simulate store error state which usually happens in the store action catch block
-    processosStore.lastError = { message: 'Erro ao criar', subErrors: [] };
+        processosStore.criarProcesso.mockResolvedValue({ codigo: 999 });
 
-    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-    await flushPromises();
+        // Confirm
+        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
 
-    expect(wrapper.vm.alertState.show).toBe(true);
-    expect(wrapper.vm.alertState.body).toContain('Erro ao criar');
-  });
+        expect(processosStore.criarProcesso).toHaveBeenCalled();
+        await flushPromises();
+        expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(999, 'MAPEAMENTO', [1]);
+        expect(mockPush).toHaveBeenCalledWith('/painel');
+    });
 
-  it('handles error when starting a process (initiation fail)', async () => {
-    wrapper.vm.processoEditando = { codigo: 123 };
-    wrapper.vm.mostrarModalConfirmacao = true;
-    await nextTick();
+    it('initiates an existing process', async () => {
+        const { wrapper, processosStore } = createWrapper();
 
-    processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro Inicio'));
-    processosStore.lastError = { message: 'Erro ao iniciar', subErrors: [] };
+        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.descricao = 'Existente';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
 
-    await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-    await flushPromises();
+        // Open modal and confirm
+        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
+        await nextTick();
 
-    expect(wrapper.vm.alertState.show).toBe(true);
-    expect(wrapper.vm.alertState.body).toContain('Erro ao iniciar');
-  });
+        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
 
-  it('handles error when removing a process', async () => {
-     vi.spyOn(processoService, 'excluirProcesso').mockRejectedValue(new Error('Erro Remocao'));
-     // Direct service call doesn't set store error, so it hits the default error path
+        expect(processosStore.criarProcesso).not.toHaveBeenCalled();
+        expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [1]);
+    });
 
-     wrapper.vm.processoEditando = { codigo: 123 };
-     wrapper.vm.mostrarModalRemocao = true;
+    it('removes a process', async () => {
+        const { wrapper } = createWrapper();
 
-     await wrapper.vm.confirmarRemocao();
-     await flushPromises();
+        // Mock the service explicitly since it's imported as *
+        vi.spyOn(processoService, 'excluirProcesso').mockResolvedValue(undefined);
 
-     expect(wrapper.vm.alertState.show).toBe(true);
-     expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
-  });
+        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.mostrarModalRemocao = true;
+
+        // Trigger remove logic (simulating button click in modal footer)
+        await wrapper.vm.confirmarRemocao();
+
+        expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
+        expect(mockPush).toHaveBeenCalledWith('/painel');
+    });
+
+    it('updates unit list when type changes', async () => {
+        const { wrapper, unidadesStore } = createWrapper();
+        wrapper.vm.tipo = 'REVISAO';
+        await nextTick();
+        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('REVISAO', undefined);
+    });
+
+    it('handles error when starting a new process (creation fail)', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        wrapper.vm.processoEditando = null;
+        wrapper.vm.descricao = 'Novo Processo Fail';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.unidadesSelecionadas = [1];
+
+        wrapper.vm.mostrarModalConfirmacao = true;
+        await nextTick();
+
+        processosStore.criarProcesso.mockRejectedValue(new Error('Erro Criacao'));
+        processosStore.lastError = { message: 'Erro ao criar', subErrors: [] };
+
+        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
+        await flushPromises();
+
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.body).toContain('Erro ao criar');
+    });
+
+    it('handles error when starting a process (initiation fail)', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.mostrarModalConfirmacao = true;
+        await nextTick();
+
+        processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro Inicio'));
+        processosStore.lastError = { message: 'Erro ao iniciar', subErrors: [] };
+
+        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
+        await flushPromises();
+
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.body).toContain('Erro ao iniciar');
+    });
+
+    it('handles error when removing a process', async () => {
+         const { wrapper } = createWrapper();
+
+         vi.spyOn(processoService, 'excluirProcesso').mockRejectedValue(new Error('Erro Remocao'));
+
+         wrapper.vm.processoEditando = { codigo: 123 };
+         wrapper.vm.mostrarModalRemocao = true;
+
+         await wrapper.vm.confirmarRemocao();
+         await flushPromises();
+
+         expect(wrapper.vm.alertState.show).toBe(true);
+         expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
+    });
 });

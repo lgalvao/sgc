@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 19 de Dezembro de 2025
-**Versão:** 2.0
+**Versão:** 2.1
 **Status dos Testes:** ✅ 894 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -93,55 +93,25 @@ Refatorações realizadas (Componentes e Views):
 - `components/__tests__/TreeRowItem.spec.ts`
 - `components/__tests__/TreeTableView.spec.ts`
 - `components/__tests__/UnidadeTreeNode.spec.ts`
+- `components/__tests__/ArvoreUnidades.spec.ts` (Consolidado com testes de integração e bugs)
 - `views/__tests__/ProcessoView.spec.ts`
 - `views/__tests__/SubprocessoView.spec.ts`
+- `views/__tests__/CadProcesso.spec.ts`
+- `views/__tests__/CadAtribuicao.spec.ts`
+- `views/__tests__/OcupacoesCriticasDiagnostico.spec.ts`
+- `views/__tests__/UnidadeView.spec.ts`
+- `views/__tests__/VisMapa.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Concluído (Services).
 - Criado helper `testErrorHandling` em `test-utils/serviceTestHelpers.ts`.
-- Todos os arquivos de service test foram refatorados para usar `testErrorHandling`:
-  - `services/__tests__/processoService.spec.ts`
-  - `services/__tests__/usuarioService.spec.ts`
-  - `services/__tests__/alertaService.spec.ts`
-  - `services/__tests__/mapaService.spec.ts`
-  - `services/__tests__/analiseService.spec.ts`
-  - `services/__tests__/atividadeService.spec.ts`
-  - `services/__tests__/atribuicaoTemporariaService.spec.ts`
-  - `services/__tests__/cadastroService.spec.ts`
-  - `services/__tests__/diagnosticoService.spec.ts`
-  - `services/__tests__/painelService.spec.ts`
-  - `services/__tests__/subprocessoService.spec.ts`
-  - `services/__tests__/unidadesService.spec.ts`
+- Todos os arquivos de service test foram refatorados para usar `testErrorHandling`.
 
 #### Ação 2.3: Padronizar Setup/Teardown
 **Status:** Em Andamento.
 - `componentTestHelpers.ts` atualizado para suportar opções de configuração do Pinia (`piniaOptions`).
-- Aplicado em:
-  - `BarraNavegacao.spec.ts`
-  - `AceitarMapaModal.spec.ts`
-  - `CriarCompetenciaModal.spec.ts`
-  - `DisponibilizarMapaModal.spec.ts`
-  - `MainNavbar.spec.ts`
-  - `HistoricoAnaliseModal.spec.ts`
-  - `ImpactoMapaModal.spec.ts`
-  - `ImportarAtividadesModal.spec.ts`
-  - `ModalFinalizacao.spec.ts`
-  - `SubprocessoModal.spec.ts`
-  - `AtividadeItem.spec.ts`
-  - `ModalAcaoBloco.spec.ts`
-  - `ProcessoAcoes.spec.ts`
-  - `ProcessoDetalhes.spec.ts`
-  - `SubprocessoCards.spec.ts`
-  - `SubprocessoHeader.spec.ts`
-  - `TabelaAlertas.spec.ts`
-  - `TabelaMovimentacoes.spec.ts`
-  - `TabelaProcessos.spec.ts`
-  - `TreeRowItem.spec.ts`
-  - `TreeTableView.spec.ts`
-  - `UnidadeTreeNode.spec.ts`
-  - `ProcessoView.spec.ts`
-  - `SubprocessoView.spec.ts`
-- `storeTestHelpers.ts` aplicado em `feedback.spec.ts`.
+- Aplicado em todos os componentes e views listados acima.
+- Removidos arquivos redundantes de teste do `ArvoreUnidades` (`.integration.spec.ts`, `.bug.spec.ts`).
 
 ---
 
@@ -157,5 +127,5 @@ Arquivos refatorados cobrem a maioria dos Stores e Services principais do sistem
 
 **Próximos passos:**
 - Continuar a refatoração para componentes restantes (Actions/Stores usados em componentes).
-- Completar refatoração de View Tests restantes.
+- Completar refatoração de View Tests restantes (`AutoavaliacaoDiagnostico`, `CadAtividades`, `MonitoramentoDiagnostico`, `VisAtividades`, `ConclusaoDiagnostico`, `CadMapa`, `RelatoriosView`).
 - Focar em testes de edge cases e tratamento de erros mais robustos usando `testErrorHandling`.
