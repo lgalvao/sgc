@@ -24,7 +24,7 @@ public class UnidadeController {
     private final UnidadeService unidadeService;
 
     /**
-     * Cria uma nova atribuição temporária para um servidor em uma unidade.
+     * Cria uma nova atribuição temporária para um usuário em uma unidade.
      *
      * @param codUnidade O Código da unidade.
      * @param request    Os dados da atribuição.
@@ -90,22 +90,7 @@ public class UnidadeController {
     }
 
     /**
-     * Busca servidores (usuários) de uma unidade específica Usado pelo frontend para validar se
-     * unidade tem servidores em processos de diagnóstico
-     *
-     * @param codigoUnidade O código da unidade
-     * @return Lista de servidores da unidade
-     */
-    @GetMapping("/{codigoUnidade}/servidores")
-    public ResponseEntity<List<UsuarioDto>> buscarServidoresPorUnidade(
-            @PathVariable Long codigoUnidade) {
-        List<UsuarioDto> servidores = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
-        return ResponseEntity.ok(servidores);
-    }
-
-    /**
-     * Busca usuários de uma unidade específica Endpoint padronizado para o novo padrão de
-     * nomenclatura
+     * Busca usuários de uma unidade específica.
      *
      * @param codigoUnidade O código da unidade
      * @return Lista de usuários da unidade
@@ -113,7 +98,7 @@ public class UnidadeController {
     @GetMapping("/{codigoUnidade}/usuarios")
     public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(
             @PathVariable Long codigoUnidade) {
-        List<UsuarioDto> usuarios = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
+        List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codigoUnidade);
         return ResponseEntity.ok(usuarios);
     }
 

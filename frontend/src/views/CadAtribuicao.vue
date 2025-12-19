@@ -10,13 +10,13 @@
           <div class="mb-3">
             <label
                 class="form-label"
-                for="servidor"
-            >Servidor</label>
+                for="usuario"
+            >Usuário</label>
             <BFormSelect
-                id="servidor"
-                v-model="servidorSelecionado"
-                :options="servidores"
-                data-testid="select-servidor"
+                id="usuario"
+                v-model="usuarioSelecionado"
+                :options="usuarios"
+                data-testid="select-usuario"
                 required
                 text-field="nome"
                 value-field="codigo"
@@ -26,15 +26,15 @@
                     :value="null"
                     disabled
                 >
-                  Selecione um servidor
+                  Selecione um usuário
                 </BFormSelectOption>
               </template>
             </BFormSelect>
             <div
-                v-if="erroServidor"
+                v-if="erroUsuario"
                 class="text-danger small mt-1"
             >
-              {{ erroServidor }}
+              {{ erroUsuario }}
             </div>
           </div>
 
@@ -131,29 +131,29 @@ const router = useRouter();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
-const servidores = ref<Usuario[]>([]);
-const servidorSelecionado = ref<string | null>(null);
+const usuarios = ref<Usuario[]>([]);
+const usuarioSelecionado = ref<string | null>(null);
 const dataTermino = ref("");
 const justificativa = ref("");
 
 const sucesso = ref(false);
-const erroServidor = ref("");
+const erroUsuario = ref("");
 const erroApi = ref("");
 
 onMounted(async () => {
   try {
     unidade.value = await buscarUnidadePorCodigo(codUnidade.value);
     if (unidade.value) {
-      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
+      usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }
   } catch (error) {
-    erroServidor.value = "Falha ao carregar dados da unidade ou servidores.";
+    erroUsuario.value = "Falha ao carregar dados da unidade ou usuários.";
     console.error(error);
   }
 });
 
 async function criarAtribuicao() {
-  if (!unidade.value || !servidorSelecionado.value) {
+  if (!unidade.value || !usuarioSelecionado.value) {
     return;
   }
 
@@ -162,13 +162,13 @@ async function criarAtribuicao() {
 
   try {
     await criarAtribuicaoTemporaria(unidade.value.codigo, {
-      tituloEleitoralServidor: servidorSelecionado.value,
+      tituloEleitoralUsuario: usuarioSelecionado.value,
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
     });
     sucesso.value = true;
     // Reset form
-    servidorSelecionado.value = null;
+    usuarioSelecionado.value = null;
     dataTermino.value = "";
     justificativa.value = "";
   } catch (error) {

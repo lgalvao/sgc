@@ -60,7 +60,7 @@ class UnidadeControllerTest {
                                 .content(
                                         """
                                                 {
-                                                    "tituloEleitoralServidor":"123",
+                                                    "tituloEleitoralUsuario":"123",
                                                     "dataTermino":"2025-12-31",
                                                     "justificativa":"teste"
                                                 }
@@ -105,12 +105,10 @@ class UnidadeControllerTest {
     }
 
     @Test
-    @DisplayName("buscarServidoresPorUnidade deve retornar lista")
+    @DisplayName("buscarUsuariosPorUnidade deve retornar lista")
     @WithMockUser
-    void buscarServidoresPorUnidade() throws Exception {
-        when(unidadeService.buscarServidoresPorUnidade(1L)).thenReturn(List.of(UsuarioDto.builder().build()));
-
-        mockMvc.perform(get("/api/unidades/1/servidores")).andExpect(status().isOk());
+    void buscarUsuariosPorUnidade() throws Exception {
+        when(unidadeService.buscarUsuariosPorUnidade(1L)).thenReturn(List.of(UsuarioDto.builder().build()));
 
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());
     }

@@ -114,12 +114,12 @@ class UnidadeServiceTest {
     }
 
     @Test
-    @DisplayName("buscarServidoresPorUnidade")
-    void buscarServidoresPorUnidade() {
+    @DisplayName("buscarUsuariosPorUnidade")
+    void buscarUsuariosPorUnidade() {
         when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
         when(sgrhMapper.toUsuarioDto(any())).thenReturn(sgc.sgrh.dto.UsuarioDto.builder().build());
 
-        assertThat(service.buscarServidoresPorUnidade(1L)).hasSize(1);
+        assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
     }
 
     @Test

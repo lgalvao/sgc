@@ -123,12 +123,12 @@ public class UnidadeService {
 
         Usuario usuario =
                 usuarioRepo
-                        .findById(request.tituloEleitoralServidor())
+                        .findById(request.tituloEleitoralUsuario())
                         .orElseThrow(
                                 () ->
                                         new ErroEntidadeNaoEncontrada(
                                                 "Usuário com título eleitoral "
-                                                        + request.tituloEleitoralServidor()
+                                                        + request.tituloEleitoralUsuario()
                                                         + " não encontrado"));
 
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
@@ -145,7 +145,7 @@ public class UnidadeService {
         return mapaRepo.findMapaVigenteByUnidade(codigoUnidade).isPresent();
     }
 
-    public List<UsuarioDto> buscarServidoresPorUnidade(Long codigoUnidade) {
+    public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
         List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
 
         return usuarios.stream()

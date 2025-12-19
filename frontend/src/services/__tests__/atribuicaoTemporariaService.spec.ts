@@ -17,7 +17,7 @@ describe("atribuicaoTemporariaService", () => {
 
     it("criarAtribuicaoTemporaria should make a POST request", async () => {
         const request = {
-            tituloEleitoralServidor: "123",
+            tituloEleitoralUsuario: "123",
             dataTermino: "2025-12-31",
             justificativa: "teste",
         };
