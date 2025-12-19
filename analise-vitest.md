@@ -33,8 +33,6 @@ Esta análise aborda a qualidade, consistência e robustez da suíte de testes u
 
 ## 2. Status das Recomendações
 
-### 2.1. Prioridade 1 (Urgente - 0-1 mês) 🔴
-
 #### Ação 1.1: Padronizar Nomenclatura para Português ✅
 **Status:** Concluído.
 Verificação realizada em todos os arquivos de teste (`__tests__`) e nenhum caso de `it("should...` ou `test("should...` foi encontrado.
@@ -42,8 +40,6 @@ Verificação realizada em todos os arquivos de teste (`__tests__`) e nenhum cas
 #### Ação 1.2: Remover Testes Duplicados ✅
 **Status:** Concluído.
 Duplicações em `processos.spec.ts` foram removidas.
-
-### 2.2. Prioridade 2 (Importante - 1-2 meses) 🟡
 
 #### Ação 2.1: Criar Test Utilities Centralizadas ✅
 **Status:** Concluído.
@@ -89,12 +85,6 @@ Refatorações realizadas:
 
 ---
 
-## 3. Análise Detalhada por Categoria
-
-### 3.1. Inconsistência de Nomenclatura
-
-**Resolvido.** Todos os testes agora seguem o padrão em Português Brasileiro.
-
 ### 3.2. Duplicação de Código 🔴 **ALTO IMPACTO**
 
 **Problema:** Código duplicado massivamente em testes de Stores e Services.
@@ -108,7 +98,3 @@ Arquivos refatorados cobrem a maioria dos Stores e Services principais do sistem
 **Próximos passos:**
 - Continuar a refatoração para componentes (Actions/Stores usados em componentes).
 - Focar em testes de edge cases e tratamento de erros mais robustos usando `testErrorHandling`.
-
----
-
-*(Resto do documento original mantido para referência)*
