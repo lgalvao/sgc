@@ -32,11 +32,11 @@ graph TD
         Facade(SubprocessoService - Fachada CRUD)
 
         subgraph "Serviços Especializados"
-            Workflow(SubprocessoWorkflowService)
+            CadastroWorkflow(SubprocessoCadastroWorkflowService)
+            MapaWorkflow(SubprocessoMapaWorkflowService)
             Consulta(SubprocessoConsultaService)
             DtoBuilder(SubprocessoDtoService)
             Mapa(SubprocessoMapaService)
-            MapaWorkflow(SubprocessoMapaWorkflowService)
             Notificacao(SubprocessoNotificacaoService)
             Permissoes(SubprocessoPermissoesService)
         end
@@ -45,11 +45,11 @@ graph TD
     end
 
     ControleCrud -- Utiliza --> Facade
-    ControleCadastro -- Utiliza --> Workflow & DtoBuilder
+    ControleCadastro -- Utiliza --> CadastroWorkflow & DtoBuilder
     ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder & Consulta
-    ControleValidacao -- Utiliza --> Workflow & DtoBuilder
+    ControleValidacao -- Utiliza --> MapaWorkflow & DtoBuilder
 
-    Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao & Permissoes -- Acessam --> Repos
+    CadastroWorkflow & MapaWorkflow & Consulta & DtoBuilder & Mapa & Notificacao & Permissoes -- Acessam --> Repos
 ```
 
 ## Componentes Principais
@@ -81,9 +81,10 @@ graph TD
 
 ### Serviços Especializados
 
-- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de
-  estado (exceto as relacionadas diretamente à edição do mapa).
-- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa e suas validações durante o workflow.
+- **`SubprocessoCadastroWorkflowService`**: Gerencia a fase de cadastro de atividades e conhecimentos, incluindo
+  disponibilização, devolução, aceite e homologação do cadastro.
+- **`SubprocessoMapaWorkflowService`**: Gerencia a fase de elaboração e validação do mapa de competências. Responsável
+  pela disponibilização, validação, sugestões, aceite e homologação final do mapa.
 - **`SubprocessoConsultaService`**: Centraliza as consultas complexas (ex: buscar subprocesso com mapa carregado).
 - **`SubprocessoPermissoesService`**: Centraliza a lógica de segurança e verificação de permissões.
 
