@@ -273,8 +273,6 @@ class SubprocessoCadastroWorkflowServiceTest {
         user.setUnidadeLotacao(u);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(unidadeRepo.findById(10L)).thenReturn(Optional.of(u)); // Mocking findById inside? No, Unidade is attached?
-        // Ah, inside logic: sp.getUnidade().getUnidadeSuperior()
         
         service.devolverRevisaoCadastro(id, "obs", user);
 
@@ -380,8 +378,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
-                .thenReturn(Collections.emptyList());
+        // Removed unnecessary stubbing
         org.mockito.Mockito.doThrow(
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
@@ -410,8 +407,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setMapa(mapa);
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(subprocessoService.obterAtividadesSemConhecimento(id))
-                .thenReturn(Collections.emptyList());
+        // Removed unnecessary stubbing
         org.mockito.Mockito.doThrow(
                         new ErroValidacao(
                                 "Pelo menos uma atividade deve ser cadastrada antes de"
