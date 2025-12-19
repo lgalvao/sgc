@@ -1,7 +1,7 @@
-import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
-import {initPinia} from "@/test-utils/helpers";
-import type {Alerta} from "@/types/tipos";
-import {useAlertasStore} from "../alertas";
+import { describe, expect, it, type Mocked, vi, beforeEach } from "vitest";
+import { setupStoreTest } from "@/test-utils/storeTestHelpers";
+import type { Alerta } from "@/types/tipos";
+import { useAlertasStore } from "../alertas";
 
 // Mock dos serviços
 vi.mock("@/services/painelService");
@@ -17,7 +17,7 @@ vi.mock("../perfil", () => ({
 }));
 
 describe("useAlertasStore", () => {
-    let alertasStore: ReturnType<typeof useAlertasStore>;
+    const context = setupStoreTest(useAlertasStore);
     let painelService: Mocked<typeof import("@/services/painelService")>;
     let alertaService: Mocked<typeof import("@/services/alertaService")>;
 
@@ -36,9 +36,6 @@ describe("useAlertasStore", () => {
     };
 
     beforeEach(async () => {
-        initPinia();
-        alertasStore = useAlertasStore();
-
         // Resetar o estado do mock antes de cada teste
         mockPerfilStoreValues.usuarioCodigo = 123;
         mockPerfilStoreValues.unidadeSelecionada = "456";
@@ -49,13 +46,11 @@ describe("useAlertasStore", () => {
         alertaService = (await import("@/services/alertaService")) as Mocked<
             typeof import("@/services/alertaService")
         >;
-
-        vi.clearAllMocks();
     });
 
     it("deve inicializar com alertas simulados e datas formatadas", () => {
-        expect(alertasStore.alertas).toEqual([]);
-        expect(alertasStore.alertasPage).toEqual({});
+        expect(context.store.alertas).toEqual([]);
+        expect(context.store.alertasPage).toEqual({});
     });
 
     describe("actions", () => {
@@ -72,7 +67,7 @@ describe("useAlertasStore", () => {
             };
             painelService.listarAlertas.mockResolvedValue(mockPage);
 
-            await alertasStore.buscarAlertas(123, 456, 0, 10);
+            await context.store.buscarAlertas(123, 456, 0, 10);
 
             expect(painelService.listarAlertas).toHaveBeenCalledWith(
                 123,
@@ -82,8 +77,8 @@ describe("useAlertasStore", () => {
                 undefined,
                 undefined,
             );
-            expect(alertasStore.alertas).toEqual(mockPage.content);
-            expect(alertasStore.alertasPage).toEqual(mockPage);
+            expect(context.store.alertas).toEqual(mockPage.content);
+            expect(context.store.alertasPage).toEqual(mockPage);
         });
 
         describe("marcarAlertaComoLido", () => {
@@ -91,7 +86,7 @@ describe("useAlertasStore", () => {
                 alertaService.marcarComoLido.mockResolvedValue();
                 const mockReloadPage = {
                     content: [
-                        {...mockAlerta, codigo: 2, descricao: "Alerta Recarregado"},
+                        { ...mockAlerta, codigo: 2, descricao: "Alerta Recarregado" },
                     ],
                     totalPages: 1,
                     totalElements: 1,
@@ -103,7 +98,7 @@ describe("useAlertasStore", () => {
                 };
                 painelService.listarAlertas.mockResolvedValue(mockReloadPage);
 
-                const result = await alertasStore.marcarAlertaComoLido(1);
+                const result = await context.store.marcarAlertaComoLido(1);
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
@@ -115,7 +110,7 @@ describe("useAlertasStore", () => {
                     undefined,
                     undefined,
                 );
-                expect(alertasStore.alertas).toEqual(mockReloadPage.content);
+                expect(context.store.alertas).toEqual(mockReloadPage.content);
             });
 
             it("deve retornar falso em caso de falha do serviço", async () => {
@@ -123,7 +118,7 @@ describe("useAlertasStore", () => {
                     new Error("Falha no serviço"),
                 );
 
-                const result = await alertasStore.marcarAlertaComoLido(1);
+                const result = await context.store.marcarAlertaComoLido(1);
 
                 expect(result).toBe(false);
                 expect(painelService.listarAlertas).not.toHaveBeenCalled();
@@ -135,7 +130,7 @@ describe("useAlertasStore", () => {
 
                 alertaService.marcarComoLido.mockResolvedValue();
 
-                const result = await alertasStore.marcarAlertaComoLido(1);
+                const result = await context.store.marcarAlertaComoLido(1);
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);

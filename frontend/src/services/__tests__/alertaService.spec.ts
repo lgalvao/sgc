@@ -1,24 +1,27 @@
-import {describe, expect, it, vi} from "vitest";
-import api from "@/axios-setup";
-import {marcarComoLido} from "../alertaService";
+import { describe, expect, it, vi } from "vitest";
+import { setupServiceTest } from "@/test-utils/serviceTestHelpers";
+import * as AlertaService from "../alertaService";
 
+// Mock do axios via helper
 vi.mock("@/axios-setup");
 
-describe("alertaService", () => {
-    it("marcarComoLido should make a POST request", async () => {
-        const id = 1;
-        vi.mocked(api.post).mockResolvedValue({});
+describe("AlertaService", () => {
+    const { mockApi } = setupServiceTest();
 
-        await marcarComoLido(id);
+    it("marcarComoLido deve chamar o endpoint correto", async () => {
+        const alertaId = 123;
+        mockApi.post.mockResolvedValue({ data: {} });
 
-        expect(api.post).toHaveBeenCalledWith(`/alertas/${id}/marcar-como-lido`);
+        await AlertaService.marcarComoLido(alertaId);
+
+        expect(mockApi.post).toHaveBeenCalledWith(`/alertas/${alertaId}/marcar-como-lido`);
     });
 
-    it("marcarComoLido should throw an error on failure", async () => {
-        const id = 1;
-        const error = new Error("Request failed");
-        vi.mocked(api.post).mockRejectedValue(error);
+    it("deve lançar um erro em caso de falha", async () => {
+        const alertaId = 123;
+        const erro = new Error("Erro na API");
+        mockApi.post.mockRejectedValue(erro);
 
-        await expect(marcarComoLido(id)).rejects.toThrow(error);
+        await expect(AlertaService.marcarComoLido(alertaId)).rejects.toThrow("Erro na API");
     });
 });
