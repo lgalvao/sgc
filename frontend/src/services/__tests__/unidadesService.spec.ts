@@ -1,5 +1,5 @@
-import {describe, expect, it, vi} from "vitest";
-import apiClient from "@/axios-setup";
+import { describe, expect, it } from "vitest";
+import { setupServiceTest, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
@@ -10,99 +10,89 @@ import {
     buscarUnidadePorSigla,
 } from "../unidadesService";
 
-vi.mock("@/axios-setup");
-
 describe("unidadesService", () => {
-    it("buscarTodasUnidades should make a GET request", async () => {
-        const mockData = [{id: 1}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
+    const { mockApi } = setupServiceTest();
 
-        const result = await buscarTodasUnidades();
-
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades");
-        expect(result).toEqual(mockData);
-    });
-
-    it("buscarUnidadePorSigla should make a GET request", async () => {
-        const mockData = {id: 1};
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarUnidadePorSigla("TESTE");
-
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/sigla/TESTE");
-        expect(result).toEqual(mockData);
-    });
-
-    it("buscarUnidadePorCodigo should make a GET request", async () => {
-        const mockData = {id: 1, nome: "Unit 1"};
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarUnidadePorCodigo(1);
-
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/1");
-        expect(result).toEqual(mockData);
-    });
-
-    it("buscarArvoreComElegibilidade should make a GET request with code", async () => {
-        const mockData = [{id: 1}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarArvoreComElegibilidade("MAPEAMENTO", 1);
-
-        expect(apiClient.get).toHaveBeenCalledWith(
-            "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=1",
+    describe("buscarTodasUnidades", () => {
+        testGetEndpoint(
+            () => buscarTodasUnidades(),
+            "/unidades",
+            [{ id: 1 }]
         );
-        expect(result).toEqual(mockData);
     });
 
-    it("buscarArvoreComElegibilidade should make a GET request without code", async () => {
-        const mockData = [{id: 1}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarArvoreComElegibilidade("MAPEAMENTO");
-
-        expect(apiClient.get).toHaveBeenCalledWith(
-            "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO",
+    describe("buscarUnidadePorSigla", () => {
+        testGetEndpoint(
+            () => buscarUnidadePorSigla("TESTE"),
+            "/unidades/sigla/TESTE",
+            { id: 1 }
         );
-        expect(result).toEqual(mockData);
     });
 
-    it("buscarArvoreUnidade should make a GET request", async () => {
-        const mockData = {id: 10, children: []};
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarArvoreUnidade(10);
-
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/10/arvore");
-        expect(result).toEqual(mockData);
+    describe("buscarUnidadePorCodigo", () => {
+        testGetEndpoint(
+            () => buscarUnidadePorCodigo(1),
+            "/unidades/1",
+            { id: 1, nome: "Unit 1" }
+        );
     });
 
-    it("buscarSubordinadas should make a GET request", async () => {
-        const mockData = [{id: 11}, {id: 12}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
+    describe("buscarArvoreComElegibilidade", () => {
+        it("deve fazer GET com código do processo", async () => {
+            const mockData = [{ id: 1 }];
+            mockApi.get.mockResolvedValue({ data: mockData });
 
-        const result = await buscarSubordinadas("SIGLA");
+            const result = await buscarArvoreComElegibilidade("MAPEAMENTO", 1);
 
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/subordinadas");
-        expect(result).toEqual(mockData);
+            expect(mockApi.get).toHaveBeenCalledWith(
+                "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=1",
+            );
+            expect(result).toEqual(mockData);
+        });
+
+        it("deve fazer GET sem código do processo", async () => {
+            const mockData = [{ id: 1 }];
+            mockApi.get.mockResolvedValue({ data: mockData });
+
+            const result = await buscarArvoreComElegibilidade("MAPEAMENTO");
+
+            expect(mockApi.get).toHaveBeenCalledWith(
+                "/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO",
+            );
+            expect(result).toEqual(mockData);
+        });
     });
 
-    it("buscarSuperior should make a GET request", async () => {
-        const mockData = {id: 9};
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
-
-        const result = await buscarSuperior("SIGLA");
-
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/superior");
-        expect(result).toEqual(mockData);
+    describe("buscarArvoreUnidade", () => {
+        testGetEndpoint(
+            () => buscarArvoreUnidade(10),
+            "/unidades/10/arvore",
+            { id: 10, children: [] }
+        );
     });
 
-    it("buscarSuperior should return null if response data is missing", async () => {
-        vi.mocked(apiClient.get).mockResolvedValue({data: null});
+    describe("buscarSubordinadas", () => {
+        testGetEndpoint(
+            () => buscarSubordinadas("SIGLA"),
+            "/unidades/sigla/SIGLA/subordinadas",
+            [{ id: 11 }, { id: 12 }]
+        );
+    });
 
-        const result = await buscarSuperior("SIGLA");
+    describe("buscarSuperior", () => {
+        testGetEndpoint(
+            () => buscarSuperior("SIGLA"),
+            "/unidades/sigla/SIGLA/superior",
+            { id: 9 }
+        );
 
-        expect(apiClient.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/superior");
-        expect(result).toBeNull();
+        it("deve retornar null se a resposta for vazia", async () => {
+            mockApi.get.mockResolvedValue({ data: null });
+
+            const result = await buscarSuperior("SIGLA");
+
+            expect(mockApi.get).toHaveBeenCalledWith("/unidades/sigla/SIGLA/superior");
+            expect(result).toBeNull();
+        });
     });
 });

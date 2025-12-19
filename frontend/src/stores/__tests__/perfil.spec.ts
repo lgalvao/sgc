@@ -1,9 +1,9 @@
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as usuarioService from "@/services/usuarioService";
-import {initPinia} from "@/test-utils/helpers";
-import {Perfil} from "@/types/tipos";
-import {usePerfilStore} from "../perfil";
+import { setupStoreTest } from "../../test-utils/storeTestHelpers";
+import { Perfil } from "@/types/tipos";
+import { usePerfilStore } from "../perfil";
 
 vi.mock("@/services/usuarioService");
 
@@ -24,52 +24,45 @@ const mockLocalStorage = (() => {
     };
 })();
 
-Object.defineProperty(window, "localStorage", {value: mockLocalStorage});
+Object.defineProperty(window, "localStorage", { value: mockLocalStorage });
 
 describe("usePerfilStore", () => {
-    let perfilStore: ReturnType<typeof usePerfilStore>;
-
+    // Setup localStorage BEFORE the store is initialized
     beforeEach(() => {
-        // Clear the mock localStorage before each test
         mockLocalStorage.clear();
         mockLocalStorage.setItem("usuarioCodigo", "9"); // Set default for initial state
-
-        initPinia();
-        perfilStore = usePerfilStore();
     });
 
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
+    const context = setupStoreTest(usePerfilStore);
 
     it("deve inicializar com valores padrão se o localStorage estiver vazio", () => {
-        expect(perfilStore.usuarioCodigo).toBe(9);
-        expect(perfilStore.perfilSelecionado).toBeNull();
-        expect(perfilStore.unidadeSelecionada).toBeNull();
+        expect(context.store.usuarioCodigo).toBe(9);
+        expect(context.store.perfilSelecionado).toBeNull();
+        expect(context.store.unidadeSelecionada).toBeNull();
     });
 
     it("deve inicializar com valores do localStorage se disponíveis", () => {
         mockLocalStorage.setItem("usuarioCodigo", "10");
         mockLocalStorage.setItem("perfilSelecionado", "USER");
         mockLocalStorage.setItem("unidadeSelecionada", "123");
-        mockLocalStorage.setItem("unidadeSelecionadaSigla", "U10"); // Add this
+        mockLocalStorage.setItem("unidadeSelecionadaSigla", "U10");
 
-        // Create a new Pinia instance and store to pick up new localStorage mocks
-        setActivePinia(createPinia()); // Re-activate Pinia with a fresh instance
-        const newPerfilStore = usePerfilStore(); // Get a fresh store instance
+        // Re-initialize store to pick up new localStorage values
+        setActivePinia(createPinia());
+        const newPerfilStore = usePerfilStore();
 
         expect(newPerfilStore.usuarioCodigo).toBe(10);
         expect(newPerfilStore.perfilSelecionado).toBe("USER");
         expect(newPerfilStore.unidadeSelecionada).toBe(123);
-        expect(newPerfilStore.unidadeSelecionadaSigla).toBe("U10"); // Add this
+        expect(newPerfilStore.unidadeSelecionadaSigla).toBe("U10");
     });
 
     describe("actions", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
         it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
-            perfilStore.definirUsuarioCodigo(15);
-            expect(perfilStore.usuarioCodigo).toBe(15);
+            context.store.definirUsuarioCodigo(15);
+            expect(context.store.usuarioCodigo).toBe(15);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", "15");
         });
 
@@ -77,11 +70,11 @@ describe("usePerfilStore", () => {
             const unidadeCodigo = 123;
             const unidadeSigla = "TEST_SIGLA";
 
-            perfilStore.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla);
+            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla);
 
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
-            expect(perfilStore.unidadeSelecionada).toBe(unidadeCodigo);
-            expect(perfilStore.unidadeSelecionadaSigla).toBe(unidadeSigla); // Add this
+            expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
+            expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
+            expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "perfilSelecionado",
                 Perfil.ADMIN,
@@ -90,19 +83,19 @@ describe("usePerfilStore", () => {
                 "unidadeSelecionada",
                 unidadeCodigo.toString(),
             );
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith( // Add this
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
                 "unidadeSelecionadaSigla",
                 unidadeSigla,
             );
-            perfilStore.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
-            expect(perfilStore.usuarioNome).toBe("Nome Teste");
+            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
+            expect(context.store.usuarioNome).toBe("Nome Teste");
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith("usuarioNome", "Nome Teste");
         });
 
         it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.CHEFE,
-                unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
+                unidade: { codigo: 1, sigla: "UT", nome: "Unidade UT" },
                 siglaUnidade: "UT",
             };
             const mockLoginResponse = {
@@ -117,7 +110,7 @@ describe("usePerfilStore", () => {
             mockUsuarioService.autorizar.mockResolvedValue([perfilUnidade]);
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
-            const result = await perfilStore.loginCompleto("123", "pass");
+            const result = await context.store.loginCompleto("123", "pass");
 
             expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({
                 tituloEleitoral: 123,
@@ -125,9 +118,9 @@ describe("usePerfilStore", () => {
             });
             expect(mockUsuarioService.autorizar).toHaveBeenCalledWith(123);
             expect(mockUsuarioService.entrar).toHaveBeenCalled();
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.CHEFE);
-            expect(perfilStore.unidadeSelecionada).toBe(1);
-            expect(perfilStore.unidadeSelecionadaSigla).toBe("UT"); // Add this
+            expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
+            expect(context.store.unidadeSelecionada).toBe(1);
+            expect(context.store.unidadeSelecionadaSigla).toBe("UT");
             expect(result).toBe(true);
         });
 
@@ -135,31 +128,31 @@ describe("usePerfilStore", () => {
             const perfis = [
                 {
                     perfil: Perfil.CHEFE,
-                    unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
+                    unidade: { codigo: 1, nome: "Unidade 1", sigla: "U1" },
                     siglaUnidade: "U1",
                 },
                 {
                     perfil: Perfil.GESTOR,
-                    unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
+                    unidade: { codigo: 2, nome: "Unidade 2", sigla: "U2" },
                     siglaUnidade: "U2",
                 },
             ];
             mockUsuarioService.autenticar.mockResolvedValue(true);
             mockUsuarioService.autorizar.mockResolvedValue(perfis);
 
-            await perfilStore.loginCompleto("123", "pass");
+            await context.store.loginCompleto("123", "pass");
 
             expect(mockUsuarioService.entrar).not.toHaveBeenCalled();
-            expect(perfilStore.perfisUnidades).toEqual(perfis);
-            expect(perfilStore.perfilSelecionado).toBeNull(); // Add this
-            expect(perfilStore.unidadeSelecionada).toBeNull(); // Add this
-            expect(perfilStore.unidadeSelecionadaSigla).toBeNull(); // Add this
+            expect(context.store.perfisUnidades).toEqual(perfis);
+            expect(context.store.perfilSelecionado).toBeNull();
+            expect(context.store.unidadeSelecionada).toBeNull();
+            expect(context.store.unidadeSelecionadaSigla).toBeNull();
         });
 
         it("selecionarPerfilUnidade deve chamar entrar e definir o perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
-                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
+                unidade: { codigo: 2, sigla: "XYZ", nome: "Unidade XYZ" },
                 siglaUnidade: "XYZ",
             };
             const mockLoginResponse = {
@@ -171,58 +164,58 @@ describe("usePerfilStore", () => {
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
-            await perfilStore.selecionarPerfilUnidade(456, perfilUnidade);
+            await context.store.selecionarPerfilUnidade(456, perfilUnidade);
 
             expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
                 tituloEleitoral: 456,
                 perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
             });
-            expect(perfilStore.perfilSelecionado).toBe(Perfil.GESTOR);
-            expect(perfilStore.unidadeSelecionada).toBe(2);
-            expect(perfilStore.unidadeSelecionadaSigla).toBe("XYZ"); // Add this
-            expect(perfilStore.usuarioCodigo).toBe(456);
+            expect(context.store.perfilSelecionado).toBe(Perfil.GESTOR);
+            expect(context.store.unidadeSelecionada).toBe(2);
+            expect(context.store.unidadeSelecionadaSigla).toBe("XYZ");
+            expect(context.store.usuarioCodigo).toBe(456);
         });
 
         it("deve lidar com erro em loginCompleto", async () => {
             mockUsuarioService.autenticar.mockRejectedValue(new Error("Fail"));
-            await expect(perfilStore.loginCompleto("123", "pass")).rejects.toThrow(
+            await expect(context.store.loginCompleto("123", "pass")).rejects.toThrow(
                 "Fail",
             );
-            expect(perfilStore.lastError).toBeTruthy();
+            expect(context.store.lastError).toBeTruthy();
         });
 
         it("deve lidar com erro em selecionarPerfilUnidade", async () => {
             mockUsuarioService.entrar.mockRejectedValue(new Error("Fail"));
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
-                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
+                unidade: { codigo: 2, sigla: "XYZ", nome: "Unidade XYZ" },
                 siglaUnidade: "XYZ",
             };
             await expect(
-                perfilStore.selecionarPerfilUnidade(123, perfilUnidade),
+                context.store.selecionarPerfilUnidade(123, perfilUnidade),
             ).rejects.toThrow("Fail");
-            expect(perfilStore.lastError).toBeTruthy();
+            expect(context.store.lastError).toBeTruthy();
         });
 
         it("deve retornar falso se a autenticação falhar em loginCompleto", async () => {
             mockUsuarioService.autenticar.mockResolvedValue(false);
-            const result = await perfilStore.loginCompleto("123", "pass");
+            const result = await context.store.loginCompleto("123", "pass");
             expect(result).toBe(false);
         });
 
         it("deve fazer logout corretamente", () => {
-            perfilStore.logout();
-            expect(perfilStore.usuarioCodigo).toBeNull();
-            expect(perfilStore.perfilSelecionado).toBeNull();
-            expect(perfilStore.unidadeSelecionada).toBeNull();
+            context.store.logout();
+            expect(context.store.usuarioCodigo).toBeNull();
+            expect(context.store.perfilSelecionado).toBeNull();
+            expect(context.store.unidadeSelecionada).toBeNull();
             expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(7);
         });
 
         it("deve limpar o erro", () => {
-            perfilStore.lastError = { kind: "unexpected", message: "Error", subErrors: [] };
-            perfilStore.clearError();
-            expect(perfilStore.lastError).toBeNull();
+            context.store.lastError = { kind: "unexpected", message: "Error", subErrors: [] };
+            context.store.clearError();
+            expect(context.store.lastError).toBeNull();
         });
     });
 });

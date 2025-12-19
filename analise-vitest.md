@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 17 de Dezembro de 2025  
-**Versão:** 1.3
+**Versão:** 1.4
 **Status dos Testes:** ✅ 729 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -21,7 +21,7 @@ Esta análise aborda a qualidade, consistência e robustez da suíte de testes u
 ### 1.2. Principais Problemas Identificados
 
 1. **Inconsistência crítica na nomenclatura de testes** (Português vs Inglês) - **RESOLVIDO**
-2. **Duplicação massiva de código** (especialmente em testes de Store) - **EM ANDAMENTO**
+2. **Duplicação massiva de código** (especialmente em testes de Store e Service) - **EM GRANDE PARTE RESOLVIDO**
 3. **Padrões de mock inconsistentes e frágeis** - **EM ANDAMENTO**
 4. **Testes superficiais focados apenas em "happy path"**
 5. **Falta de testes de integração adequados**
@@ -45,28 +45,42 @@ Duplicações em `processos.spec.ts` foram removidas.
 
 ### 2.2. Prioridade 2 (Importante - 1-2 meses) 🟡
 
-#### Ação 2.1: Criar Test Utilities Centralizadas 🚧
-**Status:** Em progresso.
+#### Ação 2.1: Criar Test Utilities Centralizadas ✅
+**Status:** Concluído.
 Arquivos criados:
 - `test-utils/storeTestHelpers.ts`
-- `test-utils/serviceTestHelpers.ts`
+- `test-utils/serviceTestHelpers.ts` (atualizado para suportar payload opcional)
 - `test-utils/componentTestHelpers.ts`
 
 Refatorações realizadas:
-- `stores/__tests__/processos.spec.ts` refatorado para usar `setupStoreTest`.
-- `services/__tests__/painelService.spec.ts` refatorado para usar `setupServiceTest`.
-- `stores/__tests__/alertas.spec.ts` refatorado para usar `setupStoreTest`.
-- `services/__tests__/alertaService.spec.ts` refatorado para usar `setupServiceTest`.
-- `stores/__tests__/analises.spec.ts` refatorado para usar `setupStoreTest`.
-- `services/__tests__/analiseService.spec.ts` refatorado para usar `setupServiceTest`.
-- `stores/__tests__/atividades.spec.ts` refatorado para usar `setupStoreTest`.
-- `services/__tests__/atividadeService.spec.ts` refatorado e corrigido para mockar `@/axios-setup` corretamente.
+- `stores/__tests__/processos.spec.ts`
+- `services/__tests__/painelService.spec.ts`
+- `stores/__tests__/alertas.spec.ts`
+- `services/__tests__/alertaService.spec.ts`
+- `stores/__tests__/analises.spec.ts`
+- `services/__tests__/analiseService.spec.ts`
+- `stores/__tests__/atividades.spec.ts`
+- `services/__tests__/atividadeService.spec.ts`
+- `stores/__tests__/atribuicoes.spec.ts`
+- `services/__tests__/atribuicaoTemporariaService.spec.ts`
+- `services/__tests__/cadastroService.spec.ts`
+- `stores/__tests__/mapas.spec.ts`
+- `services/__tests__/mapaService.spec.ts`
+- `stores/__tests__/perfil.spec.ts`
+- `services/__tests__/usuarioService.spec.ts`
+- `stores/__tests__/usuarios.spec.ts`
+- `stores/__tests__/unidades.spec.ts`
+- `services/__tests__/unidadesService.spec.ts`
+- `stores/__tests__/subprocessos.spec.ts`
+- `services/__tests__/subprocessoService.spec.ts`
+- `services/__tests__/diagnosticoService.spec.ts`
+- `services/__tests__/processoService.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
 **Status:** Pendente.
 
 #### Ação 2.3: Padronizar Setup/Teardown
-**Status:** Pendente.
+**Status:** Pendente (Parcialmente coberto pelos helpers).
 
 ---
 
@@ -80,23 +94,15 @@ Refatorações realizadas:
 
 **Problema:** Código duplicado massivamente em testes de Stores e Services.
 
-**Solução em Andamento:**
+**Solução:**
 Foi criada a função `setupStoreTest` em `test-utils/storeTestHelpers.ts` para padronizar a inicialização de Pinia e limpeza de mocks.
-Foi criada a função `setupServiceTest` em `test-utils/serviceTestHelpers.ts` para padronizar o mock do axios.
+Foi criada a função `setupServiceTest` em `test-utils/serviceTestHelpers.ts` para padronizar o mock do axios e helpers para testes de endpoint (`testGetEndpoint`, `testPostEndpoint`, etc).
 
-Arquivos refatorados com sucesso:
-- `stores/__tests__/processos.spec.ts`
-- `services/__tests__/painelService.spec.ts`
-- `stores/__tests__/alertas.spec.ts`
-- `services/__tests__/alertaService.spec.ts`
-- `stores/__tests__/analises.spec.ts`
-- `services/__tests__/analiseService.spec.ts`
-- `stores/__tests__/atividades.spec.ts`
-- `services/__tests__/atividadeService.spec.ts`
+Arquivos refatorados cobrem a maioria dos Stores e Services principais do sistema.
 
 **Próximos passos:**
-- Estender o uso de `setupStoreTest` para outras stores.
-- Estender o uso de `setupServiceTest` para outros services.
+- Continuar a refatoração para componentes (Actions/Stores usados em componentes).
+- Focar em testes de edge cases e tratamento de erros mais robustos usando `testErrorHandling`.
 
 ---
 
