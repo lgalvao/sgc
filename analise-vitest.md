@@ -1,7 +1,7 @@
 # Análise dos Testes Unitários (Vitest) do Frontend - SGC
 
 **Data da Análise:** 19 de Dezembro de 2025
-**Versão:** 1.6
+**Versão:** 1.7
 **Status dos Testes:** ✅ 732 testes passando, 3 skipped (85 arquivos)
 
 ---
@@ -78,12 +78,21 @@ Refatorações realizadas (Componentes):
 - `components/__tests__/MainNavbar.spec.ts`
 
 #### Ação 2.2: Adicionar Testes de Edge Cases
-**Status:** Em Andamento.
+**Status:** Concluído (Services).
 - Criado helper `testErrorHandling` em `test-utils/serviceTestHelpers.ts`.
-- Refatorado `services/__tests__/processoService.spec.ts` para usar `testErrorHandling`.
-- Refatorado `services/__tests__/usuarioService.spec.ts` para usar `testErrorHandling`.
-- Refatorado `services/__tests__/alertaService.spec.ts` para usar `testErrorHandling`.
-- Refatorado `services/__tests__/mapaService.spec.ts` para usar `testErrorHandling`.
+- Todos os arquivos de service test foram refatorados para usar `testErrorHandling`:
+  - `services/__tests__/processoService.spec.ts`
+  - `services/__tests__/usuarioService.spec.ts`
+  - `services/__tests__/alertaService.spec.ts`
+  - `services/__tests__/mapaService.spec.ts`
+  - `services/__tests__/analiseService.spec.ts`
+  - `services/__tests__/atividadeService.spec.ts`
+  - `services/__tests__/atribuicaoTemporariaService.spec.ts`
+  - `services/__tests__/cadastroService.spec.ts`
+  - `services/__tests__/diagnosticoService.spec.ts`
+  - `services/__tests__/painelService.spec.ts`
+  - `services/__tests__/subprocessoService.spec.ts`
+  - `services/__tests__/unidadesService.spec.ts`
 
 #### Ação 2.3: Padronizar Setup/Teardown
 **Status:** Em Andamento.

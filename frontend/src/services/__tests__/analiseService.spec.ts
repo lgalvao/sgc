@@ -1,10 +1,10 @@
 import {describe, expect, it, vi} from "vitest";
-import {setupServiceTest, testGetEndpoint} from "@/test-utils/serviceTestHelpers";
+import {setupServiceTest, testErrorHandling, testGetEndpoint} from "@/test-utils/serviceTestHelpers";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {listarAnalisesCadastro, listarAnalisesValidacao,} from "../analiseService";
 
 describe("analiseService", () => {
-    const {mockApi} = setupServiceTest();
+    setupServiceTest();
 
     describe("listarAnalisesCadastro", () => {
         const subprocessoId = 1;
@@ -27,12 +27,7 @@ describe("analiseService", () => {
             responseData
         );
 
-        it("deve lançar um erro em caso de falha", async () => {
-            const error = new Error("Request failed");
-            mockApi.get.mockRejectedValue(error);
-
-            await expect(listarAnalisesCadastro(subprocessoId)).rejects.toThrow();
-        });
+        testErrorHandling(() => listarAnalisesCadastro(subprocessoId));
     });
 
     describe("listarAnalisesValidacao", () => {
@@ -56,11 +51,6 @@ describe("analiseService", () => {
             responseData
         );
 
-        it("deve lançar um erro em caso de falha", async () => {
-            const error = new Error("Request failed");
-            mockApi.get.mockRejectedValue(error);
-
-            await expect(listarAnalisesValidacao(subprocessoId)).rejects.toThrow();
-        });
+        testErrorHandling(() => listarAnalisesValidacao(subprocessoId));
     });
 });

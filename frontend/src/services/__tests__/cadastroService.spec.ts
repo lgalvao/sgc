@@ -1,5 +1,5 @@
 import { describe } from "vitest";
-import { setupServiceTest, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
 import * as cadastroService from "@/services/cadastroService";
 
 describe("cadastroService", () => {
@@ -10,6 +10,7 @@ describe("cadastroService", () => {
             () => cadastroService.disponibilizarCadastro(1),
             "/subprocessos/1/cadastro/disponibilizar"
         );
+        testErrorHandling(() => cadastroService.disponibilizarCadastro(1), 'post');
     });
 
     describe("disponibilizarRevisaoCadastro", () => {
@@ -17,6 +18,7 @@ describe("cadastroService", () => {
             () => cadastroService.disponibilizarRevisaoCadastro(1),
             "/subprocessos/1/disponibilizar-revisao"
         );
+        testErrorHandling(() => cadastroService.disponibilizarRevisaoCadastro(1), 'post');
     });
 
     describe("devolverCadastro", () => {
@@ -26,6 +28,7 @@ describe("cadastroService", () => {
             "/subprocessos/1/devolver-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.devolverCadastro(1, payload), 'post');
     });
 
     describe("aceitarCadastro", () => {
@@ -35,6 +38,7 @@ describe("cadastroService", () => {
             "/subprocessos/1/aceitar-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.aceitarCadastro(1, payload), 'post');
     });
 
     describe("homologarCadastro", () => {
@@ -44,6 +48,7 @@ describe("cadastroService", () => {
             "/subprocessos/1/homologar-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.homologarCadastro(1, payload), 'post');
     });
 
     describe("devolverRevisaoCadastro", () => {
@@ -53,6 +58,7 @@ describe("cadastroService", () => {
             "/subprocessos/1/devolver-revisao-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.devolverRevisaoCadastro(1, payload), 'post');
     });
 
     describe("aceitarRevisaoCadastro", () => {
@@ -62,6 +68,7 @@ describe("cadastroService", () => {
             "/subprocessos/1/aceitar-revisao-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.aceitarRevisaoCadastro(1, payload), 'post');
     });
 
     describe("homologarRevisaoCadastro", () => {
@@ -71,5 +78,6 @@ describe("cadastroService", () => {
             "/subprocessos/1/homologar-revisao-cadastro",
             payload
         );
+        testErrorHandling(() => cadastroService.homologarRevisaoCadastro(1, payload), 'post');
     });
 });

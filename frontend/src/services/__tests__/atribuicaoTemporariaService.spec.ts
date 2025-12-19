@@ -1,5 +1,5 @@
 import { describe } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
 import { buscarTodasAtribuicoes, criarAtribuicaoTemporaria } from "../atribuicaoTemporariaService";
 
 describe("atribuicaoTemporariaService", () => {
@@ -11,6 +11,7 @@ describe("atribuicaoTemporariaService", () => {
             "/unidades/atribuicoes",
             [{ id: 1 }]
         );
+        testErrorHandling(() => buscarTodasAtribuicoes());
     });
 
     describe("criarAtribuicaoTemporaria", () => {
@@ -26,5 +27,6 @@ describe("atribuicaoTemporariaService", () => {
             request,
             {}
         );
+        testErrorHandling(() => criarAtribuicaoTemporaria(1, request), 'post');
     });
 });
