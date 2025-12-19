@@ -1,13 +1,22 @@
-import {flushPromises, mount} from "@vue/test-utils";
-import {BFormTextarea} from "bootstrap-vue-next";
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it} from "vitest";
-import CriarCompetenciaModal from "../CriarCompetenciaModal.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import { mount, flushPromises } from "@vue/test-utils";
+import { BFormTextarea, BButton, BCard, BFormCheckbox, BModal } from "bootstrap-vue-next";
+import { describe, expect, it } from "vitest";
+import CriarCompetenciaModal from "@/components/CriarCompetenciaModal.vue";
 
-describe("CriarCompetenciaModal", () => {
-    beforeEach(() => {
-        setActivePinia(createPinia());
-    });
+const BModalStub = {
+    template: `
+        <div v-if="modelValue" data-testid="modal-stub">
+            <slot />
+            <slot name="footer" />
+        </div>
+    `,
+    props: ["modelValue"],
+    emits: ["update:modelValue", "hide"],
+};
+
+describe("CriarCompetenciaModal.vue", () => {
+    const context = setupComponentTest();
 
     const atividades = [
         {codigo: 1, descricao: "Atividade 1", conhecimentos: []},
@@ -18,25 +27,38 @@ describe("CriarCompetenciaModal", () => {
         },
     ];
 
-    it("não deve renderizar o modal quando mostrar for falso", () => {
-        const wrapper = mount(CriarCompetenciaModal, {
+    const createWrapper = (propsOverride = {}) => {
+        const options = getCommonMountOptions({}, { BModal: BModalStub });
+
+        context.wrapper = mount(CriarCompetenciaModal, {
+            ...options,
             props: {
-                mostrar: false,
+                mostrar: true,
                 atividades: [],
+                ...propsOverride,
+            },
+            global: {
+                ...options.global,
+                components: {
+                    BFormTextarea,
+                    BButton,
+                    BCard,
+                    BFormCheckbox,
+                    BModal,
+                    ...(options.global.components || {})
+                }
             },
         });
-        expect(
-            wrapper.find('[data-testid="input-descricao-competencia"]').exists(),
-        ).toBe(false);
+        return context.wrapper;
+    };
+
+    it("não deve renderizar o modal quando mostrar for falso", () => {
+        const wrapper = createWrapper({ mostrar: false, atividades: [] });
+        expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal no modo de criação", () => {
-        const wrapper = mount(CriarCompetenciaModal, {
-            props: {
-                mostrar: true,
-                atividades,
-            },
-        });
+        const wrapper = createWrapper({ mostrar: true, atividades });
 
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
         expect(
@@ -53,31 +75,19 @@ describe("CriarCompetenciaModal", () => {
             atividadesAssociadas: [1],
         };
 
-        const wrapper = mount(CriarCompetenciaModal, {
-            props: {
-                mostrar: true,
-                atividades,
-                competenciaParaEditar,
-            },
-        });
+        const wrapper = createWrapper({ mostrar: true, atividades, competenciaParaEditar });
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe(
-            "Competência existente",
-        );
+        expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("Competência existente");
     });
 
     it("deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas", async () => {
-        const wrapper = mount(CriarCompetenciaModal, {
-            props: {
-                mostrar: true,
-                atividades,
-            },
-        });
+        const wrapper = createWrapper({ mostrar: true, atividades });
 
         await wrapper.findComponent(BFormTextarea).setValue("Nova competência");
         await wrapper.find('input[type="checkbox"]').trigger("click");
+
         expect(
             wrapper
                 .find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]')
@@ -86,28 +96,19 @@ describe("CriarCompetenciaModal", () => {
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
-        const wrapper = mount(CriarCompetenciaModal, {
-            props: {
-                mostrar: true,
-                atividades,
-            },
-        });
+        const wrapper = createWrapper({ mostrar: true, atividades });
 
         await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 
     it("deve emitir o evento salvar com os dados corretos", async () => {
-        const wrapper = mount(CriarCompetenciaModal, {
-            props: {
-                mostrar: true,
-                atividades,
-            },
-        });
+        const wrapper = createWrapper({ mostrar: true, atividades });
 
         const descricao = "Competência de teste";
         await wrapper.findComponent(BFormTextarea).setValue(descricao);
-        await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
+        // Using setValue(true) to simulate checking the checkbox
+        await wrapper.find('input[type="checkbox"]').setValue(true);
         await flushPromises();
         await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]').trigger("click");
 
