@@ -2,27 +2,31 @@ import {mount} from "@vue/test-utils";
 import {BBadge} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import ProcessoDetalhes from "../ProcessoDetalhes.vue";
+import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 describe("ProcessoDetalhes.vue", () => {
+    const context = setupComponentTest();
+
+    const mountOptions = getCommonMountOptions();
+    mountOptions.global.components = {
+        BBadge,
+    };
+
     it("renders correctly with props", () => {
-        const wrapper = mount(ProcessoDetalhes, {
+        context.wrapper = mount(ProcessoDetalhes, {
+            ...mountOptions,
             props: {
                 descricao: "Processo de Teste",
                 tipo: "REVISAO",
                 situacao: "EM_ANDAMENTO",
             },
-            global: {
-                components: {
-                    BBadge,
-                },
-            },
         });
 
-        expect(wrapper.find('[data-testid="processo-info"]').text()).toBe(
+        expect(context.wrapper.find('[data-testid="processo-info"]').text()).toBe(
             "Processo de Teste",
         );
-        expect(wrapper.text()).toContain("Tipo: Revisão");
-        expect(wrapper.text()).toContain("Situação: Em andamento");
-        expect(wrapper.findComponent(BBadge).exists()).toBe(true);
+        expect(context.wrapper.text()).toContain("Tipo: Revisão");
+        expect(context.wrapper.text()).toContain("Situação: Em andamento");
+        expect(context.wrapper.findComponent(BBadge).exists()).toBe(true);
     });
 });
