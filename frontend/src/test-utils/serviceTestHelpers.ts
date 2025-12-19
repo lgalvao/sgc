@@ -50,13 +50,17 @@ export function testGetEndpoint(
 export function testPostEndpoint(
     action: () => Promise<any>,
     url: string,
-    payload: any,
+    payload?: any,
     response: any = {}
 ) {
     it(`deve fazer POST em ${url}`, async () => {
         mockApi.post.mockResolvedValue({ data: response });
         await action();
-        expect(mockApi.post).toHaveBeenCalledWith(url, payload);
+        if (payload !== undefined) {
+            expect(mockApi.post).toHaveBeenCalledWith(url, payload);
+        } else {
+            expect(mockApi.post).toHaveBeenCalledWith(url);
+        }
     });
 }
 
@@ -66,13 +70,17 @@ export function testPostEndpoint(
 export function testPutEndpoint(
     action: () => Promise<any>,
     url: string,
-    payload: any,
+    payload?: any,
     response: any = {}
 ) {
     it(`deve fazer PUT em ${url}`, async () => {
         mockApi.put.mockResolvedValue({ data: response });
         await action();
-        expect(mockApi.put).toHaveBeenCalledWith(url, payload);
+        if (payload !== undefined) {
+            expect(mockApi.put).toHaveBeenCalledWith(url, payload);
+        } else {
+            expect(mockApi.put).toHaveBeenCalledWith(url);
+        }
     });
 }
 

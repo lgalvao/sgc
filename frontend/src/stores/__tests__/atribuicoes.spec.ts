@@ -1,18 +1,18 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import * as atribuicaoTemporariaService from "@/services/atribuicaoTemporariaService";
-import {initPinia} from "@/test-utils/helpers";
-import type {AtribuicaoTemporaria} from "@/types/tipos";
-import {useAtribuicaoTemporariaStore} from "../atribuicoes";
+import { setupStoreTest } from "../../test-utils/storeTestHelpers";
+import type { AtribuicaoTemporaria } from "@/types/tipos";
+import { useAtribuicaoTemporariaStore } from "../atribuicoes";
 
 const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {
         codigo: 1,
-        unidade: {codigo: 1, nome: "A", sigla: "A"},
+        unidade: { codigo: 1, nome: "A", sigla: "A" },
         usuario: {
             codigo: 1,
             nome: "Servidor 1",
             tituloEleitoral: "123",
-            unidade: {codigo: 1, nome: "A", sigla: "A"},
+            unidade: { codigo: 1, nome: "A", sigla: "A" },
             email: "",
             ramal: "",
         },
@@ -23,12 +23,12 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     },
     {
         codigo: 2,
-        unidade: {codigo: 2, nome: "B", sigla: "B"},
+        unidade: { codigo: 2, nome: "B", sigla: "B" },
         usuario: {
             codigo: 2,
             nome: "Servidor 2",
             tituloEleitoral: "456",
-            unidade: {codigo: 2, nome: "B", sigla: "B"},
+            unidade: { codigo: 2, nome: "B", sigla: "B" },
             email: "",
             ramal: "",
         },
@@ -39,12 +39,12 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     },
     {
         codigo: 3,
-        unidade: {codigo: 3, nome: "C", sigla: "C"},
+        unidade: { codigo: 3, nome: "C", sigla: "C" },
         usuario: {
             codigo: 1,
             nome: "Servidor 1",
             tituloEleitoral: "123",
-            unidade: {codigo: 3, nome: "C", sigla: "C"},
+            unidade: { codigo: 3, nome: "C", sigla: "C" },
             email: "",
             ramal: "",
         },
@@ -57,35 +57,31 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
 
 vi.mock("@/services/atribuicaoTemporariaService", () => ({
     buscarTodasAtribuicoes: vi.fn(() =>
-        Promise.resolve({data: mockAtribuicoes}),
+        Promise.resolve({ data: mockAtribuicoes }),
     ),
 }));
 
 describe("useAtribuicaoTemporariaStore", () => {
-    let atribuicaoTemporariaStore: ReturnType<
-        typeof useAtribuicaoTemporariaStore
-    >;
+    const context = setupStoreTest(useAtribuicaoTemporariaStore);
 
     beforeEach(() => {
-        initPinia();
-        atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
-        atribuicaoTemporariaStore.atribuicoes = mockAtribuicoes;
-        vi.clearAllMocks();
+        // Inicializa com dados simulados para os testes de getters
+        context.store.atribuicoes = mockAtribuicoes;
     });
 
     it("deve inicializar com atribuições simuladas", () => {
-        expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
-        expect(atribuicaoTemporariaStore.atribuicoes[0].codigo).toBe(1);
+        expect(context.store.atribuicoes.length).toBe(3);
+        expect(context.store.atribuicoes[0].codigo).toBe(1);
     });
 
     describe("actions", () => {
         it("buscarAtribuicoes deve buscar e definir atribuições", async () => {
-            atribuicaoTemporariaStore.atribuicoes = [];
-            await atribuicaoTemporariaStore.buscarAtribuicoes();
+            context.store.atribuicoes = [];
+            await context.store.buscarAtribuicoes();
             expect(
                 atribuicaoTemporariaService.buscarTodasAtribuicoes,
             ).toHaveBeenCalledTimes(1);
-            expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
+            expect(context.store.atribuicoes.length).toBe(3);
         });
 
         it("buscarAtribuicoes deve lidar com erros", async () => {
@@ -93,16 +89,16 @@ describe("useAtribuicaoTemporariaStore", () => {
                 atribuicaoTemporariaService.buscarTodasAtribuicoes as any
             ).mockRejectedValue(new Error("Failed"));
             await expect(
-                atribuicaoTemporariaStore.buscarAtribuicoes(),
+                context.store.buscarAtribuicoes(),
             ).rejects.toThrow("Failed");
-            expect(atribuicaoTemporariaStore.error).toContain("Failed");
+            expect(context.store.error).toContain("Failed");
         });
     });
 
     describe("getters", () => {
         it("obterAtribuicoesPorServidor deve retornar as atribuições corretas por ID do servidor", () => {
             const servidorAtribuicoes =
-                atribuicaoTemporariaStore.obterAtribuicoesPorServidor(1);
+                context.store.obterAtribuicoesPorServidor(1);
             expect(servidorAtribuicoes.length).toBe(2);
             expect(servidorAtribuicoes[0].codigo).toBe(1);
             expect(servidorAtribuicoes[1].codigo).toBe(3);
@@ -110,20 +106,20 @@ describe("useAtribuicaoTemporariaStore", () => {
 
         it("obterAtribuicoesPorServidor deve retornar uma lista vazia se nenhum servidor correspondente for encontrado", () => {
             const servidorAtribuicoes =
-                atribuicaoTemporariaStore.obterAtribuicoesPorServidor(999);
+                context.store.obterAtribuicoesPorServidor(999);
             expect(servidorAtribuicoes.length).toBe(0);
         });
 
         it("obterAtribuicoesPorUnidade deve retornar as atribuições corretas pela sigla da unidade", () => {
             const unidadeAtribuicoes =
-                atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("A");
+                context.store.obterAtribuicoesPorUnidade("A");
             expect(unidadeAtribuicoes.length).toBe(1);
             expect(unidadeAtribuicoes[0].codigo).toBe(1);
         });
 
         it("obterAtribuicoesPorUnidade deve retornar uma lista vazia se nenhuma unidade correspondente for encontrada", () => {
             const unidadeAtribuicoes =
-                atribuicaoTemporariaStore.obterAtribuicoesPorUnidade("NONEXISTENT");
+                context.store.obterAtribuicoesPorUnidade("NONEXISTENT");
             expect(unidadeAtribuicoes.length).toBe(0);
         });
     });

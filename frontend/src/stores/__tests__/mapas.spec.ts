@@ -1,9 +1,9 @@
-import {createPinia, setActivePinia} from "pinia";
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
-import {useMapasStore} from "../mapas";
+import { setupStoreTest } from "../../test-utils/storeTestHelpers";
+import type { ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao } from "@/types/tipos";
+import { useMapasStore } from "../mapas";
 
 vi.mock("@/services/mapaService", () => ({
     obterMapaCompleto: vi.fn(),
@@ -22,19 +22,13 @@ vi.mock("@/services/subprocessoService", () => ({
 }));
 
 describe("useMapasStore", () => {
-    let store: ReturnType<typeof useMapasStore>;
+    const context = setupStoreTest(useMapasStore);
     const codSubrocesso = 1;
 
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        store = useMapasStore();
-        vi.clearAllMocks();
-    });
-
     it("deve inicializar com valores nulos", () => {
-        expect(store.mapaCompleto).toBeNull();
-        expect(store.mapaAjuste).toBeNull();
-        expect(store.impactoMapa).toBeNull();
+        expect(context.store.mapaCompleto).toBeNull();
+        expect(context.store.mapaAjuste).toBeNull();
+        expect(context.store.impactoMapa).toBeNull();
     });
 
     describe("buscarMapaCompleto", () => {
@@ -48,52 +42,52 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            await store.buscarMapaCompleto(codSubrocesso);
+            await context.store.buscarMapaCompleto(codSubrocesso);
 
             expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
-            expect(store.mapaCompleto).toEqual(mockMapa);
+            expect(context.store.mapaCompleto).toEqual(mockMapa);
         });
 
         it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaCompleto).mockRejectedValue(
                 new Error("Failed"),
             );
-            store.mapaCompleto = {} as any; // Pre-set state
+            context.store.mapaCompleto = {} as any; // Pre-set state
 
-            await expect(store.buscarMapaCompleto(codSubrocesso)).rejects.toThrow("Failed");
+            await expect(context.store.buscarMapaCompleto(codSubrocesso)).rejects.toThrow("Failed");
 
-            expect(store.mapaCompleto).toBeNull();
+            expect(context.store.mapaCompleto).toBeNull();
         });
     });
 
     describe("salvarMapa", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const request = {competencias: []};
+            const request = { competencias: [] };
             const mockResponse: MapaCompleto = {
                 codigo: 1,
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
             vi.mocked(mapaService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
-            await store.salvarMapa(codSubrocesso, request);
+            await context.store.salvarMapa(codSubrocesso, request);
 
             expect(mapaService.salvarMapaCompleto).toHaveBeenCalledWith(
                 codSubrocesso,
                 request,
             );
-            expect(store.mapaCompleto).toEqual(mockResponse);
+            expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
         it("deve lançar erro em caso de falha", async () => {
-            const request = {competencias: []};
+            const request = { competencias: [] };
             vi.mocked(mapaService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
-            await expect(store.salvarMapa(codSubrocesso, request)).rejects.toThrow("Fail");
+            await expect(context.store.salvarMapa(codSubrocesso, request)).rejects.toThrow("Fail");
         });
     });
 
@@ -106,27 +100,27 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
-            await store.buscarMapaAjuste(codSubrocesso);
+            await context.store.buscarMapaAjuste(codSubrocesso);
 
             expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubrocesso);
-            expect(store.mapaAjuste).toEqual(mockMapa);
+            expect(context.store.mapaAjuste).toEqual(mockMapa);
         });
 
         it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaAjuste).mockRejectedValue(new Error("Fail"));
-            store.mapaAjuste = {} as any;
+            context.store.mapaAjuste = {} as any;
 
-            await expect(store.buscarMapaAjuste(codSubrocesso)).rejects.toThrow("Fail");
-            expect(store.mapaAjuste).toBeNull();
+            await expect(context.store.buscarMapaAjuste(codSubrocesso)).rejects.toThrow("Fail");
+            expect(context.store.mapaAjuste).toBeNull();
         });
     });
 
     describe("salvarAjustes", () => {
         it("deve chamar o serviço com sucesso", async () => {
-            const request = {competencias: [], atividades: [], sugestoes: ""};
+            const request = { competencias: [], atividades: [], sugestoes: "" };
             vi.mocked(mapaService.salvarMapaAjuste).mockResolvedValue(undefined);
 
-            await store.salvarAjustes(codSubrocesso, request);
+            await context.store.salvarAjustes(codSubrocesso, request);
 
             expect(mapaService.salvarMapaAjuste).toHaveBeenCalledWith(
                 codSubrocesso,
@@ -135,10 +129,10 @@ describe("useMapasStore", () => {
         });
 
         it("deve lançar erro em caso de falha", async () => {
-            const request = {competencias: [], atividades: [], sugestoes: ""};
+            const request = { competencias: [], atividades: [], sugestoes: "" };
             vi.mocked(mapaService.salvarMapaAjuste).mockRejectedValue(new Error("Fail"));
 
-            await expect(store.salvarAjustes(codSubrocesso, request)).rejects.toThrow("Fail");
+            await expect(context.store.salvarAjustes(codSubrocesso, request)).rejects.toThrow("Fail");
         });
     });
 
@@ -159,20 +153,20 @@ describe("useMapasStore", () => {
                 mockImpacto,
             );
 
-            await store.buscarImpactoMapa(codSubrocesso);
+            await context.store.buscarImpactoMapa(codSubrocesso);
 
             expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.impactoMapa).toEqual(mockImpacto);
+            expect(context.store.impactoMapa).toEqual(mockImpacto);
         });
 
         it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.verificarImpactosMapa).mockRejectedValue(new Error("Fail"));
-            store.impactoMapa = {} as any;
+            context.store.impactoMapa = {} as any;
 
-            await expect(store.buscarImpactoMapa(codSubrocesso)).rejects.toThrow("Fail");
-            expect(store.impactoMapa).toBeNull();
+            await expect(context.store.buscarImpactoMapa(codSubrocesso)).rejects.toThrow("Fail");
+            expect(context.store.impactoMapa).toBeNull();
         });
     });
 
@@ -188,7 +182,7 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -196,13 +190,13 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await store.adicionarCompetencia(codSubrocesso, competencia);
+            await context.store.adicionarCompetencia(codSubrocesso, competencia);
 
             expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
                 codSubrocesso,
                 competencia,
             );
-            expect(store.mapaCompleto).toEqual(mockResponse);
+            expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
         it("deve lançar erro em caso de falha", async () => {
@@ -213,7 +207,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(store.adicionarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+            await expect(context.store.adicionarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -229,7 +223,7 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -237,13 +231,13 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await store.atualizarCompetencia(codSubrocesso, competencia);
+            await context.store.atualizarCompetencia(codSubrocesso, competencia);
 
             expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
                 codSubrocesso,
                 competencia,
             );
-            expect(store.mapaCompleto).toEqual(mockResponse);
+            expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
         it("deve lançar erro em caso de falha", async () => {
@@ -254,7 +248,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.atualizarCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(store.atualizarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+            await expect(context.store.atualizarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -266,7 +260,7 @@ describe("useMapasStore", () => {
                 subprocessoCodigo: 1,
                 observacoes: "teste",
                 competencias: [
-                    {codigo: 1, descricao: "Nova", atividadesAssociadas: []},
+                    { codigo: 1, descricao: "Nova", atividadesAssociadas: [] },
                 ],
                 situacao: "EM_ANDAMENTO",
             };
@@ -274,20 +268,20 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await store.removerCompetencia(codSubrocesso, idCompetencia);
+            await context.store.removerCompetencia(codSubrocesso, idCompetencia);
 
             expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(
                 codSubrocesso,
                 idCompetencia,
             );
-            expect(store.mapaCompleto).toEqual(mockResponse);
+            expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
         it("deve lançar erro em caso de falha", async () => {
             const idCompetencia = 1;
             vi.mocked(subprocessoService.removerCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(store.removerCompetencia(codSubrocesso, idCompetencia)).rejects.toThrow("Fail");
+            await expect(context.store.removerCompetencia(codSubrocesso, idCompetencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -300,32 +294,32 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
 
-            await store.buscarMapaVisualizacao(codSubrocesso);
+            await context.store.buscarMapaVisualizacao(codSubrocesso);
 
             expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(
                 codSubrocesso,
             );
-            expect(store.mapaVisualizacao).toEqual(mockMapa);
+            expect(context.store.mapaVisualizacao).toEqual(mockMapa);
         });
 
         it("deve definir o estado como nulo em caso de falha", async () => {
             vi.mocked(mapaService.obterMapaVisualizacao).mockRejectedValue(
                 new Error("Failed"),
             );
-            store.mapaVisualizacao = {} as any; // Pre-set state
+            context.store.mapaVisualizacao = {} as any; // Pre-set state
 
-            await expect(store.buscarMapaVisualizacao(codSubrocesso)).rejects.toThrow("Failed");
+            await expect(context.store.buscarMapaVisualizacao(codSubrocesso)).rejects.toThrow("Failed");
 
-            expect(store.mapaVisualizacao).toBeNull();
+            expect(context.store.mapaVisualizacao).toBeNull();
         });
     });
 
     describe("disponibilizarMapa", () => {
         it("deve chamar o serviço com sucesso", async () => {
-            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
+            const request = { observacoes: "teste", dataLimite: "2025-12-31" };
             vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue(undefined);
 
-            await store.disponibilizarMapa(codSubrocesso, request);
+            await context.store.disponibilizarMapa(codSubrocesso, request);
 
             expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(
                 codSubrocesso,
@@ -334,12 +328,12 @@ describe("useMapasStore", () => {
         });
 
         it("deve lançar erro em caso de falha", async () => {
-            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
-            const error = {response: {data: {message: "Error"}}};
+            const request = { observacoes: "teste", dataLimite: "2025-12-31" };
+            const error = { response: { data: { message: "Error" } } };
             vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);
 
             await expect(
-                store.disponibilizarMapa(codSubrocesso, request),
+                context.store.disponibilizarMapa(codSubrocesso, request),
             ).rejects.toThrow();
         });
     });

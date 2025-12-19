@@ -1,88 +1,85 @@
-import {afterEach, describe, expect, it, type Mocked, vi} from "vitest";
-import api from "@/axios-setup";
+import { describe, expect, it, vi } from "vitest";
+import { setupServiceTest, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
 import * as mappers from "@/mappers/sgrh";
 import * as service from "../usuarioService";
 
-vi.mock("@/axios-setup");
 vi.mock("@/mappers/sgrh", () => ({
-    mapPerfilUnidadeToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
+    mapPerfilUnidadeToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
 }));
 
 describe("usuarioService", () => {
-    const mockApi = api as Mocked<typeof api>;
+    const { mockApi } = setupServiceTest();
     const mockMappers = vi.mocked(mappers);
 
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-    it("autenticar should post request and return boolean", async () => {
-        const request = {tituloEleitoral: 123, senha: "123"};
-        mockApi.post.mockResolvedValueOnce({data: true});
+    describe("autenticar", () => {
+        it("deve fazer POST e retornar booleano", async () => {
+            const request = { tituloEleitoral: 123, senha: "123" };
+            mockApi.post.mockResolvedValueOnce({ data: true });
 
-        const result = await service.autenticar(request);
+            const result = await service.autenticar(request);
 
-        expect(mockApi.post).toHaveBeenCalledWith("/usuarios/autenticar", request);
-        expect(result).toBe(true);
-    });
+            expect(mockApi.post).toHaveBeenCalledWith("/usuarios/autenticar", request);
+            expect(result).toBe(true);
+        });
 
-    it("autorizar should post, map, and return response", async () => {
-        const tituloEleitoral = 123;
-        const responseDto = [{perfil: "CHEFE", unidade: "UNIT"}];
-        mockApi.post.mockResolvedValueOnce({data: responseDto});
-
-        const result = await service.autorizar(tituloEleitoral);
-
-        expect(mockApi.post).toHaveBeenCalledWith(
-            "/usuarios/autorizar",
-            tituloEleitoral,
-            {
-                headers: {"Content-Type": "application/json"},
-            },
-        );
-        expect(mockMappers.mapPerfilUnidadeToFrontend).toHaveBeenCalled();
-        expect(mockMappers.mapPerfilUnidadeToFrontend.mock.calls[0][0]).toEqual(
-            responseDto[0],
-        );
-        expect(result[0]).toHaveProperty("mapped", true);
+        it("deve lançar erro em caso de falha", async () => {
+            const request = { tituloEleitoral: 123, senha: "123" };
+            mockApi.post.mockRejectedValueOnce(new Error("Failed"));
+            await expect(service.autenticar(request)).rejects.toThrow();
+        });
     });
 
-    it("entrar should post the request", async () => {
+    describe("autorizar", () => {
+        it("deve fazer POST, mapear e retornar resposta", async () => {
+            const tituloEleitoral = 123;
+            const responseDto = [{ perfil: "CHEFE", unidade: "UNIT" }];
+            mockApi.post.mockResolvedValueOnce({ data: responseDto });
+
+            const result = await service.autorizar(tituloEleitoral);
+
+            expect(mockApi.post).toHaveBeenCalledWith(
+                "/usuarios/autorizar",
+                tituloEleitoral,
+                {
+                    headers: { "Content-Type": "application/json" },
+                },
+            );
+            expect(mockMappers.mapPerfilUnidadeToFrontend).toHaveBeenCalled();
+            expect(mockMappers.mapPerfilUnidadeToFrontend.mock.calls[0][0]).toEqual(
+                responseDto[0],
+            );
+            expect(result[0]).toHaveProperty("mapped", true);
+        });
+    });
+
+    describe("entrar", () => {
         const request = {
             tituloEleitoral: 123,
             perfil: "GESTOR",
             unidadeCodigo: 1,
         };
-        mockApi.post.mockResolvedValueOnce({});
-
-        await service.entrar(request);
-
-        expect(mockApi.post).toHaveBeenCalledWith("/usuarios/entrar", request);
+        testPostEndpoint(
+            () => service.entrar(request),
+            "/usuarios/entrar",
+            request
+        );
     });
 
-    it("buscarTodosUsuarios should get request and return data", async () => {
-        const mockUsuarios = [{id: 1, name: "Test User"}];
-        mockApi.get.mockResolvedValueOnce({data: mockUsuarios});
-
-        const result = await service.buscarTodosUsuarios();
-
-        expect(mockApi.get).toHaveBeenCalledWith("/usuarios");
-        expect(result).toEqual(mockUsuarios);
+    describe("buscarTodosUsuarios", () => {
+        const mockUsuarios = [{ id: 1, name: "Test User" }];
+        testGetEndpoint(
+            () => service.buscarTodosUsuarios(),
+            "/usuarios",
+            mockUsuarios
+        );
     });
 
-    it("buscarUsuariosPorUnidade should get request and return data", async () => {
-        const mockUsuarios = [{id: 1, name: "Test User"}];
-        mockApi.get.mockResolvedValueOnce({data: mockUsuarios});
-
-        const result = await service.buscarUsuariosPorUnidade(1);
-
-        expect(mockApi.get).toHaveBeenCalledWith("/unidades/1/usuarios");
-        expect(result).toEqual(mockUsuarios);
-    });
-
-    // Error handling
-    it("autenticar should throw error on failure", async () => {
-        const request = {tituloEleitoral: 123, senha: "123"};
-        mockApi.post.mockRejectedValueOnce(new Error("Failed"));
-        await expect(service.autenticar(request)).rejects.toThrow();
+    describe("buscarUsuariosPorUnidade", () => {
+        const mockUsuarios = [{ id: 1, name: "Test User" }];
+        testGetEndpoint(
+            () => service.buscarUsuariosPorUnidade(1),
+            "/unidades/1/usuarios",
+            mockUsuarios
+        );
     });
 });

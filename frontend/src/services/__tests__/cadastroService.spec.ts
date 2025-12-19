@@ -1,92 +1,75 @@
-import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
-import apiClient from "@/axios-setup";
+import { describe } from "vitest";
+import { setupServiceTest, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
 import * as cadastroService from "@/services/cadastroService";
 
-vi.mock("@/axios-setup");
-
 describe("cadastroService", () => {
-    const mockedApiClient = apiClient as Mocked<typeof apiClient>;
+    setupServiceTest();
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    const testEndpoint = async (
-        serviceFn: (id: number, data?: any) => Promise<void>,
-        endpoint: string,
-        withData = false,
-    ) => {
-        mockedApiClient.post.mockResolvedValue({});
-        const data = withData
-            ? {motivo: "teste", observacoes: "teste"}
-            : undefined;
-        await serviceFn(1, data);
-        if (withData) {
-            expect(mockedApiClient.post).toHaveBeenCalledWith(endpoint, data);
-        } else {
-            expect(mockedApiClient.post).toHaveBeenCalledWith(endpoint);
-        }
-    };
-
-    it("disponibilizarCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.disponibilizarCadastro,
-            "/subprocessos/1/cadastro/disponibilizar",
+    describe("disponibilizarCadastro", () => {
+        testPostEndpoint(
+            () => cadastroService.disponibilizarCadastro(1),
+            "/subprocessos/1/cadastro/disponibilizar"
         );
     });
 
-    it("disponibilizarRevisaoCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.disponibilizarRevisaoCadastro,
-            "/subprocessos/1/disponibilizar-revisao",
+    describe("disponibilizarRevisaoCadastro", () => {
+        testPostEndpoint(
+            () => cadastroService.disponibilizarRevisaoCadastro(1),
+            "/subprocessos/1/disponibilizar-revisao"
         );
     });
 
-    it("devolverCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.devolverCadastro,
+    describe("devolverCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.devolverCadastro(1, payload),
             "/subprocessos/1/devolver-cadastro",
-            true,
+            payload
         );
     });
 
-    it("aceitarCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.aceitarCadastro,
+    describe("aceitarCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.aceitarCadastro(1, payload),
             "/subprocessos/1/aceitar-cadastro",
-            true,
+            payload
         );
     });
 
-    it("homologarCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.homologarCadastro,
+    describe("homologarCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.homologarCadastro(1, payload),
             "/subprocessos/1/homologar-cadastro",
-            true,
+            payload
         );
     });
 
-    it("devolverRevisaoCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.devolverRevisaoCadastro,
+    describe("devolverRevisaoCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.devolverRevisaoCadastro(1, payload),
             "/subprocessos/1/devolver-revisao-cadastro",
-            true,
+            payload
         );
     });
 
-    it("aceitarRevisaoCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.aceitarRevisaoCadastro,
+    describe("aceitarRevisaoCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.aceitarRevisaoCadastro(1, payload),
             "/subprocessos/1/aceitar-revisao-cadastro",
-            true,
+            payload
         );
     });
 
-    it("homologarRevisaoCadastro deve chamar o endpoint correto", async () => {
-        await testEndpoint(
-            cadastroService.homologarRevisaoCadastro,
+    describe("homologarRevisaoCadastro", () => {
+        const payload = { observacoes: "teste" };
+        testPostEndpoint(
+            () => cadastroService.homologarRevisaoCadastro(1, payload),
             "/subprocessos/1/homologar-revisao-cadastro",
-            true,
+            payload
         );
     });
 });

@@ -1,9 +1,8 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import * as unidadesService from "@/services/unidadesService";
-import {initPinia} from "@/test-utils/helpers";
-
-import type {Unidade} from "@/types/tipos";
-import {useUnidadesStore} from "../unidades";
+import { setupStoreTest } from "../../test-utils/storeTestHelpers";
+import type { Unidade } from "@/types/tipos";
+import { useUnidadesStore } from "../unidades";
 
 const mockUnidades: Unidade[] = [
     {
@@ -57,28 +56,25 @@ vi.mock("@/services/unidadesService", () => ({
 }));
 
 describe("useUnidadesStore", () => {
-    let unidadesStore: ReturnType<typeof useUnidadesStore>;
+    const context = setupStoreTest(useUnidadesStore);
 
     beforeEach(() => {
-        initPinia();
-        unidadesStore = useUnidadesStore();
-        unidadesStore.unidades = mockUnidades;
-        vi.clearAllMocks();
+        context.store.unidades = mockUnidades;
     });
 
     it("deve inicializar com unidades simuladas", () => {
-        expect(unidadesStore.unidades.length).toBeGreaterThan(0);
-        expect(unidadesStore.unidades[0].sigla).toBeDefined();
+        expect(context.store.unidades.length).toBeGreaterThan(0);
+        expect(context.store.unidades[0].sigla).toBeDefined();
     });
 
     describe("actions", () => {
         it("deve buscar e definir unidades", async () => {
-            unidadesStore.unidades = [];
-            await unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO");
+            context.store.unidades = [];
+            await context.store.buscarUnidadesParaProcesso("MAPEAMENTO");
             expect(
                 unidadesService.buscarArvoreComElegibilidade,
             ).toHaveBeenCalledTimes(1);
-            expect(unidadesStore.unidades.length).toBeGreaterThan(0);
+            expect(context.store.unidades.length).toBeGreaterThan(0);
         });
 
         it("deve lidar com erro em buscarUnidadesParaProcesso", async () => {
@@ -86,47 +82,47 @@ describe("useUnidadesStore", () => {
                 unidadesService.buscarArvoreComElegibilidade,
             ).mockRejectedValueOnce(new Error("API Error"));
             await expect(
-                unidadesStore.buscarUnidadesParaProcesso("MAPEAMENTO"),
+                context.store.buscarUnidadesParaProcesso("MAPEAMENTO"),
             ).rejects.toThrow("API Error");
-            expect(unidadesStore.error).toContain("API Error");
+            expect(context.store.error).toContain("API Error");
         });
 
         it("buscarUnidade deve definir estado da unidade", async () => {
-            const mockUnit = {sigla: "TEST", nome: "Test Unit"};
+            const mockUnit = { sigla: "TEST", nome: "Test Unit" };
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue(
                 mockUnit as any,
             );
 
-            await unidadesStore.buscarUnidade("TEST");
+            await context.store.buscarUnidade("TEST");
 
             expect(unidadesService.buscarUnidadePorSigla).toHaveBeenCalledWith(
                 "TEST",
             );
-            expect(unidadesStore.unidade).toEqual(mockUnit);
+            expect(context.store.unidade).toEqual(mockUnit);
         });
 
         it("buscarUnidade deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockRejectedValue(
                 new Error("Fail"),
             );
-            await expect(unidadesStore.buscarUnidade("TEST")).rejects.toThrow(
+            await expect(context.store.buscarUnidade("TEST")).rejects.toThrow(
                 "Fail",
             );
-            expect(unidadesStore.error).toContain("Fail");
+            expect(context.store.error).toContain("Fail");
         });
 
         it("buscarUnidadePorCodigo deve definir estado da unidade", async () => {
-            const mockUnit = {codigo: 123, nome: "Test Unit"};
+            const mockUnit = { codigo: 123, nome: "Test Unit" };
             vi.mocked(unidadesService.buscarUnidadePorCodigo).mockResolvedValue(
                 mockUnit as any,
             );
 
-            await unidadesStore.buscarUnidadePorCodigo(123);
+            await context.store.buscarUnidadePorCodigo(123);
 
             expect(unidadesService.buscarUnidadePorCodigo).toHaveBeenCalledWith(
                 123,
             );
-            expect(unidadesStore.unidade).toEqual(mockUnit);
+            expect(context.store.unidade).toEqual(mockUnit);
         });
 
         it("buscarUnidadePorCodigo deve lidar com erro", async () => {
@@ -134,31 +130,31 @@ describe("useUnidadesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                unidadesStore.buscarUnidadePorCodigo(123),
+                context.store.buscarUnidadePorCodigo(123),
             ).rejects.toThrow("Fail");
-            expect(unidadesStore.error).toContain("Fail");
+            expect(context.store.error).toContain("Fail");
         });
 
         it("buscarArvoreUnidade deve chamar serviço e definir unidade", async () => {
-            const mockUnit = {codigo: 1, filhas: []};
+            const mockUnit = { codigo: 1, filhas: [] };
             vi.mocked(unidadesService.buscarArvoreUnidade).mockResolvedValue(
                 mockUnit as any,
             );
 
-            await unidadesStore.buscarArvoreUnidade(1);
+            await context.store.buscarArvoreUnidade(1);
 
             expect(unidadesService.buscarArvoreUnidade).toHaveBeenCalledWith(1);
-            expect(unidadesStore.unidade).toEqual(mockUnit);
+            expect(context.store.unidade).toEqual(mockUnit);
         });
 
         it("buscarArvoreUnidade deve lidar com erro", async () => {
             vi.mocked(unidadesService.buscarArvoreUnidade).mockRejectedValue(
                 new Error("Fail"),
             );
-            await expect(unidadesStore.buscarArvoreUnidade(1)).rejects.toThrow(
+            await expect(context.store.buscarArvoreUnidade(1)).rejects.toThrow(
                 "Fail",
             );
-            expect(unidadesStore.error).toContain("Fail");
+            expect(context.store.error).toContain("Fail");
         });
 
         it("obterUnidadesSubordinadas deve chamar serviço", async () => {
@@ -167,7 +163,7 @@ describe("useUnidadesStore", () => {
                 mockSubordinadas,
             );
 
-            const result = await unidadesStore.obterUnidadesSubordinadas("TEST");
+            const result = await context.store.obterUnidadesSubordinadas("TEST");
 
             expect(unidadesService.buscarSubordinadas).toHaveBeenCalledWith(
                 "TEST",
@@ -180,9 +176,9 @@ describe("useUnidadesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                unidadesStore.obterUnidadesSubordinadas("TEST"),
+                context.store.obterUnidadesSubordinadas("TEST"),
             ).rejects.toThrow("Fail");
-            expect(unidadesStore.error).toContain("Fail");
+            expect(context.store.error).toContain("Fail");
         });
 
         it("obterUnidadeSuperior deve chamar serviço", async () => {
@@ -191,7 +187,7 @@ describe("useUnidadesStore", () => {
                 mockSuperior,
             );
 
-            const result = await unidadesStore.obterUnidadeSuperior("TEST");
+            const result = await context.store.obterUnidadeSuperior("TEST");
 
             expect(unidadesService.buscarSuperior).toHaveBeenCalledWith("TEST");
             expect(result).toEqual(mockSuperior);
@@ -202,9 +198,9 @@ describe("useUnidadesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                unidadesStore.obterUnidadeSuperior("TEST"),
+                context.store.obterUnidadeSuperior("TEST"),
             ).rejects.toThrow("Fail");
-            expect(unidadesStore.error).toContain("Fail");
+            expect(context.store.error).toContain("Fail");
         });
     });
 });
