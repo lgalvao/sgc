@@ -1,7 +1,7 @@
 import apiClient from "../axios-setup";
 
 export interface CriarAtribuicaoTemporariaRequest {
-    tituloEleitoralServidor: string;
+    tituloEleitoralUsuario: string;
     dataTermino: string;
     justificativa: string;
 }

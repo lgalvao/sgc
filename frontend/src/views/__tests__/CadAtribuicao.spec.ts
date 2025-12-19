@@ -80,14 +80,14 @@ describe('CadAtribuicao.vue', () => {
     await flushPromises();
     
     expect(buscarUsuariosPorUnidade).toHaveBeenCalledWith(1);
-    expect(wrapper.vm.servidores).toHaveLength(2);
+    expect(wrapper.vm.usuarios).toHaveLength(2);
   });
 
   it('submits the form successfully', async () => {
     await flushPromises();
 
     // Fill form
-    const select = wrapper.find('[data-testid="select-servidor"]');
+    const select = wrapper.find('[data-testid="select-usuario"]');
     await select.setValue('111');
     
     const dateInput = wrapper.find('[data-testid="input-data-termino"]');
@@ -100,7 +100,7 @@ describe('CadAtribuicao.vue', () => {
     await flushPromises();
     
     expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
-      tituloEleitoralServidor: '111',
+      tituloEleitoralUsuario: '111',
       dataTermino: '2023-12-31',
       justificativa: 'Justificativa de teste'
     });
@@ -114,7 +114,7 @@ describe('CadAtribuicao.vue', () => {
     (criarAtribuicaoTemporaria as any).mockRejectedValue(new Error('API Error'));
 
     // Fill form
-    wrapper.vm.servidorSelecionado = '111';
+    wrapper.vm.usuarioSelecionado = '111';
     wrapper.vm.dataTermino = '2023-12-31';
     wrapper.vm.justificativa = 'Teste';
     

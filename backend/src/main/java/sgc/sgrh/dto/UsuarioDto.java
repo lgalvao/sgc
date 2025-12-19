@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 /**
  * DTO para dados de usuário do SGRH.
  *
- * <p>Usado nos endpoints que retornam dados de usuários/servidores,
+ * <p>Usado nos endpoints que retornam dados de usuários,
  * incluindo GET /api/unidades/{codigoUnidade}/usuarios.
  */
 @Data
