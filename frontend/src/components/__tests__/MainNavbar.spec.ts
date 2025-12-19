@@ -1,81 +1,70 @@
-import {mount} from "@vue/test-utils";
-import {beforeEach, describe, expect, it, type MockInstance, vi,} from "vitest";
-import {ref} from "vue";
-import {createMemoryHistory, createRouter} from "vue-router";
-import {usePerfil} from "@/composables/usePerfil";
-import {usePerfilStore} from "@/stores/perfil";
-import {initPinia} from "@/test-utils/helpers";
+import { mount, RouterLinkStub } from "@vue/test-utils";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { ref } from "vue";
+import { getCommonMountOptions, setupComponentTest } from "@/test-utils/componentTestHelpers";
 import NavBar from "../MainNavbar.vue";
+import { usePerfil } from "@/composables/usePerfil";
 
-// Mocks
+// Mock usePerfil
 vi.mock("@/composables/usePerfil");
-vi.mock("@/stores/perfil");
 
-const routes = [
-    {path: "/", component: {template: "<div></div>"}},
-    {path: "/painel", component: {template: "<div></div>"}},
-    {path: "/login", component: {template: "<div></div>"}},
-    {path: "/teste", component: {template: "<div></div>"}},
-    {path: "/configuracoes", component: {template: "<div></div>"}},
-    {path: "/unidade/456", component: {template: "<div></div>"}},
-    {path: "/relatorios", component: {template: "<div></div>"}},
-    {path: "/historico", component: {template: "<div></div>"}},
-];
+const { mockPush } = vi.hoisted(() => ({
+    mockPush: vi.fn()
+}));
+
+// Mock vue-router to control push and satisfy imports
+vi.mock("vue-router", () => ({
+    useRoute: vi.fn(),
+    useRouter: () => ({
+        push: mockPush,
+    }),
+    createRouter: vi.fn(() => ({
+        beforeEach: vi.fn(),
+        afterEach: vi.fn(),
+        push: mockPush,
+        currentRoute: { value: { path: "/" } }
+    })),
+    createWebHistory: vi.fn(),
+    createMemoryHistory: vi.fn(),
+}));
 
 describe("MainNavbar.vue", () => {
-    let router: ReturnType<typeof createRouter>;
-    let pushSpy: MockInstance;
+    // Setup cleanup
+    const ctx = setupComponentTest();
 
     beforeEach(() => {
-        vi.restoreAllMocks();
-        initPinia();
-        router = createRouter({history: createMemoryHistory(), routes});
-        pushSpy = vi.spyOn(router, "push");
+        vi.clearAllMocks();
 
+        // Default mock for usePerfil
         vi.mocked(usePerfil).mockReturnValue({
-            servidorLogado: ref({nome: "Usuario Teste"}),
+            servidorLogado: ref({ nome: "Usuario Teste" }),
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("Unidade Teste"),
-        } as any);
-
-        vi.mocked(usePerfilStore).mockReturnValue({
-            perfilSelecionado: "ADMIN",
-            unidadeSelecionada: 456,
         } as any);
     });
 
     it("deve navegar para a rota correta ao clicar nos links do menu", async () => {
-        const wrapper = mount(NavBar, {global: {plugins: [router]}});
-        await router.isReady();
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 456
+            }
+        });
 
-        // Painel
-        const painelLink = wrapper
-            .findAll("a")
-            .find((a) => a.text().includes("Painel"));
-        expect(painelLink?.exists()).toBe(true);
-        await painelLink?.trigger("click");
-        expect(pushSpy).toHaveBeenCalledWith("/painel");
+        ctx.wrapper = mount(NavBar, options);
 
-        // Minha unidade
-        const unidadeLink = wrapper
-            .findAll("a")
-            .find((a) => a.text().includes("Minha unidade"));
-        await unidadeLink?.trigger("click");
-        expect(pushSpy).toHaveBeenCalledWith("/unidade/456");
+        // Helper to check link
+        const checkLink = (text: string, to: string) => {
+             const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
+             const link = links.find(w => w.text().includes(text));
+             expect(link?.exists()).toBe(true);
+             expect(link?.props().to).toBe(to);
+        };
 
-        // Relatorios
-        const relatoriosLink = wrapper
-            .findAll("a")
-            .find((a) => a.text().includes("Relatórios"));
-        await relatoriosLink?.trigger("click");
-        expect(pushSpy).toHaveBeenCalledWith("/relatorios");
-
-        // Historico
-        const historicoLink = wrapper
-            .findAll("a")
-            .find((a) => a.text().includes("Histórico"));
-        await historicoLink?.trigger("click");
-        expect(pushSpy).toHaveBeenCalledWith("/historico");
+        checkLink("Painel", "/painel");
+        checkLink("Minha unidade", "/unidade/456");
+        checkLink("Relatórios", "/relatorios");
+        checkLink("Histórico", "/historico");
     });
 
     it("deve exibir o perfil e a unidade do usuário", async () => {
@@ -84,56 +73,75 @@ describe("MainNavbar.vue", () => {
             unidadeSelecionada: ref("TRE-PR"),
         } as any);
 
-        const wrapper = mount(NavBar, {global: {plugins: [router]}});
-        await router.isReady();
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "CHEFE",
+                unidadeSelecionada: 123
+            }
+        });
 
-        // Procura pelo item que contém a classe user-profile-item
-        const userItem = wrapper.find(".user-profile-item");
+        ctx.wrapper = mount(NavBar, options);
+
+        const userItem = ctx.wrapper.find(".user-profile-item");
         expect(userItem.exists()).toBe(true);
         expect(userItem.text()).toContain("CHEFE - TRE-PR");
     });
 
     it("deve exibir e navegar pelo ícone de configurações para o perfil ADMIN", async () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            perfilSelecionado: "ADMIN",
-            unidadeSelecionada: 456,
-        } as any);
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 456
+            }
+        });
 
-        const wrapper = mount(NavBar, {global: {plugins: [router]}});
-        await router.isReady();
+        ctx.wrapper = mount(NavBar, options);
 
-
-        // Or just find by testid on the BNavItem which might fallthrough to LI or A depending on impl.
-        // The testid is on BNavItem.
-        // If BNavItem renders LI, the click listener might be on LI or A.
-        // The component code has @click.prevent on BNavItem.
-
-        const settingsNavItem = wrapper.find('[data-testid="btn-configuracoes"]');
+        const settingsNavItem = ctx.wrapper.find('[data-testid="btn-configuracoes"]');
         expect(settingsNavItem.exists()).toBe(true);
 
-        // Need to trigger click on the element that listens.
-        // If BNavItem is a stub or real component? It is NOT stubbed here explicitly, so it's the real component from library.
-        // Real BNavItem usually has the click listener on the anchor tag.
-        const anchor = settingsNavItem.find("a");
-        if (anchor.exists()) {
-            await anchor.trigger("click");
-        } else {
-            await settingsNavItem.trigger("click");
-        }
+        const link = settingsNavItem.findComponent(RouterLinkStub);
 
-        expect(pushSpy).toHaveBeenCalledWith("/configuracoes");
+        if (link.exists()) {
+             expect(link.props().to).toBe("/configuracoes");
+        } else {
+            expect(settingsNavItem.attributes("to")).toBe("/configuracoes");
+        }
     });
 
     it("NÃO deve exibir o ícone de configurações para perfis diferentes de ADMIN", async () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            perfilSelecionado: "GESTOR",
-            unidadeSelecionada: 456,
-        } as any);
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "GESTOR",
+                unidadeSelecionada: 456
+            }
+        });
 
-        const wrapper = mount(NavBar, {global: {plugins: [router]}});
-        await router.isReady();
+        ctx.wrapper = mount(NavBar, options);
 
-        const settingsIcon = wrapper.find('[title="Configurações do sistema"]');
+        const settingsIcon = ctx.wrapper.find('[title="Configurações do sistema"]');
         expect(settingsIcon.exists()).toBe(false);
+    });
+
+    it("deve chamar router.push ao fazer logout", async () => {
+         const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 456
+            }
+        });
+        ctx.wrapper = mount(NavBar, options);
+
+        const logoutNavItem = ctx.wrapper.find('[data-testid="btn-logout"]');
+
+        // Try finding 'a' tag inside if BNavItem renders it
+        const anchor = logoutNavItem.find("a");
+        if (anchor.exists()) {
+             await anchor.trigger("click");
+        } else {
+             await logoutNavItem.trigger("click");
+        }
+
+        expect(mockPush).toHaveBeenCalledWith("/login");
     });
 });

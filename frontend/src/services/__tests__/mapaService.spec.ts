@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
+import { setupServiceTest, testGetEndpoint, testPostEndpoint, testErrorHandling } from "../../test-utils/serviceTestHelpers";
 import { mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel } from "@/mappers/mapas";
 import * as mapaService from "@/services/mapaService";
 import { AxiosError } from "axios";
@@ -15,6 +15,7 @@ describe("mapaService", () => {
             "/subprocessos/1/mapa-visualizacao",
             {}
         );
+        testErrorHandling(() => mapaService.obterMapaVisualizacao(1), 'get');
     });
 
     describe("verificarImpactosMapa", () => {
@@ -24,6 +25,7 @@ describe("mapaService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1/impactos-mapa");
             expect(mapImpactoMapaDtoToModel).toHaveBeenCalled();
         });
+        testErrorHandling(() => mapaService.verificarImpactosMapa(1), 'get');
     });
 
     describe("obterMapaCompleto", () => {
@@ -33,6 +35,7 @@ describe("mapaService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1/mapa-completo");
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
         });
+        testErrorHandling(() => mapaService.obterMapaCompleto(1), 'get');
     });
 
     describe("salvarMapaCompleto", () => {
@@ -45,6 +48,7 @@ describe("mapaService", () => {
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
         });
+        testErrorHandling(() => mapaService.salvarMapaCompleto(1, {}), 'post');
     });
 
     describe("obterMapaAjuste", () => {
@@ -54,6 +58,7 @@ describe("mapaService", () => {
             expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/1/mapa-ajuste");
             expect(mapMapaAjusteDtoToModel).toHaveBeenCalled();
         });
+        testErrorHandling(() => mapaService.obterMapaAjuste(1), 'get');
     });
 
     describe("salvarMapaAjuste", () => {
@@ -63,6 +68,7 @@ describe("mapaService", () => {
             {},
             {}
         );
+        testErrorHandling(() => mapaService.salvarMapaAjuste(1, {}), 'post');
     });
 
     describe("verificarMapaVigente", () => {
