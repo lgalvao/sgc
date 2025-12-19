@@ -15,7 +15,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.subprocesso.service.SubprocessoWorkflowService;
+import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @Transactional
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
-    private final SubprocessoWorkflowService subprocessoWorkflowService;
+    private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoDtoService subprocessoDtoService;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
@@ -49,7 +49,12 @@ public class SubprocessoValidacaoController {
         @RequestBody @Valid DisponibilizarMapaReq request,
         @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoWorkflowService.disponibilizarMapa(codigo, request.getObservacoes(), request.getDataLimite().atStartOfDay(), usuario);
+        DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
+                .dataLimite(request.getDataLimite())
+                .observacoes(request.getObservacoes())
+                .build();
+
+        subprocessoMapaWorkflowService.disponibilizarMapa(codigo, serviceRequest, usuario);
         return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
     }
 
@@ -70,7 +75,7 @@ public class SubprocessoValidacaoController {
         @RequestBody @Valid ApresentarSugestoesReq request, 
         @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoWorkflowService.apresentarSugestoes(codigo, request.getSugestoes(), usuario);
+        subprocessoMapaWorkflowService.apresentarSugestoes(codigo, request.getSugestoes(), usuario);
     }
 
     /**
@@ -85,7 +90,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Valida o mapa de competências da unidade")
     public void validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.validarMapa(codigo, usuario);
+        subprocessoMapaWorkflowService.validarMapa(codigo, usuario);
     }
 
     /**
@@ -131,7 +136,7 @@ public class SubprocessoValidacaoController {
         @RequestBody @Valid DevolverValidacaoReq request, 
         @AuthenticationPrincipal Usuario usuario) {
 
-        subprocessoWorkflowService.devolverValidacao(codigo, request.getJustificativa(), usuario);
+        subprocessoMapaWorkflowService.devolverValidacao(codigo, request.getJustificativa(), usuario);
     }
 
     /**
@@ -147,7 +152,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Aceita a validação do mapa")
     public void aceitarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.aceitarValidacao(codigo, usuario);
+        subprocessoMapaWorkflowService.aceitarValidacao(codigo, usuario);
     }
 
     /**
@@ -162,7 +167,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa a validação do mapa")
     public void homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.homologarValidacao(codigo, usuario);
+        subprocessoMapaWorkflowService.homologarValidacao(codigo, usuario);
     }
 
     /**
@@ -179,6 +184,6 @@ public class SubprocessoValidacaoController {
     @Operation(summary = "Submete o mapa ajustado para nova validação")
     public void submeterMapaAjustado(@PathVariable Long codigo, @RequestBody @Valid SubmeterMapaAjustadoReq request, 
         @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.submeterMapaAjustado(codigo, request, usuario);
+        subprocessoMapaWorkflowService.submeterMapaAjustado(codigo, request, usuario);
     }
 }

@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {computed, defineComponent} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
-// Import services to mock
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadesService from "@/services/unidadesService";
@@ -13,6 +12,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {Perfil} from "@/types/tipos";
 import CadMapa from "@/views/CadMapa.vue";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};
@@ -61,9 +61,6 @@ vi.mock("@/services/unidadesService", () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
 
-// Mock Bootstrap components
-// Using defineComponent for Checkbox to handle v-model properly if needed,
-// but simple stubs are usually enough if we rely on props.
 const BFormCheckbox = defineComponent({
     name: "BFormCheckbox",
     props: {
@@ -101,7 +98,6 @@ const BFormCheckbox = defineComponent({
   `,
 });
 
-// Other simple stubs
 const BModalStub = {
     name: "BModal",
     props: ["modelValue", "title"],
@@ -118,7 +114,7 @@ const BModalStub = {
 };
 
 describe("CadMapa.vue", () => {
-    let wrapper: any;
+    const ctx = setupComponentTest();
 
     const mockAtividades = [
         {codigo: 101, descricao: "Atividade 1", conhecimentos: []},
@@ -140,6 +136,42 @@ describe("CadMapa.vue", () => {
         situacao: "EM_ANDAMENTO",
     };
 
+    const stubs = {
+        ImpactoMapaModal: true,
+        BModal: BModalStub,
+        BButton: {
+            name: "BButton",
+            template: '<button type="button"><slot /></button>',
+        },
+        BContainer: {name: "BContainer", template: "<div><slot /></div>"},
+        BCard: {
+            name: "BCard",
+            template: '<div class="card"><slot /></div>',
+        },
+        BCardBody: {
+            name: "BCardBody",
+            template: '<div class="card-body"><slot /></div>',
+        },
+        BFormInput: {
+            name: "BFormInput",
+            props: ["modelValue"],
+            template:
+                '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+            emits: ["update:modelValue"],
+        },
+        BFormTextarea: {
+            name: "BFormTextarea",
+            props: ["modelValue"],
+            template:
+                '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+            emits: ["update:modelValue"],
+        },
+        BFormCheckbox: BFormCheckbox,
+        BAlert: {
+            name: "BAlert",
+            template: '<div role="alert"><slot /></div>',
+        },
+    };
 
     function createWrapper(customState = {}) {
         vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
@@ -168,42 +200,7 @@ describe("CadMapa.vue", () => {
                         },
                     }),
                 ],
-                stubs: {
-                    ImpactoMapaModal: true,
-                    BModal: BModalStub,
-                    BButton: {
-                        name: "BButton",
-                        template: '<button type="button"><slot /></button>',
-                    },
-                    BContainer: {name: "BContainer", template: "<div><slot /></div>"},
-                    BCard: {
-                        name: "BCard",
-                        template: '<div class="card"><slot /></div>',
-                    },
-                    BCardBody: {
-                        name: "BCardBody",
-                        template: '<div class="card-body"><slot /></div>',
-                    },
-                    BFormInput: {
-                        name: "BFormInput",
-                        props: ["modelValue"],
-                        template:
-                            '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-                        emits: ["update:modelValue"],
-                    },
-                    BFormTextarea: {
-                        name: "BFormTextarea",
-                        props: ["modelValue"],
-                        template:
-                            '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-                        emits: ["update:modelValue"],
-                    },
-                    BFormCheckbox: BFormCheckbox,
-                    BAlert: {
-                        name: "BAlert",
-                        template: '<div role="alert"><slot /></div>',
-                    },
-                },
+                stubs,
                 directives: {
                     "b-tooltip": {},
                 },
@@ -228,7 +225,6 @@ describe("CadMapa.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Default mocks
         vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue({
             codigo: 1,
             sigla: "TESTE",
@@ -252,28 +248,27 @@ describe("CadMapa.vue", () => {
     });
 
     afterEach(() => {
-        wrapper?.unmount();
+        ctx.wrapper?.unmount();
     });
 
     it("deve carregar dados no mount", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(
             subprocessoService.buscarSubprocessoPorProcessoEUnidade,
         ).toHaveBeenCalledWith(1, "TESTE");
         expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(123);
-        expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123); // via atividadesStore
+        expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123);
 
         expect(wrapper.text()).toContain("TESTE - Teste");
-
         expect(wrapper.text()).toContain("Competencia A");
     });
 
-    it("deve abrir modal e criar nova competencia", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+    it("deve abrir modal e criar nova competência", async () => {
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper
@@ -286,12 +281,6 @@ describe("CadMapa.vue", () => {
         const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
         await textarea.setValue("Nova Competencia Teste");
 
-        // Checkbox interaction
-        // Need to check if activities are rendered in modal.
-        // Modal uses `atividades` computed property which comes from store.
-        // `mockMapaVisualizacao` provided activities.
-
-        // Select first activity (ID 101) using the checkbox stub
         const inputs = wrapper.findAll('input[type="checkbox"]');
         if (inputs.length > 0) {
             await inputs[0].setValue(true);
@@ -314,9 +303,9 @@ describe("CadMapa.vue", () => {
         );
     });
 
-    it("deve editar uma competencia existente", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+    it("deve editar uma competência existente", async () => {
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper
@@ -346,22 +335,20 @@ describe("CadMapa.vue", () => {
         );
     });
 
-    it("deve excluir uma competencia", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+    it("deve excluir uma competência", async () => {
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper
             .find('[data-testid="btn-excluir-competencia"]')
             .trigger("click");
 
-        // Find the modal by data-testid
         const deleteModal = wrapper.findComponent(
             '[data-testid="mdl-excluir-competencia"]',
-        );
+        ) as any;
 
         expect(deleteModal.exists()).toBe(true);
-        // The modal should be visible now
         expect(deleteModal.props("modelValue")).toBe(true);
 
         vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue({
@@ -374,8 +361,8 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve remover atividade associada", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         const removeBtn = wrapper.find(".botao-acao-inline");
@@ -395,8 +382,8 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve abrir modal de disponibilizar e enviar", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper
@@ -426,8 +413,8 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve abrir modal de impacto", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').trigger("click");
@@ -437,8 +424,8 @@ describe("CadMapa.vue", () => {
     });
 
     it('deve mostrar o botão "Impacto no mapa" se tiver permissão', async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(wrapper.find('[data-testid="cad-mapa__btn-impactos-mapa"]').exists()).toBe(true);
@@ -449,21 +436,11 @@ describe("CadMapa.vue", () => {
             permissoes: {podeVisualizarImpacto: false},
         } as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);
-    });
-
-    it("getConhecimentosTooltip deve retornar 'Nenhum conhecimento cadastrado' se vazia", () => {
-        const {wrapper: w} = createWrapper();
-        expect((w.vm as any).getConhecimentosTooltip(101)).toBe("Nenhum conhecimento cadastrado");
-    });
-
-    it("getConhecimentosModal deve retornar 'Nenhum conhecimento' se vazia", () => {
-        const {wrapper: w} = createWrapper();
-        expect((w.vm as any).getConhecimentosModal({conhecimentos: []})).toBe("Nenhum conhecimento");
     });
 
     it("não deve buscar dados se subprocesso não encontrado", async () => {
@@ -474,19 +451,32 @@ describe("CadMapa.vue", () => {
         expect(mapaService.obterMapaCompleto).not.toHaveBeenCalled();
     });
 
-    it.skip("deve tratar erro ao criar competencia", async () => {
-        const {wrapper: w, mapasStore} = createWrapper();
-        wrapper = w;
+    it("deve tratar erro ao criar competência", async () => {
+        // Mock o service para rejeitar com formato de AxiosError
+        const axiosError = {
+            isAxiosError: true,
+            response: {
+                status: 400,
+                data: {
+                    message: "Erro API",
+                    subErrors: [{message: "Erro API", field: null}],
+                }
+            }
+        };
+        vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValueOnce(axiosError);
+
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger("click");
-        await wrapper.find('[data-testid="inp-criar-competencia-descricao"]').setValue("Nova");
+        await wrapper.find('[data-testid="inp-criar-competencia-descricao"]').setValue("Nova Competencia");
 
-        // Mock failure on STORE
-        (mapasStore.adicionarCompetencia as any).mockImplementation(async () => {
-             mapasStore.$patch({ lastError: { message: "Erro API", subErrors: [{ message: "Erro API", field: null }], kind: 'business' } as any });
-             throw new Error("Erro API");
-        });
+        // Seleciona uma atividade para habilitar o botão de salvar
+        const inputs = wrapper.findAll('input[type="checkbox"]');
+        if (inputs.length > 0) {
+            await inputs[0].setValue(true);
+        }
 
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
         await flushPromises();
@@ -494,37 +484,55 @@ describe("CadMapa.vue", () => {
         expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
     });
 
-    it("deve tratar erro ao excluir competencia", async () => {
-        const {wrapper: w, mapasStore} = createWrapper();
-        wrapper = w;
+    it("deve tratar erro ao excluir competência", async () => {
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-excluir-competencia"]').trigger("click");
 
-        (mapasStore.removerCompetencia as any).mockImplementation(async () => {
-             mapasStore.$patch({ lastError: { message: "Erro API", subErrors: [{ message: "Erro API", field: null }], kind: 'business' } as any });
-             throw new Error("Erro API");
-        });
+        // Mock o service para rejeitar com formato de AxiosError
+        const axiosError = {
+            isAxiosError: true,
+            response: {
+                status: 400,
+                data: {
+                    message: "Erro API",
+                    subErrors: [{message: "Erro API", field: null}],
+                }
+            }
+        };
+        vi.mocked(subprocessoService.removerCompetencia).mockRejectedValueOnce(axiosError);
 
-        // Trigger confirm on modal
-        const deleteModal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]');
+        const deleteModal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]') as any;
         await deleteModal.vm.$emit("ok");
         await flushPromises();
 
         expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
     });
 
-    it.skip("deve tratar erro ao disponibilizar mapa", async () => {
-        const {wrapper: w, mapasStore} = createWrapper();
-        wrapper = w;
+    it("deve tratar erro ao disponibilizar mapa", async () => {
+        // Mock o service para rejeitar com formato de AxiosError
+        const axiosError = {
+            isAxiosError: true,
+            response: {
+                status: 400,
+                data: {
+                    message: "Erro API",
+                    subErrors: [{message: "Erro API", field: null}],
+                }
+            }
+        };
+        vi.mocked(mapaService.disponibilizarMapa).mockRejectedValueOnce(axiosError);
+
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').trigger("click");
 
-        (mapasStore.disponibilizarMapa as any).mockImplementation(async () => {
-             mapasStore.$patch({ lastError: { message: "Erro API", subErrors: [{ message: "Erro API", field: null }], kind: 'business' } as any });
-             throw new Error("Erro API");
-        });
+        // Preenche a data limite para habilitar o botão
+        await wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]').setValue("2024-12-31");
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
         await flushPromises();

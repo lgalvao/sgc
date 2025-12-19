@@ -4,48 +4,56 @@
       :model-value="mostrar"
       :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       centered
-      hide-footer
+      data-testid="mdl-criar-competencia"
       size="lg"
       @hide="fechar"
   >
+    <div v-if="fieldErrors?.generic" class="alert alert-danger mb-4">
+      {{ fieldErrors.generic }}
+    </div>
+
     <div class="mb-4">
       <h5>Descrição</h5>
       <div class="mb-2">
         <BFormTextarea
             v-model="novaCompetencia.descricao"
-            data-testid="input-descricao-competencia"
+            :state="fieldErrors?.descricao ? false : null"
+            data-testid="inp-criar-competencia-descricao"
             placeholder="Descreva a competência"
             rows="3"
         />
+        <BFormInvalidFeedback :state="fieldErrors?.descricao ? false : null">
+          {{ fieldErrors?.descricao }}
+        </BFormInvalidFeedback>
       </div>
     </div>
 
     <div class="mb-4">
       <h5>Atividades</h5>
-      <div class="d-flex flex-wrap gap-2">
+      <div 
+        class="d-flex flex-wrap gap-2 p-2 border rounded"
+        :class="{ 'border-danger': fieldErrors?.atividades }"
+      >
         <BCard
             v-for="atividade in atividades"
             :key="atividade.codigo"
             :class="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-card-item checked' : 'atividade-card-item'"
+            :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
             no-body
         >
-          <BCardBody class="d-flex align-items-center py-2">
+          <BCardBody class="d-flex align-items-center">
             <BFormCheckbox
                 :id="`atv-${atividade.codigo}`"
                 v-model="atividadesSelecionadas"
-                :data-testid="`chk-atividade-${atividade.codigo}`"
                 :value="atividade.codigo"
-                class="form-check-input me-2"
+                data-testid="chk-criar-competencia-atividade"
             >
               {{ atividade.descricao }}
               <span
                   v-if="atividade.conhecimentos.length > 0"
-                  :data-bs-html="true"
-                  :data-bs-title="getConhecimentosModal(atividade)"
+                  v-b-tooltip.html.right="getConhecimentosModal(atividade)"
                   class="badge bg-secondary ms-2"
-                  data-bs-custom-class="conhecimentos-tooltip"
-                  data-bs-placement="right"
-                  data-bs-toggle="tooltip"
+                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
               >
                 {{ atividade.conhecimentos.length }}
               </span>
@@ -53,19 +61,24 @@
           </BCardBody>
         </BCard>
       </div>
+      <div v-if="fieldErrors?.atividades" class="text-danger small mt-1">
+        {{ fieldErrors.atividades }}
+      </div>
     </div>
 
     <template #footer>
       <BButton
-          data-testid="criar-competencia-modal__btn-modal-cancelar"
+          data-testid="btn-criar-competencia-cancelar"
           variant="secondary"
           @click="fechar"
       >
         Cancelar
       </BButton>
       <BButton
+          v-b-tooltip.hover
           :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="criar-competencia-modal__btn-modal-confirmar"
+          data-testid="btn-criar-competencia-salvar"
+          title="Criar Competência"
           variant="primary"
           @click="salvar"
       >
@@ -76,7 +89,15 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BFormCheckbox, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCardBody,
+  BFormCheckbox,
+  BFormInvalidFeedback,
+  BFormTextarea,
+  BModal,
+} from "bootstrap-vue-next";
 import {ref, watch} from "vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 
@@ -84,6 +105,11 @@ const props = defineProps<{
   mostrar: boolean;
   atividades: Atividade[];
   competenciaParaEditar?: Competencia | null;
+  fieldErrors?: {
+    descricao?: string;
+    atividades?: string;
+    generic?: string;
+  };
 }>();
 
 const emit = defineEmits<{
@@ -104,7 +130,7 @@ watch(
         if (props.competenciaParaEditar) {
           novaCompetencia.value.descricao = props.competenciaParaEditar.descricao;
           atividadesSelecionadas.value = [
-            ...((props.competenciaParaEditar.atividadesAssociadas) || []),
+            ...(props.competenciaParaEditar.atividadesAssociadas || []),
           ];
           competenciaSendoEditada.value = props.competenciaParaEditar;
         } else {
@@ -152,7 +178,7 @@ function salvar() {
 
 .atividade-card-item:hover {
   border-color: var(--bs-primary);
-  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  box-shadow: 0 0 0 0.25rem var(--bs-primary);
 }
 
 .atividade-card-item.checked {

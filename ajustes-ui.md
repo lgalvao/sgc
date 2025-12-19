@@ -1,21 +1,8 @@
-# Ajustes no sistema oriuentados pelas telas capturadas
+# Ajustes no sistema orientados pelas telas capturadas
 
 ## 01-autenticacao--01-login-inicial.png
 
 Deixar o botão de mostrar senha mais discreto, com moldura mais clara ou sem moldura
-
-## 01-autenticacao--02-login-erro-credenciais.png
-
-A mensagem de erro no login nao esta boa. Mude para:
-
-- Titulo: Erro no login
-- Mensagem: Título ou senha inválidos.
-
-## 01-autenticacao--04-painel-apos-login.png
-
-- Ao lado do perfil - unidade (no caso da imagem, ADMIN - SEDOC), fazer com que um hover no ícone mostre o nome completo do usuário logado em um tooltip.
-
-- A barra de navegação nao está fazendo o collapse e os menus estao ficando cortados. Corrigir. Talvez a barra de navegação nao esteja baseada no componente Navbar do BootstrapVueNext... investigue.
 
 ## 02-painel--02-criar-processo-form-vazio.png
 

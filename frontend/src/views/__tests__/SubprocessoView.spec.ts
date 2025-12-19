@@ -1,11 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {flushPromises, mount} from '@vue/test-utils';
+import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
-import {TipoProcesso} from '@/types/tipos';
-import { setupComponentTest, getCommonMountOptions } from '@/test-utils/componentTestHelpers';
+import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+import { setupComponentTest } from '@/test-utils/componentTestHelpers';
 
 // Mock child components
 const SubprocessoHeaderStub = {
@@ -32,7 +33,7 @@ describe('SubprocessoView.vue', () => {
 
   const mockSubprocesso = {
     codigo: 10,
-    situacao: 'EM_ANDAMENTO',
+    situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
     situacaoLabel: 'Em Andamento',
     processoDescricao: 'Processo Teste',
     tipoProcesso: TipoProcesso.MAPEAMENTO,
@@ -41,10 +42,27 @@ describe('SubprocessoView.vue', () => {
       sigla: 'TEST',
       nome: 'Unidade Teste'
     },
-    responsavel: { nome: 'Resp', email: 'resp@test.com', ramal: '123' },
-    titular: { nome: 'Titular', email: 'titular@test.com', ramal: '456' },
+    responsavel: {
+      codigo: 1,
+      nome: 'Resp',
+      tituloEleitoral: '123456789012',
+      unidade: { codigo: 1, sigla: 'TEST', nome: 'Unidade Teste' },
+      email: 'resp@test.com',
+      ramal: '123'
+    },
+    titular: {
+      codigo: 2,
+      nome: 'Titular',
+      tituloEleitoral: '987654321012',
+      unidade: { codigo: 1, sigla: 'TEST', nome: 'Unidade Teste' },
+      email: 'titular@test.com',
+      ramal: '456'
+    },
     etapaAtual: 1,
     prazoEtapaAtual: '2023-12-31T00:00:00',
+    localizacaoAtual: 'Unidade Teste',
+    isEmAndamento: true,
+    elementosProcesso: [],
     permissoes: {
       podeAlterarDataLimite: true,
       podeEditarMapa: true,
@@ -57,7 +75,7 @@ describe('SubprocessoView.vue', () => {
       podeVerPagina: true,
       podeRealizarAutoavaliacao: false
     },
-    movimentacoes: [{ id: 1, descricao: 'Mov 1' }]
+    movimentacoes: [] as any[]
   };
 
   const additionalStubs = {
@@ -68,47 +86,58 @@ describe('SubprocessoView.vue', () => {
       TabelaMovimentacoes: TabelaMovimentacoesStub,
   };
 
-  const piniaOptions = {
-      initialState: {
-          subprocessos: {
-              subprocessoDetalhe: null,
-          },
-          mapas: {
-              mapaCompleto: null,
-          },
-      },
-      stubActions: true // Use spies for actions
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   // Helper to mount component with specific setup
-  const mountComponent = () => {
-    context.wrapper = mount(SubprocessoView, {
-      ...getCommonMountOptions({}, additionalStubs, piniaOptions),
-      props: {
-        codProcesso: 1,
-        siglaUnidade: 'TEST'
-      }
+  const mountComponent = (overrideMockSubprocesso?: typeof mockSubprocesso) => {
+    const subprocessoToUse = overrideMockSubprocesso || mockSubprocesso;
+    
+    // Criar pinia ANTES do mount para configurar mocks
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        subprocessos: {
+          subprocessoDetalhe: null,
+        },
+        mapas: {
+          mapaCompleto: null,
+        },
+      },
+      stubActions: true,
     });
 
-    const store = useSubprocessosStore();
-    const mapaStore = useMapasStore();
-    const feedbackStore = useFeedbackStore();
+    const store = useSubprocessosStore(pinia);
+    const mapaStore = useMapasStore(pinia);
+    const feedbackStore = useFeedbackStore(pinia);
 
-    // Mock implementations to simulate side effects of actions
+    // Mock implementations ANTES do mount para que onMounted encontre os mocks
     (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
     
     (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
-        store.subprocessoDetalhe = mockSubprocesso;
-        return mockSubprocesso;
+        store.subprocessoDetalhe = subprocessoToUse;
+        return subprocessoToUse;
     });
 
     (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
 
     (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
+
+    context.wrapper = mount(SubprocessoView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          RouterLink: RouterLinkStub,
+          RouterView: true,
+          ...additionalStubs,
+        },
+      },
+      props: {
+        codProcesso: 1,
+        siglaUnidade: 'TEST'
+      }
+    });
 
     return { store, mapaStore, feedbackStore };
   };
@@ -144,28 +173,13 @@ describe('SubprocessoView.vue', () => {
   });
 
   it('shows error when opening date limit modal is not allowed', async () => {
-    context.wrapper = mount(SubprocessoView, {
-      ...getCommonMountOptions({}, additionalStubs, piniaOptions),
-      props: {
-        codProcesso: 1,
-        siglaUnidade: 'TEST'
-      }
-    });
-
-    const store = useSubprocessosStore();
-    const feedbackStore = useFeedbackStore();
-
-    (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
-    // Return subprocesso with different permissions
-    (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
-        const forbidden = {
-            ...mockSubprocesso,
-            permissoes: { ...mockSubprocesso.permissoes, podeAlterarDataLimite: false }
-        };
-        store.subprocessoDetalhe = forbidden;
-        return forbidden;
-    });
-
+    // Subprocesso com permissão de alterar data limite = false
+    const subprocessoSemPermissao = {
+      ...mockSubprocesso,
+      permissoes: { ...mockSubprocesso.permissoes, podeAlterarDataLimite: false }
+    };
+    
+    const { feedbackStore } = mountComponent(subprocessoSemPermissao as typeof mockSubprocesso);
     await flushPromises();
     await context.wrapper.vm.$nextTick();
 

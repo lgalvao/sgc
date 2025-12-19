@@ -8,6 +8,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const pushMock = vi.fn();
 
@@ -40,7 +41,7 @@ vi.mock("@/services/analiseService", () => ({
 }));
 
 describe("VisAtividades.vue", () => {
-    let wrapper: any;
+    const ctx = setupComponentTest();
 
     function createWrapper(
         perfil: Perfil,
@@ -95,15 +96,15 @@ describe("VisAtividades.vue", () => {
     });
 
     afterEach(() => {
-        wrapper?.unmount();
+        ctx.wrapper?.unmount();
     });
 
     it('deve mostrar o botão "Impacto no mapa" para GESTOR em CADASTRO_DISPONIBILIZADO', async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         await flushPromises();
         await nextTick();
 
@@ -111,33 +112,33 @@ describe("VisAtividades.vue", () => {
     });
 
     it('deve mostrar o botão "Impacto no mapa" para ADMIN em CADASTRO_DISPONIBILIZADO', async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.ADMIN,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').exists()).toBe(true);
     });
 
     it('não deve mostrar o botão "Impacto no mapa" para GESTOR em outra situação', async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(wrapper.find('[data-testid="vis-atividades__btn-impactos-mapa"]').exists()).toBe(false);
     });
 
     it("deve listar atividades e conhecimentos", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const atividadesStore = useAtividadesStore();
         atividadesStore.atividadesPorSubprocesso.set(123, [
             {
@@ -148,7 +149,6 @@ describe("VisAtividades.vue", () => {
         ]);
 
         await flushPromises();
-        // Force re-compute
         wrapper.vm.$forceUpdate();
         await nextTick();
 
@@ -156,12 +156,12 @@ describe("VisAtividades.vue", () => {
         expect(wrapper.text()).toContain("Conhecimento 1");
     });
 
-    it("deve abrir e fechar modal de historico", async () => {
-        const {wrapper: w} = createWrapper(
+    it("deve abrir e fechar modal de histórico", async () => {
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         const btn = wrapper.findAll("button").find((b: any) => b.text() === "Histórico de análise");
@@ -170,22 +170,20 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve validar cadastro (Homologar) e redirecionar", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.ADMIN,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.homologarRevisaoCadastro = vi.fn();
 
         await flushPromises();
 
-        // Click validate button
         const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
         await btn.trigger("click");
         expect(wrapper.vm.mostrarModalValidar).toBe(true);
 
-        // Confirm
         const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
         await btnConfirm.trigger("click");
 
@@ -200,21 +198,19 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve validar cadastro (Aceitar) e redirecionar", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.aceitarRevisaoCadastro = vi.fn();
 
         await flushPromises();
 
-        // Click validate button
         const btn = wrapper.find('[data-testid="btn-acao-analisar-principal"]');
         await btn.trigger("click");
 
-        // Confirm
         const btnConfirm = wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]');
         await btnConfirm.trigger("click");
 
@@ -223,26 +219,23 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve devolver cadastro e redirecionar", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.devolverRevisaoCadastro = vi.fn();
 
         await flushPromises();
 
-        // Click return button
         const btn = wrapper.find('[data-testid="btn-acao-devolver"]');
         await btn.trigger("click");
         expect(wrapper.vm.mostrarModalDevolver).toBe(true);
 
-        // Fill observation
         const textarea = wrapper.find('[data-testid="inp-devolucao-cadastro-obs"]');
         await textarea.setValue("Devolvendo");
 
-        // Confirm
         const btnConfirm = wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]');
         await btnConfirm.trigger("click");
 
@@ -252,30 +245,27 @@ describe("VisAtividades.vue", () => {
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
-    it("deve chamar aceitarCadastro se não for revisao", async () => {
-        const {wrapper: w} = createWrapper(
+    it("deve chamar aceitarCadastro se não for revisão", async () => {
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
             TipoProcesso.MAPEAMENTO,
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.aceitarCadastro = vi.fn();
 
         await flushPromises();
 
-        // Click validate button
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
-        // Confirm
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
 
         expect(subprocessosStore.aceitarCadastro).toHaveBeenCalled();
     });
 
     it("deve encontrar unidade em hierarquia complexa", async () => {
-        // Setup store with nested units
-        const {wrapper: w} = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        wrapper = w;
+        const {wrapper} = createWrapper(Perfil.GESTOR, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        ctx.wrapper = wrapper;
         const unidadesStore = useUnidadesStore();
         unidadesStore.unidades = [{
             codigo: 99,
@@ -289,19 +279,18 @@ describe("VisAtividades.vue", () => {
             }]
         }] as any;
 
-        // Force update or wait for computed
         await flushPromises();
         await nextTick();
-        expect(w.text()).toContain("Unidade de Teste");
+        expect(wrapper.text()).toContain("Unidade de Teste");
     });
 
     it("deve validar cadastro (Homologar Mapeamento)", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.ADMIN,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
             TipoProcesso.MAPEAMENTO
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.homologarCadastro = vi.fn();
 
@@ -315,12 +304,12 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve devolver cadastro (Mapeamento)", async () => {
-        const {wrapper: w} = createWrapper(
+        const {wrapper} = createWrapper(
             Perfil.GESTOR,
             SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
             TipoProcesso.MAPEAMENTO
         );
-        wrapper = w;
+        ctx.wrapper = wrapper;
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.devolverCadastro = vi.fn();
 

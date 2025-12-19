@@ -22,6 +22,10 @@ config.global.stubs["b-modal"] = {
   `,
 };
 
+config.global.directives = {
+    "b-tooltip": {},
+};
+
 config.global.plugins.push(createBootstrap());
 
 // Mock localStorage

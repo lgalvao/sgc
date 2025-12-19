@@ -3,6 +3,7 @@ import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaMovimentacoes from "../TabelaMovimentacoes.vue";
 import type {Movimentacao, Unidade} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock do utils para formatDateTimeBR
 vi.mock("@/utils", () => ({
@@ -50,6 +51,7 @@ const mockMovimentacoes: Movimentacao[] = [
 ];
 
 describe("TabelaMovimentacoes.vue", () => {
+    setupComponentTest();
     it("deve renderizar a tabela com movimentações (verificar BTable)", () => {
         const wrapper = mount(TabelaMovimentacoes, {
             props: {movimentacoes: mockMovimentacoes},

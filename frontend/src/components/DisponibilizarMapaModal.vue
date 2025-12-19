@@ -3,12 +3,13 @@
       :fade="false"
       :model-value="mostrar"
       centered
-      header-bg-variant="primary"
-      header-text-variant="white"
-      hide-footer
-      title="Disponibilizar Mapa"
+      data-testid="mdl-disponibilizar-mapa"
+      title="Disponibilização do mapa de competências"
       @hide="fechar"
   >
+    <div v-if="fieldErrors?.generic" class="alert alert-danger mb-3">
+      {{ fieldErrors.generic }}
+    </div>
     <div class="mb-3">
       <label
           class="form-label"
@@ -17,61 +18,89 @@
       <BFormInput
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          data-testid="input-data-limite"
+          :state="fieldErrors?.dataLimite ? false : null"
+          data-testid="inp-disponibilizar-mapa-data"
           type="date"
       />
+      <BFormInvalidFeedback :state="fieldErrors?.dataLimite ? false : null">
+        {{ fieldErrors?.dataLimite }}
+      </BFormInvalidFeedback>
     </div>
-    <div
+    <div class="mb-3">
+      <label
+          class="form-label"
+          for="observacoes"
+      >Observações</label>
+      <BFormTextarea
+          id="observacoes"
+          v-model="observacoesDisponibilizacao"
+          :state="fieldErrors?.observacoes ? false : null"
+          data-testid="inp-disponibilizar-mapa-obs"
+          placeholder="Digite observações sobre a disponibilização..."
+          rows="3"
+      />
+      <BFormInvalidFeedback :state="fieldErrors?.observacoes ? false : null">
+        {{ fieldErrors?.observacoes }}
+      </BFormInvalidFeedback>
+    </div>
+    <BAlert
         v-if="notificacao"
-        class="alert alert-info mt-3"
+        :fade="false"
+        :model-value="true"
+        class="mt-3"
+        data-testid="alert-disponibilizar-mapa"
+        variant="info"
     >
       {{ notificacao }}
-    </div>
-
+    </BAlert>
     <template #footer>
-      <button
-          class="btn btn-secondary"
-          data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"
-          type="button"
+      <BButton
+          data-testid="btn-disponibilizar-mapa-cancelar"
+          variant="secondary"
           @click="fechar"
       >
         Cancelar
-      </button>
-      <button
+      </BButton>
+      <BButton
           :disabled="!dataLimiteValidacao"
-          class="btn btn-success"
-          data-testid="btn-disponibilizar"
-          type="button"
+          data-testid="btn-disponibilizar-mapa-confirmar"
+          variant="success"
           @click="disponibilizar"
       >
         Disponibilizar
-      </button>
+      </BButton>
     </template>
   </BModal>
 </template>
 
 <script lang="ts" setup>
-import {BFormInput, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormInput, BFormInvalidFeedback, BFormTextarea, BModal} from "bootstrap-vue-next";
 import {ref, watch} from "vue";
 
 const props = defineProps<{
   mostrar: boolean;
+  notificacao?: string;
+  fieldErrors?: {
+    dataLimite?: string;
+    observacoes?: string;
+    generic?: string;
+  };
 }>();
 
 const emit = defineEmits<{
   fechar: [];
-  disponibilizar: [dataLimite: string];
+  disponibilizar: [payload: { dataLimite: string; observacoes: string }];
 }>();
 
 const dataLimiteValidacao = ref("");
-const notificacao = ref("");
+const observacoesDisponibilizacao = ref("");
 
 watch(
     () => props.mostrar,
     (mostrar) => {
       if (mostrar) {
         dataLimiteValidacao.value = "";
-        notificacao.value = "";
+        observacoesDisponibilizacao.value = "";
       }
     },
 );
@@ -81,6 +110,9 @@ function fechar() {
 }
 
 function disponibilizar() {
-  emit("disponibilizar", dataLimiteValidacao.value);
+  emit("disponibilizar", {
+    dataLimite: dataLimiteValidacao.value,
+    observacoes: observacoesDisponibilizacao.value
+  });
 }
 </script>

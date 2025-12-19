@@ -11,16 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoFinalizado;
-import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -29,8 +25,9 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.*;
-import sgc.unidade.model.TipoUnidade;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -55,10 +52,8 @@ public class ProcessoService {
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final SubprocessoMapper subprocessoMapper;
-    private final MapaRepo mapaRepo;
-    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
-    private final CopiaMapaService servicoDeCopiaDeMapa;
     private final SgrhService sgrhService;
+    private final ProcessoInicializador processoInicializador;
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) return false;
@@ -104,7 +99,6 @@ public class ProcessoService {
     }
 
     private List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        // Bolt Optimization: Replace N+1 recursive database queries with a single query + in-memory traversal
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
 
         Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
@@ -264,132 +258,27 @@ public class ProcessoService {
                 .toList();
     }
 
+    // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador) ==========
+
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
-        Processo processo = processoRepo.findById(codigo)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-
-        if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
-        }
-
-        Set<Unidade> participantes = processo.getParticipantes();
-        if (participantes.isEmpty()) {
-            throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
-        }
-
-        List<Long> codigosUnidades = participantes.stream().map(Unidade::getCodigo).toList();
-
-        Optional<String> erroUnidadesAtivas = getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades);
-        if (erroUnidadesAtivas.isPresent()) {
-            return List.of(erroUnidadesAtivas.get());
-        }
-
-        for (Unidade unidade : participantes) {
-            criarSubprocessoParaMapeamento(processo, unidade);
-        }
-
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoRepo.save(processo);
-
-        publicadorEventos.publishEvent(
-                new EventoProcessoIniciado(
-                        processo.getCodigo(),
-                        processo.getTipo().name(),
-                        LocalDateTime.now(),
-                        codigosUnidades));
-
-        log.info(
-                "Processo de mapeamento {} iniciado para {} unidades.",
-                codigo,
-                codsUnidades.size());
-        return List.of();
+        return processoInicializador.iniciar(codigo, codsUnidades);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
-        log.info("Iniciando processo de revisão para código {} com unidades {}", codigo, codigosUnidades);
-        Processo processo = processoRepo.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-
-        if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
-        }
-
-        if (codigosUnidades == null || codigosUnidades.isEmpty()) {
-            throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
-        }
-
-        List<String> erros = new ArrayList<>();
-        getMensagemErroUnidadesSemMapa(codigosUnidades).ifPresent(erros::add);
-        getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades).ifPresent(erros::add);
-        if (!erros.isEmpty()) return erros;
-
-        for (Long codUnidade : codigosUnidades) {
-            Unidade unidade = unidadeRepo.findById(codUnidade)
-                            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
-
-            criarSubprocessoParaRevisao(processo, unidade);
-        }
-
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoRepo.save(processo);
-
-        publicadorEventos.publishEvent(
-                new EventoProcessoIniciado(
-                        processo.getCodigo(),
-                        processo.getTipo().name(),
-                        LocalDateTime.now(),
-                        codigosUnidades));
-
-        log.info("Processo de revisão {} iniciado para {} unidades.", codigo, codigosUnidades.size());
-        return List.of();
+        return processoInicializador.iniciar(codigo, codigosUnidades);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
-        Processo processo =
-                processoRepo
-                        .findById(codigo)
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-
-        if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida(
-                    "Apenas processos na situação 'CRIADO' podem ser iniciados.");
-        }
-
-        Set<Unidade> participantes = processo.getParticipantes();
-        if (participantes.isEmpty()) {
-            throw new ErroUnidadesNaoDefinidas(
-                    "Não há unidades participantes definidas para este processo.");
-        }
-
-        List<Long> codigosUnidades = participantes.stream().map(Unidade::getCodigo).toList();
-
-        Optional<String> erroUnidadesAtivas = getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades);
-        if (erroUnidadesAtivas.isPresent()) {
-            return List.of(erroUnidadesAtivas.get());
-        }
-
-        for (Unidade unidade : participantes) {
-            criarSubprocessoParaDiagnostico(processo, unidade);
-        }
-
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processoRepo.save(processo);
-
-        publicadorEventos.publishEvent(
-                new EventoProcessoIniciado(
-                        processo.getCodigo(),
-                        processo.getTipo().name(),
-                        LocalDateTime.now(),
-                        codigosUnidades));
-
-        log.info("Processo de diagnóstico {} iniciado para {} unidade(s).", codigo, codsUnidades.size());
-        return List.of();
+        return processoInicializador.iniciar(codigo, codsUnidades);
     }
+
+    // ========== FINALIZAÇÃO ==========
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -411,20 +300,7 @@ public class ProcessoService {
         log.info("Processo {} finalizado", codigo);
     }
 
-    private Optional<String> getMensagemErroUnidadesEmProcessosAtivos(List<Long> codsUnidades) {
-        if (codsUnidades == null || codsUnidades.isEmpty()) {
-            return Optional.empty();
-        }
-        List<Long> unidadesBloqueadas = processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
-                SituacaoProcesso.EM_ANDAMENTO, codsUnidades);
-
-        if (!unidadesBloqueadas.isEmpty()) {
-            List<String> siglasUnidadesBloqueadas = unidadeRepo.findSiglasByCodigos(unidadesBloqueadas);
-            return Optional.of("As seguintes unidades já participam de outro processo ativo: %s"
-                    .formatted(String.join(", ", siglasUnidadesBloqueadas)));
-        }
-        return Optional.empty();
-    }
+    // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (usados apenas em criar/atualizar) ==========
 
     private Optional<String> getMensagemErroUnidadesSemMapa(List<Long> codigosUnidades) {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
@@ -443,117 +319,6 @@ public class ProcessoService {
                     + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }
         return Optional.empty();
-    }
-
-    private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {
-        if (TipoUnidade.OPERACIONAL == unidade.getTipo() || TipoUnidade.INTEROPERACIONAL == unidade.getTipo()) {
-            // 1. Criar subprocesso SEM mapa primeiro
-            Subprocesso subprocesso = Subprocesso.builder()
-                            .processo(processo)
-                            .unidade(unidade)
-                            .mapa(null)  // Sem mapa inicialmente
-                            .situacao(NAO_INICIADO)
-                            .dataLimiteEtapa1(processo.getDataLimite())
-                            .build();
-            Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-            
-            // 2. Criar mapa COM referência ao subprocesso
-            Mapa mapa = new Mapa();
-            mapa.setSubprocesso(subprocessoSalvo);  // Associar ao subprocesso
-            Mapa mapaSalvo = mapaRepo.save(mapa);
-            
-            // 3. Atualizar subprocesso com o mapa
-            subprocessoSalvo.setMapa(mapaSalvo);
-            subprocessoRepo.save(subprocessoSalvo);
-            
-            // 4. Criar movimentação
-            movimentacaoRepo.save(
-                    new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
-        }
-    }
-
-    private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
-        log.debug("Criando subprocesso de revisão para unidade: {}", unidade.getCodigo());
-        // Buscar mapa vigente da unidade
-        sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                .orElseThrow(() -> {
-                    log.error("ERRO CRITICO: Unidade {} nao possui mapa vigente, mas passou pela validacao.", unidade.getCodigo());
-                    return new ErroProcesso(
-                        "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
-                });
-
-        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
-        log.debug("Mapa vigente da unidade {}: codigo={}", unidade.getSigla(), codMapaVigente);
-        
-        // 1. Criar subprocesso SEM mapa primeiro
-        Subprocesso subprocesso = Subprocesso.builder()
-                        .processo(processo)
-                        .unidade(unidade)
-                        .mapa(null)  // Sem mapa inicialmente
-                        .situacao(NAO_INICIADO)
-                        .dataLimiteEtapa1(processo.getDataLimite())
-                        .build();
-        // Salvar (mock pode retornar outro objeto); usar a instância local para associações posteriores
-        subprocessoRepo.save(subprocesso);
-        log.debug("Subprocesso criado");
-        
-        // 2. Copiar mapa COM referência ao subprocesso
-        log.debug("Iniciando copia do mapa vigente {} para unidade {}", codMapaVigente, unidade.getSigla());
-        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        
-        if (mapaCopiado == null) {
-            log.error("ERRO CRITICO: Copia do mapa retornou null para unidade {}", unidade.getSigla());
-            throw new ErroProcesso("Falha ao copiar mapa para unidade " + unidade.getSigla());
-        }
-        
-        log.debug("Mapa copiado: codigo={}", mapaCopiado.getCodigo());
-        mapaCopiado.setSubprocesso(subprocesso);  // Associar ao subprocesso local
-        Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
-        log.debug("Mapa salvo com associacao ao subprocesso");
-        
-        // 3. Atualizar subprocesso local com o mapa e salvar
-        subprocesso.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocesso);
-        
-        // 4. Não confiar em objetos retornados por mocks; evitar validação que cause falha em testes
-        log.debug("Subprocesso associado ao mapa (local): mapaId={} unidade={}",
-                mapaSalvo != null ? mapaSalvo.getCodigo() : "null", unidade.getSigla());
-
-        // 5. Criar movimentação
-        movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Processo de revisão iniciado", null));
-        log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
-    }
-
-    private void criarSubprocessoParaDiagnostico(Processo processo, Unidade unidade) {
-        sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                .orElseThrow(() -> new ErroProcesso("Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla())));
-
-        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
-        
-        // 1. Criar subprocesso SEM mapa primeiro
-        Subprocesso subprocesso = Subprocesso.builder()
-                        .processo(processo)
-                        .unidade(unidade)
-                        .mapa(null)  // Sem mapa inicialmente
-                        .situacao(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
-                        .dataLimiteEtapa1(processo.getDataLimite())
-                        .build();
-        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        
-        // 2. Copiar mapa COM referência ao subprocesso
-        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        mapaCopiado.setSubprocesso(subprocessoSalvo);  // Associar ao subprocesso
-        Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
-        
-        // 3. Atualizar subprocesso com o mapa
-        subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
-
-        // 4. Criar movimentação
-        movimentacaoRepo.save(
-                new Movimentacao(
-                        subprocessoSalvo, null, unidade, "Processo de diagnóstico iniciado", null));
-        log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 
     private void validarFinalizacaoProcesso(Processo processo) {
@@ -608,6 +373,8 @@ public class ProcessoService {
         }
         log.info("Mapa(s) de {} subprocesso(s) definidos como vigentes.", subprocessos.size());
     }
+
+    // ========== LISTAGENS E CONSULTAS ==========
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
         TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);

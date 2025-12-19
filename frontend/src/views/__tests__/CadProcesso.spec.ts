@@ -113,28 +113,28 @@ describe('CadProcesso.vue', () => {
         const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
 
         // Initially disabled (empty fields)
-        expect(salvarBtn.element.disabled).toBe(true);
-        expect(iniciarBtn.element.disabled).toBe(true);
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
+        expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Fill description
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
-        expect(salvarBtn.element.disabled).toBe(true);
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Fill date
         await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue('2023-12-31');
-        expect(salvarBtn.element.disabled).toBe(true);
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Select units (modelValue for ArvoreUnidades)
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
         // Now it should be enabled (tipo has default 'MAPEAMENTO')
-        expect(salvarBtn.element.disabled).toBe(false);
-        expect(iniciarBtn.element.disabled).toBe(false);
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(false);
+        expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(false);
 
         // Clear description again
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('');
-        expect(salvarBtn.element.disabled).toBe(true);
+        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
     });
 
     it('loads process data for editing', async () => {
@@ -395,5 +395,121 @@ describe('CadProcesso.vue', () => {
 
          expect(wrapper.vm.alertState.show).toBe(true);
          expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
+    });
+
+    it('closes confirmation modal when cancel button is clicked', async () => {
+        const { wrapper } = createWrapper();
+
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        // Open modal
+        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
+
+        // Close modal via cancel button
+        await wrapper.find('[data-testid="btn-iniciar-processo-cancelar"]').trigger('click');
+        expect(wrapper.vm.mostrarModalConfirmacao).toBe(false);
+    });
+
+    it('maps field-specific validation errors from subErrors', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        processosStore.criarProcesso.mockRejectedValue(new Error('Validation Error'));
+        processosStore.lastError = {
+            message: 'Erro de validação',
+            subErrors: [
+                { field: 'descricao', message: 'Descrição é obrigatória' },
+                { field: 'tipo', message: 'Tipo inválido' },
+                { field: 'dataLimiteEtapa1', message: 'Data inválida' },
+                { field: 'unidades', message: 'Selecione ao menos uma unidade' },
+                { field: 'outro', message: 'Erro genérico' }
+            ]
+        };
+
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await flushPromises();
+
+        // Verifica se os erros de campo foram mapeados
+        expect(wrapper.vm.fieldErrors.descricao).toBe('Descrição é obrigatória');
+        expect(wrapper.vm.fieldErrors.tipo).toBe('Tipo inválido');
+        expect(wrapper.vm.fieldErrors.dataLimite).toBe('Data inválida');
+        expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade');
+
+        // Verifica se o erro genérico aparece no alerta
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.errors).toContain('Erro genérico');
+    });
+
+    it('handles error without lastError (network/runtime error)', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        processosStore.criarProcesso.mockRejectedValue(new Error('Network Error'));
+        processosStore.lastError = null;
+
+        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.unidadesSelecionadas = [1];
+        await nextTick();
+
+        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await flushPromises();
+
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.body).toContain('Não foi possível salvar o processo');
+    });
+
+    it('does nothing when confirmarRemocao is called without processoEditando', async () => {
+        const { wrapper } = createWrapper();
+
+        vi.spyOn(processoService, 'excluirProcesso');
+
+        wrapper.vm.processoEditando = null;
+        wrapper.vm.mostrarModalRemocao = true;
+        await nextTick();
+
+        await wrapper.vm.confirmarRemocao();
+        await flushPromises();
+
+        expect(processoService.excluirProcesso).not.toHaveBeenCalled();
+        expect(wrapper.vm.mostrarModalRemocao).toBe(false);
+    });
+
+    it('clears field errors when fields are updated', async () => {
+        const { wrapper } = createWrapper();
+
+        // Set initial errors
+        wrapper.vm.fieldErrors.descricao = 'Erro';
+        wrapper.vm.fieldErrors.tipo = 'Erro';
+        wrapper.vm.fieldErrors.dataLimite = 'Erro';
+        wrapper.vm.fieldErrors.unidades = 'Erro';
+        await nextTick();
+
+        // Update fields (triggers watchers)
+        wrapper.vm.descricao = 'Nova descricao';
+        await nextTick();
+        expect(wrapper.vm.fieldErrors.descricao).toBe('');
+
+        wrapper.vm.tipo = 'REVISAO';
+        await nextTick();
+        expect(wrapper.vm.fieldErrors.tipo).toBe('');
+
+        wrapper.vm.dataLimite = '2024-01-01';
+        await nextTick();
+        expect(wrapper.vm.fieldErrors.dataLimite).toBe('');
+
+        wrapper.vm.unidadesSelecionadas = [2];
+        await nextTick();
+        expect(wrapper.vm.fieldErrors.unidades).toBe('');
     });
 });

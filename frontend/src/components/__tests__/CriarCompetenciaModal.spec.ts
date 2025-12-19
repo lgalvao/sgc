@@ -54,7 +54,7 @@ describe("CriarCompetenciaModal.vue", () => {
 
     it("não deve renderizar o modal quando mostrar for falso", () => {
         const wrapper = createWrapper({ mostrar: false, atividades: [] });
-        expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="inp-criar-competencia-descricao"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal no modo de criação", () => {
@@ -63,7 +63,7 @@ describe("CriarCompetenciaModal.vue", () => {
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
         expect(
             wrapper
-                .find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]')
+                .find('[data-testid="btn-criar-competencia-salvar"]')
                 .attributes("disabled"),
         ).toBeDefined();
     });
@@ -90,7 +90,7 @@ describe("CriarCompetenciaModal.vue", () => {
 
         expect(
             wrapper
-                .find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]')
+                .find('[data-testid="btn-criar-competencia-salvar"]')
                 .attributes("disabled"),
         ).toBeFalsy();
     });
@@ -98,7 +98,7 @@ describe("CriarCompetenciaModal.vue", () => {
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
         const wrapper = createWrapper({ mostrar: true, atividades });
 
-        await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-cancelar"]').trigger("click");
+        await wrapper.find('[data-testid="btn-criar-competencia-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 
@@ -110,7 +110,7 @@ describe("CriarCompetenciaModal.vue", () => {
         // Using setValue(true) to simulate checking the checkbox
         await wrapper.find('input[type="checkbox"]').setValue(true);
         await flushPromises();
-        await wrapper.find('[data-testid="criar-competencia-modal__btn-modal-confirmar"]').trigger("click");
+        await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
         expect(wrapper.emitted("salvar")).toBeTruthy();
         expect(wrapper.emitted("salvar")?.[0]).toEqual([

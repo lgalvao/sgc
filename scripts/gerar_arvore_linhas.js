@@ -92,7 +92,9 @@ function calculateTotals(node) {
 }
 
 function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
-    const {maxDepth} = options;
+    const {maxDepth, minLines} = options;
+
+    if (minLines !== undefined && node.count < minLines) return;
 
     // Formatação
     const connector = isRoot ? '' : (isLast ? '└── ' : '├── ');
@@ -115,7 +117,13 @@ function printTree(node, options, prefix = '', isLast = true, isRoot = true, cur
     if (node.isDir) {
         if (maxDepth !== undefined && currentDepth >= maxDepth) return;
 
-        const childKeys = Object.keys(node.children).sort((a, b) => {
+        let childKeys = Object.keys(node.children);
+
+        if (minLines !== undefined) {
+            childKeys = childKeys.filter(key => node.children[key].count >= minLines);
+        }
+
+        childKeys.sort((a, b) => {
             const nodeA = node.children[a];
             const nodeB = node.children[b];
 
@@ -144,7 +152,8 @@ Uso: node scripts/gerar_arvore_linhas.js [opções]
 
 Opções:
   --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)
-  --exclude-tests    Exclui arquivos de teste da contagem e da árvore
+  --min-lines <n>      Exibe apenas itens com no mínimo n linhas
+  --exclude-tests      Exclui arquivos de teste da contagem e da árvore
   --help, -h           Exibe esta mensagem de ajuda
 `);
         process.exit(0);
@@ -153,6 +162,11 @@ Opções:
     const depthIndex = args.indexOf('--depth');
     if (depthIndex !== -1 && args[depthIndex + 1]) {
         options.maxDepth = parseInt(args[depthIndex + 1], 10);
+    }
+
+    const minLinesIndex = args.indexOf('--min-lines');
+    if (minLinesIndex !== -1 && args[minLinesIndex + 1]) {
+        options.minLines = parseInt(args[minLinesIndex + 1], 10);
     }
 
     if (args.includes('--exclude-tests')) {

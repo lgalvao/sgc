@@ -2,11 +2,14 @@ import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import TreeRowItem from "../TreeRowItem.vue";
 import TreeTableView from "../TreeTableView.vue";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock do componente TreeRow
 const mockTreeRow = {template: "<tr><td>Mocked TreeRowItem</td></tr>"};
 
 describe("TreeTable.vue", () => {
+    setupComponentTest();
+
     const mockData = [
         {
             id: 1,

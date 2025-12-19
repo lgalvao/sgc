@@ -6,7 +6,6 @@ import {computed} from "vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
-// Import services to mock/spy
 import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
 import * as mapaService from "@/services/mapaService";
@@ -17,9 +16,10 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useFeedbackStore} from "@/stores/feedback"; // Import feedback store
+import {useFeedbackStore} from "@/stores/feedback";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadAtividades from "@/views/CadAtividades.vue";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const pushMock = vi.fn();
 
@@ -35,12 +35,10 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: () => ({}),
 }));
 
-// Mock usePerfil
 vi.mock("@/composables/usePerfil", () => ({
     usePerfil: vi.fn(),
 }));
 
-// Mock services
 vi.mock("@/services/atividadeService", () => ({
     criarAtividade: vi.fn(),
     excluirAtividade: vi.fn(),
@@ -97,7 +95,6 @@ const mockAtividades = [
     },
 ];
 
-// Helper to generate map structure
 const mockMapaVisualizacao = (atividades = []) => ({
     subprocessoCodigo: 123,
     competencias: [
@@ -110,10 +107,9 @@ const mockMapaVisualizacao = (atividades = []) => ({
 });
 
 describe("CadAtividades.vue", () => {
-    let wrapper: any;
+    const ctx = setupComponentTest();
 
     function createWrapper(isRevisao = false, customState = {}) {
-        // Setup usePerfil mock per test
         vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
             perfilSelecionado: computed(() => Perfil.CHEFE),
             servidorLogado: computed(() => null),
@@ -128,7 +124,7 @@ describe("CadAtividades.vue", () => {
             global: {
                 plugins: [
                     createTestingPinia({
-                        stubActions: false, // Allow store actions to run and call mocked services
+                        stubActions: false,
                         initialState: {
                             processos: {
                                 processoDetalhe: {
@@ -172,12 +168,12 @@ describe("CadAtividades.vue", () => {
                     BModal: {
                         name: "BModal",
                         template: `
-                   <div v-if="modelValue" class="b-modal-stub" :aria-label="title">
-                     <div class="stub-title">{{ title }}</div>
-                     <slot />
-                     <slot name="footer" />
-                   </div>
-                `,
+                       <div v-if="modelValue" class="b-modal-stub" :aria-label="title">
+                         <div class="stub-title">{{ title }}</div>
+                         <slot />
+                         <slot name="footer" />
+                       </div>
+                    `,
                         props: ["modelValue", "title"],
                         emits: ["update:modelValue"],
                     },
@@ -190,7 +186,7 @@ describe("CadAtividades.vue", () => {
         const processosStore = useProcessosStore();
         const subprocessosStore = useSubprocessosStore();
         const analisesStore = useAnalisesStore();
-        const feedbackStore = useFeedbackStore(); // Get feedback store
+        const feedbackStore = useFeedbackStore();
 
         return {
             wrapper,
@@ -206,7 +202,6 @@ describe("CadAtividades.vue", () => {
         vi.clearAllMocks();
         window.confirm = vi.fn(() => true);
 
-        // Default mocks
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
             codigo: 1,
             tipo: TipoProcesso.MAPEAMENTO,
@@ -249,12 +244,12 @@ describe("CadAtividades.vue", () => {
     });
 
     afterEach(() => {
-        wrapper?.unmount();
+        ctx.wrapper?.unmount();
     });
 
     it("deve carregar atividades no mount", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123);
@@ -264,8 +259,8 @@ describe("CadAtividades.vue", () => {
         vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
             mockMapaVisualizacao([...mockAtividades] as any) as any,
         );
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         const inputWrapper = wrapper.findComponent(BFormInput);
@@ -289,11 +284,10 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve remover uma atividade", async () => {
-        // Setup mock BEFORE wrapper creation (or mock the fetch response)
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({
@@ -315,8 +309,8 @@ describe("CadAtividades.vue", () => {
     it("deve adicionar um conhecimento", async () => {
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         const form = wrapper.find('[data-testid="form-novo-conhecimento"]');
@@ -339,8 +333,8 @@ describe("CadAtividades.vue", () => {
     it("deve remover um conhecimento", async () => {
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({
@@ -367,8 +361,8 @@ describe("CadAtividades.vue", () => {
             mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
         );
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         vi.mocked(cadastroService.disponibilizarCadastro).mockResolvedValue();
@@ -386,8 +380,8 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve abrir modal de importar atividades", async () => {
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[title="Importar"]').trigger("click");
@@ -399,8 +393,8 @@ describe("CadAtividades.vue", () => {
     it("deve permitir edição inline de atividade", async () => {
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-editar-atividade"]').trigger("click");
@@ -431,8 +425,8 @@ describe("CadAtividades.vue", () => {
     it("deve permitir edição inline de conhecimento", async () => {
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper
@@ -463,7 +457,7 @@ describe("CadAtividades.vue", () => {
         );
     });
 
-    it("deve tratar disponibilizacao de revisao", async () => {
+    it("deve tratar disponibilização de revisão", async () => {
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
             codigo: 1,
             tipo: TipoProcesso.REVISAO,
@@ -485,8 +479,8 @@ describe("CadAtividades.vue", () => {
             mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
         );
 
-        const {wrapper: w} = createWrapper(true); // isRevisao = true
-        wrapper = w;
+        const {wrapper} = createWrapper(true);
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         vi.mocked(
@@ -506,7 +500,7 @@ describe("CadAtividades.vue", () => {
         );
     });
 
-    it("deve abrir modal de historico de analise se houver analises", async () => {
+    it("deve abrir modal de histórico de análise se houver análises", async () => {
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([
             {
                 codigo: 1,
@@ -517,8 +511,8 @@ describe("CadAtividades.vue", () => {
             },
         ] as any);
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         const buttons = wrapper.findAll("button");
@@ -544,8 +538,8 @@ describe("CadAtividades.vue", () => {
             ]
         });
 
-        const {wrapper: w} = createWrapper();
-        wrapper = w;
+        const {wrapper} = createWrapper();
+        ctx.wrapper = wrapper;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");

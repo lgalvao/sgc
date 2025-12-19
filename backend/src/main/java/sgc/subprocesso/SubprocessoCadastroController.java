@@ -22,7 +22,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.subprocesso.service.SubprocessoWorkflowService;
+import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class SubprocessoCadastroController {
 
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
-    private final SubprocessoWorkflowService subprocessoWorkflowService;
+    private final SubprocessoCadastroWorkflowService subprocessoWorkflowService;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
 

@@ -47,12 +47,12 @@ describe("DisponibilizarMapaModal.vue", () => {
     it("deve renderizar o modal com os campos iniciais", () => {
         const wrapper = createWrapper({ mostrar: true });
 
-        const dataInput = wrapper.find('[data-testid="input-data-limite"]');
+        const dataInput = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
         expect(dataInput.exists()).toBe(true);
         expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
 
         const disponibilizarButton = wrapper.find(
-            '[data-testid="btn-disponibilizar"]',
+            '[data-testid="btn-disponibilizar-mapa-confirmar"]'
         );
         expect(disponibilizarButton.attributes("disabled")).toBeDefined();
     });
@@ -65,7 +65,7 @@ describe("DisponibilizarMapaModal.vue", () => {
         await nativeInput.setValue("2024-12-31");
 
         const disponibilizarButton = wrapper.find(
-            '[data-testid="btn-disponibilizar"]',
+            '[data-testid="btn-disponibilizar-mapa-confirmar"]'
         );
         expect(disponibilizarButton.attributes("disabled")).toBeUndefined();
     });
@@ -73,7 +73,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
         const wrapper = createWrapper({ mostrar: true });
 
-        await wrapper.find('[data-testid="disponibilizar-mapa-modal__btn-modal-cancelar"]').trigger("click");
+        await wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 
@@ -85,9 +85,12 @@ describe("DisponibilizarMapaModal.vue", () => {
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue(dataLimite);
 
-        await wrapper.find('[data-testid="btn-disponibilizar"]').trigger("click");
+        await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
         expect(wrapper.emitted("disponibilizar")).toBeTruthy();
-        expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([dataLimite]);
+        expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
+            dataLimite,
+            observacoes: ""
+        }]);
     });
 });

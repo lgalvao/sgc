@@ -46,3 +46,6 @@ playwright-report/
 screenshots/
 output.txt
 e2e/server.log
+
+!frontend/coverage/coverage-final.json
+/dados/

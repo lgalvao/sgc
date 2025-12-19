@@ -408,6 +408,12 @@ function abrirModalHistoricoAnalise() {
 function fecharModalHistoricoAnalise() {
   mostrarModalHistoricoAnalise.value = false;
 }
+
+defineExpose({
+  mostrarModalHistoricoAnalise,
+  mostrarModalValidar,
+  mostrarModalDevolver,
+});
 </script>
 
 <style>

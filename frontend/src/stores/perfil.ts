@@ -99,17 +99,14 @@ export const usePerfilStore = defineStore("perfil", () => {
                         perfilUnidadeSelecionado.unidade.sigla,
                         loginResponse.nome,
                     );
-                    definirUsuarioCodigo(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
-                    definirToken(loginResponse.token); // Adicionar esta linha
+                    definirUsuarioCodigo(loginResponse.tituloEleitoral);
+                    definirToken(loginResponse.token); 
                 }
                 return true;
             }
             return false;
         } catch (error: any) {
-            console.error("Erro durante loginCompleto:", error);
             lastError.value = normalizeError(error);
-            // Se for um erro 404 de autorização, ou qualquer erro de autorização/autenticação específico,
-            // retornamos false para exibir a mensagem de "Título ou senha inválidos"
             if (error?.response?.status === 404 || error?.response?.status === 401) {
                 return false;
             }

@@ -3,6 +3,7 @@ import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaAlertas from "../TabelaAlertas.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable} from "bootstrap-vue-next";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const mockAlertas: Alerta[] = [
     {
@@ -34,6 +35,7 @@ const mockAlertas: Alerta[] = [
 ];
 
 describe("TabelaAlertas.vue", () => {
+    setupComponentTest();
     it("deve passar os alertas para o BTable", () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},

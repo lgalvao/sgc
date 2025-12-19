@@ -1,9 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import {createTestingPinia} from '@pinia/testing';
 import ConclusaoDiagnostico from '@/views/ConclusaoDiagnostico.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {diagnosticoService} from '@/services/diagnosticoService';
+import {setupComponentTest, getCommonMountOptions} from '@/test-utils/componentTestHelpers';
 
 // Mocks
 const mockPush = vi.fn();
@@ -30,7 +30,7 @@ vi.mock('@/services/diagnosticoService', () => ({
 }));
 
 describe('ConclusaoDiagnostico.vue', () => {
-  let wrapper: any;
+  const ctx = setupComponentTest();
   let feedbackStore: any;
 
   const mockDiagnosticoPronto = {
@@ -51,134 +51,91 @@ describe('ConclusaoDiagnostico.vue', () => {
     motivoNaoPodeConcluir: null
   };
 
+  const stubs = {
+    BContainer: { template: '<div><slot /></div>' },
+    BCard: { template: '<div><slot /></div>' },
+    BButton: { template: '<button><slot /></button>' },
+    BSpinner: { template: '<div data-testid="spinner"></div>' },
+    BFormGroup: { template: '<div><slot /></div>' },
+    BFormInvalidFeedback: { template: '<div><slot /></div>' },
+    BFormTextarea: {
+      template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
+      props: ['modelValue', 'state']
+    },
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockRouteParams.value = { codSubprocesso: '10' };
 
-    wrapper = mount(ConclusaoDiagnostico, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            createSpy: vi.fn,
-          }),
-        ],
-        stubs: {
-          BContainer: { template: '<div><slot /></div>' },
-          BCard: { template: '<div><slot /></div>' },
-          BButton: { template: '<button><slot /></button>' },
-          BSpinner: { template: '<div data-testid="spinner"></div>' },
-          BFormGroup: { template: '<div><slot /></div>' },
-          BFormInvalidFeedback: { template: '<div><slot /></div>' },
-          BFormTextarea: {
-            template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-            props: ['modelValue', 'state']
-          },
-        },
-      },
-    });
+    const mountOptions = getCommonMountOptions({}, stubs);
+    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
 
     feedbackStore = useFeedbackStore();
     
-    // Default valid response
+    // Resposta válida padrão
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPronto);
   });
 
-  it('renders loading state initially', async () => {
-    // Check call
+  it('exibe estado de carregamento inicialmente', async () => {
     expect(diagnosticoService.buscarDiagnostico).toHaveBeenCalledWith(10);
   });
 
-  it('renders ready state correctly', async () => {
-    // Already mocked pronto in beforeEach
-    // Wait for update
-    await wrapper.vm.$nextTick();
+  it('exibe estado pronto corretamente', async () => {
+    await ctx.wrapper!.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 10));
-    await wrapper.vm.$nextTick();
+    await ctx.wrapper!.vm.$nextTick();
 
-    expect(wrapper.text()).toContain('O diagnóstico está completo');
-    expect(wrapper.find('[data-testid="btn-confirmar-conclusao"]').attributes('disabled')).toBeUndefined();
+    expect(ctx.wrapper!.text()).toContain('O diagnóstico está completo');
+    expect(ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]').attributes('disabled')).toBeUndefined();
   });
 
-  it('renders pending state and requires justification', async () => {
+  it('exibe estado pendente e requer justificativa', async () => {
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
     
-    // Re-mount to trigger onMounted with new mock
-    wrapper = mount(ConclusaoDiagnostico, {
-        global: {
-            plugins: [createTestingPinia({ createSpy: vi.fn })],
-            stubs: {
-                BContainer: { template: '<div><slot /></div>' },
-                BCard: { template: '<div><slot /></div>' },
-                BButton: { template: '<button><slot /></button>' },
-                BSpinner: { template: '<div data-testid="spinner"></div>' },
-                BFormGroup: { template: '<div><slot /></div>' },
-                BFormInvalidFeedback: { template: '<div><slot /></div>' },
-                BFormTextarea: {
-                    template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-                    props: ['modelValue', 'state']
-                },
-            },
-        }
-    });
+    const mountOptions = getCommonMountOptions({}, stubs);
+    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
 
-    await wrapper.vm.$nextTick();
+    await ctx.wrapper!.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 10));
-    await wrapper.vm.$nextTick();
+    await ctx.wrapper!.vm.$nextTick();
 
-    expect(wrapper.text()).toContain('Pendências existem');
+    expect(ctx.wrapper!.text()).toContain('Pendências existem');
     
-    // Disabled initially
-    expect(wrapper.vm.botaoHabilitado).toBe(false);
+    // Desabilitado inicialmente
+    expect(ctx.wrapper!.vm.botaoHabilitado).toBe(false);
     
-    // Add short justification (too short)
-    const textarea = wrapper.find('textarea');
-    await textarea.setValue('Short');
-    expect(wrapper.vm.botaoHabilitado).toBe(false);
+    // Justificativa curta demais
+    const textarea = ctx.wrapper!.find('textarea');
+    await textarea.setValue('Curto');
+    expect(ctx.wrapper!.vm.botaoHabilitado).toBe(false);
 
-    // Add valid justification
-    await textarea.setValue('Valid justification text here');
-    expect(wrapper.vm.botaoHabilitado).toBe(true);
+    // Justificativa válida
+    await textarea.setValue('Texto de justificativa válido aqui');
+    expect(ctx.wrapper!.vm.botaoHabilitado).toBe(true);
   });
 
-  it('redirects if already concluded', async () => {
+  it('redireciona se já concluído', async () => {
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoConcluido);
     
-    // Re-mount
-    wrapper = mount(ConclusaoDiagnostico, {
-        global: {
-            plugins: [createTestingPinia({ createSpy: vi.fn })],
-            stubs: {
-                BContainer: { template: '<div><slot /></div>' },
-                BCard: { template: '<div><slot /></div>' },
-                BButton: { template: '<button><slot /></button>' },
-                BSpinner: { template: '<div data-testid="spinner"></div>' },
-                BFormGroup: { template: '<div><slot /></div>' },
-                BFormInvalidFeedback: { template: '<div><slot /></div>' },
-                BFormTextarea: {
-                    template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-                    props: ['modelValue', 'state']
-                },
-            },
-        }
-    });
+    const mountOptions = getCommonMountOptions({}, stubs);
+    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
 
-    await wrapper.vm.$nextTick();
+    await ctx.wrapper!.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 10));
     
-    // Need access to store from new wrapper
     feedbackStore = useFeedbackStore();
     
     expect(feedbackStore.show).toHaveBeenCalledWith('Aviso', expect.any(String), 'warning');
     expect(mockPush).toHaveBeenCalledWith('/painel');
   });
 
-  it('concludes diagnosis', async () => {
-    // Ready state
-    await wrapper.vm.$nextTick();
+  it('conclui diagnóstico', async () => {
+    await ctx.wrapper!.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 10));
-    await wrapper.vm.$nextTick();
+    await ctx.wrapper!.vm.$nextTick();
 
-    const btn = wrapper.find('[data-testid="btn-confirmar-conclusao"]');
+    const btn = ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]');
     await btn.trigger('click');
 
     expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(10, '');
@@ -186,39 +143,22 @@ describe('ConclusaoDiagnostico.vue', () => {
     expect(feedbackStore.show).toHaveBeenCalledWith('Sucesso', expect.any(String), 'success');
   });
 
-  it('concludes diagnosis with justification', async () => {
+  it('conclui diagnóstico com justificativa', async () => {
       (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
       
-      // Re-mount
-      wrapper = mount(ConclusaoDiagnostico, {
-          global: {
-              plugins: [createTestingPinia({ createSpy: vi.fn })],
-              stubs: {
-                  BContainer: { template: '<div><slot /></div>' },
-                  BCard: { template: '<div><slot /></div>' },
-                  BButton: { template: '<button><slot /></button>' },
-                  BSpinner: { template: '<div data-testid="spinner"></div>' },
-                  BFormGroup: { template: '<div><slot /></div>' },
-                  BFormInvalidFeedback: { template: '<div><slot /></div>' },
-                  BFormTextarea: {
-                      template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-                      props: ['modelValue', 'state']
-                  },
-              },
-          }
-      });
+      const mountOptions = getCommonMountOptions({}, stubs);
+      ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
       
-      await wrapper.vm.$nextTick();
+      await ctx.wrapper!.vm.$nextTick();
       await new Promise(resolve => setTimeout(resolve, 10));
-      await wrapper.vm.$nextTick();
+      await ctx.wrapper!.vm.$nextTick();
       
-      // Use trigger on the element to ensure v-model updates
-      const textarea = wrapper.find('textarea');
+      const textarea = ctx.wrapper!.find('textarea');
       await textarea.setValue('Justificativa válida para teste');
       
-      await wrapper.vm.$nextTick();
+      await ctx.wrapper!.vm.$nextTick();
       
-      await wrapper.find('[data-testid="btn-confirmar-conclusao"]').trigger('click');
+      await ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]').trigger('click');
       
       expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(10, 'Justificativa válida para teste');
   });

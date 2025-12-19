@@ -10,7 +10,7 @@
         <i class="bi bi-arrow-left fs-4"/>
       </BButton>
       <div class="fs-5 d-flex align-items-center gap-2">
-        <span>{{ siglaUnidade }} - {{ nomeUnidade }}</span>
+        <span>{{ sigla }} - {{ nomeUnidade }}</span>
         <span
             v-if="subprocesso"
             :class="badgeClass(subprocesso.situacaoSubprocesso)"
@@ -35,7 +35,7 @@
           <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </BButton>
         <BButton
-            v-if="isChefe && historicoAnalises.length > 0"
+            v-if="isChefe && codSubprocesso"
             data-testid="btn-cad-atividades-historico"
             variant="outline-info"
             @click="abrirModalHistorico"
@@ -93,10 +93,10 @@
       </BCol>
     </BForm>
 
-    <div 
-      v-for="(atividade, idx) in atividades" 
-      :key="atividade.codigo || idx"
-      :ref="el => setAtividadeRef(atividade.codigo, el)"
+    <div
+        v-for="(atividade, idx) in atividades"
+        :key="atividade.codigo || idx"
+        :ref="el => setAtividadeRef(atividade.codigo, el)"
     >
       <AtividadeItem
           :atividade="atividade"
@@ -124,107 +124,40 @@
         @fechar="fecharModalImpacto"
     />
 
-    <BModal
-        v-model="mostrarModalConfirmacao"
-        :fade="false"
-        :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
-        centered
-        hide-footer
-    >
-      <template #default>
-        <p>
-          {{
-            isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
-          }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
-        </p>
-      </template>
-      <template #footer>
-        <BButton
-            variant="secondary"
-            @click="fecharModalConfirmacao"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            data-testid="btn-confirmar-disponibilizacao"
-            variant="success"
-            @click="confirmarDisponibilizacao"
-        >
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
+    <ConfirmacaoDisponibilizacaoModal
+        :mostrar="mostrarModalConfirmacao"
+        :is-revisao="!!isRevisao"
+        @fechar="mostrarModalConfirmacao = false"
+        @confirmar="confirmarDisponibilizacao"
+    />
 
-    <BModal
-        v-model="mostrarModalHistorico"
-        :fade="false"
-        centered
-        hide-footer
-        size="lg"
-        title="Histórico de Análise"
-    >
-      <div class="table-responsive">
-        <table
-            class="table table-striped"
-            data-testid="cad-atividades__tbl-historico-analise"
-        >
-          <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Unidade</th>
-            <th>Resultado</th>
-            <th>Observações</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr
-              v-for="(analise, index) in historicoAnalises"
-              :key="analise.codigo"
-              :data-testid="`row-historico-${index}`"
-          >
-            <td :data-testid="`cell-data-${index}`">{{ formatarData(analise.dataHora) }}</td>
-            <td :data-testid="`cell-unidade-${index}`">{{
-                'unidade' in analise ? analise.unidade : analise.unidadeSigla
-              }}
-            </td>
-            <td :data-testid="`cell-resultado-${index}`">{{
-                formatarAcaoAnalise(analise.acao || analise.resultado)
-              }}
-            </td>
-            <td :data-testid="`cell-observacao-${index}`">{{ analise.observacoes || '-' }}</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <template #footer>
-        <BButton
-            variant="secondary"
-            @click="fecharModalHistorico"
-        >
-          Fechar
-        </BButton>
-      </template>
-    </BModal>
+    <HistoricoAnaliseModal
+        :mostrar="mostrarModalHistorico"
+        :cod-subprocesso="codSubprocesso"
+        @fechar="mostrarModalHistorico = false"
+    />
+
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCol, BContainer, BForm, BFormInput, BModal} from "bootstrap-vue-next";
-import {computed, nextTick, onMounted, ref} from "vue";
+import {BButton, BCol, BContainer, BForm, BFormInput} from "bootstrap-vue-next";
+import {computed, nextTick, onMounted, ref, toRef} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
+import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
+import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
-import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import AtividadeItem from "@/components/AtividadeItem.vue";
 import {useFeedbackStore} from "@/stores/feedback";
-
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
+import {useSubprocessoResolver} from "@/composables/useSubprocessoResolver";
 import {
   type Atividade,
   type Conhecimento,
@@ -238,65 +171,33 @@ import {
 } from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";
 
-
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;
 }>();
 
-const unidadeId = computed(() => props.sigla);
-const codProcesso = computed(() => Number(props.codProcesso));
-
+const router = useRouter();
 const atividadesStore = useAtividadesStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
-const analisesStore = useAnalisesStore();
 const feedbackStore = useFeedbackStore();
-
-const router = useRouter();
 
 useMapasStore();
 
-const unidade = computed(() => unidadesStore.unidade);
+const {perfilSelecionado} = usePerfil();
+const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
-const siglaUnidade = computed(() => unidade.value?.sigla || props.sigla);
-const nomeUnidade = computed(() =>
-    unidade.value?.nome ? `${unidade.value.nome}` : "",
-);
-const novaAtividade = ref("");
+// Usando o novo composable
+const codProcessoRef = computed(() => Number(props.codProcesso));
+const siglaUnidadeRef = toRef(props, 'sigla');
 
-// Função helper para buscar unidade recursivamente na árvore
-function buscarUnidadeNaArvore(unidades: any[], sigla: string): any {
-    for (const unidade of unidades) {
-        if (unidade.sigla === sigla) {
-            return unidade;
-        }
-        if (unidade.filhos && unidade.filhos.length > 0) {
-            const encontrada = buscarUnidadeNaArvore(unidade.filhos, sigla);
-            if (encontrada) return encontrada;
-        }
-    }
-    return null;
-}
-
-const codSubprocesso = computed(() => {
-    if (!processosStore.processoDetalhe?.unidades) return undefined;
-    const unidadeEncontrada = buscarUnidadeNaArvore(
-        processosStore.processoDetalhe.unidades,
-        unidadeId.value
-    );
-    return unidadeEncontrada?.codSubprocesso;
-});
-
-const codMapa = computed(() => {
-    if (!processosStore.processoDetalhe?.unidades) return undefined;
-    const unidadeEncontrada = buscarUnidadeNaArvore(
-        processosStore.processoDetalhe.unidades,
-        unidadeId.value
-    );
-    return unidadeEncontrada?.mapaCodigo;
-});
+const {
+  nomeUnidade,
+  codSubprocesso,
+  codMapa,
+  subprocesso
+} = useSubprocessoResolver(codProcessoRef, siglaUnidadeRef);
 
 const atividades = computed({
   get: () => {
@@ -313,7 +214,19 @@ const isRevisao = computed(
 );
 
 const permissoes = ref<SubprocessoPermissoes | null>(null);
+const novaAtividade = ref("");
 
+// Modais
+const mostrarModalImpacto = ref(false);
+const mostrarModalImportar = ref(false);
+const mostrarModalConfirmacao = ref(false);
+const mostrarModalHistorico = ref(false);
+
+const errosValidacao = ref<ErroValidacao[]>([]);
+const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
+
+
+// CRUD Atividades (mantido local por enquanto)
 async function adicionarAtividade() {
   if (novaAtividade.value?.trim() && codMapa.value && codSubprocesso.value) {
     const request: CriarAtividadeRequest = {
@@ -436,27 +349,7 @@ async function handleImportAtividades() {
   );
 }
 
-const {perfilSelecionado} = usePerfil();
-
-const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
-
-const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(
-      (u) => u.sigla === unidadeId.value,
-  );
-});
-
-const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
-
-const mostrarModalImpacto = ref(false);
-const mostrarModalImportar = ref(false);
-const mostrarModalConfirmacao = ref(false);
-
-const mostrarModalHistorico = ref(false);
-const errosValidacao = ref<ErroValidacao[]>([]);
-
-// Mapeamento de erros para atividades
+// Mapeamento de erros
 const mapaErros = computed(() => {
   const mapa = new Map<number, string>();
   errosValidacao.value.forEach(erro => {
@@ -467,12 +360,10 @@ const mapaErros = computed(() => {
   return mapa;
 });
 
-// Obter erro para uma atividade específica
 function obterErroParaAtividade(atividadeId: number): string | undefined {
   return mapaErros.value.get(atividadeId);
 }
 
-// Refs para scroll automático
 const atividadeRefs = new Map<number, any>();
 
 function setAtividadeRef(atividadeId: number, el: any) {
@@ -481,14 +372,13 @@ function setAtividadeRef(atividadeId: number, el: any) {
   }
 }
 
-// Scroll para primeira atividade com erro
 function scrollParaPrimeiroErro() {
   if (errosValidacao.value.length > 0 && errosValidacao.value[0].atividadeId) {
     const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeId);
     if (primeiraAtividadeComErro) {
-      primeiraAtividadeComErro.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
+      primeiraAtividadeComErro.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
       });
     }
   }
@@ -497,10 +387,9 @@ function scrollParaPrimeiroErro() {
 
 onMounted(async () => {
   await unidadesStore.buscarUnidade(props.sigla);
-  await processosStore.buscarProcessoDetalhe(codProcesso.value);
+  await processosStore.buscarProcessoDetalhe(codProcessoRef.value);
   if (codSubprocesso.value) {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
-    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
     permissoes.value = await subprocessoService.obterPermissoes(codSubprocesso.value);
   } else {
     console.error('[CadAtividades] ERRO: codSubprocesso está undefined!');
@@ -508,36 +397,16 @@ onMounted(async () => {
   }
 });
 
-
-const historicoAnalises = computed(() => {
-  if (!codSubprocesso.value) return [];
-  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
-});
-
-function formatarData(data: string): string {
-  return new Date(data).toLocaleString("pt-BR");
-}
-
 function abrirModalHistorico() {
   mostrarModalHistorico.value = true;
 }
 
-function fecharModalHistorico() {
-  mostrarModalHistorico.value = false;
+function abrirModalImpacto() {
+  mostrarModalImpacto.value = true;
 }
 
-function formatarAcaoAnalise(acao: string | undefined): string {
-  if (!acao) return '';
-  switch (acao) {
-    case 'DEVOLUCAO_MAPEAMENTO':
-    case 'DEVOLUCAO_REVISAO':
-      return 'Devolução';
-    case 'ACEITE_MAPEAMENTO':
-    case 'ACEITE_REVISAO':
-      return 'Aceite';
-    default:
-      return acao;
-  }
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
 }
 
 async function disponibilizarCadastro() {
@@ -555,7 +424,6 @@ async function disponibilizarCadastro() {
     return;
   }
 
-  // Backend valida atividades sem conhecimento via SubprocessoCadastroController/DTO
   if (codSubprocesso.value) {
     try {
       const resultado = await subprocessoService.validarCadastro(codSubprocesso.value);
@@ -563,7 +431,6 @@ async function disponibilizarCadastro() {
         mostrarModalConfirmacao.value = true;
       } else {
         errosValidacao.value = resultado.erros;
-        // Scroll para primeiro erro
         await nextTick();
         scrollParaPrimeiroErro();
       }
@@ -571,10 +438,6 @@ async function disponibilizarCadastro() {
       feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
     }
   }
-}
-
-function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false;
 }
 
 async function confirmarDisponibilizacao() {
@@ -587,17 +450,9 @@ async function confirmarDisponibilizacao() {
     sucesso = await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
   }
 
-  fecharModalConfirmacao();
+  mostrarModalConfirmacao.value = false;
   if (sucesso) {
     await router.push("/painel");
   }
-}
-
-function abrirModalImpacto() {
-  mostrarModalImpacto.value = true;
-}
-
-function fecharModalImpacto() {
-  mostrarModalImpacto.value = false;
 }
 </script>
