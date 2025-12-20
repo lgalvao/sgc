@@ -13,10 +13,10 @@
         <span>{{ sigla }} - {{ nomeUnidade }}</span>
         <span
             v-if="subprocesso"
-            :class="badgeClass(subprocesso.situacaoSubprocesso)"
+            :class="badgeClass(subprocesso.situacao)"
             class="badge fs-6"
             data-testid="cad-atividades__txt-badge-situacao"
-        >{{ situacaoLabel(subprocesso.situacaoSubprocesso) }}</span>
+        >{{ subprocesso.situacaoLabel || situacaoLabel(subprocesso.situacao) }}</span>
       </div>
     </div>
 
@@ -166,7 +166,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useSubprocessoResolver} from "@/composables/useSubprocessoResolver";
 import {
   type Atividade,
   type Conhecimento,
@@ -192,25 +191,22 @@ const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const feedbackStore = useFeedbackStore();
 
-useMapasStore();
+const mapasStore = useMapasStore();
 
 const {perfilSelecionado} = usePerfil();
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
-// Usando o novo composable
 const codProcessoRef = computed(() => Number(props.codProcesso));
-const siglaUnidadeRef = toRef(props, 'sigla');
 
-const {
-  nomeUnidade,
-  codSubprocesso,
-  codMapa,
-  subprocesso
-} = useSubprocessoResolver(codProcessoRef, siglaUnidadeRef);
+const codSubprocesso = ref<number | null>(null);
+const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
+const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+const nomeUnidade = computed(() => unidadesStore.unidade?.nome || "");
+const permissoes = computed(() => subprocesso.value?.permissoes || null);
 
 const atividades = computed({
   get: () => {
-    if (codSubprocesso.value === undefined) return [];
+    if (codSubprocesso.value === null) return [];
     return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value);
   },
   set: () => {
@@ -222,7 +218,6 @@ const isRevisao = computed(
     () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
 );
 
-const permissoes = ref<SubprocessoPermissoes | null>(null);
 const novaAtividade = ref("");
 
 // Modais
@@ -403,14 +398,16 @@ function scrollParaPrimeiroErro() {
 
 
 onMounted(async () => {
-  await unidadesStore.buscarUnidade(props.sigla);
-  await processosStore.buscarProcessoDetalhe(codProcessoRef.value);
-  if (codSubprocesso.value) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
-    permissoes.value = await subprocessoService.obterPermissoes(codSubprocesso.value);
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+      codProcessoRef.value,
+      props.sigla,
+  );
+
+  if (id) {
+    codSubprocesso.value = id;
+    await subprocessosStore.buscarContextoEdicao(id);
   } else {
-    console.error('[CadAtividades] ERRO: codSubprocesso está undefined!');
-    console.error('[CadAtividades] Não foi possível carregar atividades e permissões');
+    console.error('[CadAtividades] ERRO: Subprocesso não encontrado!');
   }
 });
 
@@ -432,7 +429,7 @@ async function disponibilizarCadastro() {
       ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-  if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
+  if (!sub || sub.situacao !== situacaoEsperada) {
     feedbackStore.show(
         "Ação não permitida",
         `Ação permitida apenas na situação: "${situacaoEsperada}".`,

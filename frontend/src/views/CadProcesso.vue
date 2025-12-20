@@ -212,6 +212,7 @@ import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import * as processoService from "@/services/processoService";
+import {useFormErrors} from '@/composables/useFormErrors';
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -235,17 +236,26 @@ const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
 const feedbackStore = useFeedbackStore();
 
-const fieldErrors = ref({
-  descricao: '',
-  tipo: '',
-  dataLimite: '',
-  unidades: ''
-});
+const {errors: fieldErrors, setFromNormalizedError, clearErrors, hasErrors} = useFormErrors([
+  'descricao',
+  'tipo',
+  'dataLimite',
+  'unidades',
+  'dataLimiteEtapa1'
+]);
 
-watch(descricao, () => fieldErrors.value.descricao = '');
-watch(tipo, () => fieldErrors.value.tipo = '');
-watch(dataLimite, () => fieldErrors.value.dataLimite = '');
-watch(unidadesSelecionadas, () => fieldErrors.value.unidades = '');
+watch(descricao, () => {
+  fieldErrors.value.descricao = '';
+});
+watch(tipo, () => {
+  fieldErrors.value.tipo = '';
+});
+watch(dataLimite, () => {
+  fieldErrors.value.dataLimite = '';
+});
+watch(unidadesSelecionadas, () => {
+  fieldErrors.value.unidades = '';
+});
 
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
@@ -332,49 +342,34 @@ function limparCampos() {
   tipo.value = "MAPEAMENTO";
   dataLimite.value = "";
   unidadesSelecionadas.value = [];
-  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  clearErrors();
 }
 
 function handleApiErrors(error: any, title: string, defaultMsg: string) {
-  // Limpa erros anteriores e esconde alerta
-  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  clearErrors();
   alertState.value.show = false;
-
-  let msg = defaultMsg;
-  let genericErrors: string[] = []; 
-  let hasMappedFieldErrors = false;
 
   const lastError = processosStore.lastError;
 
   if (lastError) {
-    msg = lastError.message; 
-    if (lastError.subErrors && lastError.subErrors.length > 0) {
-      lastError.subErrors.forEach(e => {
-        const message = e.message || 'Inválido';
-        if (e.field === 'descricao') { fieldErrors.value.descricao = message; hasMappedFieldErrors = true; }
-        else if (e.field === 'tipo') { fieldErrors.value.tipo = message; hasMappedFieldErrors = true; }
-        else if (e.field === 'dataLimiteEtapa1') { fieldErrors.value.dataLimite = message; hasMappedFieldErrors = true; }
-        else if (e.field === 'unidades') { fieldErrors.value.unidades = message; hasMappedFieldErrors = true; }
-        else genericErrors.push(message); 
-      });
+    setFromNormalizedError(lastError);
+    if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
+
+    const hasFieldErrors = hasErrors();
+    const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message) || [];
+
+    if (!hasFieldErrors || genericErrors.length > 0) {
+      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors);
     }
   } else {
-    // Se não houver lastError (erro de runtime/network não capturado pelo store), mostra msg padrão
     mostrarAlerta('danger', title, defaultMsg, []);
     console.error(title + ":", error);
-    return;
-  }
-  
-  // Exibe alerta global APENAS se houver erros genéricos OU se não houve nenhum erro de campo mapeado (erro global puro)
-  if (genericErrors.length > 0 || !hasMappedFieldErrors) {
-    mostrarAlerta('danger', title, msg, genericErrors); 
   }
   console.error(title + ":", error);
 }
 
 async function salvarProcesso() {
-  // Limpa erros antes de tentar salvar
-  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  clearErrors();
   isLoading.value = true;
   
   // Validações agora são feitas no backend via Bean Validation
@@ -421,7 +416,7 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   // Limpa erros
-  fieldErrors.value = { descricao: '', tipo: '', dataLimite: '', unidades: '' };
+  clearErrors();
   isLoading.value = true;
 
   let codigoProcesso = processoEditando.value?.codigo;

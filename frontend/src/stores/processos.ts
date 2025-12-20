@@ -61,6 +61,18 @@ export const useProcessosStore = defineStore("processos", () => {
         }
     }
 
+    async function buscarContextoCompleto(idProcesso: number) {
+        lastError.value = null;
+        try {
+            const data = await processoService.buscarContextoCompleto(idProcesso);
+            processoDetalhe.value = data.processo;
+            subprocessosElegiveis.value = data.elegiveis;
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
+    }
+
     async function buscarProcessosFinalizados() {
         lastError.value = null;
         try {
@@ -242,6 +254,7 @@ export const useProcessosStore = defineStore("processos", () => {
         buscarProcessosFinalizados,
         buscarProcessoDetalhe,
         buscarSubprocessosElegiveis,
+        buscarContextoCompleto,
         criarProcesso,
         atualizarProcesso,
         removerProcesso,

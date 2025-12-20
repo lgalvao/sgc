@@ -115,3 +115,8 @@ export async function buscarSubprocessos(
     const response = await apiClient.get(`/processos/${codProcesso}/subprocessos`);
     return response.data;
 }
+
+export async function buscarContextoCompleto(codProcesso: number) {
+    const response = await apiClient.get(`/processos/${codProcesso}/contexto-completo`);
+    return response.data;
+}

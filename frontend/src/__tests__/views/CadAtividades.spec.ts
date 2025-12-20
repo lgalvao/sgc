@@ -25,6 +25,7 @@ vi.mock('vue-router', async (importOriginal) => {
 
 vi.mock('@/services/subprocessoService', () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     obterPermissoes: vi.fn(),
     validarCadastro: vi.fn(),
@@ -85,6 +86,13 @@ describe('CadAtividades.vue', () => {
             ],
             resumoSubprocessos: []
         } as any);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({ codigo: 100 } as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            unidade: { codigo: 10, sigla: 'TIC', nome: 'Tecnologia' },
+            subprocesso: { codigo: 100, situacao: 'EM_ANDAMENTO', permissoes: { podeEditarMapa: true, podeDisponibilizarCadastro: true } },
+            mapa: { codigo: 200, competencias: [] },
+            atividadesDisponiveis: []
+        } as any);
     });
 
     const mountComponent = (initialState = {}) => {
@@ -99,7 +107,11 @@ describe('CadAtividades.vue', () => {
                     stubActions: false, // We'll mock store actions individually if needed
                     initialState: {
                         perfil: {
-                            perfilSelecionado: Perfil.CHEFE
+                            perfilSelecionado: Perfil.CHEFE,
+                            unidadeSelecionada: 10,
+                            perfisUnidades: [
+                                { perfil: Perfil.CHEFE, unidade: { codigo: 10, sigla: 'TIC' } }
+                            ]
                         },
                         ...initialState
                     }
@@ -122,30 +134,19 @@ describe('CadAtividades.vue', () => {
     };
 
     it('deve carregar dados e exibir atividades', async () => {
-        // Mock resolver to return valid IDs
-        // Note: useSubprocessoResolver uses useProcessosStore().processoDetalhe logic.
-        // We need to setup store state correctly for the resolver to work.
-        const initialState = {
-            processos: {
-                processoDetalhe: {
-                    codigo: 1,
-                    unidades: [
-                        { sigla: 'TIC', codSubprocesso: 100, mapaCodigo: 200 } // Resolver needs this structure
-                    ]
-                }
-            }
-        };
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            unidade: { codigo: 10, sigla: 'TIC', nome: 'Tecnologia' },
+            subprocesso: { codigo: 100, situacao: 'EM_ANDAMENTO', permissoes: { podeEditarMapa: true } },
+            mapa: { codigo: 200, competencias: [] },
+            atividadesDisponiveis: [{ codigo: 1, descricao: 'Atv 1', conhecimentos: [] }]
+        } as any);
 
-        const wrapper = mountComponent(initialState);
-        const atividadesStore = useAtividadesStore();
-        atividadesStore.buscarAtividadesParaSubprocesso = vi.fn().mockResolvedValue(undefined);
-        atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([
-            { codigo: 1, descricao: 'Atv 1' }
-        ]);
-
+        const wrapper = mountComponent();
         await flushPromises(); // Wait for onMounted
 
-        expect(atividadesStore.buscarAtividadesParaSubprocesso).toHaveBeenCalledWith(100);
+        // Check if context was fetched
+        expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(100, 'CHEFE', 10);
+        // The component uses stored activities
         expect(wrapper.findAllComponents(AtividadeItemStub)).toHaveLength(1);
     });
 
@@ -224,7 +225,7 @@ describe('CadAtividades.vue', () => {
 
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
             valido: false,
-            erros: [{ atividadeId: 1, mensagem: 'Erro teste' }]
+            erros: [{ atividadeId: 1, mensagem: 'Erro teste', tipo: 'ERRO' }]
         });
 
         const btnDisponibilizar = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
@@ -250,9 +251,7 @@ describe('CadAtividades.vue', () => {
 
         const wrapper = mountComponent();
         const atividadesStore = useAtividadesStore();
-        atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([
-            { codigo: 1, descricao: 'Atv 1' }
-        ]);
+        atividadesStore.atividadesPorSubprocesso.set(100, [{ codigo: 1, descricao: 'Atv 1' } as any]);
         await flushPromises();
 
         // Trigger remove

@@ -122,6 +122,7 @@ import CompetenciaCard from "@/components/CompetenciaCard.vue";
 import CriarCompetenciaModal from "@/components/CriarCompetenciaModal.vue";
 import DisponibilizarMapaModal from "@/components/DisponibilizarMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {useFormErrors} from '@/composables/useFormErrors';
 import {situacaoLabel} from "@/utils";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
@@ -162,7 +163,6 @@ const unidade = computed(() => unidadesStore.unidade);
 const codSubprocesso = ref<number | null>(null);
 
 onMounted(async () => {
-  await unidadesStore.buscarUnidade(siglaUnidade.value);
   const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       codProcesso.value,
       siglaUnidade.value,
@@ -170,11 +170,7 @@ onMounted(async () => {
 
   if (id) {
     codSubprocesso.value = id;
-    await Promise.all([
-      mapasStore.buscarMapaCompleto(id),
-      subprocessosStore.buscarSubprocessoDetalhe(id),
-      atividadesStore.buscarAtividadesParaSubprocesso(id),
-    ]);
+    await subprocessosStore.buscarContextoEdicao(id);
   }
 });
 
@@ -194,57 +190,32 @@ const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
 
-const fieldErrors = ref({
-  descricao: '',
-  atividades: '',
-  dataLimite: '',
-  observacoes: '',
-  generic: ''
-});
+const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
+  'descricao',
+  'atividades',
+  'atividadesIds',
+  'atividadesAssociadas',
+  'dataLimite',
+  'observacoes',
+  'generic'
+]);
 
-function handleApiErrors(error: any, defaultMsg: string) {
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
-
-  let msg = defaultMsg;
-  let genericErrors: string[] = [];
-  
-  const lastError = mapasStore.lastError;
-
-  if (lastError) {
-    msg = lastError.message;
-    if (lastError.subErrors && lastError.subErrors.length > 0) {
-      lastError.subErrors.forEach(e => {
-        const message = e.message || 'Inválido';
-        if (e.field === 'descricao') fieldErrors.value.descricao = message;
-        else if (e.field === 'atividadesAssociadas' || e.field === 'atividades') fieldErrors.value.atividades = message;
-        else if (e.field === 'dataLimite') fieldErrors.value.dataLimite = message;
-        else if (e.field === 'observacoes') fieldErrors.value.observacoes = message;
-        else genericErrors.push(message);
-      });
-    }
-  } else {
-    console.error(defaultMsg, error);
-    fieldErrors.value.generic = defaultMsg;
-    return;
-  }
-  
-  if (genericErrors.length > 0) {
-    fieldErrors.value.generic = genericErrors.join('; ');
-  } else if (!fieldErrors.value.descricao && !fieldErrors.value.atividades && !fieldErrors.value.dataLimite && !fieldErrors.value.observacoes) {
-    fieldErrors.value.generic = msg;
-  }
+function handleErrors(store: any) {
+  setFromNormalizedError(store.lastError);
+  if (fieldErrors.value.atividadesAssociadas) fieldErrors.value.atividades = fieldErrors.value.atividadesAssociadas;
+  if (fieldErrors.value.atividadesIds) fieldErrors.value.atividades = fieldErrors.value.atividadesIds;
 }
 
 function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
-  mapasStore.clearError(); 
-  
+  clearErrors();
+  mapasStore.clearError();
+
   if (competenciaParaEditar) {
     competenciaSendoEditada.value = competenciaParaEditar;
   } else {
@@ -259,7 +230,7 @@ function abrirModalCriarLimpo() {
 
 function fecharModalCriarNovaCompetencia() {
   mostrarModalCriarNovaCompetencia.value = false;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 
 function iniciarEdicaoCompetencia(competencia: Competencia) {
@@ -281,14 +252,11 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
       await mapasStore.adicionarCompetencia(codSubprocesso.value as number, competencia);
     }
 
-    await Promise.all([
-      mapasStore.buscarMapaCompleto(codSubprocesso.value as number),
-      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number),
-    ]);
+    await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
 
     fecharModalCriarNovaCompetencia();
   } catch (error) {
-    handleApiErrors(error, "Erro ao salvar competência");
+    handleErrors(mapasStore);
   }
 }
 
@@ -307,10 +275,10 @@ async function confirmarExclusaoCompetencia() {
           codSubprocesso.value as number,
           competenciaParaExcluir.value.codigo,
       );
-      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value as number);
+      await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
       fecharModalExcluirCompetencia();
     } catch (error) {
-      handleApiErrors(error, "Erro ao remover competência");
+      handleErrors(mapasStore);
     }
   }
 }
@@ -347,14 +315,14 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
   } catch (error) {
-    handleApiErrors(error, "Erro ao disponibilizar mapa");
+    handleErrors(mapasStore);
   }
 }
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
   notificacaoDisponibilizacao.value = "";
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 </script>
 
