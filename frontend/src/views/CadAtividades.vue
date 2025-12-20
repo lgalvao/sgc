@@ -238,15 +238,12 @@ async function adicionarAtividade() {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    const status = await atividadesStore.adicionarAtividade(
+    await atividadesStore.adicionarAtividade(
         codSubprocesso.value,
         codMapa.value,
         request,
     );
     novaAtividade.value = "";
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
   }
 }
 
@@ -263,23 +260,17 @@ async function confirmarRemocao() {
 
   if (tipo === 'atividade') {
     const atividadeRemovida = atividades.value[index];
-    const status = await atividadesStore.removerAtividade(
+    await atividadesStore.removerAtividade(
         codSubprocesso.value,
         atividadeRemovida.codigo,
     );
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
   } else if (tipo === 'conhecimento' && idConhecimento !== undefined) {
     const atividade = atividades.value[index];
-    const status = await atividadesStore.removerConhecimento(
+    await atividadesStore.removerConhecimento(
         codSubprocesso.value,
         atividade.codigo,
         idConhecimento,
     );
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
   }
 }
 
@@ -290,14 +281,11 @@ async function adicionarConhecimento(idx: number, descricao: string) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
-    const status = await atividadesStore.adicionarConhecimento(
+    await atividadesStore.adicionarConhecimento(
         codSubprocesso.value,
         atividade.codigo,
         request,
     );
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
   }
 }
 
@@ -315,15 +303,12 @@ async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: num
       id: conhecimentoId,
       descricao: descricao.trim(),
     };
-    const status = await atividadesStore.atualizarConhecimento(
+    await atividadesStore.atualizarConhecimento(
         codSubprocesso.value,
         atividadeId,
         conhecimentoId,
         conhecimentoAtualizado,
     );
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
   }
 }
 
@@ -335,14 +320,11 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
         ...atividadeOriginal,
         descricao: descricao.trim(),
       };
-      const status = await atividadesStore.atualizarAtividade(
+      await atividadesStore.atualizarAtividade(
           codSubprocesso.value,
           id,
           atividadeAtualizada,
       );
-      if (status) {
-        processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-      }
     }
   }
 }
@@ -351,8 +333,6 @@ async function handleImportAtividades() {
   mostrarModalImportar.value = false;
   if (codSubprocesso.value) {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
-    const status = await subprocessoService.obterStatus(codSubprocesso.value);
-    processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
   }
   feedbackStore.show(
       "Importação Concluída",

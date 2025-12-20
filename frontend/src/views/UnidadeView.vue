@@ -1,5 +1,15 @@
 <template>
   <BContainer class="mt-4">
+    <BAlert
+        v-if="unidadesStore.lastError"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="unidadesStore.clearError()"
+    >
+      {{ unidadesStore.lastError.message }}
+    </BAlert>
+
     <BCard
         v-if="unidadeComResponsavelDinamico"
         class="mb-4"
@@ -67,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
