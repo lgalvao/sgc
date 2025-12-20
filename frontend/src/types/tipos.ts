@@ -479,3 +479,10 @@ export interface ImpactoMapa {
     atividadesAlteradas: AtividadeImpactada[];
     competenciasImpactadas: CompetenciaImpactada[];
 }
+
+export interface ContextoEdicao {
+    unidade: Unidade;
+    subprocesso: SubprocessoDetalhe;
+    mapa: MapaCompleto | null;
+    atividadesDisponiveis: Atividade[];
+}

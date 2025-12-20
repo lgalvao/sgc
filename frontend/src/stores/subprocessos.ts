@@ -13,6 +13,7 @@ import {
 import {
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    obterContextoEdicao,
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
@@ -126,6 +127,16 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
     }
 
+    async function buscarContextoEdicao(codSubprocesso: number) {
+        lastError.value = null;
+        try {
+            return await obterContextoEdicao(codSubprocesso);
+        } catch (error) {
+            lastError.value = normalizeError(error);
+            throw error;
+        }
+    }
+
     return {
         subprocessoDetalhe,
         lastError,
@@ -133,6 +144,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         alterarDataLimiteSubprocesso,
         buscarSubprocessoDetalhe,
         buscarSubprocessoPorProcessoEUnidade,
+        buscarContextoEdicao,
         disponibilizarCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubrocesso),

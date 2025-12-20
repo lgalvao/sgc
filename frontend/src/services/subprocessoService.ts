@@ -1,6 +1,13 @@
 import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import type {Atividade, Competencia, MapaCompleto, SubprocessoPermissoes, ValidacaoCadastro} from "@/types/tipos";
+import type {
+    Atividade,
+    Competencia,
+    ContextoEdicao,
+    MapaCompleto,
+    SubprocessoPermissoes,
+    ValidacaoCadastro
+} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
@@ -58,6 +65,11 @@ export async function buscarSubprocessoPorProcessoEUnidade(
     const response = await apiClient.get("/subprocessos/buscar", {
         params: {codProcesso, siglaUnidade},
     });
+    return response.data;
+}
+
+export async function obterContextoEdicao(codSubprocesso: number): Promise<ContextoEdicao> {
+    const response = await apiClient.get<ContextoEdicao>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
     return response.data;
 }
 

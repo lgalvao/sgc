@@ -128,6 +128,8 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
+import {useFormErrors} from "@/composables/useFormErrors";
+import {normalizeError} from "@/utils/apiError";
 
 const route = useRoute();
 const router = useRouter();
@@ -162,19 +164,23 @@ const unidade = computed(() => unidadesStore.unidade);
 const codSubprocesso = ref<number | null>(null);
 
 onMounted(async () => {
-  await unidadesStore.buscarUnidade(siglaUnidade.value);
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-      codProcesso.value,
-      siglaUnidade.value,
-  );
+  try {
+    const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+        codProcesso.value,
+        siglaUnidade.value,
+    );
 
-  if (id) {
-    codSubprocesso.value = id;
-    await Promise.all([
-      mapasStore.buscarMapaCompleto(id),
-      subprocessosStore.buscarSubprocessoDetalhe(id),
-      atividadesStore.buscarAtividadesParaSubprocesso(id),
-    ]);
+    if (id) {
+      codSubprocesso.value = id;
+      const contexto = await subprocessosStore.buscarContextoEdicao(id);
+
+      unidadesStore.unidade = contexto.unidade;
+      subprocessosStore.subprocessoDetalhe = contexto.subprocesso;
+      mapasStore.mapaCompleto = contexto.mapa;
+      atividadesStore.atividadesPorSubprocesso.set(id, contexto.atividadesDisponiveis);
+    }
+  } catch (e) {
+    console.error("Erro ao carregar contexto de edição", e);
   }
 });
 
@@ -194,55 +200,42 @@ const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
 
-const fieldErrors = ref({
-  descricao: '',
-  atividades: '',
-  dataLimite: '',
-  observacoes: '',
-  generic: ''
-});
+const { errors: fieldErrors, setFromNormalizedError, clearErrors } = useFormErrors(['descricao', 'atividades', 'dataLimite', 'observacoes', 'generic']);
 
 function handleApiErrors(error: any, defaultMsg: string) {
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  const normalized = normalizeError(error);
+  setFromNormalizedError(normalized);
 
-  let msg = defaultMsg;
-  let genericErrors: string[] = [];
-  
-  const lastError = mapasStore.lastError;
-
-  if (lastError) {
-    msg = lastError.message;
-    if (lastError.subErrors && lastError.subErrors.length > 0) {
-      lastError.subErrors.forEach(e => {
-        const message = e.message || 'Inválido';
-        if (e.field === 'descricao') fieldErrors.value.descricao = message;
-        else if (e.field === 'atividadesAssociadas' || e.field === 'atividades') fieldErrors.value.atividades = message;
-        else if (e.field === 'dataLimite') fieldErrors.value.dataLimite = message;
-        else if (e.field === 'observacoes') fieldErrors.value.observacoes = message;
-        else genericErrors.push(message);
-      });
+  // Custom handling for aliases and generic errors
+  if (normalized.subErrors) {
+    const genericErrors: string[] = [];
+    normalized.subErrors.forEach(e => {
+      if (e.field === 'atividadesAssociadas') fieldErrors.value.atividades = e.message || 'Inválido';
+      else if (!['descricao', 'atividades', 'dataLimite', 'observacoes'].includes(e.field || '')) {
+        genericErrors.push(e.message || 'Inválido');
+      }
+    });
+    if (genericErrors.length > 0) {
+      fieldErrors.value.generic = genericErrors.join('; ');
     }
-  } else {
-    console.error(defaultMsg, error);
-    fieldErrors.value.generic = defaultMsg;
-    return;
   }
-  
-  if (genericErrors.length > 0) {
-    fieldErrors.value.generic = genericErrors.join('; ');
-  } else if (!fieldErrors.value.descricao && !fieldErrors.value.atividades && !fieldErrors.value.dataLimite && !fieldErrors.value.observacoes) {
-    fieldErrors.value.generic = msg;
+
+  // If no specific field errors, use the main message
+  const hasFieldErrors = fieldErrors.value.descricao || fieldErrors.value.atividades || fieldErrors.value.dataLimite || fieldErrors.value.observacoes || fieldErrors.value.generic;
+
+  if (!hasFieldErrors) {
+    fieldErrors.value.generic = normalized.message || defaultMsg;
   }
 }
 
 function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
   mapasStore.clearError(); 
   
   if (competenciaParaEditar) {
@@ -259,7 +252,7 @@ function abrirModalCriarLimpo() {
 
 function fecharModalCriarNovaCompetencia() {
   mostrarModalCriarNovaCompetencia.value = false;
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 
 function iniciarEdicaoCompetencia(competencia: Competencia) {
@@ -354,7 +347,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
   notificacaoDisponibilizacao.value = "";
-  fieldErrors.value = { descricao: '', atividades: '', dataLimite: '', observacoes: '', generic: '' };
+  clearErrors();
 }
 </script>
 
