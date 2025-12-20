@@ -1,4 +1,4 @@
-import { mount, type VueWrapper, RouterLinkStub } from "@vue/test-utils";
+import { type VueWrapper, RouterLinkStub } from '@vue/test-utils';
 import { createTestingPinia } from "@pinia/testing";
 import { vi, afterEach } from "vitest";
 
@@ -13,9 +13,7 @@ export function setupComponentTest(): ComponentTestContext {
     const context: ComponentTestContext = { wrapper: undefined };
 
     afterEach(() => {
-        if (context.wrapper) {
-            context.wrapper.unmount();
-        }
+        if (context.wrapper) { context.wrapper.unmount(); }
     });
 
     return context;

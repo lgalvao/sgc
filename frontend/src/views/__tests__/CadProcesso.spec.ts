@@ -138,16 +138,6 @@ describe('CadProcesso.vue', () => {
     });
 
     it('loads process data for editing', async () => {
-        mockRoute.query = { codProcesso: '123' };
-        const mockProcesso = {
-            codigo: 123,
-            descricao: 'Processo Teste',
-            tipo: 'MAPEAMENTO',
-            situacao: 'CRIADO',
-            dataLimite: '2023-12-31T00:00:00',
-            unidades: [{ codUnidade: 1 }]
-        };
-
         const { processosStore } = createWrapper();
 
         // Mock implementation inside the test setup doesn't work well with onMounted if not set before mount
@@ -173,11 +163,6 @@ describe('CadProcesso.vue', () => {
     });
 
     it('redirects if process is not editable', async () => {
-        mockRoute.query = { codProcesso: '123' };
-        const mockProcesso = {
-            codigo: 123,
-            situacao: 'EM_ANDAMENTO' // Not CRIADO
-        };
 
         // We use initialState to simulate the store already having the data, or we mock the action to set it.
         // In the component, onMounted calls `buscarProcessoDetalhe`.
@@ -187,7 +172,6 @@ describe('CadProcesso.vue', () => {
         // Or we can just set the state initially.
 
         const { processosStore } = createWrapper({
-            processos: { processoDetalhe: mockProcesso }
         });
 
         // The component calls `buscarProcessoDetalhe`.

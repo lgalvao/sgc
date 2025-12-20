@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { normalizeError, isAxiosError, notifyError, shouldNotifyGlobally, existsOrFalse, getOrNull, type NormalizedError } from "../apiError";
+import { normalizeError, notifyError, shouldNotifyGlobally, existsOrFalse, getOrNull, type NormalizedError } from "../apiError";
 import { useFeedbackStore } from "@/stores/feedback";
 import { createPinia, setActivePinia } from "pinia";
 
