@@ -54,11 +54,12 @@ public class SubprocessoCrudController {
 
     /**
      * Lista todos os subprocessos.
+     * <p>Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @return Uma {@link List} de {@link SubprocessoDto}.
      */
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoDto> listar() {
         return subprocessoDtoService.listar();
     }

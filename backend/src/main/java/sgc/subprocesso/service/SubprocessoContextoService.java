@@ -10,6 +10,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Perfil;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -32,11 +33,12 @@ public class SubprocessoContextoService {
 
         // 2. Obter Unidade
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
-        UnidadeDto unidadeDto = sgrhService.buscarUnidadePorSigla(siglaUnidade);
+        UnidadeDto unidadeDto = sgrhService.buscarUnidadePorSigla(siglaUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
         // 3. Obter Mapa Completo (se existir)
         MapaCompletoDto mapaDto = null;
-        Subprocesso subprocesso = subprocessoConsultaService.buscarPorId(codSubprocesso);
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocesso(codSubprocesso);
         if (subprocesso.getMapa() != null) {
             mapaDto = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
         }
