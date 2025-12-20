@@ -266,7 +266,6 @@ describe('ProcessoView.vue', () => {
              },
              stubActions: false // Allow action to be called
         });
-        const processosStore = useProcessosStore();
         vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({} as any);
 
@@ -295,7 +294,6 @@ describe('ProcessoView.vue', () => {
              },
              stubActions: false
         });
-        const processosStore = useProcessosStore();
         vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error('Fail'));
 
         const modalFinalizacao = wrapper.findComponent(ModalFinalizacaoStub);
@@ -323,7 +321,6 @@ describe('ProcessoView.vue', () => {
              },
              stubActions: false
         });
-        const processosStore = useProcessosStore();
         vi.mocked(processoService.processarAcaoEmBloco).mockResolvedValue(undefined);
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({} as any);
 

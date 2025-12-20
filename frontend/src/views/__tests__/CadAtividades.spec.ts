@@ -160,6 +160,16 @@ describe("CadAtividades.vue", () => {
                             analises: {
                                 analisesPorSubprocesso: new Map(),
                             },
+                            perfil: {
+                                perfilSelecionado: Perfil.CHEFE,
+                                unidadeSelecionada: 1,
+                                perfisUnidades: [
+                                    {
+                                        perfil: Perfil.CHEFE,
+                                        unidade: {codigo: 1, sigla: "TESTE"},
+                                    },
+                                ],
+                            },
                             ...customState,
                         },
                     }),
@@ -344,10 +354,16 @@ describe("CadAtividades.vue", () => {
             }
         } as any);
 
-        await wrapper
-            .find('[data-testid="btn-remover-atividade"]')
-            .trigger("click");
-        expect(window.confirm).toHaveBeenCalled();
+        const btnRemover = wrapper.find('[data-testid="btn-remover-atividade"]');
+        expect(btnRemover.exists()).toBe(true);
+        await btnRemover.trigger("click");
+
+        // Modal de confirmação
+        const modal = wrapper.findComponent({name: "ModalConfirmacao"});
+        expect(modal.exists()).toBe(true);
+        await modal.vm.$emit("confirmar");
+        await flushPromises();
+
         expect(atividadeService.excluirAtividade).toHaveBeenCalledWith(1);
     });
 
@@ -409,10 +425,16 @@ describe("CadAtividades.vue", () => {
             }
         } as any);
 
-        await wrapper
-            .find('[data-testid="btn-remover-conhecimento"]')
-            .trigger("click");
-        expect(window.confirm).toHaveBeenCalled();
+        const btnRemover = wrapper.find('[data-testid="btn-remover-conhecimento"]');
+        expect(btnRemover.exists()).toBe(true);
+        await btnRemover.trigger("click");
+
+        // Modal de confirmação
+        const modal = wrapper.findComponent({name: "ModalConfirmacao"});
+        expect(modal.exists()).toBe(true);
+        await modal.vm.$emit("confirmar");
+        await flushPromises();
+
         expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 101);
     });
 
@@ -541,7 +563,7 @@ describe("CadAtividades.vue", () => {
         expect(atividadeService.atualizarConhecimento).toHaveBeenCalledWith(
             1,
             101,
-            expect.objectContaining({descricao: "Conhecimento Editado"}),
+            expect.objectContaining({descricao: "Conhecimento Editado", id: 101}),
         );
     });
 

@@ -174,7 +174,6 @@ import {
   type ErroValidacao,
   Perfil,
   SituacaoSubprocesso,
-  type SubprocessoPermissoes,
   TipoProcesso,
 } from "@/types/tipos";
 import * as subprocessoService from "@/services/subprocessoService";

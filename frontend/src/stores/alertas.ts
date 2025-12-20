@@ -4,7 +4,6 @@ import type {Page} from "@/services/painelService";
 import type {Alerta} from "@/types/tipos";
 import * as alertaService from "../services/alertaService";
 import * as painelService from "../services/painelService";
-import {usePerfilStore} from "./perfil";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 export const useAlertasStore = defineStore("alertas", () => {
