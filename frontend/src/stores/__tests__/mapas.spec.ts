@@ -199,33 +199,6 @@ describe("useMapasStore", () => {
             expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
-        it("deve recarregar mapa se competencia retornada não tiver ID (problema de sincronia)", async () => {
-             const competencia = {
-                descricao: "Nova Competencia",
-                codigo: 0,
-                atividadesAssociadas: [],
-            };
-            // Mock retorna competencia com ID 0
-            const mockResponseInvalido: MapaCompleto = {
-                codigo: 1,
-                subprocessoCodigo: 1,
-                observacoes: "teste",
-                competencias: [
-                    { codigo: 0, descricao: "Nova", atividadesAssociadas: [] },
-                ],
-                situacao: "EM_ANDAMENTO",
-            };
-
-            vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(mockResponseInvalido);
-
-            // Mock da recarga
-            vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockResponseInvalido);
-
-            await context.store.adicionarCompetencia(codSubrocesso, competencia);
-
-            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
-        });
-
         it("deve lançar erro em caso de falha", async () => {
             const competencia = {
                 descricao: "Nova Competencia",

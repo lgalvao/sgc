@@ -257,7 +257,7 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
     await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
 
     fecharModalCriarNovaCompetencia();
-  } catch (error) {
+  } catch (_) {
     handleErrors(mapasStore);
   }
 }
@@ -279,7 +279,7 @@ async function confirmarExclusaoCompetencia() {
       );
       await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
       fecharModalExcluirCompetencia();
-    } catch (error) {
+    } catch (_) {
       handleErrors(mapasStore);
     }
   }
@@ -316,7 +316,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
     await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
-  } catch (error) {
+  } catch (_) {
     handleErrors(mapasStore);
   }
 }

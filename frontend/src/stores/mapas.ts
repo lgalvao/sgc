@@ -74,10 +74,6 @@ export const useMapasStore = defineStore("mapas", () => {
                 codSubrocesso,
                 competencia,
             );
-            // Garantir que o mapa foi recarregado com códigos corretos
-            if (mapaCompleto.value && mapaCompleto.value.competencias.some(c => !c.codigo || c.codigo === 0)) {
-                await buscarMapaCompleto(codSubrocesso);
-            }
         } catch (error) {
             lastError.value = normalizeError(error);
             throw error;
