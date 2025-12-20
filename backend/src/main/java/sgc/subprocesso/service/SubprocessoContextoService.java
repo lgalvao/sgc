@@ -3,6 +3,7 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.service.MapaService;
 import sgc.sgrh.SgrhService;
@@ -32,11 +33,12 @@ public class SubprocessoContextoService {
 
         // 2. Obter Unidade
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
-        UnidadeDto unidadeDto = sgrhService.buscarUnidadePorSigla(siglaUnidade);
+        UnidadeDto unidadeDto = sgrhService.buscarUnidadePorSigla(siglaUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
         // 3. Obter Mapa Completo (se existir)
         MapaCompletoDto mapaDto = null;
-        Subprocesso subprocesso = subprocessoConsultaService.buscarPorId(codSubprocesso);
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocesso(codSubprocesso);
         if (subprocesso.getMapa() != null) {
             mapaDto = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
         }
