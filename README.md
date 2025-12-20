@@ -20,7 +20,7 @@ O SGC permite:
 - Spring Boot 4
 - Hibernate 7
 - Lombok e MapStruct
-- PostgreSQL (produção) / H2 (desenvolvimento e testes)
+- Oracle (produção) / H2 (desenvolvimento e testes)
 - Arquitetura: Modular Monolith em camadas, estruturada por domínio
 
 **Frontend:**
