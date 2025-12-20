@@ -13,12 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sgc.sgrh.SgrhService;
 import sgc.sgrh.autenticacao.GerenciadorJwt;
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 @Profile({"!test", "secure-test"})
@@ -27,9 +26,7 @@ import java.util.Optional;
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     @Lazy
-    private final UsuarioRepo usuarioRepo;
-    @Lazy
-    private final sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private final SgrhService sgrhService;
 
     @Override
     protected void doFilterInternal(
@@ -44,15 +41,9 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
             String jwtToken = authHeader.substring(7);
             
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
-                Optional<Usuario> usuarioOpt = usuarioRepo.findById(claims.tituloEleitoral());
+                Usuario usuario = sgrhService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
                 
-                if (usuarioOpt.isPresent()) {
-                    Usuario usuario = usuarioOpt.get();
-                    
-                    // Carregar atribuições do banco
-                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
-                    usuario.setAtribuicoes(new java.util.HashSet<>(atribuicoes));
-                    
+                if (usuario != null) {
                     log.debug("Carregando authorities para usuário {}", claims.tituloEleitoral());
                     var authorities = usuario.getAuthorities();
                     log.debug("Authorities carregadas: {}", authorities);

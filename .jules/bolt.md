@@ -9,3 +9,7 @@
 ## 2025-02-18 - Recursive Queries vs Single Fetch
 **Learning:** Replacing recursive N+1 queries with a single `findAll` (or `JOIN FETCH`) plus in-memory processing is a significant performance win for hierarchical data, provided the dataset fits in memory (e.g., Org Charts).
 **Action:** Look for recursive logic in service methods and replace with "fetch-all + map" pattern.
+
+## 2024-05-22 - N+1 fix in Usuario
+**Learning:** `FetchType.EAGER` on `OneToMany` collections is a silent performance killer, especially on frequently loaded entities like `Usuario`. Spring Data JPA finders (like `findByUnidadeLotacaoCodigo`) do not join these collections by default, leading to N+1 queries.
+**Action:** Audit all `FetchType.EAGER` usages. When changing to `LAZY`, ensure that specialized methods (like authentication) explicitly initialize the collection within a transaction.

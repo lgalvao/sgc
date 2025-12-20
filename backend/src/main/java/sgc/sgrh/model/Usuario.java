@@ -47,7 +47,7 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "unidade_comp_codigo")
     private Unidade unidadeCompetencia;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new java.util.HashSet<>();
 
     public Usuario(
