@@ -3,6 +3,7 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.service.MapaService;
 import sgc.sgrh.SgrhService;
