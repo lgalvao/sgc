@@ -140,11 +140,11 @@ public class SubprocessoDtoService {
 
                 List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
                 if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
-                        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+                        List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
                         if (atividades == null) atividades = emptyList();
 
                         for (Atividade a : atividades) {
-                                List<Conhecimento> ks = repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
+                                List<Conhecimento> ks = a.getConhecimentos();
                                 List<ConhecimentoDto> ksDto = ks == null ? emptyList() : ks.stream().map(conhecimentoMapper::toDto).toList();
 
                                 atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
@@ -237,7 +237,7 @@ public class SubprocessoDtoService {
                         .build();
                 }
 
-                List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+                List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
 
                 if (atividades == null || atividades.isEmpty()) {
                         erros.add(ErroValidacaoDto.builder()
@@ -247,7 +247,7 @@ public class SubprocessoDtoService {
                 } else {
                         for (Atividade atividade : atividades) {
                                 // Valida se tem conhecimentos
-                                long qtdConhecimentos = repositorioConhecimento.countByAtividadeCodigo(atividade.getCodigo());
+                                long qtdConhecimentos = atividade.getConhecimentos() == null ? 0 : atividade.getConhecimentos().size();
                                 if (qtdConhecimentos == 0) {
                                         erros.add(ErroValidacaoDto.builder()
                                                         .tipo("ATIVIDADE_SEM_CONHECIMENTO")

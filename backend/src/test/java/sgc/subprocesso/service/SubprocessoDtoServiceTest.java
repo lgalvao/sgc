@@ -350,11 +350,10 @@ class SubprocessoDtoServiceTest {
 
         Atividade ativ = new Atividade();
         ativ.setCodigo(10L);
+        ativ.setConhecimentos(List.of(new Conhecimento()));
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(atividadeRepo.findByMapaCodigo(100L)).thenReturn(List.of(ativ));
-        when(repositorioConhecimento.findByAtividadeCodigo(10L))
-                .thenReturn(List.of(new Conhecimento()));
+        when(atividadeRepo.findByMapaCodigoWithConhecimentos(100L)).thenReturn(List.of(ativ));
         when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
 
         var res = service.obterCadastro(id);
