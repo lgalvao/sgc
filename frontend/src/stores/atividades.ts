@@ -20,6 +20,10 @@ export const useAtividadesStore = defineStore("atividades", () => {
             },
     );
 
+    function setAtividadesParaSubprocesso(codSubprocesso: number, atividades: Atividade[]) {
+        atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
+    }
+
     async function buscarAtividadesParaSubprocesso(codSubrocesso: number) {
         lastError.value = null;
         try {
@@ -143,6 +147,7 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadesPorSubprocesso,
         lastError,
         obterAtividadesPorSubprocesso,
+        setAtividadesParaSubprocesso,
         buscarAtividadesParaSubprocesso,
         adicionarAtividade,
         removerAtividade,

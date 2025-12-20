@@ -20,6 +20,7 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.model.Subprocesso;
@@ -41,6 +42,25 @@ public class SubprocessoMapaController {
     private final SubprocessoConsultaService subprocessoConsultaService;
     private final SgrhService sgrhService;
     private final SubprocessoService subprocessoService;
+    private final SubprocessoContextoService subprocessoContextoService;
+
+    /**
+     * Obtém o contexto completo para edição de mapa (BFF).
+     *
+     * @param codigo         O código do subprocesso.
+     * @param perfil         O perfil do usuário (opcional).
+     * @param unidadeUsuario O código da unidade do usuário (opcional).
+     * @return O {@link ContextoEdicaoDto} com todos os dados necessários.
+     */
+    @GetMapping("/{codigo}/contexto-edicao")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
+    public ContextoEdicaoDto obterContextoEdicao(
+            @PathVariable Long codigo,
+            @RequestParam(required = false) sgc.sgrh.model.Perfil perfil,
+            @RequestParam(required = false) Long unidadeUsuario) {
+        return subprocessoContextoService.obterContextoEdicao(codigo, perfil, unidadeUsuario);
+    }
 
     /**
      * Analisa e retorna os impactos de uma revisão de mapa de competências.

@@ -51,6 +51,17 @@ export async function buscarSubprocessoDetalhe(
     return response.data;
 }
 
+export async function buscarContextoEdicao(
+    codSubprocesso: number,
+    perfil: string,
+    unidadeCodigo: number,
+) {
+    const response = await apiClient.get(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
+        params: {perfil, unidadeUsuario: unidadeCodigo},
+    });
+    return response.data;
+}
+
 export async function buscarSubprocessoPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,

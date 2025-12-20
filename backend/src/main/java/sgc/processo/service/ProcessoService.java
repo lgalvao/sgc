@@ -236,6 +236,18 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
+    public ProcessoContextoDto obterContextoCompleto(Long codigo) {
+        ProcessoDetalheDto detalhes = obterDetalhes(codigo);
+        List<SubprocessoElegivelDto> elegiveis = listarSubprocessosElegiveis(codigo);
+
+        return ProcessoContextoDto.builder()
+                .processo(detalhes)
+                .elegiveis(elegiveis)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)

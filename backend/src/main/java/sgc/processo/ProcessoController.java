@@ -134,6 +134,12 @@ public class ProcessoController {
         return ResponseEntity.ok(detalhes);
     }
 
+    @GetMapping("/{codigo}/contexto-completo")
+    @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
+    public ResponseEntity<ProcessoContextoDto> obterContextoCompleto(@PathVariable Long codigo) {
+        return ResponseEntity.ok(processoService.obterContextoCompleto(codigo));
+    }
+
     /**
      * Inicia um processo, disparando a criação dos subprocessos e notificações.
      *

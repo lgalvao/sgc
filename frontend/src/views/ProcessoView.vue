@@ -104,8 +104,7 @@ const codProcesso = computed(() =>
 
 onMounted(async () => {
   if (codProcesso.value) {
-    await processosStore.buscarProcessoDetalhe(codProcesso.value);
-    await processosStore.buscarSubprocessosElegiveis(codProcesso.value);
+    await processosStore.buscarContextoCompleto(codProcesso.value);
   }
 });
 
