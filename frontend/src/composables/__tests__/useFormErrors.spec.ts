@@ -10,6 +10,7 @@ describe('useFormErrors', () => {
   it('sets errors from normalized error', () => {
     const { errors, setFromNormalizedError } = useFormErrors(['field1']);
     const normalizedError = {
+      kind: 'validation' as const,
       message: 'Global error',
       subErrors: [{ field: 'field1', message: 'Error 1' }]
     };

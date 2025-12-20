@@ -736,3 +736,44 @@ export interface CriarProcessoRequest {
 - **TypeScript Docs:** <https://www.typescriptlang.org/>
 - **BootstrapVueNext:** <https://bootstrap-vue-next.github.io/>
 - **Vitest Docs:** <https://vitest.dev/>
+
+### 9.2. Tratamento de Erros de Formulário
+
+Para simplificar o mapeamento de erros de validação (API 422) para campos de formulário, utilize o composable `useFormErrors`.
+
+**Arquivo:** `@/composables/useFormErrors.ts`
+
+**Exemplo de Uso:**
+
+```typescript
+import { useFormErrors } from '@/composables/useFormErrors';
+
+// 1. Inicialize com os nomes dos campos que podem ter erro
+const { errors, setFromNormalizedError, clearErrors } = useFormErrors([
+  'descricao',
+  'dataLimite',
+  'atividades'
+]);
+
+async function salvar() {
+  clearErrors();
+  try {
+    await store.salvar(dados);
+  } catch (error) {
+    // 2. Mapeie automaticamente os erros do backend
+    setFromNormalizedError(store.lastError);
+  }
+}
+```
+
+**Template:**
+
+```vue
+<BFormInput
+  v-model="form.descricao"
+  :state="errors.descricao ? false : null"
+/>
+<BFormInvalidFeedback :state="errors.descricao ? false : null">
+  {{ errors.descricao }}
+</BFormInvalidFeedback>
+```

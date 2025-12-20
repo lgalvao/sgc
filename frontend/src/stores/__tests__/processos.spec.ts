@@ -353,18 +353,6 @@ describe("useProcessosStore", () => {
             });
         });
 
-        describe("atualizarStatusSubprocesso", () => {
-            it("deve atualizar o status de uma unidade no detalhe do processo", () => {
-                const unidade = {codSubprocesso: 100, situacaoSubprocesso: "OLD", situacaoLabel: "Old"};
-                context.store.processoDetalhe = {...MOCK_PROCESSO_DETALHE, unidades: [unidade]} as any;
-
-                context.store.atualizarStatusSubprocesso(100, {situacao: "NEW", situacaoLabel: "New"});
-
-                const unidadeAtualizada = context.store.processoDetalhe!.unidades.find((u: any) => u.codSubprocesso === 100);
-                expect(unidadeAtualizada!.situacaoSubprocesso).toBe("NEW");
-                expect(unidadeAtualizada!.situacaoLabel).toBe("New");
-            });
-        });
 
         describe("obterUnidadesDoProcesso (Getter)", () => {
             it("deve retornar unidades do processo correto", () => {

@@ -21,7 +21,7 @@ describe('CompetenciaCard.vue', () => {
         {
             codigo: 1,
             descricao: 'Atividade 1',
-            conhecimentos: [{ codigo: 1, descricao: 'Conhecimento 1' }]
+            conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }]
         },
         {
             codigo: 2,

@@ -19,12 +19,17 @@ vi.mock('vue-router', async (importOriginal) => {
   };
 });
 
-vi.mock('@/services/processoService', () => ({
-    obterDetalhesProcesso: vi.fn(),
-    buscarSubprocessosElegiveis: vi.fn(),
-    finalizarProcesso: vi.fn(),
-    processarAcaoEmBloco: vi.fn(),
-}));
+vi.mock('@/services/processoService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/processoService')>();
+    return {
+        ...actual,
+        obterDetalhesProcesso: vi.fn(),
+        buscarSubprocessosElegiveis: vi.fn(),
+        finalizarProcesso: vi.fn(),
+        processarAcaoEmBloco: vi.fn(),
+        buscarContextoCompleto: vi.fn(),
+    };
+});
 
 // Component Stubs
 const BAlertStub = {
@@ -84,6 +89,15 @@ describe('ProcessoView.vue', () => {
             resumoSubprocessos: []
         } as any);
         vi.mocked(processoService.buscarSubprocessosElegiveis).mockResolvedValue([]);
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
+            processo: {
+                codigo: 1,
+                descricao: 'Processo Teste',
+                unidades: [],
+                resumoSubprocessos: []
+            },
+            elegiveis: []
+        } as any);
     });
 
     const mountComponent = (piniaConfig = {}) => {
@@ -261,7 +275,7 @@ describe('ProcessoView.vue', () => {
         // Open modal
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
         await acoes.vm.$emit('finalizar');
-        expect(wrapper.vm.mostrarModalFinalizacao).toBe(true);
+        expect((wrapper.vm as any).mostrarModalFinalizacao).toBe(true);
 
         // Confirm
         await modalFinalizacao.vm.$emit('confirmar');
@@ -319,8 +333,8 @@ describe('ProcessoView.vue', () => {
         const acoes = wrapper.findComponent(ProcessoAcoesStub);
         await acoes.vm.$emit('aceitar-bloco');
 
-        expect(wrapper.vm.mostrarModalBloco).toBe(true);
-        expect(wrapper.vm.tipoAcaoBloco).toBe('aceitar');
+        expect((wrapper.vm as any).mostrarModalBloco).toBe(true);
+        expect((wrapper.vm as any).tipoAcaoBloco).toBe('aceitar');
 
         // Confirm action
         await modalBloco.vm.$emit('confirmar', [
