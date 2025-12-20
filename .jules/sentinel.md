@@ -12,3 +12,8 @@
 **Vulnerability:** `SgrhService.autenticar` defaulted to returning `true` (bypass) if the AD Client bean was missing, assuming this meant a test environment. In production, a configuration error preventing bean creation would leave the system wide open.
 **Learning:** Implicit "fail-open" logic based on bean presence is dangerous. Security controls must explicitly verify the environment before bypassing checks.
 **Prevention:** Explicitly check configuration properties (e.g., `ambiente-testes`) and default to "Fail Closed" (deny access) if the environment is not explicitly safe.
+
+## 2025-05-27 - [Authorization Bypass in List Endpoint]
+**Vulnerability:** The `GET /api/subprocessos` endpoint allowed any authenticated user to list all subprocesses, exposing organizational workflow state (IDOR/Data Leakage).
+**Learning:** `PreAuthorize("isAuthenticated()")` is insufficient for endpoints that return global collections. Default "list all" endpoints often lack context-aware filtering.
+**Prevention:** Use `hasRole('ADMIN')` for global listings or implement filtering based on the authenticated user's scope (e.g., unit). Review all methods returning `List<Dto>` for authorization scope.

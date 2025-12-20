@@ -44,7 +44,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("listar deve retornar lista de subprocessos")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void listar() throws Exception {
         when(subprocessoDtoService.listar()).thenReturn(List.of(new SubprocessoDto()));
 
@@ -83,7 +83,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("criar deve retornar Created")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void criar() throws Exception {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
@@ -101,7 +101,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("atualizar deve retornar Ok")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void atualizar() throws Exception {
         SubprocessoDto dto = new SubprocessoDto();
         dto.setCodigo(1L);
@@ -118,7 +118,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("excluir deve retornar NoContent")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void excluir() throws Exception {
         doNothing().when(subprocessoService).excluir(1L);
 
@@ -128,7 +128,7 @@ class SubprocessoCrudControllerTest {
 
     @Test
     @DisplayName("excluir retorna NotFound se erro")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void excluirNotFound() throws Exception {
         doThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L))
                 .when(subprocessoService)
