@@ -46,6 +46,9 @@ describe("useAlertasStore", () => {
         alertaService = (await import("@/services/alertaService")) as Mocked<
             typeof import("@/services/alertaService")
         >;
+
+        // Reset calls
+        vi.clearAllMocks();
     });
 
     it("deve inicializar com alertas simulados e datas formatadas", () => {
@@ -82,38 +85,26 @@ describe("useAlertasStore", () => {
         });
 
         describe("marcarAlertaComoLido", () => {
-            it("deve chamar alertaService e recarregar alertas em caso de sucesso", async () => {
+            it("deve realizar update otimista e chamar alertaService sem recarregar tudo", async () => {
+                // Setup initial state
+                context.store.alertas = [JSON.parse(JSON.stringify(mockAlerta))];
                 alertaService.marcarComoLido.mockResolvedValue();
-                const mockReloadPage = {
-                    content: [
-                        { ...mockAlerta, codigo: 2, descricao: "Alerta Recarregado" },
-                    ],
-                    totalPages: 1,
-                    totalElements: 1,
-                    number: 0,
-                    size: 10,
-                    first: true,
-                    last: true,
-                    empty: false,
-                };
-                painelService.listarAlertas.mockResolvedValue(mockReloadPage);
 
                 const result = await context.store.marcarAlertaComoLido(1);
 
                 expect(result).toBe(true);
+                // Check optimistic update: dataHoraLeitura should be set (it was null in mockAlerta)
+                expect(context.store.alertas[0].dataHoraLeitura).not.toBeNull();
+
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                expect(painelService.listarAlertas).toHaveBeenCalledWith(
-                    123,
-                    456,
-                    0,
-                    20,
-                    undefined,
-                    undefined,
-                );
-                expect(context.store.alertas).toEqual(mockReloadPage.content);
+                // Should NOT reload
+                expect(painelService.listarAlertas).not.toHaveBeenCalled();
             });
 
-            it("deve retornar falso em caso de falha do serviço", async () => {
+            it("deve reverter estado em caso de falha do serviço", async () => {
+                // Setup initial state
+                context.store.alertas = [JSON.parse(JSON.stringify(mockAlerta))];
+
                 alertaService.marcarComoLido.mockRejectedValue(
                     new Error("Falha no serviço"),
                 );
@@ -121,20 +112,9 @@ describe("useAlertasStore", () => {
                 const result = await context.store.marcarAlertaComoLido(1);
 
                 expect(result).toBe(false);
-                expect(painelService.listarAlertas).not.toHaveBeenCalled();
-            });
-
-            it("deve lidar com dados faltantes do perfilStore", async () => {
-                mockPerfilStoreValues.usuarioCodigo = null;
-                mockPerfilStoreValues.unidadeSelecionada = null;
-
-                alertaService.marcarComoLido.mockResolvedValue();
-
-                const result = await context.store.marcarAlertaComoLido(1);
-
-                expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                expect(painelService.listarAlertas).not.toHaveBeenCalled();
+                // Revert check: dataHoraLeitura should be null again
+                expect(context.store.alertas[0].dataHoraLeitura).toBeNull();
             });
         });
     });

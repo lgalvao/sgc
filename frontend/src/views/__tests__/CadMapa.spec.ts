@@ -51,6 +51,7 @@ vi.mock("@/services/mapaService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
     adicionarCompetencia: vi.fn(),
     atualizarCompetencia: vi.fn(),
     removerCompetencia: vi.fn(),
@@ -60,6 +61,65 @@ vi.mock("@/services/subprocessoService", () => ({
 vi.mock("@/services/unidadesService", () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
+
+// Mocks for Async Components
+vi.mock("@/components/CriarCompetenciaModal.vue", () => {
+    const { defineComponent, ref } = require('vue');
+    return {
+        __esModule: true,
+        default: defineComponent({
+            props: ['mostrar'],
+            emits: ['salvar', 'fechar'],
+            setup(props, { emit }) {
+                const descricao = ref("");
+                return { descricao, emit };
+            },
+            template: `
+                <div v-if="mostrar" data-testid="mdl-criar-competencia">
+                    <textarea data-testid="inp-criar-competencia-descricao" v-model="descricao"></textarea>
+                    <input type="checkbox" value="101" checked />
+                    <button data-testid="btn-criar-competencia-salvar" @click="emit('salvar', { descricao: descricao, atividadesSelecionadas: [101] })"></button>
+                    <button data-testid="btn-criar-competencia-cancelar" @click="emit('fechar')"></button>
+                </div>
+            `
+        })
+    };
+});
+
+vi.mock("@/components/DisponibilizarMapaModal.vue", () => {
+    const { defineComponent, ref } = require('vue');
+    return {
+        __esModule: true,
+        default: defineComponent({
+            props: ['mostrar'],
+            emits: ['disponibilizar', 'fechar'],
+             setup(props, { emit }) {
+                const data = ref("");
+                const obs = ref("");
+                return { data, obs, emit };
+            },
+            template: `
+                <div v-if="mostrar" data-testid="mdl-disponibilizar-mapa">
+                    <input data-testid="inp-disponibilizar-mapa-data" v-model="data" />
+                    <input data-testid="inp-disponibilizar-mapa-obs" v-model="obs" />
+                    <button data-testid="btn-disponibilizar-mapa-confirmar" @click="emit('disponibilizar', { dataLimite: data, observacoes: obs })"></button>
+                </div>
+            `
+        })
+    };
+});
+
+vi.mock("@/components/ImpactoMapaModal.vue", () => {
+    const { defineComponent } = require('vue');
+    return {
+        __esModule: true,
+        default: defineComponent({
+            name: "ImpactoMapaModal",
+            props: ['mostrar'],
+            template: `<div v-if="mostrar">Impacto</div>`
+        })
+    };
+});
 
 const BFormCheckbox = defineComponent({
     name: "BFormCheckbox",
@@ -137,7 +197,6 @@ describe("CadMapa.vue", () => {
     };
 
     const stubs = {
-        ImpactoMapaModal: true,
         BModal: BModalStub,
         BButton: {
             name: "BButton",
@@ -196,6 +255,9 @@ describe("CadMapa.vue", () => {
                                     },
                                 ],
                             },
+                            unidades: {
+                                unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"},
+                            },
                             ...customState,
                         },
                     }),
@@ -212,6 +274,7 @@ describe("CadMapa.vue", () => {
         const atividadesStore = useAtividadesStore();
         const subprocessosStore = useSubprocessosStore();
         const unidadesStore = useUnidadesStore();
+        unidadesStore.unidade = {codigo: 1, sigla: "TESTE", nome: "Teste"} as any;
 
         return {
             wrapper,
@@ -236,6 +299,15 @@ describe("CadMapa.vue", () => {
         vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
             permissoes: {podeVisualizarImpacto: true},
         } as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                situacao: 'EM_ANDAMENTO',
+                situacaoLabel: 'Em Andamento',
+                permissoes: { podeVisualizarImpacto: true }
+            },
+            mapa: mockMapaCompleto,
+            atividades: mockAtividades
+        } as any);
         vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(
             mockMapaCompleto as any,
         );
@@ -259,8 +331,6 @@ describe("CadMapa.vue", () => {
         expect(
             subprocessoService.buscarSubprocessoPorProcessoEUnidade,
         ).toHaveBeenCalledWith(1, "TESTE");
-        expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(123);
-        expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123);
 
         expect(wrapper.text()).toContain("TESTE - Teste");
         expect(wrapper.text()).toContain("Competencia A");

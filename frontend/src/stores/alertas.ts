@@ -44,21 +44,27 @@ export const useAlertasStore = defineStore("alertas", () => {
 
     async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
         lastError.value = null;
+
+        // 1. Snapshot state for revert
+        const originalAlertas = JSON.parse(JSON.stringify(alertas.value));
+
+        // 2. Optimistic Update (UI Otimista)
+        const index = alertas.value.findIndex(a => a.codigo === idAlerta);
+        if (index !== -1) {
+            // Update local state immediately
+            alertas.value[index].dataHoraLeitura = new Date().toISOString();
+        }
+
         try {
+            // 3. Call API
             await alertaService.marcarComoLido(idAlerta);
-            const perfilStore = usePerfilStore();
-            if (perfilStore.usuarioCodigo && perfilStore.unidadeSelecionada) {
-                await buscarAlertas(
-                    Number(perfilStore.usuarioCodigo),
-                    Number(perfilStore.unidadeSelecionada),
-                    0,
-                    20,
-                    undefined,
-                    undefined,
-                );
-            }
+
+            // 4. Success: We do NOT re-fetch to preserve current pagination and provide instant feedback.
+            // If strict consistency is needed, we could fetch in background, but it might disrupt UX if list shifts.
             return true;
         } catch (error) {
+            // 5. Error: Revert state
+            alertas.value = originalAlertas;
             lastError.value = normalizeError(error);
             return false;
         }
