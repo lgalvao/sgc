@@ -137,6 +137,14 @@
         @fechar="mostrarModalHistorico = false"
     />
 
+    <ModalConfirmacao
+        v-model="mostrarModalConfirmacaoRemocao"
+        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover Atividade' : 'Remover Conhecimento'"
+        :mensagem="dadosRemocao?.tipo === 'atividade' ? 'Confirma a remoção desta atividade e todos os conhecimentos associados?' : 'Confirma a remoção deste conhecimento?'"
+        variant="danger"
+        @confirmar="confirmarRemocao"
+    />
+
   </BContainer>
 </template>
 
@@ -149,6 +157,7 @@ import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
@@ -221,6 +230,8 @@ const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
+const mostrarModalConfirmacaoRemocao = ref(false);
+const dadosRemocao = ref<{ tipo: 'atividade' | 'conhecimento', index: number, idConhecimento?: number } | null>(null);
 
 const errosValidacao = ref<ErroValidacao[]>([]);
 const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
@@ -244,17 +255,32 @@ async function adicionarAtividade() {
   }
 }
 
-async function removerAtividade(idx: number) {
+function removerAtividade(idx: number) {
   if (!codSubprocesso.value) return;
-  const atividadeRemovida = atividades.value[idx];
-  if (
-      confirm(
-          "Confirma a remoção desta atividade e todos os conhecimentos associados?",
-      )
-  ) {
+  dadosRemocao.value = { tipo: 'atividade', index: idx };
+  mostrarModalConfirmacaoRemocao.value = true;
+}
+
+async function confirmarRemocao() {
+  if (!dadosRemocao.value || !codSubprocesso.value) return;
+
+  const { tipo, index, idConhecimento } = dadosRemocao.value;
+
+  if (tipo === 'atividade') {
+    const atividadeRemovida = atividades.value[index];
     const status = await atividadesStore.removerAtividade(
         codSubprocesso.value,
         atividadeRemovida.codigo,
+    );
+    if (status) {
+      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
+    }
+  } else if (tipo === 'conhecimento' && idConhecimento !== undefined) {
+    const atividade = atividades.value[index];
+    const status = await atividadesStore.removerConhecimento(
+        codSubprocesso.value,
+        atividade.codigo,
+        idConhecimento,
     );
     if (status) {
       processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
@@ -280,19 +306,10 @@ async function adicionarConhecimento(idx: number, descricao: string) {
   }
 }
 
-async function removerConhecimento(idx: number, idConhecimento: number) {
+function removerConhecimento(idx: number, idConhecimento: number) {
   if (!codSubprocesso.value) return;
-  const atividade = atividades.value[idx];
-  if (confirm("Confirma a remoção deste conhecimento?")) {
-    const status = await atividadesStore.removerConhecimento(
-        codSubprocesso.value,
-        atividade.codigo,
-        idConhecimento,
-    );
-    if (status) {
-      processosStore.atualizarStatusSubprocesso(codSubprocesso.value, status);
-    }
-  }
+  dadosRemocao.value = { tipo: 'conhecimento', index: idx, idConhecimento };
+  mostrarModalConfirmacaoRemocao.value = true;
 }
 
 async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: number, descricao: string) {
