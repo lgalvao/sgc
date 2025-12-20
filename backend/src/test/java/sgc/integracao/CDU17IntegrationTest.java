@@ -235,7 +235,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict());
+                    .andExpect(status().isUnprocessableContent());
         }
 
         @Test
@@ -249,24 +249,13 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             DisponibilizarMapaReq request =
                     new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
-            String responseBody =
-                    mockMvc.perform(
-                                    post(API_URL, subprocesso.getCodigo())
-                                            .with(csrf())
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .content(objectMapper.writeValueAsString(request)))
-                            .andExpect(status().isUnprocessableContent())
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString();
-
-            ErroApi erroApi = objectMapper.readValue(responseBody, ErroApi.class);
-            assertThat(erroApi.getDetails()).isNotNull();
-
-            @SuppressWarnings("unchecked")
-            List<String> atividades =
-                    (List<String>) erroApi.getDetails().get("atividadesNaoAssociadas");
-            assertThat(atividades).isNotNull().contains("Atividade Solta");
+            mockMvc.perform(
+                            post(API_URL, subprocesso.getCodigo())
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Atividades pendentes: " + atividadeSolta.getDescricao())));
         }
 
         @Test
@@ -285,9 +274,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
-                    .andExpect(
-                            jsonPath("$.details.competenciasNaoAssociadas")
-                                    .value(competenciaSolta.getDescricao()));
+                    .andExpect(jsonPath("$.message").value("Todas as competências devem estar associadas a pelo menos uma atividade."));
         }
     }
 }

@@ -99,6 +99,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         gestor = usuarioRepo.findById("222222222222").orElseThrow();
         chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
+        // Inicializa coleções lazy para evitar LazyInitializationException no SecurityMockMvcRequestPostProcessors
+        admin.getAtribuicoesTemporarias().size();
+        gestor.getAtribuicoesTemporarias().size();
+        chefe.getAtribuicoesTemporarias().size();
+
         // Configuração do Mock SgrhService
         when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
                 .thenReturn(
