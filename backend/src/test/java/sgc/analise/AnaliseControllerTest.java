@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.analise.dto.CriarAnaliseApiRequest;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
@@ -154,7 +155,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveCriarAnaliseCadastro() throws Exception {
             var requestDto =
-                    CriarAnaliseRequest.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
+                    CriarAnaliseApiRequest.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
@@ -181,7 +182,7 @@ class AnaliseControllerTest {
                 "Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
         @WithMockUser
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes("").build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes("").build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
@@ -223,7 +224,7 @@ class AnaliseControllerTest {
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         @WithMockUser
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
@@ -242,7 +243,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes(ANALISE_INVALIDA).build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_INVALIDA).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
@@ -266,7 +267,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
         @WithMockUser
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));
@@ -280,6 +281,25 @@ class AnaliseControllerTest {
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
             verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 Bad Request para observação muito longa")
+        @WithMockUser
+        void deveRetornarBadRequestParaObservacaoMuitoLonga() throws Exception {
+            var requestDto = CriarAnaliseApiRequest.builder()
+                    .observacoes("a".repeat(501))
+                    .build();
+
+            mockMvc.perform(
+                            post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(requestDto)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém dados de entrada inválidos."));
+
+            verify(analiseService, never()).criarAnalise(any(CriarAnaliseRequest.class));
         }
     }
 
@@ -369,7 +389,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveCriarAnaliseValidacao() throws Exception {
             var requestDto =
-                    CriarAnaliseRequest.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
+                    CriarAnaliseApiRequest.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
@@ -396,7 +416,7 @@ class AnaliseControllerTest {
                 "Deve criar uma análise de validação com observações vazias e retornar 201 Created")
         @WithMockUser
         void deveCriarAnaliseValidacaoComObservacoesVazias() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes("").build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes("").build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
@@ -418,7 +438,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacaoValidacao() throws Exception {
             var requestDto =
-                    CriarAnaliseRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
+                    CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
@@ -437,7 +457,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser
         void deveRetornarBadRequestParaParametroInvalidoValidacao() throws Exception {
-            var requestDto = CriarAnaliseRequest.builder().observacoes(ANALISE_INVALIDA).build();
+            var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_INVALIDA).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
@@ -463,7 +483,7 @@ class AnaliseControllerTest {
         void deveRetornarInternalServerErrorParaErroValidacaoInesperadoNaCriacao()
                 throws Exception {
             var requestDto =
-                    CriarAnaliseRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
+                    CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
 
             when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));

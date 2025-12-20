@@ -5,13 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import sgc.analise.dto.CriarAnaliseApiRequest;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroRequisicaoSemCorpo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para gerenciar as análises de subprocessos.
@@ -41,21 +41,21 @@ public class AnaliseController {
     /**
      * Registra uma nova análise para a fase de cadastro de um subprocesso.
      *
-     * <p>Este endpoint recebe os dados da análise a partir de um corpo flexível. A análise é
+     * <p>Este endpoint recebe os dados da análise a partir de um corpo estruturado. A análise é
      * associada ao subprocesso identificado pelo código na URL.
      *
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param corpo          Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
+     * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
+     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-cadastro")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova análise de cadastro")
     public Analise criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                        @RequestBody(required = false) Map<String, String> corpo) {
+                                        @RequestBody @Valid CriarAnaliseApiRequest request) {
 
-        return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.CADASTRO);
+        return criarAnaliseInterna(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
     /**
@@ -74,34 +74,33 @@ public class AnaliseController {
      * Registra uma nova análise para a fase de validação de um subprocesso.
      *
      * <p>Assim como na análise de cadastro, este endpoint recebe os dados da análise a partir de um
-     * corpo flexível e a associa ao subprocesso correspondente.
+     * corpo estruturado e a associa ao subprocesso correspondente.
      *
      * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param corpo          Um mapa contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'. O corpo da requisição não pode ser nulo.
+     * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
+     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
      * @return A entidade {@link Analise} recém-criada.
      */
     @PostMapping("/analises-validacao")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova análise de validação")
     public Analise criarAnaliseValidacao(@PathVariable Long codSubprocesso,
-                                         @RequestBody(required = false) Map<String, String> corpo) {
+                                         @RequestBody @Valid CriarAnaliseApiRequest request) {
 
-        return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.VALIDACAO);
+        return criarAnaliseInterna(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    private Analise criarAnaliseInterna(Long codSubprocesso, Map<String, String> corpo, TipoAnalise tipo) {
-        if (corpo == null) throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
+    private Analise criarAnaliseInterna(Long codSubprocesso, CriarAnaliseApiRequest request, TipoAnalise tipo) {
+        String observacoes = request.observacoes() != null ? request.observacoes() : "";
 
-        String observacoes = corpo.getOrDefault("observacoes", "");
         CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
                 .tipo(tipo)
                 .acao(null)
-                .siglaUnidade(corpo.get("siglaUnidade"))
-                .tituloUsuario(corpo.get("tituloUsuario"))
-                .motivo(corpo.get("motivo"))
+                .siglaUnidade(request.siglaUnidade())
+                .tituloUsuario(request.tituloUsuario())
+                .motivo(request.motivo())
                 .build();
 
         return analiseService.criarAnalise(criarAnaliseRequest);
