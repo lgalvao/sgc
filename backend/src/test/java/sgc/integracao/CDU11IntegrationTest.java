@@ -96,13 +96,17 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         Conhecimento conhecimento1 =
                 new Conhecimento(atividade1, "Interpretação de textos técnicos");
         conhecimentoRepo.save(conhecimento1);
+        atividade1.getConhecimentos().add(conhecimento1);
 
         Atividade atividade2 = new Atividade(mapa, "Elaborar relatórios");
         atividadeRepo.save(atividade2);
         Conhecimento conhecimento2a = new Conhecimento(atividade2, "Escrita clara e concisa");
         conhecimentoRepo.save(conhecimento2a);
+        atividade2.getConhecimentos().add(conhecimento2a);
+
         Conhecimento conhecimento2b = new Conhecimento(atividade2, "Uso de planilhas");
         conhecimentoRepo.save(conhecimento2b);
+        atividade2.getConhecimentos().add(conhecimento2b);
     }
 
     @Nested

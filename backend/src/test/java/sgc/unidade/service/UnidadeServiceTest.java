@@ -93,6 +93,47 @@ class UnidadeServiceTest {
     }
 
     @Test
+    @DisplayName("buscarArvoreComElegibilidade unidade sem mapa em processo REVISAO nao deve ser elegivel")
+    void buscarArvoreComElegibilidade_UnidadeSemMapa_Ineligivel() {
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+
+        // Unidade 1 não está na lista de mapas vigentes
+        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(2L));
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
+                .thenReturn(new ArrayList<>());
+
+        // Mock deve ser chamado com elegivel=false
+        when(sgrhMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
+
+        List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, null);
+
+        assertThat(result).hasSize(1);
+        verify(sgrhMapper).toUnidadeDto(u1, false);
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade unidade em processo ativo nao deve ser elegivel")
+    void buscarArvoreComElegibilidade_UnidadeEmProcesso_Ineligivel() {
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+
+        // Unidade 1 está em processo ativo
+        when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
+                .thenReturn(new ArrayList<>(List.of(1L)));
+
+        // Mock deve ser chamado com elegivel=false
+        when(sgrhMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
+
+        List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
+
+        assertThat(result).hasSize(1);
+        verify(sgrhMapper).toUnidadeDto(u1, false);
+    }
+
+    @Test
     @DisplayName("criarAtribuicaoTemporaria sucesso")
     void criarAtribuicaoTemporaria() {
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
