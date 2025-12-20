@@ -115,12 +115,8 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BContainer, BModal,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, defineAsyncComponent} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
-import CompetenciaCard from "@/components/CompetenciaCard.vue";
-import CriarCompetenciaModal from "@/components/CriarCompetenciaModal.vue";
-import DisponibilizarMapaModal from "@/components/DisponibilizarMapaModal.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {situacaoLabel} from "@/utils";
@@ -129,6 +125,12 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
+import CompetenciaCard from "@/components/CompetenciaCard.vue";
+
+// Lazy loading de componentes pesados ou modais
+const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/ImpactoMapaModal.vue"));
+const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/CriarCompetenciaModal.vue"));
+const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/DisponibilizarMapaModal.vue"));
 
 const route = useRoute();
 const router = useRouter();
