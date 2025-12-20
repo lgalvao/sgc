@@ -64,6 +64,7 @@ vi.mock("@/services/unidadesService", () => ({
 
 // Mocks for Async Components
 vi.mock("@/components/CriarCompetenciaModal.vue", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { defineComponent, ref } = require('vue');
     return {
         __esModule: true,
@@ -87,6 +88,7 @@ vi.mock("@/components/CriarCompetenciaModal.vue", () => {
 });
 
 vi.mock("@/components/DisponibilizarMapaModal.vue", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { defineComponent, ref } = require('vue');
     return {
         __esModule: true,
@@ -110,6 +112,7 @@ vi.mock("@/components/DisponibilizarMapaModal.vue", () => {
 });
 
 vi.mock("@/components/ImpactoMapaModal.vue", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { defineComponent } = require('vue');
     return {
         __esModule: true,
@@ -306,7 +309,8 @@ describe("CadMapa.vue", () => {
                 permissoes: { podeVisualizarImpacto: true }
             },
             mapa: mockMapaCompleto,
-            atividades: mockAtividades
+            atividades: mockAtividades,
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
         } as any);
         vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(
             mockMapaCompleto as any,

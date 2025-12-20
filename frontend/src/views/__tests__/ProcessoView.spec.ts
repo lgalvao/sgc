@@ -36,6 +36,7 @@ vi.mock("@/services/processoService", () => ({
     finalizarProcesso: vi.fn(),
     processarAcaoEmBloco: vi.fn(),
     buscarProcessosFinalizados: vi.fn(),
+    buscarContextoCompleto: vi.fn(),
 }));
 
 // Stubs
@@ -140,6 +141,10 @@ describe("ProcessoView.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
+            processo: mockProcesso,
+            elegiveis: mockSubprocessosElegiveis,
+        } as any);
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(
             mockProcesso as any,
         );
@@ -152,8 +157,7 @@ describe("ProcessoView.vue", () => {
         const {wrapper} = createWrapper();
         await flushPromises();
 
-        expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
-        expect(processoService.buscarSubprocessosElegiveis).toHaveBeenCalledWith(1);
+        expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
 
         const detalhes = wrapper.findComponent(ProcessoDetalhesStub);
         expect(detalhes.props("descricao")).toBe("Test Process");
@@ -179,7 +183,10 @@ describe("ProcessoView.vue", () => {
                 filhos: [],
             },
         ];
-        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(mockProcessoNullDate as any);
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
+            processo: mockProcessoNullDate,
+            elegiveis: mockSubprocessosElegiveis,
+        } as any);
 
         const {wrapper} = createWrapper();
         await flushPromises();
@@ -269,7 +276,7 @@ describe("ProcessoView.vue", () => {
         expect(feedbackStore.show).toHaveBeenCalled();
 
         // Verificar se a busca foi realizada novamente
-        expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(2);
+        expect(processoService.obterDetalhesProcesso).toHaveBeenCalledTimes(1);
     });
 
     it("deve navegar para detalhes da unidade se perfil for CHEFE e unidade corresponder", async () => {

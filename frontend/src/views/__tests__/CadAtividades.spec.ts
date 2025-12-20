@@ -65,6 +65,8 @@ vi.mock("@/services/subprocessoService", () => ({
     listarAtividades: vi.fn(),
     obterPermissoes: vi.fn(),
     validarCadastro: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
 }));
 
 vi.mock("@/services/processoService", () => ({
@@ -202,6 +204,33 @@ describe("CadAtividades.vue", () => {
         vi.clearAllMocks();
         window.confirm = vi.fn(() => true);
 
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({
+            codigo: 123
+        } as any);
+
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                situacaoLabel: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                permissoes: {
+                    podeVerPagina: true,
+                    podeEditarMapa: true,
+                    podeVisualizarMapa: true,
+                    podeDisponibilizarCadastro: true,
+                    podeDevolverCadastro: false,
+                    podeAceitarCadastro: false,
+                    podeVisualizarDiagnostico: false,
+                    podeAlterarDataLimite: false,
+                    podeVisualizarImpacto: true,
+                    podeRealizarAutoavaliacao: false,
+                }
+            },
+            mapa: { codigo: 456, subprocessoCodigo: 123, competencias: [], situacao: "EM_ANDAMENTO" },
+            atividadesDisponiveis: [],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
+
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
             codigo: 1,
             tipo: TipoProcesso.MAPEAMENTO,
@@ -252,13 +281,20 @@ describe("CadAtividades.vue", () => {
         ctx.wrapper = wrapper;
         await flushPromises();
 
-        expect(subprocessoService.listarAtividades).toHaveBeenCalledWith(123);
+        expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(123, expect.anything(), expect.anything());
     });
 
     it("deve adicionar uma atividade", async () => {
-        vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-            mockMapaVisualizacao([...mockAtividades] as any) as any,
-        );
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
         await flushPromises();
@@ -284,7 +320,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve remover uma atividade", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -307,7 +352,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve adicionar um conhecimento", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -331,7 +385,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve remover um conhecimento", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -357,9 +420,16 @@ describe("CadAtividades.vue", () => {
         const atividadesComConhecimento = mockAtividades.filter(
             (a) => a.conhecimentos.length > 0,
         );
-        vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-            mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
-        );
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeDisponibilizarCadastro: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...atividadesComConhecimento],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -391,7 +461,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve permitir edição inline de atividade", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -423,7 +502,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve permitir edição inline de conhecimento", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeEditarMapa: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper();
         ctx.wrapper = wrapper;
@@ -475,9 +563,16 @@ describe("CadAtividades.vue", () => {
         const atividadesComConhecimento = mockAtividades.filter(
             (a) => a.conhecimentos.length > 0,
         );
-        vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(
-            mockMapaVisualizacao([...atividadesComConhecimento] as any) as any,
-        );
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeDisponibilizarCadastro: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...atividadesComConhecimento],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
 
         const {wrapper} = createWrapper(true);
         ctx.wrapper = wrapper;
@@ -529,7 +624,16 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve mostrar erros de validação ao tentar disponibilizar se cadastro inválido", async () => {
-        vi.mocked(subprocessoService.listarAtividades).mockResolvedValue([...mockAtividades] as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                permissoes: { podeDisponibilizarCadastro: true }
+            },
+            mapa: { codigo: 456 },
+            atividadesDisponiveis: [...mockAtividades],
+            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+        } as any);
         
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
             valido: false,
