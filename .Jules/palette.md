@@ -5,3 +5,7 @@
 ## 2024-05-24 - Native Confirm Dialogs Break Immersion
 **Learning:** Critical actions like deletion in `CadAtividades.vue` relied on `window.confirm()`. This native browser dialog is blocking, visually inconsistent with the app's Bootstrap theme, and cannot be customized for accessibility or clarity.
 **Action:** Replace `window.confirm()` with a custom `ModalConfirmacao.vue` wrapper around `BModal`. This ensures visual consistency, allows for richer content (titles, better button labels), and maintains the non-blocking SPA experience.
+
+## 2025-02-18 - Skip Link for Keyboard Navigation
+**Learning:** The application lacked a mechanism for keyboard users to bypass the main navigation, forcing them to tab through all menu items to reach the main content. This is a critical WCAG requirement (Bypass Blocks).
+**Action:** Implemented a standard "Skip to Content" link using Bootstrap's `visually-hidden-focusable` class. Future layouts should always include a main content landmark with an ID for skipping.

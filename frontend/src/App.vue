@@ -50,6 +50,9 @@ const shouldShowNavBarExtras = computed(() => {
 </script>
 
 <template>
+  <a href="#main-content" class="visually-hidden-focusable p-3 bg-white text-primary position-absolute start-0 top-0" style="z-index: 2050;">
+    Pular para o conteúdo principal
+  </a>
   <BOrchestrator/>
   <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
     <BAlert
@@ -82,7 +85,7 @@ const shouldShowNavBarExtras = computed(() => {
       </div>
     </div>
 
-    <main class="flex-grow-1 pb-3">
+    <main id="main-content" class="flex-grow-1 pb-3">
       <router-view/>
     </main>
 

@@ -83,6 +83,21 @@ describe("App.vue", () => {
         expect(wrapper.text()).toContain("Versão");
     });
 
+    it("deve renderizar o link de 'pular para o conteúdo' com os atributos corretos", () => {
+        (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
+        const wrapper = mount(App, {
+            global: {
+                plugins: [createTestingPinia({createSpy: vi.fn})],
+                stubs: {BOrchestrator: true, BAlert: true, 'router-view': true}
+            },
+        });
+
+        const skipLink = wrapper.find('a[href="#main-content"]');
+        expect(skipLink.exists()).toBe(true);
+        expect(skipLink.classes()).toContain('visually-hidden-focusable');
+        expect(wrapper.find('main#main-content').exists()).toBe(true);
+    });
+
     it("não deve renderizar BarraNavegacao na rota /painel", () => {
         (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
 
