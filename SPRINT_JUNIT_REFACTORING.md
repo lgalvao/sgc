@@ -214,16 +214,16 @@ Para **qualquer** PR de refatoração de testes:
 
 ## 🎯 Progresso Esperado
 
-| Sprint | Foco | Métrica de Sucesso |
-|--------|------|-------------------|
-| 0 | Baseline | Comandos documentados, métricas estabelecidas |
-| 1 | Boilerplate | -X arquivos de teste removidos |
-| 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` |
-| 3 | Fixtures | Pacote `fixture/` criado com N builders |
-| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta |
-| 5 | Integração | 0 IDs hardcoded sem setup explícito |
-| 6 | Cobertura | Relatório HTML visível, gate configurado |
-| 7 | Qualidade | >30% redução em testes duplicados via parametrização |
+| Sprint | Foco | Métrica de Sucesso | Status |
+|--------|------|-------------------|--------|
+| 0 | Baseline | Comandos documentados, métricas estabelecidas | ✅ Concluído |
+| 1 | Boilerplate | -15 arquivos de teste removidos | ✅ Concluído |
+| 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
+| 3 | Fixtures | Pacote `fixture/` criado com N builders | Pendente |
+| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | Pendente |
+| 5 | Integração | 0 IDs hardcoded sem setup explícito | Pendente |
+| 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
+| 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
 ## 🔄 Ordem de Execução Recomendada
 
@@ -248,10 +248,13 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 
 ## 📝 Notas de Atualização
 
-**Data**: 21 de dezembro de 2025
+**Data**: 21 de dezembro de 2025 (Atualizado em Execução)
 
 **Mudanças Realizadas**:
-1. ✅ Adicionado contexto específico do SGC em cada sprint
+1. ✅ **Sprint 0:** Validada baseline (98 testes iniciais, 1 LENIENT).
+2. ✅ **Sprint 1:** Removidos 15 arquivos de testes boilerplate (DTOs/Models), reduzindo para 83 arquivos.
+3. ✅ **Sprint 2:** Removido `Strictness.LENIENT` de `ProcessoServiceTest.java`. Corrigido stub de `save` para `saveAndFlush`.
+4. ✅ Adicionado contexto específico do SGC em cada sprint
 2. ✅ Substituído comando genérico "mvn test" por Gradle correto
 3. ✅ Documentada estrutura real de 9 módulos
 4. ✅ Adicionadas estatísticas verificadas (98 testes, 478 @DisplayName, etc)

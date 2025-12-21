@@ -51,7 +51,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ProcessoServiceTest {
     @Mock
     private ProcessoRepo processoRepo;
@@ -158,7 +157,7 @@ class ProcessoServiceTest {
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-        when(processoRepo.save(any())).thenReturn(processo);
+        when(processoRepo.saveAndFlush(any())).thenReturn(processo);
         when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
         processoService.atualizar(id, req);
