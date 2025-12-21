@@ -37,6 +37,9 @@ public class SgrhService {
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
+    // SENTINEL: Cache para controlar autenticações recentes e prevenir bypass
+    private final Map<String, java.time.LocalDateTime> autenticacoesRecentes = new java.util.concurrent.ConcurrentHashMap<>();
+
     @Transactional(readOnly = true)
     public Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioRepo.findById(titulo).orElse(null);
@@ -289,22 +292,28 @@ public class SgrhService {
     public boolean autenticar(String tituloEleitoral, String senha) {
         log.debug("Autenticando usuário no AD: {}", tituloEleitoral);
 
+        boolean autenticado = false;
         if (acessoAdClient == null) {
             if (ambienteTestes) {
                 log.debug("Ambiente de testes: Simulando autenticação com sucesso.");
-                return true;
+                autenticado = true;
             } else {
                 log.error("ERRO CRÍTICO DE SEGURANÇA: Tentativa de autenticação sem provedor configurado em ambiente produtivo. Usuário: {}", tituloEleitoral);
-                return false;
+                autenticado = false;
+            }
+        } else {
+            try {
+                autenticado = acessoAdClient.autenticar(tituloEleitoral, senha);
+            } catch (ErroAutenticacao e) {
+                log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
+                autenticado = false;
             }
         }
 
-        try {
-            return acessoAdClient.autenticar(tituloEleitoral, senha);
-        } catch (ErroAutenticacao e) {
-            log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
-            return false;
+        if (autenticado) {
+            autenticacoesRecentes.put(tituloEleitoral, java.time.LocalDateTime.now());
         }
+        return autenticado;
     }
 
     @Transactional(readOnly = true)
@@ -330,6 +339,15 @@ public class SgrhService {
     }
 
     public String entrar(@NonNull EntrarReq request) {
+        // SENTINEL: Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
+        // O uso de remove() garante atomicidade: apenas uma requisição consome o token de login.
+        java.time.LocalDateTime ultimoAcesso = autenticacoesRecentes.remove(request.getTituloEleitoral());
+
+        if (ultimoAcesso == null || ultimoAcesso.isBefore(java.time.LocalDateTime.now().minusMinutes(5))) {
+            log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}", request.getTituloEleitoral());
+            throw new ErroAutenticacao("Sessão de login expirada ou inválida. Por favor, autentique-se novamente.");
+        }
+
         Long codUnidade = request.getUnidadeCodigo();
 
         if (!unidadeRepo.existsById(codUnidade)) {

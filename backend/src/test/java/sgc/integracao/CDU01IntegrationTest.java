@@ -209,6 +209,17 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
             // Arrange
             String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             long codigoUnidadeInexistente = 999999L;
+
+            // Pre-authenticate (Required by security fix)
+            AutenticacaoReq authRequest = AutenticacaoReq.builder()
+                    .tituloEleitoral(tituloEleitoral)
+                    .senha("any")
+                    .build();
+            mockMvc.perform(post(BASE_URL + "/autenticar")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(testUtil.toJson(authRequest)));
+
             EntrarReq entrarReq = EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("ADMIN")
