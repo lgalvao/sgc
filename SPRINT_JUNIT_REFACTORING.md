@@ -121,6 +121,8 @@ backend/src/test/java/sgc/fixture/
 
 **Testes Afetados**: 30 testes de integração (CDU01-CDU21, etc)
 
+**Estado**: ⚠️ Em Andamento (Piloto CDU-02 concluído com sucesso)
+
 **Documento**: [`sprint-05-desacoplamento-integracao.md`](./sprint-05-desacoplamento-integracao.md)
 
 ---
@@ -221,7 +223,7 @@ Para **qualquer** PR de refatoração de testes:
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
-| 5 | Integração | 0 IDs hardcoded sem setup explícito | Pendente |
+| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-02 Pilotado) |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
@@ -264,6 +266,7 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 11. ✅ Todos os comandos validados e testados
 12. ✅ Referências aos READMEs do projeto
 13. ✅ **Sprint 4 (Concluído):** Todos os módulos do backend padronizados (`sgrh`, `unidade`, `painel`, `comum`, `mapa`, `e2e` e `integracao`). Total de `@DisplayName` aumentou para 646.
+14. ✅ **Sprint 5 (Piloto CDU-02):** Refatorado `CDU02IntegrationTest` para não depender de IDs do `data.sql`. Criado `AlertaFixture`. Resolvidos problemas de `ObjectOptimisticLockingFailureException` via reset de sequence H2.
 
 **Validação**: Todos os comandos foram testados com script automatizado (`/tmp/validate_commands.sh`).
 
