@@ -40,6 +40,9 @@ class SgrhControllerIntegrationTest {
     private WebApplicationContext context;
     @Autowired
     private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SgrhService sgrhService;
+
     private Unidade unidade;
 
     @BeforeEach
@@ -81,6 +84,10 @@ class SgrhControllerIntegrationTest {
     @Test
     @DisplayName("Deve entrar")
     void entrar_deveRetornarOk() throws Exception {
+        // Simula a etapa prévia de autenticação para popular o cache 'autenticacoesRecentes' no serviço,
+        // que é verificado pelo método entrar() para prevenir bypass.
+        sgrhService.autenticar("111111111111", "senha-qualquer");
+
         EntrarReq request =
                 EntrarReq.builder()
                         .tituloEleitoral("111111111111")
