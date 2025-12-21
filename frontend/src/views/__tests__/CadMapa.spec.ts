@@ -73,7 +73,7 @@ vi.mock("@/components/CriarCompetenciaModal.vue", () => ({
     __esModule: true,
     default: {
         props: ['mostrar'],
-        emits: ['salvar', 'fechar'],
+        emits: ['salvar', 'fechar', 'update:descricao'],
         template: `
             <div v-if="mostrar" data-testid="mdl-criar-competencia">
                 <textarea data-testid="inp-criar-competencia-descricao" @input="$emit('update:descricao', $event.target.value)">Nova Competencia Teste</textarea>
@@ -232,7 +232,7 @@ describe("CadMapa.vue", () => {
         CompetenciaCard: CompetenciaCardStub,
         CriarCompetenciaModal: {
             props: ['mostrar'],
-            emits: ['salvar', 'fechar'],
+            emits: ['salvar', 'fechar', 'update:descricao'],
             template: `
                 <div v-if="mostrar" data-testid="mdl-criar-competencia">
                     <textarea data-testid="inp-criar-competencia-descricao" @input="$emit('update:descricao', $event.target.value)">Nova Competencia Teste</textarea>
