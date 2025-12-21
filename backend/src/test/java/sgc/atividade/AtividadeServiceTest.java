@@ -1,6 +1,7 @@
 package sgc.atividade;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Testes Unitários: AtividadeService")
 class AtividadeServiceTest {
 
     @InjectMocks
@@ -60,384 +62,474 @@ class AtividadeServiceTest {
     @Mock
     private UsuarioRepo usuarioRepo;
 
-    @Test
-    @DisplayName("listar deve retornar todas atividades")
-    void listar() {
-        when(atividadeRepo.findAll()).thenReturn(List.of(AtividadeFixture.atividadePadrao(null)));
-        when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+    @Nested
+    @DisplayName("Método: listar")
+    class Listar {
+        @Test
+        @DisplayName("Deve retornar todas as atividades")
+        void deveRetornarTodasAtividades() {
+            // Given
+            when(atividadeRepo.findAll()).thenReturn(List.of(AtividadeFixture.atividadePadrao(null)));
+            when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
 
-        var result = atividadeService.listar();
+            // When
+            var result = atividadeService.listar();
 
-        assertThat(result).hasSize(1);
+            // Then
+            assertThat(result).hasSize(1);
+        }
     }
 
-    @Test
-    @DisplayName("obterPorCodigo deve retornar atividade se existir")
-    void obterPorCodigo() {
-        Long id = 1L;
-        when(atividadeRepo.findById(id)).thenReturn(Optional.of(AtividadeFixture.atividadePadrao(null)));
-        when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
+    @Nested
+    @DisplayName("Método: obterPorCodigo")
+    class ObterPorCodigo {
+        @Test
+        @DisplayName("Deve retornar atividade quando existir")
+        void deveRetornarAtividadeQuandoExistir() {
+            // Given
+            Long id = 1L;
+            when(atividadeRepo.findById(id)).thenReturn(Optional.of(AtividadeFixture.atividadePadrao(null)));
+            when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
 
-        var result = atividadeService.obterPorCodigo(id);
+            // When
+            var result = atividadeService.obterPorCodigo(id);
 
-        assertThat(result).isNotNull();
+            // Then
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando atividade não existir")
+        void deveLancarExcecaoQuandoNaoExistir() {
+            // Given
+            Long id = 1L;
+            when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.obterPorCodigo(id))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("obterPorCodigo deve lançar exceção se não existir")
-    void obterPorCodigoNaoEncontrado() {
-        Long id = 1L;
-        when(atividadeRepo.findById(id)).thenReturn(Optional.empty());
+    @Nested
+    @DisplayName("Método: criar")
+    class Criar {
+        @Test
+        @DisplayName("Deve salvar e retornar atividade quando usuario autorizado")
+        void deveSalvarERetornarAtividadeQuandoUsuarioAutorizado() {
+            // Given
+            Long mapaId = 10L;
+            String usuarioId = "user1";
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(mapaId);
 
-        assertThatThrownBy(() -> atividadeService.obterPorCodigo(id))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            Unidade unidade = UnidadeFixture.unidadePadrao();
+            unidade.setTituloTitular(usuarioId);
+
+            Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+            mapa.setCodigo(mapaId);
+            subprocesso.setMapa(mapa);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
+            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeRepo.save(any())).thenReturn(new Atividade());
+            when(atividadeMapper.toDto(any())).thenReturn(dto);
+
+            // When
+            var result = atividadeService.criar(dto, usuarioId);
+
+            // Then
+            assertThat(result).isNotNull();
+            verify(atividadeRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve atualizar situacao do subprocesso quando nao iniciado")
+        void deveAtualizarSituacaoQuandoNaoIniciado() {
+            // Given
+            Long mapaId = 10L;
+            String usuarioId = "user1";
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(mapaId);
+
+            Unidade unidade = UnidadeFixture.unidadePadrao();
+            unidade.setTituloTitular(usuarioId);
+
+            Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+
+            Processo processo = new Processo();
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+            subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+            Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+            mapa.setCodigo(mapaId);
+            subprocesso.setMapa(mapa);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
+            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
+            when(atividadeRepo.save(any())).thenReturn(new Atividade());
+            when(atividadeMapper.toDto(any())).thenReturn(dto);
+
+            // When
+            atividadeService.criar(dto, usuarioId);
+
+            // Then
+            assertThat(subprocesso.getSituacao())
+                    .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            verify(subprocessoRepo).save(subprocesso);
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando subprocesso nao encontrado")
+        void deveFalharQuandoSubprocessoNaoEncontrado() {
+            // Given
+            Long mapaId = 10L;
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(mapaId);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando usuario nao encontrado")
+        void deveFalharQuandoUsuarioNaoEncontrado() {
+            // Given
+            Long mapaId = 10L;
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(mapaId);
+
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, null);
+            Mapa mapa = MapaFixture.mapaPadrao(sp);
+            mapa.setCodigo(mapaId);
+            sp.setMapa(mapa);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(sp));
+            when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando usuario não for titular")
+        void deveLancarExcecaoQuandoUsuarioNaoTitular() {
+            // Given
+            Long mapaId = 10L;
+            String usuarioId = "user1";
+            AtividadeDto dto = new AtividadeDto();
+            dto.setMapaCodigo(mapaId);
+
+            Unidade unidade = UnidadeFixture.unidadePadrao();
+            unidade.setTituloTitular("outro");
+
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
+            Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+            mapa.setCodigo(mapaId);
+            subprocesso.setMapa(mapa);
+
+            Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.criar(dto, usuarioId))
+                    .isInstanceOf(ErroAccessoNegado.class);
+        }
     }
 
-    @Test
-    @DisplayName("criar deve salvar e retornar atividade se usuario autorizado")
-    void criar() {
-        Long mapaId = 10L;
-        String usuarioId = "user1";
-        AtividadeDto dto = new AtividadeDto();
-        dto.setMapaCodigo(mapaId);
+    @Nested
+    @DisplayName("Método: atualizar")
+    class Atualizar {
+        @Test
+        @DisplayName("Deve atualizar e retornar dto quando dados válidos")
+        void deveAtualizarERetornarDtoQuandoDadosValidos() {
+            // Given
+            Long id = 1L;
+            Long mapaId = 100L;
+            AtividadeDto dto = new AtividadeDto();
+            dto.setDescricao("Nova desc");
 
-        Unidade unidade = UnidadeFixture.unidadePadrao();
-        unidade.setTituloTitular(usuarioId);
+            Mapa mapa = MapaFixture.mapaPadrao(null);
+            mapa.setCodigo(mapaId);
 
-        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+            Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
+            atividade.setDescricao("Velha desc");
+            atividade.setCodigo(id);
 
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
-        mapa.setCodigo(mapaId);
-        subprocesso.setMapa(mapa);
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade(null, "Nova desc"));
+            when(atividadeRepo.save(any())).thenReturn(atividade);
+            when(atividadeMapper.toDto(any())).thenReturn(dto);
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
-        when(atividadeRepo.save(any())).thenReturn(new Atividade());
-        when(atividadeMapper.toDto(any())).thenReturn(dto);
+            // When
+            var result = atividadeService.atualizar(id, dto);
 
-        var result = atividadeService.criar(dto, usuarioId);
+            // Then
+            assertThat(result.getDescricao()).isEqualTo("Nova desc");
+        }
 
-        assertThat(result).isNotNull();
-        verify(atividadeRepo).save(any());
+        @Test
+        @DisplayName("Deve falhar quando atividade não encontrada")
+        void deveFalharQuandoAtividadeNaoEncontrada() {
+            // Given
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.atualizar(1L, new AtividadeDto()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("criar deve atualizar situacao se nao iniciado")
-    void criarAtualizaSituacao() {
-        Long mapaId = 10L;
-        String usuarioId = "user1";
-        AtividadeDto dto = new AtividadeDto();
-        dto.setMapaCodigo(mapaId);
+    @Nested
+    @DisplayName("Método: excluir")
+    class Excluir {
+        @Test
+        @DisplayName("Deve remover atividade e conhecimentos quando existir")
+        void deveRemoverAtividadeEConhecimentosQuandoExistir() {
+            // Given
+            Long id = 1L;
+            Long mapaId = 100L;
 
-        Unidade unidade = UnidadeFixture.unidadePadrao();
-        unidade.setTituloTitular(usuarioId);
+            Mapa mapa = MapaFixture.mapaPadrao(null);
+            mapa.setCodigo(mapaId);
 
-        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+            Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
+            atividade.setCodigo(id);
 
-        Processo processo = new Processo();
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(conhecimentoRepo.findByAtividadeCodigo(id)).thenReturn(List.of());
 
-        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
-        mapa.setCodigo(mapaId);
-        subprocesso.setMapa(mapa);
+            // When
+            atividadeService.excluir(id);
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade());
-        when(atividadeRepo.save(any())).thenReturn(new Atividade());
-        when(atividadeMapper.toDto(any())).thenReturn(dto);
+            // Then
+            verify(conhecimentoRepo).deleteAll(any());
+            verify(atividadeRepo).delete(atividade);
+        }
 
-        atividadeService.criar(dto, usuarioId);
+        @Test
+        @DisplayName("Deve falhar quando atividade não encontrada")
+        void deveFalharQuandoAtividadeNaoEncontrada() {
+            // Given
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
 
-        assertThat(subprocesso.getSituacao())
-                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        verify(subprocessoRepo).save(subprocesso);
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.excluir(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("criar falha se subprocesso nao encontrado")
-    void criarSubprocessoNaoEncontrado() {
-        Long mapaId = 10L;
-        AtividadeDto dto = new AtividadeDto();
-        dto.setMapaCodigo(mapaId);
+    @Nested
+    @DisplayName("Método: listarConhecimentos")
+    class ListarConhecimentos {
+        @Test
+        @DisplayName("Deve retornar lista de conhecimentos quando atividade existe")
+        void deveRetornarListaDeConhecimentosQuandoAtividadeExiste() {
+            // Given
+            Long id = 1L;
+            when(atividadeRepo.existsById(id)).thenReturn(true);
+            when(conhecimentoRepo.findByAtividadeCodigo(id)).thenReturn(List.of(new Conhecimento()));
+            when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.empty());
+            // When
+            var result = atividadeService.listarConhecimentos(id);
 
-        assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            // Then
+            assertThat(result).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando atividade não existe")
+        void deveFalharQuandoAtividadeNaoExiste() {
+            // Given
+            when(atividadeRepo.existsById(1L)).thenReturn(false);
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.listarConhecimentos(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("criar falha se usuario nao encontrado")
-    void criarUsuarioNaoEncontrado() {
-        Long mapaId = 10L;
-        AtividadeDto dto = new AtividadeDto();
-        dto.setMapaCodigo(mapaId);
+    @Nested
+    @DisplayName("Método: criarConhecimento")
+    class CriarConhecimento {
+        @Test
+        @DisplayName("Deve salvar e retornar conhecimento")
+        void deveSalvarERetornarConhecimento() {
+            // Given
+            Long id = 1L;
+            Long mapaId = 100L;
+            ConhecimentoDto dto = new ConhecimentoDto();
 
-        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, null);
-        Mapa mapa = MapaFixture.mapaPadrao(sp);
-        mapa.setCodigo(mapaId);
-        sp.setMapa(mapa);
+            Mapa mapa = MapaFixture.mapaPadrao(null);
+            mapa.setCodigo(mapaId);
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(sp));
-        when(usuarioRepo.findById("user")).thenReturn(Optional.empty());
+            Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
 
-        assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
+            when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
+            when(conhecimentoRepo.save(any())).thenReturn(new Conhecimento());
+            when(conhecimentoMapper.toDto(any())).thenReturn(dto);
+
+            // When
+            var result = atividadeService.criarConhecimento(id, dto);
+
+            // Then
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando atividade não encontrada")
+        void deveFalharQuandoAtividadeNaoEncontrada() {
+            // Given
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.criarConhecimento(1L, new ConhecimentoDto()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("criar deve lançar exceção se usuario não for titular")
-    void criarNegado() {
-        Long mapaId = 10L;
-        String usuarioId = "user1";
-        AtividadeDto dto = new AtividadeDto();
-        dto.setMapaCodigo(mapaId);
+    @Nested
+    @DisplayName("Método: atualizarConhecimento")
+    class AtualizarConhecimento {
+        @Test
+        @DisplayName("Deve atualizar quando pertencer à atividade")
+        void deveAtualizarQuandoPertencerAAtividade() {
+            // Given
+            Long ativId = 1L;
+            Long conId = 2L;
+            Long mapaId = 100L;
 
-        Unidade unidade = UnidadeFixture.unidadePadrao();
-        unidade.setTituloTitular("outro");
+            ConhecimentoDto dto = new ConhecimentoDto().setDescricao("Novo");
 
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
-        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
-        mapa.setCodigo(mapaId);
-        subprocesso.setMapa(mapa);
+            Mapa mapa = MapaFixture.mapaPadrao(null);
+            mapa.setCodigo(mapaId);
 
-        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
+            Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
+            atividade.setCodigo(ativId);
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
+            Conhecimento conhecimento = new Conhecimento();
+            conhecimento.setAtividade(atividade);
 
-        assertThatThrownBy(() -> atividadeService.criar(dto, usuarioId))
-                .isInstanceOf(ErroAccessoNegado.class);
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
+            when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento("Novo", atividade));
+            when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
+            when(conhecimentoMapper.toDto(any())).thenReturn(dto);
+
+            // When
+            var result = atividadeService.atualizarConhecimento(ativId, conId, dto);
+
+            // Then
+            assertThat(result.getDescricao()).isEqualTo("Novo");
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando não pertence à atividade")
+        void deveFalharQuandoNaoPertenceAAtividade() {
+            // Given
+            Long ativId = 1L;
+            Long conId = 2L;
+
+            Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
+            atividadeOutra.setCodigo(99L);
+
+            Conhecimento conhecimento = new Conhecimento();
+            conhecimento.setAtividade(atividadeOutra);
+
+            when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
+
+            // When / Then
+            assertThatThrownBy(
+                    () ->
+                            atividadeService.atualizarConhecimento(
+                                    ativId, conId, new ConhecimentoDto()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    @DisplayName("atualizar deve atualizar e retornar dto")
-    void atualizar() {
-        Long id = 1L;
-        Long mapaId = 100L;
-        AtividadeDto dto = new AtividadeDto();
-        dto.setDescricao("Nova desc");
+    @Nested
+    @DisplayName("Método: excluirConhecimento")
+    class ExcluirConhecimento {
+        @Test
+        @DisplayName("Deve excluir quando pertencer à atividade")
+        void deveExcluirQuandoPertencerAAtividade() {
+            // Given
+            Long ativId = 1L;
+            Long conId = 2L;
+            Long mapaId = 100L;
 
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(mapaId);
+            Mapa mapa = MapaFixture.mapaPadrao(null);
+            mapa.setCodigo(mapaId);
 
-        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
-        atividade.setDescricao("Velha desc");
-        atividade.setCodigo(id);
+            Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
+            atividade.setCodigo(ativId);
 
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Conhecimento conhecimento = new Conhecimento();
+            conhecimento.setAtividade(atividade);
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
-        when(atividadeMapper.toEntity(dto)).thenReturn(new Atividade(null, "Nova desc"));
-        when(atividadeRepo.save(any())).thenReturn(atividade);
-        when(atividadeMapper.toDto(any())).thenReturn(dto);
+            Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        var result = atividadeService.atualizar(id, dto);
+            when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
+            when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
-        assertThat(result.getDescricao()).isEqualTo("Nova desc");
-    }
+            // When
+            atividadeService.excluirConhecimento(ativId, conId);
 
-    @Test
-    @DisplayName("atualizar falha se nao encontrado")
-    void atualizarNaoEncontrado() {
-        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> atividadeService.atualizar(1L, new AtividadeDto()))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
+            // Then
+            verify(conhecimentoRepo).delete(conhecimento);
+        }
 
-    @Test
-    @DisplayName("excluir deve remover atividade e conhecimentos")
-    void excluir() {
-        Long id = 1L;
-        Long mapaId = 100L;
+        @Test
+        @DisplayName("Deve falhar quando não pertence à atividade")
+        void deveFalharQuandoNaoPertenceAAtividade() {
+            // Given
+            Long ativId = 1L;
+            Long conId = 2L;
 
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(mapaId);
+            Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
+            atividadeOutra.setCodigo(99L);
 
-        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
-        atividade.setCodigo(id);
+            Conhecimento conhecimento = new Conhecimento();
+            conhecimento.setAtividade(atividadeOutra);
 
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
 
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
-        when(conhecimentoRepo.findByAtividadeCodigo(id)).thenReturn(List.of());
-
-        atividadeService.excluir(id);
-
-        verify(conhecimentoRepo).deleteAll(any());
-        verify(atividadeRepo).delete(atividade);
-    }
-
-    @Test
-    @DisplayName("excluir falha se nao encontrado")
-    void excluirNaoEncontrado() {
-        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> atividadeService.excluir(1L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("listarConhecimentos deve retornar lista")
-    void listarConhecimentos() {
-        Long id = 1L;
-        when(atividadeRepo.existsById(id)).thenReturn(true);
-        when(conhecimentoRepo.findByAtividadeCodigo(id)).thenReturn(List.of(new Conhecimento()));
-        when(conhecimentoMapper.toDto(any())).thenReturn(new ConhecimentoDto());
-
-        var result = atividadeService.listarConhecimentos(id);
-
-        assertThat(result).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("listarConhecimentos falha se atividade nao existe")
-    void listarConhecimentosNaoEncontrada() {
-        when(atividadeRepo.existsById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> atividadeService.listarConhecimentos(1L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("criarConhecimento deve salvar")
-    void criarConhecimento() {
-        Long id = 1L;
-        Long mapaId = 100L;
-        ConhecimentoDto dto = new ConhecimentoDto();
-
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(mapaId);
-
-        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
-
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(atividadeRepo.findById(id)).thenReturn(Optional.of(atividade));
-        when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento());
-        when(conhecimentoRepo.save(any())).thenReturn(new Conhecimento());
-        when(conhecimentoMapper.toDto(any())).thenReturn(dto);
-
-        var result = atividadeService.criarConhecimento(id, dto);
-
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    @DisplayName("criarConhecimento falha se atividade nao existe")
-    void criarConhecimentoAtividadeNaoEncontrada() {
-        when(atividadeRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> atividadeService.criarConhecimento(1L, new ConhecimentoDto()))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("atualizarConhecimento deve atualizar se pertencer a atividade")
-    void atualizarConhecimento() {
-        Long ativId = 1L;
-        Long conId = 2L;
-        Long mapaId = 100L;
-
-        ConhecimentoDto dto = new ConhecimentoDto().setDescricao("Novo");
-
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(mapaId);
-
-        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
-        atividade.setCodigo(ativId);
-
-        Conhecimento conhecimento = new Conhecimento();
-        conhecimento.setAtividade(atividade);
-
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
-        when(conhecimentoMapper.toEntity(dto)).thenReturn(new Conhecimento("Novo", atividade));
-        when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-        when(conhecimentoMapper.toDto(any())).thenReturn(dto);
-
-        var result = atividadeService.atualizarConhecimento(ativId, conId, dto);
-
-        assertThat(result.getDescricao()).isEqualTo("Novo");
-    }
-
-    @Test
-    @DisplayName("atualizarConhecimento falha se nao pertence a atividade")
-    void atualizarConhecimentoErrado() {
-        Long ativId = 1L;
-        Long conId = 2L;
-
-        Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
-        atividadeOutra.setCodigo(99L);
-
-        Conhecimento conhecimento = new Conhecimento();
-        conhecimento.setAtividade(atividadeOutra);
-
-        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
-
-        assertThatThrownBy(
-                () ->
-                        atividadeService.atualizarConhecimento(
-                                ativId, conId, new ConhecimentoDto()))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("excluirConhecimento deve excluir se pertencer a atividade")
-    void excluirConhecimento() {
-        Long ativId = 1L;
-        Long conId = 2L;
-        Long mapaId = 100L;
-
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(mapaId);
-
-        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
-        atividade.setCodigo(ativId);
-
-        Conhecimento conhecimento = new Conhecimento();
-        conhecimento.setAtividade(atividade);
-
-        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
-        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
-
-        atividadeService.excluirConhecimento(ativId, conId);
-
-        verify(conhecimentoRepo).delete(conhecimento);
-    }
-
-    @Test
-    @DisplayName("excluirConhecimento falha se nao pertence a atividade")
-    void excluirConhecimentoErrado() {
-        Long ativId = 1L;
-        Long conId = 2L;
-
-        Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
-        atividadeOutra.setCodigo(99L);
-
-        Conhecimento conhecimento = new Conhecimento();
-        conhecimento.setAtividade(atividadeOutra);
-
-        when(conhecimentoRepo.findById(conId)).thenReturn(Optional.of(conhecimento));
-
-        assertThatThrownBy(() -> atividadeService.excluirConhecimento(ativId, conId))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            // When / Then
+            assertThatThrownBy(() -> atividadeService.excluirConhecimento(ativId, conId))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 }

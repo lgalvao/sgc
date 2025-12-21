@@ -2,6 +2,7 @@ package sgc.notificacao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Testes Unitários: NotificacaoModelosService")
 class NotificacaoModelosServiceTest {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -41,150 +43,188 @@ class NotificacaoModelosServiceTest {
                 .thenReturn("<html></html>");
     }
 
-    @Test
-    @DisplayName("Deve criar email de processo iniciado com os dados corretos")
-    void criarEmailDeProcessoIniciado() {
-        String nomeUnidade = "Unidade Teste";
-        String nomeProcesso = "Processo Teste";
-        String tipoProcesso = "REVISAO";
-        LocalDateTime dataLimite = LocalDateTime.now();
+    @Nested
+    @DisplayName("Geração de E-mails de Processo Iniciado")
+    class ProcessoIniciado {
+        @Test
+        @DisplayName("Deve criar email de processo iniciado com os dados corretos")
+        void criarEmailDeProcessoIniciado() {
+            // Given
+            String nomeUnidade = "Unidade Teste";
+            String nomeProcesso = "Processo Teste";
+            String tipoProcesso = "REVISAO";
+            LocalDateTime dataLimite = LocalDateTime.now();
 
-        notificacaoModelosService.criarEmailDeProcessoIniciado(
-                nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
+            // When
+            notificacaoModelosService.criarEmailDeProcessoIniciado(
+                    nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
 
-        assertEquals("processo-iniciado", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Processo iniciado - " + tipoProcesso, context.getVariable("titulo"));
-        assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(tipoProcesso, context.getVariable("tipoProcesso"));
-        assertEquals(dataLimite.format(FORMATADOR), context.getVariable("dataLimite"));
+            // Then
+            assertEquals("processo-iniciado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Processo iniciado - " + tipoProcesso, context.getVariable("titulo"));
+            assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(tipoProcesso, context.getVariable("tipoProcesso"));
+            assertEquals(dataLimite.format(FORMATADOR), context.getVariable("dataLimite"));
+        }
     }
 
-    @Test
-    @DisplayName("Deve criar email de cadastro disponibilizado com os dados corretos")
-    void criarEmailCadastroDisponibilizado() {
-        String nomeUnidade = "Unidade Teste";
-        String nomeProcesso = "Processo Teste";
-        int quantidadeAtividades = 10;
+    @Nested
+    @DisplayName("Geração de E-mails de Cadastro")
+    class Cadastro {
+        @Test
+        @DisplayName("Deve criar email de cadastro disponibilizado com os dados corretos")
+        void criarEmailCadastroDisponibilizado() {
+            // Given
+            String nomeUnidade = "Unidade Teste";
+            String nomeProcesso = "Processo Teste";
+            int quantidadeAtividades = 10;
 
-        notificacaoModelosService.criarEmailCadastroDisponibilizado(
-                nomeUnidade, nomeProcesso, quantidadeAtividades);
+            // When
+            notificacaoModelosService.criarEmailCadastroDisponibilizado(
+                    nomeUnidade, nomeProcesso, quantidadeAtividades);
 
-        assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Cadastro disponibilizado para análise", context.getVariable("titulo"));
-        assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(quantidadeAtividades, context.getVariable("quantidadeAtividades"));
+            // Then
+            assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Cadastro disponibilizado para análise", context.getVariable("titulo"));
+            assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(quantidadeAtividades, context.getVariable("quantidadeAtividades"));
+        }
+
+        @Test
+        @DisplayName("Deve criar email de cadastro devolvido com os dados corretos")
+        void criarEmailCadastroDevolvido() {
+            // Given
+            String nomeUnidade = "Unidade Teste";
+            String nomeProcesso = "Processo Teste";
+            String motivo = "Motivo Teste";
+            String observacoes = "Observações Teste";
+
+            // When
+            notificacaoModelosService.criarEmailCadastroDevolvido(
+                    nomeUnidade, nomeProcesso, motivo, observacoes);
+
+            // Then
+            assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Cadastro devolvido para ajustes", context.getVariable("titulo"));
+            assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(motivo, context.getVariable("motivo"));
+            assertEquals(observacoes, context.getVariable("observacoes"));
+        }
     }
 
-    @Test
-    @DisplayName("Deve criar email de cadastro devolvido com os dados corretos")
-    void criarEmailCadastroDevolvido() {
-        String nomeUnidade = "Unidade Teste";
-        String nomeProcesso = "Processo Teste";
-        String motivo = "Motivo Teste";
-        String observacoes = "Observações Teste";
+    @Nested
+    @DisplayName("Geração de E-mails de Mapa")
+    class Mapa {
+        @Test
+        @DisplayName("Deve criar email de mapa disponibilizado com os dados corretos")
+        void criarEmailMapaDisponibilizado() {
+            // Given
+            String nomeUnidade = "Unidade Teste";
+            String nomeProcesso = "Processo Teste";
+            LocalDateTime dataLimite = LocalDateTime.now();
 
-        notificacaoModelosService.criarEmailCadastroDevolvido(
-                nomeUnidade, nomeProcesso, motivo, observacoes);
+            // When
+            notificacaoModelosService.criarEmailMapaDisponibilizado(
+                    nomeUnidade, nomeProcesso, dataLimite);
 
-        assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Cadastro devolvido para ajustes", context.getVariable("titulo"));
-        assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(motivo, context.getVariable("motivo"));
-        assertEquals(observacoes, context.getVariable("observacoes"));
+            // Then
+            assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Mapa de Competências disponibilizado", context.getVariable("titulo"));
+            assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(dataLimite.format(FORMATADOR), context.getVariable("dataLimiteValidacao"));
+        }
+
+        @Test
+        @DisplayName("Deve criar email de mapa validado com os dados corretos")
+        void criarEmailMapaValidado() {
+            // Given
+            String nomeUnidade = "Unidade Teste";
+            String nomeProcesso = "Processo Teste";
+
+            // When
+            notificacaoModelosService.criarEmailMapaValidado(nomeUnidade, nomeProcesso);
+
+            // Then
+            assertEquals("mapa-validado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Mapa de Competências validado", context.getVariable("titulo"));
+            assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+        }
     }
 
-    @Test
-    @DisplayName("Deve criar email de mapa disponibilizado com os dados corretos")
-    void criarEmailMapaDisponibilizado() {
-        String nomeUnidade = "Unidade Teste";
-        String nomeProcesso = "Processo Teste";
-        LocalDateTime dataLimite = LocalDateTime.now();
+    @Nested
+    @DisplayName("Geração de E-mails de Finalização")
+    class Finalizacao {
+        @Test
+        @DisplayName("Deve criar email de processo finalizado com os dados corretos")
+        void criarEmailProcessoFinalizado() {
+            // Given
+            String nomeProcesso = "Processo Teste";
+            LocalDateTime dataFinalizacao = LocalDateTime.now();
+            int quantidadeMapas = 5;
 
-        notificacaoModelosService.criarEmailMapaDisponibilizado(
-                nomeUnidade, nomeProcesso, dataLimite);
+            // When
+            notificacaoModelosService.criarEmailProcessoFinalizado(
+                    nomeProcesso, dataFinalizacao, quantidadeMapas);
 
-        assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Mapa de Competências disponibilizado", context.getVariable("titulo"));
-        assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(dataLimite.format(FORMATADOR), context.getVariable("dataLimiteValidacao"));
-    }
+            // Then
+            assertEquals("processo-finalizado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Processo finalizado - Mapas Vigentes", context.getVariable("titulo"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(dataFinalizacao.format(FORMATADOR), context.getVariable("dataFinalizacao"));
+            assertEquals(quantidadeMapas, context.getVariable("quantidadeMapas"));
+        }
 
-    @Test
-    @DisplayName("Deve criar email de mapa validado com os dados corretos")
-    void criarEmailMapaValidado() {
-        String nomeUnidade = "Unidade Teste";
-        String nomeProcesso = "Processo Teste";
+        @Test
+        @DisplayName("Deve criar email de processo finalizado por unidade com os dados corretos")
+        void criarEmailProcessoFinalizadoPorUnidade() {
+            // Given
+            String siglaUnidade = "UT";
+            String nomeProcesso = "Processo Teste";
 
-        notificacaoModelosService.criarEmailMapaValidado(nomeUnidade, nomeProcesso);
+            // When
+            notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                    siglaUnidade, nomeProcesso);
 
-        assertEquals("mapa-validado", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Mapa de Competências validado", context.getVariable("titulo"));
-        assertEquals(nomeUnidade, context.getVariable("nomeUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-    }
+            // Then
+            assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
+            assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+        }
 
-    @Test
-    @DisplayName("Deve criar email de processo finalizado com os dados corretos")
-    void criarEmailProcessoFinalizado() {
-        String nomeProcesso = "Processo Teste";
-        LocalDateTime dataFinalizacao = LocalDateTime.now();
-        int quantidadeMapas = 5;
+        @Test
+        @DisplayName("Deve criar email de processo finalizado para unidades subordinadas")
+        void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
+            // Given
+            String siglaUnidade = "UT";
+            String nomeProcesso = "Processo Teste";
+            List<String> siglas = List.of("SUB1", "SUB2");
 
-        notificacaoModelosService.criarEmailProcessoFinalizado(
-                nomeProcesso, dataFinalizacao, quantidadeMapas);
+            // When
+            notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                    siglaUnidade, nomeProcesso, siglas);
 
-        assertEquals("processo-finalizado", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Processo finalizado - Mapas Vigentes", context.getVariable("titulo"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(dataFinalizacao.format(FORMATADOR), context.getVariable("dataFinalizacao"));
-        assertEquals(quantidadeMapas, context.getVariable("quantidadeMapas"));
-    }
-
-    @Test
-    @DisplayName("Deve criar email de processo finalizado por unidade com os dados corretos")
-    void criarEmailProcessoFinalizadoPorUnidade() {
-        String siglaUnidade = "UT";
-        String nomeProcesso = "Processo Teste";
-
-        notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
-                siglaUnidade, nomeProcesso);
-
-        assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals("Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
-        assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-    }
-
-    @Test
-    @DisplayName(
-            "Deve criar email de processo finalizado para unidades subordinadas com os dados"
-                    + " corretos")
-    void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
-        String siglaUnidade = "UT";
-        String nomeProcesso = "Processo Teste";
-        List<String> siglas = List.of("SUB1", "SUB2");
-
-        notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-                siglaUnidade, nomeProcesso, siglas);
-
-        assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
-        Context context = contextCaptor.getValue();
-        assertEquals(
-                "Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
-                context.getVariable("titulo"));
-        assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
-        assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-        assertEquals(siglas, context.getVariable("siglasUnidadesSubordinadas"));
+            // Then
+            assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals(
+                    "Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
+                    context.getVariable("titulo"));
+            assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
+            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertEquals(siglas, context.getVariable("siglasUnidadesSubordinadas"));
+        }
     }
 }
