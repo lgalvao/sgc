@@ -86,10 +86,6 @@ const corpoModal = computed(() => {
       ? "Confirma a homologação do mapa de competências?"
       : "Observações";
 });
-
-computed(() => {
-  return props.perfil !== "ADMIN";
-});
 </script>
 
 <style scoped>

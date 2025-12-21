@@ -1,6 +1,5 @@
 # Componentes do Frontend
 
-
 Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend.
 
 ## Princípios dos Componentes
@@ -10,6 +9,22 @@ Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplic
 - **Controlados por Props e Eventos:** A comunicação deve ser feita via `props` e `emits`.
 - **Uso de BootstrapVueNext:** A maioria dos componentes utiliza componentes base da biblioteca `bootstrap-vue-next` (
   ex: `BModal`, `BButton`).
+
+## Componentes de Navegação
+
+### MainNavbar
+**Responsabilidade:** Menu principal do sistema (topo da aplicação)
+- Links para páginas principais (Home, Alertas, Movimentações)
+- Links contextuais baseados em perfil do usuário
+- Responsivo com toggle para mobile
+- Posição: Fixa no topo
+
+### BarraNavegacao
+**Responsabilidade:** Breadcrumbs contextuais e navegação hierárquica
+- Mostra caminho atual na hierarquia (Processo → Subprocesso → Seção)
+- Botão de voltar
+- Breadcrumbs dinâmicos baseados na rota atual
+- Posição: Abaixo do MainNavbar, dentro do conteúdo
 
 ---
 
@@ -38,7 +53,11 @@ Componente de árvore hierárquica para seleção de unidades com checkboxes tri
 
 ### BarraNavegacao.vue
 
-Fornece navegação contextual, incluindo botão "Voltar" e breadcrumbs dinâmicos baseados na rota atual.
+(Veja seção Componentes de Navegação acima)
+
+### ConfirmacaoDisponibilizacaoModal.vue
+
+Modal de confirmação para disponibilização de cadastro.
 
 ### CriarCompetenciaModal.vue
 
@@ -73,24 +92,23 @@ Permite importar atividades de outros processos/unidades finalizados.
 
 ### MainNavbar.vue
 
-Barra de navegação superior da aplicação. Gerencia a exibição do usuário logado, seleção de perfil/unidade e logout.
+(Veja seção Componentes de Navegação acima)
 
 ### ModalAcaoBloco.vue
 
 Modal alternativo ou legado para realizar ações em massa (aceitar/homologar) em uma lista de unidades com seleção via
 checkbox.
 
-### ModalFinalizacao.vue
+### ModalConfirmacao.vue
 
-Modal de confirmação para finalizar um processo.
+Modal genérico de confirmação.
+
+- **Props:** `modelValue`, `titulo`, `mensagem` (opcional), `variant`.
+- **Slots:** default (para conteúdo customizado).
 
 ### ProcessoAcoes.vue
 
 Barra de botões de ação para a tela de detalhes do processo (Aceitar em bloco, Homologar em bloco, Finalizar).
-
-### ProcessoDetalhes.vue
-
-Exibe o cabeçalho com informações resumidas do processo (Descrição, Tipo, Situação).
 
 ### SistemaNotificacoesModal.vue
 
@@ -135,7 +153,6 @@ Tabela hierárquica genérica com suporte a expansão/colapso de linhas.
 
 - **Props:** `data` (estrutura de árvore), `columns`.
 
-### UnidadeTreeItem.vue
+### UnidadeTreeNode.vue
 
 Item recursivo para a árvore de seleção de unidades (`ArvoreUnidades`).
-

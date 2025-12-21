@@ -14,11 +14,25 @@
     </BAlert>
 
     <div v-if="processo">
-      <ProcessoDetalhes
-          :descricao="processo.descricao"
-          :situacao="processo.situacao"
-          :tipo="processo.tipo"
-      />
+      <div>
+        <BBadge
+            class="mb-2"
+            style="border-radius: 0"
+            variant="secondary"
+        >
+          Detalhes do processo
+        </BBadge>
+        <h2
+            class="display-6"
+            data-testid="processo-info"
+        >
+          {{ processo.descricao }}
+        </h2>
+        <div class="mb-4 mt-3">
+          <strong>Tipo:</strong> {{ formatarTipoProcesso(processo.tipo) }}<br>
+          <strong>Situação:</strong> {{ formatarSituacaoProcesso(processo.situacao) }}<br>
+        </div>
+      </div>
 
       <TreeTable
           :columns="colunasTabela"
@@ -45,27 +59,38 @@
         @fechar="fecharModalBloco"
     />
 
-    <ModalFinalizacao
-        :mostrar="mostrarModalFinalizacao"
-        :processo-descricao="processo?.descricao || ''"
+    <ModalConfirmacao
+        v-model="mostrarModalFinalizacao"
+        titulo="Finalização de processo"
+        variant="success"
         @confirmar="confirmarFinalizacao"
-        @fechar="fecharModalFinalizacao"
-    />
+    >
+      <BAlert
+          :fade="false"
+          :model-value="true"
+          variant="info"
+      >
+        <i class="bi bi-info-circle"/>
+        Confirma a finalização do processo <strong>{{ processo?.descricao || '' }}</strong>?<br>
+        Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
+        participantes do processo.
+      </BAlert>
+    </ModalConfirmacao>
   </BContainer>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BContainer} from "bootstrap-vue-next";
+import {BAlert, BBadge, BContainer} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco, {type UnidadeSelecao,} from "@/components/ModalAcaoBloco.vue";
-import ModalFinalizacao from "@/components/ModalFinalizacao.vue";
+import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
-import ProcessoDetalhes from "@/components/ProcessoDetalhes.vue";
 import TreeTable from "@/components/TreeTableView.vue";
 
 import {usePerfilStore} from "@/stores/perfil";
+import {formatarSituacaoProcesso, formatarTipoProcesso} from "@/utils/formatters";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";

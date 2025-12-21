@@ -1,3 +1,7 @@
+<!--
+BarraNavegacao - Breadcrumbs contextuais e navegação hierárquica
+Responsável por: mostrar caminho atual na hierarquia, botão voltar
+-->
 <template>
   <div class="barra-navegacao d-flex align-items-center gap-2">
     <BButton

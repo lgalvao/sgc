@@ -20,33 +20,24 @@
     </BAlert>
 
     <div class="table-responsive">
-      <table class="table table-bordered">
-        <thead class="table-light">
-        <tr>
-          <th>Selecionar</th>
-          <th>Sigla</th>
-          <th>Nome</th>
-          <th>Situação Atual</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr
-            v-for="unidade in unidades"
-            :key="unidade.sigla"
-        >
-          <td>
-            <BFormCheckbox
-                :id="'chk-' + unidade.sigla"
-                v-model="unidade.selecionada"
-                :data-testid="'chk-unidade-' + unidade.sigla"
-            />
-          </td>
-          <td><strong>{{ unidade.sigla }}</strong></td>
-          <td>{{ unidade.nome }}</td>
-          <td>{{ unidade.situacao }}</td>
-        </tr>
-        </tbody>
-      </table>
+      <BTable
+          :fields="fields"
+          :items="unidades"
+          bordered
+          hover
+          striped
+      >
+        <template #cell(selecionada)="{ item }">
+          <BFormCheckbox
+              :id="'chk-' + item.sigla"
+              v-model="item.selecionada"
+              :data-testid="'chk-unidade-' + item.sigla"
+          />
+        </template>
+        <template #cell(sigla)="{ item }">
+          <strong>{{ item.sigla }}</strong>
+        </template>
+      </BTable>
     </div>
 
     <template #footer>
@@ -70,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox, BModal, BTable} from "bootstrap-vue-next";
 
 export interface UnidadeSelecao {
   sigla: string;
@@ -89,4 +80,11 @@ const emit = defineEmits<{
   (e: "fechar"): void;
   (e: "confirmar", unidades: UnidadeSelecao[]): void;
 }>();
+
+const fields = [
+  {key: "selecionada", label: "Selecionar"},
+  {key: "sigla", label: "Sigla"},
+  {key: "nome", label: "Nome"},
+  {key: "situacao", label: "Situação Atual"},
+];
 </script>
