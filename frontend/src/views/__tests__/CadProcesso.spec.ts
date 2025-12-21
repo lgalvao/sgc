@@ -11,7 +11,7 @@ import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componen
 const { mockPush, mockRoute } = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
-        mockRoute: { query: {} }
+        mockRoute: { query: {} as Record<string, string> }
     }
 });
 
@@ -138,50 +138,30 @@ describe('CadProcesso.vue', () => {
     });
 
     it('loads process data for editing', async () => {
+        // Mock route query param BEFORE creating wrapper
+        mockRoute.query = { codProcesso: '123' };
+
         const { processosStore } = createWrapper();
 
-        // Mock implementation inside the test setup doesn't work well with onMounted if not set before mount
-        // Here we rely on the store mocking logic or implementation injection
-        // But since we use createWrapper which mounts immediately, we might miss the onMounted hook logic if we don't mock the store method return beforehand.
-        // However, Pinia actions are mocked as spies by default with createTestingPinia.
-        // We can manually call the onMounted logic or just check if it was called.
-
-        // Wait, the original test re-mounted. Here createWrapper mounts.
-        // We need to set up the mock BEFORE createWrapper if we want onMounted to use it?
-        // Actually, createTestingPinia mocks actions as spies. We can set mockImplementation on the spy.
-        // BUT, `useProcessosStore()` returns the store instance. If we want to mock the action behavior for onMounted, we need to do it before mount, or use initial state.
-
-        // The original test used:
-        // processosStore.buscarProcessoDetalhe.mockImplementation(...)
-        // wrapper = mount(...)
-
-        // With createWrapper, we mount inside. So we can't mock the store method on the *instance* before mount easily unless we pass a setup function or access the pinia instance.
-        // But createTestingPinia puts the store in the app.
-
-        // Better approach for this test: Just verify the call.
+        // Verify the action was called
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
     });
 
     it('redirects if process is not editable', async () => {
+        mockRoute.query = { codProcesso: '123' };
 
-        // We use initialState to simulate the store already having the data, or we mock the action to set it.
-        // In the component, onMounted calls `buscarProcessoDetalhe`.
-        // Then it checks `store.processoDetalhe`.
-
-        // Since `buscarProcessoDetalhe` is async, we can mock it to update the state.
-        // Or we can just set the state initially.
-
+        // Mock the store to return a non-CRIADO process
+        // We need to pass initial state because onMounted runs immediately
         const { processosStore } = createWrapper({
+            processos: {
+                processoDetalhe: { codigo: 123, situacao: 'EM_ANDAMENTO', unidades: [] },
+                lastError: null
+            }
         });
 
-        // The component calls `buscarProcessoDetalhe`.
-        // Then it watchers or checks state.
-        // The component does:
-        // await processosStore.buscarProcessoDetalhe(cod);
-        // if (processosStore.processoDetalhe.situacao !== 'CRIADO') ...
-
-        // Since the action is mocked (spy), it won't actually fetch data. But we initialized the state.
-        // The component awaits the action. Even if it does nothing, the state is already there.
+        // The component calls await buscarProcessoDetalhe(123)
+        // Since it's a spy from createTestingPinia, it resolves immediately.
+        // The component then checks state.
 
         await flushPromises();
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
@@ -402,17 +382,24 @@ describe('CadProcesso.vue', () => {
     it('maps field-specific validation errors from subErrors', async () => {
         const { wrapper, processosStore } = createWrapper();
 
-        processosStore.criarProcesso.mockRejectedValue(new Error('Validation Error'));
-        processosStore.lastError = {
-            message: 'Erro de validação',
-            subErrors: [
-                { field: 'descricao', message: 'Descrição é obrigatória' },
-                { field: 'tipo', message: 'Tipo inválido' },
-                { field: 'dataLimiteEtapa1', message: 'Data inválida' },
-                { field: 'unidades', message: 'Selecione ao menos uma unidade' },
-                { field: 'outro', message: 'Erro genérico' }
-            ]
-        };
+        // Ensure lastError is null initially
+        processosStore.lastError = null;
+
+        // Mock implementation to set lastError before throwing
+        // This ensures the component sees the error state when catching the exception
+        processosStore.criarProcesso.mockImplementation(async () => {
+             processosStore.lastError = {
+                message: 'Erro de validação',
+                subErrors: [
+                    { field: 'descricao', message: 'Descrição é obrigatória' },
+                    { field: 'tipo', message: 'Tipo inválido' },
+                    { field: 'dataLimiteEtapa1', message: 'Data inválida' },
+                    { field: 'unidades', message: 'Selecione ao menos uma unidade' },
+                    { field: 'outro', message: 'Erro genérico' }
+                ]
+            };
+            throw new Error('Validation Error');
+        });
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
