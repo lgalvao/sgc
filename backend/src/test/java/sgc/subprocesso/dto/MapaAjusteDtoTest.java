@@ -78,7 +78,7 @@ class MapaAjusteDtoTest {
         assertThat(ativDto.getConhecimentos()).hasSize(1);
 
         ConhecimentoAjusteDto conDto = ativDto.getConhecimentos().get(0);
-        assertThat(conDto.getConhecimentoId()).isEqualTo(3L);
+        assertThat(conDto.getConhecimentoCodigo()).isEqualTo(3L);
         assertThat(conDto.getNome()).isEqualTo("Con 1");
         assertThat(conDto.isIncluido()).isTrue();
     }

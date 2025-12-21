@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class ErroValidacaoDto {
     private String tipo; // "ATIVIDADE_SEM_CONHECIMENTO", "SEM_ATIVIDADES", etc.
-    private Long atividadeId;
+    private Long atividadeCodigo;
     private String descricaoAtividade;
     private String mensagem;
 }

@@ -9,7 +9,7 @@ describe("atribuicaoTemporariaService", () => {
         testGetEndpoint(
             () => buscarTodasAtribuicoes(),
             "/unidades/atribuicoes",
-            [{ id: 1 }]
+            [{ codigo: 1 }]
         );
         testErrorHandling(() => buscarTodasAtribuicoes());
     });

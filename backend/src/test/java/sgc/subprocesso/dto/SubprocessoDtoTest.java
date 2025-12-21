@@ -54,7 +54,7 @@ class SubprocessoDtoTest {
         List<ConhecimentoAjusteDto> conhecimentos =
                 List.of(
                         ConhecimentoAjusteDto.builder()
-                                .conhecimentoId(1L)
+                                .conhecimentoCodigo(1L)
                                 .nome(COMPETENCIA)
                                 .incluido(true)
                                 .build());
@@ -96,12 +96,12 @@ class SubprocessoDtoTest {
     void conhecimentoAjusteDtoRecordConstructorAndGetters() {
         ConhecimentoAjusteDto dto =
                 ConhecimentoAjusteDto.builder()
-                        .conhecimentoId(1L)
+                        .conhecimentoCodigo(1L)
                         .nome(COMPETENCIA)
                         .incluido(true)
                         .build();
 
-        assertEquals(1L, dto.getConhecimentoId());
+        assertEquals(1L, dto.getConhecimentoCodigo());
         assertEquals(COMPETENCIA, dto.getNome());
         assertTrue(dto.isIncluido());
     }
@@ -218,12 +218,12 @@ class SubprocessoDtoTest {
                                 .build());
         SubprocessoCadastroDto dto =
                 SubprocessoCadastroDto.builder()
-                        .subprocessoId(1L)
+                        .subprocessoCodigo(1L)
                         .unidadeSigla(SIGLA)
                         .atividades(atividades)
                         .build();
 
-        assertEquals(1L, dto.getSubprocessoId());
+        assertEquals(1L, dto.getSubprocessoCodigo());
         assertEquals(SIGLA, dto.getUnidadeSigla());
         assertEquals(atividades, dto.getAtividades());
     }

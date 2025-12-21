@@ -156,7 +156,7 @@ public class SubprocessoDtoService {
                 }
 
                 return SubprocessoCadastroDto.builder()
-                                .subprocessoId(sp.getCodigo())
+                                .subprocessoCodigo(sp.getCodigo())
                                 .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
                                 .atividades(atividadesComConhecimentos)
                                 .build();
@@ -251,7 +251,7 @@ public class SubprocessoDtoService {
                                 if (qtdConhecimentos == 0) {
                                         erros.add(ErroValidacaoDto.builder()
                                                         .tipo("ATIVIDADE_SEM_CONHECIMENTO")
-                                                        .atividadeId(atividade.getCodigo())
+                                                        .atividadeCodigo(atividade.getCodigo())
                                                         .descricaoAtividade(atividade.getDescricao())
                                                         .mensagem("A atividade '" + atividade.getDescricao()
                                                                         + "' não possui conhecimentos associados.")

@@ -29,7 +29,7 @@ describe("painelService", () => {
 
     describe("listarProcessos", () => {
         it("deve buscar e mapear processos", async () => {
-            const dtoList = [{id: 1, tipo: "MAPEAMENTO"}];
+            const dtoList = [{codigo: 1, tipo: "MAPEAMENTO"}];
             const responseData = {
                 content: dtoList,
                 totalPages: 1,
@@ -70,7 +70,7 @@ describe("painelService", () => {
 
     describe("listarAlertas", () => {
         it("deve buscar e mapear alertas", async () => {
-            const dtoList = [{id: 1, mensagem: "Alerta DTO"}];
+            const dtoList = [{codigo: 1, mensagem: "Alerta DTO"}];
             const responseData = {
                 content: dtoList,
                 totalPages: 1,

@@ -17,7 +17,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarTodasUnidades(),
             "/unidades",
-            [{ id: 1 }]
+            [{ codigo: 1 }]
         );
         testErrorHandling(() => buscarTodasUnidades());
     });
@@ -26,7 +26,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarUnidadePorSigla("TESTE"),
             "/unidades/sigla/TESTE",
-            { id: 1 }
+            { codigo: 1 }
         );
         testErrorHandling(() => buscarUnidadePorSigla("TESTE"));
     });
@@ -35,14 +35,14 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarUnidadePorCodigo(1),
             "/unidades/1",
-            { id: 1, nome: "Unit 1" }
+            { codigo: 1, nome: "Unit 1" }
         );
         testErrorHandling(() => buscarUnidadePorCodigo(1));
     });
 
     describe("buscarArvoreComElegibilidade", () => {
         it("deve fazer GET com código do processo", async () => {
-            const mockData = [{ id: 1 }];
+            const mockData = [{ codigo: 1 }];
             mockApi.get.mockResolvedValue({ data: mockData });
 
             const result = await buscarArvoreComElegibilidade("MAPEAMENTO", 1);
@@ -54,7 +54,7 @@ describe("unidadesService", () => {
         });
 
         it("deve fazer GET sem código do processo", async () => {
-            const mockData = [{ id: 1 }];
+            const mockData = [{ codigo: 1 }];
             mockApi.get.mockResolvedValue({ data: mockData });
 
             const result = await buscarArvoreComElegibilidade("MAPEAMENTO");
@@ -72,7 +72,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarArvoreUnidade(10),
             "/unidades/10/arvore",
-            { id: 10, children: [] }
+            { codigo: 10, children: [] }
         );
         testErrorHandling(() => buscarArvoreUnidade(10));
     });
@@ -81,7 +81,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarSubordinadas("SIGLA"),
             "/unidades/sigla/SIGLA/subordinadas",
-            [{ id: 11 }, { id: 12 }]
+            [{ codigo: 11 }, { codigo: 12 }]
         );
         testErrorHandling(() => buscarSubordinadas("SIGLA"));
     });
@@ -90,7 +90,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarSuperior("SIGLA"),
             "/unidades/sigla/SIGLA/superior",
-            { id: 9 }
+            { codigo: 9 }
         );
 
         it("deve retornar null se a resposta for vazia", async () => {

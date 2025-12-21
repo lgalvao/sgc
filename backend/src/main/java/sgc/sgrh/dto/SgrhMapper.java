@@ -69,7 +69,7 @@ public interface SgrhMapper {
         }
 
         return AtribuicaoTemporariaDto.builder()
-                .id(atribuicao.getCodigo())
+                .codigo(atribuicao.getCodigo())
                 .unidade(toUnidadeDto(atribuicao.getUnidade()))
                 .usuario(toUsuarioDto(atribuicao.getUsuario()))
                 .dataInicio(atribuicao.getDataInicio())

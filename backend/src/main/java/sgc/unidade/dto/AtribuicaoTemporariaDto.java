@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtribuicaoTemporariaDto {
-    private Long id;
+    private Long codigo;
     private UnidadeDto unidade;
     private UsuarioDto usuario;
     private LocalDateTime dataInicio;

@@ -48,7 +48,7 @@ describe("useProcessosStore", () => {
     describe("Actions", () => {
         describe("buscarProcessosPainel", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockPage = {content: [{id: 1}], totalPages: 1};
+                const mockPage = {content: [{codigo: 1}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await context.store.buscarProcessosPainel("perfil", 1, 0, 10);
                 const calls = painelService.listarProcessos.mock.calls[0];
@@ -60,7 +60,7 @@ describe("useProcessosStore", () => {
             });
 
             it("deve respeitar ordenacao personalizada", async () => {
-                const mockPage = {content: [{id: 2}], totalPages: 1};
+                const mockPage = {content: [{codigo: 2}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await context.store.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
                 expect(painelService.listarProcessos).toHaveBeenCalledWith(
@@ -179,7 +179,7 @@ describe("useProcessosStore", () => {
 
         describe("buscarProcessosFinalizados", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockProcessos = [{id: 1}];
+                const mockProcessos = [{codigo: 1}];
                 processoService.buscarProcessosFinalizados.mockResolvedValue(
                     mockProcessos as any,
                 );
@@ -196,7 +196,7 @@ describe("useProcessosStore", () => {
 
         describe("buscarSubprocessosElegiveis", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockSubprocessos = [{id: 1}];
+                const mockSubprocessos = [{codigo: 1}];
                 processoService.buscarSubprocessosElegiveis.mockResolvedValue(
                     mockSubprocessos as any,
                 );

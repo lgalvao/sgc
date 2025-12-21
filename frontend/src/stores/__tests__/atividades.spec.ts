@@ -110,7 +110,7 @@ describe("useAtividadesStore", () => {
             context.store.atividadesPorSubprocesso.set(1, [
                 {codigo: 1, descricao: "Atividade Teste", conhecimentos: []},
             ]);
-            const novoConhecimento = {id: 1, descricao: "Novo Conhecimento"};
+            const novoConhecimento = {codigo: 1, descricao: "Novo Conhecimento"};
             vi.mocked(atividadeService.criarConhecimento).mockResolvedValue({
                 atividade: {codigo: 1, descricao: "Atividade Teste", conhecimentos: [novoConhecimento]},
                 subprocesso: {
@@ -153,7 +153,7 @@ describe("useAtividadesStore", () => {
                 {
                     codigo: 1,
                     descricao: "Atividade Teste",
-                    conhecimentos: [{id: 1, descricao: "Conhecimento Teste"}],
+                    conhecimentos: [{codigo: 1, descricao: "Conhecimento Teste"}],
                 },
             ]);
             vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({
@@ -258,7 +258,7 @@ describe("useAtividadesStore", () => {
     describe("atualizarConhecimento", () => {
         it("deve atualizar um conhecimento", async () => {
             const conhecimentoAtualizado = {
-                id: 1,
+                codigo: 1,
                 descricao: "Conhecimento Atualizado",
             };
             const atividadeComConhecimentoAtualizado = {
@@ -271,7 +271,7 @@ describe("useAtividadesStore", () => {
                 {
                     codigo: 1,
                     descricao: "Atividade Teste",
-                    conhecimentos: [{id: 1, descricao: "Conhecimento Teste"}],
+                    conhecimentos: [{codigo: 1, descricao: "Conhecimento Teste"}],
                 },
             ]);
             vi.mocked(atividadeService.atualizarConhecimento).mockResolvedValue({
@@ -303,7 +303,7 @@ describe("useAtividadesStore", () => {
                 new Error("Erro"),
             );
             await expect(
-                context.store.atualizarConhecimento(1, 1, 1, {id: 1, descricao: "Teste"}),
+                context.store.atualizarConhecimento(1, 1, 1, {codigo: 1, descricao: "Teste"}),
             ).rejects.toThrow("Erro");
         });
     });

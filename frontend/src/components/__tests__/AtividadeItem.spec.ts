@@ -11,7 +11,7 @@ describe("AtividadeItem.vue", () => {
     codigo: 1,
     descricao: "Atividade Teste",
     conhecimentos: [
-        { id: 10, descricao: "Conhecimento 1" }
+        { codigo: 10, descricao: "Conhecimento 1" }
     ],
   };
 

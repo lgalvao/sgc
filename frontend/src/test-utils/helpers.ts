@@ -11,20 +11,20 @@ export function getMockAtividadesData(): Atividade[] {
             codigo: 1,
             descricao: "Manutenção de sistemas administrativos criados pela unidade",
             conhecimentos: [
-                {id: 1, descricao: "Criação de testes de integração em Cypress"},
+                {codigo: 1, descricao: "Criação de testes de integração em Cypress"},
             ],
         },
         {
             codigo: 2,
             descricao: "Especificação de sistemas administrativos",
-            conhecimentos: [{id: 6, descricao: "Modelagem de dados"}],
+            conhecimentos: [{codigo: 6, descricao: "Modelagem de dados"}],
         },
         {
             codigo: 3,
             descricao: "Implantação de sistemas externos",
             conhecimentos: [
                 {
-                    id: 40,
+                    codigo: 40,
                     descricao: "Conhecimento em configuração de APIs de terceiros",
                 },
             ],

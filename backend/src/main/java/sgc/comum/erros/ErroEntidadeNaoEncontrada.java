@@ -11,8 +11,8 @@ public class ErroEntidadeNaoEncontrada extends ErroNegocioBase {
         super(message, "ENTIDADE_NAO_ENCONTRADA", HttpStatus.NOT_FOUND);
     }
 
-    public ErroEntidadeNaoEncontrada(String entidade, Object id) {
-        super("'%s' com codigo '%s' não encontrado(a).".formatted(entidade, id),
+    public ErroEntidadeNaoEncontrada(String entidade, Object codigo) {
+        super("'%s' com codigo '%s' não encontrado(a).".formatted(entidade, codigo),
                 "ENTIDADE_NAO_ENCONTRADA",
                 HttpStatus.NOT_FOUND
         );

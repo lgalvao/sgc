@@ -71,7 +71,7 @@ import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
 
 interface TreeTableItem {
-  id: number | string;
+  codigo: number | string;
   nome: string;
   situacao: string;
   dataLimite: string;
@@ -98,7 +98,7 @@ const mostrarModalFinalizacao = ref(false);
 
 const codProcesso = computed(() =>
     Number(
-        route.params.codProcesso || route.params.id || route.query.codProcesso,
+        route.params.codProcesso || route.query.codProcesso,
     ),
 );
 
@@ -140,7 +140,7 @@ function formatarDadosParaArvore(
 ): TreeTableItem[] {
   if (!dados) return [];
   return dados.map((item) => ({
-    id: item.codUnidade,
+    codigo: item.codUnidade,
     nome: item.sigla,
     situacao: item.situacaoSubprocesso || "Não iniciado",
     dataLimite: formatarData(item.dataLimite || null),
@@ -164,7 +164,7 @@ function abrirDetalhesUnidade(item: any) {
       });
     } else if (
         (perfilUsuario === "CHEFE" || perfilUsuario === "SERVIDOR") &&
-        perfilStore.unidadeSelecionada === item.id
+        perfilStore.unidadeSelecionada === item.codigo
     ) {
       router.push({
         name: "Subprocesso",

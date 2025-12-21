@@ -205,7 +205,7 @@ describe("ProcessoView.vue", () => {
         const treeTable = wrapper.findComponent(TreeTableStub);
 
         // Simulando evento row-click
-        const item = {id: 10, unidadeAtual: "U1", clickable: true};
+        const item = {codigo: 10, unidadeAtual: "U1", clickable: true};
         // Disparar evento diretamente no componente filho
         treeTable.vm.$emit("row-click", item);
 
@@ -286,7 +286,7 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = {id: 10, unidadeAtual: "U1", clickable: true};
+        const item = {codigo: 10, unidadeAtual: "U1", clickable: true};
         treeTable.vm.$emit("row-click", item);
 
         expect(pushMock).toHaveBeenCalledWith({
@@ -304,7 +304,7 @@ describe("ProcessoView.vue", () => {
         pushMock.mockClear();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = {id: 10, unidadeAtual: "U1", clickable: true};
+        const item = {codigo: 10, unidadeAtual: "U1", clickable: true};
         treeTable.vm.$emit("row-click", item);
 
         expect(pushMock).not.toHaveBeenCalled();

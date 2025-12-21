@@ -74,7 +74,7 @@ export async function atualizarConhecimento(
     request: Conhecimento,
 ): Promise<AtividadeOperacaoResponse> {
     const payload = {
-        codigo: request.id,
+        codigo: request.codigo,
         atividadeCodigo: codAtividade,
         descricao: request.descricao,
     };

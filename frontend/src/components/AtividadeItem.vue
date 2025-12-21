@@ -95,10 +95,10 @@
 
         <div
             v-for="conhecimento in atividade.conhecimentos"
-            :key="conhecimento.id"
+            :key="conhecimento.codigo"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >
-          <template v-if="conhecimentoEmEdicao === conhecimento.id">
+          <template v-if="conhecimentoEmEdicao === conhecimento.codigo">
             <BFormInput
                 v-model="conhecimentoEditadoDescricao"
                 aria-label="Editar conhecimento"
@@ -113,7 +113,7 @@
                 title="Salvar"
                 aria-label="Salvar edição do conhecimento"
                 variant="outline-success"
-                @click="salvarEdicaoConhecimento(conhecimento.id)"
+                @click="salvarEdicaoConhecimento(conhecimento.codigo)"
             >
               <i class="bi bi-save"/>
             </BButton>
@@ -153,7 +153,7 @@
                   title="Remover"
                   :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
                   variant="outline-danger"
-                  @click="$emit('remover-conhecimento', conhecimento.id)"
+                  @click="$emit('remover-conhecimento', conhecimento.codigo)"
               >
                 <i class="bi bi-trash"/>
               </BButton>
@@ -210,8 +210,8 @@ const emit = defineEmits<{
   (e: "atualizar-atividade", novaDescricao: string): void;
   (e: "remover-atividade"): void;
   (e: "adicionar-conhecimento", descricao: string): void;
-  (e: "atualizar-conhecimento", idConhecimento: number, novaDescricao: string): void;
-  (e: "remover-conhecimento", idConhecimento: number): void;
+  (e: "atualizar-conhecimento", conhecimentoCodigo: number, novaDescricao: string): void;
+  (e: "remover-conhecimento", conhecimentoCodigo: number): void;
 }>();
 
 // Estado de Edição da Atividade
@@ -241,7 +241,7 @@ const conhecimentoEmEdicao = ref<number | null>(null);
 const conhecimentoEditadoDescricao = ref("");
 
 function iniciarEdicaoConhecimento(conhecimento: Conhecimento) {
-  conhecimentoEmEdicao.value = conhecimento.id;
+  conhecimentoEmEdicao.value = conhecimento.codigo;
   conhecimentoEditadoDescricao.value = conhecimento.descricao;
 }
 
@@ -250,10 +250,10 @@ function cancelarEdicaoConhecimento() {
   conhecimentoEditadoDescricao.value = "";
 }
 
-function salvarEdicaoConhecimento(id: number) {
+function salvarEdicaoConhecimento(codigo: number) {
   const descricao = conhecimentoEditadoDescricao.value.trim();
   if (descricao) {
-    emit("atualizar-conhecimento", id, descricao);
+    emit("atualizar-conhecimento", codigo, descricao);
   }
   cancelarEdicaoConhecimento();
 }

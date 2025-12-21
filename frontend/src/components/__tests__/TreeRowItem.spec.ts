@@ -11,7 +11,7 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve renderizar o item corretamente", () => {
-        const item = {id: 1, nome: "Item 1", situacao: "Ativo"};
+        const item = {codigo: 1, nome: "Item 1", situacao: "Ativo"};
         const columns = [
             {key: "nome", label: "Nome"},
             {key: "situacao", label: "Situação"},
@@ -25,7 +25,7 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve aplicar paddingLeft com base no level", () => {
-        const item = {id: 1, nome: "Item 1"};
+        const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 2},
@@ -37,9 +37,9 @@ describe("TreeRowItem.vue", () => {
 
     it("deve exibir o toggle-icon se houver children", () => {
         const item = {
-            id: 1,
+            codigo: 1,
             nome: "Item 1",
-            children: [{id: 2, nome: "Child 1"}],
+            children: [{codigo: 2, nome: "Child 1"}],
         };
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
@@ -51,7 +51,7 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("não deve exibir o toggle-icon se não houver children", () => {
-        const item = {id: 1, nome: "Item 1"};
+        const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 0},
@@ -62,9 +62,9 @@ describe("TreeRowItem.vue", () => {
 
     it("deve emitir o evento toggle ao clicar no toggle-icon", async () => {
         const item = {
-            id: 1,
+            codigo: 1,
             nome: "Item 1",
-            children: [{id: 2, nome: "Child 1"}],
+            children: [{codigo: 2, nome: "Child 1"}],
         };
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
@@ -81,7 +81,7 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve emitir o evento row-click ao clicar na linha se clickable for true (padrao)", async () => {
-        const item = {id: 1, nome: "Item 1", clickable: true};
+        const item = {codigo: 1, nome: "Item 1", clickable: true};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 0},
@@ -95,7 +95,7 @@ describe("TreeRowItem.vue", () => {
 
     it("deve emitir o evento row-click ao clicar na linha se clickable for undefined (default true logic check)", async () => {
         // Since clickable? is optional, if it's undefined, the check `props.item.clickable === false` is false, so it should emit.
-        const item = {id: 1, nome: "Item 1"};
+        const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 0},
@@ -107,7 +107,7 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("não deve emitir o evento row-click ao clicar na linha se clickable for false", async () => {
-        const item = {id: 1, nome: "Item 1", clickable: false};
+        const item = {codigo: 1, nome: "Item 1", clickable: false};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
             props: {item, columns, level: 0},
@@ -120,9 +120,9 @@ describe("TreeRowItem.vue", () => {
 
     it("deve exibir o ícone chevron-down quando item está expandido", () => {
         const item = {
-            id: 1,
+            codigo: 1,
             nome: "Item 1",
-            children: [{id: 2, nome: "Child 1"}],
+            children: [{codigo: 2, nome: "Child 1"}],
             expanded: true,
         };
         const columns = [{key: "nome", label: "Nome"}];

@@ -55,7 +55,7 @@
         <tbody>
         <TreeRowItem
             v-for="item in flattenedData"
-            :key="item.id"
+            :key="item.codigo"
             :columns="columns"
             :item="item"
             :level="item.level"
@@ -74,7 +74,7 @@ import {computed, nextTick, ref, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 
 interface TreeItem {
-  id: number | string;
+  codigo: number | string;
   expanded?: boolean;
   children?: TreeItem[];
   level?: number;
@@ -136,22 +136,22 @@ const flattenedData = computed((): FlattenedTreeItem[] => {
   return flattened;
 });
 
-const findItemById = (
+const findItemByCodigo = (
     items: TreeItem[],
-    id: number | string,
+    codigo: number | string,
 ): TreeItem | null => {
   for (const item of items) {
-    if (item.id === id) return item;
+    if (item.codigo === codigo) return item;
     if (item.children) {
-      const found = findItemById(item.children, id);
+      const found = findItemByCodigo(item.children, codigo);
       if (found) return found;
     }
   }
   return null;
 };
 
-const toggleExpand = (id: number | string) => {
-  const item = findItemById(internalData.value, id);
+const toggleExpand = (codigo: number | string) => {
+  const item = findItemByCodigo(internalData.value, codigo);
   if (item) {
     item.expanded = !item.expanded;
   }
@@ -193,7 +193,7 @@ const handleTreeRowClick = (clickedItem: TreeItem) => {
 
 defineExpose({
   internalData,
-  findItemById,
+  findItemByCodigo,
   toggleExpand,
   handleTreeRowClick,
 });
