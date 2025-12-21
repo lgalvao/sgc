@@ -24,6 +24,8 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.MapaFixture;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
@@ -47,7 +49,7 @@ class SubprocessoServiceTest {
     @Test
     @DisplayName("obterStatus sucesso")
     void obterSituacao() {
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, null);
         sp.setCodigo(1L);
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
 
@@ -65,7 +67,7 @@ class SubprocessoServiceTest {
     @Test
     @DisplayName("obterEntidadePorCodigoMapa sucesso")
     void obterEntidadePorCodigoMapa() {
-        when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(new Subprocesso()));
+        when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(SubprocessoFixture.subprocessoPadrao(null, null)));
         assertThat(service.obterEntidadePorCodigoMapa(100L)).isNotNull();
     }
 
@@ -73,11 +75,11 @@ class SubprocessoServiceTest {
     @DisplayName("criar sucesso")
     void criar() {
         SubprocessoDto dto = SubprocessoDto.builder().build();
-        Subprocesso entity = new Subprocesso();
+        Subprocesso entity = SubprocessoFixture.subprocessoPadrao(null, null);
         
         when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
         when(repositorioSubprocesso.save(any())).thenReturn(entity);
-        when(mapaRepo.save(any())).thenReturn(new Mapa());
+        when(mapaRepo.save(any())).thenReturn(MapaFixture.mapaPadrao(null));
         when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
         assertThat(service.criar(dto)).isNotNull();
@@ -88,7 +90,7 @@ class SubprocessoServiceTest {
     @DisplayName("atualizar sucesso")
     void atualizar() {
         SubprocessoDto dto = SubprocessoDto.builder().codMapa(100L).build();
-        Subprocesso entity = new Subprocesso();
+        Subprocesso entity = SubprocessoFixture.subprocessoPadrao(null, null);
 
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(entity));
         when(repositorioSubprocesso.save(any())).thenReturn(entity);

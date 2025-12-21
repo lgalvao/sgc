@@ -26,6 +26,12 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
+import sgc.fixture.AtividadeFixture;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +63,7 @@ class AtividadeServiceTest {
     @Test
     @DisplayName("listar deve retornar todas atividades")
     void listar() {
-        when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
+        when(atividadeRepo.findAll()).thenReturn(List.of(AtividadeFixture.atividadePadrao(null)));
         when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
 
         var result = atividadeService.listar();
@@ -69,7 +75,7 @@ class AtividadeServiceTest {
     @DisplayName("obterPorCodigo deve retornar atividade se existir")
     void obterPorCodigo() {
         Long id = 1L;
-        when(atividadeRepo.findById(id)).thenReturn(Optional.of(new Atividade()));
+        when(atividadeRepo.findById(id)).thenReturn(Optional.of(AtividadeFixture.atividadePadrao(null)));
         when(atividadeMapper.toDto(any())).thenReturn(new AtividadeDto());
 
         var result = atividadeService.obterPorCodigo(id);
@@ -95,18 +101,16 @@ class AtividadeServiceTest {
         AtividadeDto dto = new AtividadeDto();
         dto.setMapaCodigo(mapaId);
 
-        Unidade unidade = new Unidade();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setTituloTitular(usuarioId);
 
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(usuarioId);
+        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
 
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(mapaId);
-
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setUnidade(unidade);
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(mapaId);
         subprocesso.setMapa(mapa);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -129,22 +133,19 @@ class AtividadeServiceTest {
         AtividadeDto dto = new AtividadeDto();
         dto.setMapaCodigo(mapaId);
 
-        Unidade unidade = new Unidade();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setTituloTitular(usuarioId);
 
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(usuarioId);
-
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(mapaId);
+        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
 
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setUnidade(unidade);
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        subprocesso.setProcesso(processo);
+
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(mapaId);
         subprocesso.setMapa(mapa);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -179,8 +180,9 @@ class AtividadeServiceTest {
         Long mapaId = 10L;
         AtividadeDto dto = new AtividadeDto();
         dto.setMapaCodigo(mapaId);
-        Subprocesso sp = new Subprocesso();
-        Mapa mapa = new Mapa();
+
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, null);
+        Mapa mapa = MapaFixture.mapaPadrao(sp);
         mapa.setCodigo(mapaId);
         sp.setMapa(mapa);
 
@@ -199,21 +201,15 @@ class AtividadeServiceTest {
         AtividadeDto dto = new AtividadeDto();
         dto.setMapaCodigo(mapaId);
 
-        Unidade unidade = new Unidade();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setTituloTitular("outro");
 
-        Usuario titular = new Usuario();
-        titular.setTituloEleitoral("outro");
-
-        Mapa mapa = new Mapa();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, unidade);
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
         mapa.setCodigo(mapaId);
-
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
 
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(usuarioId);
+        Usuario usuario = UsuarioFixture.usuarioComTitulo(usuarioId);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
         when(usuarioRepo.findById(usuarioId)).thenReturn(Optional.of(usuario));
@@ -230,14 +226,14 @@ class AtividadeServiceTest {
         AtividadeDto dto = new AtividadeDto();
         dto.setDescricao("Nova desc");
 
-        Mapa mapa = new Mapa();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(mapaId);
 
-        Atividade atividade = new Atividade();
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setDescricao("Velha desc");
-        atividade.setMapa(mapa);
+        atividade.setCodigo(id);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -265,14 +261,13 @@ class AtividadeServiceTest {
         Long id = 1L;
         Long mapaId = 100L;
 
-        Mapa mapa = new Mapa();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(mapaId);
 
-        Atividade atividade = new Atividade();
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setCodigo(id);
-        atividade.setMapa(mapa);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -321,13 +316,12 @@ class AtividadeServiceTest {
         Long mapaId = 100L;
         ConhecimentoDto dto = new ConhecimentoDto();
 
-        Mapa mapa = new Mapa();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(mapaId);
 
-        Atividade atividade = new Atividade();
-        atividade.setMapa(mapa);
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -358,17 +352,16 @@ class AtividadeServiceTest {
 
         ConhecimentoDto dto = new ConhecimentoDto().setDescricao("Novo");
 
-        Mapa mapa = new Mapa();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(mapaId);
 
-        Atividade atividade = new Atividade();
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setCodigo(ativId);
-        atividade.setMapa(mapa);
 
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setAtividade(atividade);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -388,7 +381,7 @@ class AtividadeServiceTest {
         Long ativId = 1L;
         Long conId = 2L;
 
-        Atividade atividadeOutra = new Atividade();
+        Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
         atividadeOutra.setCodigo(99L);
 
         Conhecimento conhecimento = new Conhecimento();
@@ -410,17 +403,16 @@ class AtividadeServiceTest {
         Long conId = 2L;
         Long mapaId = 100L;
 
-        Mapa mapa = new Mapa();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(mapaId);
 
-        Atividade atividade = new Atividade();
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setCodigo(ativId);
-        atividade.setMapa(mapa);
 
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setAtividade(atividade);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(null, null);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.findByMapaCodigo(mapaId)).thenReturn(Optional.of(subprocesso));
@@ -437,7 +429,7 @@ class AtividadeServiceTest {
         Long ativId = 1L;
         Long conId = 2L;
 
-        Atividade atividadeOutra = new Atividade();
+        Atividade atividadeOutra = AtividadeFixture.atividadePadrao(null);
         atividadeOutra.setCodigo(99L);
 
         Conhecimento conhecimento = new Conhecimento();

@@ -219,7 +219,7 @@ Para **qualquer** PR de refatoração de testes:
 | 0 | Baseline | Comandos documentados, métricas estabelecidas | ✅ Concluído |
 | 1 | Boilerplate | -15 arquivos de teste removidos | ✅ Concluído |
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
-| 3 | Fixtures | Pacote `fixture/` criado com N builders | Pendente |
+| 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | Pendente |
 | 5 | Integração | 0 IDs hardcoded sem setup explícito | Pendente |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
@@ -254,14 +254,15 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 1. ✅ **Sprint 0:** Validada baseline (98 testes iniciais, 1 LENIENT).
 2. ✅ **Sprint 1:** Removidos 15 arquivos de testes boilerplate (DTOs/Models), reduzindo para 83 arquivos.
 3. ✅ **Sprint 2:** Removido `Strictness.LENIENT` de `ProcessoServiceTest.java`. Corrigido stub de `save` para `saveAndFlush`.
-4. ✅ Adicionado contexto específico do SGC em cada sprint
-2. ✅ Substituído comando genérico "mvn test" por Gradle correto
-3. ✅ Documentada estrutura real de 9 módulos
-4. ✅ Adicionadas estatísticas verificadas (98 testes, 478 @DisplayName, etc)
-5. ✅ Incluído detalhe que JaCoCo já está configurado (Sprint 6)
-6. ✅ Adicionados exemplos de código baseados na arquitetura real
-7. ✅ Todos os comandos validados e testados
-8. ✅ Referências aos READMEs do projeto
+4. ✅ **Sprint 3:** Criado pacote `sgc.fixture` com 6 builders (Processo, Subprocesso, Mapa, Atividade, Unidade, Usuario). Refatorados `ProcessoServiceTest`, `SubprocessoServiceTest` e `AtividadeServiceTest` para usar fixtures.
+5. ✅ Adicionado contexto específico do SGC em cada sprint
+6. ✅ Substituído comando genérico "mvn test" por Gradle correto
+7. ✅ Documentada estrutura real de 9 módulos
+8. ✅ Adicionadas estatísticas verificadas (98 testes, 478 @DisplayName, etc)
+9. ✅ Incluído detalhe que JaCoCo já está configurado (Sprint 6)
+10. ✅ Adicionados exemplos de código baseados na arquitetura real
+11. ✅ Todos os comandos validados e testados
+12. ✅ Referências aos READMEs do projeto
 
 **Validação**: Todos os comandos foram testados com script automatizado (`/tmp/validate_commands.sh`).
 
