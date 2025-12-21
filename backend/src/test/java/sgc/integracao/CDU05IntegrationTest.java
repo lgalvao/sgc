@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -75,6 +77,9 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private Unidade unidade;
     private Mapa mapaOriginal;
     private Competencia competenciaOriginal;
@@ -83,7 +88,20 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = unidadeRepo.findById(13L).orElseThrow(); // SEPRO
+        // Reset sequences
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 40000");
+            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 100000"); // Aumentado para evitar conflito com CDU04
+            jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
+            jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 70000");
+        } catch (Exception ignored) {}
+
+        // 1. Criar unidade
+        unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setSigla("U_REV");
+        unidade.setNome("Unidade Revisão");
+        unidade = unidadeRepo.save(unidade);
 
         // Cria um mapa detalhado para ser copiado
         mapaOriginal = new Mapa();
@@ -97,8 +115,6 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
         conhecimentoOriginal = new Conhecimento("Conhecimento Original", atividadeOriginal);
         conhecimentoRepo.save(conhecimentoOriginal);
-
-        unidadeRepo.save(unidade);
 
         unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaOriginal));
     }
@@ -162,8 +178,12 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
-        // 1. Use existing unit without mapa vigente
-        Unidade unidadeSemMapa = unidadeRepo.findById(14L).orElseThrow(); // COJUR
+        // 1. Criar unidade SEM mapa vigente
+        Unidade unidadeSemMapa = UnidadeFixture.unidadePadrao();
+        unidadeSemMapa.setCodigo(null);
+        unidadeSemMapa.setSigla("U_SEM_MAPA");
+        unidadeSemMapa.setNome("Unidade Sem Mapa");
+        unidadeSemMapa = unidadeRepo.save(unidadeSemMapa);
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());
@@ -181,7 +201,7 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
         var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L)
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 99999L)
                 .with(csrf()) // código que não existe
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(iniciarReq)))
