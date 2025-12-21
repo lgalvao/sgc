@@ -38,7 +38,9 @@ public class CopiaMapaService {
 
         Map<Long, Atividade> mapaDeAtividades = new HashMap<>();
 
-        List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigo(fonte.getCodigo());
+        // Optimization: Use findByMapaCodigoWithConhecimentos to fetch activities and their knowledges
+        // in a single query (LEFT JOIN FETCH), avoiding the N+1 problem inside the loop.
+        List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigoWithConhecimentos(fonte.getCodigo());
         if (atividadesFonte == null) {
             atividadesFonte = Collections.emptyList();
         }
@@ -50,7 +52,8 @@ public class CopiaMapaService {
             Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
             mapaDeAtividades.put(atividadeFonte.getCodigo(), atividadeSalva);
 
-            List<Conhecimento> conhecimentosFonte = conhecimentoRepo.findByAtividadeCodigo(atividadeFonte.getCodigo());
+            // Accessing the collection directly as it was pre-fetched
+            List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
             if (conhecimentosFonte != null && !conhecimentosFonte.isEmpty()) {
                 List<Conhecimento> novosConhecimentos = new ArrayList<>();
                 for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
@@ -75,8 +78,10 @@ public class CopiaMapaService {
                 Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
                 for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
                     Atividade novaAtividade = mapaDeAtividades.get(atividadeFonteAssociada.getCodigo());
-                    novasAtividadesAssociadas.add(novaAtividade);
-                    novaAtividade.getCompetencias().add(novaCompetencia);
+                    if (novaAtividade != null) {
+                        novasAtividadesAssociadas.add(novaAtividade);
+                        novaAtividade.getCompetencias().add(novaCompetencia);
+                    }
                 }
                 novaCompetencia.setAtividades(novasAtividadesAssociadas);
 

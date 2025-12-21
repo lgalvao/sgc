@@ -114,6 +114,7 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(atividadeOriginal);
 
         conhecimentoOriginal = new Conhecimento("Conhecimento Original", atividadeOriginal);
+        atividadeOriginal.getConhecimentos().add(conhecimentoOriginal); // Mantém consistência bidirecional
         conhecimentoRepo.save(conhecimentoOriginal);
 
         unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapaOriginal));

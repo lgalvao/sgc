@@ -13,3 +13,7 @@
 ## 2024-05-22 - N+1 fix in Usuario
 **Learning:** `FetchType.EAGER` on `OneToMany` collections is a silent performance killer, especially on frequently loaded entities like `Usuario`. Spring Data JPA finders (like `findByUnidadeLotacaoCodigo`) do not join these collections by default, leading to N+1 queries.
 **Action:** Audit all `FetchType.EAGER` usages. When changing to `LAZY`, ensure that specialized methods (like authentication) explicitly initialize the collection within a transaction.
+
+## 2025-12-21 - JPA Test Setup for Bidirectional Relationships
+**Learning:** In `@Transactional` integration tests, querying for an entity that is already in the persistence context (Session) returns the existing managed instance. If that instance was created with incomplete data (e.g., a child added to DB but not to the parent's list in memory), subsequent operations that rely on traversing the relationship will see stale/empty data, even if `JOIN FETCH` was used.
+**Action:** Always maintain bidirectional consistency in test setup. When creating a child entity, explicitly add it to the parent's collection in the test code.
