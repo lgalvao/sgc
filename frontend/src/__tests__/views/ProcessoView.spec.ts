@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ProcessoView from '@/views/ProcessoView.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { useProcessosStore } from '@/stores/processos';
-import { usePerfilStore } from '@/stores/perfil';
+
 import { useFeedbackStore } from '@/stores/feedback';
 import { useRoute, useRouter } from 'vue-router';
 import { Perfil } from '@/types/tipos';

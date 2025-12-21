@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import * as analiseService from "@/services/analiseService";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {useAnalisesStore} from "../analises";

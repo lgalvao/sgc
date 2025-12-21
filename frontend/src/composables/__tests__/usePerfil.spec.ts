@@ -40,7 +40,7 @@ describe("usePerfil", () => {
         } as any);
 
         vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorId: (id: number) => ({id, nome: "Usuário Teste"}),
+            obterUsuarioPorId: (id: number) => ({ id, nome: "Usuário Teste"}),
         } as any);
 
         const {servidorLogado} = usePerfil();
@@ -59,7 +59,7 @@ describe("usePerfil", () => {
         } as any);
 
         vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorId: (id: number) => null,
+            obterUsuarioPorId: () => null,
         } as any);
 
         const {servidorLogado} = usePerfil();
