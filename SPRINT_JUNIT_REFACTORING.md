@@ -220,7 +220,7 @@ Para **qualquer** PR de refatoração de testes:
 | 1 | Boilerplate | -15 arquivos de teste removidos | ✅ Concluído |
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
-| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | Pendente |
+| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | Em Andamento (Módulo Processo Concluído) |
 | 5 | Integração | 0 IDs hardcoded sem setup explícito | Pendente |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
@@ -263,6 +263,7 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 10. ✅ Adicionados exemplos de código baseados na arquitetura real
 11. ✅ Todos os comandos validados e testados
 12. ✅ Referências aos READMEs do projeto
+13. ✅ **Sprint 4 (Parcial):** Padronizados testes do módulo `sgc.processo` com `@Nested`, `@DisplayName` e nomenclatura oficial.
 
 **Validação**: Todos os comandos foram testados com script automatizado (`/tmp/validate_commands.sh`).
 
