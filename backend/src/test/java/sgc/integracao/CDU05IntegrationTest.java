@@ -200,7 +200,7 @@ public class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
+        var iniciarReq = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(unidade.getCodigo()));
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 99999L)
                 .with(csrf()) // código que não existe
                 .contentType(MediaType.APPLICATION_JSON)
