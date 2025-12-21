@@ -36,18 +36,6 @@ const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 // Estado local sincronizado com props.modelValue
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
-// Watch para sincronizar props.modelValue -> local (apenas quando props mudam externamente)
-watch(
-    () => props.modelValue,
-    (newValue) => {
-      // Só atualiza se for diferente (evita loop)
-      if (JSON.stringify(newValue) !== JSON.stringify(unidadesSelecionadasLocal.value)) {
-        unidadesSelecionadasLocal.value = [...newValue];
-      }
-    },
-    {deep: true}
-);
-
 // Mapas computados uma única vez para acesso O(1)
 // Bolt Optimization: Pre-calculate maps to avoid O(N^2) lookups during rendering
 const maps = computed(() => {
@@ -216,10 +204,11 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
 watch(
     () => props.modelValue,
     (novoValor) => {
-      if (
-          JSON.stringify(novoValor.sort()) !==
-          JSON.stringify(unidadesSelecionadasLocal.value.sort())
-      ) {
+      // Clone arrays before sorting to avoid mutating props or local state
+      const sortedNew = [...novoValor].sort();
+      const sortedLocal = [...unidadesSelecionadasLocal.value].sort();
+
+      if (JSON.stringify(sortedNew) !== JSON.stringify(sortedLocal)) {
         unidadesSelecionadasLocal.value = [...novoValor];
       }
     },

@@ -5,7 +5,9 @@
       centered
       @hide="fechar"
   >
-    <p>{{ mensagem }}</p>
+    <slot>
+      <p>{{ mensagem }}</p>
+    </slot>
     <template #footer>
       <BButton
           variant="secondary"
@@ -31,7 +33,7 @@ import {computed} from "vue";
 const props = defineProps<{
   modelValue: boolean;
   titulo: string;
-  mensagem: string;
+  mensagem?: string;
   variant?: any;
 }>();
 

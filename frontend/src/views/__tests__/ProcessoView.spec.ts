@@ -40,12 +40,6 @@ vi.mock("@/services/processoService", () => ({
 }));
 
 // Stubs
-const ProcessoDetalhesStub = {
-    name: "ProcessoDetalhes",
-    props: ["descricao", "tipo", "situacao"],
-    template: '<div data-testid="processo-detalhes">{{ descricao }}</div>',
-};
-
 const ProcessoAcoesStub = {
     name: "ProcessoAcoes",
     props: ["mostrarBotoesBloco", "perfil", "situacaoProcesso"],
@@ -53,11 +47,11 @@ const ProcessoAcoesStub = {
     emits: ["aceitar-bloco", "homologar-bloco", "finalizar"],
 };
 
-const ModalFinalizacaoStub = {
-    name: "ModalFinalizacao",
-    props: ["mostrar", "processoDescricao"],
-    template: '<div v-if="mostrar" data-testid="modal-finalizacao"></div>',
-    emits: ["fechar", "confirmar"],
+const ModalConfirmacaoStub = {
+    name: "ModalConfirmacao",
+    props: ["modelValue", "titulo", "variant"],
+    template: '<div v-if="modelValue" data-testid="modal-confirmacao"></div>',
+    emits: ["update:modelValue", "confirmar"],
 };
 
 const ModalAcaoBlocoStub = {
@@ -105,9 +99,8 @@ describe("ProcessoView.vue", () => {
     ];
 
     const additionalStubs = {
-        ProcessoDetalhes: ProcessoDetalhesStub,
         ProcessoAcoes: ProcessoAcoesStub,
-        ModalFinalizacao: ModalFinalizacaoStub,
+        ModalConfirmacao: ModalConfirmacaoStub,
         ModalAcaoBloco: ModalAcaoBlocoStub,
         TreeTable: TreeTableStub,
         BContainer: {template: "<div><slot /></div>"},
@@ -159,8 +152,7 @@ describe("ProcessoView.vue", () => {
 
         expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
 
-        const detalhes = wrapper.findComponent(ProcessoDetalhesStub);
-        expect(detalhes.props("descricao")).toBe("Test Process");
+        expect(wrapper.find('[data-testid="processo-info"]').text()).toBe("Test Process");
     });
 
     it("deve mostrar botões de ação quando houver subprocessos elegíveis", async () => {
@@ -223,9 +215,9 @@ describe("ProcessoView.vue", () => {
         acoes.vm.$emit("finalizar");
         await flushPromises(); // Aguardar reatividade
 
-        const modal = wrapper.findComponent(ModalFinalizacaoStub);
+        const modal = wrapper.findComponent(ModalConfirmacaoStub);
         expect(modal.exists()).toBe(true);
-        expect(modal.props("mostrar")).toBe(true);
+        expect(modal.props("modelValue")).toBe(true);
     });
 
     it("deve confirmar finalização", async () => {
@@ -234,7 +226,7 @@ describe("ProcessoView.vue", () => {
 
         vi.spyOn(feedbackStore, "show");
 
-        const modal = wrapper.findComponent(ModalFinalizacaoStub);
+        const modal = wrapper.findComponent(ModalConfirmacaoStub);
         modal.vm.$emit("confirmar");
         await flushPromises();
 
@@ -332,7 +324,7 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
         vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Fail"));
 
-        const modal = wrapper.findComponent(ModalFinalizacaoStub);
+        const modal = wrapper.findComponent(ModalConfirmacaoStub);
         modal.vm.$emit("confirmar");
         await flushPromises();
 
