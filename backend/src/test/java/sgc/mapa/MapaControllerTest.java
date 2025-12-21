@@ -1,6 +1,7 @@
 package sgc.mapa;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MapaController.class)
 @Import(RestExceptionHandler.class)
+@DisplayName("Testes do Controller de Mapas")
 class MapaControllerTest {
     private static final String API_MAPAS = "/api/mapas";
     private static final String API_MAPAS_1 = "/api/mapas/1";
@@ -53,7 +55,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void listar_DeveRetornarListaDeMapas() throws Exception {
+    @DisplayName("Deve retornar lista de mapas")
+    void deveRetornarListaDeMapas() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
@@ -68,7 +71,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void obterPorId_QuandoMapaExiste_DeveRetornarOk() throws Exception {
+    @DisplayName("Deve retornar mapa quando existir")
+    void deveRetornarMapaQuandoExistir() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
@@ -83,7 +87,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void obterPorId_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
+    @DisplayName("Deve retornar NotFound quando mapa não existir")
+    void deveRetornarNotFoundQuandoMapaNaoExistir() throws Exception {
         when(mapaService.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada(""));
 
         mockMvc.perform(get(API_MAPAS_1)).andExpect(status().isNotFound());
@@ -91,7 +96,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void criar_ComDadosValidos_DeveRetornarCreated() throws Exception {
+    @DisplayName("Deve retornar Created ao criar mapa")
+    void deveRetornarCreatedAoCriar() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
@@ -111,7 +117,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void atualizar_QuandoMapaExiste_DeveRetornarOk() throws Exception {
+    @DisplayName("Deve retornar Ok ao atualizar mapa existente")
+    void deveRetornarOkAoAtualizarMapaExistente() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
@@ -131,7 +138,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void atualizar_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
+    @DisplayName("Deve retornar NotFound ao atualizar mapa inexistente")
+    void deveRetornarNotFoundAoAtualizarMapaInexistente() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaService.atualizar(eq(1L), any(Mapa.class)))
@@ -148,7 +156,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void excluir_QuandoMapaExiste_DeveRetornarNoContent() throws Exception {
+    @DisplayName("Deve retornar NoContent ao excluir mapa")
+    void deveRetornarNoContentAoExcluir() throws Exception {
         doNothing().when(mapaService).excluir(1L);
 
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNoContent());
@@ -158,7 +167,8 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    void excluir_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
+    @DisplayName("Deve retornar NotFound ao excluir mapa inexistente")
+    void deveRetornarNotFoundAoExcluirInexistente() throws Exception {
         doThrow(new ErroEntidadeNaoEncontrada("")).when(mapaService).excluir(1L);
 
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNotFound());

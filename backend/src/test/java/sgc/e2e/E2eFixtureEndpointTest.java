@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("e2e")
+@DisplayName("Testes de Endpoint de Fixture E2E")
 class E2eFixtureEndpointTest {
 
     @Autowired
@@ -38,6 +40,7 @@ class E2eFixtureEndpointTest {
     }
 
     @Test
+    @DisplayName("Deve permitir criar processo de mapeamento via fixture")
     void devePermitirCriarProcessoMapeamentoViaFixture() throws Exception {
         // Preparar requisição
         E2eController.ProcessoFixtureRequest request =
@@ -56,6 +59,7 @@ class E2eFixtureEndpointTest {
     }
 
     @Test
+    @DisplayName("Deve permitir criar e iniciar processo de mapeamento via fixture")
     void devePermitirCriarEIniciarProcessoMapeamentoViaFixture() throws Exception {
         // Preparar requisição
         E2eController.ProcessoFixtureRequest request =
@@ -78,6 +82,7 @@ class E2eFixtureEndpointTest {
     }
 
     @Test
+    @DisplayName("Deve retornar erro quando unidade não existe")
     void deveRetornarErroQuandoUnidadeNaoExiste() throws Exception {
         // Preparar requisição com unidade inexistente
         E2eController.ProcessoFixtureRequest request =
@@ -93,6 +98,7 @@ class E2eFixtureEndpointTest {
     }
 
     @Test
+    @DisplayName("Deve gerar descrição automática quando não fornecida")
     void deveGerarDescricaoAutomaticaQuandoNaoFornecida() throws Exception {
         // Preparar requisição sem descrição
         E2eController.ProcessoFixtureRequest request =

@@ -16,7 +16,7 @@ Este documento descreve o plano completo de refatoração dos testes JUnit do ba
 ### Estatísticas Verificadas
 - **98 arquivos de teste** em `backend/src/test/java/sgc/`
 - **30 testes de integração** em `backend/src/test/java/sgc/integracao/`
-- **478 anotações @DisplayName** (boa padronização já existente)
+- **646 anotações @DisplayName** (Aumento significativo após Sprint 4)
 - **56 anotações @Nested** para organização
 - **1 ocorrência** de `Strictness.LENIENT` (a ser removida)
 - **0 testes parametrizados** (oportunidade de melhoria)
@@ -220,7 +220,7 @@ Para **qualquer** PR de refatoração de testes:
 | 1 | Boilerplate | -15 arquivos de teste removidos | ✅ Concluído |
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
-| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | Em Andamento (Processo, Subprocesso, Mapa, Atividade, Analise, Notificacao, Alerta concluídos) |
+| 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
 | 5 | Integração | 0 IDs hardcoded sem setup explícito | Pendente |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
@@ -263,7 +263,7 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 10. ✅ Adicionados exemplos de código baseados na arquitetura real
 11. ✅ Todos os comandos validados e testados
 12. ✅ Referências aos READMEs do projeto
-13. ✅ **Sprint 4 (Parcial):** Padronizados testes dos módulos `sgc.processo`, `sgc.subprocesso`, `sgc.mapa`, `sgc.atividade`, `sgc.analise`, `sgc.notificacao`, e `sgc.alerta` com `@Nested`, `@DisplayName` e nomenclatura oficial.
+13. ✅ **Sprint 4 (Concluído):** Todos os módulos do backend padronizados (`sgrh`, `unidade`, `painel`, `comum`, `mapa`, `e2e` e `integracao`). Total de `@DisplayName` aumentou para 646.
 
 **Validação**: Todos os comandos foram testados com script automatizado (`/tmp/validate_commands.sh`).
 

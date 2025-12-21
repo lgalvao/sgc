@@ -1,5 +1,7 @@
 package sgc.sgrh;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@DisplayName("Testes do Serviço SgrhService")
 class SgrhServiceTest {
 
     // Data from backend/src/test/resources/data.sql
@@ -37,203 +40,253 @@ class SgrhServiceTest {
     @Autowired
     private SgrhService sgrhService;
 
-    @Test
-    void testBuscarUsuarioPorTitulo() {
-        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO_ADMIN);
+    @Nested
+    @DisplayName("Consultas de Usuário")
+    class ConsultasUsuario {
 
-        assertTrue(result.isPresent());
-        assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-        assertEquals(NOME_ADMIN, result.get().getNome());
-    }
+        @Test
+        @DisplayName("Deve buscar usuário por título")
+        void deveBuscarUsuarioPorTitulo() {
+            // Act
+            Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO_ADMIN);
 
-    @Test
-    void testBuscarUsuarioPorEmail() {
-        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(EMAIL_ADMIN);
+            // Assert
+            assertTrue(result.isPresent());
+            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
+            assertEquals(NOME_ADMIN, result.get().getNome());
+        }
 
-        assertTrue(result.isPresent());
-        assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-        assertEquals(EMAIL_ADMIN, result.get().getEmail());
-    }
+        @Test
+        @DisplayName("Deve buscar usuário por email")
+        void deveBuscarUsuarioPorEmail() {
+            // Act
+            Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(EMAIL_ADMIN);
 
-    @Test
-    void testBuscarUsuariosAtivos() {
-        List<UsuarioDto> result = sgrhService.buscarUsuariosAtivos();
+            // Assert
+            assertTrue(result.isPresent());
+            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
+            assertEquals(EMAIL_ADMIN, result.get().getEmail());
+        }
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertTrue(result.size() >= 2);
-    }
+        @Test
+        @DisplayName("Deve buscar usuários ativos")
+        void deveBuscarUsuariosAtivos() {
+            // Act
+            List<UsuarioDto> result = sgrhService.buscarUsuariosAtivos();
 
-    @Test
-    void testBuscarUnidadePorCodigo() {
-        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(COD_UNIT_SEC1);
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            assertTrue(result.size() >= 2);
+        }
 
-        assertTrue(result.isPresent());
-        assertEquals(COD_UNIT_SEC1, result.get().getCodigo());
-        assertEquals(NOME_UNIT_SEC1, result.get().getNome());
-    }
+        @Test
+        @DisplayName("Deve buscar usuários por lista de títulos")
+        void deveBuscarUsuariosPorTitulos() {
+            // Arrange
+            List<String> titulos = List.of(TITULO_CHEFE_UNIT2, TITULO_ADMIN);
 
-    @Test
-    void testBuscarUnidadesAtivas() {
-        List<UnidadeDto> result = sgrhService.buscarUnidadesAtivas();
+            // Act
+            Map<String, UsuarioDto> result = sgrhService.buscarUsuariosPorTitulos(titulos);
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertTrue(result.size() > 5);
-    }
-
-    @Test
-    void testBuscarSubunidades() {
-        // Unit 2 has children
-        List<UnidadeDto> result = sgrhService.buscarSubunidades(COD_UNIT_SEC1);
-
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        for (UnidadeDto unidade : result) {
-            assertEquals(COD_UNIT_SEC1, unidade.getCodigoPai());
+            // Assert
+            assertNotNull(result);
+            assertEquals(2, result.size());
+            assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
+            assertTrue(result.containsKey(TITULO_ADMIN));
         }
     }
 
-    @Test
-    void testConstruirArvoreHierarquica() {
-        List<UnidadeDto> result = sgrhService.construirArvoreHierarquica();
+    @Nested
+    @DisplayName("Consultas de Unidade")
+    class ConsultasUnidade {
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        // Roots in data.sql: 1 (TRE)
-        assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(1L)));
+        @Test
+        @DisplayName("Deve buscar unidade por código")
+        void deveBuscarUnidadePorCodigo() {
+            // Act
+            Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(COD_UNIT_SEC1);
 
-        // Ensure roots have no parent
-        for (UnidadeDto unidade : result) {
-            if (unidade.getCodigo().equals(1L)) {
-                assertNull(unidade.getCodigoPai());
+            // Assert
+            assertTrue(result.isPresent());
+            assertEquals(COD_UNIT_SEC1, result.get().getCodigo());
+            assertEquals(NOME_UNIT_SEC1, result.get().getNome());
+        }
+
+        @Test
+        @DisplayName("Deve buscar unidades ativas")
+        void deveBuscarUnidadesAtivas() {
+            // Act
+            List<UnidadeDto> result = sgrhService.buscarUnidadesAtivas();
+
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            assertTrue(result.size() > 5);
+        }
+
+        @Test
+        @DisplayName("Deve buscar subunidades")
+        void deveBuscarSubunidades() {
+            // Act
+            List<UnidadeDto> result = sgrhService.buscarSubunidades(COD_UNIT_SEC1);
+
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            for (UnidadeDto unidade : result) {
+                assertEquals(COD_UNIT_SEC1, unidade.getCodigoPai());
+            }
+        }
+
+        @Test
+        @DisplayName("Deve construir árvore hierárquica")
+        void deveConstruirArvoreHierarquica() {
+            // Act
+            List<UnidadeDto> result = sgrhService.construirArvoreHierarquica();
+
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            // Roots in data.sql: 1 (TRE)
+            assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(1L)));
+
+            // Ensure roots have no parent
+            for (UnidadeDto unidade : result) {
+                if (unidade.getCodigo().equals(1L)) {
+                    assertNull(unidade.getCodigoPai());
+                }
             }
         }
     }
 
-    @Test
-    void testBuscarResponsavelUnidade() {
-        // Unit 2 has User 777 as Chefe
-        Optional<ResponsavelDto> result = sgrhService.buscarResponsavelUnidade(2L);
+    @Nested
+    @DisplayName("Gestão de Responsáveis")
+    class GestaoResponsaveis {
 
-        assertTrue(result.isPresent());
-        assertEquals(2L, result.get().getUnidadeCodigo());
-        assertEquals(TITULO_CHEFE_UNIT2, result.get().getTitularTitulo());
+        @Test
+        @DisplayName("Deve buscar responsável da unidade")
+        void deveBuscarResponsavelUnidade() {
+            // Act
+            Optional<ResponsavelDto> result = sgrhService.buscarResponsavelUnidade(2L);
+
+            // Assert
+            assertTrue(result.isPresent());
+            assertEquals(2L, result.get().getUnidadeCodigo());
+            assertEquals(TITULO_CHEFE_UNIT2, result.get().getTitularTitulo());
+        }
+
+        @Test
+        @DisplayName("Deve buscar unidades onde usuário é responsável")
+        void deveBuscarUnidadesOndeEhResponsavel() {
+            // Act
+            List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
+
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            assertTrue(result.contains(2L));
+        }
+
+        @Test
+        @DisplayName("Deve buscar responsáveis de múltiplas unidades")
+        void deveBuscarResponsaveisUnidades() {
+            // Arrange
+            List<Long> unidades = List.of(2L, 9L);
+
+            // Act
+            Map<Long, ResponsavelDto> result = sgrhService.buscarResponsaveisUnidades(unidades);
+
+            // Assert
+            assertNotNull(result);
+            assertTrue(result.containsKey(2L));
+            assertTrue(result.containsKey(9L));
+            assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).getTitularTitulo());
+            assertEquals("333333333333", result.get(9L).getTitularTitulo());
+        }
     }
 
-    @Test
-    void testBuscarUnidadesOndeEhResponsavel() {
-        // User 777 is Chefe of Unit 2
-        List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
+    @Nested
+    @DisplayName("Gestão de Perfis")
+    class GestaoPerfis {
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertTrue(result.contains(2L));
+        @Test
+        @DisplayName("Deve buscar perfis do usuário")
+        void deveBuscarPerfisUsuario() {
+            // Act
+            List<PerfilDto> result = sgrhService.buscarPerfisUsuario(TITULO_CHEFE_UNIT2);
+
+            // Assert
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+            assertTrue(result.stream()
+                    .anyMatch(p -> p.getPerfil().equals("CHEFE") && p.getUnidadeCodigo().equals(2L)));
+        }
+
+        @Test
+        @DisplayName("Deve verificar se usuário tem perfil")
+        void deveVerificarUsuarioTemPerfil() {
+            // Act & Assert
+            assertTrue(sgrhService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "CHEFE", 2L));
+            assertTrue(sgrhService.usuarioTemPerfil(TITULO_ADMIN, "ADMIN", 100L));
+        }
+
+        @Test
+        @DisplayName("Deve buscar unidades por perfil")
+        void deveBuscarUnidadesPorPerfil() {
+            // Act
+            List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(TITULO_ADMIN, "ADMIN");
+
+            // Assert
+            assertTrue(adminUnits.contains(100L));
+        }
     }
 
-    @Test
-    void testBuscarPerfisUsuario() {
-        List<PerfilDto> result = sgrhService.buscarPerfisUsuario(TITULO_CHEFE_UNIT2);
+    @Nested
+    @DisplayName("Autenticação e Autorização")
+    class AutenticacaoAutorizacao {
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertTrue(
-                result.stream()
-                        .anyMatch(
-                                p ->
-                                        p.getPerfil().equals("CHEFE")
-                                                && p.getUnidadeCodigo().equals(2L)));
-    }
+        @Test
+        @DisplayName("Deve autenticar usuário com sucesso")
+        void deveAutenticarComSucesso() {
+            // Act
+            boolean resultado = sgrhService.autenticar(TITULO_ADMIN, "senha");
 
-    @Test
-    void testUsuarioTemPerfil() {
-        // User 777 has CHEFE on 2
-        boolean result = sgrhService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, "CHEFE", 2L);
-        assertTrue(result);
+            // Assert
+            assertTrue(resultado);
+        }
 
-        // User 111111111111 has ADMIN on 100
-        boolean result3 = sgrhService.usuarioTemPerfil(TITULO_ADMIN, "ADMIN", 100L);
-        assertTrue(result3);
-    }
+        @Test
+        @DisplayName("Deve autorizar e retornar lista de perfis/unidades")
+        void deveAutorizarERetornarPerfis() {
+            // Act
+            List<PerfilUnidade> resultado = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
 
-    @Test
-    void testBuscarUnidadesPorPerfil() {
-        // User 111111111111 has ADMIN on 100
-        List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(TITULO_ADMIN, "ADMIN");
-        assertTrue(adminUnits.contains(100L));
-    }
+            // Assert
+            assertNotNull(resultado);
+            assertFalse(resultado.isEmpty());
+            assertTrue(resultado.stream()
+                    .anyMatch(pu -> pu.getPerfil() == Perfil.CHEFE
+                            && pu.getUnidade().getCodigo().equals(2L)));
+        }
 
-    @Test
-    void testBuscarResponsaveisUnidades() {
-        // Unit 2 (Chefe 777)
-        // Unit 100 (Chefe 7) -> No, user 7 has no profile in data.sql (only titular reference in unidade)
-        // Wait, does Unit 100 have a profile CHEFE?
-        // INSERT INTO SGC.VW_UNIDADE ... VALUES ('100', 'ADMIN-UNIT', ... '7');
-        // User 7 'Zeca Silva'.
-        // Profiles:
-        // No explicit profile for 7.
-        // User 111111111111 has ADMIN on 100.
-        // So search for CHEFE on 100 will likely return nothing unless 111111111111 is CHEFE?
-        // 111111111111 is ADMIN.
+        @Test
+        @DisplayName("Deve lançar exceção ao autorizar usuário não encontrado")
+        void deveLancarExcecaoAoAutorizarUsuarioNaoEncontrado() {
+            // Act & Assert
+            assertThrows(ErroEntidadeNaoEncontrada.class,
+                    () -> sgrhService.autorizar("TITULO_INEXISTENTE_XYZ"));
+        }
 
-        // Let's check who has CHEFE on 100.
-        // Nobody in data.sql.
-        // Unit 9 has CHEFE 333333333333.
+        @Test
+        @DisplayName("Deve entrar no sistema com perfil selecionado")
+        void deveEntrarComSucesso() {
+            // Arrange
+            List<PerfilUnidade> perfis = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
+            PerfilUnidade perfilUnidade = perfis.getFirst();
 
-        List<Long> unidades = List.of(2L, 9L);
-        Map<Long, ResponsavelDto> result = sgrhService.buscarResponsaveisUnidades(unidades);
-
-        assertNotNull(result);
-        assertTrue(result.containsKey(2L));
-        assertTrue(result.containsKey(9L));
-
-        assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).getTitularTitulo());
-        assertEquals("333333333333", result.get(9L).getTitularTitulo());
-    }
-
-    @Test
-    void testBuscarUsuariosPorTitulos() {
-        List<String> titulos = List.of(TITULO_CHEFE_UNIT2, TITULO_ADMIN);
-        Map<String, UsuarioDto> result = sgrhService.buscarUsuariosPorTitulos(titulos);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
-        assertTrue(result.containsKey(TITULO_ADMIN));
-    }
-
-    // ========== Testes migrados de UsuarioServiceTest ==========
-
-    @Test
-    void testAutenticar_deveRetornarTrue() {
-        boolean resultado = sgrhService.autenticar(TITULO_ADMIN, "senha");
-        assertTrue(resultado);
-    }
-
-    @Test
-    void testAutorizar_deveRetornarListaDePerfisUnidades() {
-        List<PerfilUnidade> resultado = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
-
-        assertNotNull(resultado);
-        assertFalse(resultado.isEmpty());
-        assertTrue(resultado.stream()
-                .anyMatch(pu -> pu.getPerfil() == Perfil.CHEFE
-                        && pu.getUnidade().getCodigo().equals(2L)));
-    }
-
-    @Test
-    void testAutorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
-        assertThrows(ErroEntidadeNaoEncontrada.class,
-                () -> sgrhService.autorizar("TITULO_INEXISTENTE_XYZ"));
-    }
-
-    @Test
-    void testEntrar_deveExecutarSemErro() {
-        List<PerfilUnidade> perfis = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
-        assertFalse(perfis.isEmpty());
-
-        PerfilUnidade perfilUnidade = perfis.getFirst();
-        assertDoesNotThrow(() -> sgrhService.entrar(TITULO_CHEFE_UNIT2, perfilUnidade));
+            // Act & Assert
+            assertDoesNotThrow(() -> sgrhService.entrar(TITULO_CHEFE_UNIT2, perfilUnidade));
+        }
     }
 }
-

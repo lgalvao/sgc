@@ -1,15 +1,18 @@
 package sgc.integracao;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import java.time.LocalDateTime;
 
+@DisplayName("Testes de Reprodução de Erros de Processo")
 public class ReproducaoErroProcessoTest extends BaseIntegrationTest {
 
     @Test
-    void tentarSalvarProcesso() {
+    @DisplayName("Deve salvar processo para reprodução de erro")
+    void deveSalvarProcessoParaReproducao() {
         Processo processo = new Processo();
         processo.setDescricao("Teste de Reprodução");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
