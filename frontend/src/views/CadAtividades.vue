@@ -32,7 +32,10 @@
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
+          <i
+              aria-hidden="true"
+              class="bi bi-arrow-right-circle me-2"
+          />Impacto no mapa
         </BButton>
         <BButton
             v-if="isChefe && codSubprocesso"
@@ -79,6 +82,7 @@
       </BCol>
       <BCol cols="auto">
         <BButton
+            aria-label="Adicionar atividade"
             :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
             data-testid="btn-adicionar-atividade"
             size="sm"
@@ -87,7 +91,8 @@
             variant="outline-primary"
         >
           <i
-              class="bi bi-save"
+              aria-hidden="true"
+              class="bi bi-plus-lg"
           />
         </BButton>
       </BCol>
