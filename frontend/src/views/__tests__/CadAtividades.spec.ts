@@ -92,18 +92,18 @@ const AtividadeItemStub = {
       <button data-testid="btn-remover-atividade" @click="$emit('remover-atividade')">Remover Atv</button>
       <button data-testid="btn-editar-atividade" @click="$emit('editar-atividade')">Editar Atv</button>
       <input data-testid="inp-editar-atividade" v-if="editandoAtividade" :value="atividade.descricao" @input="$emit('update:atividade', {...atividade, descricao: $event.target.value})" />
-      <button data-testid="btn-salvar-edicao-atividade" v-if="editandoAtividade" @click="$emit('salvar-edicao-atividade', atividade.codigo, atividade.descricao)">Salvar Atv</button>
+      <button data-testid="btn-salvar-edicao-atividade" v-if="editandoAtividade" @click="$emit('atualizar-atividade', 'Atividade Editada')">Salvar Atv</button>
 
       <div v-for="c in atividade.conhecimentos" :key="c.id">
          <button data-testid="btn-remover-conhecimento" @click="$emit('remover-conhecimento', c.id)">Remover Conh</button>
          <button data-testid="btn-editar-conhecimento" @click="$emit('editar-conhecimento', c.id)">Editar Conh</button>
          <input data-testid="inp-editar-conhecimento" v-if="editandoConhecimento === c.id" :value="c.descricao" @input="$emit('update:conhecimento', {...c, descricao: $event.target.value})" />
-         <button data-testid="btn-salvar-edicao-conhecimento" v-if="editandoConhecimento === c.id" @click="$emit('salvar-edicao-conhecimento', atividade.codigo, c.id, 'Conhecimento Editado')">Salvar Conh</button>
+         <button data-testid="btn-salvar-edicao-conhecimento" v-if="editandoConhecimento === c.id" @click="$emit('atualizar-conhecimento', c.id, 'Conhecimento Editado')">Salvar Conh</button>
       </div>
     </div>
   `,
     props: ["atividade", "podeEditar", "editandoAtividade", "editandoConhecimento"],
-    emits: ["remover-atividade", "editar-atividade", "salvar-edicao-atividade", "adicionar-conhecimento", "remover-conhecimento", "editar-conhecimento", "salvar-edicao-conhecimento", "update:atividade", "update:conhecimento"]
+    emits: ["remover-atividade", "editar-atividade", "atualizar-atividade", "adicionar-conhecimento", "remover-conhecimento", "editar-conhecimento", "atualizar-conhecimento", "update:atividade", "update:conhecimento"]
 };
 
 // Custom helper to override common options but ensure pinia stubActions is FALSE
@@ -187,6 +187,9 @@ describe("CadAtividades.vue", () => {
                         tipo: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO,
                         unidades: [{ codUnidade: 1, codSubprocesso: 123 }]
                     }
+                },
+                mapas: {
+                    mapaCompleto: { codigo: 456, competencias: [] }
                 }
             }
         });
@@ -225,7 +228,7 @@ describe("CadAtividades.vue", () => {
 
         const input = wrapper.find('input[placeholder="Nova atividade"]');
         await input.setValue("Nova Atividade");
-        await wrapper.find('[data-testid="btn-adicionar-atividade"]').trigger("click");
+        await wrapper.find('[data-testid="form-nova-atividade"]').trigger("submit");
         await flushPromises();
 
         expect(atividadeService.criarAtividade).toHaveBeenCalledWith(
@@ -299,7 +302,7 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
-        await item.vm.$emit('salvar-edicao-atividade', 1, "Atividade Editada");
+        await item.vm.$emit('atualizar-atividade', "Atividade Editada");
         await flushPromises();
 
         expect(atividadeService.atualizarAtividade).toHaveBeenCalledWith(
@@ -315,7 +318,7 @@ describe("CadAtividades.vue", () => {
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
-        await item.vm.$emit('salvar-edicao-conhecimento', 1, 101, "Conhecimento Editado");
+        await item.vm.$emit('atualizar-conhecimento', 101, "Conhecimento Editado");
         await flushPromises();
 
         expect(atividadeService.atualizarConhecimento).toHaveBeenCalledWith(

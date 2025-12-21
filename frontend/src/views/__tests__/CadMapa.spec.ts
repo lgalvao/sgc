@@ -1,4 +1,4 @@
-/* eslint-disable vue/one-component-per-file */
+
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
@@ -232,7 +232,35 @@ describe("CadMapa.vue", () => {
             name: "BAlert",
             template: '<div role="alert"><slot /></div>',
         },
-        CompetenciaCard: CompetenciaCardStub
+        CompetenciaCard: CompetenciaCardStub,
+        CriarCompetenciaModal: {
+            props: ['mostrar'],
+            emits: ['salvar', 'fechar'],
+            template: `
+                <div v-if="mostrar" data-testid="mdl-criar-competencia">
+                    <textarea data-testid="inp-criar-competencia-descricao" @input="$emit('update:descricao', $event.target.value)">Nova Competencia Teste</textarea>
+                    <input type="checkbox" value="101" checked />
+                    <button data-testid="btn-criar-competencia-salvar" @click="$emit('salvar', { descricao: 'Nova Competencia Teste', atividadesSelecionadas: [101] })"></button>
+                    <button data-testid="btn-criar-competencia-cancelar" @click="$emit('fechar')"></button>
+                </div>
+            `
+        },
+        DisponibilizarMapaModal: {
+            props: ['mostrar'],
+            emits: ['disponibilizar', 'fechar'],
+            template: `
+                <div v-if="mostrar" data-testid="mdl-disponibilizar-mapa">
+                    <input data-testid="inp-disponibilizar-mapa-data" value="2023-12-31" />
+                    <input data-testid="inp-disponibilizar-mapa-obs" value="Obs" />
+                    <button data-testid="btn-disponibilizar-mapa-confirmar" @click="$emit('disponibilizar', { dataLimite: '2023-12-31', observacoes: 'Obs' })"></button>
+                </div>
+            `
+        },
+        ImpactoMapaModal: {
+            name: "ImpactoMapaModal",
+            props: ['mostrar'],
+            template: `<div v-if="mostrar">Impacto</div>`
+        }
     };
 
     function createWrapper(customState = {}) {
@@ -523,7 +551,7 @@ describe("CadMapa.vue", () => {
                 status: 400,
                 data: {
                     message: "Erro API",
-                    subErrors: [{message: "Erro API", field: null}],
+                    subErrors: [{message: "Erro API", field: "generic"}],
                 }
             }
         };
@@ -553,7 +581,7 @@ describe("CadMapa.vue", () => {
                 status: 400,
                 data: {
                     message: "Erro API",
-                    subErrors: [{message: "Erro API", field: null}],
+                    subErrors: [{message: "Erro API", field: "generic"}],
                 }
             }
         };
@@ -573,7 +601,7 @@ describe("CadMapa.vue", () => {
                 status: 400,
                 data: {
                     message: "Erro API",
-                    subErrors: [{message: "Erro API", field: null}],
+                    subErrors: [{message: "Erro API", field: "generic"}],
                 }
             }
         };
