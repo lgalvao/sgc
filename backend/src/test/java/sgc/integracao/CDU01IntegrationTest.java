@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,11 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import sgc.util.TestUtil;
@@ -37,19 +44,79 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private EntityManager entityManager;
+
     private Unidade unidadeAdmin;
+    private Unidade unidadeGestor;
+    private Usuario usuarioAdmin;
+    private Usuario usuarioGestor;
 
     @BeforeEach
     void setUp() {
-        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
+        // Reset sequences to avoid conflicts
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
+        } catch (Exception ignored) { }
+
+        // Setup Unidade Admin
+        unidadeAdmin = UnidadeFixture.unidadePadrao();
+        unidadeAdmin.setCodigo(null);
+        unidadeAdmin.setSigla("ADM-UNIT-TEST");
+        unidadeAdmin.setNome("Unidade Admin Teste");
+        unidadeAdmin = unidadeRepo.saveAndFlush(unidadeAdmin);
+
+        // Setup Usuario Admin
+        usuarioAdmin = UsuarioFixture.usuarioComPerfil(unidadeAdmin, Perfil.ADMIN);
+        usuarioAdmin.setTituloEleitoral("999999990001");
+        usuarioAdmin.setNome("Admin User Teste");
+        usuarioAdmin = usuarioRepo.saveAndFlush(usuarioAdmin);
+
+        // Persist Perfil via JDBC explicitly
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
+
+        // Setup Unidade Gestor
+        unidadeGestor = UnidadeFixture.unidadePadrao();
+        unidadeGestor.setCodigo(null);
+        unidadeGestor.setSigla("GES-UNIT-TEST");
+        unidadeGestor.setNome("Unidade Gestor Teste");
+        unidadeGestor = unidadeRepo.saveAndFlush(unidadeGestor);
+
+        // Setup Usuario Gestor
+        usuarioGestor = UsuarioFixture.usuarioPadrao();
+        usuarioGestor.setTituloEleitoral("999999990002");
+        usuarioGestor.setNome("Gestor User Teste");
+        usuarioGestor = usuarioRepo.saveAndFlush(usuarioGestor);
+
+        // Persist Perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na unidadeGestor)
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioGestor.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
+                usuarioGestor.getTituloEleitoral(), "GESTOR", unidadeGestor.getCodigo());
+
+        entityManager.clear(); // Clear cache to ensure subsequent reads fetch fresh data including profiles
+
+        // Reload entities to ensure they are managed and up-to-date
+        unidadeAdmin = unidadeRepo.findById(unidadeAdmin.getCodigo()).orElseThrow();
+        unidadeGestor = unidadeRepo.findById(unidadeGestor.getCodigo()).orElseThrow();
+        usuarioAdmin = usuarioRepo.findById(usuarioAdmin.getTituloEleitoral()).orElseThrow();
+        usuarioGestor = usuarioRepo.findById(usuarioGestor.getTituloEleitoral()).orElseThrow();
     }
+
     @Nested
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
         @Test
         @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            String tituloEleitoral = "111111111111"; // ADMIN
+            String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             String senha = "password";
             AutenticacaoReq authRequest =
                     AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
@@ -67,7 +134,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                                     .content(tituloEleitoral))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
-                    .andExpect(jsonPath("$[0].siglaUnidade").value("ADMIN-UNIT"));
+                    .andExpect(jsonPath("$[0].siglaUnidade").value(unidadeAdmin.getSigla()));
 
             // Act & Assert: Etapa 3 - Entrar
             EntrarReq entrarReq = EntrarReq.builder()
@@ -86,7 +153,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            String tituloEleitoral = "999999999999"; // GESTOR
+            String tituloEleitoral = usuarioGestor.getTituloEleitoral();
             String senha = "password";
             AutenticacaoReq authRequest =
                     AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
@@ -106,12 +173,12 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$.length()").value(2))
                     .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
 
-            // O usuário 999999999999 possui perfis ADMIN e GESTOR na unidade de código 2 (data.sql)
+            // Entrar como GESTOR na unidadeGestor
             EntrarReq entrarReq =
                     EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("GESTOR")
-                            .unidadeCodigo(2L) // Unidade onde o usuário tem o perfil GESTOR
+                            .unidadeCodigo(unidadeGestor.getCodigo())
                             .build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                                     .with(csrf())
@@ -140,8 +207,8 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
         void testEntrar_falhaUnidadeInexistente() throws Exception {
             // Arrange
-            String tituloEleitoral = "111222333444";
-            long codigoUnidadeInexistente = 999L;
+            String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
+            long codigoUnidadeInexistente = 999999L;
             EntrarReq entrarReq = EntrarReq.builder()
                             .tituloEleitoral(tituloEleitoral)
                             .perfil("ADMIN")
