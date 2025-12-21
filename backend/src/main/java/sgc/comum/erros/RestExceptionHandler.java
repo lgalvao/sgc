@@ -138,6 +138,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(erroApi);
     }
 
+    @ExceptionHandler(ErroAutenticacao.class)
+    protected ResponseEntity<Object> handleErroAutenticacao(ErroAutenticacao ex) {
+        log.warn("Erro de autenticação: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO", UUID.randomUUID().toString()));
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         String traceId = UUID.randomUUID().toString();
