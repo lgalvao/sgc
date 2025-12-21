@@ -23,7 +23,11 @@ public class UsuarioFixture {
 
     public static Usuario usuarioComPerfil(Unidade unidade, Perfil perfil) {
         Usuario usuario = usuarioPadrao();
+        adicionarPerfil(usuario, unidade, perfil);
+        return usuario;
+    }
 
+    public static void adicionarPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
         UsuarioPerfil up = new UsuarioPerfil();
         up.setUsuario(usuario);
         up.setUsuarioTitulo(usuario.getTituloEleitoral());
@@ -31,11 +35,12 @@ public class UsuarioFixture {
         up.setUnidadeCodigo(unidade.getCodigo());
         up.setPerfil(perfil);
 
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
+        if (atribuicoes == null || atribuicoes.isEmpty()) {
+            atribuicoes = new HashSet<>();
+        }
         atribuicoes.add(up);
         usuario.setAtribuicoes(atribuicoes);
-
-        return usuario;
     }
 
     public static Usuario usuarioComTitulo(String titulo) {

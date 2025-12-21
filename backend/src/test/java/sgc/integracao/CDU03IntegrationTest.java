@@ -65,18 +65,18 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
         } catch (Exception ignored) { }
 
-        // Create fixtures
+        // Create fixtures using saveAndFlush to ensure visibility
         unidade1 = UnidadeFixture.unidadePadrao();
         unidade1.setCodigo(null);
         unidade1.setNome("Unidade 1");
         unidade1.setSigla("U1");
-        unidade1 = unidadeRepo.save(unidade1);
+        unidade1 = unidadeRepo.saveAndFlush(unidade1);
 
         unidade2 = UnidadeFixture.unidadePadrao();
         unidade2.setCodigo(null);
         unidade2.setNome("Unidade 2");
         unidade2.setSigla("U2");
-        unidade2 = unidadeRepo.save(unidade2);
+        unidade2 = unidadeRepo.saveAndFlush(unidade2);
     }
 
     private CriarProcessoReq criarCriarProcessoReq(
@@ -146,8 +146,8 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(objectMapper.writeValueAsString(requestDTO)))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andReturn();
 
         String responseBody = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         try {
@@ -181,6 +181,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         MvcResult result =
                 mockMvc.perform(
                                 post(API_PROCESSOS)
+                                        .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
                         .andExpect(status().isCreated())
