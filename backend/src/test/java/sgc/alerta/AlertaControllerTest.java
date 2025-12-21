@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AlertaController.class)
 @Import(RestExceptionHandler.class)
+@DisplayName("Testes Unitários: AlertaController")
 class AlertaControllerTest {
     @MockitoBean
     private AlertaService alertaService;
