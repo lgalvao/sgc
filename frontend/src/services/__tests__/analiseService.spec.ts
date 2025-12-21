@@ -1,4 +1,4 @@
-import {describe,   vi} from "vitest";
+import {describe} from "vitest";
 import {setupServiceTest, testErrorHandling, testGetEndpoint} from "@/test-utils/serviceTestHelpers";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {listarAnalisesCadastro, listarAnalisesValidacao,} from "../analiseService";

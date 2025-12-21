@@ -68,9 +68,6 @@ vi.mock("@/services/unidadesService", () => ({
 }));
 
 // Mocks for Async Components - simplified to avoid require issues
-const AsyncComponentStub = {
-    template: '<div data-testid="async-stub"></div>'
-};
 
 vi.mock("@/components/CriarCompetenciaModal.vue", () => ({
     __esModule: true,
@@ -368,7 +365,7 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve carregar dados no mount", async () => {
-        const {wrapper, subprocessosStore} = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         expect(subprocessoService.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
@@ -378,7 +375,7 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve abrir modal e criar nova competência", async () => {
-        const {wrapper, mapasStore} = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         await wrapper

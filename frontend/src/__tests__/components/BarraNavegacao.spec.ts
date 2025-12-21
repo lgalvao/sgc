@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import BarraNavegacao from '@/components/BarraNavegacao.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { usePerfilStore } from '@/stores/perfil';
+
 import { createTestingPinia } from '@pinia/testing';
 import { Perfil } from '@/types/tipos';
 

@@ -1,22 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import CadAtividades from "@/views/CadAtividades.vue";
 import { useSubprocessosStore } from "@/stores/subprocessos";
 import { useAtividadesStore } from "@/stores/atividades";
-import { useMapasStore } from "@/stores/mapas";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
-import * as processoService from "@/services/processoService";
-import * as analiseService from "@/services/analiseService";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
-import AtividadeItem from "@/components/AtividadeItem.vue";
-import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import {
     SituacaoSubprocesso,
     TipoProcesso,
 } from "@/types/tipos";
-import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 
 // Mocks
