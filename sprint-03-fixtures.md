@@ -5,13 +5,16 @@
 ## Contexto do Projeto SGC
 
 ### Arquitetura de Domínio
-O SGC possui entidades complexas organizadas por módulos:
+O SGC possui entidades complexas organizadas por módulos em `backend/src/main/java/sgc/`:
 - **processo** - `Processo` (orquestrador)
 - **subprocesso** - `Subprocesso`, `Movimentacao` (workflow)
 - **mapa** - `Mapa`, `Competencia` 
 - **atividade** - `Atividade`, `Conhecimento`
+- **analise** - `Analise` (auditoria de revisões)
 - **sgrh** - `Usuario`, `Perfil`
 - **unidade** - `Unidade` (hierarquia organizacional)
+- **alerta** - `Alerta`
+- **painel** - Agregações e visualizações
 
 ### Problemas Comuns nos Testes
 - **Magic numbers**: IDs hardcoded como `99L`, `1L`, `2L`

@@ -11,20 +11,25 @@ O **SGC (Sistema de Gestão de Competências)** é um sistema corporativo desenv
 - **Estrutura:** Modular Monolith com módulos de domínio (processo, subprocesso, mapa, atividade, etc)
 
 ### Estatísticas Atuais
-- **113 arquivos de teste** em `backend/src/test/java/sgc/`
-- **62 testes** já possuem `@DisplayName`
-- **23 testes** já utilizam `@Nested`
+- **98 arquivos de teste** (`*Test.java`) em `backend/src/test/java/sgc/`
+- **30 testes de integração** em `backend/src/test/java/sgc/integracao/`
+- **478 anotações @DisplayName** (múltiplos usos indicam boa padronização)
+- **56 anotações @Nested** para organização de testes
 - **1 ocorrência** de `Strictness.LENIENT` encontrada
+- **0 testes parametrizados** (`@ParameterizedTest`) - oportunidade para Sprint 7
 - Testes separados em: unitários (`@ExtendWith(MockitoExtension.class)`) e integração (`@SpringBootTest`)
 
 ### Arquitetura de Módulos
+O backend está organizado em módulos de domínio em `backend/src/main/java/sgc/`:
 - `processo` - Orquestrador central do sistema
 - `subprocesso` - Máquina de estados e workflow
-- `mapa` e `atividade` - Domínio principal (competências)
-- `analise` - Auditoria e revisão
+- `mapa` - Mapas de competências
+- `atividade` - Atividades e conhecimentos associados
+- `analise` - Auditoria e revisão de processos
 - `notificacao` e `alerta` - Comunicação reativa (eventos)
-- `sgrh` e `unidade` - Estrutura organizacional
-- `comum` e `util` - Componentes transversais
+- `sgrh` e `unidade` - Estrutura organizacional e usuários
+- `painel` - Visualizações e dashboards
+- `comum` - Componentes transversais (erros, config, util)
 
 ### Referências
 - Arquitetura detalhada: `backend/README.md`

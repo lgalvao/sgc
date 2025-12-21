@@ -5,12 +5,13 @@
 ## Contexto do Projeto SGC
 
 ### Estado Atual da Padronização
-- **62 de 113 testes** (~55%) já possuem `@DisplayName`
-- **23 testes** (~20%) já utilizam `@Nested`
+- **478 anotações @DisplayName** (múltiplos usos em ~98 arquivos de teste)
+- **56 anotações @Nested** para organização de cenários
+- **0 testes parametrizados** - será implementado no Sprint 7
 - Coexistem múltiplos padrões de nomenclatura:
-  - `deve{Acao}Quando{Condicao}` (padrão recomendado)
-  - `test{Acao}` (padrão antigo)
-  - Nomes com underscore `test_cenario_especifico`
+  - `deve{Acao}Quando{Condicao}` (padrão recomendado) ✅
+  - `test{Acao}` (padrão antigo) ❌
+  - Nomes com underscore `test_cenario_especifico` ❌
 
 ### Padrão Oficial do Projeto
 Conforme `AGENTS.md` e `backend/README.md`:
