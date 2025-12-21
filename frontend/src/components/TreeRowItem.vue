@@ -1,7 +1,7 @@
 <template>
   <tr
       :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
-      :data-testid="'tree-table-row-' + item.id"
+      :data-testid="'tree-table-row-' + item.codigo"
       @click="handleRowClick"
   >
     <td
@@ -11,9 +11,9 @@
     >
       <span
           v-if="index === 0 && item.children && item.children.length > 0"
-          :data-testid="`btn-toggle-expand-${item.id}`"
+          :data-testid="`btn-toggle-expand-${item.codigo}`"
           class="toggle-icon"
-          @click.stop="toggleExpand(item.id)"
+          @click.stop="toggleExpand(item.codigo)"
       >
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
       </span>
@@ -28,7 +28,7 @@ interface Column {
 }
 
 interface TreeItem {
-  id: number | string;
+  codigo: number | string;
   expanded?: boolean;
   children?: TreeItem[];
   clickable?: boolean;
@@ -44,12 +44,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "toggle", id: number | string): void;
+  (e: "toggle", codigo: number | string): void;
   (e: "row-click", item: TreeItem): void;
 }>();
 
-const toggleExpand = (id: number | string) => {
-  emit("toggle", id);
+const toggleExpand = (codigo: number | string) => {
+  emit("toggle", codigo);
 };
 
 const handleRowClick = () => {

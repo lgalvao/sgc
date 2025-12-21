@@ -24,7 +24,7 @@ describe("subprocessoService", () => {
 
     describe("listarAtividades", () => {
         it("deve chamar o endpoint correto e mapear os resultados", async () => {
-            const mockAtividades = [{ id: 1 }];
+            const mockAtividades = [{ codigo: 1 }];
             mockApi.get.mockResolvedValue({ data: mockAtividades });
             vi.mocked(mapAtividadeVisualizacaoToModel).mockImplementation((a: any) => a);
 
@@ -65,7 +65,7 @@ describe("subprocessoService", () => {
 
     describe("buscarSubprocessoPorProcessoEUnidade", () => {
         it("deve chamar o endpoint correto com query params", async () => {
-            const mockResponse = { id: 100 };
+            const mockResponse = { codigo: 100 };
             mockApi.get.mockResolvedValue({ data: mockResponse });
 
             const result = await subprocessoService.buscarSubprocessoPorProcessoEUnidade(10, "UNID");
@@ -95,7 +95,7 @@ describe("subprocessoService", () => {
             descricao: "Teste",
             atividadesAssociadas: [],
         };
-        const mockMapaCompleto = { id: 1, competencias: [mockCompetencia] };
+        const mockMapaCompleto = { codigo: 1, competencias: [mockCompetencia] };
 
         it("adicionarCompetencia deve chamar o endpoint correto e mapear a resposta", async () => {
             vi.mocked(mapMapaCompletoDtoToModel).mockReturnValue(mockMapaCompleto as any);

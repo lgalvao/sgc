@@ -87,11 +87,11 @@ const AtividadeItemStub = {
       <input data-testid="inp-editar-atividade" v-if="editandoAtividade" :value="atividade.descricao" @input="$emit('update:atividade', {...atividade, descricao: $event.target.value})" />
       <button data-testid="btn-salvar-edicao-atividade" v-if="editandoAtividade" @click="$emit('atualizar-atividade', 'Atividade Editada')">Salvar Atv</button>
 
-      <div v-for="c in atividade.conhecimentos" :key="c.id">
-         <button data-testid="btn-remover-conhecimento" @click="$emit('remover-conhecimento', c.id)">Remover Conh</button>
-         <button data-testid="btn-editar-conhecimento" @click="$emit('editar-conhecimento', c.id)">Editar Conh</button>
-         <input data-testid="inp-editar-conhecimento" v-if="editandoConhecimento === c.id" :value="c.descricao" @input="$emit('update:conhecimento', {...c, descricao: $event.target.value})" />
-         <button data-testid="btn-salvar-edicao-conhecimento" v-if="editandoConhecimento === c.id" @click="$emit('atualizar-conhecimento', c.id, 'Conhecimento Editado')">Salvar Conh</button>
+      <div v-for="c in atividade.conhecimentos" :key="c.codigo">
+         <button data-testid="btn-remover-conhecimento" @click="$emit('remover-conhecimento', c.codigo)">Remover Conh</button>
+         <button data-testid="btn-editar-conhecimento" @click="$emit('editar-conhecimento', c.codigo)">Editar Conh</button>
+         <input data-testid="inp-editar-conhecimento" v-if="editandoConhecimento === c.codigo" :value="c.descricao" @input="$emit('update:conhecimento', {...c, descricao: $event.target.value})" />
+         <button data-testid="btn-salvar-edicao-conhecimento" v-if="editandoConhecimento === c.codigo" @click="$emit('atualizar-conhecimento', c.codigo, 'Conhecimento Editado')">Salvar Conh</button>
       </div>
     </div>
   `,
@@ -138,7 +138,7 @@ describe("CadAtividades.vue", () => {
         {
             codigo: 1,
             descricao: "Atividade 1",
-            conhecimentos: [{id: 101, descricao: "Conhecimento 1"}],
+            conhecimentos: [{codigo: 101, descricao: "Conhecimento 1"}],
         },
     ];
 
@@ -325,7 +325,7 @@ describe("CadAtividades.vue", () => {
         vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({
             valido: false,
             erros: [
-                {tipo: 'ATIVIDADE_SEM_CONHECIMENTO', mensagem: 'Atividade sem conhecimento', atividadeId: 1}
+                {tipo: 'ATIVIDADE_SEM_CONHECIMENTO', mensagem: 'Atividade sem conhecimento', atividadeCodigo: 1}
             ]
         });
 

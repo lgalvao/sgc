@@ -121,7 +121,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.subprocessoId", is(subprocesso.getCodigo().intValue())))
+                    .andExpect(jsonPath("$.subprocessoCodigo", is(subprocesso.getCodigo().intValue())))
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")))
                     .andExpect(jsonPath("$.atividades", hasSize(2)))
                     // Valida a primeira atividade e seu conhecimento
@@ -198,7 +198,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath(
-                                    "$.subprocessoId",
+                                    "$.subprocessoCodigo",
                                     is(subprocessoSemAtividades.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(0)));
         }
@@ -227,7 +227,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath(
-                                    "$.subprocessoId",
+                                    "$.subprocessoCodigo",
                                     is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(1)))
                     .andExpect(

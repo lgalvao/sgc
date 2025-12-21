@@ -144,7 +144,7 @@ describe("VisAtividades.vue", () => {
             {
                 codigo: 1,
                 descricao: "Atividade 1",
-                conhecimentos: [{id: 10, descricao: "Conhecimento 1"}],
+                conhecimentos: [{codigo: 10, descricao: "Conhecimento 1"}],
             },
         ]);
 

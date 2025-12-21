@@ -23,7 +23,7 @@ describe("CriarCompetenciaModal.vue", () => {
         {
             codigo: 2,
             descricao: "Atividade 2",
-            conhecimentos: [{id: 1, descricao: "Conhecimento 1"}],
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}],
         },
     ];
 

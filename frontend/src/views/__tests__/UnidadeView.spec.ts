@@ -115,9 +115,9 @@ describe('UnidadeView.vue', () => {
         unidadesStore.buscarArvoreUnidade.mockResolvedValue(null);
         atribuicaoStore.buscarAtribuicoes.mockResolvedValue(null);
         atribuicaoStore.obterAtribuicoesPorUnidade = vi.fn().mockReturnValue([]);
-        usuariosStore.obterUsuarioPorId = vi.fn().mockImplementation((id: number) => {
-            if (id === 10) return mockUsuario;
-            if (id === 20) return mockUsuarioResponsavel;
+        usuariosStore.obterUsuarioPorId = vi.fn().mockImplementation((codigo: number) => {
+            if (codigo === 10) return mockUsuario;
+            if (codigo === 20) return mockUsuarioResponsavel;
             return null;
         });
 
@@ -227,7 +227,7 @@ describe('UnidadeView.vue', () => {
         await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        treeTable.vm.$emit('row-click', { id: 2 });
+        treeTable.vm.$emit('row-click', { codigo: 2 });
 
         expect(mockPush).toHaveBeenCalledWith({ path: '/unidade/2' });
     });

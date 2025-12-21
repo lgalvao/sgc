@@ -225,7 +225,7 @@ const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
 const mostrarModalConfirmacaoRemocao = ref(false);
-const dadosRemocao = ref<{ tipo: 'atividade' | 'conhecimento', index: number, idConhecimento?: number } | null>(null);
+const dadosRemocao = ref<{ tipo: 'atividade' | 'conhecimento', index: number, conhecimentoCodigo?: number } | null>(null);
 
 const errosValidacao = ref<ErroValidacao[]>([]);
 const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
@@ -255,7 +255,7 @@ function removerAtividade(idx: number) {
 async function confirmarRemocao() {
   if (!dadosRemocao.value || !codSubprocesso.value) return;
 
-  const { tipo, index, idConhecimento } = dadosRemocao.value;
+  const { tipo, index, conhecimentoCodigo } = dadosRemocao.value;
 
   if (tipo === 'atividade') {
     const atividadeRemovida = atividades.value[index];
@@ -263,12 +263,12 @@ async function confirmarRemocao() {
         codSubprocesso.value,
         atividadeRemovida.codigo,
     );
-  } else if (tipo === 'conhecimento' && idConhecimento !== undefined) {
+  } else if (tipo === 'conhecimento' && conhecimentoCodigo !== undefined) {
     const atividade = atividades.value[index];
     await atividadesStore.removerConhecimento(
         codSubprocesso.value,
         atividade.codigo,
-        idConhecimento,
+        conhecimentoCodigo,
     );
   }
 }
@@ -288,32 +288,32 @@ async function adicionarConhecimento(idx: number, descricao: string) {
   }
 }
 
-function removerConhecimento(idx: number, idConhecimento: number) {
+function removerConhecimento(idx: number, conhecimentoCodigo: number) {
   if (!codSubprocesso.value) return;
-  dadosRemocao.value = { tipo: 'conhecimento', index: idx, idConhecimento };
+  dadosRemocao.value = { tipo: 'conhecimento', index: idx, conhecimentoCodigo };
   mostrarModalConfirmacaoRemocao.value = true;
 }
 
-async function salvarEdicaoConhecimento(atividadeId: number, conhecimentoId: number, descricao: string) {
+async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCodigo: number, descricao: string) {
   if (!codSubprocesso.value) return;
 
   if (descricao.trim()) {
     const conhecimentoAtualizado: Conhecimento = {
-      id: conhecimentoId,
+      codigo: conhecimentoCodigo,
       descricao: descricao.trim(),
     };
     await atividadesStore.atualizarConhecimento(
         codSubprocesso.value,
-        atividadeId,
-        conhecimentoId,
+        atividadeCodigo,
+        conhecimentoCodigo,
         conhecimentoAtualizado,
     );
   }
 }
 
-async function salvarEdicaoAtividade(id: number, descricao: string) {
+async function salvarEdicaoAtividade(codigo: number, descricao: string) {
   if (descricao.trim() && codSubprocesso.value) {
-    const atividadeOriginal = atividades.value.find((a) => a.codigo === id);
+    const atividadeOriginal = atividades.value.find((a) => a.codigo === codigo);
     if (atividadeOriginal) {
       const atividadeAtualizada: Atividade = {
         ...atividadeOriginal,
@@ -321,7 +321,7 @@ async function salvarEdicaoAtividade(id: number, descricao: string) {
       };
       await atividadesStore.atualizarAtividade(
           codSubprocesso.value,
-          id,
+          codigo,
           atividadeAtualizada,
       );
     }
@@ -344,28 +344,28 @@ async function handleImportAtividades() {
 const mapaErros = computed(() => {
   const mapa = new Map<number, string>();
   errosValidacao.value.forEach(erro => {
-    if (erro.atividadeId) {
-      mapa.set(erro.atividadeId, erro.mensagem);
+    if (erro.atividadeCodigo) {
+      mapa.set(erro.atividadeCodigo, erro.mensagem);
     }
   });
   return mapa;
 });
 
-function obterErroParaAtividade(atividadeId: number): string | undefined {
-  return mapaErros.value.get(atividadeId);
+function obterErroParaAtividade(atividadeCodigo: number): string | undefined {
+  return mapaErros.value.get(atividadeCodigo);
 }
 
 const atividadeRefs = new Map<number, any>();
 
-function setAtividadeRef(atividadeId: number, el: any) {
+function setAtividadeRef(atividadeCodigo: number, el: any) {
   if (el) {
-    atividadeRefs.set(atividadeId, el);
+    atividadeRefs.set(atividadeCodigo, el);
   }
 }
 
 function scrollParaPrimeiroErro() {
-  if (errosValidacao.value.length > 0 && errosValidacao.value[0].atividadeId) {
-    const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeId);
+  if (errosValidacao.value.length > 0 && errosValidacao.value[0].atividadeCodigo) {
+    const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeCodigo);
     if (primeiraAtividadeComErro) {
       primeiraAtividadeComErro.scrollIntoView({
         behavior: 'smooth',

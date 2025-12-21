@@ -66,7 +66,7 @@ describe("usuarioService", () => {
     });
 
     describe("buscarTodosUsuarios", () => {
-        const mockUsuarios = [{ id: 1, name: "Test User" }];
+        const mockUsuarios = [{ codigo: 1, name: "Test User" }];
         testGetEndpoint(
             () => service.buscarTodosUsuarios(),
             "/usuarios",
@@ -77,7 +77,7 @@ describe("usuarioService", () => {
     });
 
     describe("buscarUsuariosPorUnidade", () => {
-        const mockUsuarios = [{ id: 1, name: "Test User" }];
+        const mockUsuarios = [{ codigo: 1, name: "Test User" }];
         testGetEndpoint(
             () => service.buscarUsuariosPorUnidade(1),
             "/unidades/1/usuarios",

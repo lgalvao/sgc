@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(force = true)
 public class ConhecimentoAjusteDto {
     @NotNull
-    private final Long conhecimentoId;
+    private final Long conhecimentoCodigo;
     @NotBlank
     private final String nome;
     @NotNull

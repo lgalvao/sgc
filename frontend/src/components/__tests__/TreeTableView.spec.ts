@@ -12,15 +12,15 @@ describe("TreeTable.vue", () => {
 
     const mockData = [
         {
-            id: 1,
+            codigo: 1,
             nome: "Item 1",
             value: "A",
             children: [
-                {id: 11, nome: "SubItem 1.1", value: "A1"},
-                {id: 12, nome: "SubItem 1.2", value: "A2"},
+                {codigo: 11, nome: "SubItem 1.1", value: "A1"},
+                {codigo: 12, nome: "SubItem 1.2", value: "A2"},
             ],
         },
-        {id: 2, nome: "Item 2", value: "B"},
+        {codigo: 2, nome: "Item 2", value: "B"},
     ];
 
     const mockColumns = [
@@ -101,10 +101,10 @@ describe("TreeTable.vue", () => {
     it("deve expandir todos os itens ao chamar expandAll", async () => {
         const dataWithChildren = [
             {
-                id: 1,
+                codigo: 1,
                 nome: "Item 1",
                 expanded: false,
-                children: [{id: 11, nome: "SubItem 1.1", expanded: false}],
+                children: [{codigo: 11, nome: "SubItem 1.1", expanded: false}],
             },
         ];
         const wrapper = mount(TreeTableView, {
@@ -136,10 +136,10 @@ describe("TreeTable.vue", () => {
     it("deve colapsar todos os itens ao chamar collapseAll", async () => {
         const dataWithChildren = [
             {
-                id: 1,
+                codigo: 1,
                 nome: "Item 1",
                 expanded: true,
-                children: [{id: 11, nome: "SubItem 1.1", expanded: true}],
+                children: [{codigo: 11, nome: "SubItem 1.1", expanded: true}],
             },
         ];
         const wrapper = mount(TreeTableView, {
@@ -160,23 +160,23 @@ describe("TreeTable.vue", () => {
         expect(internalData[0].expanded).toBe(false);
     });
 
-    it("deve encontrar item existente usando findItemById", async () => {
+    it("deve encontrar item existente usando findItemByCodigo", async () => {
         const dataWithNestedChildren = [
             {
-                id: 1,
+                codigo: 1,
                 nome: "Item 1",
                 expanded: false,
                 children: [
                     {
-                        id: 11,
+                        codigo: 11,
                         nome: "SubItem 1.1",
                         expanded: false,
-                        children: [{id: 111, nome: "SubSubItem 1.1.1", expanded: false}],
+                        children: [{codigo: 111, nome: "SubSubItem 1.1.1", expanded: false}],
                     },
-                    {id: 12, nome: "SubItem 1.2", expanded: false},
+                    {codigo: 12, nome: "SubItem 1.2", expanded: false},
                 ],
             },
-            {id: 2, nome: "Item 2", expanded: false},
+            {codigo: 2, nome: "Item 2", expanded: false},
         ];
         const wrapper = mount(TreeTableView, {
             props: {data: dataWithNestedChildren, columns: mockColumns},
@@ -186,20 +186,20 @@ describe("TreeTable.vue", () => {
         // Testar encontrar item de nível superior
 
         const vm = wrapper.vm as any;
-        const foundItem = vm.findItemById(dataWithNestedChildren, 1);
+        const foundItem = vm.findItemByCodigo(dataWithNestedChildren, 1);
         expect(foundItem).toBeTruthy();
         expect(foundItem?.nome).toBe("Item 1");
 
         // Testar encontrar item aninhado
-        const foundNestedItem = vm.findItemById(dataWithNestedChildren, 111);
+        const foundNestedItem = vm.findItemByCodigo(dataWithNestedChildren, 111);
         expect(foundNestedItem).toBeTruthy();
         expect(foundNestedItem?.nome).toBe("SubSubItem 1.1.1");
     });
 
-    it("deve retornar null quando item não encontrado usando findItemById", async () => {
+    it("deve retornar null quando item não encontrado usando findItemByCodigo", async () => {
         const mockData = [
-            {id: 1, nome: "Item 1"},
-            {id: 2, nome: "Item 2"},
+            {codigo: 1, nome: "Item 1"},
+            {codigo: 2, nome: "Item 2"},
         ];
         const wrapper = mount(TreeTableView, {
             props: {data: mockData, columns: mockColumns},
@@ -207,17 +207,17 @@ describe("TreeTable.vue", () => {
         });
 
         const vm = wrapper.vm as any;
-        const notFoundItem = vm.findItemById(mockData, 999);
+        const notFoundItem = vm.findItemByCodigo(mockData, 999);
         expect(notFoundItem).toBeNull();
     });
 
     it("deve alternar expansão de item usando toggleExpand", async () => {
         const dataWithChildren = [
             {
-                id: 1,
+                codigo: 1,
                 nome: "Item 1",
                 expanded: false,
-                children: [{id: 11, nome: "SubItem 1.1"}],
+                children: [{codigo: 11, nome: "SubItem 1.1"}],
             },
         ];
         const wrapper = mount(TreeTableView, {
@@ -240,7 +240,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("não deve fazer nada ao tentar alternar item inexistente usando toggleExpand", async () => {
-        const mockData = [{id: 1, nome: "Item 1", expanded: false}];
+        const mockData = [{codigo: 1, nome: "Item 1", expanded: false}];
         const wrapper = mount(TreeTableView, {
             props: {data: mockData, columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},

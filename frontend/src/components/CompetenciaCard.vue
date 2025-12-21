@@ -41,21 +41,21 @@
       </div>
       <div class="d-flex flex-wrap gap-2 mt-2">
         <BCard
-            v-for="atvId in competencia.atividadesAssociadas"
-            :key="atvId"
+            v-for="atvCodigo in competencia.atividadesAssociadas"
+            :key="atvCodigo"
             class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
             no-body
         >
           <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
-                    {{ getDescricaoAtividade(atvId) }}
+                    {{ getDescricaoAtividade(atvCodigo) }}
                     <span
-                        v-if="(getAtividadeCompleta(atvId)?.conhecimentos.length ?? 0) > 0"
-                        v-b-tooltip.html.top="getConhecimentosTooltip(atvId)"
+                        v-if="(getAtividadeCompleta(atvCodigo)?.conhecimentos.length ?? 0) > 0"
+                        v-b-tooltip.html.top="getConhecimentosTooltip(atvCodigo)"
                         class="badge bg-secondary ms-2"
                         data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
-                      {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
+                      {{ getAtividadeCompleta(atvCodigo)?.conhecimentos.length }}
                     </span>
                   </span>
             <BButton
@@ -64,9 +64,9 @@
                 data-testid="btn-remover-atividade-associada"
                 size="sm"
                 title="Remover Atividade"
-                :aria-label="`Remover atividade ${getDescricaoAtividade(atvId)}`"
+                :aria-label="`Remover atividade ${getDescricaoAtividade(atvCodigo)}`"
                 variant="outline-secondary"
-                @click="emit('removerAtividade', competencia.codigo, atvId)"
+                @click="emit('removerAtividade', competencia.codigo, atvCodigo)"
             >
               <i class="bi bi-trash" aria-hidden="true"/>
             </BButton>
@@ -101,8 +101,8 @@ function getDescricaoAtividade(codigo: number): string {
   return atv ? atv.descricao : "Atividade não encontrada";
 }
 
-function getConhecimentosTooltip(atividadeId: number): string {
-  const atividade = getAtividadeCompleta(atividadeId);
+function getConhecimentosTooltip(atividadeCodigo: number): string {
+  const atividade = getAtividadeCompleta(atividadeCodigo);
   if (!atividade || !atividade.conhecimentos.length) {
     return "Nenhum conhecimento cadastrado";
   }

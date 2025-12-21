@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventoRevisaoSubprocessoDisponibilizada {
-    private Long subprocessoId;
+    private Long subprocessoCodigo;
 }

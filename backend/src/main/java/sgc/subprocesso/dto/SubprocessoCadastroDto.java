@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoCadastroDto {
-    private final Long subprocessoId;
+    private final Long subprocessoCodigo;
     private final String unidadeSigla;
     private final List<AtividadeCadastroDto> atividades;
 

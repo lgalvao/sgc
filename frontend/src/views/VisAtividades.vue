@@ -65,7 +65,7 @@
         <div class="mt-3 ms-3">
           <div
               v-for="(conhecimento) in atividade.conhecimentos"
-              :key="conhecimento.id"
+              :key="conhecimento.codigo"
               class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>

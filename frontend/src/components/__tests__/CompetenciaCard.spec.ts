@@ -20,7 +20,7 @@ const stubs = {
 describe("CompetenciaCard.vue", () => {
   const mockAtividades: Atividade[] = [
     {codigo: 101, descricao: "Atividade 1", conhecimentos: []},
-    {codigo: 102, descricao: "Atividade 2", conhecimentos: [{descricao: "Java", id: 1}]},
+    {codigo: 102, descricao: "Atividade 2", conhecimentos: [{descricao: "Java", codigo: 1}]},
   ];
 
   const mockCompetencia: Competencia = {

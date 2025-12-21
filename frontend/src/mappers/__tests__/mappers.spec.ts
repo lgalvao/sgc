@@ -55,19 +55,19 @@ describe("mappers/atividades", () => {
         const dto = {
             codigo: 1,
             descricao: "Atividade Teste",
-            conhecimentos: [{id: 101, descricao: "Conhecimento Teste"}],
+            conhecimentos: [{codigo: 101, descricao: "Conhecimento Teste"}],
         };
         const model = mapAtividadeDtoToModel(dto);
         expect(model.codigo).toBe(1);
         expect(model.descricao).toBe("Atividade Teste");
         expect(model.conhecimentos).toHaveLength(1);
-        expect(model.conhecimentos[0].id).toBe(101);
+        expect(model.conhecimentos[0].codigo).toBe(101);
     });
 
     it("mapConhecimentoDtoToModel deve mapear corretamente", () => {
-        const dto = {id: 101, descricao: "Conhecimento Teste"};
+        const dto = {codigo: 101, descricao: "Conhecimento Teste"};
         const model = mapConhecimentoDtoToModel(dto);
-        expect(model.id).toBe(101);
+        expect(model.codigo).toBe(101);
         expect(model.descricao).toBe("Conhecimento Teste");
     });
 
@@ -107,13 +107,13 @@ describe("mappers/mapas", () => {
     //         competencias: [
     //             {
     //                 codigo: 10,
-    //                 atividades: [{codigo: 100, conhecimentos: [{id: 1000}]}],
+    //                 atividades: [{codigo: 100, conhecimentos: [{codigo: 1000}]}],
     //             },
     //         ],
     //     };
     //     const model = mapMapaCompletoDtoToModel(dto);
     //     expect(
-    //         (model.competencias[0] as any).atividades[0].conhecimentos[0].id,
+    //         (model.competencias[0] as any).atividades[0].conhecimentos[0].codigo,
     //     ).toBe(1000);
     // });
 

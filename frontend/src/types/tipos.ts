@@ -85,14 +85,14 @@ export enum SituacaoSubprocesso {
 }
 
 export interface Conhecimento {
-    id: number;
+    codigo: number;
     descricao: string;
 }
 
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: { id: number; descricao: string }[];
+    conhecimentos: { codigo: number; descricao: string }[];
     mapaCodigo?: number;
 }
 
@@ -298,7 +298,7 @@ export interface SubprocessoDetalhe {
 }
 
 export interface ConhecimentoVisualizacao {
-    id: number;
+    codigo: number;
     descricao: string;
 }
 
@@ -342,7 +342,7 @@ export interface SalvarMapaRequest {
             codigo?: number;
             descricao: string;
             conhecimentos: {
-                id?: number;
+                codigo?: number;
                 descricao: string;
             }[];
         }[];
@@ -407,7 +407,7 @@ export interface SubprocessoPermissoes {
 
 export interface ErroValidacao {
     tipo: string;
-    atividadeId?: number;
+    atividadeCodigo?: number;
     descricaoAtividade?: string;
     mensagem: string;
 }

@@ -178,11 +178,11 @@ public class MovimentacaoListener {
         notificacaoService.notificarDisponibilizacaoMapa(sp);
     }
 
-    private Subprocesso buscarSubprocesso(Long id) {
+    private Subprocesso buscarSubprocesso(Long codigo) {
         return subprocessoRepo
-                .findById(id)
+                .findById(codigo)
                 .orElseThrow(
-                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + id));
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codigo));
     }
 
     private void salvarMovimentacao(

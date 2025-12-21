@@ -184,7 +184,7 @@ const dadosFormatadosSubordinadas = computed(() => {
 const colunasTabela = [{key: "nome", label: "Unidade"}];
 
 interface UnidadeFormatada {
-  id: number;
+  codigo: number;
   nome: string;
   expanded: boolean;
   children?: UnidadeFormatada[];
@@ -196,7 +196,7 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   return dados.map((item) => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas) : [];
     return {
-      id: item.codigo,
+      codigo: item.codigo,
       nome: item.sigla + " - " + item.nome,
       expanded: true,
       ...(children.length > 0 && {children}),
@@ -204,9 +204,9 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   });
 }
 
-function navegarParaUnidadeSubordinada(item: { id: any }) {
-  if (item && typeof item.id === "number")
-    router.push({path: `/unidade/${item.id}`});
+function navegarParaUnidadeSubordinada(item: { codigo: any }) {
+  if (item && typeof item.codigo === "number")
+    router.push({path: `/unidade/${item.codigo}`});
 }
 
 function visualizarMapa() {

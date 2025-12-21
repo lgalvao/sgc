@@ -12,7 +12,7 @@ export function mapAtividadeVisualizacaoToModel(dto: any): Atividade {
 export function mapConhecimentoVisualizacaoToModel(dto: any): Conhecimento {
     if (!dto) return null as any;
     return {
-        id: dto.codigo,
+        codigo: dto.codigo,
         descricao: dto.descricao,
     };
 }
@@ -31,7 +31,7 @@ export function mapAtividadeDtoToModel(dto: any): Atividade {
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
     if (!dto) return null as any;
     return {
-        id: dto.id || dto.codigo,
+        codigo: dto.codigo,
         descricao: dto.descricao,
     };
 }

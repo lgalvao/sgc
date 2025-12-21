@@ -87,7 +87,7 @@ export async function alterarDataLimiteSubprocesso(
     codSubprocesso: number,
     dados: { novaData: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/alterar-data-limite`, {id: codSubprocesso, ...dados});
+    await apiClient.post(`/processos/alterar-data-limite`, {codigo: codSubprocesso, ...dados});
 }
 
 export async function apresentarSugestoes(

@@ -99,7 +99,7 @@ describe("processoService", () => {
         testPostEndpoint(
             () => service.alterarDataLimiteSubprocesso(1, payload),
             "/processos/alterar-data-limite",
-            { id: 1, ...payload }
+            { codigo: 1, ...payload }
         );
     });
 

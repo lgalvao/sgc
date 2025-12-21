@@ -144,7 +144,7 @@ describe("PainelView.vue", () => {
     it("deve navegar ao selecionar processo", async () => {
         const wrapper = mount(PainelView, mountOptions());
 
-        const processoMock = {id: 1, descricao: "Teste", linkDestino: "/processo/1"};
+        const processoMock = {codigo: 1, descricao: "Teste", linkDestino: "/processo/1"};
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('selecionar-processo', processoMock);
 
         expect(routerPushMock).toHaveBeenCalledWith("/processo/1");

@@ -147,7 +147,7 @@ describe('ProcessoView.vue', () => {
         });
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = { clickable: true, unidadeAtual: 'UNIDADE', id: 10 };
+        const item = { clickable: true, unidadeAtual: 'UNIDADE', codigo: 10 };
 
         await treeTable.vm.$emit('row-click', item);
 
@@ -173,7 +173,7 @@ describe('ProcessoView.vue', () => {
         });
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = { clickable: true, unidadeAtual: 'UNIDADE', id: 10 };
+        const item = { clickable: true, unidadeAtual: 'UNIDADE', codigo: 10 };
 
         await treeTable.vm.$emit('row-click', item);
 
@@ -200,7 +200,7 @@ describe('ProcessoView.vue', () => {
         });
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = { clickable: true, unidadeAtual: 'UNIDADE', id: 10 };
+        const item = { clickable: true, unidadeAtual: 'UNIDADE', codigo: 10 };
 
         await treeTable.vm.$emit('row-click', item);
 
@@ -227,7 +227,7 @@ describe('ProcessoView.vue', () => {
         });
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const item = { clickable: true, unidadeAtual: 'UNIDADE', id: 10 };
+        const item = { clickable: true, unidadeAtual: 'UNIDADE', codigo: 10 };
 
         await treeTable.vm.$emit('row-click', item);
 

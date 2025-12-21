@@ -14,7 +14,7 @@ import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 
 export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
     return {
-        codigo: obj.codigo ?? obj.id ?? 0,
+        codigo: obj.codigo ?? 0,
         nome: obj.nome ?? obj.nome_unidade ?? "",
         sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? "",
         filhas: Array.isArray(obj.filhas || obj.subunidades)
@@ -25,7 +25,7 @@ export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
 
 export function mapUnidade(obj: any): Unidade {
     return {
-        codigo: obj.id ?? obj.codigo ?? obj.codigo_unidade ?? 0,
+        codigo: obj.codigo ?? obj.codigo_unidade ?? 0,
         sigla: obj.sigla ?? obj.sigla_unidade ?? "",
         tipo: obj.tipo ?? obj.tipo_unidade ?? "",
         nome: obj.nome ?? obj.nome_unidade ?? "",

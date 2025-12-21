@@ -21,7 +21,7 @@ describe("atividadeService", () => {
     });
 
     it("listarAtividades deve buscar e mapear atividades", async () => {
-        const dtoList = [{id: 1, descricao: "Atividade DTO"}];
+        const dtoList = [{codigo: 1, descricao: "Atividade DTO"}];
         mockApi.get.mockResolvedValue({data: dtoList});
 
         const result = await service.listarAtividades();
@@ -35,7 +35,7 @@ describe("atividadeService", () => {
     });
 
     it("obterAtividadePorCodigo deve buscar e mapear uma atividade", async () => {
-        const dto = {id: 1, descricao: "Atividade DTO"};
+        const dto = {codigo: 1, descricao: "Atividade DTO"};
         mockApi.get.mockResolvedValue({data: dto});
 
         const result = await service.obterAtividadePorCodigo(1);
@@ -49,7 +49,7 @@ describe("atividadeService", () => {
         const request = {descricao: "Nova Atividade"};
         const requestDto = {...request, mapped: true};
         const responseDto = {
-            atividade: {id: 2, ...requestDto},
+            atividade: {codigo: 2, ...requestDto},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
         mockApi.post.mockResolvedValue({data: responseDto});
@@ -105,7 +105,7 @@ describe("atividadeService", () => {
     });
 
     it("listarConhecimentos deve buscar e mapear conhecimentos", async () => {
-        const dtoList = [{id: 1, descricao: "Conhecimento DTO"}];
+        const dtoList = [{codigo: 1, descricao: "Conhecimento DTO"}];
         mockApi.get.mockResolvedValue({data: dtoList});
 
         const result = await service.listarConhecimentos(1);
@@ -122,7 +122,7 @@ describe("atividadeService", () => {
         const request = {descricao: "Novo Conhecimento"};
         const requestDto = {...request, mapped: true};
         const responseDto = {
-            atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{id: 2, ...requestDto}]},
+            atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{codigo: 2, ...requestDto}]},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
         };
         mockApi.post.mockResolvedValue({data: responseDto});
@@ -143,7 +143,7 @@ describe("atividadeService", () => {
 
     it("atualizarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request: Conhecimento = {
-            id: 1,
+            codigo: 1,
             descricao: "Conhecimento Atualizado",
         };
         const responseDto = {
@@ -152,16 +152,16 @@ describe("atividadeService", () => {
         };
         mockApi.post.mockResolvedValue({data: responseDto});
 
-        const result = await service.atualizarConhecimento(1, request.id, request);
+        const result = await service.atualizarConhecimento(1, request.codigo, request);
 
         const expectedPayload = {
-            codigo: request.id,
+            codigo: request.codigo,
             atividadeCodigo: 1,
             descricao: request.descricao,
         };
 
         expect(mockApi.post).toHaveBeenCalledWith(
-            `/atividades/1/conhecimentos/${request.id}/atualizar`,
+            `/atividades/1/conhecimentos/${request.codigo}/atualizar`,
             expectedPayload,
         );
         expect(result).toHaveProperty("atividade");
@@ -189,7 +189,7 @@ describe("atividadeService", () => {
         testErrorHandling(() => service.excluirAtividade(1), 'post');
         testErrorHandling(() => service.listarConhecimentos(1));
         testErrorHandling(() => service.criarConhecimento(1, {descricao: "Novo"}), 'post');
-        testErrorHandling(() => service.atualizarConhecimento(1, 1, {id: 1} as any), 'post');
+        testErrorHandling(() => service.atualizarConhecimento(1, 1, {codigo: 1} as any), 'post');
         testErrorHandling(() => service.excluirConhecimento(1, 1), 'post');
     });
 });

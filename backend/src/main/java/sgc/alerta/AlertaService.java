@@ -145,16 +145,16 @@ public class AlertaService {
      * Marca um alerta como lido para o usuário especificado.
      */
     @Transactional
-    public void marcarComoLido(String usuarioTitulo, Long alertaId) {
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+    public void marcarComoLido(String usuarioTitulo, Long alertaCodigo) {
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaCodigo, usuarioTitulo);
         AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Não foi encontrado o alerta %d para o usuário %s".formatted(alertaId, usuarioTitulo)));
+                        "Não foi encontrado o alerta %d para o usuário %s".formatted(alertaCodigo, usuarioTitulo)));
 
         if (alertaUsuario.getDataHoraLeitura() == null) {
             alertaUsuario.setDataHoraLeitura(LocalDateTime.now());
             alertaUsuarioRepo.save(alertaUsuario);
-            log.info("Alerta {} marcado como lido para o usuário {}", alertaId, usuarioTitulo);
+            log.info("Alerta {} marcado como lido para o usuário {}", alertaCodigo, usuarioTitulo);
         }
     }
 

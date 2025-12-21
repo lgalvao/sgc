@@ -41,7 +41,7 @@ public interface MapaAjusteMapper {
                                 .map(
                                         con ->
                                                 ConhecimentoAjusteDto.builder()
-                                                        .conhecimentoId(con.getCodigo())
+                                                        .conhecimentoCodigo(con.getCodigo())
                                                         .nome(con.getDescricao())
                                                         .incluido(isLinked)
                                                         .build())
