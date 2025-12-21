@@ -80,11 +80,15 @@ Modal simples para editar a descrição de um conhecimento.
 
 Exibe o histórico de análises (auditoria) de um subprocesso em formato de tabela.
 
-- **Props:** `mostrarModal`, `codSubprocesso`.
+- **Props:** `mostrar`, `historico`.
+- **Eventos:** `fechar`.
 
 ### ImpactoMapaModal.vue
 
 Analisa e exibe os impactos (adições/remoções) de uma revisão de mapa comparando com a versão anterior.
+
+- **Props:** `mostrar`, `impacto`, `loading`.
+- **Eventos:** `fechar`.
 
 ### ImportarAtividadesModal.vue
 

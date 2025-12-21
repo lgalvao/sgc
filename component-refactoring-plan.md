@@ -706,16 +706,16 @@ cd /home/runner/work/sgc/sgc/frontend && npm run build
 
 ### Métricas de Sucesso
 
-- [ ] **Código morto removido:** 3 ocorrências eliminadas
-- [ ] **Duplicações resolvidas:** UnidadeTreeItem/UnidadeTreeNode consolidado
-- [ ] **Cobertura de testes:** 100% (27/27 componentes)
-- [ ] **Componentes consolidados:** ModalFinalizacao → ModalConfirmacao
-- [ ] **Uso de BTable:** HistoricoAnaliseModal e ModalAcaoBloco migrados
-- [ ] **Componentes simplificados:** ProcessoDetalhes movido inline
-- [ ] **TypeCheck:** ✅ Sem erros
-- [ ] **Lint:** ✅ Sem erros
-- [ ] **Testes:** ✅ Todos passando
-- [ ] **Build:** ✅ Sucesso
+- [x] **Código morto removido:** 3 ocorrências eliminadas
+- [x] **Duplicações resolvidas:** UnidadeTreeItem/UnidadeTreeNode consolidado
+- [x] **Cobertura de testes:** 100% (27/27 componentes)
+- [x] **Componentes consolidados:** ModalFinalizacao → ModalConfirmacao
+- [x] **Uso de BTable:** HistoricoAnaliseModal e ModalAcaoBloco migrados
+- [x] **Componentes simplificados:** ProcessoDetalhes movido inline
+- [x] **TypeCheck:** ✅ Sem erros
+- [x] **Lint:** ✅ Sem erros
+- [x] **Testes:** ✅ Todos passando
+- [x] **Build:** ✅ Sucesso
 
 ---
 
