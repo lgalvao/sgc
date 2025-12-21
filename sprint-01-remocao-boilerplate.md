@@ -2,16 +2,74 @@
 
 **Baseado em:** `analise-junit-nova.md` - Onda 1
 
+## Contexto do Projeto SGC
+
+### Estrutura de Testes
+- **Localização:** `backend/src/test/java/sgc/`
+- **Total de testes:** 113 arquivos
+- **Candidatos a remoção:** Testes em pacotes `dto/` e `model/` de cada módulo
+
+### Exemplos de Arquivos Candidatos
+Procurar por testes como:
+- `*Dto*Test.java` - testes de DTOs sem validação
+- `*Mapper*Test.java` - testes de mappers sem lógica customizada  
+- `Model*Test.java` - testes de entidades JPA sem invariantes
+
+### Identificando Boilerplate
+Testes que apenas verificam getters/setters gerados pelo Lombok:
+```java
+@Test
+void testGettersSetters() {
+    dto.setNome("teste");
+    assertEquals("teste", dto.getNome());
+}
+```
+
+Testes que verificam builders sem validação:
+```java
+@Test
+void testBuilder() {
+    var dto = MinhaDto.builder().nome("teste").build();
+    assertNotNull(dto);
+}
+```
+
 ## Objetivo
 Reduzir ruído e cobertura artificial removendo testes de getters/setters e builders que não agregam valor.
 
 ## Tarefas
-- Remover testes de getters/setters e builders sem regra de negócio ou validação.
-- Manter apenas testes onde exista validação, serialização customizada ou invariantes.
+- Identificar testes de DTOs e entidades que apenas verificam Lombok (getters/setters/builders).
+- Remover testes sem regra de negócio ou validação.
+- Manter apenas testes onde exista:
+  - Validação customizada (anotações `@Valid`, lógica no setter)
+  - Serialização/deserialização JSON customizada
+  - Invariantes de domínio
+  - Lógica de construção complexa
+
+## Comandos de Verificação
+
+### Listar testes de DTOs
+```bash
+find backend/src/test -path "*/dto/*Test.java" -o -path "*/model/*Test.java"
+```
+
+### Executar testes após remoção
+```bash
+./gradlew :backend:test
+```
+
+### Verificar redução de arquivos
+```bash
+# Antes
+find backend/src/test -name "*Test.java" | wc -l
+# Após remoção
+find backend/src/test -name "*Test.java" | wc -l
+```
 
 ## Critérios de Aceite
-- Testes passam.
-- Redução objetiva de arquivos/linhas de testes inúteis.
+- `./gradlew :backend:test` passa sem erros.
+- Redução objetiva de arquivos/linhas de testes inúteis (métricas antes/depois documentadas).
+- Nenhum teste com validação real foi removido.
 
 ---
 

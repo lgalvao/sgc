@@ -2,15 +2,82 @@
 
 **Baseado em:** `analise-junit-nova.md` - Onda 0
 
+## Contexto do Projeto SGC
+
+O **SGC (Sistema de Gestão de Competências)** é um sistema corporativo desenvolvido com:
+- **Backend:** Java 21, Spring Boot 4.0.1, Hibernate, JPA, H2 (testes)
+- **Build System:** Gradle 9.2.1 (usa Gradle Wrapper)
+- **Framework de Testes:** JUnit 5, Mockito, AssertJ, Spring Boot Test
+- **Estrutura:** Modular Monolith com módulos de domínio (processo, subprocesso, mapa, atividade, etc)
+
+### Estatísticas Atuais
+- **113 arquivos de teste** em `backend/src/test/java/sgc/`
+- **62 testes** já possuem `@DisplayName`
+- **23 testes** já utilizam `@Nested`
+- **1 ocorrência** de `Strictness.LENIENT` encontrada
+- Testes separados em: unitários (`@ExtendWith(MockitoExtension.class)`) e integração (`@SpringBootTest`)
+
+### Arquitetura de Módulos
+- `processo` - Orquestrador central do sistema
+- `subprocesso` - Máquina de estados e workflow
+- `mapa` e `atividade` - Domínio principal (competências)
+- `analise` - Auditoria e revisão
+- `notificacao` e `alerta` - Comunicação reativa (eventos)
+- `sgrh` e `unidade` - Estrutura organizacional
+- `comum` e `util` - Componentes transversais
+
+### Referências
+- Arquitetura detalhada: `backend/README.md`
+- Convenções do projeto: `AGENTS.md`
+- Análise completa: `analise-junit-nova.md`
+
+---
+
 ## Objetivo
 Garantir medições e diagnóstico rápido antes de iniciar as refatorações pesadas.
 
 ## Tarefas
 - Garantir pipeline rodando testes e publicando relatórios.
 - Documentar comandos de execução.
+- Validar que o ambiente de testes está funcionando corretamente.
+
+## Comandos de Execução
+
+### Executar todos os testes do backend
+```bash
+./gradlew :backend:test
+```
+
+### Gerar relatório de cobertura JaCoCo (já configurado)
+```bash
+./gradlew :backend:jacocoTestReport
+```
+Relatório gerado em: `backend/build/reports/jacoco/test/html/index.html`
+
+### Executar verificação de qualidade completa
+```bash
+./gradlew :backend:qualityCheck
+```
+
+### Verificar uso de LENIENT
+```bash
+grep -R "Strictness.LENIENT" backend/src/test --include="*.java"
+```
+
+### Contar testes com @DisplayName
+```bash
+grep -R "@DisplayName" backend/src/test --include="*.java" | wc -l
+```
+
+### Contar testes com @Nested
+```bash
+grep -R "@Nested" backend/src/test --include="*.java" | wc -l
+```
 
 ## Critérios de Aceite
-- CI executa testes e falha se houver erro.
+- `./gradlew :backend:test` executa com sucesso.
+- JaCoCo gera relatórios de cobertura (já está configurado no `backend/build.gradle.kts`).
+- Comandos de verificação documentados e validados.
 
 ---
 
