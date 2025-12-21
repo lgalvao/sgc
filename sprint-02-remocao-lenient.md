@@ -2,16 +2,89 @@
 
 **Baseado em:** `analise-junit-nova.md` - Onda 2
 
+## Contexto do Projeto SGC
+
+### Estado Atual
+- **1 ocorrência** de `Strictness.LENIENT` detectada
+- Testes unitários usam `@ExtendWith(MockitoExtension.class)`
+- O padrão do Mockito 5+ é **strict stubbing** (stubs não utilizados causam falha)
+
+### O Problema do LENIENT
+O modo `LENIENT` desabilita verificações importantes:
+- Permite stubs configurados mas não usados no teste
+- Mascara arranges excessivos que podem indicar design ruim
+- Reduz a capacidade do teste de detectar mudanças na classe sob teste
+
+### Como Corrigir
+Quando remover `@MockitoSettings(strictness = LENIENT)`:
+
+1. **Stub não usado**: Remova o `when()` desnecessário
+2. **Stub usado condicionalmente**: Use `lenient().when()` pontualmente
+3. **Muitos mocks**: Considere refatorar o teste ou a classe (code smell)
+
+### Exemplo de Correção
+```java
+// ANTES (com LENIENT)
+@MockitoSettings(strictness = LENIENT)
+class MeuServiceTest {
+    @Test
+    void teste() {
+        when(repo.buscar(1L)).thenReturn(obj1); // não usado!
+        when(repo.buscar(2L)).thenReturn(obj2); // usado
+        service.processar(2L);
+    }
+}
+
+// DEPOIS (corrigido)
+class MeuServiceTest {
+    @Test
+    void teste() {
+        // Removido stub não usado
+        when(repo.buscar(2L)).thenReturn(obj2);
+        service.processar(2L);
+    }
+}
+```
+
 ## Objetivo
 Aumentar a qualidade do sinal dos testes unitários, garantindo que stubs não utilizados não sejam permitidos.
 
 ## Tarefas
-- Remover `@MockitoSettings(strictness = LENIENT)`.
-- Corrigir stubs não usados e arranges excessivos que causavam falhas sem o modo LENIENT.
+- Localizar todas as ocorrências de `@MockitoSettings(strictness = LENIENT)`.
+- Remover a anotação ou o parâmetro `strictness = LENIENT`.
+- Executar `./gradlew :backend:test` e corrigir falhas de strict stubbing:
+  - Remover stubs não usados
+  - Usar `lenient()` apenas quando realmente necessário
+  - Considerar refatoração se há excesso de mocks
+- Documentar mudanças e razões.
+
+## Comandos de Verificação
+
+### Localizar LENIENT no código
+```bash
+grep -R "Strictness.LENIENT" backend/src/test --include="*.java" -n
+```
+
+### Localizar anotação MockitoSettings
+```bash
+grep -R "@MockitoSettings" backend/src/test --include="*.java" -n
+```
+
+### Executar testes após remoção
+```bash
+./gradlew :backend:test
+```
+
+### Verificar que não há LENIENT remanescente
+```bash
+# Deve retornar 0
+grep -R "Strictness.LENIENT" backend/src/test --include="*.java" | wc -l
+```
 
 ## Critérios de Aceite
-- `grep -R "Strictness.LENIENT" -n` não retorna resultados no código de teste (exceto talvez em classes legadas que serão removidas posteriormente, mas o ideal é zero).
-- Suíte de testes passa integralmente.
+- `grep -R "Strictness.LENIENT" backend/src/test --include="*.java"` não retorna resultados (exceto talvez em classes legadas documentadas, mas o ideal é zero).
+- `./gradlew :backend:test` passa integralmente sem erros.
+- Nenhum novo uso de `lenient()` sem justificativa em comentário.
 
 ---
 
