@@ -131,9 +131,22 @@ backend/src/test/java/sgc/fixture/
 - ✅ CDU-02 (Piloto) - Concluído.
 - ✅ CDU-01 - Concluído.
 - ✅ CDU-03 - Concluído.
-- 🔄 Próximo: Lote 2 (CDU-04 a CDU-08).
+- ✅ CDU-04 a CDU-08 (Lote 2) - Concluído.
+- 🔄 Próximo: Lote 3 (CDU-09 a CDU-15).
 
 **Documento**: [`sprint-05-desacoplamento-integracao.md`](./sprint-05-desacoplamento-integracao.md)
+
+#### Detalhamento da Execução - Lote 3 (Sprint 5)
+
+| Teste | Descrição | Estado Atual | Ação Planejada |
+|-------|-----------|--------------|----------------|
+| `CDU09IntegrationTest` | Cadastrar competência | Pendente verificação | Converter para Fixtures |
+| `CDU10IntegrationTest` | Consultar competência | Pendente verificação | Converter para Fixtures |
+| `CDU11IntegrationTest` | Alterar competência | Pendente verificação | Converter para Fixtures |
+| `CDU12IntegrationTest` | Excluir competência | Pendente verificação | Converter para Fixtures |
+| `CDU13IntegrationTest` | Cadastrar atividade | Pendente verificação | Converter para Fixtures |
+| `CDU14IntegrationTest` | Consultar atividade | Pendente verificação | Converter para Fixtures |
+| `CDU15IntegrationTest` | Alterar atividade | Pendente verificação | Converter para Fixtures |
 
 ---
 
@@ -233,7 +246,7 @@ Para **qualquer** PR de refatoração de testes:
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
-| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-01, CDU-03) |
+| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-01 a CDU-08) |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
@@ -278,5 +291,6 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 13. ✅ **Sprint 4 (Concluído):** Todos os módulos do backend padronizados (`sgrh`, `unidade`, `painel`, `comum`, `mapa`, `e2e` e `integracao`). Total de `@DisplayName` aumentou para 646.
 14. ✅ **Sprint 5 (Piloto CDU-02):** Refatorado `CDU02IntegrationTest` para não depender de IDs do `data.sql`. Criado `AlertaFixture`. Resolvidos problemas de `ObjectOptimisticLockingFailureException` via reset de sequence H2.
 15. ✅ **Sprint 5 (Lote 1):** Refatorados `CDU01IntegrationTest` e `CDU03IntegrationTest`. Uso de `jdbcTemplate` para setup de Usuários/Perfis imutáveis e `saveAndFlush` para entidades gerenciadas.
+16. ✅ **Sprint 5 (Lote 2):** Verificados e validados `CDU04IntegrationTest` a `CDU08IntegrationTest`. Corrigido uso de ID fixo em `CDU05IntegrationTest`. Confirmado que os testes já utilizam Fixtures e não dependem do seed global (apenas de resets de sequence H2).
 
-**Próximo Passo**: Executar refatoração do Lote 2 da Sprint 5 (CDU-04 a CDU-08).
+**Próximo Passo**: Executar refatoração do Lote 3 da Sprint 5 (CDU-09 a CDU-15).
