@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("ProcessoDetalheBuilder")
 class ProcessoDetalheBuilderTest {
 
     @Mock
@@ -37,9 +38,9 @@ class ProcessoDetalheBuilderTest {
     private ProcessoDetalheBuilder builder;
 
     @Test
-    @DisplayName("Deve construir DTO com dados básicos e unidades")
-    void build() {
-        // Setup Processo
+    @DisplayName("Deve construir DTO com dados básicos e unidades quando dados válidos")
+    void deveConstruirDtoQuandoDadosValidos() {
+        // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Teste");
@@ -55,7 +56,6 @@ class ProcessoDetalheBuilderTest {
 
         processo.setParticipantes(Set.of(u1));
 
-        // Setup Subprocesso
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
@@ -64,15 +64,14 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        // Mock Security Context (Empty/Anonymous)
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(null);
         SecurityContextHolder.setContext(securityContext);
 
-        // Executar
+        // Act
         ProcessoDetalheDto dto = builder.build(processo);
 
-        // Assertions
+        // Assert
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
         assertThat(dto.getDescricao()).isEqualTo("Processo Teste");
@@ -85,8 +84,9 @@ class ProcessoDetalheBuilderTest {
     }
 
     @Test
-    @DisplayName("Deve permitir finalizar se admin")
-    void buildAdmin() {
+    @DisplayName("Deve permitir finalizar quando usuário é admin")
+    void devePermitirFinalizarQuandoUsuarioAdmin() {
+        // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -94,7 +94,6 @@ class ProcessoDetalheBuilderTest {
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-        // Mock Admin
         SecurityContext securityContext = mock(SecurityContext.class);
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
@@ -102,8 +101,10 @@ class ProcessoDetalheBuilderTest {
         when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
 
+        // Act
         ProcessoDetalheDto dto = builder.build(processo);
 
+        // Assert
         assertThat(dto.isPodeFinalizar()).isTrue();
     }
 }
