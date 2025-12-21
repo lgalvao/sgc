@@ -25,7 +25,10 @@
               variant="outline-success"
               @click="salvarEdicaoAtividade"
           >
-            <i class="bi bi-save"/>
+            <i
+                aria-hidden="true"
+                class="bi bi-save"
+            />
           </BButton>
           <BButton
               class="botao-acao"
@@ -36,7 +39,10 @@
               variant="outline-secondary"
               @click="cancelarEdicaoAtividade"
           >
-            <i class="bi bi-x"/>
+            <i
+                aria-hidden="true"
+                class="bi bi-x"
+            />
           </BButton>
         </template>
 
@@ -60,7 +66,10 @@
             variant="outline-primary"
             @click="iniciarEdicaoAtividade"
         >
-          <i class="bi bi-pencil"/>
+          <i
+              aria-hidden="true"
+              class="bi bi-pencil"
+          />
         </BButton>
         <BButton
             class="botao-acao ms-1"
@@ -71,18 +80,24 @@
             variant="outline-danger"
             @click="$emit('remover-atividade')"
         >
-          <i class="bi bi-trash"/>
+          <i
+              aria-hidden="true"
+              class="bi bi-trash"
+          />
         </BButton>
       </div>
 
       <!-- Mensagem de erro inline -->
-      <div 
-        v-if="erroValidacao" 
-        class="alert alert-danger d-flex align-items-center mt-2 mb-0 py-2"
-        role="alert"
-        data-testid="atividade-erro-validacao"
+      <div
+          v-if="erroValidacao"
+          class="alert alert-danger d-flex align-items-center mt-2 mb-0 py-2"
+          data-testid="atividade-erro-validacao"
+          role="alert"
       >
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <i
+            aria-hidden="true"
+            class="bi bi-exclamation-triangle-fill me-2"
+        />
         <span>{{ erroValidacao }}</span>
       </div>
 
@@ -115,7 +130,10 @@
                 variant="outline-success"
                 @click="salvarEdicaoConhecimento(conhecimento.codigo)"
             >
-              <i class="bi bi-save"/>
+              <i
+                  aria-hidden="true"
+                  class="bi bi-save"
+              />
             </BButton>
             <BButton
                 class="botao-acao"
@@ -126,7 +144,10 @@
                 variant="outline-secondary"
                 @click="cancelarEdicaoConhecimento"
             >
-              <i class="bi bi-x"/>
+              <i
+                  aria-hidden="true"
+                  class="bi bi-x"
+              />
             </BButton>
           </template>
           <template v-else>
@@ -144,7 +165,10 @@
                   variant="outline-primary"
                   @click="iniciarEdicaoConhecimento(conhecimento)"
               >
-                <i class="bi bi-pencil"/>
+                <i
+                    aria-hidden="true"
+                    class="bi bi-pencil"
+                />
               </BButton>
               <BButton
                   class="botao-acao"
@@ -155,7 +179,10 @@
                   variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.codigo)"
               >
-                <i class="bi bi-trash"/>
+                <i
+                    aria-hidden="true"
+                    class="bi bi-trash"
+                />
               </BButton>
             </div>
           </template>
@@ -178,13 +205,17 @@
           </BCol>
           <BCol cols="auto">
             <BButton
+                aria-label="Adicionar conhecimento"
                 data-testid="btn-adicionar-conhecimento"
                 size="sm"
                 title="Adicionar Conhecimento"
                 type="submit"
                 variant="outline-secondary"
             >
-              <i class="bi bi-save"/>
+              <i
+                  aria-hidden="true"
+                  class="bi bi-plus-lg"
+              />
             </BButton>
           </BCol>
         </BForm>

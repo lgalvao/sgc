@@ -9,3 +9,7 @@
 ## 2025-02-18 - Skip Link for Keyboard Navigation
 **Learning:** The application lacked a mechanism for keyboard users to bypass the main navigation, forcing them to tab through all menu items to reach the main content. This is a critical WCAG requirement (Bypass Blocks).
 **Action:** Implemented a standard "Skip to Content" link using Bootstrap's `visually-hidden-focusable` class. Future layouts should always include a main content landmark with an ID for skipping.
+
+## 2025-02-19 - Semantic Icon Mismatch
+**Learning:** The application used `bi-save` icons for "Add" actions (e.g., adding a new activity or knowledge). This creates a cognitive dissonance for users who expect a "Plus" icon for creation and a "Save" icon for persistence, and confuses the action's intent.
+**Action:** Replaced `bi-save` with `bi-plus-lg` for creation actions. Future implementations should strictly distinguish between "Add to list" (client-side or creation) and "Save to database" (persistence) actions in both iconography and labels.
