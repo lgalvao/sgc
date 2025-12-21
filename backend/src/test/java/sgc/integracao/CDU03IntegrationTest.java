@@ -1,19 +1,24 @@
 package sgc.integracao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +48,37 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private Unidade unidade1;
+    private Unidade unidade2;
+
+    @BeforeEach
+    void setup() {
+        // Reset sequences to avoid conflicts
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
+            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
+        } catch (Exception ignored) { }
+
+        // Create fixtures
+        unidade1 = UnidadeFixture.unidadePadrao();
+        unidade1.setCodigo(null);
+        unidade1.setNome("Unidade 1");
+        unidade1.setSigla("U1");
+        unidade1 = unidadeRepo.save(unidade1);
+
+        unidade2 = UnidadeFixture.unidadePadrao();
+        unidade2.setCodigo(null);
+        unidade2.setNome("Unidade 2");
+        unidade2.setSigla("U2");
+        unidade2 = unidadeRepo.save(unidade2);
+    }
+
     private CriarProcessoReq criarCriarProcessoReq(
             String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
         return new CriarProcessoReq(descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
@@ -56,8 +92,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCriarProcesso_sucesso() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L); // Assumindo que a unidade com código 1 existe
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         CriarProcessoReq requestDTO =
                 criarCriarProcessoReq(
@@ -79,8 +114,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCriarProcesso_descricaoVazia_falha() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         CriarProcessoReq requestDTO =
                 criarCriarProcessoReq(
@@ -139,8 +173,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     @Test
     void testEditarProcesso_sucesso() throws Exception {
         // 1. Criar um processo para ser editado
-        List<Long> unidadesIniciais = new ArrayList<>();
-        unidadesIniciais.add(1L);
+        List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoReq criarRequestDTO =
                 criarCriarProcessoReq(
                         "Processo para Edição", unidadesIniciais, LocalDateTime.now().plusDays(20));
@@ -161,8 +194,8 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
         // 2. Editar o processo
         List<Long> unidadesEditadas = new ArrayList<>();
-        unidadesEditadas.add(1L);
-        unidadesEditadas.add(2L); // Adiciona outra unidade
+        unidadesEditadas.add(unidade1.getCodigo());
+        unidadesEditadas.add(unidade2.getCodigo()); // Adiciona outra unidade
 
         AtualizarProcessoReq editarRequestDTO =
                 criarAtualizarProcessoReq(
@@ -185,12 +218,11 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testEditarProcesso_processoNaoEncontrado_falha() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         AtualizarProcessoReq editarRequestDTO =
                 criarAtualizarProcessoReq(
-                        999L, // Código que não existe
+                        99999L, // Código que não existe
                         "Processo Inexistente",
                         unidades,
                         LocalDateTime.now().plusDays(30));
@@ -198,7 +230,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                         post(
                                 API_PROCESSOS + "/{codProcesso}/atualizar",
-                                999L) // código que não existe
+                                99999L) // código que não existe
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(editarRequestDTO)))
@@ -208,8 +240,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
     @Test
     void testRemoverProcesso_sucesso() throws Exception {
         // 1. Criar um processo para ser removido
-        List<Long> unidadesIniciais = new ArrayList<>();
-        unidadesIniciais.add(1L);
+        List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoReq criarRequestDTO =
                 criarCriarProcessoReq(
                         "Processo para Remoção",
@@ -244,7 +275,7 @@ public class CDU03IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                         post(
                                 API_PROCESSOS + "/{codProcesso}/excluir",
-                                999L) // código que não existe
+                                99999L) // código que não existe
                                 .with(csrf()))
                 .andExpect(status().isNotFound());
     }

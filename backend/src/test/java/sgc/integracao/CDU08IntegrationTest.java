@@ -8,12 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
@@ -23,6 +27,11 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioPerfilRepo;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.ImportarAtividadesReq;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -73,13 +82,58 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ProcessoRepo processoRepo;
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
+    private Unidade unidadeOrigem;
+    private Unidade unidadeDestino;
 
     @BeforeEach
     void setUp() {
-        Unidade unidadeOrigem = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-        Unidade unidadeDestino = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+        // Reset sequences
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 70000");
+            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
+            jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
+            jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 90000");
+        } catch (Exception ignored) {}
+
+        // 1. Criar unidades
+        unidadeOrigem = UnidadeFixture.unidadePadrao();
+        unidadeOrigem.setCodigo(null);
+        unidadeOrigem.setSigla("U_ORIG");
+        unidadeOrigem.setNome("Unidade Origem");
+        unidadeOrigem = unidadeRepo.save(unidadeOrigem);
+
+        unidadeDestino = UnidadeFixture.unidadePadrao();
+        unidadeDestino.setCodigo(null);
+        unidadeDestino.setSigla("U_DEST");
+        unidadeDestino.setNome("Unidade Destino");
+        unidadeDestino = unidadeRepo.save(unidadeDestino);
+
+        // 2. Criar chefe para unidade destino (para validação de segurança)
+        Usuario chefe = UsuarioFixture.usuarioPadrao();
+        chefe.setTituloEleitoral("888888888888"); // Título esperado pelo @WithMockChefe
+        chefe.setNome("Chefe Destino");
+        chefe.setUnidadeLotacao(unidadeDestino);
+        chefe = usuarioRepo.save(chefe);
+
+        UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
+                .usuarioTitulo(chefe.getTituloEleitoral())
+                .usuario(chefe)
+                .unidadeCodigo(unidadeDestino.getCodigo())
+                .unidade(unidadeDestino)
+                .perfil(Perfil.CHEFE)
+                .build();
+        usuarioPerfilRepo.save(perfilChefe);
 
         Processo processo =
                 new Processo(
@@ -226,7 +280,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao importar de subprocesso inexistente")
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
-            ImportarAtividadesReq request = new ImportarAtividadesReq(9999L);
+            ImportarAtividadesReq request = new ImportarAtividadesReq(99999L);
 
             mockMvc.perform(
                             post(

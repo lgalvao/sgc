@@ -1,16 +1,20 @@
 package sgc.integracao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -23,6 +27,11 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.model.UsuarioPerfilRepo;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -66,21 +75,67 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;
+
+    private Unidade unidadeLivre;
+
+    @BeforeEach
+    void setup() {
+        // Reset sequences
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 30000");
+            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
+            jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
+        } catch (Exception ignored) {}
+
+        // Cria unidade programaticamente
+        unidadeLivre = UnidadeFixture.unidadePadrao();
+        unidadeLivre.setCodigo(null);
+        unidadeLivre.setSigla("U_LIVRE_MAPP");
+        unidadeLivre.setNome("Unidade Livre Mapeamento");
+        unidadeLivre = unidadeRepo.save(unidadeLivre);
+
+        // Cria titular para a unidade (para garantir envio de notificação)
+        Usuario titular = UsuarioFixture.usuarioPadrao();
+        titular.setTituloEleitoral("999999999999");
+        titular.setEmail("titular@teste.com");
+        titular = usuarioRepo.save(titular);
+
+        // Associa titular à unidade
+        // A entidade Unidade tem um campo 'titular' (Usuario).
+        unidadeLivre.setTitular(titular);
+        unidadeRepo.save(unidadeLivre);
+
+        // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo SgrhService
+        UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
+                .usuarioTitulo(titular.getTituloEleitoral())
+                .usuario(titular)
+                .unidadeCodigo(unidadeLivre.getCodigo())
+                .unidade(unidadeLivre)
+                .perfil(Perfil.CHEFE)
+                .build();
+        usuarioPerfilRepo.save(perfilChefe);
+    }
 
     @Test
     @DisplayName("Deve iniciar processo de mapeamento com sucesso e gerar subprocessos, alertas e notificações")
     void deveIniciarProcessoMapeamento() throws Exception {
         // 1. Arrange: Criar um processo em estado 'CRIADO'
-        // Usar unidade 9 (ASSESSORIA_12) que não está em nenhum processo no import.sql
-        Unidade livre = unidadeRepo.findById(9L).orElseThrow();
-
         CriarProcessoReq criarReq = new CriarProcessoReq(
                 "Processo Mapeamento Teste CDU-04",
                 TipoProcesso.MAPEAMENTO,
                 LocalDateTime.now().plusDays(10),
-                List.of(livre.getCodigo())
+                List.of(unidadeLivre.getCodigo())
         );
 
         var result = mockMvc.perform(post("/api/processos")
@@ -93,8 +148,7 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Act: Iniciar Processo
-        // O endpoint espera IniciarProcessoReq com a lista de unidades (para validação/confirmação)
-        IniciarProcessoReq iniciarReq = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(livre.getCodigo()));
+        IniciarProcessoReq iniciarReq = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(unidadeLivre.getCodigo()));
 
         mockMvc.perform(post("/api/processos/{id}/iniciar", processoId)
                         .with(csrf())
@@ -112,7 +166,7 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
 
         // Verificar subprocesso da unidade livre
         Subprocesso sub = subprocessos.stream()
-                .filter(s -> s.getUnidade().getCodigo().equals(9L))
+                .filter(s -> s.getUnidade().getCodigo().equals(unidadeLivre.getCodigo()))
                 .findFirst()
                 .orElseThrow();
         assertThat(sub.getMapa()).isNotNull();

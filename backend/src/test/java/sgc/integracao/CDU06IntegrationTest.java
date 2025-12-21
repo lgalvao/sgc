@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,17 +14,19 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -48,166 +51,180 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
 public class CDU06IntegrationTest extends BaseIntegrationTest {
-        private static final String TEST_USER_ID = "123456789";
+    private static final String TEST_USER_ID = "123456789";
 
-        @Autowired
-        private ProcessoRepo processoRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
 
-        @Autowired
-        private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
-        @Autowired
-        private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
-        @MockitoBean
-        private SgrhService sgrhService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-        private Processo processo;
+    @MockitoBean
+    private SgrhService sgrhService;
 
-        @BeforeEach
-        void setUp() {
-                processo = new Processo();
-                processo.setDescricao("Processo de Teste");
-                processo.setTipo(TipoProcesso.MAPEAMENTO);
-                processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-                processo.setDataLimite(LocalDateTime.now().plusDays(10));
-                processo = processoRepo.save(processo);
-                SecurityContextHolder.clearContext();
-        }
+    private Processo processo;
+    private Unidade unidade;
 
-        private org.springframework.security.core.Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
-                Usuario principal = new Usuario(TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123", unidade);
+    @BeforeEach
+    void setUp() {
+        // Reset sequences
+        try {
+            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 50000");
+            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 60000");
+        } catch (Exception ignored) {}
 
-                Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-                atribuicoes.add(
-                                UsuarioPerfil.builder()
-                                                .usuario(principal)
-                                                .unidade(unidade)
-                                                .perfil(perfil)
-                                                .build());
-                principal.setAtribuicoes(atribuicoes);
+        // Cria unidade programaticamente
+        unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setSigla("U_TESTE");
+        unidade.setNome("Unidade Teste");
+        unidade = unidadeRepo.save(unidade);
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                principal, null, principal.getAuthorities());
+        // Cria processo
+        processo = new Processo();
+        processo.setDescricao("Processo de Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDataLimite(LocalDateTime.now().plusDays(10));
+        processo = processoRepo.save(processo);
 
-                                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(auth);
+        SecurityContextHolder.clearContext();
+    }
 
-                when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
-                                new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
-                return auth;
-        }
+    private org.springframework.security.core.Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
+        Usuario principal = UsuarioFixture.usuarioPadrao();
+        principal.setTituloEleitoral(TEST_USER_ID);
+        principal.setUnidadeLotacao(unidade);
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve detalhar processo para Admin")
-        void testDetalharProcesso_sucesso() throws Exception {
-                Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
-                subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        atribuicoes.add(
+                UsuarioPerfil.builder()
+                        .usuario(principal)
+                        .unidade(unidade)
+                        .perfil(perfil)
+                        .build());
+        principal.setAtribuicoes(atribuicoes);
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
-        }
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                principal, null, principal.getAuthorities());
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve retornar 404 para processo inexistente")
-        void testDetalharProcesso_naoEncontrado() throws Exception {
-                mockMvc.perform(get("/api/processos/{id}/detalhes", 9999L))
-                                .andExpect(status().isNotFound());
-        }
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
-        void testPodeFinalizar_true_comAdmin() throws Exception {
-                Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
-                subprocessoRepo.save(
-                                new Subprocesso(
-                                                processo,
-                                                unidade,
-                                                null,
-                                                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                                                processo.getDataLimite()));
+        when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
+                new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
+        return auth;
+    }
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.podeFinalizar").value(true));
-        }
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve detalhar processo para Admin")
+    void testDetalharProcesso_sucesso() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
-        @Test
-        @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
-        void testPodeFinalizar_false_semAdmin() throws Exception {
-                Unidade unidade = unidadeRepo.findById(102L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
-                org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
-                subprocessoRepo.save(
-                                new Subprocesso(
-                                                processo,
-                                                unidade,
-                                                null,
-                                                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                                                processo.getDataLimite()));
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
+    }
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.podeFinalizar").value(false));
-        }
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve retornar 404 para processo inexistente")
+    void testDetalharProcesso_naoEncontrado() throws Exception {
+        mockMvc.perform(get("/api/processos/{id}/detalhes", 99999L))
+                .andExpect(status().isNotFound());
+    }
 
-        @Test
-        @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro"
-                        + " disponibilizado")
-        void testPodeHomologarCadastro_true() throws Exception {
-                Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
-                org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-                subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
+    void testPodeFinalizar_true_comAdmin() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
-        }
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(true));
+    }
 
-        @Test
-        @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
-        void testPodeHomologarMapa_true() throws Exception {
-                Unidade unidade = unidadeRepo.findById(9L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
-                org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-                subprocessoRepo.save(new Subprocesso(processo, unidade, null,
-                                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, processo.getDataLimite()));
+    @Test
+    @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
+    void testPodeFinalizar_false_semAdmin() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
+        subprocessoRepo.save(
+                new Subprocesso(
+                        processo,
+                        unidade,
+                        null,
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        processo.getDataLimite()));
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.podeHomologarMapa").value(true));
-        }
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(false));
+    }
 
-        @Test
-        @WithMockAdmin
-        @DisplayName("Deve retornar detalhes da unidade com situação do subprocesso correta")
-        void testDetalharProcesso_dadosSubprocesso() throws Exception {
-                Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
-                processo.setParticipantes(new HashSet<>(Set.of(unidade)));
-                processoRepo.save(processo);
+    @Test
+    @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
+    void testPodeHomologarCadastro_true() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
 
-                Subprocesso subprocesso = new Subprocesso(processo, unidade, null,
-                                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
-                subprocessoRepo.save(subprocesso);
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
+    }
 
-                mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso")
-                                                .value("MAPEAMENTO_MAPA_HOMOLOGADO"))
-                                .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
-        }
+    @Test
+    @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
+    void testPodeHomologarMapa_true() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+        org.springframework.security.core.Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
+        subprocessoRepo.save(new Subprocesso(processo, unidade, null,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, processo.getDataLimite()));
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarMapa").value(true));
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Deve retornar detalhes da unidade com situação do subprocesso correta")
+    void testDetalharProcesso_dadosSubprocesso() throws Exception {
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
+
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, null,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, processo.getDataLimite());
+        subprocessoRepo.save(subprocesso);
+
+        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso")
+                        .value("MAPEAMENTO_MAPA_HOMOLOGADO"))
+                .andExpect(jsonPath("$.unidades[0].dataLimite").exists());
+    }
 }
