@@ -395,7 +395,7 @@ describe('CadProcesso.vue', () => {
                     { field: 'tipo', message: 'Tipo inválido' },
                     { field: 'dataLimiteEtapa1', message: 'Data inválida' },
                     { field: 'unidades', message: 'Selecione ao menos uma unidade' },
-                    { field: 'outro', message: 'Erro genérico' }
+                    { field: null, message: 'Erro genérico' }
                 ]
             };
             throw new Error('Validation Error');
