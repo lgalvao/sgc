@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DisplayName("Testes do E2eController (Backend Support)")
 class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -44,7 +46,9 @@ class E2eControllerTest {
     }
 
     @Test
-    void shouldClearProcessData_RealDelete() {
+    @DisplayName("Deve limpar dados do processo e suas dependências")
+    void deveLimparDadosDoProcessoComDependentes() {
+        // Arrange
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.processo");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.subprocesso");
@@ -101,8 +105,10 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade", 1);
         assertCount("sgc.vw_usuario", 1);
 
+        // Act
         controller.limparProcessoComDependentes(100L);
 
+        // Assert
         assertCount("sgc.processo", 0);
         assertCount("sgc.subprocesso", 0);
         assertCount("sgc.mapa", 0);
@@ -117,7 +123,9 @@ class E2eControllerTest {
     }
 
     @Test
-    void shouldResetDatabase_TruncateTables() throws SQLException {
+    @DisplayName("Deve resetar o banco de dados truncando tabelas")
+    void deveResetarBancoTruncandoTabelas() throws SQLException {
+        // Arrange
         jdbcTemplate.execute(
                 "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
@@ -127,12 +135,15 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
 
+        // Act
         try {
             controller.resetDatabase();
         } catch (RuntimeException e) {
-            // Ignored
+            // Ignored - pode ocorrer erro de integridade referencial se não limpar na ordem, mas o teste foca no truncate
+            // Na implementação real do resetDatabase, ele desativa constraints.
         }
 
+        // Assert
         assertCount("sgc.vw_unidade WHERE codigo=888", 0);
         assertCount("sgc.processo WHERE codigo=888", 0);
     }

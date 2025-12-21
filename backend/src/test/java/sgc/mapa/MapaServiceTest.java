@@ -1,6 +1,8 @@
 package sgc.mapa;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,6 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Testes do Serviço de Mapas")
 class MapaServiceTest {
     @Mock
     private MapaRepo mapaRepo;
@@ -66,112 +69,132 @@ class MapaServiceTest {
         competencia.setAtividades(Set.of(atividade));
     }
 
-    @Test
-    void listar() {
-        when(mapaRepo.findAll()).thenReturn(List.of(mapa));
-        assertThat(mapaService.listar()).hasSize(1);
+    @Nested
+    @DisplayName("CRUD de Mapa")
+    class CrudMapa {
+        @Test
+        @DisplayName("Deve listar mapas")
+        void deveListarMapas() {
+            when(mapaRepo.findAll()).thenReturn(List.of(mapa));
+            assertThat(mapaService.listar()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve obter mapa por código")
+        void deveObterPorCodigo() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            assertThat(mapaService.obterPorCodigo(1L)).isEqualTo(mapa);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao obter mapa inexistente")
+        void deveLancarErroAoObterMapaInexistente() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> mapaService.obterPorCodigo(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve criar mapa")
+        void deveCriarMapa() {
+            when(mapaRepo.save(mapa)).thenReturn(mapa);
+            assertThat(mapaService.criar(mapa)).isEqualTo(mapa);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar mapa")
+        void deveAtualizarMapa() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(mapaRepo.save(mapa)).thenReturn(mapa);
+            assertThat(mapaService.atualizar(1L, mapa)).isEqualTo(mapa);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
+        void deveLancarErroAoAtualizarMapaInexistente() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> mapaService.atualizar(1L, mapa))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+
+        @Test
+        @DisplayName("Deve excluir mapa")
+        void deveExcluirMapa() {
+            when(mapaRepo.existsById(1L)).thenReturn(true);
+            mapaService.excluir(1L);
+            verify(mapaRepo).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao excluir mapa inexistente")
+        void deveLancarErroAoExcluirMapaInexistente() {
+            when(mapaRepo.existsById(1L)).thenReturn(false);
+            assertThatThrownBy(() -> mapaService.excluir(1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 
-    @Test
-    void obterPorCodigo() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        assertThat(mapaService.obterPorCodigo(1L)).isEqualTo(mapa);
-    }
+    @Nested
+    @DisplayName("Mapa Completo")
+    class MapaCompleto {
+        @Test
+        @DisplayName("Deve retornar mapa completo quando existir")
+        void deveRetornarMapaCompletoQuandoExistir() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
 
-    @Test
-    void obterPorCodigo_NaoEncontrado() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> mapaService.obterPorCodigo(1L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
+            MapaCompletoDto dtoMock = MapaCompletoDto.builder()
+                    .codigo(1L)
+                    .subprocessoCodigo(100L)
+                    .observacoes("Observações do Mapa")
+                    .competencias(List.of(new CompetenciaMapaDto(1L, "Competência 1", List.of(1L))))
+                    .build();
 
-    @Test
-    void criar() {
-        when(mapaRepo.save(mapa)).thenReturn(mapa);
-        assertThat(mapaService.criar(mapa)).isEqualTo(mapa);
-    }
+            when(mapaCompletoMapper.toDto(any(), anyLong(), anyList())).thenReturn(dtoMock);
 
-    @Test
-    void atualizar() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(mapaRepo.save(mapa)).thenReturn(mapa);
-        assertThat(mapaService.atualizar(1L, mapa)).isEqualTo(mapa);
-    }
+            MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
-    @Test
-    void atualizar_NaoEncontrado() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> mapaService.atualizar(1L, mapa))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
+            assertThat(mapaCompleto).isNotNull();
+            assertThat(mapaCompleto.getCodigo()).isEqualTo(1L);
+            assertThat(mapaCompleto.getSubprocessoCodigo()).isEqualTo(100L);
+            assertThat(mapaCompleto.getObservacoes()).isEqualTo("Observações do Mapa");
+            assertThat(mapaCompleto.getCompetencias()).hasSize(1);
+            assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao())
+                    .isEqualTo("Competência 1");
+        }
 
-    @Test
-    void excluir() {
-        when(mapaRepo.existsById(1L)).thenReturn(true);
-        mapaService.excluir(1L);
-        verify(mapaRepo).deleteById(1L);
-    }
+        @Test
+        @DisplayName("Deve lançar erro ao buscar mapa completo inexistente")
+        void deveLancarErroAoBuscarMapaCompletoInexistente() {
+            when(mapaRepo.findById(anyLong())).thenReturn(Optional.empty());
 
-    @Test
-    void excluir_NaoEncontrado() {
-        when(mapaRepo.existsById(1L)).thenReturn(false);
-        assertThatThrownBy(() -> mapaService.excluir(1L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
+            assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessage("Mapa não encontrado: 1");
+        }
 
-    @Test
-    void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
+        @Test
+        @DisplayName("Deve lançar erro ao salvar mapa completo se mapa não existe")
+        void deveLancarErroAoSalvarMapaCompletoInexistente() {
+            when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
 
-        MapaCompletoDto dtoMock = MapaCompletoDto.builder()
-                .codigo(1L)
-                .subprocessoCodigo(100L)
-                .observacoes("Observações do Mapa")
-                .competencias(List.of(new CompetenciaMapaDto(1L, "Competência 1", List.of(1L))))
-                .build();
+        @Test
+        @DisplayName("Deve lançar erro ao salvar mapa completo se competência não existe")
+        void deveLancarErroAoSalvarMapaCompletoSeCompetenciaNaoExiste() {
+            SalvarMapaRequest req = new SalvarMapaRequest();
+            req.setObservacoes("Obs");
+            CompetenciaMapaDto cDto1 = new CompetenciaMapaDto(99L, "Comp 99", List.of());
+            req.setCompetencias(List.of(cDto1));
 
-        when(mapaCompletoMapper.toDto(any(), anyLong(), anyList())).thenReturn(dtoMock);
+            when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
+            when(competenciaRepo.findById(99L)).thenReturn(Optional.empty());
 
-        MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
-
-        assertThat(mapaCompleto).isNotNull();
-        assertThat(mapaCompleto.getCodigo()).isEqualTo(1L);
-        assertThat(mapaCompleto.getSubprocessoCodigo()).isEqualTo(100L);
-        assertThat(mapaCompleto.getObservacoes()).isEqualTo("Observações do Mapa");
-        assertThat(mapaCompleto.getCompetencias()).hasSize(1);
-        assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao())
-                .isEqualTo("Competência 1");
-    }
-
-    @Test
-    void obterMapaCompleto_deveLancarErro_quandoMapaNaoEncontrado() {
-        when(mapaRepo.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                .hasMessage("Mapa não encontrado: 1");
-    }
-
-    @Test
-    void salvarMapaCompleto_MapaNaoEncontrado() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    void salvarMapaCompleto_CompetenciaNaoEncontrada() {
-        SalvarMapaRequest req = new SalvarMapaRequest();
-        req.setObservacoes("Obs");
-        CompetenciaMapaDto cDto1 = new CompetenciaMapaDto(99L, "Comp 99", List.of());
-        req.setCompetencias(List.of(cDto1));
-
-        when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-        when(competenciaRepo.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package sgc.sgrh.mapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.sgrh.dto.SgrhMapper;
@@ -10,19 +11,24 @@ import sgc.unidade.model.Unidade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Testes de Mapper: SgrhMapper")
 class SgrhMapperTest {
 
     private final SgrhMapper mapper = Mappers.getMapper(SgrhMapper.class);
 
     @Test
-    void toUnidadeDto() {
+    @DisplayName("Deve mapear Unidade para UnidadeDto corretamente")
+    void deveMapearParaUnidadeDtoCorretamente() {
+        // Arrange
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setNome("Unidade Teste");
         unidade.setSigla("UT");
 
+        // Act
         UnidadeDto dto = mapper.toUnidadeDto(unidade);
 
+        // Assert
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
         assertThat(dto.getNome()).isEqualTo("Unidade Teste");
@@ -31,19 +37,23 @@ class SgrhMapperTest {
     }
 
     @Test
-    void toUsuarioDto() {
+    @DisplayName("Deve mapear Usuario para UsuarioDto corretamente")
+    void deveMapearParaUsuarioDtoCorretamente() {
+        // Arrange
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
         usuario.setNome("Usuário Teste");
         usuario.setEmail("teste@email.com");
         usuario.setMatricula("MAT001");
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
         usuario.setUnidadeLotacao(unidade);
 
+        // Act
         UsuarioDto dto = mapper.toUsuarioDto(usuario);
 
+        // Assert
         assertThat(dto).isNotNull();
         assertThat(dto.getTituloEleitoral()).isEqualTo("123");
         assertThat(dto.getNome()).isEqualTo("Usuário Teste");
@@ -52,4 +62,3 @@ class SgrhMapperTest {
         assertThat(dto.getUnidadeCodigo()).isEqualTo(10L);
     }
 }
-
