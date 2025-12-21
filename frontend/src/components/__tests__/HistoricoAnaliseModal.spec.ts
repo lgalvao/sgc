@@ -4,7 +4,7 @@ import { formatDateBR } from "@/utils";
 import HistoricoAnaliseModal from "../HistoricoAnaliseModal.vue";
 import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
-const mockAnalises = [
+const mockAnalises: any[] = [
     {
         dataHora: "2024-01-01T12:00:00Z",
         unidadeSigla: "TEST",
@@ -27,7 +27,7 @@ describe("HistoricoAnaliseModal", () => {
             ...getCommonMountOptions(),
             props: {
                 mostrar: false,
-                codSubprocesso: 1,
+                historico: [],
             },
         });
         expect(context.wrapper.find('[data-testid="modal-historico-body"]').exists()).toBe(
@@ -36,17 +36,11 @@ describe("HistoricoAnaliseModal", () => {
     });
 
     it('deve renderizar a mensagem de "nenhuma análise" quando não houver análises', () => {
-        const mapAnalises = new Map();
-
         context.wrapper = mount(HistoricoAnaliseModal, {
-            ...getCommonMountOptions({
-                analises: {
-                    analisesPorSubprocesso: mapAnalises,
-                }
-            }),
+            ...getCommonMountOptions(),
             props: {
                 mostrar: true,
-                codSubprocesso: 2,
+                historico: [],
             },
         });
 
@@ -56,22 +50,13 @@ describe("HistoricoAnaliseModal", () => {
     });
 
     it("deve renderizar a tabela com as análises", async () => {
-        const mapAnalises = new Map();
-        mapAnalises.set(1, mockAnalises);
-
         context.wrapper = mount(HistoricoAnaliseModal, {
-            ...getCommonMountOptions({
-                analises: {
-                    analisesPorSubprocesso: mapAnalises,
-                }
-            }),
+            ...getCommonMountOptions(),
             props: {
                 mostrar: true,
-                codSubprocesso: 1,
+                historico: mockAnalises,
             },
         });
-
-        await context.wrapper.vm.$nextTick(); // Aguarda a atualização do DOM
 
         const rows = context.wrapper.findAll("tbody tr");
         expect(rows.length).toBe(mockAnalises.length);
@@ -87,7 +72,7 @@ describe("HistoricoAnaliseModal", () => {
             ...getCommonMountOptions(),
             props: {
                 mostrar: true,
-                codSubprocesso: 1,
+                historico: [],
             },
         });
 

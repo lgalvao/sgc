@@ -119,7 +119,8 @@
 
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :cod-subprocesso="codSubprocesso"
+        :impacto="impactoMapa"
+        :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
     />
@@ -132,8 +133,8 @@
     />
 
     <HistoricoAnaliseModal
+        :historico="historicoAnalises"
         :mostrar="mostrarModalHistorico"
-        :cod-subprocesso="codSubprocesso"
         @fechar="mostrarModalHistorico = false"
     />
 
@@ -159,6 +160,7 @@ import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import AtividadeItem from "@/components/AtividadeItem.vue";
@@ -166,6 +168,7 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
+import {storeToRefs} from "pinia";
 import {
   type Atividade,
   type Conhecimento,
@@ -189,8 +192,11 @@ const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const feedbackStore = useFeedbackStore();
+const analisesStore = useAnalisesStore();
 
 const mapasStore = useMapasStore();
+const {impactoMapa} = storeToRefs(mapasStore);
+const loadingImpacto = ref(false);
 
 const {perfilSelecionado} = usePerfil();
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
@@ -216,6 +222,11 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(
     () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
 );
+
+const historicoAnalises = computed(() => {
+  if (!codSubprocesso.value) return [];
+  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+});
 
 const novaAtividade = ref("");
 
@@ -390,12 +401,20 @@ onMounted(async () => {
   }
 });
 
-function abrirModalHistorico() {
+async function abrirModalHistorico() {
+  if (codSubprocesso.value) {
+    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+  }
   mostrarModalHistorico.value = true;
 }
 
 function abrirModalImpacto() {
   mostrarModalImpacto.value = true;
+  if (codSubprocesso.value) {
+    loadingImpacto.value = true;
+    mapasStore.buscarImpactoMapa(codSubprocesso.value)
+        .finally(() => loadingImpacto.value = false);
+  }
 }
 
 function fecharModalImpacto() {

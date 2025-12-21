@@ -1,28 +1,19 @@
 import { flushPromises, mount } from "@vue/test-utils";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import { TipoImpactoCompetencia } from "@/types/tipos";
-import { useMapasStore } from "@/stores/mapas";
 import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 
 describe("ImpactoMapaModal.vue", () => {
     const context = setupComponentTest();
 
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-
-    function createWrapper(propsOverrides = {}, initialState = {}) {
+    function createWrapper(propsOverrides = {}) {
         context.wrapper = mount(ImpactoMapaModal, {
-            ...getCommonMountOptions({
-                mapas: {
-                    impactoMapa: null,
-                    ...initialState
-                }
-            }),
+            ...getCommonMountOptions(),
             props: {
                 mostrar: true,
-                codSubprocesso: 123,
+                impacto: null,
+                loading: false,
                 ...propsOverrides
             },
         });
@@ -30,7 +21,7 @@ describe("ImpactoMapaModal.vue", () => {
     }
 
     it("deve mostrar mensagem de nenhum impacto", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: false,
             atividadesInseridas: [],
             atividadesRemovidas: [],
@@ -38,14 +29,14 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Nenhum impacto detectado no mapa.");
     });
 
     it("deve mostrar atividades inseridas", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: true,
             atividadesInseridas: [{codigo: 1, descricao: "Nova Atividade", competenciasVinculadas: ["Comp A"]}],
             atividadesRemovidas: [],
@@ -53,7 +44,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Inseridas");
@@ -62,7 +53,7 @@ describe("ImpactoMapaModal.vue", () => {
     });
 
     it("deve mostrar atividades removidas", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: true,
             atividadesInseridas: [],
             atividadesRemovidas: [{codigo: 2, descricao: "Atividade Removida"}],
@@ -70,18 +61,17 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Removidas");
         expect(wrapper.text()).toContain("Atividade Removida");
-        // Verifica se tem a classe text-decoration-line-through
         const item = wrapper.find('[data-testid="lista-atividades-removidas"] li strong');
         expect(item.classes()).toContain("text-decoration-line-through");
     });
 
     it("deve mostrar atividades alteradas", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: true,
             atividadesInseridas: [],
             atividadesRemovidas: [],
@@ -93,7 +83,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Alteradas");
@@ -102,7 +92,7 @@ describe("ImpactoMapaModal.vue", () => {
     });
 
     it("deve mostrar competências impactadas e formatar tipos de impacto corretamente", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: true,
             atividadesInseridas: [],
             atividadesRemovidas: [],
@@ -129,7 +119,7 @@ describe("ImpactoMapaModal.vue", () => {
             ],
         };
 
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Competências Impactadas");
@@ -143,34 +133,15 @@ describe("ImpactoMapaModal.vue", () => {
         expect(wrapper.text()).toContain("Alteração no Mapa"); // Formatação do tipo
     });
 
-    it("deve carregar dados quando 'mostrar' mudar para true", async () => {
-        // Inicia com mostrar: false
-        const wrapper = mount(ImpactoMapaModal, {
-            ...getCommonMountOptions(),
-            props: {
-                mostrar: false,
-                codSubprocesso: 123,
-            },
-        });
-        context.wrapper = wrapper;
-
-        const mapasStore = useMapasStore();
-
-        await wrapper.setProps({mostrar: true});
-        await flushPromises();
-
-        expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
-    });
-
     it("deve emitir evento 'fechar' ao clicar no botão", async () => {
-        const impacto = {
+        const impacto: any = {
             temImpactos: false,
             atividadesInseridas: [],
             atividadesRemovidas: [],
             atividadesAlteradas: [],
             competenciasImpactadas: []
         };
-        const wrapper = createWrapper({}, { impactoMapa: impacto });
+        const wrapper = createWrapper({ impacto });
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-fechar-impacto"]');
@@ -179,23 +150,8 @@ describe("ImpactoMapaModal.vue", () => {
         expect(wrapper.emitted().fechar).toBeTruthy();
     });
 
-    it("deve exibir estado de carregamento", async () => {
-        // Forçamos o estado de carregamento simulando a chamada
-
-        // Recriar para pegar a transição de props
-        const wrapper = mount(ImpactoMapaModal, {
-            ...getCommonMountOptions(),
-            props: {mostrar: false, codSubprocesso: 123},
-        });
-        context.wrapper = wrapper;
-
-        // Mockar depois de montar
-        const store = useMapasStore();
-        (store.buscarImpactoMapa as any).mockImplementation((_: number) => new Promise<void>(() => {})); // Promise que nunca resolve
-
-        await wrapper.setProps({mostrar: true});
-        // Não damos flushPromises para manter o loading state
-
+    it("deve exibir estado de carregamento via prop", async () => {
+        const wrapper = createWrapper({ loading: true, impacto: null });
         expect(wrapper.text()).toContain("Verificando impactos...");
         expect(wrapper.find('.spinner-border').exists()).toBe(true);
     });

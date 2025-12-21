@@ -77,14 +77,15 @@
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :cod-subprocesso="codSubprocesso"
+        :impacto="impactoMapa"
+        :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
     />
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-        :cod-subprocesso="codSubprocesso"
+        :historico="historicoAnalises"
         :mostrar="mostrarModalHistoricoAnalise"
         @fechar="fecharModalHistoricoAnalise"
     />
@@ -180,12 +181,15 @@ import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import {useAnalisesStore} from "@/stores/analises";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
+import {useMapasStore} from "@/stores/mapas";
+import {storeToRefs} from "pinia";
 import {
   type AceitarCadastroRequest,
   type Atividade,
@@ -211,6 +215,8 @@ const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const perfilStore = usePerfilStore();
 const feedbackStore = useFeedbackStore();
+const analisesStore = useAnalisesStore();
+const mapasStore = useMapasStore();
 const router = useRouter();
 
 const mostrarModalImpacto = ref(false);
@@ -219,6 +225,9 @@ const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
 const observacaoValidacao = ref<string>("");
 const observacaoDevolucao = ref<string>("");
+
+const {impactoMapa} = storeToRefs(mapasStore);
+const loadingImpacto = ref(false);
 
 const unidade = computed(() => {
   function buscarUnidade(
@@ -283,6 +292,11 @@ const isRevisao = computed(
     () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
 );
 
+const historicoAnalises = computed(() => {
+  if (!codSubprocesso.value) return [];
+  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+});
+
 onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
@@ -304,8 +318,6 @@ async function confirmarValidacao() {
   const commonRequest = {
     observacoes: observacaoValidacao.value,
   };
-
-  // Re-declare store removed
 
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = {
@@ -393,15 +405,26 @@ function fecharModalDevolver() {
   observacaoDevolucao.value = "";
 }
 
-function abrirModalImpacto() {
+async function abrirModalImpacto() {
   mostrarModalImpacto.value = true;
+  if (codSubprocesso.value) {
+    loadingImpacto.value = true;
+    try {
+      await mapasStore.buscarImpactoMapa(codSubprocesso.value);
+    } finally {
+      loadingImpacto.value = false;
+    }
+  }
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
 }
 
-function abrirModalHistoricoAnalise() {
+async function abrirModalHistoricoAnalise() {
+  if (codSubprocesso.value) {
+    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+  }
   mostrarModalHistoricoAnalise.value = true;
 }
 

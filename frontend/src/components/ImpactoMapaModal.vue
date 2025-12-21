@@ -7,7 +7,7 @@
       size="lg"
       title="Impacto no Mapa de Competências"
       @hide="fechar">
-    <div v-if="carregando" class="text-center p-4">
+    <div v-if="loading" class="text-center p-4">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Carregando...</span>
       </div>
@@ -142,40 +142,15 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
-import {storeToRefs} from "pinia";
-import {ref, watch} from "vue";
-import {useMapasStore} from "@/stores/mapas";
-import {TipoImpactoCompetencia} from "@/types/tipos";
+import {TipoImpactoCompetencia, type ImpactoMapa} from "@/types/tipos";
 
 const props = defineProps<{
   mostrar: boolean;
-  codSubprocesso: number;
+  impacto: ImpactoMapa | null;
+  loading: boolean;
 }>();
 
 const emit = defineEmits<(e: "fechar") => void>();
-
-const mapasStore = useMapasStore();
-const {impactoMapa: impacto} = storeToRefs(mapasStore);
-
-const carregando = ref(false);
-
-watch(
-    () => props.mostrar,
-    async (novoValor) => {
-      if (novoValor) {
-        carregando.value = true;
-        try {
-          if (props.codSubprocesso) {
-            await mapasStore.buscarImpactoMapa(props.codSubprocesso);
-          } else {
-            console.error("Código do subprocesso não fornecido.");
-          }
-        } finally {
-          carregando.value = false;
-        }
-      }
-    },
-);
 
 function formatTipoImpacto(tipo: TipoImpactoCompetencia): string {
   switch (tipo) {
