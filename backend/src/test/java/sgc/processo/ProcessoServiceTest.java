@@ -42,6 +42,11 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
 
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.MapaFixture;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -88,8 +93,7 @@ class ProcessoServiceTest {
         CriarProcessoReq req =
                 new CriarProcessoReq(
                         "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
+        Unidade unidade = UnidadeFixture.unidadeComId(1L);
 
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
         when(processoRepo.saveAndFlush(any()))
@@ -142,9 +146,8 @@ class ProcessoServiceTest {
     @DisplayName("Atualizar deve modificar processo se estiver CRIADO")
     void atualizar() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(id);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
 
         AtualizarProcessoReq req =
                 AtualizarProcessoReq.builder()
@@ -156,7 +159,7 @@ class ProcessoServiceTest {
                         .build();
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(UnidadeFixture.unidadePadrao()));
         when(processoRepo.saveAndFlush(any())).thenReturn(processo);
         when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -170,8 +173,8 @@ class ProcessoServiceTest {
     @DisplayName("Atualizar deve falhar se não estiver CRIADO")
     void atualizarInvalido() {
         Long id = 100L;
-        Processo processo = new Processo();
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        Processo processo = ProcessoFixture.processoEmAndamento();
+        processo.setCodigo(id);
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         AtualizarProcessoReq req =
@@ -189,9 +192,8 @@ class ProcessoServiceTest {
     @DisplayName("Atualizar deve falhar se unidade não encontrada")
     void atualizarUnidadeNaoEncontrada() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(id);
-        processo.setSituacao(SituacaoProcesso.CRIADO);
 
         AtualizarProcessoReq req =
                 AtualizarProcessoReq.builder()
@@ -212,8 +214,8 @@ class ProcessoServiceTest {
     @DisplayName("Apagar deve remover se estiver CRIADO")
     void apagar() {
         Long id = 100L;
-        Processo processo = new Processo();
-        processo.setSituacao(SituacaoProcesso.CRIADO);
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(id);
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         processoService.apagar(id);
@@ -233,8 +235,8 @@ class ProcessoServiceTest {
     @DisplayName("Apagar falha se processo não estiver CRIADO")
     void apagarSituacaoInvalida() {
         Long id = 100L;
-        Processo processo = new Processo();
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        Processo processo = ProcessoFixture.processoEmAndamento();
+        processo.setCodigo(id);
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.apagar(id))
@@ -245,7 +247,7 @@ class ProcessoServiceTest {
     @DisplayName("ObterDetalhes deve retornar DTO")
     void obterDetalhes() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoPadrao();
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
@@ -306,9 +308,8 @@ class ProcessoServiceTest {
     @DisplayName("Finalizar deve falhar se houver subprocessos não homologados")
     void finalizarFalha() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoEmAndamento();
         processo.setCodigo(id);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = new Subprocesso();
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -323,8 +324,8 @@ class ProcessoServiceTest {
     @DisplayName("Finalizar deve falhar se processo não está em andamento")
     void finalizarNaoEmAndamento() {
         Long id = 100L;
-        Processo processo = new Processo();
-        processo.setSituacao(SituacaoProcesso.CRIADO);
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(id);
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
 
         assertThatThrownBy(() -> processoService.finalizar(id))
@@ -336,18 +337,14 @@ class ProcessoServiceTest {
     @DisplayName("Finalizar deve completar se tudo homologado")
     void finalizarSucesso() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoEmAndamento();
         processo.setCodigo(id);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
+        Unidade u = UnidadeFixture.unidadeComId(1L);
+        Mapa m = MapaFixture.mapaPadrao(null); // Subprocesso linked later via setter if needed, but here it is circular.
 
-        Mapa m = new Mapa();
-
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        sp.setUnidade(u);
         sp.setMapa(m);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
@@ -365,13 +362,11 @@ class ProcessoServiceTest {
     @DisplayName("Finalizar deve falhar se subprocesso sem unidade")
     void finalizarSubprocessoSemUnidade() {
         Long id = 100L;
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoEmAndamento();
         processo.setCodigo(id);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, null);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        sp.setUnidade(null);
 
         when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
@@ -384,7 +379,7 @@ class ProcessoServiceTest {
     @Test
     @DisplayName("listarFinalizados e listarAtivos devem chamar repo")
     void listagens() {
-        when(processoRepo.findBySituacao(any())).thenReturn(List.of(new Processo()));
+        when(processoRepo.findBySituacao(any())).thenReturn(List.of(ProcessoFixture.processoPadrao()));
         when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
         assertThat(processoService.listarFinalizados()).hasSize(1);
@@ -477,13 +472,10 @@ class ProcessoServiceTest {
         authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         doReturn(authorities).when(auth).getAuthorities();
 
-        Subprocesso sp = new Subprocesso();
+        Unidade u = UnidadeFixture.unidadePadrao();
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, u);
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-        Unidade u = new Unidade();
-        u.setNome("U1");
-        u.setSigla("S1");
-        sp.setUnidade(u);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));
 
@@ -508,15 +500,10 @@ class ProcessoServiceTest {
         PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
         when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setNome("U1");
-        u.setSigla("S1");
-
-        Subprocesso sp = new Subprocesso();
+        Unidade u = UnidadeFixture.unidadeComId(10L);
+        Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, u);
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        sp.setUnidade(u);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of(sp));
 
