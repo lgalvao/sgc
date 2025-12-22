@@ -7,22 +7,31 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
-import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -49,7 +58,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -81,7 +90,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
     @Autowired
-    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
     @MockitoBean
@@ -94,15 +103,43 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = unidadeRepo.findById(102L).orElseThrow();
-        admin = usuarioRepo.findById("111111111111").orElseThrow();
-        gestor = usuarioRepo.findById("222222222222").orElseThrow();
-        chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        // IDs controlados para evitar conflito
+        Long idAdminUnit = 4000L;
+        Long idGestorUnit = 4001L;
+        Long idChefeUnit = 4002L;
 
-        // Inicializa coleções lazy para evitar LazyInitializationException no SecurityMockMvcRequestPostProcessors
-        admin.getAtribuicoesTemporarias().size();
-        gestor.getAtribuicoesTemporarias().size();
-        chefe.getAtribuicoesTemporarias().size();
+        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC Teste", "SEDOC-TEST", "OPERACIONAL", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", null, null);
+
+        Unidade unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
+        Unidade unidadeGestor = unidadeRepo.findById(idGestorUnit).orElseThrow();
+        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
+
+        // Criar Usuários
+        admin = UsuarioFixture.usuarioPadrao();
+        admin.setTituloEleitoral("303030303030");
+        admin.setUnidadeLotacao(unidadeAdmin);
+        admin = usuarioRepo.save(admin);
+
+        gestor = UsuarioFixture.usuarioPadrao();
+        gestor.setTituloEleitoral("404040404040");
+        gestor.setUnidadeLotacao(unidadeGestor);
+        gestor = usuarioRepo.save(gestor);
+
+        chefe = UsuarioFixture.usuarioPadrao();
+        chefe.setTituloEleitoral("505050505050");
+        chefe.setUnidadeLotacao(unidade);
+        chefe = usuarioRepo.save(chefe);
+
+        // Update titular using JDBC
+        jdbcTemplate.update("UPDATE sgc.vw_unidade SET titulo_titular = ? WHERE codigo = ?",
+                chefe.getTituloEleitoral(), unidade.getCodigo());
+
+        entityManager.clear();
+        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
 
         // Configuração do Mock SgrhService
         when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
@@ -110,24 +147,24 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         List.of(
                                 new PerfilDto(
                                         admin.getTituloEleitoral().toString(),
-                                        100L,
-                                        "SEDOC",
+                                        unidadeAdmin.getCodigo(),
+                                        "SEDOC-TEST",
                                         Perfil.ADMIN.name())));
         when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
                                         gestor.getTituloEleitoral().toString(),
-                                        101L,
-                                        "DA",
+                                        unidadeGestor.getCodigo(),
+                                        "DA-TEST",
                                         Perfil.GESTOR.name())));
         when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
                                         chefe.getTituloEleitoral().toString(),
-                                        102L,
-                                        "SA",
+                                        unidade.getCodigo(),
+                                        "SA-TEST",
                                         Perfil.CHEFE.name())));
 
         when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
@@ -137,50 +174,27 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
                 .thenReturn(chefe);
 
-        Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
+        UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);
+        UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
+        UsuarioFixture.adicionarPerfil(chefe, unidade, Perfil.CHEFE);
 
-        // Atualiza titular via JDBC para contornar restrição @Immutable da entidade Unidade
-        jdbcTemplate.update("UPDATE sgc.vw_unidade SET titulo_titular = ? WHERE codigo = ?",
-                chefe.getTituloEleitoral(), unidade.getCodigo());
+        Mapa mapaVigente = MapaFixture.mapaPadrao();
+        mapaVigente.setCodigo(null);
+        mapaVigente = mapaRepo.save(mapaVigente);
 
-        // Recarrega a unidade para refletir a alteração no contexto JPA
+        Atividade atividade = new Atividade(mapaVigente, "Atividade Existente");
+        atividadeRepo.save(atividade);
+
+        UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
+        unidadeMapaRepo.save(unidadeMapa);
+
+        entityManager.flush();
         entityManager.clear();
-        unidade = unidadeRepo.findById(102L).orElseThrow();
 
-        java.util.Set<sgc.sgrh.model.UsuarioPerfil> adminAttrs = new java.util.HashSet<>();
-        adminAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
-                .usuario(admin)
-                .perfil(Perfil.ADMIN)
-                .unidade(unidadeAdmin)
-                .build());
-        admin.setAtribuicoes(adminAttrs);
-
-        java.util.Set<sgc.sgrh.model.UsuarioPerfil> gestorAttrs = new java.util.HashSet<>();
-        gestorAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
-                .usuario(gestor)
-                .perfil(Perfil.GESTOR)
-                .unidade(unidadeGestor)
-                .build());
-        gestor.setAtribuicoes(gestorAttrs);
-
-        java.util.Set<sgc.sgrh.model.UsuarioPerfil> chefeAttrs = new java.util.HashSet<>();
-        chefeAttrs.add(sgc.sgrh.model.UsuarioPerfil.builder()
-                .usuario(chefe)
-                .perfil(Perfil.CHEFE)
-                .unidade(unidade)
-                .build());
-        chefe.setAtribuicoes(chefeAttrs);
-
-        // Ensure UnidadeMapa exists for unit 102
-        Mapa mapa201 = mapaRepo.findById(201L).orElseThrow();
-        if (unidadeMapaRepo.findById(unidade.getCodigo()).isEmpty()) {
-            UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapa201);
-            unidadeMapaRepo.save(unidadeMapa);
-        }
+        // Reload
+        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
     }
 
-    // Métodos de setup
     private Long criarEComecarProcessoDeRevisao() throws Exception {
         ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
 
@@ -236,9 +250,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         entityManager.flush();
         entityManager.clear();
-
-        // O processo de iniciar revisão já cria uma cópia do mapa vigente e associa ao subprocesso.
-        // Não é necessário sobrescrever o mapa manualmente.
 
         return processoDto;
     }

@@ -4,21 +4,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import sgc.Sgc;
 import sgc.atividade.model.Atividade;
-import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 
@@ -29,12 +40,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@org.springframework.boot.test.context.SpringBootTest(classes = Sgc.class)
 @DisplayName("CDU-15: Manter Mapa de Competências")
-@Import(TestThymeleafConfig.class)
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @ActiveProfiles("test")
+@org.springframework.transaction.annotation.Transactional
 class CDU15IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";
+
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -42,26 +66,38 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Unidade unidade = unidadeRepo.findById(10L).orElseThrow(); // Use existing SESEL
+        // Criar Unidade via Fixture
+        Unidade unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setNome("Unidade CDU-15");
+        unidade.setSigla("U15");
+        unidade = unidadeRepo.save(unidade);
 
-        Processo processo = new Processo();
-        processo.setDescricao("Processo Teste");
+        // Criar Processo via Fixture
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
+        processo.setDescricao("Processo Teste CDU-15");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.setDataCriacao(java.time.LocalDateTime.now());
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        Mapa mapa = mapaRepo.save(new Mapa());
+        // Criar Mapa
+        Mapa mapa = MapaFixture.mapaPadrao();
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
 
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(processo);
-        sp.setUnidade(unidade);
-        sp.setMapa(mapa);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        subprocesso = subprocessoRepo.save(sp);
+        // Criar Subprocesso
+        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        subprocesso.setCodigo(null);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso = subprocessoRepo.save(subprocesso);
 
-        atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
+        atividade1 = new Atividade(mapa, "Atividade 1");
+        atividade1 = atividadeRepo.save(atividade1);
+
+        atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade2 = atividadeRepo.save(atividade2);
     }
 
     @Test
