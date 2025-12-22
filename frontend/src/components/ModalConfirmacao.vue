@@ -17,7 +17,7 @@
       </BButton>
       <BButton
           :variant="variant || 'primary'"
-          data-testid="btn-modal-confirmacao-confirmar"
+          :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
           @click="confirmar"
       >
         Confirmar
@@ -35,6 +35,7 @@ const props = defineProps<{
   titulo: string;
   mensagem?: string;
   variant?: any;
+  testIdConfirmar?: string;
 }>();
 
 const emit = defineEmits<{

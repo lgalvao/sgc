@@ -61,6 +61,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
+        test-id-confirmar="btn-finalizar-processo-confirmar"
         titulo="Finalização de processo"
         variant="success"
         @confirmar="confirmarFinalizacao"
