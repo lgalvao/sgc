@@ -4,6 +4,7 @@ import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {useSubprocessosStore} from "@/stores/subprocessos";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
@@ -45,6 +46,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.criarAtividade(request, codMapa);
             await buscarAtividadesParaSubprocesso(codSubprocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -57,6 +61,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.excluirAtividade(atividadeId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -73,6 +80,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.criarConhecimento(atividadeId, request);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -89,6 +99,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -104,6 +117,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
             await buscarAtividadesParaSubprocesso(codSubrocessoDestino);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocessoDestino);
         } catch (error) {
             lastError.value = normalizeError(error);
             throw error;
@@ -119,6 +135,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.atualizarAtividade(atividadeId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);
@@ -136,6 +155,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
         try {
             const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
             await buscarAtividadesParaSubprocesso(codSubrocesso);
+            // Atualiza o detalhe do subprocesso para refletir mudanças de estado
+            const subprocessosStore = useSubprocessosStore();
+            await subprocessosStore.buscarSubprocessoDetalhe(codSubrocesso);
             return response.subprocesso; // Retorna status do subprocesso
         } catch (error) {
             lastError.value = normalizeError(error);

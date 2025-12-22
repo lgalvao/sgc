@@ -31,17 +31,25 @@
               responsive
               striped
           >
-            <template #cell(dataHora)="{ item }">
-              {{ formatarData((item as Analise).dataHora) }}
+            <template #cell(dataHora)="{ item, index }">
+              <span :data-testid="`cell-dataHora-${index}`">
+                {{ formatarData((item as Analise).dataHora) }}
+              </span>
             </template>
-            <template #cell(unidade)="{ item }">
-              {{ (item as AnaliseValidacao).unidade || (item as AnaliseCadastro).unidadeSigla }}
+            <template #cell(unidade)="{ item, index }">
+              <span :data-testid="`cell-unidade-${index}`">
+                {{ (item as AnaliseValidacao).unidade || (item as AnaliseCadastro).unidadeSigla }}
+              </span>
             </template>
-            <template #cell(resultado)="{ item }">
-              {{ (item as Analise).acao || (item as Analise).resultado }}
+            <template #cell(resultado)="{ item, index }">
+              <span :data-testid="`cell-resultado-${index}`">
+                {{ (item as Analise).acao || (item as Analise).resultado }}
+              </span>
             </template>
-            <template #cell(observacoes)="{ item }">
-              {{ (item as Analise).observacoes || '-' }}
+            <template #cell(observacoes)="{ item, index }">
+              <span :data-testid="`cell-observacao-${index}`">
+                {{ (item as Analise).observacoes || '-' }}
+              </span>
             </template>
           </BTable>
         </div>
