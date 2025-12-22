@@ -16,7 +16,7 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockGestor;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
@@ -101,7 +101,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockGestor
+    @WithMockAdmin
     @DisplayName("Deve criar competências em um mapa vazio e mudar situação do subprocesso")
     void deveCriarCompetenciasEmMapaVazio() throws Exception {
         // Given
@@ -138,7 +138,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockGestor
+    @WithMockAdmin
     @DisplayName("Deve editar, adicionar e remover competências de um mapa existente")
     void deveEditarAdicionarRemoverCompetencias() throws Exception {
         // First, create an initial map
@@ -202,7 +202,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockGestor
+    @WithMockAdmin
     @DisplayName("Deve retornar 400 se tentar salvar mapa para subprocesso em situação inválida")
     void deveRetornarErroParaSituacaoInvalida() throws Exception {
         // Given
@@ -223,7 +223,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockGestor
+    @WithMockAdmin
     @DisplayName("Deve obter o mapa completo do subprocesso")
     void deveObterMapaCompleto() throws Exception {
         // Given
@@ -254,7 +254,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     class CrudCompetenciaTests {
 
         @Test
-        @WithMockGestor
+        @WithMockAdmin
         @DisplayName("Deve adicionar uma nova competência a um mapa")
         void deveAdicionarCompetencia() throws Exception {
             var request =
@@ -274,7 +274,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @WithMockGestor
+        @WithMockAdmin
         @DisplayName("Deve atualizar uma competência existente")
         void deveAtualizarCompetencia() throws Exception {
             // Adicionar primeiro
@@ -316,7 +316,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @WithMockGestor
+        @WithMockAdmin
         @DisplayName("Deve remover uma competência existente")
         void deveRemoverCompetencia() throws Exception {
             // Adicionar primeiro
@@ -350,7 +350,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @WithMockGestor
+        @WithMockAdmin
         @DisplayName(
                 "Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida")
         void deveRetornarErroParaSituacaoInvalidaCrud() throws Exception {
