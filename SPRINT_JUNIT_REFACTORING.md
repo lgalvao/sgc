@@ -132,8 +132,8 @@ backend/src/test/java/sgc/fixture/
 - ✅ CDU-01 - Concluído.
 - ✅ CDU-03 - Concluído.
 - ✅ CDU-04 a CDU-08 (Lote 2) - Concluído.
-- ⚠️ CDU-09 (Lote 3) - Concluído (Refatorado para Fixtures e IDs dinâmicos).
-- 🔄 Próximo: Restante do Lote 3 (CDU-10 a CDU-15).
+- ✅ CDU-09 a CDU-12 (Lote 3) - Concluído (Refatorado para Fixtures e IDs dinâmicos).
+- 🔄 Próximo: CDU-13, CDU-14, CDU-15 (Restante Lote 3).
 
 **Documento**: [`sprint-05-desacoplamento-integracao.md`](./sprint-05-desacoplamento-integracao.md)
 
@@ -142,9 +142,9 @@ backend/src/test/java/sgc/fixture/
 | Teste | Descrição | Estado Atual | Ação Planejada |
 |-------|-----------|--------------|----------------|
 | `CDU09IntegrationTest` | Cadastrar competência | ✅ Concluído | Refatorado para Fixtures |
-| `CDU10IntegrationTest` | Consultar competência | Pendente | Converter para Fixtures |
-| `CDU11IntegrationTest` | Alterar competência | Pendente | Converter para Fixtures |
-| `CDU12IntegrationTest` | Excluir competência | Pendente | Converter para Fixtures |
+| `CDU10IntegrationTest` | Consultar competência | ✅ Concluído | Refatorado para Fixtures |
+| `CDU11IntegrationTest` | Alterar competência | ✅ Concluído | Refatorado para Fixtures |
+| `CDU12IntegrationTest` | Excluir competência | ✅ Concluído | Refatorado para Fixtures |
 | `CDU13IntegrationTest` | Cadastrar atividade | Pendente | Converter para Fixtures |
 | `CDU14IntegrationTest` | Consultar atividade | Pendente | Converter para Fixtures |
 | `CDU15IntegrationTest` | Alterar atividade | Pendente | Converter para Fixtures |
@@ -293,6 +293,6 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 14. ✅ **Sprint 5 (Piloto CDU-02):** Refatorado `CDU02IntegrationTest` para não depender de IDs do `data.sql`. Criado `AlertaFixture`. Resolvidos problemas de `ObjectOptimisticLockingFailureException` via reset de sequence H2.
 15. ✅ **Sprint 5 (Lote 1):** Refatorados `CDU01IntegrationTest` e `CDU03IntegrationTest`. Uso de `jdbcTemplate` para setup de Usuários/Perfis imutáveis e `saveAndFlush` para entidades gerenciadas.
 16. ✅ **Sprint 5 (Lote 2):** Verificados e validados `CDU04IntegrationTest` a `CDU08IntegrationTest`. Corrigido uso de ID fixo em `CDU05IntegrationTest`. Confirmado que os testes já utilizam Fixtures e não dependem do seed global (apenas de resets de sequence H2).
-17. ✅ **Sprint 5 (Lote 3):** Refatorado `CDU09IntegrationTest`. Removidos IDs hardcoded e dependência de `data.sql` (reset de sequence H2 + `saveAndFlush` + fixtures). Teste passa com sucesso.
+17. ✅ **Sprint 5 (Lote 3):** Refatorados `CDU09IntegrationTest`, `CDU10IntegrationTest`, `CDU11IntegrationTest` e `CDU12IntegrationTest`. Criado `CompetenciaFixture` e atualizado `AtividadeFixture` para permitir persistence. Todos os testes validados com sucesso.
 
-**Próximo Passo**: Executar refatoração do restante do Lote 3 da Sprint 5 (CDU-10 a CDU-15).
+**Próximo Passo**: Executar refatoração do restante do Lote 3 da Sprint 5 (CDU-13 a CDU-15).

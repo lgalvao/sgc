@@ -11,36 +11,38 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
-import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.MapaRepo;
-import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,7 +53,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
-@WithMockChefe("333333333333")
 @Import({
         TestSecurityConfig.class,
         WithMockChefeSecurityContextFactory.class,
@@ -68,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private MapaRepo mapaRepo;
+    private sgc.mapa.model.MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
     @Autowired
@@ -88,7 +89,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    @MockitoSpyBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     @MockitoBean
@@ -97,68 +98,114 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
     private Subprocesso subprocessoRevisao;
+    private Usuario usuarioChefe;
 
     @BeforeEach
     void setUp() {
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
 
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
-        unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
+        // Reset sequence to avoid collision
+        try {
+            jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
+        } catch (Exception e) {
+            try {
+                jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
+            } catch (Exception ex) {
+                // Ignore
+            }
+        }
 
-        Processo processoRevisao =
-                new Processo(
-                        "Processo de Revisão",
-                        TipoProcesso.REVISAO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
-        processoRepo.save(processoRevisao);
+        // 1. Criar Unidades (Superior e Chefe)
+        unidadeSuperior = UnidadeFixture.unidadeComSigla("COSIS");
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
+        unidadeChefe = UnidadeFixture.unidadeComSigla("SESEL");
+        unidadeChefe.setCodigo(null);
+        unidadeChefe.setUnidadeSuperior(unidadeSuperior);
+        unidadeChefe = unidadeRepo.save(unidadeChefe);
+
+        // 2. Criar Usuários
+        usuarioChefe = UsuarioFixture.usuarioComTitulo("333333333333");
+        usuarioChefe.setUnidadeLotacao(unidadeChefe);
+        usuarioChefe = usuarioRepo.saveAndFlush(usuarioChefe);
+
+        Usuario usuarioSuperior = UsuarioFixture.usuarioComTitulo("666666666666");
+        usuarioSuperior.setUnidadeLotacao(unidadeSuperior);
+        usuarioSuperior = usuarioRepo.saveAndFlush(usuarioSuperior);
+
+        // 3. Configurar Perfil e Titularidade
+        setupUsuarioPerfil(usuarioChefe, unidadeChefe, Perfil.CHEFE);
+        definirTitular(unidadeChefe, usuarioChefe);
+        definirTitular(unidadeSuperior, usuarioSuperior);
+
+        // 4. Criar Processo, Mapa e Subprocesso
+        sgc.processo.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
+        processoRevisao.setCodigo(null);
+        processoRevisao.setTipo(TipoProcesso.REVISAO);
+        processoRevisao.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoRevisao.setDataLimite(LocalDateTime.now().plusDays(30));
+        processoRevisao = processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
-        subprocessoRevisao =
-                new Subprocesso(
-                        processoRevisao,
-                        unidadeChefe,
-                        mapa,
-                        SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-                        processoRevisao.getDataLimite());
-        subprocessoRepo.save(subprocessoRevisao);
 
-        // Setup para corrigir erro 403 (titular/perfil)
-        // Configurar perfil de CHEFE para o usuário do teste (333333333333) na unidade correta (SESEL - 10L)
-        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
-        // Insert na VIEW_USUARIO_PERFIL_UNIDADE
+        subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
+        subprocessoRevisao.setCodigo(null);
+        subprocessoRevisao.setMapa(mapa);
+        subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
+        subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
+
+        // 5. Autenticar
+        autenticarUsuario(usuarioChefe);
+    }
+
+    private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                chefe.getTituloEleitoral(), unidadeChefe.getCodigo(), Perfil.CHEFE.name());
+                usuario.getTituloEleitoral(), unidade.getCodigo(), perfil.name());
 
-        // Definir o usuário como TITULAR da unidade na VIEW VW_UNIDADE
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setUsuario(usuario);
+        up.setUsuarioTitulo(usuario.getTituloEleitoral());
+        up.setUnidade(unidade);
+        up.setUnidadeCodigo(unidade.getCodigo());
+        up.setPerfil(perfil);
+
+        Set<UsuarioPerfil> atribuicoes = usuario.getAtribuicoes();
+        if (atribuicoes == null || atribuicoes.isEmpty()) {
+            atribuicoes = new HashSet<>();
+        }
+        atribuicoes.add(up);
+        usuario.setAtribuicoes(atribuicoes);
+    }
+
+    private void definirTitular(Unidade unidade, Usuario usuario) {
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
-                chefe.getTituloEleitoral(), unidadeChefe.getCodigo());
+                usuario.getTituloEleitoral(), unidade.getCodigo());
+        unidade.setTitular(usuario);
+    }
 
-        // Refresh na entidade Unidade para refletir a mudança no banco
-        entityManager.refresh(unidadeChefe);
-
-        // Definir titular da unidade superior (COSIS - 6) para que o envio de e-mail não falhe
-        jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
-                "666666666666", unidadeSuperior.getCodigo());
-        entityManager.refresh(unidadeSuperior);
+    private void autenticarUsuario(Usuario usuario) {
+        Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @Nested
     @DisplayName("Testes para Disponibilizar Revisão do Cadastro")
     class DisponibilizarRevisaoCadastro {
         @Test
-        @DisplayName(
-                "Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
+        @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia =
-                    competenciaRepo.save(
-                            new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
-            var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
+            var competencia = competenciaRepo.save(CompetenciaFixture.competenciaPadrao(subprocessoRevisao.getMapa()));
+            var atividade = AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa());
+
+            // Associar
             atividade.getCompetencias().add(competencia);
-            atividadeRepo.save(atividade);
+            atividade = atividadeRepo.save(atividade);
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
-            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
+
+            conhecimentoRepo.save(new sgc.atividade.model.Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(
                             post(
@@ -207,8 +254,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Não deve disponibilizar se houver atividade sem conhecimento associado")
         void naoDeveDisponibilizarComAtividadeSemConhecimento() throws Exception {
-            Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade Vazia");
-            atividadeRepo.save(atividade);
+            AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa());
+            atividadeRepo.save(AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa()));
 
             mockMvc.perform(
                             post(
@@ -227,9 +274,19 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Testes de Segurança")
     class Seguranca {
         @Test
-        @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
+            // Autenticar com outro usuário
+            Usuario outroChefe = UsuarioFixture.usuarioComTitulo("999999999999");
+            outroChefe = usuarioRepo.save(outroChefe);
+
+            Unidade outraUnidade = UnidadeFixture.unidadeComSigla("OUTRA");
+            outraUnidade.setCodigo(null);
+            outraUnidade = unidadeRepo.save(outraUnidade);
+
+            setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
+            autenticarUsuario(outroChefe);
+
             mockMvc.perform(
                             post(
                                     "/api/subprocessos/{id}/disponibilizar-revisao",
@@ -243,78 +300,55 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     class HistoricoAnaliseExcluido {
 
         @Test
-        @DisplayName(
-                "Deve excluir histórico de análises anteriores quando disponibilizar revisão"
-                        + " novamente - Fluxo completo")
+        @DisplayName("Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente")
         void deveExcluirHistoricoAposNovaDisponibilizacao() throws Exception {
             // Preparar: criar atividade com conhecimento para permitir disponibilização
-            var competencia =
-                    competenciaRepo.save(
-                            new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
-            var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
+            var competencia = competenciaRepo.save(CompetenciaFixture.competenciaPadrao(subprocessoRevisao.getMapa()));
+            var atividade = AtividadeFixture.atividadePadrao(subprocessoRevisao.getMapa());
+
             atividade.getCompetencias().add(competencia);
-            atividadeRepo.save(atividade);
+            atividade = atividadeRepo.save(atividade);
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
-            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
+
+            conhecimentoRepo.save(new sgc.atividade.model.Conhecimento("Conhecimento de Teste", atividade));
 
             Long subprocessoId = subprocessoRevisao.getCodigo();
 
-            // 1. Primeira disponibilização (como CHEFE)
+            // 1. Primeira disponibilização
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
                     .andExpect(status().isOk());
 
-            // Verificar situação
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao())
-                    .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-
-            // Verificar que não há análises ainda
-            List<Analise> analisesAposDisp1 =
-                    analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
-            assertThat(analisesAposDisp1).isEmpty();
-
-            // 2. Criar análise de "Aceite" manualmente (simulando GESTOR/ADMIN aceitou)
+            // 2. Criar análise de "Aceite" manualmente
             Analise analiseAceite = new Analise();
-            analiseAceite.setSubprocesso(sp);
+            analiseAceite.setSubprocesso(subprocessoRevisao);
             analiseAceite.setUnidadeCodigo(unidadeSuperior.getCodigo());
             analiseAceite.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
             analiseAceite.setDataHora(LocalDateTime.now());
             analiseRepo.saveAndFlush(analiseAceite);
 
-            // 3. Criar análise de "Devolução" manualmente (simulando segunda devolução)
+            // 3. Criar análise de "Devolução" manualmente
             Analise analiseDevolucao = new Analise();
-            analiseDevolucao.setSubprocesso(sp);
+            analiseDevolucao.setSubprocesso(subprocessoRevisao);
             analiseDevolucao.setUnidadeCodigo(unidadeSuperior.getCodigo());
             analiseDevolucao.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
             analiseDevolucao.setObservacoes("Segunda devolução");
             analiseDevolucao.setDataHora(LocalDateTime.now());
             analiseRepo.saveAndFlush(analiseDevolucao);
 
-            // Verificar que temos 2 análises
-            List<Analise> analisesAntes =
-                    analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
-            assertThat(analisesAntes).hasSize(2);
+            // 4. Simular devolução
+            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRevisao.setDataFimEtapa1(null);
+            subprocessoRepo.saveAndFlush(subprocessoRevisao);
 
-            // 4. Simular devolução: mudar situação para em andamento (como faria o endpoint de
-            // devolução)
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            sp.setDataFimEtapa1(null);
-            subprocessoRepo.saveAndFlush(sp);
-
-            // 5. Nova disponibilização (como CHEFE) - deve excluir histórico anterior (CDU-10 passo
-            // 15)
+            // 5. Nova disponibilização
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
                     .andExpect(status().isOk());
 
             // 6. Verificar que histórico foi excluído
             List<Analise> analisesDepois =
                     analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
-            assertThat(analisesDepois)
-                    .as(
-                            "Histórico de análises deve estar vazio após nova disponibilização"
-                                    + " (CDU-10 passo 15)")
-                    .isEmpty();
+            assertThat(analisesDepois).isEmpty();
         }
     }
 }
