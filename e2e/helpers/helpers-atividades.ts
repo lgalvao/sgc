@@ -60,10 +60,11 @@ export async function removerAtividade(page: Page, descricao: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(descricao)});
     const row = card.locator('.atividade-hover-row');
 
-    page.once('dialog', async dialog => await dialog.accept());
-
     await row.hover();
     await card.getByTestId('btn-remover-atividade').click({force: true});
+    
+    // Confirmar no modal
+    await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
     await expect(page.getByText(descricao)).toBeHidden();
 }
@@ -86,10 +87,11 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
 
-    page.once('dialog', dialog => dialog.accept());
-
     await linhaConhecimento.hover();
     await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({force: true});
+    
+    // Confirmar no modal
+    await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
