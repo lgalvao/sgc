@@ -7,7 +7,8 @@ public class AtividadeFixture {
 
     public static Atividade atividadePadrao(Mapa mapa) {
         Atividade atividade = new Atividade();
-        atividade.setCodigo(1L);
+        // Remove fixed ID for persistence tests
+        // atividade.setCodigo(1L);
         atividade.setMapa(mapa);
         atividade.setDescricao("Atividade de Teste");
         return atividade;
