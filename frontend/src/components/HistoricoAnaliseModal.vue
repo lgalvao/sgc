@@ -75,7 +75,7 @@ import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
 
-const props = defineProps<{
+const __ = defineProps<{
   mostrar: boolean;
   historico: Analise[];
   loading?: boolean;

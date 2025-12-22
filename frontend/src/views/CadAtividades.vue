@@ -223,7 +223,7 @@ const atividades = computed({
   },
 });
 
-const processoAtual = computed(() => processosStore.processoDetalhe);
+const __ = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(
     () => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO,
 );
