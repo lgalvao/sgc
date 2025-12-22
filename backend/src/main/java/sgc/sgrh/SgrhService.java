@@ -70,23 +70,36 @@ public class SgrhService {
         return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
     }
 
+    @Transactional(readOnly = true)
     public Usuario buscarUsuarioPorLogin(String login) {
         Usuario usuario = usuarioRepo
                 .findById(login)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", login));
 
         carregarAtribuicoes(usuario);
+        // Inicializa a coleção lazy para evitar LazyInitializationException
+        if (usuario.getAtribuicoesTemporarias() != null) {
+            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
+        }
         return usuario;
     }
 
+    @Transactional(readOnly = true)
     public Usuario buscarResponsavelVigente(String sigla) {
         Unidade unidade = unidadeRepo
                 .findBySigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
-        return usuarioRepo
+        Usuario usuario = usuarioRepo
                 .chefePorCodUnidade(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
+        
+        carregarAtribuicoes(usuario);
+        // Inicializa a coleção lazy para evitar LazyInitializationException
+        if (usuario.getAtribuicoesTemporarias() != null) {
+            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
+        }
+        return usuario;
     }
 
     @Transactional(readOnly = true)
@@ -95,6 +108,10 @@ public class SgrhService {
                 .findById(titulo)
                 .map(usuario -> {
                     carregarAtribuicoes(usuario);
+                    // Inicializa a coleção lazy para evitar LazyInitializationException
+                    if (usuario.getAtribuicoesTemporarias() != null) {
+                        Hibernate.initialize(usuario.getAtribuicoesTemporarias());
+                    }
                     return usuario.getTodasAtribuicoes().stream()
                             .map(this::toPerfilDto)
                             .toList();
@@ -178,7 +195,13 @@ public class SgrhService {
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
 
-        todosChefes.forEach(this::carregarAtribuicoes);
+        todosChefes.forEach(usuario -> {
+            carregarAtribuicoes(usuario);
+            // Inicializa a coleção lazy para evitar LazyInitializationException
+            if (usuario.getAtribuicoesTemporarias() != null) {
+                Hibernate.initialize(usuario.getAtribuicoesTemporarias());
+            }
+        });
 
         Map<Long, List<Usuario>> chefesPorUnidade = todosChefes.stream()
                 .flatMap(u -> u.getTodasAtribuicoes().stream()
@@ -212,6 +235,10 @@ public class SgrhService {
                 .findById(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
+                    // Inicializa a coleção lazy para evitar LazyInitializationException
+                    if (u.getAtribuicoesTemporarias() != null) {
+                        Hibernate.initialize(u.getAtribuicoesTemporarias());
+                    }
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil() == Perfil.CHEFE)
                             .map(UsuarioPerfil::getUnidadeCodigo)
@@ -226,6 +253,10 @@ public class SgrhService {
                 .findById(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
+                    // Inicializa a coleção lazy para evitar LazyInitializationException
+                    if (u.getAtribuicoesTemporarias() != null) {
+                        Hibernate.initialize(u.getAtribuicoesTemporarias());
+                    }
                     return u.getTodasAtribuicoes().stream()
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
@@ -239,6 +270,10 @@ public class SgrhService {
                 .findById(titulo)
                 .map(u -> {
                     carregarAtribuicoes(u);
+                    // Inicializa a coleção lazy para evitar LazyInitializationException
+                    if (u.getAtribuicoesTemporarias() != null) {
+                        Hibernate.initialize(u.getAtribuicoesTemporarias());
+                    }
                     return u.getTodasAtribuicoes().stream()
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())
@@ -327,6 +362,10 @@ public class SgrhService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         carregarAtribuicoes(usuario);
+        // Inicializa a coleção lazy para evitar LazyInitializationException
+        if (usuario.getAtribuicoesTemporarias() != null) {
+            Hibernate.initialize(usuario.getAtribuicoesTemporarias());
+        }
 
         return usuario.getTodasAtribuicoes().stream().map(atribuicao -> new PerfilUnidade(
                         atribuicao.getPerfil(),
