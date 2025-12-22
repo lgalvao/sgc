@@ -15,6 +15,7 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
+import org.hibernate.Hibernate;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -47,8 +48,10 @@ public class SgrhService {
             carregarAtribuicoes(usuario);
             // Inicializa a coleção lazy
             if (usuario.getAtribuicoesTemporarias() != null) {
-                usuario.getAtribuicoesTemporarias().size();
+                Hibernate.initialize(usuario.getAtribuicoesTemporarias());
             }
+            // Força a inicialização das authorities
+            usuario.getAuthorities();
         }
         return usuario;
     }
@@ -338,6 +341,7 @@ public class SgrhService {
                 pu.getSiglaUnidade());
     }
 
+    @Transactional(readOnly = true)
     public String entrar(@NonNull EntrarReq request) {
         // SENTINEL: Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
         // O uso de remove() garante atomicidade: apenas uma requisição consome o token de login.
