@@ -144,7 +144,7 @@
 import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
 import {TipoImpactoCompetencia, type ImpactoMapa} from "@/types/tipos";
 
-const props = defineProps<{
+const __ = defineProps<{
   mostrar: boolean;
   impacto: ImpactoMapa | null;
   loading: boolean;
