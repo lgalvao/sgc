@@ -132,8 +132,8 @@ backend/src/test/java/sgc/fixture/
 - ✅ CDU-01 - Concluído.
 - ✅ CDU-03 - Concluído.
 - ✅ CDU-04 a CDU-08 (Lote 2) - Concluído.
-- ✅ CDU-09 a CDU-12 (Lote 3) - Concluído (Refatorado para Fixtures e IDs dinâmicos).
-- 🔄 Próximo: CDU-13, CDU-14, CDU-15 (Restante Lote 3).
+- ✅ CDU-09 a CDU-15 (Lote 3) - Concluído (Refatorado para Fixtures e IDs dinâmicos).
+- 🔄 Próximo: CDU-16 a CDU-21 (Lote 4).
 
 **Documento**: [`sprint-05-desacoplamento-integracao.md`](./sprint-05-desacoplamento-integracao.md)
 
@@ -145,9 +145,9 @@ backend/src/test/java/sgc/fixture/
 | `CDU10IntegrationTest` | Consultar competência | ✅ Concluído | Refatorado para Fixtures |
 | `CDU11IntegrationTest` | Alterar competência | ✅ Concluído | Refatorado para Fixtures |
 | `CDU12IntegrationTest` | Excluir competência | ✅ Concluído | Refatorado para Fixtures |
-| `CDU13IntegrationTest` | Cadastrar atividade | Pendente | Converter para Fixtures |
-| `CDU14IntegrationTest` | Consultar atividade | Pendente | Converter para Fixtures |
-| `CDU15IntegrationTest` | Alterar atividade | Pendente | Converter para Fixtures |
+| `CDU13IntegrationTest` | Devolução/Homologação | ✅ Concluído | Refatorado para Fixtures e setup JDBC |
+| `CDU14IntegrationTest` | Revisão e Análise | ✅ Concluído | Refatorado para Fixtures e setup JDBC |
+| `CDU15IntegrationTest` | Manter Mapa | ✅ Concluído | Refatorado para Fixtures |
 
 ---
 
@@ -247,7 +247,7 @@ Para **qualquer** PR de refatoração de testes:
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
-| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-01 a CDU-08) |
+| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-01 a CDU-15) |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
@@ -294,5 +294,6 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 15. ✅ **Sprint 5 (Lote 1):** Refatorados `CDU01IntegrationTest` e `CDU03IntegrationTest`. Uso de `jdbcTemplate` para setup de Usuários/Perfis imutáveis e `saveAndFlush` para entidades gerenciadas.
 16. ✅ **Sprint 5 (Lote 2):** Verificados e validados `CDU04IntegrationTest` a `CDU08IntegrationTest`. Corrigido uso de ID fixo em `CDU05IntegrationTest`. Confirmado que os testes já utilizam Fixtures e não dependem do seed global (apenas de resets de sequence H2).
 17. ✅ **Sprint 5 (Lote 3):** Refatorados `CDU09IntegrationTest`, `CDU10IntegrationTest`, `CDU11IntegrationTest` e `CDU12IntegrationTest`. Criado `CompetenciaFixture` e atualizado `AtividadeFixture` para permitir persistence. Todos os testes validados com sucesso.
+18. ✅ **Sprint 5 (Lote 3):** Refatorados `CDU13IntegrationTest`, `CDU14IntegrationTest` e `CDU15IntegrationTest`. Utilizado `JdbcTemplate` para contornar `ObjectOptimisticLockingFailureException` em entidades imutáveis (`VW_UNIDADE`) nos testes transacionais.
 
-**Próximo Passo**: Executar refatoração do restante do Lote 3 da Sprint 5 (CDU-13 a CDU-15).
+**Próximo Passo**: Executar refatoração do Lote 4 da Sprint 5 (CDU-16 a CDU-21).
