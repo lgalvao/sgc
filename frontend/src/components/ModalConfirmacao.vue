@@ -10,6 +10,7 @@
     </slot>
     <template #footer>
       <BButton
+          :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
           variant="secondary"
           @click="fechar"
       >
@@ -36,6 +37,7 @@ const props = defineProps<{
   mensagem?: string;
   variant?: any;
   testIdConfirmar?: string;
+  testIdCancelar?: string;
 }>();
 
 const emit = defineEmits<{

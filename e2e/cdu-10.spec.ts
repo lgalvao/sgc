@@ -375,7 +375,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Verificar que tem data/hora e sigla da unidade
         await expect(modal.getByTestId('cell-unidade-0')).toBeVisible();
-        await expect(modal.getByTestId('cell-data-0')).toBeVisible();
+        await expect(modal.getByTestId('cell-dataHora-0')).toBeVisible();
 
         // Fechar modal
         await page.getByRole('button', {name: 'Fechar'}).click();

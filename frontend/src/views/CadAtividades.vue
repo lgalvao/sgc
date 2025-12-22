@@ -225,7 +225,7 @@ const atividades = computed({
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(
-    () => processoAtual.value?.tipo === TipoProcesso.REVISAO,
+    () => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO,
 );
 
 const historicoAnalises = computed(() => {
@@ -287,6 +287,9 @@ async function confirmarRemocao() {
         conhecimentoCodigo,
     );
   }
+
+  mostrarModalConfirmacaoRemocao.value = false;
+  dadosRemocao.value = null;
 }
 
 async function adicionarConhecimento(idx: number, descricao: string) {

@@ -4,7 +4,6 @@
       :model-value="mostrar"
       :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
       centered
-      hide-footer
       @hide="emit('fechar')"
   >
     <template #default>
