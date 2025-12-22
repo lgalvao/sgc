@@ -82,7 +82,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Criar Mapa
-        Mapa mapa = MapaFixture.mapaPadrao();
+        Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(null);
         mapa = mapaRepo.save(mapa);
 

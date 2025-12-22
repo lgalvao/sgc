@@ -1,0 +1,211 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos FAILED
+    org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA')]; Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+    MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+        at app//org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:106)
+        at app//org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+        at app//org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+        at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:428)
+        at app//org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:581)
+        at app//sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:90)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+        MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintCheck.checkRow(ConstraintCheck.java:107)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireBeforeRow(Table.java:1199)
+            at app//org.h2.command.dml.SetClauseList.prepareUpdate(SetClauseList.java:174)
+            at app//org.h2.command.dml.Update.update(Update.java:70)
+            at app//org.h2.command.dml.Merge.merge(Merge.java:192)
+            at app//org.h2.command.dml.Merge.update(Merge.java:111)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdateInternal(JdbcStatement.java:196)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdate(JdbcStatement.java:147)
+            at app//com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:120)
+            at app//com.zaxxer.hikari.pool.HikariProxyStatement.executeUpdate(HikariProxyStatement.java)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:569)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:566)
+            at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:413)
+            ... 2 more
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa com usuário sem permissão (não ADMIN) FAILED
+    org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA')]; Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+    MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+        at app//org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:106)
+        at app//org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+        at app//org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+        at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:428)
+        at app//org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:581)
+        at app//sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:90)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+        MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintCheck.checkRow(ConstraintCheck.java:107)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireBeforeRow(Table.java:1199)
+            at app//org.h2.command.dml.SetClauseList.prepareUpdate(SetClauseList.java:174)
+            at app//org.h2.command.dml.Update.update(Update.java:70)
+            at app//org.h2.command.dml.Merge.merge(Merge.java:192)
+            at app//org.h2.command.dml.Merge.update(Merge.java:111)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdateInternal(JdbcStatement.java:196)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdate(JdbcStatement.java:147)
+            at app//com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:120)
+            at app//com.zaxxer.hikari.pool.HikariProxyStatement.executeUpdate(HikariProxyStatement.java)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:569)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:566)
+            at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:413)
+            ... 2 more
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver atividade sem competência associada FAILED
+    org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA')]; Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+    MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+        at app//org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:106)
+        at app//org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+        at app//org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+        at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:428)
+        at app//org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:581)
+        at app//sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:90)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+        MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintCheck.checkRow(ConstraintCheck.java:107)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireBeforeRow(Table.java:1199)
+            at app//org.h2.command.dml.SetClauseList.prepareUpdate(SetClauseList.java:174)
+            at app//org.h2.command.dml.Update.update(Update.java:70)
+            at app//org.h2.command.dml.Merge.merge(Merge.java:192)
+            at app//org.h2.command.dml.Merge.update(Merge.java:111)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdateInternal(JdbcStatement.java:196)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdate(JdbcStatement.java:147)
+            at app//com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:120)
+            at app//com.zaxxer.hikari.pool.HikariProxyStatement.executeUpdate(HikariProxyStatement.java)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:569)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:566)
+            at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:413)
+            ... 2 more
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver competência sem atividade associada FAILED
+    org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA')]; Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+    MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+        at app//org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:106)
+        at app//org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+        at app//org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+        at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:428)
+        at app//org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:581)
+        at app//sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:90)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+        MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintCheck.checkRow(ConstraintCheck.java:107)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireBeforeRow(Table.java:1199)
+            at app//org.h2.command.dml.SetClauseList.prepareUpdate(SetClauseList.java:174)
+            at app//org.h2.command.dml.Update.update(Update.java:70)
+            at app//org.h2.command.dml.Merge.merge(Merge.java:192)
+            at app//org.h2.command.dml.Merge.update(Merge.java:111)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdateInternal(JdbcStatement.java:196)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdate(JdbcStatement.java:147)
+            at app//com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:120)
+            at app//com.zaxxer.hikari.pool.HikariProxyStatement.executeUpdate(HikariProxyStatement.java)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:569)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:566)
+            at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:413)
+            ... 2 more
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se subprocesso não está no estado correto FAILED
+    org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA')]; Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+    MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+        at app//org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:106)
+        at app//org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:102)
+        at app//org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+        at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:428)
+        at app//org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:581)
+        at app//sgc.integracao.CDU17IntegrationTest.setUp(CDU17IntegrationTest.java:90)
+
+        Caused by:
+        org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Check constraint violation: "CONSTRAINT_1: "; SQL statement:
+        MERGE INTO SGC.VW_UNIDADE (CODIGO, NOME, SIGLA, TIPO, SITUACAO) VALUES (100, 'Secretaria de Documentação', 'SEDOC', 'ADMINISTRATIVA', 'ATIVA') [23513-240]
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+            at app//org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+            at app//org.h2.message.DbException.get(DbException.java:223)
+            at app//org.h2.message.DbException.get(DbException.java:199)
+            at app//org.h2.constraint.ConstraintCheck.checkRow(ConstraintCheck.java:107)
+            at app//org.h2.table.Table.fireConstraints(Table.java:1208)
+            at app//org.h2.table.Table.fireBeforeRow(Table.java:1199)
+            at app//org.h2.command.dml.SetClauseList.prepareUpdate(SetClauseList.java:174)
+            at app//org.h2.command.dml.Update.update(Update.java:70)
+            at app//org.h2.command.dml.Merge.merge(Merge.java:192)
+            at app//org.h2.command.dml.Merge.update(Merge.java:111)
+            at app//org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:77)
+            at app//org.h2.command.CommandContainer.update(CommandContainer.java:139)
+            at app//org.h2.command.Command.executeUpdate(Command.java:306)
+            at app//org.h2.command.Command.executeUpdate(Command.java:250)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdateInternal(JdbcStatement.java:196)
+            at app//org.h2.jdbc.JdbcStatement.executeUpdate(JdbcStatement.java:147)
+            at app//com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:120)
+            at app//com.zaxxer.hikari.pool.HikariProxyStatement.executeUpdate(HikariProxyStatement.java)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:569)
+            at app//org.springframework.jdbc.core.JdbcTemplate$1UpdateStatementCallback.doInStatement(JdbcTemplate.java:566)
+            at app//org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:413)
+            ... 2 more
+
+8 tests completed, 5 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 23s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry reused.
