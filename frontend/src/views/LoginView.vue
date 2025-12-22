@@ -70,6 +70,8 @@
                     :disabled="loginStep > 1"
                     placeholder="Digite sua senha"
                     :type="showPassword ? 'text' : 'password'"
+                    @keydown="verificarCapsLock"
+                    @keyup="verificarCapsLock"
                 />
                 <template #append>
                   <BButton
@@ -86,6 +88,18 @@
                   </BButton>
                 </template>
               </BInputGroup>
+              <div
+                  v-if="capsLockAtivado"
+                  class="text-warning small mt-1 d-flex align-items-center"
+                  data-testid="alert-caps-lock"
+                  role="alert"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-exclamation-triangle-fill me-1"
+                />
+                Caps Lock ativado
+              </div>
             </div>
 
             <div
@@ -177,6 +191,7 @@ const loginStep = ref(1);
 const parSelecionado = ref<PerfilUnidade | null>(null);
 const isLoading = ref(false);
 const showPassword = ref(false);
+const capsLockAtivado = ref(false);
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
@@ -192,6 +207,12 @@ watch(perfisUnidadesDisponiveis, (newVal) => {
     parSelecionado.value = newVal[0];
   }
 });
+
+const verificarCapsLock = (event: KeyboardEvent) => {
+  if (event.getModifierState) {
+    capsLockAtivado.value = event.getModifierState("CapsLock");
+  }
+};
 
 const handleLogin = async () => {
   if (loginStep.value === 1) {
