@@ -105,7 +105,8 @@
 
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :cod-subprocesso="codSubprocesso"
+        :impacto="impactoMapa"
+        :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
     />
@@ -135,7 +136,7 @@ const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/
 const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
-const {mapaCompleto} = storeToRefs(mapasStore);
+const {mapaCompleto, impactoMapa} = storeToRefs(mapasStore);
 const atividadesStore = useAtividadesStore();
 const subprocessosStore = useSubprocessosStore();
 const unidadesStore = useUnidadesStore();
@@ -152,9 +153,15 @@ const podeVerImpacto = computed(() => {
 });
 
 const mostrarModalImpacto = ref(false);
+const loadingImpacto = ref(false);
 
 function abrirModalImpacto() {
   mostrarModalImpacto.value = true;
+  if (codSubprocesso.value) {
+    loadingImpacto.value = true;
+    mapasStore.buscarImpactoMapa(codSubprocesso.value)
+        .finally(() => loadingImpacto.value = false);
+  }
 }
 
 function fecharModalImpacto() {
