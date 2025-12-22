@@ -1,0 +1,32 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos FAILED
+    org.opentest4j.AssertionFailedError:
+    expected: MAPEAMENTO_MAPA_DISPONIBILIZADO
+     but was: REVISAO_MAPA_DISPONIBILIZADO
+        at app//sgc.integracao.CDU17IntegrationTest$Sucesso.disponibilizarMapa_comDadosValidos_retornaOk(CDU17IntegrationTest.java:179)
+
+8 tests completed, 1 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 24s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.

@@ -178,7 +178,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
         UsuarioFixture.adicionarPerfil(chefe, unidade, Perfil.CHEFE);
 
-        Mapa mapaVigente = MapaFixture.mapaPadrao();
+        Mapa mapaVigente = MapaFixture.mapaPadrao(null);
         mapaVigente.setCodigo(null);
         mapaVigente = mapaRepo.save(mapaVigente);
 
