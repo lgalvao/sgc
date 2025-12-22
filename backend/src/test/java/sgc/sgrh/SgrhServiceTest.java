@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.PerfilUnidade;
@@ -257,8 +258,18 @@ class SgrhServiceTest {
         }
 
         @Test
+        @DisplayName("Deve impedir autorização sem autenticação prévia")
+        void deveImpedirAutorizacaoSemAutenticacao() {
+            assertThrows(ErroAutenticacao.class,
+                    () -> sgrhService.autorizar(TITULO_ADMIN));
+        }
+
+        @Test
         @DisplayName("Deve autorizar e retornar lista de perfis/unidades")
         void deveAutorizarERetornarPerfis() {
+            // Arrange
+            sgrhService.autenticar(TITULO_CHEFE_UNIT2, "senha");
+
             // Act
             List<PerfilUnidade> resultado = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
 
@@ -273,6 +284,9 @@ class SgrhServiceTest {
         @Test
         @DisplayName("Deve lançar exceção ao autorizar usuário não encontrado")
         void deveLancarExcecaoAoAutorizarUsuarioNaoEncontrado() {
+            // Arrange
+            sgrhService.autenticar("TITULO_INEXISTENTE_XYZ", "senha");
+
             // Act & Assert
             assertThrows(ErroEntidadeNaoEncontrada.class,
                     () -> sgrhService.autorizar("TITULO_INEXISTENTE_XYZ"));
@@ -282,6 +296,7 @@ class SgrhServiceTest {
         @DisplayName("Deve entrar no sistema com perfil selecionado")
         void deveEntrarComSucesso() {
             // Arrange
+            sgrhService.autenticar(TITULO_CHEFE_UNIT2, "senha");
             List<PerfilUnidade> perfis = sgrhService.autorizar(TITULO_CHEFE_UNIT2);
             PerfilUnidade perfilUnidade = perfis.getFirst();
 

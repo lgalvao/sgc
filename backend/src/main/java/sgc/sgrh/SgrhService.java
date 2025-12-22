@@ -356,6 +356,12 @@ public class SgrhService {
 
     @Transactional(readOnly = true)
     public List<PerfilUnidade> autorizar(String tituloEleitoral) {
+        // SENTINEL: Previne Information Disclosure verificando se usuário se autenticou recentemente
+        if (!autenticacoesRecentes.containsKey(tituloEleitoral)) {
+            log.warn("Tentativa de autorização sem autenticação prévia para usuário {}", tituloEleitoral);
+            throw new ErroAutenticacao("É necessário autenticar-se antes de consultar autorizações.");
+        }
+
         log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo
                 .findById(tituloEleitoral)
