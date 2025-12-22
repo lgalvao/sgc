@@ -287,6 +287,9 @@ async function confirmarRemocao() {
         conhecimentoCodigo,
     );
   }
+
+  mostrarModalConfirmacaoRemocao.value = false;
+  dadosRemocao.value = null;
 }
 
 async function adicionarConhecimento(idx: number, descricao: string) {
