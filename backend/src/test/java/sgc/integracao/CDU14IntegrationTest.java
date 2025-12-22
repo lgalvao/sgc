@@ -16,7 +16,6 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
@@ -178,8 +177,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
         UsuarioFixture.adicionarPerfil(chefe, unidade, Perfil.CHEFE);
 
-        Mapa mapaVigente = MapaFixture.mapaPadrao();
-        mapaVigente.setCodigo(null);
+        Mapa mapaVigente = new Mapa();
         mapaVigente = mapaRepo.save(mapaVigente);
 
         Atividade atividade = new Atividade(mapaVigente, "Atividade Existente");

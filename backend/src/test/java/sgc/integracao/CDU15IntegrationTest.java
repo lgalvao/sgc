@@ -7,14 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.dto.CompetenciaMapaDto;
@@ -59,6 +58,8 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     private MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -66,12 +67,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar Unidade via Fixture
-        Unidade unidade = UnidadeFixture.unidadePadrao();
-        unidade.setCodigo(null);
-        unidade.setNome("Unidade CDU-15");
-        unidade.setSigla("U15");
-        unidade = unidadeRepo.save(unidade);
+        // Criar Unidade via JDBC para evitar conflito com data.sql
+        Long idUnidade = 5000L;
+        String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Unidade CDU-15", "U15", "OPERACIONAL", "ATIVA", null, null);
+        
+        Unidade unidade = unidadeRepo.findById(idUnidade).orElseThrow();
 
         // Criar Processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
@@ -82,8 +83,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Criar Mapa
-        Mapa mapa = MapaFixture.mapaPadrao();
-        mapa.setCodigo(null);
+        Mapa mapa = new Mapa();
         mapa = mapaRepo.save(mapa);
 
         // Criar Subprocesso
