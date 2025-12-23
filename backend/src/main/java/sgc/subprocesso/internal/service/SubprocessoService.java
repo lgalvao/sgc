@@ -126,7 +126,7 @@ public class SubprocessoService {
             return emptyList();
         }
 
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
         if (atividades == null || atividades.isEmpty()) {
             return emptyList();
         }
@@ -135,8 +135,7 @@ public class SubprocessoService {
                 .filter(
                         a -> {
                             if (a.getCodigo() == null) return true;
-                            List<Conhecimento> ks =
-                                    repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
+                            List<Conhecimento> ks = a.getConhecimentos();
                             return ks == null || ks.isEmpty();
                         })
                 .collect(Collectors.toList());
