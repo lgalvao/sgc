@@ -16,6 +16,8 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -85,6 +87,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
@@ -183,13 +187,16 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         mapaVigente = mapaRepo.save(mapaVigente);
 
         Atividade atividade = new Atividade(mapaVigente, "Atividade Existente");
-        atividadeRepo.save(atividade);
+        atividade = atividadeRepo.save(atividade);
+        
+        // Adicionar conhecimento à atividade para passar na validação
+        Conhecimento conhecimento = new Conhecimento("Conhecimento Teste", atividade);
+        conhecimentoRepo.save(conhecimento);
 
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
 
         entityManager.flush();
-        entityManager.clear();
 
         // Reload
         unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
