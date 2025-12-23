@@ -1,4 +1,4 @@
-package sgc.alerta.model;
+package sgc.alerta.internal.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

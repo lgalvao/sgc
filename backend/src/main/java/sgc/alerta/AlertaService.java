@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.model.*;
+import sgc.alerta.api.AlertaDto;
+import sgc.alerta.internal.AlertaMapper;
+import sgc.alerta.internal.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
 import sgc.sgrh.dto.UnidadeDto;
@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA;
-import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
+import static sgc.alerta.internal.model.TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA;
+import static sgc.alerta.internal.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 
 /**
  * Serviço para gerenciar alertas do sistema.

@@ -24,6 +24,27 @@ spring:
     properties:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
+  modulith:
+    # Verificação de estrutura modular na inicialização
+    verification:
+      enabled: false  # Iniciar desabilitado durante implementação
+    # Event Publication Registry - persiste eventos para garantir entrega
+    events:
+      externalization:
+        enabled: true
+      completion-mode: on-completion
+      delete-completion-after: 7d  # Apagar eventos completados após 7 dias
+    # Observability - endpoints de monitoramento
+    actuator:
+      enabled: true
+  # Configuração de Async para processamento de eventos
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 100
+      thread-name-prefix: sgc-async-
 springdoc:
   api-docs.enabled: false
   swagger-ui.enabled: false
@@ -35,6 +56,11 @@ springdoc:
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
 server:
   port: 10000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,modulith,metrics
 logging:
   pattern:
     console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"

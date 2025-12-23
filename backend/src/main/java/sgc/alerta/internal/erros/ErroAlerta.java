@@ -1,4 +1,4 @@
-package sgc.alerta.erros;
+package sgc.alerta.internal.erros;
 
 import org.springframework.http.HttpStatus;
 import sgc.comum.erros.ErroNegocioBase;

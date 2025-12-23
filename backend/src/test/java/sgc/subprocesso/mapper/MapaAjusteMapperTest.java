@@ -2,7 +2,7 @@ package sgc.subprocesso.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.analise.model.Analise;
+import sgc.analise.internal.model.Analise;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.MapaAjusteDto;

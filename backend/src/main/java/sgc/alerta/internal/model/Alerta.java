@@ -1,4 +1,4 @@
-package sgc.alerta.model;
+package sgc.alerta.internal.model;
 
 import jakarta.persistence.*;
 import lombok.*;

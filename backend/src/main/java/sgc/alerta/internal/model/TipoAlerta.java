@@ -1,4 +1,4 @@
-package sgc.alerta.model;
+package sgc.alerta.internal.model;
 
 public enum TipoAlerta {
     PROCESSO_INICIADO_OPERACIONAL,

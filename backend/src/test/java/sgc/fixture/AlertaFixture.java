@@ -1,6 +1,6 @@
 package sgc.fixture;
 
-import sgc.alerta.model.Alerta;
+import sgc.alerta.internal.model.Alerta;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;

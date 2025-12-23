@@ -1,4 +1,4 @@
-package sgc.analise;
+package sgc.analise.internal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import sgc.analise.dto.CriarAnaliseApiRequest;
-import sgc.analise.dto.CriarAnaliseRequest;
-import sgc.analise.model.Analise;
-import sgc.analise.model.TipoAnalise;
+import sgc.analise.AnaliseService;
+import sgc.analise.api.CriarAnaliseApiRequest;
+import sgc.analise.api.CriarAnaliseRequest;
+import sgc.analise.internal.model.Analise;
+import sgc.analise.internal.model.TipoAnalise;
 
 import java.util.List;
 

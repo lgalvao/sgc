@@ -1,9 +1,9 @@
-package sgc.analise.dto;
+package sgc.analise.api;
 
 import lombok.Builder;
 import lombok.Getter;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
+import sgc.analise.internal.model.TipoAcaoAnalise;
+import sgc.analise.internal.model.TipoAnalise;
 
 @Getter
 @Builder
