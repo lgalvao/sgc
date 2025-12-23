@@ -1,6 +1,6 @@
 package sgc.fixture;
 
-import sgc.atividade.model.Atividade;
+import sgc.atividade.internal.model.Atividade;
 import sgc.mapa.model.Mapa;
 
 public class AtividadeFixture {

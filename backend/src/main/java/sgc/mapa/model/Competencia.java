@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.internal.model.Atividade;
 import sgc.comum.model.EntidadeBase;
 
 import java.util.HashSet;

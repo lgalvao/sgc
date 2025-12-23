@@ -1,4 +1,4 @@
-package sgc.atividade.dto;
+package sgc.atividade.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

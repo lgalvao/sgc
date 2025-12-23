@@ -1,9 +1,10 @@
-package sgc.atividade.dto;
+package sgc.atividade.internal;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.api.AtividadeDto;
+import sgc.atividade.internal.model.Atividade;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.

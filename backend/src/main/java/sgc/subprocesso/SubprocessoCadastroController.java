@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.api.AnaliseHistoricoDto;
 import sgc.analise.internal.AnaliseMapper;
 import sgc.analise.internal.model.TipoAnalise;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.internal.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.SgrhService;

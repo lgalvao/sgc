@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.analise.internal.model.Analise;
-import sgc.atividade.model.Atividade;
-import sgc.atividade.model.Conhecimento;
+import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.internal.model.Conhecimento;
 import sgc.mapa.model.Competencia;
 import sgc.subprocesso.model.Subprocesso;
 

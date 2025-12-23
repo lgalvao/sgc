@@ -1,9 +1,12 @@
 package sgc.atividade.dto;
 
+import sgc.atividade.internal.AtividadeMapper;
+import sgc.atividade.api.AtividadeDto;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.internal.model.Atividade;
 import sgc.mapa.model.Mapa;
 
 import static org.junit.jupiter.api.Assertions.*;
