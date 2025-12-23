@@ -14,6 +14,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  * ser mantidas separadas.
  */
 @Configuration
-@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@EnableSpringDataWebSupport
 public class Config {
 }

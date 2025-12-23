@@ -19,7 +19,7 @@ import sgc.processo.api.CriarProcessoReq;
 import sgc.processo.internal.model.TipoProcesso;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

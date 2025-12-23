@@ -29,7 +29,7 @@ import sgc.subprocesso.internal.service.SubprocessoConsultaService;
 import sgc.subprocesso.internal.service.SubprocessoDtoService;
 import sgc.subprocesso.internal.service.SubprocessoMapaService;
 import sgc.subprocesso.internal.service.SubprocessoMapaWorkflowService;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 

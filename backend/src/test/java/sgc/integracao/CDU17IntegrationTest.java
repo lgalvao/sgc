@@ -33,7 +33,7 @@ import sgc.subprocesso.api.DisponibilizarMapaReq;
 import sgc.subprocesso.internal.model.*;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import sgc.fixture.*;
 
 import java.time.LocalDate;

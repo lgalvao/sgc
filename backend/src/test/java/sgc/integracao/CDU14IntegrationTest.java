@@ -44,7 +44,7 @@ import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 import sgc.unidade.internal.model.UnidadeMapa;
 import sgc.unidade.internal.model.UnidadeMapaRepo;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -15,7 +15,7 @@ import sgc.mapa.internal.model.MapaRepo;
 import sgc.processo.internal.model.ProcessoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.UnidadeRepo;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 

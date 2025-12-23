@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.6"
+    id("org.springframework.boot") version "3.2.12"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -17,7 +17,7 @@ java {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
-extra["modulith.version"] = "1.2.5"  // Versão do Spring Modulith compatível com Spring Boot 3.3.x
+extra["modulith.version"] = "1.1.9"  // Versão do Spring Modulith compatível com Spring Boot 3.2.x
 
 dependencyManagement {
     imports {
@@ -85,7 +85,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Documentação da API
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.36")
     implementation("org.mozilla:rhino:1.8.1")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")

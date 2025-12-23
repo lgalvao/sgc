@@ -20,7 +20,7 @@ import sgc.processo.internal.erros.ErroProcesso;
 import sgc.processo.internal.model.SituacaoProcesso;
 import sgc.processo.internal.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
