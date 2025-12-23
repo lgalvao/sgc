@@ -260,7 +260,7 @@ Para **qualquer** PR de refatoração de testes:
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
 | 5 | Integração | 0 IDs hardcoded sem setup explícito | ✅ Concluído (CDU-01 a CDU-21) |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | ✅ Concluído |
-| 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
+| 7 | Qualidade | Parametrização, asserções completas, AssertJ padronizado | ✅ Concluído |
 
 ## 🔄 Ordem de Execução Recomendada
 
@@ -325,4 +325,13 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 
 **Sprint 6 - Status Final**: ✅ **CONCLUÍDO**. Visibilidade de cobertura estabelecida com relatórios HTML, quality gates configurados e documentação completa.
 
-**Próximo Passo**: Sprint 7 - Qualidade Avançada.
+**Sprint 7 - Status Final**: ✅ **CONCLUÍDO**. Qualidade avançada implementada com:
+- 2 testes parametrizados (eliminando 3 testes duplicados)
+- 23 verificações de mensagem com `hasMessageContaining()`
+- 19 verificações de causa com `hasNoCause()`
+- Migração completa para AssertJ em `AnaliseServiceTest`
+- Melhorias de verificação de estado com `argThat()` e `extracting()`
+- 658 testes com `@DisplayName`
+- Todos os 84 arquivos de teste passando
+
+**Próximo Passo**: Plano completo! Todas as 8 sprints concluídas com sucesso.
