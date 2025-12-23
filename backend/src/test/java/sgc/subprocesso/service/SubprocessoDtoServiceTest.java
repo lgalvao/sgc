@@ -139,7 +139,8 @@ class SubprocessoDtoServiceTest {
         @DisplayName("Deve lançar exceção se perfil for nulo")
         void deveLancarExcecaoSePerfilNull() {
             assertThatThrownBy(() -> service.obterDetalhes(1L, null, null))
-                    .isInstanceOf(ErroAccessoNegado.class);
+                    .isInstanceOf(ErroAccessoNegado.class)
+                    .hasNoCause();
         }
 
         @Test
@@ -194,7 +195,9 @@ class SubprocessoDtoServiceTest {
             when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
 
             assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.SERVIDOR, null))
-                    .isInstanceOf(ErroAccessoNegado.class);
+                    .isInstanceOf(ErroAccessoNegado.class)
+                    .hasMessageContaining("permissão")
+                    .hasNoCause();
         }
 
         @Test
@@ -249,7 +252,9 @@ class SubprocessoDtoServiceTest {
             when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
 
             assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.GESTOR, 20L))
-                    .isInstanceOf(ErroAccessoNegado.class);
+                    .isInstanceOf(ErroAccessoNegado.class)
+                    .hasMessageContaining("permissão")
+                    .hasNoCause();
         }
 
         @Test
@@ -343,7 +348,9 @@ class SubprocessoDtoServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoParaSugestoes() {
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
             assertThatThrownBy(() -> service.obterSugestoes(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
     }
 
@@ -379,7 +386,8 @@ class SubprocessoDtoServiceTest {
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
 
             assertThatThrownBy(() -> service.obterMapaParaAjuste(id))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasNoCause();
         }
     }
 
@@ -411,7 +419,9 @@ class SubprocessoDtoServiceTest {
             when(repositorioSubprocesso.findByProcessoCodigoAndUnidadeCodigo(1L, 1L))
                     .thenReturn(Optional.empty());
             assertThatThrownBy(() -> service.obterPorProcessoEUnidade(1L, 1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
     }
 

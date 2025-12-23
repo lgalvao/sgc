@@ -1,7 +1,10 @@
 package sgc.subprocesso.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +41,7 @@ class SubprocessoPermissoesServiceTest {
     private SubprocessoPermissoesService service;
 
     @Test
+    @DisplayName("Deve validar acesso da unidade com sucesso")
     void deveValidarAcessoUnidadeComSucesso() {
         Subprocesso sub = mock(Subprocesso.class);
         Unidade unidade = mock(Unidade.class);
@@ -49,6 +53,7 @@ class SubprocessoPermissoesServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar erro quando unidade sem acesso")
     void deveLancarErroQuandoUnidadeSemAcesso() {
         Subprocesso sub = mock(Subprocesso.class);
         Unidade unidade = mock(Unidade.class);
@@ -57,36 +62,31 @@ class SubprocessoPermissoesServiceTest {
 
         assertThatThrownBy(() -> service.validar(sub, 2L, "QUALQUER_ACAO"))
                 .isInstanceOf(ErroAccessoNegado.class)
-                .hasMessageContaining("Unidade '2' sem acesso a este subprocesso (Unidade do Subprocesso: '1')");
+                .hasMessageContaining("Unidade '2' sem acesso a este subprocesso (Unidade do Subprocesso: '1')")
+                .hasNoCause();
     }
 
-    @Test
-    void deveLancarErroQuandoSituacaoInvalidaParaEnviarRevisao() {
+    @ParameterizedTest
+    @CsvSource({
+        "ENVIAR_REVISAO",
+        "AJUSTAR_MAPA"
+    })
+    @DisplayName("Deve lançar erro quando situação inválida para ação específica")
+    void deveLancarErroQuandoSituacaoInvalidaParaAcao(String acao) {
         Subprocesso sub = mock(Subprocesso.class);
         Unidade unidade = mock(Unidade.class);
         when(unidade.getCodigo()).thenReturn(1L);
         when(sub.getUnidade()).thenReturn(unidade);
         when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.NAO_INICIADO);
 
-        assertThatThrownBy(() -> service.validar(sub, 1L, "ENVIAR_REVISAO"))
+        assertThatThrownBy(() -> service.validar(sub, 1L, acao))
                 .isInstanceOf(ErroAccessoNegado.class)
-                .hasMessageContaining("Ação 'ENVIAR_REVISAO' inválida");
+                .hasMessageContaining("Ação '" + acao + "' inválida")
+                .hasNoCause();
     }
 
     @Test
-    void deveLancarErroQuandoSituacaoInvalidaParaAjustarMapa() {
-        Subprocesso sub = mock(Subprocesso.class);
-        Unidade unidade = mock(Unidade.class);
-        when(unidade.getCodigo()).thenReturn(1L);
-        when(sub.getUnidade()).thenReturn(unidade);
-        when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.NAO_INICIADO);
-
-        assertThatThrownBy(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"))
-                .isInstanceOf(ErroAccessoNegado.class)
-                .hasMessageContaining("Ação 'AJUSTAR_MAPA' inválida");
-    }
-
-    @Test
+    @DisplayName("Deve lançar erro quando mapa vazio ao ajustar mapa em situação revisão mapa ajustado")
     void deveLancarErroQuandoMapaVazioAoAjustarMapaEmSituacaoRevisaoMapaAjustado() {
         Subprocesso sub = mock(Subprocesso.class);
         Unidade unidade = mock(Unidade.class);
@@ -103,10 +103,12 @@ class SubprocessoPermissoesServiceTest {
 
         assertThatThrownBy(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"))
                 .isInstanceOf(ErroAccessoNegado.class)
-                .hasMessageContaining("mapa do subprocesso '123' está vazio");
+                .hasMessageContaining("mapa do subprocesso '123' está vazio")
+                .hasNoCause();
     }
 
     @Test
+    @DisplayName("Deve validar ajuste de mapa com sucesso")
     void deveValidarAjusteMapaComSucesso() {
         Subprocesso sub = mock(Subprocesso.class);
         Unidade unidade = mock(Unidade.class);

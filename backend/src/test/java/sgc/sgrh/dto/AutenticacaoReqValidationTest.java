@@ -7,9 +7,12 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,15 +40,20 @@ class AutenticacaoReqValidationTest {
         Set<ConstraintViolation<AutenticacaoReq>> violations = validator.validate(req);
 
         // Assert
-        assertTrue(violations.isEmpty(), "Deveria passar na validação com inputs normais");
+        assertThat(violations).isEmpty();
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({
+        "1000, 5000",
+        "500, 1000",
+        "2000, 3000"
+    })
     @DisplayName("Deve rejeitar inputs excessivamente longos")
-    void deveRejeitarInputsExcessivamenteLongos() {
+    void deveRejeitarInputsExcessivamenteLongos(int tamanhoTitulo, int tamanhoSenha) {
         // Arrange
-        String tituloLongo = "a".repeat(1000);
-        String senhaLonga = "b".repeat(5000);
+        String tituloLongo = "a".repeat(tamanhoTitulo);
+        String senhaLonga = "b".repeat(tamanhoSenha);
 
         AutenticacaoReq req = AutenticacaoReq.builder()
                 .tituloEleitoral(tituloLongo)
@@ -56,6 +64,6 @@ class AutenticacaoReqValidationTest {
         Set<ConstraintViolation<AutenticacaoReq>> violations = validator.validate(req);
 
         // Assert
-        assertFalse(violations.isEmpty(), "Inputs longos devem ser rejeitados por segurança");
+        assertThat(violations).isNotEmpty();
     }
 }
