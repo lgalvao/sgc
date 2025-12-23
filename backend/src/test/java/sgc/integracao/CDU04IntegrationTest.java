@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import sgc.Sgc;
 import sgc.alerta.internal.model.AlertaRepo;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
+import sgc.integracao.mocks.RealEventListenerConfig;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -52,10 +54,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 @WithMockAdmin
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
-@Transactional
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class, RealEventListenerConfig.class})
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 public class CDU04IntegrationTest extends BaseIntegrationTest {
 
