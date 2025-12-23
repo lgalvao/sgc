@@ -51,6 +51,7 @@ vi.mock("@/services/mapaService", () => ({
     adicionarCompetencia: vi.fn(),
     atualizarCompetencia: vi.fn(),
     removerCompetencia: vi.fn(),
+    verificarImpactosMapa: vi.fn(),
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
