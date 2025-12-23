@@ -127,13 +127,13 @@ backend/src/test/java/sgc/fixture/
 
 **Testes Afetados**: 30 testes de integração (CDU01-CDU21, etc)
 
-**Estado**: ⚠️ Em Andamento
+**Estado**: ✅ Concluído
 - ✅ CDU-02 (Piloto) - Concluído.
 - ✅ CDU-01 - Concluído.
 - ✅ CDU-03 - Concluído.
 - ✅ CDU-04 a CDU-08 (Lote 2) - Concluído.
 - ✅ CDU-09 a CDU-15 (Lote 3) - Concluído.
-- 🔄 Próximo: CDU-16 a CDU-21 (Lote 4).
+- ✅ CDU-16 a CDU-21 (Lote 4) - Concluído.
 
 **Documento**: [`sprint-05-desacoplamento-integracao.md`](./sprint-05-desacoplamento-integracao.md)
 
@@ -151,14 +151,14 @@ backend/src/test/java/sgc/fixture/
 
 #### Detalhamento da Execução - Lote 4 (Sprint 5)
 
-| Teste | Descrição | Estado Atual | Ação Planejada |
+| Teste | Descrição | Estado Atual | Ação Realizada |
 |-------|-----------|--------------|----------------|
-| `CDU16IntegrationTest` | Homologação Mapa | ⏳ Pendente | Verificar fixtures/hardcodes |
-| `CDU17IntegrationTest` | Consulta Histórico | ⏳ Pendente | Verificar fixtures/hardcodes |
-| `CDU18IntegrationTest` | Notificações | ⏳ Pendente | Verificar fixtures/hardcodes |
-| `CDU19IntegrationTest` | Dashboards | ⏳ Pendente | Verificar fixtures/hardcodes |
-| `CDU20IntegrationTest` | Relatórios | ⏳ Pendente | Verificar fixtures/hardcodes |
-| `CDU21IntegrationTest` | Auditoria | ⏳ Pendente | Verificar fixtures/hardcodes |
+| `CDU16IntegrationTest` | Ajustar mapa de competências | ✅ Concluído | Refatorado para Fixtures (Unidade, Processo, Mapa, Subprocesso) |
+| `CDU17IntegrationTest` | Disponibilizar Mapa | ✅ Concluído | Já refatorado (Fixtures + JdbcTemplate) |
+| `CDU18IntegrationTest` | Visualizar Mapa | ✅ Concluído | Refatorado para Fixtures |
+| `CDU19IntegrationTest` | Validar Mapa | ✅ Concluído | Refatorado para Fixtures com hierarquia (2 níveis), corrigidas assertions hardcoded |
+| `CDU20IntegrationTest` | Analisar validação | ✅ Concluído | Refatorado para Fixtures com hierarquia (3 níveis), corrigidas assertions hardcoded |
+| `CDU21IntegrationTest` | Finalizar Processo | ✅ Concluído | Refatorado para Fixtures (Unidades + Usuários dinâmicos, mocks atualizados) |
 
 ---
 
@@ -258,7 +258,7 @@ Para **qualquer** PR de refatoração de testes:
 | 2 | LENIENT | 0 ocorrências de `Strictness.LENIENT` | ✅ Concluído |
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
-| 5 | Integração | 0 IDs hardcoded sem setup explícito | ⚠️ Em Andamento (CDU-01 a CDU-15) |
+| 5 | Integração | 0 IDs hardcoded sem setup explícito | ✅ Concluído (CDU-01 a CDU-21) |
 | 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
@@ -306,5 +306,14 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
 16. ✅ **Sprint 5 (Lote 2):** Verificados e validados `CDU04IntegrationTest` a `CDU08IntegrationTest`. Corrigido uso de ID fixo em `CDU05IntegrationTest`. Confirmado que os testes já utilizam Fixtures e não dependem do seed global (apenas de resets de sequence H2).
 17. ✅ **Sprint 5 (Lote 3):** Refatorados `CDU09IntegrationTest`, `CDU10IntegrationTest`, `CDU11IntegrationTest` e `CDU12IntegrationTest`. Criado `CompetenciaFixture` e atualizado `AtividadeFixture` para permitir persistence. Todos os testes validados com sucesso.
 18. ✅ **Sprint 5 (Lote 3):** Refatorados `CDU13IntegrationTest`, `CDU14IntegrationTest` e `CDU15IntegrationTest`. Utilizado `JdbcTemplate` para contornar `ObjectOptimisticLockingFailureException` em entidades imutáveis (`VW_UNIDADE`) nos testes transacionais. Corrigida compilação de `MapaFixture`.
+19. ✅ **Sprint 5 (Lote 4 - CONCLUÍDO):** Refatorados `CDU16IntegrationTest` a `CDU21IntegrationTest`. Todos os testes agora utilizam Fixtures para criar entidades dinamicamente:
+   - **CDU16**: Removido hardcode de Unidade (ID 15). Criadas entidades via Fixtures.
+   - **CDU17**: Já estava refatorado com Fixtures e JdbcTemplate.
+   - **CDU18**: Removido hardcode de Unidade (ID 11). Criadas entidades via Fixtures.
+   - **CDU19**: Removidos hardcodes de Unidades (IDs 6, 9). Criada hierarquia de 2 níveis com Fixtures. Corrigidas assertions hardcoded de siglas.
+   - **CDU20**: Removidos hardcodes de Unidades (IDs 2, 6, 8). Criada hierarquia de 3 níveis com Fixtures. Corrigidas assertions hardcoded de siglas.
+   - **CDU21**: Removidos hardcodes de Unidades (IDs 3, 4, 5) e Usuários (IDs "1", "2", "3"). Criadas entidades via Fixtures. Atualizados mocks do `SgrhService` para usar dados dinâmicos.
 
-**Próximo Passo**: Verificar e refatorar Lote 4 (CDU16-CDU21).
+**Sprint 5 - Status Final**: ✅ **CONCLUÍDO**. Todos os 30 testes de integração (CDU01-CDU21) estão completamente desacoplados do seed global e utilizam setup programático via Fixtures.
+
+**Próximo Passo**: Sprint 6 - Cobertura e Visibilidade.
