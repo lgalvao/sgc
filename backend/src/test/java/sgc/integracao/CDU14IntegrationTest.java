@@ -115,8 +115,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC Teste", "SEDOC-TEST", "OPERACIONAL", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", idAdminUnit, null);
+        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", idGestorUnit, null);
 
         Unidade unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
         Unidade unidadeGestor = unidadeRepo.findById(idGestorUnit).orElseThrow();
@@ -172,11 +172,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         Perfil.CHEFE.name())));
 
         when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
-                .thenReturn(admin);
+                .thenAnswer(inv -> usuarioRepo.findById(admin.getTituloEleitoral()).orElseThrow());
         when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString()))
-                .thenReturn(gestor);
+                .thenAnswer(inv -> usuarioRepo.findById(gestor.getTituloEleitoral()).orElseThrow());
         when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
-                .thenReturn(chefe);
+                .thenAnswer(inv -> usuarioRepo.findById(chefe.getTituloEleitoral()).orElseThrow());
 
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);
         UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
@@ -191,14 +191,18 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         
         // Adicionar conhecimento à atividade para passar na validação
         Conhecimento conhecimento = new Conhecimento("Conhecimento Teste", atividade);
-        conhecimentoRepo.save(conhecimento);
+        conhecimento = conhecimentoRepo.save(conhecimento);
+        
+        // Adicionar o conhecimento à lista de conhecimentos da atividade para garantir a relação bidirecional
+        atividade.getConhecimentos().add(conhecimento);
+        atividadeRepo.save(atividade);
 
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
 
         entityManager.flush();
 
-        // Reload
+        // Reload unidade to ensure it's managed
         unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
     }
 
