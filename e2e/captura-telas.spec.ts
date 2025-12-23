@@ -475,8 +475,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Navegar para o subprocesso
             await page.getByText(descricao).click();
-            // Clicar na unidade (como admin vê tabela)
-            await page.getByRole('row', {name: 'SECAO_121'}).click();
+
+            // Se não for redirecionado automaticamente, clicar na unidade
+            if (!page.url().includes('SECAO_121')) {
+                // Clicar na unidade (como admin vê tabela)
+                await page.getByRole('row', {name: 'SECAO_121'}).click();
+            }
 
             // Entrar no cadastro de atividades (visualização)
             await page.getByTestId('card-subprocesso-atividades-vis').click();

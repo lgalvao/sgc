@@ -132,7 +132,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         // Navegar para o subprocesso
         await page.getByText(descricaoProcesso).click();
-                    await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();        await verificarPaginaSubprocesso(page);
+
+        // Se não for redirecionado automaticamente, clicar na unidade
+        if (!page.url().includes('ASSESSORIA_21')) {
+            await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();
+        }
+        await verificarPaginaSubprocesso(page);
 
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -153,7 +158,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Após homologação, já está na tela de Detalhes do subprocesso
         // Navegar para o subprocesso (caso não esteja mais lá)
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();        await verificarPaginaSubprocesso(page);
+
+        // Se não for redirecionado automaticamente, clicar na unidade
+        if (!page.url().includes('ASSESSORIA_21')) {
+            await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();
+        }
+        await verificarPaginaSubprocesso(page);
 
         // Entrar no Mapa de Competencias
         await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
@@ -222,7 +232,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         // Navegar para o subprocesso
         await page.getByText(descricaoProcesso).click();
-                    await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();        await verificarPaginaSubprocesso(page);
+
+        // Se não for redirecionado automaticamente, clicar na unidade
+        if (!page.url().includes('ASSESSORIA_21')) {
+            await page.getByRole('row', {name: 'ASSESSORIA_21'}).click();
+        }
+        await verificarPaginaSubprocesso(page);
 
         // Abrir mapa para homologar
         await page.getByTestId('card-subprocesso-mapa').click();
