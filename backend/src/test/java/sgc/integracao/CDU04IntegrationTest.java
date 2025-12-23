@@ -40,8 +40,10 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -179,7 +181,8 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
 
-        // 6. Assert: Envio de Notificação por Email
-        verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
+        // 6. Assert: Envio de Notificação por Email (aguarda processamento assíncrono)
+        await().atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any()));
     }
 }

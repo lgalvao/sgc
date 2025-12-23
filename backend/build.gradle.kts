@@ -17,7 +17,7 @@ java {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
-extra["modulith.version"] = "1.3.1"  // Versão do Spring Modulith compatível com Spring Boot 4.0.1
+extra["modulith.version"] = "2.0.1"  // Versão do Spring Modulith compatível com Spring Boot 4.0.1
 
 dependencyManagement {
     imports {
@@ -68,6 +68,9 @@ dependencies {
     
     // Spring Modulith - Event Publication Registry
     implementation("org.springframework.modulith:spring-modulith-events-jpa")
+    
+    // Spring Modulith - Event Serialization (required for 2.0+)
+    implementation("org.springframework.modulith:spring-modulith-events-jackson")
     
     // Spring Modulith - Observability (opcional mas recomendado)
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
