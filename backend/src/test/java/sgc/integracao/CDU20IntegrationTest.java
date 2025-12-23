@@ -11,7 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.internal.model.Alerta;
 import sgc.alerta.internal.model.AlertaRepo;
-import sgc.analise.model.TipoAcaoAnalise;
+import sgc.analise.internal.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
@@ -142,7 +142,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao =
+        List<sgc.analise.api.AnaliseValidacaoHistoricoDto> historicoDevolucao =
                 objectMapper.readValue(responseDevolucao, new TypeReference<>() {
                 });
 
@@ -198,7 +198,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite =
+        List<sgc.analise.api.AnaliseValidacaoHistoricoDto> historicoAceite =
                 objectMapper.readValue(responseAceite, new TypeReference<>() {
                 });
 

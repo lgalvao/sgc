@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import sgc.analise.model.Analise;
+import sgc.analise.internal.model.Analise;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.Conhecimento;
 import sgc.mapa.model.Competencia;

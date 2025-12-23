@@ -1,4 +1,4 @@
-package sgc.analise.model;
+package sgc.analise.internal.model;
 
 public enum TipoAcaoAnalise {
     ACEITE_MAPEAMENTO,

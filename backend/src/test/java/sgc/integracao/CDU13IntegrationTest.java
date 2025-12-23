@@ -13,9 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
-import sgc.analise.model.TipoAcaoAnalise;
+import sgc.analise.internal.model.Analise;
+import sgc.analise.internal.model.AnaliseRepo;
+import sgc.analise.internal.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
@@ -327,18 +327,18 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
                             .getResponse()
                             .getContentAsString();
 
-            List<sgc.analise.dto.AnaliseHistoricoDto> historico =
+            List<sgc.analise.api.AnaliseHistoricoDto> historico =
                     objectMapper.readValue(jsonResponse, new TypeReference<>() {
                     });
 
             assertThat(historico).hasSize(2);
 
-            sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
+            sgc.analise.api.AnaliseHistoricoDto aceite = historico.getFirst();
             assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
             assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-            sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
+            sgc.analise.api.AnaliseHistoricoDto devolucao = historico.get(1);
             assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
             assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());

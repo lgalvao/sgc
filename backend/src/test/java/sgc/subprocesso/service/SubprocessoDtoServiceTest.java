@@ -27,7 +27,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import sgc.analise.AnaliseService;
-import sgc.analise.model.TipoAnalise;
+import sgc.analise.internal.model.TipoAnalise;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;

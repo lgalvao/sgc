@@ -1,4 +1,4 @@
-package sgc.analise.dto;
+package sgc.analise.api;
 
 import jakarta.validation.constraints.Size;
 import lombok.Builder;

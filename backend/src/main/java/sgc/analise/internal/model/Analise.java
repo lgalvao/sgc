@@ -1,4 +1,4 @@
-package sgc.analise.model;
+package sgc.analise.internal.model;
 
 import jakarta.persistence.*;
 import lombok.*;

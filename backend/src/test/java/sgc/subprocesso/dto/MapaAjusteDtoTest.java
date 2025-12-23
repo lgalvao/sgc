@@ -13,7 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import sgc.analise.model.Analise;
+import sgc.analise.internal.model.Analise;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.Conhecimento;
 import sgc.mapa.model.Competencia;
