@@ -66,7 +66,8 @@ dependencies {
     implementation("org.springframework.modulith:spring-modulith-events-api")
     
     // Spring Modulith - Event Publication Registry
-    implementation("org.springframework.modulith:spring-modulith-events-jpa")
+    // Comentado temporariamente devido a problema com EventSerializer no Modulith 1.1.9
+    // implementation("org.springframework.modulith:spring-modulith-events-jpa")
     
     // Spring Modulith - Observability (opcional mas recomendado)
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")

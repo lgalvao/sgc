@@ -1,0 +1,212 @@
+Calculating task graph as configuration cache cannot be reused because file 'backend/build.gradle.kts' has changed.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+Testes Unitários: AlertaController > marcarComoLido_quandoSucesso_deveRetornarOk FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.alerta.AlertaControllerTest.marcarComoLido_quandoSucesso_deveRetornarOk(AlertaControllerTest.java:42)
+
+Testes Unitários: AlertaController > marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict FAILED
+    java.lang.AssertionError: Status expected:<409> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.alerta.AlertaControllerTest.marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict(AlertaControllerTest.java:87)
+
+Testes Unitários: AlertaController > marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound FAILED
+    java.lang.AssertionError: Status expected:<404> but was:<500>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.alerta.AlertaControllerTest.marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound(AlertaControllerTest.java:59)
+
+RestExceptionHandlerSecurityTest > deveOcultarValorRejeitadoNoErroDeValidacao() FAILED
+    java.lang.AssertionError: Status expected:<400> but was:<401>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.comum.erros.RestExceptionHandlerSecurityTest.deveOcultarValorRejeitadoNoErroDeValidacao(RestExceptionHandlerSecurityTest.java:33)
+
+CDU-04: Iniciar processo de mapeamento > Deve iniciar processo de mapeamento com sucesso e gerar subprocessos, alertas e notificações FAILED
+    Wanted but not invoked:
+    notificacaoEmailServiceMock bean.enviarEmailHtml(
+        <any>,
+        <any>,
+        <any>
+    );
+    -> at sgc.notificacao.NotificacaoEmailService.enviarEmailHtml(NotificacaoEmailService.java:69)
+    Actually, there were zero interactions with this mock.
+        at app//sgc.notificacao.NotificacaoEmailService.enviarEmailHtml(NotificacaoEmailService.java:69)
+        at app//sgc.integracao.CDU04IntegrationTest.deveIniciarProcessoMapeamento(CDU04IntegrationTest.java:183)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Endpoints de Consulta > Deve retornar histórico de análise corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<400>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarHistoricoDeAnalise(CDU14IntegrationTest.java:433)
+
+CDU-14: Analisar revisão de cadastro de atividades e conhecimentos > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<400>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.integracao.CDU14IntegrationTest$Devolucao.gestorDevolveRevisao(CDU14IntegrationTest.java:306)
+
+CDU-20: Analisar validação de mapa de competências > Devolução e aceite da validação do mapa com verificação do histórico FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: "Justificativa da devolução"
+     but was: "Justificativa da devoluÃ§Ã£o"
+        at java.base@21.0.9/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+        at java.base@21.0.9/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+        at app//sgc.integracao.CDU20IntegrationTest.devolucaoEaceiteComVerificacaoHistorico(CDU20IntegrationTest.java:154)
+
+CDU-21: Finalizar Processo > Deve finalizar processo, atualizar status, tornar mapas vigentes e notificar todas as unidades corretamente FAILED
+    Wanted but not invoked:
+    notificacaoEmailServiceMock bean.enviarEmailHtml(
+        <any string>,
+        <any string>,
+        <any string>
+    );
+    -> at sgc.notificacao.NotificacaoEmailService.enviarEmailHtml(NotificacaoEmailService.java:69)
+    Actually, there were zero interactions with this mock.
+        at app//sgc.notificacao.NotificacaoEmailService.enviarEmailHtml(NotificacaoEmailService.java:69)
+        at app//sgc.integracao.CDU21IntegrationTest.finalizarProcesso_ComSucesso_DeveAtualizarStatusENotificarUnidades(CDU21IntegrationTest.java:229)
+
+ProcessoController > Atualização de Processo > Deve retornar 404 Not Found ao atualizar se processo não encontrado FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.AtualizarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Atualizacao.deveRetornarNotFoundAoAtualizarQuandoProcessoNaoEncontrado(ProcessoControllerTest.java:342)
+
+ProcessoController > Atualização de Processo > Deve retornar 200 OK ao atualizar processo existente FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.AtualizarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Atualizacao.deveRetornarOkAoAtualizarQuandoProcessoExiste(ProcessoControllerTest.java:310)
+
+ProcessoController > Atualização de Processo > Deve retornar 409 Conflict ao atualizar se estado inválido FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.AtualizarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Atualizacao.deveRetornarConflictAoAtualizarQuandoEstadoInvalido(ProcessoControllerTest.java:368)
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando data limite está no passado FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.CriarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Criacao.deveRetornarBadRequestQuandoDataLimiteNoPassado(ProcessoControllerTest.java:162)
+
+ProcessoController > Criação de Processo > Deve retornar 201 Created quando processo é válido FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.CriarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Criacao.deveRetornarCreatedQuandoProcessoValido(ProcessoControllerTest.java:100)
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando processo é inválido (descrição vazia) FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.CriarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Criacao.deveRetornarBadRequestQuandoProcessoInvalido(ProcessoControllerTest.java:125)
+
+ProcessoController > Criação de Processo > Deve retornar 400 Bad Request quando lista de unidades é vazia FAILED
+    com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: sgc.processo.api.CriarProcessoReq["dataLimiteEtapa1"])
+        at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+        at com.fasterxml.jackson.databind.SerializerProvider.reportBadDefinition(SerializerProvider.java:1308)
+        at com.fasterxml.jackson.databind.ser.impl.UnsupportedTypeSerializer.serialize(UnsupportedTypeSerializer.java:35)
+        at com.fasterxml.jackson.databind.ser.BeanPropertyWriter.serializeAsField(BeanPropertyWriter.java:732)
+        at com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.serializeFields(BeanSerializerBase.java:772)
+        at com.fasterxml.jackson.databind.ser.BeanSerializer.serialize(BeanSerializer.java:178)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider._serialize(DefaultSerializerProvider.java:479)
+        at com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.serializeValue(DefaultSerializerProvider.java:318)
+        at com.fasterxml.jackson.databind.ObjectMapper._writeValueAndClose(ObjectMapper.java:4719)
+        at com.fasterxml.jackson.databind.ObjectMapper.writeValueAsString(ObjectMapper.java:3964)
+        at sgc.processo.ProcessoControllerTest$Criacao.deveRetornarBadRequestQuandoListaUnidadesVazia(ProcessoControllerTest.java:183)
+
+Testes de Segurança do Actuator > Deve negar acesso anônimo ao Actuator FAILED
+    java.lang.AssertionError: Status expected:<401> but was:<200>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at sgc.security.ActuatorSecurityTest.deveNegarAcessoAnonimoAoActuator(ActuatorSecurityTest.java:74)
+
+592 tests completed, 17 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///home/runner/work/sgc/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 37s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry stored.

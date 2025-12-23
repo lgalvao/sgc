@@ -31,7 +31,7 @@ spring:
     # Event Publication Registry - persiste eventos para garantir entrega
     events:
       externalization:
-        enabled: true
+        enabled: false  # Desabilitado temporariamente devido a problema com EventSerializer
       completion-mode: on-completion
       delete-completion-after: 7d  # Apagar eventos completados após 7 dias
     # Observability - endpoints de monitoramento
