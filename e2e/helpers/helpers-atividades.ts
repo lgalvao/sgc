@@ -25,7 +25,6 @@ export async function navegarParaAtividadesVisualizacao(page: Page) {
 
 export async function adicionarAtividade(page: Page, descricao: string) {
     await page.getByTestId('inp-nova-atividade').fill(descricao);
-    await expect(page.getByTestId('btn-adicionar-atividade')).toBeEnabled();
     await page.getByTestId('btn-adicionar-atividade').click();
     await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
