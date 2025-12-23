@@ -1,4 +1,5 @@
 package sgc.notificacao;
+import sgc.notificacao.internal.services.NotificacaoModelosService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

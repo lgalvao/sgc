@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.mapa.MapaService;
 import sgc.mapa.api.MapaCompletoDto;
 import sgc.mapa.api.SalvarMapaRequest;
 import sgc.mapa.internal.mapper.MapaCompletoMapper;

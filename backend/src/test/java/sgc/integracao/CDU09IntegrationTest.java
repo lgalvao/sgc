@@ -151,7 +151,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        sgc.mapa.model.Mapa mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
+        sgc.mapa.internal.model.Mapa mapa = mapaRepo.save(new sgc.mapa.internal.model.Mapa());
 
         subprocessoMapeamento = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
         subprocessoMapeamento.setCodigo(null);

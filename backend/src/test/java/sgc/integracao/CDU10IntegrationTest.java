@@ -69,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private sgc.mapa.model.MapaRepo mapaRepo;
+    private sgc.mapa.internal.model.MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
     @Autowired
@@ -147,7 +147,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         processoRevisao.setDataLimite(LocalDateTime.now().plusDays(30));
         processoRevisao = processoRepo.save(processoRevisao);
 
-        var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
+        var mapa = mapaRepo.save(new sgc.mapa.internal.model.Mapa());
 
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);

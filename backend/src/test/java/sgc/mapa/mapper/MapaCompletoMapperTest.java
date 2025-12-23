@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.atividade.internal.model.Atividade;
 import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.internal.mapper.MapaCompletoMapper;
 import sgc.mapa.internal.model.Competencia;
 import sgc.mapa.internal.model.Mapa;
 

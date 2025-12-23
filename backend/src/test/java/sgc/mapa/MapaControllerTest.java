@@ -1,4 +1,5 @@
 package sgc.mapa;
+import sgc.mapa.internal.MapaController;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

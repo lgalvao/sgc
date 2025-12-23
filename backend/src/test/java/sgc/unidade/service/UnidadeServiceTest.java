@@ -233,7 +233,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
             // Arrange
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.model.Mapa()));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.internal.model.Mapa()));
 
             // Act & Assert
             assertThat(service.verificarMapaVigente(1L)).isTrue();
