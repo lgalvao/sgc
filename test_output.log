@@ -1,32 +1,121 @@
-Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
-............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
-
-Welcome to Gradle 9.2.1!
-
-Here are the highlights of this release:
- - Windows ARM support
- - Improved publishing APIs
- - Better guidance for dependency verification failures
-
-For more details see https://docs.gradle.org/9.2.1/release-notes.html
-
-Starting a Gradle Daemon (subsequent builds will be faster)
 Calculating task graph as no cached configuration is available for tasks: :backend:test
 > Task :backend:processTestResources
 > Task :backend:processResources
-> Task :backend:compileJava
+> Task :backend:compileJava UP-TO-DATE
 > Task :backend:classes
 
 > Task :backend:compileTestJava
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/e2e/E2eFixtureEndpointTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/e2e/E2eFixtureEndpointTest.java:24: error: cannot find symbol
+@AutoConfigureMockMvc
+ ^
+  symbol: class AutoConfigureMockMvc
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerSecurityTest.java:5: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/comum/erros/RestExceptionHandlerSecurityTest.java:17: error: cannot find symbol
+@WebMvcTest(controllers = TestSecurityController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoMapaControllerTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoMapaControllerTest.java:44: error: cannot find symbol
+@WebMvcTest(SubprocessoMapaController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:7: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:32: error: cannot find symbol
+@WebMvcTest(SubprocessoCrudController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/atividade/AtividadeControllerTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/atividade/AtividadeControllerTest.java:42: error: cannot find symbol
+@WebMvcTest(AtividadeController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/analise/AnaliseControllerTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/analise/AnaliseControllerTest.java:35: error: cannot find symbol
+@WebMvcTest(AnaliseController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/integracao/BaseIntegrationTest.java:6: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/integracao/BaseIntegrationTest.java:25: error: cannot find symbol
+@AutoConfigureMockMvc
+ ^
+  symbol: class AutoConfigureMockMvc
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/alerta/AlertaControllerTest.java:6: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/alerta/AlertaControllerTest.java:25: error: cannot find symbol
+@WebMvcTest(AlertaController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/unidade/UnidadeControllerTest.java:6: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/unidade/UnidadeControllerTest.java:33: error: cannot find symbol
+@WebMvcTest(UnidadeController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/sgrh/SgrhControllerIntegrationTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/sgrh/SgrhControllerIntegrationTest.java:30: error: cannot find symbol
+@AutoConfigureMockMvc
+ ^
+  symbol: class AutoConfigureMockMvc
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/security/ActuatorSecurityTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/security/ActuatorSecurityTest.java:25: error: cannot find symbol
+@AutoConfigureMockMvc
+ ^
+  symbol: class AutoConfigureMockMvc
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/mapa/MapaControllerTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/mapa/MapaControllerTest.java:32: error: cannot find symbol
+@WebMvcTest(MapaController.class)
+ ^
+  symbol: class WebMvcTest
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/processo/ProcessoControllerTest.java:9: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                                                         ^
+/home/runner/work/sgc/sgc/backend/src/test/java/sgc/processo/ProcessoControllerTest.java:37: error: cannot find symbol
+@WebMvcTest(ProcessoController.class)
+ ^
+  symbol: class WebMvcTest
+26 errors
 
-> Task :backend:testClasses
-> Task :backend:test
-> Task :backend:jacocoTestReport
+> Task :backend:compileTestJava FAILED
 
-[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+[Incubating] Problems report is available at: file:///home/runner/work/sgc/sgc/build/reports/problems/problems-report.html
 
-BUILD SUCCESSFUL in 5m 13s
-6 actionable tasks: 6 executed
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /home/runner/work/sgc/sgc/backend/src/test/java/sgc/e2e/E2eFixtureEndpointTest.java:8: error: package org.springframework.boot.webmvc.test.autoconfigure does not exist
+  import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+                                                           ^
+  26 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 4s
+4 actionable tasks: 3 executed, 1 up-to-date
 Configuration cache entry stored.

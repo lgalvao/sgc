@@ -268,7 +268,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                                     "/api/subprocessos/{id}/cadastro/disponibilizar",
                                     subprocessoMapeamento.getCodigo())
                                     .with(csrf()))
-                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(status().isUnprocessableEntity())
                     .andExpect(
                             jsonPath(
                                     "$.message",

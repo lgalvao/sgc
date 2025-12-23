@@ -261,7 +261,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                             post(
                                     "/api/subprocessos/{id}/disponibilizar-revisao",
                                     subprocessoRevisao.getCodigo()))
-                    .andExpect(status().isUnprocessableContent());
+                    .andExpect(status().isUnprocessableEntity());
 
             Subprocesso subprocessoNaoAlterado =
                     subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();

@@ -238,7 +238,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent());
+                    .andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -257,7 +257,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(status().isUnprocessableEntity())
                     // Adjusted expectation based on actual error message
                     .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Existem atividades que não foram associadas a nenhuma competência.")));
         }
@@ -277,7 +277,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(status().isUnprocessableEntity())
                     .andExpect(jsonPath("$.message").value("Todas as competências devem estar associadas a pelo menos uma atividade."));
         }
     }
