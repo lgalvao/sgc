@@ -66,6 +66,17 @@
       </div>
     </div>
 
+    <BAlert
+        v-if="erroGlobal"
+        :model-value="true"
+        class="mb-4"
+        dismissible
+        variant="danger"
+        @dismissed="erroGlobal = null"
+    >
+      {{ erroGlobal }}
+    </BAlert>
+
     <BForm
         class="row g-2 align-items-center mb-4"
         data-testid="form-nova-atividade"
@@ -244,6 +255,7 @@ const mostrarModalConfirmacaoRemocao = ref(false);
 const dadosRemocao = ref<{ tipo: 'atividade' | 'conhecimento', index: number, conhecimentoCodigo?: number } | null>(null);
 
 const errosValidacao = ref<ErroValidacao[]>([]);
+const erroGlobal = ref<string | null>(null);
 const podeVerImpacto = computed(() => !!permissoes.value?.podeVisualizarImpacto);
 
 
@@ -273,23 +285,33 @@ async function confirmarRemocao() {
 
   const { tipo, index, conhecimentoCodigo } = dadosRemocao.value;
 
-  if (tipo === 'atividade') {
-    const atividadeRemovida = atividades.value[index];
-    await atividadesStore.removerAtividade(
-        codSubprocesso.value,
-        atividadeRemovida.codigo,
+  try {
+    if (tipo === 'atividade') {
+      const atividadeRemovida = atividades.value[index];
+      await atividadesStore.removerAtividade(
+          codSubprocesso.value,
+          atividadeRemovida.codigo,
+      );
+    } else if (tipo === 'conhecimento' && conhecimentoCodigo !== undefined) {
+      const atividade = atividades.value[index];
+      await atividadesStore.removerConhecimento(
+          codSubprocesso.value,
+          atividade.codigo,
+          conhecimentoCodigo,
+      );
+    }
+    mostrarModalConfirmacaoRemocao.value = false;
+    dadosRemocao.value = null;
+  } catch (e: any) {
+    feedbackStore.show(
+        "Erro na remoção",
+        e.message || "Não foi possível remover o item.",
+        "danger"
     );
-  } else if (tipo === 'conhecimento' && conhecimentoCodigo !== undefined) {
-    const atividade = atividades.value[index];
-    await atividadesStore.removerConhecimento(
-        codSubprocesso.value,
-        atividade.codigo,
-        conhecimentoCodigo,
-    );
+    // Fecha modal mesmo com erro para não travar UI (mas mantém visível se erro)
+    // O ideal é manter modal se retry for possível, mas aqui assumimos erro fatal ou validação
+    mostrarModalConfirmacaoRemocao.value = false;
   }
-
-  mostrarModalConfirmacaoRemocao.value = false;
-  dadosRemocao.value = null;
 }
 
 async function adicionarConhecimento(idx: number, descricao: string) {
@@ -445,12 +467,21 @@ async function disponibilizarCadastro() {
   }
 
   if (codSubprocesso.value) {
+    errosValidacao.value = [];
+    erroGlobal.value = null;
     try {
       const resultado = await subprocessoService.validarCadastro(codSubprocesso.value);
       if (resultado.valido) {
         mostrarModalConfirmacao.value = true;
       } else {
         errosValidacao.value = resultado.erros;
+
+        // Identificar erro global
+        const erroSemAtividade = resultado.erros.find(e => !e.atividadeCodigo);
+        if (erroSemAtividade) {
+          erroGlobal.value = erroSemAtividade.mensagem;
+        }
+
         await nextTick();
         scrollParaPrimeiroErro();
       }
