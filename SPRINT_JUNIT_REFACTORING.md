@@ -259,7 +259,7 @@ Para **qualquer** PR de refatoração de testes:
 | 3 | Fixtures | Pacote `fixture/` criado com N builders | ✅ Concluído |
 | 4 | Padronização | >90% com `@DisplayName` e nomenclatura correta | ✅ Concluído |
 | 5 | Integração | 0 IDs hardcoded sem setup explícito | ✅ Concluído (CDU-01 a CDU-21) |
-| 6 | Cobertura | Relatório HTML visível, gate configurado | Pendente |
+| 6 | Cobertura | Relatório HTML visível, gate configurado | ✅ Concluído |
 | 7 | Qualidade | >30% redução em testes duplicados via parametrização | Pendente |
 
 ## 🔄 Ordem de Execução Recomendada
@@ -313,7 +313,16 @@ Os sprints devem ser executados **sequencialmente** na ordem 0→7, pois cada sp
    - **CDU19**: Removidos hardcodes de Unidades (IDs 6, 9). Criada hierarquia de 2 níveis com Fixtures. Corrigidas assertions hardcoded de siglas.
    - **CDU20**: Removidos hardcodes de Unidades (IDs 2, 6, 8). Criada hierarquia de 3 níveis com Fixtures. Corrigidas assertions hardcoded de siglas.
    - **CDU21**: Removidos hardcodes de Unidades (IDs 3, 4, 5) e Usuários (IDs "1", "2", "3"). Criadas entidades via Fixtures. Atualizados mocks do `SgrhService` para usar dados dinâmicos.
+20. ✅ **Sprint 6 (CONCLUÍDO):** Configurada visibilidade de cobertura JaCoCo com relatórios HTML e quality gate:
+   - Habilitado relatório HTML do JaCoCo em `backend/build.gradle.kts`.
+   - Configurado quality gate com limites mínimos: 60% para branches, 80% para linhas.
+   - Estabelecida baseline de cobertura: Linhas 85.9%, Branches 62.1%, Instruções 84.6%, Métodos 83.5%, Classes 91.3%.
+   - Adicionada documentação completa de testes no `backend/README.md` incluindo comandos, métricas e estrutura.
+   - Integrado quality gate ao `check` task do Gradle.
+   - Validações confirmadas: relatório HTML gerado com sucesso, quality gate passando.
 
 **Sprint 5 - Status Final**: ✅ **CONCLUÍDO**. Todos os 30 testes de integração (CDU01-CDU21) estão completamente desacoplados do seed global e utilizam setup programático via Fixtures.
 
-**Próximo Passo**: Sprint 6 - Cobertura e Visibilidade.
+**Sprint 6 - Status Final**: ✅ **CONCLUÍDO**. Visibilidade de cobertura estabelecida com relatórios HTML, quality gates configurados e documentação completa.
+
+**Próximo Passo**: Sprint 7 - Qualidade Avançada.
