@@ -25,6 +25,10 @@ async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
     if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
         await page.getByRole('row', {name: 'SECAO_221'}).click();
     }
+
+    // Garantir que estamos no dashboard do subprocesso correto
+    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
+    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText('SECAO_221');
 }
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
