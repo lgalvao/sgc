@@ -122,6 +122,76 @@ A documentação da API é gerada automaticamente com SpringDoc e está acessív
 A especificação OpenAPI em formato JSON pode ser encontrada em:
 [http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
+## 🧪 Testes
+
+O backend possui uma suíte completa de testes (unitários e de integração) usando JUnit 5, Mockito e Spring Boot Test.
+
+### Executar Testes
+
+```bash
+# Todos os testes
+./gradlew :backend:test
+
+# Apenas testes de integração
+./gradlew :backend:test --tests "sgc.integracao.*"
+
+# Com relatório de cobertura
+./gradlew :backend:test :backend:jacocoTestReport
+```
+
+### Cobertura de Código (JaCoCo)
+
+O projeto utiliza **JaCoCo** para medir a cobertura de testes. Os relatórios são gerados automaticamente após a execução dos testes.
+
+#### Visualizar Relatório de Cobertura
+
+Após executar os testes, abra o relatório HTML:
+
+```bash
+# Gerar relatório
+./gradlew :backend:test :backend:jacocoTestReport
+
+# Visualizar relatório HTML no navegador
+open backend/build/reports/jacoco/test/html/index.html
+```
+
+#### Métricas de Cobertura (Baseline Atual)
+
+- **Linhas**: 85.9% (3848/4480)
+- **Branches**: 62.1% (845/1361)
+- **Instruções**: 84.6% (15861/18759)
+- **Métodos**: 83.5% (664/795)
+- **Classes**: 91.3% (126/138)
+
+#### Quality Gate
+
+O projeto possui verificações automáticas de cobertura mínima:
+
+- **Branches**: 60% mínimo
+- **Linhas**: 80% mínimo
+
+```bash
+# Verificar quality gate
+./gradlew :backend:jacocoTestCoverageVerification
+```
+
+**Observação**: O quality gate é executado automaticamente durante o `./gradlew :backend:check`.
+
+### Estrutura de Testes
+
+```
+backend/src/test/java/sgc/
+├── fixture/              # Builders reutilizáveis para entidades de teste
+│   ├── ProcessoFixture.java
+│   ├── SubprocessoFixture.java
+│   ├── MapaFixture.java
+│   ├── AtividadeFixture.java
+│   ├── UnidadeFixture.java
+│   └── UsuarioFixture.java
+├── integracao/           # Testes de integração (CDU01-CDU21)
+└── [módulos]/            # Testes unitários por módulo
+```
+
 ## 🛡️ Verificações de Qualidade
 
 O backend utiliza um conjunto de ferramentas de análise estática para garantir a qualidade do código. As verificações
@@ -132,7 +202,7 @@ são não-bloqueantes (warnings only).
 - **Checkstyle**: Verifica a aderência ao padrão de código (Google Checks).
 - **PMD**: Analisa o código em busca de más práticas e código morto.
 - **SpotBugs**: Detecta bugs potenciais através de análise de bytecode.
-- **JaCoCo**: Mede a cobertura de testes unitários.
+- **JaCoCo**: Mede a cobertura de testes unitários e de integração.
 
 ### Como Executar
 
