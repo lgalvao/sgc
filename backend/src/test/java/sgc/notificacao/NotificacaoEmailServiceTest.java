@@ -18,12 +18,17 @@ import sgc.notificacao.model.NotificacaoRepo;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
+    
+    private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
+    private static final int TAMANHO_CORPO_LONGO = 600;
+    
     @Mock
     private JavaMailSender enviadorDeEmail;
 
@@ -155,7 +160,7 @@ class NotificacaoEmailServiceTest {
 
         String para = "recipient@test.com";
         String assunto = "Test";
-        String corpoLongo = "A".repeat(600); // Mais que o limite de 500
+        String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
 
         // Act
         notificacaoServico.enviarEmail(para, assunto, corpoLongo);
@@ -165,7 +170,7 @@ class NotificacaoEmailServiceTest {
         verify(repositorioNotificacao).save(captorNotificacao.capture());
 
         Notificacao notificacaoSalva = captorNotificacao.getValue();
-        assertTrue(notificacaoSalva.getConteudo().length() <= 500);
-        assertTrue(notificacaoSalva.getConteudo().endsWith("..."));
+        assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
+        assertThat(notificacaoSalva.getConteudo()).endsWith("...");
     }
 }
