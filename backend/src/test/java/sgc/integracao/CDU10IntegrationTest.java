@@ -205,7 +205,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade));
+            var conhecimento = new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade);
+            conhecimentoRepo.save(conhecimento);
+            atividade.getConhecimentos().add(conhecimento);
 
             mockMvc.perform(
                             post(
@@ -311,7 +313,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade));
+            var conhecimento = new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade);
+            conhecimentoRepo.save(conhecimento);
+            atividade.getConhecimentos().add(conhecimento);
 
             Long subprocessoId = subprocessoRevisao.getCodigo();
 

@@ -204,6 +204,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 atividadeService.criarConhecimento(ativCriada.getCodigo(), conReq);
 
                 em.flush();
+                em.clear();
 
                 verificarSituacao(codSubprocesso, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
@@ -302,6 +303,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
+            em.clear();
 
             // Disponibilizar
             autenticar(chefeMapeamento, "ROLE_CHEFE");
@@ -445,6 +447,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             atividadeService.criarConhecimento(ativ.getCodigo(), ConhecimentoDto.builder().descricao("C").build());
 
             em.flush();
+            em.clear();
 
             // 4. Disponibilizar
             autenticar(chefeRevisao, "ROLE_CHEFE");
