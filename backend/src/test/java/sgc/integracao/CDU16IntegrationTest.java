@@ -12,6 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -77,25 +81,32 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
+        // Criar Unidade via Fixture
+        Unidade unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setNome("Unidade CDU-16");
+        unidade.setSigla("U16");
+        unidade = unidadeRepo.save(unidade);
 
-        Processo processo =
-                new Processo(
-                        "Processo de Revisão",
-                        TipoProcesso.REVISAO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
-        processoRepo.save(processo);
+        // Criar Processo via Fixture
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
+        processo.setDescricao("Processo de Revisão");
+        processo.setTipo(TipoProcesso.REVISAO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo = processoRepo.save(processo);
 
-        Mapa mapa = mapaRepo.save(new Mapa());
-        subprocesso =
-                new Subprocesso(
-                        processo,
-                        unidade,
-                        mapa,
-                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
-                        processo.getDataLimite());
-        subprocessoRepo.save(subprocesso);
+        // Criar Mapa via Fixture
+        Mapa mapa = MapaFixture.mapaPadrao(null);
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
+
+        // Criar Subprocesso via Fixture
+        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        subprocesso.setCodigo(null);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        subprocesso = subprocessoRepo.save(subprocesso);
 
         var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
         atividade1 = new Atividade(mapa, "Atividade 1");
