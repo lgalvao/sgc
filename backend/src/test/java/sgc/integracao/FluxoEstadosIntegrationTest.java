@@ -16,7 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.AtividadeService;
@@ -79,7 +79,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     @Autowired private MapaRepo mapaRepo;
     @PersistenceContext private EntityManager em;
 
-    @MockitoBean
+    @MockBean
     private ImpactoMapaService impactoMapaService;
 
     // Users and Units for Mapeamento (SENIC -> COSINF -> STIC)

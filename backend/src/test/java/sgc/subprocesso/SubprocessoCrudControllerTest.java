@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
@@ -33,11 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class SubprocessoCrudControllerTest {
 
-    @MockitoBean
+    @MockBean
     private SubprocessoService subprocessoService;
-    @MockitoBean
+    @MockBean
     private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean
+    @MockBean
     private UnidadeService unidadeService;
 
     @Autowired

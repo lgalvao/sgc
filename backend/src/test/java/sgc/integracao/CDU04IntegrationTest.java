@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.internal.model.AlertaRepo;
@@ -84,7 +84,7 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @MockitoBean
+    @MockBean
     private NotificacaoEmailService notificacaoEmailService;
 
     private Unidade unidadeLivre;

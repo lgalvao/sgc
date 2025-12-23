@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.alerta.internal.AlertaController;
 import sgc.alerta.internal.erros.ErroAlerta;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 @DisplayName("Testes Unitários: AlertaController")
 class AlertaControllerTest {
-    @MockitoBean
+    @MockBean
     private AlertaService alertaService;
 
     @Autowired

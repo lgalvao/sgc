@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.atividade.internal.model.ConhecimentoRepo;
@@ -38,19 +38,19 @@ class ImpactoMapaServiceTest {
     @Autowired
     private ImpactoMapaService impactoMapaService;
 
-    @MockitoBean
+    @MockBean
     private SubprocessoRepo subprocessoRepo;
 
-    @MockitoBean
+    @MockBean
     private MapaRepo mapaRepo;
 
-    @MockitoBean
+    @MockBean
     private AtividadeRepo atividadeRepo;
 
-    @MockitoBean
+    @MockBean
     private ConhecimentoRepo conhecimentoRepo;
 
-    @MockitoBean
+    @MockBean
     private CompetenciaRepo competenciaRepo;
 
     private Usuario chefe;

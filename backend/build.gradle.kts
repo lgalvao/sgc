@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.1"
+    id("org.springframework.boot") version "3.3.6"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -17,7 +17,7 @@ java {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
-extra["modulith.version"] = "1.3.1"  // Versão do Spring Modulith compatível com Spring Boot 3.4.x
+extra["modulith.version"] = "1.2.5"  // Versão do Spring Modulith compatível com Spring Boot 3.3.x
 
 dependencyManagement {
     imports {

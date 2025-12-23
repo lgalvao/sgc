@@ -15,8 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.internal.model.AlertaRepo;
 import sgc.analise.internal.model.Analise;
@@ -89,10 +89,10 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @MockitoSpyBean
+    @SpyBean
     private sgc.subprocesso.internal.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    @MockitoBean
+    @MockBean
     private JavaMailSender javaMailSender;
 
     private Unidade unidadeChefe;

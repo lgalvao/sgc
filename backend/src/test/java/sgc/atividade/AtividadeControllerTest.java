@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import sgc.atividade.internal.AtividadeController;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.atividade.api.AtividadeDto;
 import sgc.atividade.internal.AtividadeMapper;
@@ -54,13 +54,13 @@ class AtividadeControllerTest {
 
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     private AtividadeService atividadeService;
-    @MockitoBean
+    @MockBean
     private SubprocessoService subprocessoService;
-    @MockitoBean
+    @MockBean
     private AtividadeMapper atividadeMapper;
-    @MockitoBean
+    @MockBean
     private ConhecimentoMapper conhecimentoMapper;
 
     @BeforeEach

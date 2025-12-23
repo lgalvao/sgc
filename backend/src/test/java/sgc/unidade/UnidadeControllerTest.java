@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.internal.model.TipoProcesso;
@@ -35,16 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Testes do Controller de Unidade")
 class UnidadeControllerTest {
 
-    @MockitoBean
+    @MockBean
     private UnidadeService unidadeService;
 
-    @MockitoBean
+    @MockBean
     private sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt;
 
-    @MockitoBean
+    @MockBean
     private sgc.sgrh.internal.model.UsuarioRepo usuarioRepo;
 
-    @MockitoBean
+    @MockBean
     private sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Autowired

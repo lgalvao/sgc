@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.api.CriarAnaliseApiRequest;
 import sgc.analise.api.CriarAnaliseRequest;
@@ -63,7 +63,7 @@ class AnaliseControllerTest {
 
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     private AnaliseService analiseService;
 
     @BeforeEach

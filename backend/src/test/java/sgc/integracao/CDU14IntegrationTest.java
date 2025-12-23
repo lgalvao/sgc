@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import sgc.Sgc;
 import sgc.alerta.internal.model.AlertaRepo;
 import sgc.analise.internal.model.AnaliseRepo;
@@ -101,7 +101,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
-    @MockitoBean
+    @MockBean
     private SgrhService sgrhService;
 
     private Unidade unidade;

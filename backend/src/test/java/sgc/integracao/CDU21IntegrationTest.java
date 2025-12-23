@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.fixture.MapaFixture;
@@ -70,13 +70,13 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
-    @MockitoBean
+    @MockBean
     private SgrhService sgrhService;
 
-    @MockitoBean
+    @MockBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    @MockitoBean
+    @MockBean
     private NotificacaoEmailService notificacaoEmailService;
 
     private Processo processo;

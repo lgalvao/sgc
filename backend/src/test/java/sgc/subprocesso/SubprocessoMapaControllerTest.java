@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.api.ImpactoMapaDto;
@@ -45,25 +45,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 class SubprocessoMapaControllerTest {
 
-    @MockitoBean
+    @MockBean
     private SubprocessoMapaService subprocessoMapaService;
-    @MockitoBean
+    @MockBean
     private MapaService mapaService;
-    @MockitoBean
+    @MockBean
     private MapaVisualizacaoService mapaVisualizacaoService;
-    @MockitoBean
+    @MockBean
     private ImpactoMapaService impactoMapaService;
-    @MockitoBean
+    @MockBean
     private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean
+    @MockBean
     private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @MockitoBean
+    @MockBean
     private SubprocessoConsultaService subprocessoConsultaService;
-    @MockitoBean
+    @MockBean
     private SgrhService sgrhService;
-    @MockitoBean
+    @MockBean
     private sgc.subprocesso.internal.service.SubprocessoService subprocessoService;
-    @MockitoBean
+    @MockBean
     private sgc.subprocesso.internal.service.SubprocessoContextoService subprocessoContextoService;
 
     @Autowired

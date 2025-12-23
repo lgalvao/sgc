@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.internal.model.Alerta;
 import sgc.alerta.internal.model.AlertaRepo;
@@ -65,10 +65,10 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoSpyBean
+    @SpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    @MockitoSpyBean
+    @SpyBean
     private NotificacaoEmailService notificacaoEmailService;
 
     private Subprocesso subprocesso;

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.internal.model.Analise;
 import sgc.analise.internal.model.AnaliseRepo;
@@ -65,16 +65,16 @@ public class SubprocessoServiceActionsTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoBean
+    @MockBean
     private NotificacaoEmailService notificacaoEmailService;
 
-    @MockitoBean
+    @MockBean
     private ApplicationEventPublisher eventPublisher;
 
-    @MockitoBean
+    @MockBean
     private ImpactoMapaService impactoMapaService;
 
-    @MockitoBean
+    @MockBean
     private sgc.subprocesso.internal.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidade;
