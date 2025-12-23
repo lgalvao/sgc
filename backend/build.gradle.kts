@@ -17,6 +17,13 @@ java {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
+extra["modulith.version"] = "1.3.1"  // Versão do Spring Modulith compatível com Spring Boot 4.0.1
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.modulith:spring-modulith-bom:${property("modulith.version")}")
+    }
+}
 
 dependencies {
     // Spring
@@ -54,6 +61,23 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
+
+    // Spring Modulith - Core
+    implementation("org.springframework.modulith:spring-modulith-starter-core")
+    implementation("org.springframework.modulith:spring-modulith-events-api")
+    
+    // Spring Modulith - Event Publication Registry
+    implementation("org.springframework.modulith:spring-modulith-events-jpa")
+    
+    // Spring Modulith - Observability (opcional mas recomendado)
+    runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
+    runtimeOnly("org.springframework.modulith:spring-modulith-observability")
+    
+    // Spring Modulith - Testes
+    testImplementation("org.springframework.modulith:spring-modulith-starter-test")
+    
+    // Spring Modulith - Documentação
+    testImplementation("org.springframework.modulith:spring-modulith-docs")
 
     // Testes
     testImplementation("org.awaitility:awaitility")
