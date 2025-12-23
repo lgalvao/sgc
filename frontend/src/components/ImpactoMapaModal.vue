@@ -144,11 +144,16 @@
 import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
 import {TipoImpactoCompetencia, type ImpactoMapa} from "@/types/tipos";
 
-const __ = defineProps<{
+interface Props {
   mostrar: boolean;
-  impacto: ImpactoMapa | null;
-  loading: boolean;
-}>();
+  impacto?: ImpactoMapa | null;
+  loading?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  impacto: null,
+  loading: false,
+});
 
 const emit = defineEmits<(e: "fechar") => void>();
 
