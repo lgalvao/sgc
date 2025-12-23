@@ -93,6 +93,11 @@ Os relatórios são gerados em:
 *   Backend: `backend/build/reports/`
 *   Frontend: `frontend/coverage/`
 
+### Guia de Testes JUnit
+
+Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
+*   **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
+
 ---
 
 ## 📚 Documentação de Negócio
