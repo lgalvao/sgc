@@ -2,8 +2,10 @@ package sgc.notificacao.internal.listeners;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.internal.model.Alerta;
@@ -62,10 +64,14 @@ public class EventoProcessoListener {
      * (Operacional, Intermediária, etc.), garantindo que cada participante receba instruções
      * relevantes para sua função.
      *
+     * <p>Processamento assíncrono: Este listener usa @ApplicationModuleListener com @Async,
+     * garantindo que falhas de notificação não afetem a transação do processo.
+     *
      * @param evento O evento contendo os detalhes do processo que foi iniciado.
      */
-    @EventListener
-    @Transactional
+    @ApplicationModuleListener
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
         log.debug(
@@ -86,10 +92,14 @@ public class EventoProcessoListener {
      * Escuta e processa o evento {@link EventoProcessoFinalizado}, disparado quando um processo
      * é concluído.
      *
+     * <p>Processamento assíncrono: Este listener usa @ApplicationModuleListener com @Async,
+     * garantindo que falhas de notificação não afetem a transação do processo.
+     *
      * @param evento O evento contendo os detalhes do processo que foi finalizado.
      */
-    @EventListener
-    @Transactional
+    @ApplicationModuleListener
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
         log.debug("Processando evento de processo finalizado: {}", evento.getCodProcesso());
