@@ -19,7 +19,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,9 +60,12 @@ class AnaliseServiceTest {
 
             List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
 
-            assertFalse(resultado.isEmpty());
-            assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.CADASTRO, resultado.getFirst().getTipo());
+            assertThat(resultado)
+                    .isNotEmpty()
+                    .hasSize(1)
+                    .first()
+                    .extracting(Analise::getTipo)
+                    .isEqualTo(TipoAnalise.CADASTRO);
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -76,9 +80,12 @@ class AnaliseServiceTest {
 
             List<Analise> resultado = service.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
 
-            assertFalse(resultado.isEmpty());
-            assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.VALIDACAO, resultado.getFirst().getTipo());
+            assertThat(resultado)
+                    .isNotEmpty()
+                    .hasSize(1)
+                    .first()
+                    .extracting(Analise::getTipo)
+                    .isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -87,9 +94,10 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(
-                    ErroEntidadeNaoEncontrada.class,
-                    () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
+            assertThatThrownBy(() -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
     }
 
@@ -115,10 +123,10 @@ class AnaliseServiceTest {
                                     .motivo(null)
                                     .build());
 
-            assertNotNull(resultado);
-            assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBS, resultado.getObservacoes());
-            assertEquals(TipoAnalise.CADASTRO, resultado.getTipo());
+            assertThat(resultado).isNotNull();
+            assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
+            assertThat(resultado.getObservacoes()).isEqualTo(OBS);
+            assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.CADASTRO);
             verify(analiseRepo).save(any(Analise.class));
         }
 
@@ -140,10 +148,10 @@ class AnaliseServiceTest {
                                     .motivo(null)
                                     .build());
 
-            assertNotNull(resultado);
-            assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBS, resultado.getObservacoes());
-            assertEquals(TipoAnalise.VALIDACAO, resultado.getTipo());
+            assertThat(resultado).isNotNull();
+            assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
+            assertThat(resultado.getObservacoes()).isEqualTo(OBS);
+            assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.VALIDACAO);
             verify(analiseRepo).save(any(Analise.class));
         }
 
@@ -152,10 +160,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(
-                    ErroEntidadeNaoEncontrada.class,
-                    () ->
-                            service.criarAnalise(
+            assertThatThrownBy(() -> service.criarAnalise(
                                     CriarAnaliseRequest.builder()
                                             .codSubprocesso(99L)
                                             .observacoes("Obs")
@@ -164,7 +169,10 @@ class AnaliseServiceTest {
                                             .siglaUnidade(null)
                                             .tituloUsuario(null)
                                             .motivo(null)
-                                            .build()));
+                                            .build()))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
     }
 

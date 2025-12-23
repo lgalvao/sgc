@@ -72,7 +72,9 @@ class SubprocessoServiceTest {
         void deveLancarExcecaoQuandoSubprocessoNaoExiste() {
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
             assertThatThrownBy(() -> service.obterSituacao(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
 
         @Test
@@ -142,7 +144,9 @@ class SubprocessoServiceTest {
         void deveLancarExcecaoAoExcluirSubprocessoInexistente() {
             when(repositorioSubprocesso.existsById(1L)).thenReturn(false);
             assertThatThrownBy(() -> service.excluir(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
     }
 
@@ -158,7 +162,9 @@ class SubprocessoServiceTest {
                     .thenReturn(Collections.singletonList(competencia));
 
             assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
-                    .isInstanceOf(ErroValidacao.class);
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("competência")
+                    .hasNoCause();
         }
     }
 }

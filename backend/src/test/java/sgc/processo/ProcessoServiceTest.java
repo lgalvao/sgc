@@ -109,10 +109,15 @@ class ProcessoServiceTest {
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act
-            processoService.criar(req);
+            ProcessoDto resultado = processoService.criar(req);
 
             // Assert
-            verify(processoRepo).saveAndFlush(any());
+            assertThat(resultado).isNotNull();
+            verify(processoRepo).saveAndFlush(argThat(p -> 
+                p.getDescricao().equals("Teste") && 
+                p.getTipo() == TipoProcesso.MAPEAMENTO &&
+                p.getSituacao() == SituacaoProcesso.CRIADO
+            ));
             verify(publicadorEventos).publishEvent(any(EventoProcessoCriado.class));
         }
 
@@ -125,7 +130,8 @@ class ProcessoServiceTest {
 
             // Act & Assert
             assertThatThrownBy(() -> processoService.criar(req))
-                    .isInstanceOf(ConstraintViolationException.class);
+                    .isInstanceOf(ConstraintViolationException.class)
+                    .hasMessageContaining("descrição");
         }
 
         @Test
@@ -138,7 +144,8 @@ class ProcessoServiceTest {
 
             // Act & Assert
             assertThatThrownBy(() -> processoService.criar(req))
-                    .isInstanceOf(ConstraintViolationException.class);
+                    .isInstanceOf(ConstraintViolationException.class)
+                    .hasMessageContaining("unidade");
         }
 
         @Test
@@ -152,7 +159,9 @@ class ProcessoServiceTest {
 
             // Act & Assert
             assertThatThrownBy(() -> processoService.criar(req))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Unidade")
+                    .hasNoCause();
         }
     }
 

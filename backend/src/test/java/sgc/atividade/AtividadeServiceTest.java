@@ -107,7 +107,9 @@ class AtividadeServiceTest {
 
             // When / Then
             assertThatThrownBy(() -> atividadeService.obterPorCodigo(id))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Atividade")
+                    .hasNoCause();
         }
     }
 
@@ -200,7 +202,9 @@ class AtividadeServiceTest {
 
             // When / Then
             assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Subprocesso")
+                    .hasNoCause();
         }
 
         @Test
@@ -221,7 +225,9 @@ class AtividadeServiceTest {
 
             // When / Then
             assertThatThrownBy(() -> atividadeService.criar(dto, "user"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Usuário")
+                    .hasNoCause();
         }
 
         @Test
@@ -248,7 +254,9 @@ class AtividadeServiceTest {
 
             // When / Then
             assertThatThrownBy(() -> atividadeService.criar(dto, usuarioId))
-                    .isInstanceOf(ErroAccessoNegado.class);
+                    .isInstanceOf(ErroAccessoNegado.class)
+                    .hasMessageContaining("autorizado")
+                    .hasNoCause();
         }
     }
 
