@@ -189,6 +189,7 @@ backend/src/test/java/sgc/fixture/
 
 ## 📖 Documentos de Referência
 
+- **Guia de Testes JUnit**: [`guia-testes-junit.md`](./guia-testes-junit.md) - Recomendações e boas práticas consolidadas
 - **Análise Base**: [`analise-junit-nova.md`](./analise-junit-nova.md)
 - **Convenções do Projeto**: [`AGENTS.md`](./AGENTS.md)
 - **Arquitetura Backend**: [`backend/README.md`](./backend/README.md)
