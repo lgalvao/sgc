@@ -18,12 +18,17 @@ import sgc.notificacao.model.NotificacaoRepo;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificacaoEmailServiceTest {
+    
+    private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
+    private static final int TAMANHO_CORPO_LONGO = 600;
+    
     @Mock
     private JavaMailSender enviadorDeEmail;
 
@@ -86,5 +91,86 @@ class NotificacaoEmailServiceTest {
         verify(enviadorDeEmail, never()).createMimeMessage();
         verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
+    }
+
+    @Test
+    @DisplayName("Deve enviar e-mail de texto simples")
+    void deveEnviarEmailTextoSimples() throws Exception {
+        // Arrange
+        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
+        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+
+        String para = "recipient@test.com";
+        String assunto = "Test Subject Plain";
+        String corpo = "This is plain text";
+
+        // Act
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        // Assert
+        ArgumentCaptor<MimeMessage> captorMimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(enviadorDeEmail).send(captorMimeMessage.capture());
+
+        MimeMessage mensagemCapturada = captorMimeMessage.getValue();
+        assertEquals(para, mensagemCapturada.getAllRecipients()[0].toString());
+        assertEquals("[SGC] Test Subject Plain", mensagemCapturada.getSubject());
+        verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
+    }
+
+    @Test
+    @DisplayName("Não deve enviar e-mail para endereço vazio")
+    void naoDeveEnviarEmailParaEnderecoVazio() {
+        // Arrange
+        String para = "";
+        String assunto = "Test";
+        String corpo = "Body";
+
+        // Act
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        // Assert
+        verify(enviadorDeEmail, never()).createMimeMessage();
+        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
+        verify(repositorioNotificacao, never()).save(any(Notificacao.class));
+    }
+
+    @Test
+    @DisplayName("Não deve enviar e-mail para endereço null")
+    void naoDeveEnviarEmailParaEnderecoNull() {
+        // Arrange
+        String para = null;
+        String assunto = "Test";
+        String corpo = "Body";
+
+        // Act
+        notificacaoServico.enviarEmail(para, assunto, corpo);
+
+        // Assert
+        verify(enviadorDeEmail, never()).createMimeMessage();
+        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
+        verify(repositorioNotificacao, never()).save(any(Notificacao.class));
+    }
+
+    @Test
+    @DisplayName("Deve truncar conteúdo longo da notificação")
+    void deveTruncarConteudoLongoDaNotificacao() throws Exception {
+        // Arrange
+        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
+        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+
+        String para = "recipient@test.com";
+        String assunto = "Test";
+        String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
+
+        // Act
+        notificacaoServico.enviarEmail(para, assunto, corpoLongo);
+
+        // Assert
+        ArgumentCaptor<Notificacao> captorNotificacao = ArgumentCaptor.forClass(Notificacao.class);
+        verify(repositorioNotificacao).save(captorNotificacao.capture());
+
+        Notificacao notificacaoSalva = captorNotificacao.getValue();
+        assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
+        assertThat(notificacaoSalva.getConteudo()).endsWith("...");
     }
 }
