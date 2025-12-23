@@ -166,7 +166,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCol, BContainer, BForm, BFormInput} from "bootstrap-vue-next";
+import {BAlert, BButton, BCol, BContainer, BForm, BFormInput} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {badgeClass, situacaoLabel} from "@/utils";

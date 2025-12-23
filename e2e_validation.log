@@ -1,0 +1,535 @@
+
+> sgc-e2e@1.0.0 test:e2e
+> playwright test
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m478[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+
+Running 149 tests using 1 worker
+
+[1A[2K[1/149] [chromium] › e2e/captura-telas.spec.ts:55:13 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:55:13 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 404 ()
+
+[1A[2K[NETWORK ERROR] 404 POST http://localhost:10000/api/usuarios/autorizar
+
+[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"23-12-2025 10:41:53","traceId":"4330c989-c409-4d7b-8fe3-d274614b08c7"}
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+
+[1A[2K[2/149] [chromium] › e2e/captura-telas.spec.ts:84:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel ADMIN
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 1 criado.
+
+[1A[2K[3/149] [chromium] › e2e/captura-telas.spec.ts:142:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 2 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_212
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_211
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 2 iniciado para 2 unidade(s).
+
+[1A[2K[4/149] [chromium] › e2e/captura-telas.spec.ts:163:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 3 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_211
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 3 iniciado para 1 unidade(s).
+
+[1A[2K[5/149] [chromium] › e2e/captura-telas.spec.ts:186:13 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 4 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 4 iniciado para 1 unidade(s).
+
+[1A[2K[6/149] [chromium] › e2e/captura-telas.spec.ts:226:13 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário
+[1A[2K[7/149] [chromium] › e2e/captura-telas.spec.ts:260:13 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 5 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_211
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 5 iniciado para 1 unidade(s).
+
+[1A[2K[8/149] [chromium] › e2e/captura-telas.spec.ts:328:13 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 6 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_212
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 6 iniciado para 1 unidade(s).
+
+[1A[2K[9/149] [chromium] › e2e/captura-telas.spec.ts:428:13 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 7 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_121
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 7 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=7
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 7 atualizado e mapa disponibilizado.
+
+[1A[2K[10/149] [chromium] › e2e/captura-telas.spec.ts:535:13 › Captura de Telas - Sistema SGC › 06 - Navegação e Menus › Captura elementos de navegação
+[1A[2K[11/149] [chromium] › e2e/captura-telas.spec.ts:571:13 › Captura de Telas - Sistema SGC › 07 - Estados e Situações › Captura diferentes estados de processo
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 8 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 9 criado.
+[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 9 iniciado para 1 unidade(s).
+
+[1A[2K[12/149] [chromium] › e2e/captura-telas.spec.ts:611:13 › Captura de Telas - Sistema SGC › 08 - Responsividade (Tamanhos de Tela) › Captura em diferentes resoluções
+[1A[2K[13/149] [chromium] › e2e/cdu-01.spec.ts:9:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir erro com credenciais inválidas
+[1A[2K[chromium] › e2e/cdu-01.spec.ts:9:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir erro com credenciais inválidas
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 404 ()
+
+[1A[2K[NETWORK ERROR] 404 POST http://localhost:10000/api/usuarios/autorizar
+
+[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"23-12-2025 10:42:41","traceId":"682181b2-4b43-4659-abfc-5a70683a799f"}
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+
+[1A[2K[14/149] [chromium] › e2e/cdu-01.spec.ts:14:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve realizar login com sucesso (Perfil Único)
+[1A[2K[15/149] [chromium] › e2e/cdu-01.spec.ts:22:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir seleção de perfil se houver múltiplos
+[1A[2K[16/149] [chromium] › e2e/cdu-01.spec.ts:34:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação após login
+[1A[2K[17/149] [chromium] › e2e/cdu-01.spec.ts:46:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir informações do usuário e controles
+[1A[2K[18/149] [chromium] › e2e/cdu-01.spec.ts:60:9 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir rodapé
+[1A[2K[19/149] [chromium] › e2e/cdu-02.spec.ts:23:13 › CDU-02 - Visualizar Painel › Como ADMIN › Deve exibir seções de Processos e Alertas
+[1A[2K[20/149] [chromium] › e2e/cdu-02.spec.ts:31:13 › CDU-02 - Visualizar Painel › Como ADMIN › Deve exibir botão "Criar processo"
+[1A[2K[21/149] [chromium] › e2e/cdu-02.spec.ts:35:13 › CDU-02 - Visualizar Painel › Como ADMIN › Deve criar processo e visualizá-lo na tabela
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 10 criado.
+
+[1A[2K[22/149] [chromium] › e2e/cdu-02.spec.ts:60:13 › CDU-02 - Visualizar Painel › Como ADMIN › Processos "Criado" devem aparecer apenas para ADMIN
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 11 criado.
+
+[1A[2K[23/149] [chromium] › e2e/cdu-02.spec.ts:94:13 › CDU-02 - Visualizar Painel › Como ADMIN › Não deve incluir unidades INTERMEDIARIAS na seleção
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 12 criado.
+
+[1A[2K[24/149] [chromium] › e2e/cdu-02.spec.ts:152:13 › CDU-02 - Visualizar Painel › Como GESTOR › Não deve exibir botão "Criar processo"
+[1A[2K[25/149] [chromium] › e2e/cdu-02.spec.ts:156:13 › CDU-02 - Visualizar Painel › Como GESTOR › Deve exibir mensagem quando não há processos
+[1A[2K[26/149] [chromium] › e2e/cdu-02.spec.ts:167:13 › CDU-02 - Visualizar Painel › Como GESTOR › Deve exibir tabela de alertas vazia
+[1A[2K[27/149] [chromium] › e2e/cdu-03.spec.ts:21:9 › CDU-03 - Manter Processo › Deve validar campos obrigatórios
+[1A[2K[28/149] [chromium] › e2e/cdu-03.spec.ts:47:9 › CDU-03 - Manter Processo › Deve editar um processo existente
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 13 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.atualizar:214 - Processo 13 atualizado.
+
+[1A[2K[29/149] [chromium] › e2e/cdu-03.spec.ts:84:9 › CDU-03 - Manter Processo › Deve remover um processo
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 14 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.apagar:230 - Processo 14 removido.
+
+[1A[2K[30/149] [chromium] › e2e/cdu-04.spec.ts:19:9 › CDU-04 - Iniciar processo de mapeamento › Deve iniciar um processo com sucesso
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 15 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_11
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 15 iniciado para 1 unidade(s).
+
+[1A[2K[31/149] [chromium] › e2e/cdu-05.spec.ts:262:9 › CDU-05 - Iniciar processo de revisao › Fase 1: Ciclo completo de Mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 16 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_21
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 16 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=10
+[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 10 atualizado e mapa disponibilizado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 16
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para ASSESSORIA_21
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 16 finalizado
+
+[1A[2K[32/149] [chromium] › e2e/cdu-05.spec.ts:279:9 › CDU-05 - Iniciar processo de revisao › Fase 2: Iniciar processo de Revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 17 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade ASSESSORIA_21
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_21
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 17 iniciado para 1 unidade(s).
+
+[1A[2K[33/149] [chromium] › e2e/cdu-06.spec.ts:16:9 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para ADMIN
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 18 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 18 iniciado para 1 unidade(s).
+
+[1A[2K[34/149] [chromium] › e2e/cdu-06.spec.ts:60:9 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para GESTOR
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 19 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_111
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 19 iniciado para 1 unidade(s).
+
+[1A[2K[35/149] [chromium] › e2e/cdu-07.spec.ts:18:9 › CDU-07 - Detalhar subprocesso › Deve exibir detalhes do subprocesso para CHEFE
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 20 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_121
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 20 iniciado para 1 unidade(s).
+
+[1A[2K[36/149] [chromium] › e2e/cdu-08.spec.ts:16:9 › CDU-08 - Manter cadastro de atividades e conhecimentos › Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 21 criado.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_11
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 21 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.atividade.AtividadeService.lambda$atualizar$4:149 - Atividade 11 atualizada
+
+[1A[2K[37/149] [chromium] › e2e/cdu-08.spec.ts:85:9 › CDU-08 - Manter cadastro de atividades e conhecimentos › Cenário 2: Processo de Revisão (Botão Impacto)
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 22 criado.
+[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 22 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=1 removidas=0, alteradas=0
+
+[1A[2K[38/149] [chromium] › e2e/cdu-09.spec.ts:37:9 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Preparacao: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 23 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 23 iniciado para 1 unidade(s).
+
+[1A[2K[39/149] [chromium] › e2e/cdu-09.spec.ts:66:9 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 1: Validacao - Atividade sem conhecimento
+[1A[2K[40/149] [chromium] › e2e/cdu-09.spec.ts:102:9 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar Cadastro
+[1A[2K[41/149] [chromium] › e2e/cdu-09.spec.ts:131:9 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 3: Devolucao e Historico de Analise
+[1A[2K[42/149] [chromium] › e2e/cdu-10.spec.ts:40:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 24 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 24 iniciado para 1 unidade(s).
+
+[1A[2K[43/149] [chromium] › e2e/cdu-10.spec.ts:70:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[44/149] [chromium] › e2e/cdu-10.spec.ts:94:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 3: Admin homologa cadastro
+[1A[2K[45/149] [chromium] › e2e/cdu-10.spec.ts:110:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 4: Admin adiciona competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=18
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 18 atualizado e mapa disponibilizado.
+
+[1A[2K[46/149] [chromium] › e2e/cdu-10.spec.ts:157:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 5: Chefe valida mapa
+[1A[2K[47/149] [chromium] › e2e/cdu-10.spec.ts:171:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 24
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 24 finalizado
+
+[1A[2K[48/149] [chromium] › e2e/cdu-10.spec.ts:199:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 7: Admin cria e inicia processo de revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 25 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 25 iniciado para 1 unidade(s).
+
+[1A[2K[49/149] [chromium] › e2e/cdu-10.spec.ts:226:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 8: Chefe revisa atividades
+[1A[2K[50/149] [chromium] › e2e/cdu-10.spec.ts:259:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 1: Validação - Atividade sem conhecimento impede disponibilização
+[1A[2K[51/149] [chromium] › e2e/cdu-10.spec.ts:291:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar revisão do cadastro
+[1A[2K[52/149] [chromium] › e2e/cdu-10.spec.ts:327:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 3: Devolução e Histórico de Análise
+[1A[2K[53/149] [chromium] › e2e/cdu-10.spec.ts:391:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 4: Verificar que histórico foi excluído após nova disponibilização
+[1A[2K[chromium] › e2e/cdu-10.spec.ts:391:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 4: Verificar que histórico foi excluído após nova disponibilização
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[54/149] [chromium] › e2e/cdu-10.spec.ts:504:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 5: Cancelar disponibilização mantém na mesma tela
+[1A[2K[55/149] [chromium] › e2e/cdu-11.spec.ts:44:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 26 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 26 iniciado para 1 unidade(s).
+
+[1A[2K[56/149] [chromium] › e2e/cdu-11.spec.ts:73:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro
+[1A[2K[57/149] [chromium] › e2e/cdu-11.spec.ts:105:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada
+[1A[2K[58/149] [chromium] › e2e/cdu-11.spec.ts:154:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)
+[1A[2K[59/149] [chromium] › e2e/cdu-11.spec.ts:185:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 3: Visualizar processo finalizado
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=20
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 20 atualizado e mapa disponibilizado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 26
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 26 finalizado
+
+[1A[2K[60/149] [chromium] › e2e/cdu-11.spec.ts:274:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza cadastro de processo finalizado
+[1A[2K[61/149] [chromium] › e2e/cdu-12.spec.ts:61:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 27 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 27 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=21
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 21 atualizado e mapa disponibilizado.
+
+[1A[2K[chromium] › e2e/cdu-12.spec.ts:61:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 27
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 27 finalizado
+
+[1A[2K[62/149] [chromium] › e2e/cdu-12.spec.ts:176:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 2: Iniciar Processo de Revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 28 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 28 iniciado para 1 unidade(s).
+
+[1A[2K[63/149] [chromium] › e2e/cdu-12.spec.ts:202:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial)
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=false, inseridas=0 removidas=0, alteradas=0
+
+[1A[2K[64/149] [chromium] › e2e/cdu-12.spec.ts:218:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 2: Verificar Impacto de Inclusão de Atividade
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=1 removidas=0, alteradas=0
+
+[1A[2K[65/149] [chromium] › e2e/cdu-12.spec.ts:241:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)
+[1A[2K[2m[WebServer] [22mINFO  s.atividade.AtividadeService.lambda$atualizar$4:149 - Atividade 30 atualizada
+
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=2 removidas=1, alteradas=0
+
+[1A[2K[66/149] [chromium] › e2e/cdu-12.spec.ts:267:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[67/149] [chromium] › e2e/cdu-12.spec.ts:293:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 5: Verificar visualização pelo Admin (Somente Leitura)
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[68/149] [chromium] › e2e/cdu-13.spec.ts:54:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 29 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 29 iniciado para 1 unidade(s).
+
+[1A[2K[69/149] [chromium] › e2e/cdu-13.spec.ts:79:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza
+[1A[2K[70/149] [chromium] › e2e/cdu-13.spec.ts:109:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[71/149] [chromium] › e2e/cdu-13.spec.ts:126:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 2: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[72/149] [chromium] › e2e/cdu-13.spec.ts:137:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[73/149] [chromium] › e2e/cdu-13.spec.ts:163:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 4: GESTOR cancela devolução
+[1A[2K[74/149] [chromium] › e2e/cdu-13.spec.ts:177:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 5: GESTOR registra aceite COM observação
+[1A[2K[75/149] [chromium] › e2e/cdu-13.spec.ts:188:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 6: ADMIN devolve para nova rodada de aceite
+[1A[2K[76/149] [chromium] › e2e/cdu-13.spec.ts:210:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 7: GESTOR registra aceite SEM observação
+[1A[2K[77/149] [chromium] › e2e/cdu-13.spec.ts:221:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 8: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[78/149] [chromium] › e2e/cdu-13.spec.ts:250:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 9: ADMIN cancela homologação
+[1A[2K[79/149] [chromium] › e2e/cdu-13.spec.ts:264:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 10: ADMIN homologa cadastro
+[1A[2K[80/149] [chromium] › e2e/cdu-14.spec.ts:57:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0: Criar mapa vigente através de processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 30 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 30 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=24
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 24 atualizado e mapa disponibilizado.
+
+[1A[2K[chromium] › e2e/cdu-14.spec.ts:57:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0: Criar mapa vigente através de processo de mapeamento
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 30
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 30 finalizado
+
+[1A[2K[81/149] [chromium] › e2e/cdu-14.spec.ts:170:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 31 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 31 iniciado para 1 unidade(s).
+
+[1A[2K[82/149] [chromium] › e2e/cdu-14.spec.ts:195:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 2: CHEFE revisa atividades e disponibiliza
+[1A[2K[83/149] [chromium] › e2e/cdu-14.spec.ts:225:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[84/149] [chromium] › e2e/cdu-14.spec.ts:241:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível
+[1A[2K[85/149] [chromium] › e2e/cdu-14.spec.ts:252:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 3: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[86/149] [chromium] › e2e/cdu-14.spec.ts:263:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[87/149] [chromium] › e2e/cdu-14.spec.ts:289:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 5: GESTOR cancela devolução
+[1A[2K[88/149] [chromium] › e2e/cdu-14.spec.ts:303:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 6: GESTOR registra aceite COM observação
+[1A[2K[89/149] [chromium] › e2e/cdu-14.spec.ts:314:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 7: ADMIN devolve para nova rodada de aceite
+[1A[2K[90/149] [chromium] › e2e/cdu-14.spec.ts:336:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 8: GESTOR registra aceite SEM observação
+[1A[2K[91/149] [chromium] › e2e/cdu-14.spec.ts:347:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 9: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[92/149] [chromium] › e2e/cdu-14.spec.ts:376:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 10: ADMIN cancela homologação
+[1A[2K[93/149] [chromium] › e2e/cdu-14.spec.ts:390:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 11: ADMIN homologa cadastro de revisão
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=3 removidas=0, alteradas=0
+
+[1A[2K[94/149] [chromium] › e2e/cdu-15.spec.ts:55:9 › CDU-15 - Manter mapa de competências › Preparacao: Criar processo e homologar cadastro de atividades
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 32 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 32 iniciado para 1 unidade(s).
+
+[1A[2K[chromium] › e2e/cdu-15.spec.ts:55:9 › CDU-15 - Manter mapa de competências › Preparacao: Criar processo e homologar cadastro de atividades
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[95/149] [chromium] › e2e/cdu-15.spec.ts:117:9 › CDU-15 - Manter mapa de competências › CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos
+[1A[2K[96/149] [chromium] › e2e/cdu-15.spec.ts:137:9 › CDU-15 - Manter mapa de competências › CT-02: Criar Competência
+[1A[2K[97/149] [chromium] › e2e/cdu-15.spec.ts:153:9 › CDU-15 - Manter mapa de competências › CT-03: Editar Competência
+[1A[2K[98/149] [chromium] › e2e/cdu-15.spec.ts:169:9 › CDU-15 - Manter mapa de competências › CT-05: Validar Cancelamento da Exclusão
+[1A[2K[99/149] [chromium] › e2e/cdu-15.spec.ts:182:9 › CDU-15 - Manter mapa de competências › CT-04: Excluir Competência com Confirmação
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.removerCompetencia:118 - Situação do subprocesso 26 alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)
+
+[1A[2K[100/149] [chromium] › e2e/cdu-15.spec.ts:196:9 › CDU-15 - Manter mapa de competências › CT-06: Navegar para Disponibilização
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=26
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 26 atualizado e mapa disponibilizado.
+
+[1A[2K[101/149] [chromium] › e2e/cdu-16.spec.ts:63:9 › CDU-16 - Ajustar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 33 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 33 iniciado para 1 unidade(s).
+
+[1A[2K[102/149] [chromium] › e2e/cdu-16.spec.ts:87:9 › CDU-16 - Ajustar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[103/149] [chromium] › e2e/cdu-16.spec.ts:111:9 › CDU-16 - Ajustar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[104/149] [chromium] › e2e/cdu-16.spec.ts:123:9 › CDU-16 - Ajustar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=27
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 27 atualizado e mapa disponibilizado.
+
+[1A[2K[105/149] [chromium] › e2e/cdu-16.spec.ts:141:9 › CDU-16 - Ajustar mapa de competências › Preparacao 5: Chefe valida mapa
+[1A[2K[106/149] [chromium] › e2e/cdu-16.spec.ts:156:9 › CDU-16 - Ajustar mapa de competências › Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 33
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 33 finalizado
+
+[1A[2K[107/149] [chromium] › e2e/cdu-16.spec.ts:181:9 › CDU-16 - Ajustar mapa de competências › Preparacao 7: Admin cria e inicia processo de revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 34 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.service.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 34 iniciado para 1 unidade(s).
+
+[1A[2K[108/149] [chromium] › e2e/cdu-16.spec.ts:205:9 › CDU-16 - Ajustar mapa de competências › Preparacao 8: Chefe revisa atividades com alterações
+[1A[2K[2m[WebServer] [22mINFO  s.atividade.AtividadeService.lambda$atualizar$4:149 - Atividade 47 atualizada
+
+[1A[2K[109/149] [chromium] › e2e/cdu-16.spec.ts:235:9 › CDU-16 - Ajustar mapa de competências › Preparacao 9: Admin homologa revisão do cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[110/149] [chromium] › e2e/cdu-16.spec.ts:258:9 › CDU-16 - Ajustar mapa de competências › Cenario 1: ADMIN navega para tela de edição do mapa
+[1A[2K[111/149] [chromium] › e2e/cdu-16.spec.ts:291:9 › CDU-16 - Ajustar mapa de competências › Cenario 2: ADMIN visualiza impactos no mapa
+[1A[2K[2m[WebServer] [22mINFO  s.m.service.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[112/149] [chromium] › e2e/cdu-16.spec.ts:325:9 › CDU-16 - Ajustar mapa de competências › Cenario 3: ADMIN pode abrir modal para editar competência
+[1A[2K[113/149] [chromium] › e2e/cdu-16.spec.ts:353:9 › CDU-16 - Ajustar mapa de competências › Cenario 4: ADMIN associa atividade não vinculada a nova competência
+[1A[2K[114/149] [chromium] › e2e/cdu-17.spec.ts:41:9 › CDU-17 - Disponibilizar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 35 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 35 iniciado para 1 unidade(s).
+
+[1A[2K[115/149] [chromium] › e2e/cdu-17.spec.ts:65:9 › CDU-17 - Disponibilizar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[116/149] [chromium] › e2e/cdu-17.spec.ts:90:9 › CDU-17 - Disponibilizar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[117/149] [chromium] › e2e/cdu-17.spec.ts:102:9 › CDU-17 - Disponibilizar mapa de competências › Preparacao 4: Admin cria competências com todas as atividades associadas
+[1A[2K[118/149] [chromium] › e2e/cdu-17.spec.ts:128:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 1: ADMIN navega para tela de edição do mapa
+[1A[2K[119/149] [chromium] › e2e/cdu-17.spec.ts:152:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 2: ADMIN abre modal de disponibilização
+[1A[2K[120/149] [chromium] › e2e/cdu-17.spec.ts:171:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 3: ADMIN cancela disponibilização - permanece na tela
+[1A[2K[121/149] [chromium] › e2e/cdu-17.spec.ts:191:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 4: ADMIN disponibiliza mapa com sucesso
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=29
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 29 atualizado e mapa disponibilizado.
+
+[1A[2K[122/149] [chromium] › e2e/cdu-18.spec.ts:23:9 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo
+[1A[2K[123/149] [chromium] › e2e/cdu-18.spec.ts:73:9 › CDU-18: Visualizar mapa de competências › Cenário 2: CHEFE visualiza mapa da própria unidade
+[1A[2K[124/149] [chromium] › e2e/cdu-19.spec.ts:40:9 › CDU-19 - Validar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 36 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 36 iniciado para 1 unidade(s).
+
+[1A[2K[125/149] [chromium] › e2e/cdu-19.spec.ts:64:9 › CDU-19 - Validar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[126/149] [chromium] › e2e/cdu-19.spec.ts:84:9 › CDU-19 - Validar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[127/149] [chromium] › e2e/cdu-19.spec.ts:96:9 › CDU-19 - Validar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=30
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 30 atualizado e mapa disponibilizado.
+
+[1A[2K[128/149] [chromium] › e2e/cdu-19.spec.ts:119:9 › CDU-19 - Validar mapa de competências › Cenario 1: CHEFE navega para visualização do mapa
+[1A[2K[129/149] [chromium] › e2e/cdu-19.spec.ts:143:9 › CDU-19 - Validar mapa de competências › Cenario 2: CHEFE cancela validação - permanece na tela
+[1A[2K[130/149] [chromium] › e2e/cdu-19.spec.ts:167:9 › CDU-19 - Validar mapa de competências › Cenario 3: CHEFE valida mapa com sucesso
+[1A[2K[131/149] [chromium] › e2e/cdu-20.spec.ts:48:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 37 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 37 iniciado para 1 unidade(s).
+
+[1A[2K[132/149] [chromium] › e2e/cdu-20.spec.ts:72:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[133/149] [chromium] › e2e/cdu-20.spec.ts:92:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[134/149] [chromium] › e2e/cdu-20.spec.ts:104:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=31
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 31 atualizado e mapa disponibilizado.
+
+[1A[2K[135/149] [chromium] › e2e/cdu-20.spec.ts:121:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 5: Chefe valida o mapa
+[1A[2K[136/149] [chromium] › e2e/cdu-20.spec.ts:141:9 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado
+[1A[2K[137/149] [chromium] › e2e/cdu-20.spec.ts:166:9 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: GESTOR cancela aceite - permanece na tela
+[1A[2K[138/149] [chromium] › e2e/cdu-20.spec.ts:189:9 › CDU-20 - Analisar validação de mapa de competências › Cenario 3: GESTOR registra aceite do mapa
+[1A[2K[139/149] [chromium] › e2e/cdu-20.spec.ts:215:9 › CDU-20 - Analisar validação de mapa de competências › Cenario 4: ADMIN homologa o mapa
+[1A[2K[140/149] [chromium] › e2e/cdu-21.spec.ts:48:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.criar:180 - Processo 38 criado.
+
+[1A[2K[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:342 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 38 iniciado para 1 unidade(s).
+
+[1A[2K[141/149] [chromium] › e2e/cdu-21.spec.ts:72:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[142/149] [chromium] › e2e/cdu-21.spec.ts:92:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 3: Admin homologa cadastro
+[1A[2K[143/149] [chromium] › e2e/cdu-21.spec.ts:104:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=32
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 32 atualizado e mapa disponibilizado.
+
+[1A[2K[144/149] [chromium] › e2e/cdu-21.spec.ts:121:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 5: Chefe valida o mapa
+[1A[2K[145/149] [chromium] › e2e/cdu-21.spec.ts:136:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 6: Gestor registra aceite do mapa
+[1A[2K[146/149] [chromium] › e2e/cdu-21.spec.ts:151:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 7: Admin homologa o mapa
+[1A[2K[147/149] [chromium] › e2e/cdu-21.spec.ts:175:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 1: ADMIN navega para detalhes do processo
+[1A[2K[148/149] [chromium] › e2e/cdu-21.spec.ts:191:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 2: ADMIN cancela finalização - permanece na tela
+[1A[2K[149/149] [chromium] › e2e/cdu-21.spec.ts:214:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 3: ADMIN finaliza processo com sucesso
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 38
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:228 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.service.ProcessoService.finalizar:312 - Processo 38 finalizado
+
+[1A[2K  149 passed (6.2m)
