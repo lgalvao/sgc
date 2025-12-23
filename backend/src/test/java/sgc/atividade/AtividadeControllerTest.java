@@ -20,12 +20,12 @@ import sgc.atividade.internal.model.Atividade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.internal.model.Mapa;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.api.AtividadeVisualizacaoDto;
+import sgc.subprocesso.api.ConhecimentoVisualizacaoDto;
+import sgc.subprocesso.api.SubprocessoSituacaoDto;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.service.SubprocessoService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;

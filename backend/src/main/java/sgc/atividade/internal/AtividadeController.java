@@ -14,11 +14,11 @@ import sgc.atividade.api.ConhecimentoDto;
 import sgc.atividade.internal.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.api.AtividadeOperacaoResponse;
+import sgc.subprocesso.api.AtividadeVisualizacaoDto;
+import sgc.subprocesso.api.SubprocessoSituacaoDto;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.service.SubprocessoService;
 
 import java.net.URI;
 import java.util.List;

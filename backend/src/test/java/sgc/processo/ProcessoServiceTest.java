@@ -18,24 +18,24 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.CopiaMapaService;
-import sgc.processo.dto.*;
-import sgc.processo.dto.mappers.ProcessoMapper;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.processo.eventos.EventoProcessoFinalizado;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.*;
+import sgc.processo.internal.mappers.ProcessoMapper;
+import sgc.processo.internal.erros.ErroProcesso;
+import sgc.processo.internal.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.api.eventos.EventoProcessoCriado;
+import sgc.processo.api.eventos.EventoProcessoFinalizado;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.api.PerfilDto;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.mappers.SubprocessoMapper;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeMapaRepo;
 import sgc.unidade.internal.model.UnidadeRepo;
@@ -67,7 +67,7 @@ class ProcessoServiceTest {
     @Mock
     private ProcessoMapper processoMapper;
     @Mock
-    private sgc.processo.service.ProcessoDetalheBuilder processoDetalheBuilder;
+    private sgc.processo.internal.service.ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private MapaRepo mapaRepo;
     @Mock
@@ -81,7 +81,7 @@ class ProcessoServiceTest {
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
-    private sgc.processo.service.ProcessoInicializador processoInicializador;
+    private sgc.processo.internal.service.ProcessoInicializador processoInicializador;
 
     @InjectMocks
     private ProcessoService processoService;

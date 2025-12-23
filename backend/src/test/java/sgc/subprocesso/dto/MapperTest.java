@@ -1,4 +1,4 @@
-package sgc.subprocesso.dto;
+package sgc.subprocesso.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.mapper.MovimentacaoMapper;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.subprocesso.internal.mappers.MovimentacaoMapper;
+import sgc.subprocesso.internal.mappers.SubprocessoMapper;
+import sgc.subprocesso.internal.model.Movimentacao;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 

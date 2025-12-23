@@ -13,8 +13,8 @@ import sgc.analise.internal.model.Analise;
 import sgc.analise.internal.model.AnaliseRepo;
 import sgc.analise.internal.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Optional;

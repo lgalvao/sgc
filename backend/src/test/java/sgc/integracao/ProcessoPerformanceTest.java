@@ -4,11 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.ProcessoDto;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.unidade.internal.model.Unidade;
 
 import java.time.LocalDateTime;

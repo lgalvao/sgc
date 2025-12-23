@@ -1,12 +1,12 @@
-package sgc.subprocesso.mapper;
+package sgc.subprocesso.internal.mappers;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.analise.internal.model.Analise;
 import sgc.mapa.internal.model.Competencia;
 import sgc.mapa.internal.model.Mapa;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.api.MapaAjusteDto;
+import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.unidade.internal.model.Unidade;
 
 import java.util.Collections;

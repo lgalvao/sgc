@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,16 +17,16 @@ import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.service.CompetenciaService;
 import sgc.mapa.MapaService;
-import sgc.processo.eventos.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.api.eventos.*;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Usuario;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.api.DisponibilizarMapaRequest;
+import sgc.subprocesso.api.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.internal.erros.ErroMapaNaoAssociado;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 
@@ -111,7 +111,7 @@ class SubprocessoMapaWorkflowServiceTest {
                 .build();
 
         assertThatThrownBy(() -> service.disponibilizarMapa(id, request, new Usuario()))
-                .isInstanceOf(sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida.class);
+                .isInstanceOf(sgc.subprocesso.internal.erros.ErroMapaEmSituacaoInvalida.class);
     }
 
     // --- Apresentar Sugestões ---

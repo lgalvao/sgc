@@ -1,4 +1,4 @@
-package sgc.subprocesso.mapper;
+package sgc.subprocesso.internal.mappers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,12 +7,12 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.subprocesso.api.SubprocessoDetalheDto;
+import sgc.subprocesso.api.SubprocessoPermissoesDto;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 
 import java.util.Collections;
 

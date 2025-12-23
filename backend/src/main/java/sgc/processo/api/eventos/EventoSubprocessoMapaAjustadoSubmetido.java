@@ -1,0 +1,13 @@
+package sgc.processo.api.eventos;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+public class EventoSubprocessoMapaAjustadoSubmetido extends EventoSubprocessoBase {
+}

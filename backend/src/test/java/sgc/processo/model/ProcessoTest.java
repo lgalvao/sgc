@@ -1,4 +1,4 @@
-package sgc.processo.model;
+package sgc.processo.internal.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

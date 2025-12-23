@@ -1,4 +1,4 @@
-package sgc.processo.eventos;
+package sgc.processo.api.eventos;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

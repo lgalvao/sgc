@@ -1,4 +1,4 @@
-package sgc.processo.service;
+package sgc.processo.internal.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,12 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.processo.api.ProcessoDetalheDto;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 
 import java.time.LocalDateTime;
@@ -59,7 +59,7 @@ class ProcessoDetalheBuilderTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacao(sgc.subprocesso.internal.model.SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));

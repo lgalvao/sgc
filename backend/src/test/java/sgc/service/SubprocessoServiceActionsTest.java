@@ -18,13 +18,13 @@ import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoEmailService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.internal.model.*;
+import sgc.subprocesso.internal.service.SubprocessoCadastroWorkflowService;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 
@@ -75,7 +75,7 @@ public class SubprocessoServiceActionsTest {
     private ImpactoMapaService impactoMapaService;
 
     @MockitoBean
-    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
+    private sgc.subprocesso.internal.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidade;
     private Usuario usuario;

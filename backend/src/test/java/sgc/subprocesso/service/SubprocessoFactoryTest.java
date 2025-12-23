@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,13 +19,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.CopiaMapaService;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.processo.internal.erros.ErroProcesso;
+import sgc.processo.internal.model.Processo;
+import sgc.subprocesso.internal.model.Movimentacao;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.TipoUnidade;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeMapa;

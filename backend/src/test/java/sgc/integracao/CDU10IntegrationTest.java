@@ -28,14 +28,14 @@ import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioPerfil;
 import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.internal.model.*;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 
@@ -90,7 +90,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
 
     @MockitoSpyBean
-    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
+    private sgc.subprocesso.internal.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -140,7 +140,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         definirTitular(unidadeSuperior, usuarioSuperior);
 
         // 4. Criar Processo, Mapa e Subprocesso
-        sgc.processo.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
+        sgc.processo.internal.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
         processoRevisao.setCodigo(null);
         processoRevisao.setTipo(TipoProcesso.REVISAO);
         processoRevisao.setSituacao(SituacaoProcesso.EM_ANDAMENTO);

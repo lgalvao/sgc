@@ -9,11 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.CriarProcessoReq;
+import sgc.processo.api.ProcessoDto;
+import sgc.processo.api.ProcessoResumoDto;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.internal.model.Perfil;
 
 import java.time.LocalDateTime;

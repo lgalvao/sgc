@@ -20,11 +20,11 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.*;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.subprocesso.internal.model.*;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 

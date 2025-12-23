@@ -1,6 +1,7 @@
 package sgc.subprocesso;
 
 import org.junit.jupiter.api.DisplayName;
+import sgc.subprocesso.internal.SubprocessoCrudController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -12,10 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.sgrh.api.UnidadeDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.api.SubprocessoDetalheDto;
+import sgc.subprocesso.api.SubprocessoDto;
+import sgc.subprocesso.internal.service.SubprocessoDtoService;
+import sgc.subprocesso.internal.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
 
 import java.util.List;

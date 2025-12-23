@@ -30,5 +30,5 @@ public class Mapa extends EntidadeBase {
     
     @OneToOne
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
-    private sgc.subprocesso.model.Subprocesso subprocesso;
+    private sgc.subprocesso.internal.model.Subprocesso subprocesso;
 }

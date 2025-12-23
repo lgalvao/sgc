@@ -1,4 +1,4 @@
-package sgc.subprocesso.dto;
+package sgc.subprocesso.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -18,7 +18,7 @@ import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.Conhecimento;
 import sgc.mapa.internal.model.Competencia;
 import sgc.mapa.internal.model.Mapa;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.unidade.internal.model.Unidade;
 
 class MapaAjusteDtoTest {

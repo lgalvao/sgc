@@ -1,6 +1,7 @@
 package sgc.processo;
 
 import org.junit.jupiter.api.BeforeEach;
+import sgc.processo.internal.ProcessoController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,11 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.processo.dto.*;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.*;
+import sgc.processo.internal.erros.ErroProcesso;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -610,7 +611,7 @@ public class ProcessoControllerTest {
             when(processoService.listarSubprocessosElegiveis(1L))
                     .thenReturn(
                             List.of(
-                                    sgc.processo.dto.SubprocessoElegivelDto.builder()
+                                    sgc.processo.api.SubprocessoElegivelDto.builder()
                                             .codSubprocesso(10L)
                                             .build()));
 
@@ -628,7 +629,7 @@ public class ProcessoControllerTest {
             // Arrange
             when(processoService.listarTodosSubprocessos(1L))
                     .thenReturn(
-                            List.of(sgc.subprocesso.dto.SubprocessoDto.builder().codigo(10L).build()));
+                            List.of(sgc.subprocesso.api.SubprocessoDto.builder().codigo(10L).build()));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/subprocessos"))

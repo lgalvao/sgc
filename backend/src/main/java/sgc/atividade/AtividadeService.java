@@ -14,10 +14,10 @@ import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroSituacaoInvalida;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 
 import java.util.List;
 

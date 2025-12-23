@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,18 +43,18 @@ import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioPerfil;
 import sgc.sgrh.SgrhService;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.mapper.MapaAjusteMapper;
-import sgc.subprocesso.mapper.MovimentacaoMapper;
-import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.api.MapaAjusteDto;
+import sgc.subprocesso.api.SubprocessoDetalheDto;
+import sgc.subprocesso.api.SubprocessoDto;
+import sgc.subprocesso.api.SubprocessoPermissoesDto;
+import sgc.subprocesso.internal.mappers.MapaAjusteMapper;
+import sgc.subprocesso.internal.mappers.MovimentacaoMapper;
+import sgc.subprocesso.internal.mappers.SubprocessoDetalheMapper;
+import sgc.subprocesso.internal.mappers.SubprocessoMapper;
+import sgc.subprocesso.internal.model.MovimentacaoRepo;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,4 +1,4 @@
-package sgc.subprocesso.model;
+package sgc.subprocesso.internal.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +10,7 @@ import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.mapa.internal.model.Mapa;
-import sgc.processo.model.Processo;
+import sgc.processo.internal.model.Processo;
 import sgc.unidade.internal.model.Unidade;
 
 import java.time.LocalDateTime;

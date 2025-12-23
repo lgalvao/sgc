@@ -23,20 +23,20 @@ import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioPerfil;
 import sgc.sgrh.internal.model.UsuarioPerfilRepo;
 import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.subprocesso.dto.ImportarAtividadesReq;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.api.ImportarAtividadesReq;
+import sgc.subprocesso.internal.model.MovimentacaoRepo;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
@@ -224,7 +224,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList())
                     .containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
 
-            List<sgc.subprocesso.model.Movimentacao> movimentacoes =
+            List<sgc.subprocesso.internal.model.Movimentacao> movimentacoes =
                     movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                             subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);

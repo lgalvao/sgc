@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,14 +12,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.internal.model.Mapa;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioPerfil;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.api.SubprocessoPermissoesDto;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.unidade.internal.model.Unidade;
 
 import java.util.HashSet;

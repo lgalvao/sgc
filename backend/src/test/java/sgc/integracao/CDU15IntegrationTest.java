@@ -21,13 +21,13 @@ import sgc.mapa.api.CompetenciaMapaDto;
 import sgc.mapa.api.SalvarMapaRequest;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 
@@ -258,7 +258,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve adicionar uma nova competência a um mapa")
         void deveAdicionarCompetencia() throws Exception {
             var request =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.api.CompetenciaReq(
                             "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(
@@ -279,7 +279,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         void deveAtualizarCompetencia() throws Exception {
             // Adicionar primeiro
             var addRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.api.CompetenciaReq(
                             "Competência Original", List.of(atividade1.getCodigo()));
             var result =
                     mockMvc.perform(
@@ -298,7 +298,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
             // Atualizar
             var updateRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.api.CompetenciaReq(
                             "Competência Atualizada",
                             List.of(atividade1.getCodigo(), atividade2.getCodigo()));
             mockMvc.perform(
@@ -321,7 +321,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         void deveRemoverCompetencia() throws Exception {
             // Adicionar primeiro
             var addRequest =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.api.CompetenciaReq(
                             "Competência a ser removida", List.of(atividade1.getCodigo()));
             var result =
                     mockMvc.perform(
@@ -358,7 +358,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocesso);
 
             var request =
-                    new sgc.subprocesso.dto.CompetenciaReq(
+                    new sgc.subprocesso.api.CompetenciaReq(
                             "Nova Competência", List.of(atividade1.getCodigo()));
 
             mockMvc.perform(

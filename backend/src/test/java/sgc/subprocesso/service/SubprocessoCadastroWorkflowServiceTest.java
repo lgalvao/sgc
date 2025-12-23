@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,14 +15,14 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.api.ImpactoMapaDto;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.service.ImpactoMapaService;
-import sgc.processo.eventos.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.api.eventos.*;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.TipoProcesso;
 import sgc.sgrh.internal.model.Usuario;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.erros.ErroMapaNaoAssociado;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 

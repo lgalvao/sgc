@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.SgrhService;
 
 import javax.sql.DataSource;

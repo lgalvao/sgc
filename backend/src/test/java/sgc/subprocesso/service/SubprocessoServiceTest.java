@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,10 +26,10 @@ import sgc.mapa.internal.model.Competencia;
 import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.api.SubprocessoDto;
+import sgc.subprocesso.internal.mappers.SubprocessoMapper;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.MapaFixture;
 
