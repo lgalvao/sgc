@@ -172,11 +172,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         Perfil.CHEFE.name())));
 
         when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
-                .thenAnswer(inv -> usuarioRepo.findById(admin.getTituloEleitoral()).orElseThrow());
+                .thenReturn(admin);
         when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString()))
-                .thenAnswer(inv -> usuarioRepo.findById(gestor.getTituloEleitoral()).orElseThrow());
+                .thenReturn(gestor);
         when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
-                .thenAnswer(inv -> usuarioRepo.findById(chefe.getTituloEleitoral()).orElseThrow());
+                .thenReturn(chefe);
 
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);
         UsuarioFixture.adicionarPerfil(gestor, unidadeGestor, Perfil.GESTOR);
@@ -200,10 +200,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
 
-        entityManager.flush();
-
-        // Reload unidade to ensure it's managed
-        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
+        // Note: Not flushing here to avoid detaching entities that are mocked
     }
 
     private Long criarEComecarProcessoDeRevisao() throws Exception {
