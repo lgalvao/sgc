@@ -1,10 +1,13 @@
-# Contexto Técnico - Spring Modulith no SGC
+# Contexto Técnico - Spring Modulith 2.0.1 no SGC
 
-**Baseado em:** `modulith-report.md` - Seção 8 (Configuração Técnica)
+**Baseado em:** `modulith-report.md` - Seção 8 (Configuração Técnica)  
+**Versão Atualizada:** Spring Modulith 2.0.1 (Dezembro 2023)
 
 ## Visão Geral
 
-Este documento detalha a configuração técnica necessária para implementar o Spring Modulith no projeto SGC, incluindo dependências, configurações e exemplos de código.
+Este documento detalha a configuração técnica do Spring Modulith 2.0.1 no projeto SGC, incluindo dependências, configurações e exemplos de código. 
+
+**IMPORTANTE**: Spring Modulith 2.0.1 é obrigatório para compatibilidade com Spring Boot 4.0.1.
 
 ---
 
@@ -29,6 +32,10 @@ dependencies {
     // Persistência de eventos com JPA
     implementation("org.springframework.modulith:spring-modulith-events-jpa")
     
+    // ===== Spring Modulith - Event Serialization (OBRIGATÓRIO em 2.0+) =====
+    // Serialização de eventos com Jackson
+    implementation("org.springframework.modulith:spring-modulith-events-jackson")
+    
     // ===== Spring Modulith - Observability (opcional mas recomendado) =====
     // Endpoints Actuator para monitoramento de módulos
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
@@ -49,9 +56,9 @@ dependencies {
 ### Versões
 
 Spring Modulith usa o **BOM (Bill of Materials) do Spring Boot**, portanto:
+- Versão configurada: **2.0.1** (compatível com Spring Boot 4.0.1)
 - Não é necessário especificar versões manualmente
-- A versão compatível com Spring Boot 4.0.1 será resolvida automaticamente
-- Spring Modulith requer Spring Boot 3.2+ (✅ atendido - versão atual: 4.0.1)
+- A versão compatível é resolvida automaticamente via BOM
 
 ### Verificar Resolução de Dependências
 
@@ -61,9 +68,10 @@ Spring Modulith usa o **BOM (Bill of Materials) do Spring Boot**, portanto:
 
 **Saída esperada:**
 ```
-+--- org.springframework.modulith:spring-modulith-starter-core:1.x.x
-+--- org.springframework.modulith:spring-modulith-events-api:1.x.x
-+--- org.springframework.modulith:spring-modulith-events-jpa:1.x.x
++--- org.springframework.modulith:spring-modulith-starter-core:2.0.1
++--- org.springframework.modulith:spring-modulith-events-api:2.0.1
++--- org.springframework.modulith:spring-modulith-events-jpa:2.0.1
++--- org.springframework.modulith:spring-modulith-events-jackson:2.0.1
 ...
 ```
 
@@ -401,42 +409,74 @@ public class ProcessoListener {
 
 ---
 
-## 7. Event Publication Registry
+## 7. Event Publication Registry (Spring Modulith 2.0)
 
 ### Esquema de Banco de Dados
 
-Spring Modulith cria automaticamente a tabela `EVENT_PUBLICATION`.
+Spring Modulith 2.0 introduz um novo esquema para a tabela `EVENT_PUBLICATION` com suporte a estados avançados.
 
-**Esquema (referência):**
+**Esquema Spring Modulith 2.0:**
 
 ```sql
 CREATE TABLE EVENT_PUBLICATION (
     ID UUID NOT NULL PRIMARY KEY,
-    EVENT_TYPE VARCHAR(512) NOT NULL,
-    LISTENER_ID VARCHAR(512) NOT NULL,
     PUBLICATION_DATE TIMESTAMP NOT NULL,
-    SERIALIZED_EVENT TEXT NOT NULL,
+    LISTENER_ID VARCHAR(255) NOT NULL,
+    SERIALIZED_EVENT CLOB NOT NULL,
+    EVENT_TYPE VARCHAR(255) NOT NULL,
+    STATUS VARCHAR(20) NOT NULL,              -- NOVO em 2.0
     COMPLETION_DATE TIMESTAMP,
+    LAST_RESUBMISSION_DATE TIMESTAMP,         -- NOVO em 2.0
+    COMPLETION_ATTEMPTS INT DEFAULT 0,        -- NOVO em 2.0
     INDEX idx_completion_date (COMPLETION_DATE),
     INDEX idx_publication_date (PUBLICATION_DATE)
 );
 ```
 
-### Consultas Úteis
+**Mudanças na versão 2.0:**
+- **STATUS**: Rastreia estado do evento (published, processing, failed, resubmitted, completed)
+- **LAST_RESUBMISSION_DATE**: Data da última tentativa de reenvio
+- **COMPLETION_ATTEMPTS**: Contador de tentativas de processamento
+
+### Consultas Úteis (Versão 2.0)
 
 **Eventos pendentes (não processados):**
 ```sql
 SELECT * FROM EVENT_PUBLICATION 
 WHERE COMPLETION_DATE IS NULL 
+  AND STATUS IN ('published', 'processing')
+ORDER BY PUBLICATION_DATE DESC;
+```
+
+**Eventos com falha:**
+```sql
+SELECT * FROM EVENT_PUBLICATION 
+WHERE STATUS = 'failed'
 ORDER BY PUBLICATION_DATE DESC;
 ```
 
 **Eventos completados recentemente:**
 ```sql
 SELECT * FROM EVENT_PUBLICATION 
-WHERE COMPLETION_DATE IS NOT NULL 
+WHERE STATUS = 'completed'
+  AND COMPLETION_DATE IS NOT NULL 
 ORDER BY COMPLETION_DATE DESC 
 LIMIT 50;
+```
+
+**Eventos resubmetidos:**
+```sql
+SELECT * FROM EVENT_PUBLICATION 
+WHERE LAST_RESUBMISSION_DATE IS NOT NULL
+ORDER BY LAST_RESUBMISSION_DATE DESC;
+```
+
+**Contagem por tipo de evento e status:**
+```sql
+SELECT EVENT_TYPE, STATUS, COUNT(*) as total
+FROM EVENT_PUBLICATION
+GROUP BY EVENT_TYPE, STATUS
+ORDER BY total DESC;
 ```
 
 **Contagem por tipo de evento:**
