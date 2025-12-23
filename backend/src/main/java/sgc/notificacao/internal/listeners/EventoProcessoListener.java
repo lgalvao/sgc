@@ -1,4 +1,4 @@
-package sgc.notificacao;
+package sgc.notificacao.internal.listeners;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.internal.model.Alerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.internal.services.NotificacaoModelosService;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;

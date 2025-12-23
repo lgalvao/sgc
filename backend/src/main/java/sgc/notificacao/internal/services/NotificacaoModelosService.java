@@ -1,4 +1,4 @@
-package sgc.notificacao;
+package sgc.notificacao.internal.services;
 
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;

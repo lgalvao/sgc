@@ -1,4 +1,4 @@
-package sgc.notificacao.model;
+package sgc.notificacao.internal.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

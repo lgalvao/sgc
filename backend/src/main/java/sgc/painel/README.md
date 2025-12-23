@@ -7,6 +7,32 @@ O módulo `painel` é responsável por fornecer os dados agregados para o dashbo
 centraliza a lógica de negócio que coleta informações de diferentes módulos, como `processo` e `alerta`, para apresentar
 uma visão consolidada ao usuário.
 
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`PainelService`** (raiz do módulo) - Facade para operações do painel
+
+### Implementação Interna
+- `internal/PainelController` - REST endpoints
+- `internal/erros/` - Exceções específicas do módulo
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `processo` - Consulta de processos para dashboard
+- `alerta` - Consulta de alertas para dashboard
+- `unidade` - Informações de unidades organizacionais
+- `sgrh` - Informações de perfis e usuários
+- `comum` - Componentes compartilhados
+
+### Características
+- Módulo read-only que agrega dados de outros módulos
+- Não possui eventos próprios
+
 ## Arquitetura
 
 Este módulo segue a arquitetura padrão da aplicação, com uma camada de Controle e uma de Serviço.

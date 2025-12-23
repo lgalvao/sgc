@@ -1,4 +1,4 @@
-package sgc.painel.erros;
+package sgc.painel.internal.erros;
 
 import org.springframework.http.HttpStatus;
 import sgc.comum.erros.ErroNegocioBase;

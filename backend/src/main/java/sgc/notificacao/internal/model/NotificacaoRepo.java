@@ -1,4 +1,4 @@
-package sgc.notificacao.model;
+package sgc.notificacao.internal.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

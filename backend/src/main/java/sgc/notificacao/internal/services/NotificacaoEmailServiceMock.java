@@ -1,10 +1,11 @@
-package sgc.notificacao;
+package sgc.notificacao.internal.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import sgc.notificacao.dto.EmailDto;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.api.EmailDto;
 
 import java.util.concurrent.CompletableFuture;
 

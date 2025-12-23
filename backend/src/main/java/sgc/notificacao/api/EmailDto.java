@@ -1,4 +1,4 @@
-package sgc.notificacao.dto;
+package sgc.notificacao.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

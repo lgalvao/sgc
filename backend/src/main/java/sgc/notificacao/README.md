@@ -10,6 +10,36 @@ Este pacote tem uma dupla responsabilidade:
 2. **Orquestração de Eventos:** Contém o `EventoProcessoListener`, o principal listener de eventos de domínio da
    aplicação, que também orquestra a criação de **alertas** ao invocar o `AlertaService`.
 
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`NotificacaoEmailService`** (raiz do módulo) - Serviço para envio de e-mails
+- **`api/EmailDto`** - DTO para encapsular dados de envio de e-mail
+
+### Implementação Interna
+- `internal/listeners/EventoProcessoListener` - Listener principal de eventos de domínio
+- `internal/services/NotificacaoModelosService` - Construção de templates de e-mail
+- `internal/services/NotificacaoEmailServiceMock` - Implementação mock para testes
+- `internal/model/` - Entidades JPA (Notificacao, NotificacaoRepo)
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `alerta` - Criação de alertas internos
+- `processo` - Eventos de processo e acesso a dados
+- `subprocesso` - Acesso a dados de subprocessos
+- `sgrh` - Informações de usuários
+- `unidade` - Informações de unidades organizacionais
+- `comum` - Componentes compartilhados
+
+### Eventos Consumidos
+- `EventoProcessoIniciado` - Notifica início de processo
+- `EventoProcessoFinalizado` - Notifica finalização de processo
+
 ## Arquitetura Orientada a Eventos
 
 O `EventoProcessoListener` é o coração da arquitetura reativa do SGC. Ele se inscreve para receber eventos publicados

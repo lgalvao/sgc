@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.util.ReflectionTestUtils;
-import sgc.notificacao.model.Notificacao;
-import sgc.notificacao.model.NotificacaoRepo;
+import sgc.notificacao.internal.model.Notificacao;
+import sgc.notificacao.internal.model.NotificacaoRepo;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
