@@ -212,7 +212,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividade);
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
-            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
+            var conhecimento = new Conhecimento("Conhecimento de Teste", atividade);
+            conhecimentoRepo.save(conhecimento);
+            atividade.getConhecimentos().add(conhecimento);
 
             mockMvc.perform(
                             post(
