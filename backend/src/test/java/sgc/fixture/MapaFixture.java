@@ -1,7 +1,7 @@
 package sgc.fixture;
 
 import sgc.mapa.internal.model.Mapa;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 
 public class MapaFixture {
 

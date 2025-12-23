@@ -3,7 +3,7 @@ package sgc.analise.internal.model;
 import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 
 import java.time.LocalDateTime;
 

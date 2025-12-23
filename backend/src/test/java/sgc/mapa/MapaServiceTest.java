@@ -20,7 +20,7 @@ import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.MapaService;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;

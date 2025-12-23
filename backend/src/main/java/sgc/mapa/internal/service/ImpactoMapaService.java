@@ -21,14 +21,14 @@ import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.model.TipoImpactoAtividade;
 import sgc.mapa.internal.model.TipoImpactoCompetencia;
 import sgc.sgrh.internal.model.Usuario;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados por alterações no

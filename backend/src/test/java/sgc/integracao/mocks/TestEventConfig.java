@@ -9,10 +9,10 @@ import sgc.alerta.AlertaService;
 import sgc.notificacao.internal.listeners.EventoProcessoListener;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.internal.services.NotificacaoModelosService;
-import sgc.processo.eventos.EventoProcessoIniciado;
-import sgc.processo.model.ProcessoRepo;
+import sgc.processo.api.eventos.EventoProcessoIniciado;
+import sgc.processo.internal.model.ProcessoRepo;
 import sgc.sgrh.SgrhService;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 
 /**
  * Configuração de teste que permite a execução de todos os eventos, exceto aoIniciarProcesso

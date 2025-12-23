@@ -11,7 +11,7 @@ import sgc.alerta.api.AlertaDto;
 import sgc.alerta.internal.AlertaMapper;
 import sgc.alerta.internal.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.model.Processo;
+import sgc.processo.internal.model.Processo;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioRepo;

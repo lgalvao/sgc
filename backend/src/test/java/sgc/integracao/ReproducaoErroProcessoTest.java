@@ -2,9 +2,9 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.internal.model.Processo;
+import sgc.processo.internal.model.SituacaoProcesso;
+import sgc.processo.internal.model.TipoProcesso;
 import java.time.LocalDateTime;
 
 @DisplayName("Testes de Reprodução de Erros de Processo")

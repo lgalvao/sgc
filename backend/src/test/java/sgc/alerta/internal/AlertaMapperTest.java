@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.api.AlertaDto;
 import sgc.alerta.internal.model.Alerta;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 
 import java.time.LocalDateTime;
 

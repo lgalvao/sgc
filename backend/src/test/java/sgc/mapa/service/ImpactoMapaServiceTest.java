@@ -18,8 +18,8 @@ import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
 
 @SpringBootTest
 @ActiveProfiles("test")

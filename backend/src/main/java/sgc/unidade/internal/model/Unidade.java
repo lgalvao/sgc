@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 import sgc.comum.model.EntidadeBase;
-import sgc.processo.model.Processo;
+import sgc.processo.internal.model.Processo;
 import sgc.sgrh.internal.model.Usuario;
 
 import java.time.LocalDateTime;

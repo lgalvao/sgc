@@ -1,6 +1,7 @@
 package sgc.subprocesso;
 
 import org.junit.jupiter.api.BeforeEach;
+import sgc.subprocesso.internal.SubprocessoMapaController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,14 @@ import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.mapa.MapaService;
 import sgc.mapa.internal.service.MapaVisualizacaoService;
 import sgc.sgrh.SgrhService;
-import sgc.subprocesso.dto.CompetenciaReq;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.subprocesso.service.SubprocessoMapaService;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.api.CompetenciaReq;
+import sgc.subprocesso.api.MapaAjusteDto;
+import sgc.subprocesso.api.SalvarAjustesReq;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.service.SubprocessoConsultaService;
+import sgc.subprocesso.internal.service.SubprocessoDtoService;
+import sgc.subprocesso.internal.service.SubprocessoMapaService;
+import sgc.subprocesso.internal.service.SubprocessoMapaWorkflowService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -61,9 +62,9 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private SgrhService sgrhService;
     @MockitoBean
-    private sgc.subprocesso.service.SubprocessoService subprocessoService;
+    private sgc.subprocesso.internal.service.SubprocessoService subprocessoService;
     @MockitoBean
-    private sgc.subprocesso.service.SubprocessoContextoService subprocessoContextoService;
+    private sgc.subprocesso.internal.service.SubprocessoContextoService subprocessoContextoService;
 
     @Autowired
     private MockMvc mockMvc;

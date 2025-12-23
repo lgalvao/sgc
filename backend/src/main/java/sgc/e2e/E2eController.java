@@ -11,10 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.CriarProcessoReq;
+import sgc.processo.api.ProcessoDto;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.SgrhService;
 

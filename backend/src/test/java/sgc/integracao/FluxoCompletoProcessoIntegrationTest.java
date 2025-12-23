@@ -10,12 +10,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.processo.api.CriarProcessoReq;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
+import sgc.subprocesso.internal.service.SubprocessoDtoService;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 

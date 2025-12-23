@@ -1,4 +1,4 @@
-package sgc.subprocesso.service;
+package sgc.subprocesso.internal.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,10 +21,10 @@ import sgc.mapa.MapaService;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.internal.model.Perfil;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.api.AtividadeVisualizacaoDto;
+import sgc.subprocesso.api.ContextoEdicaoDto;
+import sgc.subprocesso.api.SubprocessoDetalheDto;
+import sgc.subprocesso.internal.model.Subprocesso;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoContextoServiceTest {

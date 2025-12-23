@@ -15,8 +15,8 @@ import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.internal.model.Competencia;
 import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.mapa.internal.model.Mapa;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;
 
 import java.util.List;

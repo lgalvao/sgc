@@ -40,7 +40,7 @@ public class ArchConsistencyTest {
                     .haveNameMatching("sgc.processo.ProcessoController")
                     .should()
                     .onlyAccessClassesThat()
-                    .haveNameMatching("sgc.processo.service.ProcessoService")
+                    .haveNameMatching("sgc.processo.internal.service.ProcessoService")
                     .orShould()
                     .accessClassesThat()
                     .resideOutsideOfPackage("sgc.processo..");

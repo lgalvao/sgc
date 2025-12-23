@@ -33,19 +33,19 @@ import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.ImpactoMapaService;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.api.CriarProcessoReq;
+import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.api.DisponibilizarMapaRequest;
+import sgc.subprocesso.api.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.api.SubprocessoDto;
+import sgc.subprocesso.internal.model.SituacaoSubprocesso;
+import sgc.subprocesso.internal.model.Subprocesso;
+import sgc.subprocesso.internal.model.SubprocessoRepo;
+import sgc.subprocesso.internal.service.SubprocessoCadastroWorkflowService;
+import sgc.subprocesso.internal.service.SubprocessoMapaWorkflowService;
 import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDate;
@@ -57,7 +57,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
 
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
@@ -267,7 +267,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 autenticar(admin, "ROLE_ADMIN");
                 processoService.finalizar(codProcesso);
                 assertThat(processoService.obterPorId(codProcesso).get().getSituacao())
-                    .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
+                    .isEqualTo(sgc.processo.internal.model.SituacaoProcesso.FINALIZADO);
             } catch (ErroValidacao e) {
                 log.error("VALIDATION ERROR Mapeamento: {}", e.getMessage());
                 if (e.getDetails() != null) e.getDetails().forEach((k, v) -> log.error(" - {}: {}", k, v));
