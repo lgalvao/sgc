@@ -10,6 +10,37 @@ como o `processo`) e gerando os alertas correspondentes.
 O objetivo é notificar os usuários sobre eventos que exigem sua atenção, como o início de um novo processo ou a
 devolução de um mapa para ajuste.
 
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`AlertaService`** (pacote raiz) - Facade principal para operações de alertas
+- **`AlertaDto`** (em `api/`) - DTO exposto para transferência de dados
+
+### Implementação Interna
+- `AlertaController` - REST endpoints
+- `AlertaMapper` - Mapeamento entre entidade e DTO
+- Model: Entidades JPA e Repositories (`Alerta`, `AlertaUsuario`, `TipoAlerta`)
+- Erros: Exceções customizadas
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `sgrh` - Para obter informações de usuários
+- `comum` - Para componentes compartilhados
+
+## Eventos
+
+### Publicados
+Nenhum evento é publicado por este módulo no momento.
+
+### Consumidos
+- `EventoProcessoIniciado` - Cria alertas ao iniciar processo
+- `EventoSubprocessoCriado` - Cria alertas para novos subprocessos
+
 ## Arquitetura e Funcionamento
 
 A principal característica deste módulo é seu **baixo acoplamento**. Ele não é invocado diretamente. Em vez disso, o
@@ -65,22 +96,22 @@ graph TD
 
 ### Controladores e Serviços
 
-- **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua
+- **`AlertaService`** (API pública): Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua
   leitura. É invocado pelo `EventoProcessoListener` central.
-- **`AlertaController`**: Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para
+- **`AlertaController`** (internal): Expõe endpoints REST (`GET /api/alertas`, `POST /api/alertas/{codigo}/marcar-como-lido`) para
   o frontend.
 
-### Modelo de Dados (`model`)
+### Modelo de Dados (`internal/model`)
 
 - **`Alerta`**: Entidade JPA que representa o alerta em si (título, mensagem, data).
 - **`AlertaUsuario`**: Entidade que associa um alerta a um usuário específico, controlando se já foi lido ou não.
 - **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data.
 - **`TipoAlerta`**: Enum que define os tipos de alerta (ex: `INFORMATIVO`, `ACAO_NECESSARIA`).
 
-### DTOs (`dto`)
+### DTOs (`api`)
 
 - **`AlertaDto`**: Objeto de transferência de dados utilizado para enviar informações de alertas para o frontend.
-- **`AlertaMapper`**: Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
+- **`AlertaMapper`** (internal): Interface MapStruct para conversão entre entidade `Alerta`/`AlertaUsuario` e `AlertaDto`.
 
 
 ## Como Testar

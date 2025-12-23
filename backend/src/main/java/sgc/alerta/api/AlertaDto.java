@@ -1,4 +1,4 @@
-package sgc.alerta.dto;
+package sgc.alerta.api;
 
 import lombok.Builder;
 import lombok.Value;

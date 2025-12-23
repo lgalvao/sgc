@@ -1,9 +1,10 @@
-package sgc.alerta.dto;
+package sgc.alerta.internal;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import sgc.alerta.model.Alerta;
+import sgc.alerta.api.AlertaDto;
+import sgc.alerta.internal.model.Alerta;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgc.Sgc;
-import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.internal.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
