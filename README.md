@@ -8,15 +8,15 @@ O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa p
 
 ## 🏗️ Arquitetura e Stack Tecnológico
 
-O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Based** no frontend.
+O projeto segue uma arquitetura **Modular Monolith** no backend (com **Spring Modulith 2.0.1**) e **Component-Based** no frontend.
 
 ### Stack Principal
 
 | Camada | Tecnologias Principais |
 |--------|------------------------|
-| **Backend** | Java 21, Spring Boot, Hibernate, H2/Oracle |
+| **Backend** | Java 21, Spring Boot 4.0.1, Spring Modulith 2.0.1, Hibernate, H2/Oracle |
 | **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext |
-| **Testes** | JUnit 5, Mockito, Vitest, Playwright |
+| **Testes** | JUnit 5, Mockito, Vitest, Playwright, ArchUnit |
 
 ### Documentação Detalhada
 
