@@ -1,5 +1,19 @@
 create schema if not exists sgc;
 
+-- Tabela de Event Publication Registry do Spring Modulith 2.0
+create table if not exists sgc.event_publication
+(
+    id                      uuid         not null primary key,
+    publication_date        timestamp    not null,
+    listener_id             varchar(255) not null,
+    serialized_event        clob         not null,
+    event_type              varchar(255) not null,
+    status                  varchar(20)  not null,
+    completion_date         timestamp,
+    last_resubmission_date  timestamp,
+    completion_attempts     int default 0
+);
+
 -- Tabelas físicas que eram VIEWs no Oracle, mas no H2 de testes são tabelas simples
 create table if not exists sgc.vw_usuario
 (

@@ -41,8 +41,10 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -226,7 +228,10 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Processo processoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(processoFinalizado.getDataFinalizacao()).isNotNull();
-        verify(notificacaoEmailService, times(3)).enviarEmailHtml(anyString(), anyString(), anyString());
+        
+        // Aguarda processamento assíncrono de eventos antes de verificar chamadas ao mock
+        await().atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(notificacaoEmailService, times(3)).enviarEmailHtml(anyString(), anyString(), anyString()));
     }
 
     @Test
