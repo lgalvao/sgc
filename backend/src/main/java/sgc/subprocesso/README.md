@@ -3,7 +3,7 @@
 
 ## Visão Geral
 
-Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma
+Este módulo é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma
 única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o
 ciclo de vida de cada tarefa, desde sua criação até a homologação.
 
@@ -12,6 +12,59 @@ e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimen
 
 Para melhor organização e desacoplamento, o `SubprocessoController` original foi dividido em múltiplos controladores
 especializados.
+
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`SubprocessoService`** (raiz do módulo) - Facade para operações de CRUD
+- **`api/SubprocessoDto`** - DTO principal de subprocesso
+- **`api/SubprocessoDetalheDto`** - DTO detalhado com movimentações
+- **`api/SubprocessoMapaDto`** - DTO de mapa no contexto do subprocesso
+
+### Implementação Interna
+- Controllers especializados:
+  - `internal/SubprocessoCrudController` - Operações CRUD
+  - `internal/SubprocessoCadastroController` - Workflow etapa de cadastro
+  - `internal/SubprocessoMapaController` - Operações relacionadas ao mapa
+  - `internal/SubprocessoValidacaoController` - Workflow etapa de validação
+- Serviços especializados:
+  - `internal/service/SubprocessoCadastroWorkflowService` - Lógica de cadastro
+  - `internal/service/SubprocessoMapaWorkflowService` - Lógica de mapa
+  - `internal/service/SubprocessoConsultaService` - Consultas complexas
+  - `internal/service/SubprocessoDtoService` - Construção de DTOs
+  - `internal/service/SubprocessoMapaService` - Operações de mapa
+  - `internal/service/SubprocessoNotificacaoService` - Notificações
+  - `internal/service/SubprocessoPermissoesService` - Validação de permissões
+- `internal/listeners/MovimentacaoListener` - Listener **síncrono** para auditoria crítica
+- `internal/model/Subprocesso`, `Movimentacao` - Entidades JPA
+- `internal/model/SubprocessoRepo`, `MovimentacaoRepo` - Repositórios
+- `internal/model/SituacaoSubprocesso` - Enum de estados
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `processo::api.eventos` - Consome eventos de processo (dependência granular)
+- `mapa` - Gerencia mapas de competências
+- `analise` - Registra análises de revisão
+- `unidade` - Estrutura organizacional
+- `sgrh` - Informações de usuários
+- `comum` - Componentes compartilhados
+
+### Módulos que dependem deste módulo
+- `processo` - Cria e gerencia subprocessos
+- `notificacao` - Acessa dados de subprocessos
+- `painel` - Dashboard com dados de subprocessos
+
+## Listener Síncrono (MovimentacaoListener)
+
+**Decisão Arquitetural**: O `MovimentacaoListener` permanece **síncrono** (usa `@EventListener` em vez de `@ApplicationModuleListener`) porque:
+- Registra auditoria crítica de transições de estado
+- Deve executar na mesma transação (`Propagation.MANDATORY`)
+- Falhas não devem ser silenciosas (devem quebrar a transação principal)
 
 ## Arquitetura de Serviços
 

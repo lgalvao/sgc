@@ -1,9 +1,9 @@
-# Pacote SGRH e Usuário
+# Módulo SGRH (Sistema de Gestão de Recursos Humanos)
 
 
 ## Visão Geral
 
-Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
+Este módulo tem uma **dupla responsabilidade** fundamental para o SGC:
 
 1. **Gestão de Usuários e Autenticação:** Define e gerencia a entidade `Usuario` do próprio SGC. Esta entidade é usada
    pelo Spring Security para autenticação e para armazenar os perfis de acesso (`Perfil`) do usuário no sistema.
@@ -13,6 +13,38 @@ Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
 
 **Status da Integração:** A fachada (`SgrhService`) está implementada com **dados simulados (mock)**. Ela está pronta
 para ser conectada a uma fonte de dados real, mas atualmente não realiza chamadas externas.
+
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`SgrhService`** (raiz do módulo) - Facade unificada para autenticação e consultas de RH
+- **`api/UsuarioDto`** - DTO de usuário
+- **`api/PerfilDto`** - DTO de perfil de acesso
+- **`api/AutenticacaoReq`**, **`api/EntrarReq`** - DTOs de requisições de login
+- **`api/LoginResp`** - DTO de resposta de login
+
+### Implementação Interna
+- `internal/SgrhController` - REST endpoints (`/api/usuarios`)
+- `internal/model/Usuario` - Entidade JPA (implementa `UserDetails`)
+- `internal/model/Perfil` - Enum de perfis (`ADMIN`, `CHEFE`, `GESTOR`, `SERVIDOR`)
+- `internal/model/UsuarioRepo` - Repositório
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `comum` - Componentes compartilhados
+- `unidade` - Estrutura organizacional
+
+### Módulos que dependem deste módulo
+- `processo` - Consulta usuários responsáveis
+- `subprocesso` - Validações de perfil
+- `alerta` - Consulta destinatários de alertas
+- `notificacao` - Consulta dados de usuários para e-mails
+- Spring Security - Autenticação e autorização
 
 ## Arquitetura Híbrida
 

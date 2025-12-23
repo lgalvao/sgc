@@ -1,11 +1,43 @@
-# Pacote Unidade
+# Módulo de Unidade
 
 
 ## Visão Geral
 
-Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que
+Este módulo define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que
 representa uma unidade organizacional (secretaria, seção, etc.), seu repositório e uma camada de serviço para operações
 relacionadas.
+
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`UnidadeService`** (raiz do módulo) - Facade principal para operações de consulta de unidades
+- **`api/UnidadeDto`** - DTO principal de unidade
+- **`api/AtribuicaoTemporariaDto`** - DTO para atribuições temporárias
+- **`api/ArvoreUnidadeDto`** - DTO para árvore hierárquica
+
+### Implementação Interna
+- `internal/UnidadeController` - REST endpoints
+- `internal/UnidadeMapper` - Mapeamento entre entidade e DTO
+- `internal/model/Unidade` - Entidade JPA principal
+- `internal/model/UnidadeRepo` - Repositório
+- `internal/model/AtribuicaoTemporaria`, `VinculacaoUnidade` - Entidades relacionadas
+- `internal/model/TipoUnidade`, `SituacaoUnidade` - Enums
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `comum` - Componentes compartilhados
+
+### Módulos que dependem deste módulo
+- `processo` - Processos vinculados a unidades
+- `subprocesso` - Subprocessos por unidade
+- `mapa` - Mapas por unidade
+- `sgrh` - Integração com RH usa estrutura de unidades
+- `notificacao` - Notificações para usuários de unidades
 
 ## Arquitetura e Propósito
 
