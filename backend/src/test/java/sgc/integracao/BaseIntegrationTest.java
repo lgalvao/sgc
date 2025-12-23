@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.integracao.mocks.TestConfig;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.internal.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.internal.model.UnidadeRepo;

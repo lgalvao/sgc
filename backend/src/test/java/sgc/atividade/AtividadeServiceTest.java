@@ -17,7 +17,7 @@ import sgc.atividade.internal.model.Conhecimento;
 import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.internal.model.Usuario;

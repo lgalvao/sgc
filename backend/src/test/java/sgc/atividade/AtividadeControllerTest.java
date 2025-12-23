@@ -19,7 +19,7 @@ import sgc.atividade.internal.ConhecimentoMapper;
 import sgc.atividade.internal.model.Atividade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.atividade.internal.model.Atividade;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 
 import static org.junit.jupiter.api.Assertions.*;
 

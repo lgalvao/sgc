@@ -18,12 +18,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.MapaService;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.api.SalvarMapaRequest;
+import sgc.mapa.internal.mapper.MapaCompletoMapper;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.internal.model.MapaRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários para MapaService")

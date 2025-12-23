@@ -8,7 +8,7 @@ import lombok.Getter;
 import sgc.analise.internal.model.Analise;
 import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.Conhecimento;
-import sgc.mapa.model.Competencia;
+import sgc.mapa.internal.model.Competencia;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;

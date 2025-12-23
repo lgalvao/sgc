@@ -3,7 +3,7 @@ package sgc.subprocesso.model;
 import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.unidade.internal.model.Unidade;
 

@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.internal.model.Perfil;

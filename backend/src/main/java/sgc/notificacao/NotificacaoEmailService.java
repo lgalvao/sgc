@@ -13,9 +13,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.notificacao.dto.EmailDto;
-import sgc.notificacao.model.Notificacao;
-import sgc.notificacao.model.NotificacaoRepo;
+import sgc.notificacao.api.EmailDto;
+import sgc.notificacao.internal.model.Notificacao;
+import sgc.notificacao.internal.model.NotificacaoRepo;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;

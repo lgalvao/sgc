@@ -12,9 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.api.ImpactoMapaDto;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
@@ -197,9 +198,9 @@ class ImpactoMapaServiceTest {
         @DisplayName("Deve detectar impactos quando há diferenças entre mapas")
         void comImpacto() {
             subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            sgc.mapa.model.Mapa mapaVigente = new sgc.mapa.model.Mapa();
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
             mapaVigente.setCodigo(1L);
-            sgc.mapa.model.Mapa mapaSubprocesso = new sgc.mapa.model.Mapa();
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
             mapaSubprocesso.setCodigo(2L);
 
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));

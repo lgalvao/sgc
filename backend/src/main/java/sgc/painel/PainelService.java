@@ -13,7 +13,7 @@ import sgc.alerta.internal.model.Alerta;
 import sgc.alerta.internal.model.AlertaRepo;
 import sgc.alerta.internal.model.AlertaUsuario;
 import sgc.alerta.internal.model.AlertaUsuarioRepo;
-import sgc.painel.erros.ErroParametroPainelInvalido;
+import sgc.painel.internal.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;

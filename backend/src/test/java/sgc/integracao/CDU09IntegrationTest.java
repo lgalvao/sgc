@@ -27,9 +27,9 @@ import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -151,7 +151,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        sgc.mapa.model.Mapa mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
+        sgc.mapa.internal.model.Mapa mapa = mapaRepo.save(new sgc.mapa.internal.model.Mapa());
 
         subprocessoMapeamento = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
         subprocessoMapeamento.setCodigo(null);
