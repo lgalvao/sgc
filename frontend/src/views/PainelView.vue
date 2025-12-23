@@ -23,6 +23,7 @@
           :criterio-ordenacao="criterio"
           :direcao-ordenacao-asc="asc"
           :processos="processosOrdenados"
+          :loading="isLoadingProcessos"
           @ordenar="ordenarPor"
           @selecionar-processo="abrirDetalhesProcesso"
       />
@@ -68,23 +69,29 @@ const router = useRouter();
 
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
+const isLoadingProcessos = ref(false);
 
 async function carregarDados() {
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
-    await processosStore.buscarProcessosPainel(
-        perfil.perfilSelecionado,
-        Number(perfil.unidadeSelecionada),
-        0,
-        10,
-    ); // Paginação inicial
-
-    if (perfil.usuarioCodigo) {
-      await alertasStore.buscarAlertas(
-          Number(perfil.usuarioCodigo),
+    isLoadingProcessos.value = true;
+    try {
+      await processosStore.buscarProcessosPainel(
+          perfil.perfilSelecionado,
           Number(perfil.unidadeSelecionada),
           0,
           10,
       ); // Paginação inicial
+
+      if (perfil.usuarioCodigo) {
+        await alertasStore.buscarAlertas(
+            Number(perfil.usuarioCodigo),
+            Number(perfil.unidadeSelecionada),
+            0,
+            10,
+        ); // Paginação inicial
+      }
+    } finally {
+      isLoadingProcessos.value = false;
     }
   }
 }
@@ -99,21 +106,27 @@ onActivated(async () => {
 
 const processosOrdenados = computed(() => processosPainel.value);
 
-function ordenarPor(campo: keyof ProcessoResumo) {
+async function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
     asc.value = !asc.value;
   } else {
     criterio.value = campo;
     asc.value = true;
   }
-  processosStore.buscarProcessosPainel(
-      perfil.perfilSelecionado!,
-      Number(perfil.unidadeSelecionada),
-      0,
-      10,
-      criterio.value,
-      asc.value ? "asc" : "desc",
-  );
+
+  isLoadingProcessos.value = true;
+  try {
+    await processosStore.buscarProcessosPainel(
+        perfil.perfilSelecionado!,
+        Number(perfil.unidadeSelecionada),
+        0,
+        10,
+        criterio.value,
+        asc.value ? "asc" : "desc",
+    );
+  } finally {
+    isLoadingProcessos.value = false;
+  }
 }
 
 function abrirDetalhesProcesso(processo: ProcessoResumo) {

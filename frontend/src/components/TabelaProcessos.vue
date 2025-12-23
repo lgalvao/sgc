@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {BTable} from "bootstrap-vue-next";
+import {BTable, BSpinner} from "bootstrap-vue-next";
 import {computed} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
 import { formatarSituacaoProcesso, formatarTipoProcesso } from "@/utils/formatters";
@@ -10,6 +10,7 @@ const props = defineProps<{
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
   compacto?: boolean;
+  loading?: boolean;
 }>();
 
 /**
@@ -79,6 +80,7 @@ const rowClass = (item: ProcessoResumo | null, type: string) => {
     <BTable
         :fields="fields"
         :items="processos"
+        :busy="loading"
         :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
         :sort-desc="[!direcaoOrdenacaoAsc]"
         :tbody-tr-class="rowClass"
@@ -89,6 +91,13 @@ const rowClass = (item: ProcessoResumo | null, type: string) => {
         @row-clicked="handleSelecionarProcesso"
         @sort-changed="handleSortChange"
     >
+      <template #table-busy>
+        <div class="text-center text-primary my-2">
+          <BSpinner class="align-middle me-2" />
+          <strong>Carregando processos...</strong>
+        </div>
+      </template>
+
       <template #empty>
         <div class="text-center text-muted">
           Nenhum processo encontrado.
