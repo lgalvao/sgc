@@ -260,8 +260,10 @@ class SgrhServiceTest {
         @Test
         @DisplayName("Deve impedir autorização sem autenticação prévia")
         void deveImpedirAutorizacaoSemAutenticacao() {
+            // Usa um usuário diferente que não foi autenticado nos outros testes
+            String usuarioNaoAutenticado = "999999999999";
             assertThrows(ErroAutenticacao.class,
-                    () -> sgrhService.autorizar(TITULO_ADMIN));
+                    () -> sgrhService.autorizar(usuarioNaoAutenticado));
         }
 
         @Test

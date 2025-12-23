@@ -70,6 +70,9 @@ class SgrhControllerIntegrationTest {
     void autorizar_deveRetornarPerfis() throws Exception {
         long tituloEleitoral = 111111111111L;
 
+        // Autentica primeiro (necessário para autorizar)
+        sgrhService.autenticar(Long.toString(tituloEleitoral), "senha-qualquer");
+
         // When/Then
         mockMvc.perform(
                         post(API_URL + "/autorizar")

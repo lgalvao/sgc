@@ -389,8 +389,7 @@ public class SgrhService {
     @Transactional(readOnly = true)
     public String entrar(@NonNull EntrarReq request) {
         // SENTINEL: Verifica se houve autenticação recente (previne bypass chamando /entrar direto)
-        // O uso de remove() garante atomicidade: apenas uma requisição consome o token de login.
-        java.time.LocalDateTime ultimoAcesso = autenticacoesRecentes.remove(request.getTituloEleitoral());
+        java.time.LocalDateTime ultimoAcesso = autenticacoesRecentes.get(request.getTituloEleitoral());
 
         if (ultimoAcesso == null || ultimoAcesso.isBefore(java.time.LocalDateTime.now().minusMinutes(5))) {
             log.warn("Tentativa de acesso não autorizada (sem login prévio) para usuário {}", request.getTituloEleitoral());
@@ -404,6 +403,9 @@ public class SgrhService {
         }
 
         List<PerfilUnidade> autorizacoes = autorizar(request.getTituloEleitoral());
+        
+        // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
+        autenticacoesRecentes.remove(request.getTituloEleitoral());
         boolean autorizado = autorizacoes
                 .stream()
                 .anyMatch(pu -> {

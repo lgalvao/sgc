@@ -16,6 +16,8 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -86,6 +88,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AtividadeRepo atividadeRepo;
     @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
@@ -111,8 +115,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC Teste", "SEDOC-TEST", "OPERACIONAL", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", idAdminUnit, null);
+        jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", idGestorUnit, null);
 
         Unidade unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
         Unidade unidadeGestor = unidadeRepo.findById(idGestorUnit).orElseThrow();
@@ -183,16 +187,20 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         mapaVigente = mapaRepo.save(mapaVigente);
 
         Atividade atividade = new Atividade(mapaVigente, "Atividade Existente");
+        atividade = atividadeRepo.save(atividade);
+        
+        // Adicionar conhecimento à atividade para passar na validação
+        Conhecimento conhecimento = new Conhecimento("Conhecimento Teste", atividade);
+        conhecimento = conhecimentoRepo.save(conhecimento);
+        
+        // Adicionar o conhecimento à lista de conhecimentos da atividade para garantir a relação bidirecional
+        atividade.getConhecimentos().add(conhecimento);
         atividadeRepo.save(atividade);
 
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
 
-        entityManager.flush();
-        entityManager.clear();
-
-        // Reload
-        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
+        // Note: Not flushing here to avoid detaching entities that are mocked
     }
 
     private Long criarEComecarProcessoDeRevisao() throws Exception {
