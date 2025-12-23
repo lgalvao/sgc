@@ -1,4 +1,4 @@
-package sgc.atividade.model;
+package sgc.atividade.internal.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

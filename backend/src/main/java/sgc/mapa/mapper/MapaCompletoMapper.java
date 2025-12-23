@@ -29,12 +29,12 @@ public interface MapaCompletoMapper {
     CompetenciaMapaDto toDto(Competencia competencia);
 
     @Named("mapAtividadesCodigos")
-    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.model.Atividade> atividades) {
+    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.internal.model.Atividade> atividades) {
         if (atividades == null) return null;
 
         return atividades.stream()
                 .filter(Objects::nonNull)
-                .map(sgc.atividade.model.Atividade::getCodigo)
+                .map(sgc.atividade.internal.model.Atividade::getCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

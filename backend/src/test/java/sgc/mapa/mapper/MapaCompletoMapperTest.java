@@ -2,7 +2,7 @@ package sgc.mapa.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.internal.model.Atividade;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;

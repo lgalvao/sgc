@@ -1,12 +1,13 @@
-package sgc.atividade.dto;
+package sgc.atividade.internal;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sgc.atividade.model.Atividade;
-import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.Conhecimento;
+import sgc.atividade.api.ConhecimentoDto;
+import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.internal.model.Conhecimento;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")

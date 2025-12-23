@@ -22,8 +22,8 @@ import sgc.alerta.internal.model.AlertaRepo;
 import sgc.analise.internal.model.Analise;
 import sgc.analise.internal.model.AnaliseRepo;
 import sgc.analise.internal.model.TipoAcaoAnalise;
-import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.ConhecimentoRepo;
+import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
@@ -205,7 +205,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.atividade.model.Conhecimento("Conhecimento de Teste", atividade));
+            conhecimentoRepo.save(new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(
                             post(
@@ -311,7 +311,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            conhecimentoRepo.save(new sgc.atividade.model.Conhecimento("Conhecimento de Teste", atividade));
+            conhecimentoRepo.save(new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade));
 
             Long subprocessoId = subprocessoRevisao.getCodigo();
 

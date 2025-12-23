@@ -2,7 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.sgrh.internal.model.Perfil;
 import sgc.sgrh.internal.model.Usuario;

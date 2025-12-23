@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;

@@ -1,4 +1,4 @@
-package sgc.atividade;
+package sgc.atividade.internal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import sgc.atividade.dto.AtividadeDto;
-import sgc.atividade.dto.ConhecimentoDto;
-import sgc.atividade.model.Atividade;
+import sgc.atividade.AtividadeService;
+import sgc.atividade.api.AtividadeDto;
+import sgc.atividade.api.ConhecimentoDto;
+import sgc.atividade.internal.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
