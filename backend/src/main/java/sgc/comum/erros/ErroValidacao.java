@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.Map;
 
 @Getter
-@ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 public class ErroValidacao extends RuntimeException {
     private final Map<String, ?> details;
 

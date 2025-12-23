@@ -10,6 +10,6 @@ import sgc.comum.erros.ErroNegocioBase;
  */
 public class ErroProcessoEmSituacaoInvalida extends ErroNegocioBase {
     public ErroProcessoEmSituacaoInvalida(String message) {
-        super(message, "PROCESSO_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "PROCESSO_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

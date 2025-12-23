@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -17,7 +17,7 @@ java {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
-extra["modulith.version"] = "1.3.1"  // Versão do Spring Modulith compatível com Spring Boot 4.0.1
+extra["modulith.version"] = "1.3.1"  // Versão do Spring Modulith compatível com Spring Boot 3.4.x
 
 dependencyManagement {
     imports {
@@ -29,7 +29,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -37,7 +37,6 @@ dependencies {
     implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

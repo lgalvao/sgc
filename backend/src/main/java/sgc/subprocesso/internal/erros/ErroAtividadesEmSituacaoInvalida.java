@@ -11,6 +11,6 @@ import sgc.comum.erros.ErroNegocioBase;
  */
 public class ErroAtividadesEmSituacaoInvalida extends ErroNegocioBase {
     public ErroAtividadesEmSituacaoInvalida(String message) {
-        super(message, "ATIVIDADES_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "ATIVIDADES_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

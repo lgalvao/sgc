@@ -90,7 +90,7 @@ Cada arquivo de sprint contém:
 
 ## Pré-requisitos
 
-- Spring Boot 4.0.1+ (✅ atendido - versão atual: 4.0.1)
+- Spring Boot 3.4.1+ (✅ atendido - versão atual: 3.4.1)
 - Java 21+ (✅ atendido - versão atual: 21)
 - Gradle 8+ (✅ atendido - versão atual: 8.x)
 - Conhecimento de Spring Events (✅ já utilizado no projeto)

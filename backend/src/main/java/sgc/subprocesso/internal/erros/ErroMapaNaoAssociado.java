@@ -8,6 +8,6 @@ import sgc.comum.erros.ErroNegocioBase;
  */
 public class ErroMapaNaoAssociado extends ErroNegocioBase {
     public ErroMapaNaoAssociado(String message) {
-        super(message, "MAPA_NAO_ASSOCIADO", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "MAPA_NAO_ASSOCIADO", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

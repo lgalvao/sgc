@@ -8,6 +8,6 @@ import sgc.comum.erros.ErroNegocioBase;
  */
 public class ErroUnidadesNaoDefinidas extends ErroNegocioBase {
     public ErroUnidadesNaoDefinidas(String message) {
-        super(message, "UNIDADES_NAO_DEFINIDAS", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "UNIDADES_NAO_DEFINIDAS", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

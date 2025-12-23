@@ -11,6 +11,6 @@ import sgc.comum.erros.ErroNegocioBase;
  */
 public class ErroMapaEmSituacaoInvalida extends ErroNegocioBase {
     public ErroMapaEmSituacaoInvalida(String message) {
-        super(message, "MAPA_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_CONTENT);
+        super(message, "MAPA_SITUACAO_INVALIDA", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }
