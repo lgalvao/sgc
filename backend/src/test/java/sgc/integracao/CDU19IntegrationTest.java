@@ -11,6 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
@@ -62,24 +66,40 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Usar dados existentes (SEDIA e COSIS)
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+        // Criar hierarquia de unidades via Fixture
+        // Unidade Superior (intermediária)
+        unidadeSuperior = UnidadeFixture.unidadePadrao();
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior.setNome("Coordenadoria CDU-19");
+        unidadeSuperior.setSigla("COORD19");
+        unidadeSuperior.setUnidadeSuperior(null);
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
+        // Unidade operacional (subordinada)
+        unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setNome("Seção CDU-19");
+        unidade.setSigla("SEC19");
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade = unidadeRepo.save(unidade);
 
         // Criar dados para o teste dinamicamente
-        Processo processo = new Processo();
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
         processo.setDescricao("Processo para CDU-19");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDataLimite(LocalDateTime.now().plusDays(30));
-        processoRepo.save(processo);
+        processo = processoRepo.save(processo);
 
-        Mapa mapa = new Mapa();
-        mapaRepo.save(mapa);
+        Mapa mapa = MapaFixture.mapaPadrao(null);
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
 
-        subprocesso = new Subprocesso(processo, unidade, mapa,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, processo.getDataLimite());
-        subprocessoRepo.save(subprocesso);
+        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        subprocesso.setCodigo(null);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        subprocesso = subprocessoRepo.save(subprocesso);
     }
 
     @Nested
@@ -158,7 +178,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             assertThat(alertas.getFirst().getDescricao())
-                    .contains("Validação do mapa de competências da SEDIA aguardando análise");
+                    .contains("Validação do mapa de competências da " + unidade.getSigla() + " aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
                     .isEqualTo(unidadeSuperior.getSigla());
         }

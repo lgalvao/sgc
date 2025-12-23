@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.TipoAcaoAnalise;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
@@ -69,30 +72,50 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     private NotificacaoEmailService notificacaoEmailService;
 
     private Subprocesso subprocesso;
+    private Unidade unidade;
     private Unidade unidadeSuperior;
     private Unidade unidadeSuperiorSuperior;
 
     @BeforeEach
     void setUp() {
-        unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
+        // Criar hierarquia de 3 níveis de unidades via Fixture
+        // Nível 1: Unidade superior superior (interoperacional)
+        unidadeSuperiorSuperior = UnidadeFixture.unidadePadrao();
+        unidadeSuperiorSuperior.setCodigo(null);
+        unidadeSuperiorSuperior.setNome("Secretaria CDU-20");
+        unidadeSuperiorSuperior.setSigla("SEC20");
+        unidadeSuperiorSuperior.setUnidadeSuperior(null);
+        unidadeSuperiorSuperior = unidadeRepo.save(unidadeSuperiorSuperior);
 
-        Processo processo =
-                processoRepo.save(
-                        new Processo(
-                                "Processo de Teste",
-                                TipoProcesso.MAPEAMENTO,
-                                SituacaoProcesso.EM_ANDAMENTO,
-                                LocalDateTime.now()));
-        subprocesso =
-                subprocessoRepo.save(
-                        new Subprocesso(
-                                processo,
-                                unidade,
-                                null,
-                                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                                LocalDateTime.now()));
+        // Nível 2: Unidade superior (intermediária)
+        unidadeSuperior = UnidadeFixture.unidadePadrao();
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior.setNome("Coordenadoria CDU-20");
+        unidadeSuperior.setSigla("COORD20");
+        unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
+        // Nível 3: Unidade operacional
+        unidade = UnidadeFixture.unidadePadrao();
+        unidade.setCodigo(null);
+        unidade.setNome("Seção CDU-20");
+        unidade.setSigla("SECAO20");
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade = unidadeRepo.save(unidade);
+
+        // Criar Processo via Fixture
+        Processo processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
+        processo.setDescricao("Processo de Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo = processoRepo.save(processo);
+
+        // Criar Subprocesso via Fixture
+        subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
+        subprocesso.setCodigo(null);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso = subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
     }
 
@@ -147,7 +170,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasDevolucao).hasSize(1);
         assertThat(alertasDevolucao.getFirst().getDescricao())
                 .contains(
-                        "Cadastro de atividades e conhecimentos da unidade SEDESENV devolvido para"
+                        "Cadastro de atividades e conhecimentos da unidade " + unidade.getSigla() + " devolvido para"
                                 + " ajustes");
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
@@ -216,7 +239,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                                                         + " encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
-                .contains("Validação do mapa de competências da SEDESENV submetida para análise");
+                .contains("Validação do mapa de competências da " + unidade.getSigla() + " submetida para análise");
     }
 
     @Test

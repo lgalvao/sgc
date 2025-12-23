@@ -11,6 +11,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
@@ -75,99 +80,134 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private NotificacaoEmailService notificacaoEmailService;
 
     private Processo processo;
+    private Unidade unidadeIntermediaria;
     private Unidade unidadeOperacional1;
     private Unidade unidadeOperacional2;
+    private Usuario titularIntermediaria;
+    private Usuario titularOp1;
+    private Usuario titularOp2;
 
     @BeforeEach
     void setUp() {
+        // Criar hierarquia de unidades via Fixture
+        // Unidade intermediária
+        unidadeIntermediaria = UnidadeFixture.unidadePadrao();
+        unidadeIntermediaria.setCodigo(null);
+        unidadeIntermediaria.setNome("Coordenadoria CDU-21");
+        unidadeIntermediaria.setSigla("COORD21");
+        unidadeIntermediaria = unidadeRepo.save(unidadeIntermediaria);
 
-        Usuario titularIntermediaria = usuarioRepo.findById("1").orElseThrow();
-        Usuario titularOp1 = usuarioRepo.findById("2").orElseThrow();
-        Usuario titularOp2 = usuarioRepo.findById("3").orElseThrow();
+        // Unidades operacionais subordinadas
+        unidadeOperacional1 = UnidadeFixture.unidadePadrao();
+        unidadeOperacional1.setCodigo(null);
+        unidadeOperacional1.setNome("Seção Op1 CDU-21");
+        unidadeOperacional1.setSigla("OP1-21");
+        unidadeOperacional1.setUnidadeSuperior(unidadeIntermediaria);
+        unidadeOperacional1 = unidadeRepo.save(unidadeOperacional1);
 
-        Unidade unidadeIntermediaria = unidadeRepo.findById(3L).orElseThrow();
-        unidadeOperacional1 = unidadeRepo.findById(5L).orElseThrow();
-        unidadeOperacional2 = unidadeRepo.findById(4L).orElseThrow();
+        unidadeOperacional2 = UnidadeFixture.unidadePadrao();
+        unidadeOperacional2.setCodigo(null);
+        unidadeOperacional2.setNome("Seção Op2 CDU-21");
+        unidadeOperacional2.setSigla("OP2-21");
+        unidadeOperacional2.setUnidadeSuperior(unidadeIntermediaria);
+        unidadeOperacional2 = unidadeRepo.save(unidadeOperacional2);
 
-        processo =
-                new Processo(
-                        "Processo de Teste para Finalizar",
-                        TipoProcesso.MAPEAMENTO,
-                        SituacaoProcesso.EM_ANDAMENTO,
-                        LocalDateTime.now().plusDays(30));
+        // Criar Usuários via Fixture
+        titularIntermediaria = UsuarioFixture.usuarioComTitulo("111111111111");
+        titularIntermediaria.setNome("Titular Intermediaria");
+        titularIntermediaria.setEmail("titular.intermediaria@test.com");
+        titularIntermediaria = usuarioRepo.save(titularIntermediaria);
+
+        titularOp1 = UsuarioFixture.usuarioComTitulo("222222222222");
+        titularOp1.setNome("Titular Op1");
+        titularOp1.setEmail("titular.op1@test.com");
+        titularOp1 = usuarioRepo.save(titularOp1);
+
+        titularOp2 = UsuarioFixture.usuarioComTitulo("333333333333");
+        titularOp2.setNome("Titular Op2");
+        titularOp2.setEmail("titular.op2@test.com");
+        titularOp2 = usuarioRepo.save(titularOp2);
+
+        // Criar Processo via Fixture
+        processo = ProcessoFixture.processoPadrao();
+        processo.setCodigo(null);
+        processo.setDescricao("Processo de Teste para Finalizar");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setParticipantes(
                 new HashSet<>(
                         Set.of(unidadeIntermediaria, unidadeOperacional1, unidadeOperacional2)));
-        processoRepo.save(processo);
+        processo = processoRepo.save(processo);
 
-        Mapa mapa1 = mapaRepo.save(new Mapa());
-        Subprocesso sp1 =
-                new Subprocesso(
-                        processo,
-                        unidadeOperacional1,
-                        mapa1,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processo.getDataLimite());
+        // Criar Mapas e Subprocessos via Fixture
+        Mapa mapa1 = MapaFixture.mapaPadrao(null);
+        mapa1.setCodigo(null);
+        mapa1 = mapaRepo.save(mapa1);
+
+        Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(processo, unidadeOperacional1);
+        sp1.setCodigo(null);
+        sp1.setMapa(mapa1);
+        sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp1);
 
-        Mapa mapa2 = mapaRepo.save(new Mapa());
-        Subprocesso sp2 =
-                new Subprocesso(
-                        processo,
-                        unidadeOperacional2,
-                        mapa2,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        processo.getDataLimite());
+        Mapa mapa2 = MapaFixture.mapaPadrao(null);
+        mapa2.setCodigo(null);
+        mapa2 = mapaRepo.save(mapa2);
+
+        Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(processo, unidadeOperacional2);
+        sp2.setCodigo(null);
+        sp2.setMapa(mapa2);
+        sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp2);
 
+        // Configurar mocks do SgrhService com dados dinâmicos
         when(sgrhService.buscarResponsaveisUnidades(anyList()))
                 .thenReturn(
                         Map.of(
                                 unidadeIntermediaria.getCodigo(),
                                 new ResponsavelDto(
                                         unidadeIntermediaria.getCodigo(),
-                                        String.valueOf(
-                                                titularIntermediaria.getTituloEleitoral()),
-                                        "Titular Intermediaria",
+                                        titularIntermediaria.getTituloEleitoral(),
+                                        titularIntermediaria.getNome(),
                                         null,
                                         null),
                                 unidadeOperacional1.getCodigo(),
                                 new ResponsavelDto(
                                         unidadeOperacional1.getCodigo(),
-                                        String.valueOf(titularOp1.getTituloEleitoral()),
-                                        "Titular Op1",
+                                        titularOp1.getTituloEleitoral(),
+                                        titularOp1.getNome(),
                                         null,
                                         null),
                                 unidadeOperacional2.getCodigo(),
                                 new ResponsavelDto(
                                         unidadeOperacional2.getCodigo(),
-                                        String.valueOf(titularOp2.getTituloEleitoral()),
-                                        "Titular Op2",
+                                        titularOp2.getTituloEleitoral(),
+                                        titularOp2.getNome(),
                                         null,
                                         null)));
         when(sgrhService.buscarUsuariosPorTitulos(anyList()))
                 .thenReturn(
                         Map.of(
-                                "1",
+                                titularIntermediaria.getTituloEleitoral(),
                                 UsuarioDto.builder()
-                                        .tituloEleitoral("1")
-                                        .nome("Titular Intermediaria")
-                                        .email("titular.intermediaria@test.com")
+                                        .tituloEleitoral(titularIntermediaria.getTituloEleitoral())
+                                        .nome(titularIntermediaria.getNome())
+                                        .email(titularIntermediaria.getEmail())
                                         .matricula("123")
                                         .build(),
-                                "2",
+                                titularOp1.getTituloEleitoral(),
                                 UsuarioDto.builder()
-                                        .tituloEleitoral("2")
-                                        .nome("Titular Op1")
-                                        .email("titular.op1@test.com")
-                                        .matricula("123")
+                                        .tituloEleitoral(titularOp1.getTituloEleitoral())
+                                        .nome(titularOp1.getNome())
+                                        .email(titularOp1.getEmail())
+                                        .matricula("456")
                                         .build(),
-                                "3",
+                                titularOp2.getTituloEleitoral(),
                                 UsuarioDto.builder()
-                                        .tituloEleitoral("3")
-                                        .nome("Titular Op2")
-                                        .email("titular.op2@test.com")
-                                        .matricula("123")
+                                        .tituloEleitoral(titularOp2.getTituloEleitoral())
+                                        .nome(titularOp2.getNome())
+                                        .email(titularOp2.getEmail())
+                                        .matricula("789")
                                         .build()));
     }
 
