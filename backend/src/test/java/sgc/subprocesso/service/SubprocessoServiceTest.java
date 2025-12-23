@@ -93,10 +93,42 @@ class SubprocessoServiceTest {
             subprocesso.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(Collections.emptyList());
 
             List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve filtrar corretamente atividades sem conhecimento")
+        void deveFiltrarAtividadesSemConhecimento() {
+            Subprocesso subprocesso = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            subprocesso.setMapa(mapa);
+
+            // Atividade sem conhecimentos (deve ser retornada)
+            Atividade atividadeSem = new Atividade();
+            atividadeSem.setCodigo(10L);
+            atividadeSem.setConhecimentos(Collections.emptyList());
+
+            // Atividade com conhecimentos (não deve ser retornada)
+            Atividade atividadeCom = new Atividade();
+            atividadeCom.setCodigo(20L);
+            // Mockando lista não vazia
+            atividadeCom.setConhecimentos(List.of(new sgc.atividade.internal.model.Conhecimento()));
+
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L))
+                    .thenReturn(List.of(atividadeSem, atividadeCom));
+
+            List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getCodigo()).isEqualTo(10L);
+
+            // Verifica se NÃO chamou o método antigo que causava N+1
+            verify(repositorioConhecimento, never()).findByAtividadeCodigo(any());
         }
     }
 
