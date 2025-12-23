@@ -3,9 +3,9 @@ package sgc.mapa.mapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.atividade.internal.model.Atividade;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.Mapa;
 
 import java.util.List;
 import java.util.Set;

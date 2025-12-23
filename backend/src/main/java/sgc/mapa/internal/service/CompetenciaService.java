@@ -1,4 +1,4 @@
-package sgc.mapa.service;
+package sgc.mapa.internal.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.Mapa;
 
 import java.util.HashSet;
 import java.util.List;

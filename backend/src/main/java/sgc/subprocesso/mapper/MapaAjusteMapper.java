@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import sgc.analise.internal.model.Analise;
 import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.Conhecimento;
-import sgc.mapa.model.Competencia;
+import sgc.mapa.internal.model.Competencia;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.ConhecimentoAjusteDto;

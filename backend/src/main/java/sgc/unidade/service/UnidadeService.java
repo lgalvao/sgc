@@ -3,7 +3,7 @@ package sgc.unidade.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.internal.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;

@@ -1,12 +1,12 @@
-package sgc.mapa.mapper;
+package sgc.mapa.internal.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.api.CompetenciaMapaDto;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.Mapa;
 
 import java.util.List;
 import java.util.Objects;

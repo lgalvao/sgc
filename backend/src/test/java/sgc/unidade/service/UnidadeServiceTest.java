@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.internal.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.api.UnidadeDto;

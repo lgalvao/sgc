@@ -1,4 +1,4 @@
-package sgc.mapa.dto;
+package sgc.mapa.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package sgc.fixture;
 
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.Mapa;
 
 public class CompetenciaFixture {
 

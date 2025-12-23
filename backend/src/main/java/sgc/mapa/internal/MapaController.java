@@ -1,4 +1,4 @@
-package sgc.mapa;
+package sgc.mapa.internal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -6,9 +6,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.dto.MapaDto;
-import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.api.MapaDto;
+import sgc.mapa.internal.mapper.MapaMapper;
+import sgc.mapa.MapaService;
 
 import java.net.URI;
 import java.util.List;

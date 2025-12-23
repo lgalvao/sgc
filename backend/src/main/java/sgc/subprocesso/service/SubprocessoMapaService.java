@@ -9,7 +9,7 @@ import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.atividade.internal.model.Conhecimento;
 import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.internal.model.CompetenciaRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;

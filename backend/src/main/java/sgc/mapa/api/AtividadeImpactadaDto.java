@@ -1,10 +1,10 @@
-package sgc.mapa.dto;
+package sgc.mapa.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.mapa.model.TipoImpactoAtividade;
+import sgc.mapa.internal.model.TipoImpactoAtividade;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package sgc.mapa.dto.visualizacao;
+package sgc.mapa.internal.mapper.visualizacao;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

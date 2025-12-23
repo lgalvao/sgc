@@ -1,4 +1,4 @@
-package sgc.mapa.model;
+package sgc.mapa.internal.model;
 
 /**
  * Tipos de impacto que uma competência pode sofrer em relação a mudanças em atividades.

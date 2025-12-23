@@ -1,4 +1,4 @@
-package sgc.mapa.service;
+package sgc.mapa.internal.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,13 +8,13 @@ import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.Conhecimento;
 import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.CompetenciaDto;
-import sgc.mapa.dto.visualizacao.ConhecimentoDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.mapper.visualizacao.AtividadeDto;
+import sgc.mapa.internal.mapper.visualizacao.CompetenciaDto;
+import sgc.mapa.internal.mapper.visualizacao.ConhecimentoDto;
+import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.internal.model.Unidade;

@@ -16,9 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.internal.service.CopiaMapaService;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Movimentacao;

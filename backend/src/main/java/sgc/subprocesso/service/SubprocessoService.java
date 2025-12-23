@@ -10,9 +10,9 @@ import sgc.atividade.internal.model.Conhecimento;
 import sgc.atividade.internal.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -38,7 +38,7 @@ public class SubprocessoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final SubprocessoMapper subprocessoMapper;
-    private final sgc.mapa.model.MapaRepo mapaRepo;
+    private final sgc.mapa.internal.model.MapaRepo mapaRepo;
 
     @Transactional(readOnly = true)
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {

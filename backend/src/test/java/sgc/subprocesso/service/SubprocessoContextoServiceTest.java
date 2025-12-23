@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaService;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.MapaService;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.internal.model.Perfil;

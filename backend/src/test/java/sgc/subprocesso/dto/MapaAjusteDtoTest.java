@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import sgc.analise.internal.model.Analise;
 import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.Conhecimento;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.internal.model.Unidade;
 

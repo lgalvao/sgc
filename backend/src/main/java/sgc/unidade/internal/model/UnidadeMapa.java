@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.internal.model.Mapa;
 
 @Entity
 @Table(name = "UNIDADE_MAPA", schema = "sgc")

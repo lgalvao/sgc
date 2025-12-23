@@ -1,4 +1,4 @@
-package sgc.mapa.service;
+package sgc.mapa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.internal.model.Atividade;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.api.CompetenciaMapaDto;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.api.SalvarMapaRequest;
+import sgc.mapa.internal.mapper.MapaCompletoMapper;
+import sgc.mapa.internal.model.Competencia;
+import sgc.mapa.internal.model.CompetenciaRepo;
+import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.internal.model.MapaRepo;
 
 import java.util.HashSet;
 import java.util.List;

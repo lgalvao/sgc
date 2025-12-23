@@ -1,4 +1,4 @@
-package sgc.mapa.dto.visualizacao;
+package sgc.mapa.internal.mapper.visualizacao;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompetenciaDto {
+public class AtividadeDto {
     private Long codigo;
     private String descricao;
-    private List<AtividadeDto> atividades;
+    private List<ConhecimentoDto> conhecimentos;
 }

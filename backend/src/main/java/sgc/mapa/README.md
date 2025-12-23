@@ -8,6 +8,41 @@ artefato que agrega competências, atividades e conhecimentos de uma unidade org
 
 O pacote organiza a lógica de negócio em componentes coesos com responsabilidades únicas.
 
+## Estrutura Spring Modulith
+
+Este módulo segue a convenção Spring Modulith:
+
+### API Pública
+- **`MapaService`** (raiz do módulo) - Facade principal para operações de CRUD de mapas
+- **`api/MapaDto`** - DTO principal para transferência de dados
+- **`api/MapaCompletoDto`** - DTO completo com competências e vínculos
+- **`api/ImpactoMapaDto`** - DTO para análise de impactos
+- **`api/SalvarMapaRequest`** - Request para salvamento de mapas
+- **`api/CompetenciaMapaDto`** - DTO de competências do mapa
+- **`api/AtividadeImpactadaDto`** - DTO de atividades impactadas
+- **`api/CompetenciaImpactadaDto`** - DTO de competências impactadas
+
+### Implementação Interna
+- `internal/MapaController` - REST endpoints
+- `internal/mapper/` - Mapeadores (MapStruct) e DTOs de visualização
+- `internal/model/` - Entidades JPA (Mapa, Competencia, Repositórios)
+- `internal/service/` - Serviços especializados (Copia, Impacto, Visualizacao, Competencia)
+
+**⚠️ Importante:** Outros módulos **NÃO** devem acessar classes em `internal/`.
+
+## Dependências
+
+### Módulos que este módulo depende
+- `atividade` - Vinculação com atividades e conhecimentos
+- `subprocesso` - Consulta situação de subprocessos
+- `unidade` - Mapas associados a unidades organizacionais
+- `sgrh` - Informações de usuários
+- `comum` - Componentes compartilhados
+
+### Módulos que dependem deste módulo
+- `processo`
+- `subprocesso`
+
 ## Arquitetura de Serviços
 
 O módulo utiliza um conjunto enxuto de serviços especializados. O `MapaService` atua como fachada para operações de CRUD

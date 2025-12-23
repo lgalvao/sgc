@@ -1,4 +1,4 @@
-package sgc.mapa.dto;
+package sgc.mapa.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

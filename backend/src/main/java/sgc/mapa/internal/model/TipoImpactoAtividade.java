@@ -1,4 +1,4 @@
-package sgc.mapa.model;
+package sgc.mapa.internal.model;
 
 public enum TipoImpactoAtividade {
     INSERIDA,
