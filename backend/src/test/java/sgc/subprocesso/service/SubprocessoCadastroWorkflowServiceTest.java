@@ -18,13 +18,13 @@ import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.model.Usuario;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.util.Collections;
 import java.util.List;

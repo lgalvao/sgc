@@ -39,9 +39,9 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioPerfil;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
@@ -55,7 +55,7 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
+import sgc.unidade.internal.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários para SubprocessoDtoService")

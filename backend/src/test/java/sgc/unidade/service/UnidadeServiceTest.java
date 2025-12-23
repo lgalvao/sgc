@@ -21,15 +21,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.SgrhMapper;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
-import sgc.unidade.model.AtribuicaoTemporariaRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeMapaRepo;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.api.UnidadeDto;
+import sgc.sgrh.api.SgrhMapper;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.unidade.api.CriarAtribuicaoTemporariaReq;
+import sgc.unidade.internal.model.AtribuicaoTemporariaRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeMapaRepo;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço UnidadeService")
@@ -266,7 +266,7 @@ class UnidadeServiceTest {
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
             when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
-            when(sgrhMapper.toUsuarioDto(any())).thenReturn(sgc.sgrh.dto.UsuarioDto.builder().build());
+            when(sgrhMapper.toUsuarioDto(any())).thenReturn(sgc.sgrh.api.UsuarioDto.builder().build());
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);

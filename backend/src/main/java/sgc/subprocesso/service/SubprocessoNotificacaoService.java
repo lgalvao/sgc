@@ -10,9 +10,9 @@ import sgc.alerta.internal.model.AlertaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.erros.ErroUnidadeNaoEncontrada;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 

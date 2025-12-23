@@ -20,7 +20,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.model.TipoImpactoAtividade;
 import sgc.mapa.model.TipoImpactoCompetencia;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;

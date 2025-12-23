@@ -14,7 +14,7 @@ import sgc.integracao.mocks.TestConfig;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;

@@ -9,15 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.sgrh.dto.*;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.model.TipoUnidade;
+import sgc.sgrh.api.*;
+import sgc.sgrh.internal.EntrarReq;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioPerfil;
+import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.unidade.internal.model.TipoUnidade;
 import org.hibernate.Hibernate;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,11 +30,11 @@ import static java.util.stream.Collectors.toMap;
 public class SgrhService {
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
-    private final sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
-    private final sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt;
+    private final sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private final sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt;
 
     @Autowired(required = false)
-    private sgc.sgrh.autenticacao.AcessoAdClient acessoAdClient;
+    private sgc.sgrh.internal.autenticacao.AcessoAdClient acessoAdClient;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -58,8 +59,8 @@ public class SgrhService {
 
     public SgrhService(UnidadeRepo unidadeRepo,
                        UsuarioRepo usuarioRepo,
-                       sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo,
-                       sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt) {
+                       sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo,
+                       sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt) {
         this.unidadeRepo = unidadeRepo;
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;

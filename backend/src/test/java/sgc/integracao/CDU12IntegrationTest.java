@@ -26,10 +26,10 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeMapa;
-import sgc.unidade.model.UnidadeMapaRepo;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeMapa;
+import sgc.unidade.internal.model.UnidadeMapaRepo;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
@@ -333,6 +333,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     // Helper to insert User/Profile data for security checks that hit the DB (or View)
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
          jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), sgc.sgrh.model.Perfil.CHEFE.name());
+                titulo, unidade.getCodigo(), sgc.sgrh.internal.model.Perfil.CHEFE.name());
     }
 }

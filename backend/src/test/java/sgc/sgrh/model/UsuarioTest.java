@@ -7,8 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
-import sgc.unidade.model.AtribuicaoTemporaria;
-import sgc.unidade.model.Unidade;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.unidade.internal.model.AtribuicaoTemporaria;
+import sgc.unidade.internal.model.Unidade;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.UsuarioPerfil;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

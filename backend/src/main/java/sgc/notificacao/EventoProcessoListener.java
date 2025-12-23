@@ -13,21 +13,21 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.api.ResponsavelDto;
+import sgc.sgrh.api.UnidadeDto;
+import sgc.sgrh.api.UsuarioDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
+import sgc.unidade.internal.model.TipoUnidade;
+import sgc.unidade.internal.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static sgc.unidade.model.TipoUnidade.*;
+import static sgc.unidade.internal.model.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.

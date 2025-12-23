@@ -12,10 +12,10 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.TipoUnidade;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeMapa;
-import sgc.unidade.model.UnidadeMapaRepo;
+import sgc.unidade.internal.model.TipoUnidade;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeMapa;
+import sgc.unidade.internal.model.UnidadeMapaRepo;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

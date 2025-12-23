@@ -11,9 +11,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
+import sgc.sgrh.api.UsuarioDto;
+import sgc.sgrh.api.UnidadeDto;
+import sgc.unidade.api.CriarAtribuicaoTemporariaReq;
+import sgc.unidade.internal.UnidadeController;
 import sgc.unidade.service.UnidadeService;
 
 import java.util.Collections;
@@ -38,13 +39,13 @@ class UnidadeControllerTest {
     private UnidadeService unidadeService;
 
     @MockitoBean
-    private sgc.sgrh.autenticacao.GerenciadorJwt gerenciadorJwt;
+    private sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt;
 
     @MockitoBean
-    private sgc.sgrh.model.UsuarioRepo usuarioRepo;
+    private sgc.sgrh.internal.model.UsuarioRepo usuarioRepo;
 
     @MockitoBean
-    private sgc.sgrh.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Autowired
     private MockMvc mockMvc;

@@ -16,7 +16,7 @@ import sgc.analise.internal.AnaliseMapper;
 import sgc.analise.internal.model.TipoAnalise;
 import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
@@ -296,8 +296,8 @@ public class SubprocessoCadastroController {
 
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;
-        if (principal instanceof sgc.sgrh.model.Usuario)
-            return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        if (principal instanceof sgc.sgrh.internal.model.Usuario)
+            return ((sgc.sgrh.internal.model.Usuario) principal).getTituloEleitoral();
         return principal != null ? principal.toString() : null;
     }
 }
