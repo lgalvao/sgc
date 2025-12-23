@@ -24,6 +24,8 @@ import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.dto.ProcessoDto;
@@ -90,6 +92,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
@@ -114,11 +118,17 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC Teste", "SEDOC-TEST", "OPERACIONAL", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", idAdminUnit, null);
+        // Verificar se SEDOC já existe
+        Unidade unidadeAdmin = unidadeRepo.findBySigla("SEDOC").orElse(null);
+        if (unidadeAdmin == null) {
+            jdbcTemplate.update(sqlInsertUnidade, idAdminUnit, "SEDOC", "SEDOC", "OPERACIONAL", "ATIVA", null, null);
+            unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
+        }
+
+        // Criar DA-TEST e SA-TEST
+        jdbcTemplate.update(sqlInsertUnidade, idGestorUnit, "DA Teste", "DA-TEST", "OPERACIONAL", "ATIVA", unidadeAdmin.getCodigo(), null);
         jdbcTemplate.update(sqlInsertUnidade, idChefeUnit, "SA Teste", "SA-TEST", "OPERACIONAL", "ATIVA", idGestorUnit, null);
 
-        Unidade unidadeAdmin = unidadeRepo.findById(idAdminUnit).orElseThrow();
         Unidade unidadeGestor = unidadeRepo.findById(idGestorUnit).orElseThrow();
         unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
 
@@ -126,24 +136,26 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         admin = UsuarioFixture.usuarioPadrao();
         admin.setTituloEleitoral("303030303030");
         admin.setUnidadeLotacao(unidadeAdmin);
+        admin.setEmail("admin@test.com");
         admin = usuarioRepo.save(admin);
 
         gestor = UsuarioFixture.usuarioPadrao();
         gestor.setTituloEleitoral("404040404040");
         gestor.setUnidadeLotacao(unidadeGestor);
+        gestor.setEmail("gestor@test.com");
         gestor = usuarioRepo.save(gestor);
 
         chefe = UsuarioFixture.usuarioPadrao();
         chefe.setTituloEleitoral("505050505050");
         chefe.setUnidadeLotacao(unidade);
+        chefe.setEmail("chefe@test.com");
         chefe = usuarioRepo.save(chefe);
 
         // Update titular using JDBC
         jdbcTemplate.update("UPDATE sgc.vw_unidade SET titulo_titular = ? WHERE codigo = ?",
                 chefe.getTituloEleitoral(), unidade.getCodigo());
 
-        entityManager.clear();
-        unidade = unidadeRepo.findById(idChefeUnit).orElseThrow();
+        entityManager.refresh(unidade);
 
         // Configuração do Mock SgrhService
         when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
@@ -152,7 +164,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                 new PerfilDto(
                                         admin.getTituloEleitoral().toString(),
                                         unidadeAdmin.getCodigo(),
-                                        "SEDOC-TEST",
+                                        "SEDOC",
                                         Perfil.ADMIN.name())));
         when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
                 .thenReturn(
@@ -195,6 +207,13 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         
         // Adicionar o conhecimento à lista de conhecimentos da atividade para garantir a relação bidirecional
         atividade.getConhecimentos().add(conhecimento);
+        atividadeRepo.save(atividade);
+
+        // Adicionar competência e vincular à atividade para teste de impacto
+        Competencia competencia = new Competencia("Competencia Teste", mapaVigente);
+        competencia = competenciaRepo.save(competencia);
+        atividade.getCompetencias().add(competencia);
+        competencia.getAtividades().add(atividade); // Manter bidirecionalidade para testes sem clear()
         atividadeRepo.save(atividade);
 
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo(), mapaVigente);
@@ -257,7 +276,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         entityManager.flush();
-        entityManager.clear();
 
         return processoDto;
     }
@@ -376,7 +394,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             .orElseThrow();
             atividadeRepo.delete(atividadeExistente);
             entityManager.flush();
-            entityManager.clear();
 
             mockMvc.perform(
                             post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
@@ -435,7 +452,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                             .orElseThrow();
             atividadeRepo.delete(atividadeExistente);
             entityManager.flush();
-            entityManager.clear();
 
             mockMvc.perform(
                             get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
