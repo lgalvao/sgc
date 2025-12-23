@@ -292,4 +292,32 @@ describe("LoginView.vue", () => {
             "danger"
         );
     });
+
+    it("deve exibir aviso de caps lock ativado", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+
+        const inputWrapper = wrapper.find('[data-testid="inp-login-senha"]');
+        expect(inputWrapper.exists()).toBe(true);
+
+        // Disparar evento nativo com mock do getModifierState
+        const eventOn = new KeyboardEvent("keydown", { bubbles: true });
+        Object.defineProperty(eventOn, "getModifierState", {
+            value: (key: string) => key === "CapsLock",
+        });
+        inputWrapper.element.dispatchEvent(eventOn);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('[data-testid="alert-caps-lock"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="alert-caps-lock"]').text()).toContain("Caps Lock ativado");
+
+        // Simula evento keyup com caps lock desativado
+        const eventOff = new KeyboardEvent("keyup", { bubbles: true });
+        Object.defineProperty(eventOff, "getModifierState", {
+            value: (key: string) => false,
+        });
+        inputWrapper.element.dispatchEvent(eventOff);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('[data-testid="alert-caps-lock"]').exists()).toBe(false);
+    });
 });
