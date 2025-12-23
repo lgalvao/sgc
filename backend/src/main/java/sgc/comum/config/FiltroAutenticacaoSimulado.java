@@ -14,8 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import sgc.sgrh.SgrhService;
-import sgc.sgrh.autenticacao.GerenciadorJwt;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.autenticacao.GerenciadorJwt;
+import sgc.sgrh.internal.model.Usuario;
 
 import java.io.IOException;
 

@@ -3,7 +3,7 @@ package sgc.subprocesso.dto;
 import lombok.Builder;
 import lombok.Getter;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.api.UnidadeDto;
 
 import java.util.List;
 

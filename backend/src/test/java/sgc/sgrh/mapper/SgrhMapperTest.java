@@ -3,11 +3,11 @@ package sgc.sgrh.mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.sgrh.dto.SgrhMapper;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.model.Usuario;
-import sgc.unidade.model.Unidade;
+import sgc.sgrh.api.SgrhMapper;
+import sgc.sgrh.api.UnidadeDto;
+import sgc.sgrh.api.UsuarioDto;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.unidade.internal.model.Unidade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -11,8 +11,8 @@ import sgc.analise.internal.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;

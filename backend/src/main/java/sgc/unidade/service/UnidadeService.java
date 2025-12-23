@@ -7,17 +7,17 @@ import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.SgrhMapper;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.dto.AtribuicaoTemporariaDto;
-import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
-import sgc.unidade.model.AtribuicaoTemporaria;
-import sgc.unidade.model.AtribuicaoTemporariaRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.api.UsuarioDto;
+import sgc.sgrh.api.UnidadeDto;
+import sgc.sgrh.api.SgrhMapper;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.unidade.api.AtribuicaoTemporariaDto;
+import sgc.unidade.api.CriarAtribuicaoTemporariaReq;
+import sgc.unidade.internal.model.AtribuicaoTemporaria;
+import sgc.unidade.internal.model.AtribuicaoTemporariaRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -26,7 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.unidade.internal.model.UnidadeMapaRepo unidadeMapaRepo;
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
@@ -71,7 +71,7 @@ public class UnidadeService {
             // Elegibilidade simples (não recursiva):
             // 3. NÃO está em outro processo ativo
             boolean isElegivel =
-                    u.getTipo() != sgc.unidade.model.TipoUnidade.INTERMEDIARIA
+                    u.getTipo() != sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA
                             && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 

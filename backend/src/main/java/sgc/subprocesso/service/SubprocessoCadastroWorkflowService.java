@@ -15,12 +15,12 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.model.Usuario;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

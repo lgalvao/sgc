@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.sgrh.dto.AutenticacaoReq;
-import sgc.sgrh.dto.EntrarReq;
-import sgc.sgrh.model.Perfil;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.internal.AutenticacaoReq;
+import sgc.sgrh.internal.EntrarReq;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

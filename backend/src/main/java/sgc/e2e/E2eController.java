@@ -15,7 +15,7 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.SgrhService;
 
 import javax.sql.DataSource;

@@ -5,12 +5,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioPerfil;
+import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.util.HashSet;
 import java.util.Set;

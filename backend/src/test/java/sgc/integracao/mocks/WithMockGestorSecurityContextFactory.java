@@ -7,10 +7,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
-import sgc.unidade.model.Unidade;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.unidade.internal.model.Unidade;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,9 +42,9 @@ public class WithMockGestorSecurityContextFactory
             Unidade u = new Unidade("Unidade Mock", "UO_SUP");
             principal.setUnidadeLotacao(u);
 
-            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            Set<sgc.sgrh.internal.model.UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                            sgc.sgrh.model.UsuarioPerfil.builder()
+                            sgc.sgrh.internal.model.UsuarioPerfil.builder()
                                     .usuario(principal)
                                     .unidade(u)
                                     .perfil(Perfil.GESTOR)
@@ -52,12 +52,12 @@ public class WithMockGestorSecurityContextFactory
             principal.setAtribuicoes(atribuicoes);
 
         } else {
-            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            Set<sgc.sgrh.internal.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
             if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 Unidade u = new Unidade("Unidade Mock", "UO_SUP");
                 atribuicoes.add(
-                                sgc.sgrh.model.UsuarioPerfil.builder()
+                                sgc.sgrh.internal.model.UsuarioPerfil.builder()
                                         .usuario(principal)
                                         .unidade(u)
                                         .perfil(Perfil.GESTOR)

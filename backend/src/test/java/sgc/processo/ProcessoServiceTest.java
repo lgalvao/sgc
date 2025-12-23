@@ -30,15 +30,15 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.api.PerfilDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeMapaRepo;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeMapaRepo;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
@@ -533,7 +533,7 @@ class ProcessoServiceTest {
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
-            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.model.UnidadeMapa()));
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.internal.model.UnidadeMapa()));
 
             // Act
             processoService.finalizar(id);

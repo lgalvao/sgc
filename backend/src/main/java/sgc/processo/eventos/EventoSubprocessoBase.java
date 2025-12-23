@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sgc.sgrh.model.Usuario;
-import sgc.unidade.model.Unidade;
+import sgc.sgrh.internal.model.Usuario;
+import sgc.unidade.internal.model.Unidade;
 
 @Data
 @SuperBuilder

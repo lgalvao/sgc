@@ -18,8 +18,8 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
+import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
@@ -29,7 +29,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
+import sgc.unidade.internal.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class SubprocessoDtoService {
         }
 
         private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
-                sgc.unidade.model.Unidade atual = alvo;
+                sgc.unidade.internal.model.Unidade atual = alvo;
                 while (atual != null) {
                         if (atual.getCodigo().equals(superior.getCodigo())) {
                                 return true;

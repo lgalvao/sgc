@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
-import sgc.unidade.model.Unidade;
+import sgc.unidade.internal.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.List;

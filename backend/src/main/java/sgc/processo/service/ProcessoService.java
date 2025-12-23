@@ -21,15 +21,15 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.api.PerfilDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,7 +38,7 @@ import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
+import static sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.unidade.internal.model.UnidadeMapaRepo unidadeMapaRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
@@ -74,7 +74,7 @@ public class ProcessoService {
         Long codUnidadeUsuario =
                 perfis.stream()
                         .findFirst()
-                        .map(sgc.sgrh.dto.PerfilDto::getUnidadeCodigo)
+                        .map(sgc.sgrh.api.PerfilDto::getUnidadeCodigo)
                         .orElse(null);
 
         if (codUnidadeUsuario == null) {
@@ -373,8 +373,8 @@ public class ProcessoService {
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                    .orElse(new sgc.unidade.model.UnidadeMapa());
+            sgc.unidade.internal.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
+                    .orElse(new sgc.unidade.internal.model.UnidadeMapa());
             unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
             unidadeMapa.setMapaVigente(mapaDoSubprocesso);
             unidadeMapaRepo.save(unidadeMapa);

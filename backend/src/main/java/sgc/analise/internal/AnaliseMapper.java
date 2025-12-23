@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import sgc.analise.api.AnaliseHistoricoDto;
 import sgc.analise.api.AnaliseValidacaoHistoricoDto;
 import sgc.analise.internal.model.Analise;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.internal.model.UnidadeRepo;
 
 /**
  * Mapper para converter a entidade {@link Analise} em DTOs.
@@ -39,7 +39,7 @@ public abstract class AnaliseMapper {
     protected String getUnidadeSigla(Long codigo) {
         if (codigo == null) return null;
         return unidadeRepo.findById(codigo)
-                .map(sgc.unidade.model.Unidade::getSigla)
+                .map(sgc.unidade.internal.model.Unidade::getSigla)
                 .orElse(null);
     }
 }
