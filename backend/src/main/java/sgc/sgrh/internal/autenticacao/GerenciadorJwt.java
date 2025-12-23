@@ -3,8 +3,10 @@ package sgc.sgrh.internal.autenticacao;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import sgc.sgrh.internal.model.Perfil;
 
@@ -14,13 +16,33 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class GerenciadorJwt {
     private final JwtProperties jwtProperties;
+    private final Environment environment;
     
+    private static final String DEFAULT_INSECURE_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+
+    @PostConstruct
+    public void verificarSeguranca() {
+        String secret = jwtProperties.getSecret();
+
+        if (DEFAULT_INSECURE_SECRET.equals(secret)) {
+            boolean isProd = Arrays.asList(environment.getActiveProfiles()).contains("prod");
+
+            if (isProd) {
+                log.error("🚨 CRÍTICO: Aplicação rodando em perfil PROD com secret JWT padrão e inseguro! Configure 'aplicacao.jwt.secret'.");
+                throw new IllegalStateException("Configuração insegura de JWT detectada em ambiente de produção.");
+            } else {
+                log.warn("⚠️ ALERTA DE SEGURANÇA: Usando secret JWT padrão inseguro. Isso é aceitável apenas para desenvolvimento/testes.");
+            }
+        }
+    }
+
     private SecretKey getSigningKey() {
         // Garante que a chave tenha tamanho adequado (mínimo 256 bits para HS256)
         String secret = jwtProperties.getSecret();

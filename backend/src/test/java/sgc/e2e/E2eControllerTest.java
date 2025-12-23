@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ class E2eControllerTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Autowired
     private DataSource dataSource;
 
     @Mock
@@ -42,7 +46,7 @@ class E2eControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new E2eController(jdbcTemplate, dataSource, processoService, sgrhService);
+        controller = new E2eController(jdbcTemplate, namedParameterJdbcTemplate, dataSource, processoService, sgrhService);
     }
 
     @Test

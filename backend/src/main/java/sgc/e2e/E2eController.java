@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class E2eController {
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoService processoService;
     private final SgrhService sgrhService;
@@ -48,6 +51,8 @@ public class E2eController {
                             String.class);
 
             for (String table : tables) {
+                // TRUNCATE is a DDL command, parameters are not supported here, but table names
+                // come from trusted schema query.
                 jdbcTemplate.execute("TRUNCATE TABLE sgc." + table);
             }
         } finally {
@@ -83,28 +88,35 @@ public class E2eController {
                         + " sgc.subprocesso WHERE processo_codigo = ?)",
                 codigo);
 
-
-
         if (!mapaIds.isEmpty()) {
-            String ids = mapaIds.toString().replace("[", "").replace("]", "");
-            jdbcTemplate.update(
+            MapSqlParameterSource params = new MapSqlParameterSource("ids", mapaIds);
+
+            namedParameterJdbcTemplate.update(
                     "DELETE FROM sgc.conhecimento WHERE atividade_codigo IN (SELECT codigo FROM"
-                            + " sgc.atividade WHERE mapa_codigo IN ("
-                            + ids
-                            + "))");
-            jdbcTemplate.update(
+                            + " sgc.atividade WHERE mapa_codigo IN (:ids))",
+                    params);
+
+            namedParameterJdbcTemplate.update(
                     "DELETE FROM sgc.competencia_atividade WHERE atividade_codigo IN (SELECT codigo"
-                            + " FROM sgc.atividade WHERE mapa_codigo IN ("
-                            + ids
-                            + "))");
-            jdbcTemplate.update(
+                            + " FROM sgc.atividade WHERE mapa_codigo IN (:ids))",
+                    params);
+
+            namedParameterJdbcTemplate.update(
                     "DELETE FROM sgc.competencia_atividade WHERE competencia_codigo IN (SELECT"
-                            + " codigo FROM sgc.competencia WHERE mapa_codigo IN ("
-                            + ids
-                            + "))");
-            jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN (" + ids + ")");
-            jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN (" + ids + ")");
-            jdbcTemplate.update("DELETE FROM sgc.mapa WHERE codigo IN (" + ids + ")");
+                            + " codigo FROM sgc.competencia WHERE mapa_codigo IN (:ids))",
+                    params);
+
+            namedParameterJdbcTemplate.update(
+                    "DELETE FROM sgc.atividade WHERE mapa_codigo IN (:ids)",
+                    params);
+
+            namedParameterJdbcTemplate.update(
+                    "DELETE FROM sgc.competencia WHERE mapa_codigo IN (:ids)",
+                    params);
+
+            namedParameterJdbcTemplate.update(
+                    "DELETE FROM sgc.mapa WHERE codigo IN (:ids)",
+                    params);
         }
 
         jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
