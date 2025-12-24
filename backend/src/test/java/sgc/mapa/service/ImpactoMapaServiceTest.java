@@ -213,5 +213,177 @@ class ImpactoMapaServiceTest {
 
             assertNotNull(resultado);
         }
+
+        @Test
+        @DisplayName("Deve detectar atividade inserida quando existe no mapa atual mas não no vigente")
+        void deveDetectarAtividadeInserida() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
+            mapaVigente.setCodigo(1L);
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            // Atividade nova (não existe no vigente)
+            sgc.atividade.internal.model.Atividade atividadeNova = new sgc.atividade.internal.model.Atividade();
+            atividadeNova.setCodigo(10L);
+            atividadeNova.setDescricao("Nova atividade");
+            atividadeNova.setConhecimentos(List.of());
+
+            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of(atividadeNova));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of());
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
+            assertTrue(resultado.isTemImpactos());
+            assertEquals(1, resultado.getTotalAtividadesInseridas());
+        }
+
+        @Test
+        @DisplayName("Deve detectar atividade removida quando existe no vigente mas não no atual")
+        void deveDetectarAtividadeRemovida() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
+            mapaVigente.setCodigo(1L);
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            // Atividade que será removida (existe no vigente, não no atual)
+            sgc.atividade.internal.model.Atividade atividadeVigente = new sgc.atividade.internal.model.Atividade();
+            atividadeVigente.setCodigo(5L);
+            atividadeVigente.setDescricao("Atividade removida");
+            atividadeVigente.setConhecimentos(List.of());
+            atividadeVigente.setCompetencias(new java.util.HashSet<>());
+
+            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of()); // Mapa atual vazio
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(atividadeVigente));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
+            assertTrue(resultado.isTemImpactos());
+            assertEquals(1, resultado.getTotalAtividadesRemovidas());
+        }
+
+        @Test
+        @DisplayName("Deve detectar atividade alterada quando conhecimentos são diferentes")
+        void deveDetectarAtividadeAlterada() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
+            mapaVigente.setCodigo(1L);
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            // Atividade atual com conhecimento novo
+            sgc.atividade.internal.model.Conhecimento conhecimentoNovo = new sgc.atividade.internal.model.Conhecimento();
+            conhecimentoNovo.setDescricao("Conhecimento novo");
+
+            sgc.atividade.internal.model.Atividade atividadeAtual = new sgc.atividade.internal.model.Atividade();
+            atividadeAtual.setCodigo(10L);
+            atividadeAtual.setDescricao("Atividade existente");
+            atividadeAtual.setConhecimentos(List.of(conhecimentoNovo));
+            atividadeAtual.setCompetencias(new java.util.HashSet<>());
+
+            // Atividade vigente sem conhecimento (mesma descrição)
+            sgc.atividade.internal.model.Atividade atividadeVigente = new sgc.atividade.internal.model.Atividade();
+            atividadeVigente.setCodigo(5L);
+            atividadeVigente.setDescricao("Atividade existente");
+            atividadeVigente.setConhecimentos(List.of());
+            atividadeVigente.setCompetencias(new java.util.HashSet<>());
+
+            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of(atividadeAtual));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(atividadeVigente));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
+            assertTrue(resultado.isTemImpactos());
+            assertEquals(1, resultado.getTotalAtividadesAlteradas());
+        }
+
+        @Test
+        @DisplayName("Deve detectar atividades removidas E alteradas simultaneamente")
+        void deveDetectarAtividadesRemovidasEAlteradas() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
+            mapaVigente.setCodigo(1L);
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            // Conhecimento para causar alteração
+            sgc.atividade.internal.model.Conhecimento conhecimentoNovo = new sgc.atividade.internal.model.Conhecimento();
+            conhecimentoNovo.setDescricao("Conhecimento adicionado");
+
+            // Atividade atual com alteração
+            sgc.atividade.internal.model.Atividade atividadeAtual = new sgc.atividade.internal.model.Atividade();
+            atividadeAtual.setCodigo(10L);
+            atividadeAtual.setDescricao("Atividade alterada");
+            atividadeAtual.setConhecimentos(List.of(conhecimentoNovo));
+            atividadeAtual.setCompetencias(new java.util.HashSet<>());
+
+            // Atividade vigente sem alteração
+            sgc.atividade.internal.model.Atividade atividadeVigenteMantida = new sgc.atividade.internal.model.Atividade();
+            atividadeVigenteMantida.setCodigo(5L);
+            atividadeVigenteMantida.setDescricao("Atividade alterada");
+            atividadeVigenteMantida.setConhecimentos(List.of());
+            atividadeVigenteMantida.setCompetencias(new java.util.HashSet<>());
+
+            // Atividade removida
+            sgc.atividade.internal.model.Atividade atividadeVigenteRemovida = new sgc.atividade.internal.model.Atividade();
+            atividadeVigenteRemovida.setCodigo(6L);
+            atividadeVigenteRemovida.setDescricao("Atividade removida");
+            atividadeVigenteRemovida.setConhecimentos(List.of());
+            atividadeVigenteRemovida.setCompetencias(new java.util.HashSet<>());
+
+            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of(atividadeAtual));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(atividadeVigenteMantida, atividadeVigenteRemovida));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
+            assertTrue(resultado.isTemImpactos());
+            assertEquals(1, resultado.getTotalAtividadesRemovidas());
+            assertEquals(1, resultado.getTotalAtividadesAlteradas());
+        }
+
+        @Test
+        @DisplayName("Não deve ter impacto quando mapas são idênticos")
+        void naoDeveHaverImpactoQuandoMapasIdenticos() {
+            subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            sgc.mapa.internal.model.Mapa mapaVigente = new sgc.mapa.internal.model.Mapa();
+            mapaVigente.setCodigo(1L);
+            sgc.mapa.internal.model.Mapa mapaSubprocesso = new sgc.mapa.internal.model.Mapa();
+            mapaSubprocesso.setCodigo(2L);
+
+            // Mesma atividade em ambos os mapas
+            sgc.atividade.internal.model.Atividade atividade = new sgc.atividade.internal.model.Atividade();
+            atividade.setCodigo(5L);
+            atividade.setDescricao("Atividade comum");
+            atividade.setConhecimentos(List.of());
+            atividade.setCompetencias(new java.util.HashSet<>());
+
+            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of(atividade));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(atividade));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+
+            ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
+
+            assertFalse(resultado.isTemImpactos());
+        }
     }
 }
