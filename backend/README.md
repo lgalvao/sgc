@@ -1,6 +1,5 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
-
 ## Visão Geral
 
 Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A
@@ -17,7 +16,8 @@ O backend foi refatorado para adotar **Spring Modulith 2.0.1**, que fornece:
 - **Testes Modulares Mais Rápidos**: Testes podem focar em módulos individuais com contexto Spring reduzido
 
 Cada módulo segue a estrutura:
-```
+
+```text
 sgc/{modulo}/
 ├── {Modulo}Service.java    # API pública (facade)
 ├── package-info.java        # Metadados e dependências permitidas
@@ -351,7 +351,7 @@ O projeto possui verificações automáticas de cobertura mínima:
 
 ### Estrutura de Testes
 
-```
+```text
 backend/src/test/java/sgc/
 ├── fixture/              # Builders reutilizáveis para entidades de teste
 │   ├── ProcessoFixture.java
@@ -418,6 +418,6 @@ Os relatórios HTML são gerados em `backend/build/reports/`:
 ### Documentação de Módulos
 
 Cada módulo possui:
+
 - **README.md:** Visão geral, arquitetura, componentes e dependências
 - **package-info.java:** Metadados Spring Modulith (display name, allowed dependencies, eventos publicados/consumidos)
-

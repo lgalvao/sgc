@@ -41,6 +41,7 @@ void deveLancarExcecaoQuandoProcessoNaoEncontrado() {
 ```
 
 **❌ Evite:**
+
 - `test{Acao}` (padrão antigo)
 - `test_cenario_especifico` (com underscore)
 - Nomes em inglês
@@ -155,6 +156,7 @@ void deveCriarProcessoComUnidadeAssociada() {
 ```
 
 **Fixtures disponíveis:**
+
 - `ProcessoFixture`
 - `SubprocessoFixture`
 - `MapaFixture`
@@ -554,6 +556,7 @@ open backend/build/reports/jacoco/test/html/index.html
 ### Quality Gates
 
 O projeto possui limites mínimos configurados:
+
 - **Branches**: 60%
 - **Linhas**: 80%
 
@@ -737,6 +740,7 @@ O projeto usa **PITest** para mutation testing:
 Abra o relatório HTML: `backend/build/reports/pitest/index.html`
 
 **Estados de Mutantes:**
+
 - ✅ **KILLED**: Teste detectou a mutação → **BOM**
 - ❌ **SURVIVED**: Teste NÃO detectou → **RUIM** (adicionar teste)
 - ⚠️ **NO_COVERAGE**: Linha não testada → **MUITO RUIM** (adicionar teste)
@@ -877,6 +881,7 @@ void deveLancarExcecaoQuandoPedidoInvalido() {
 ### Recursos Adicionais
 
 Para um guia completo de Mutation Testing no SGC, consulte:
+
 - **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano detalhado com estratégias e exemplos
 
 ---

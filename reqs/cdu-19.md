@@ -21,7 +21,7 @@ Ator: CHEFE
 
    4.1. O sistema abre um modal com um campo de texto formatado, para inclusão das sugestões.
 
-   -  Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com essa informação.
+   - Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com essa informação.
 
    4.2. Usuário fornece as sugestões e clica em `Confirmar`.
 

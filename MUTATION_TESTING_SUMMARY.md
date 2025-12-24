@@ -13,9 +13,11 @@ Esta implementação adiciona **Mutation-Based Testing (MBT)** ao projeto SGC, u
 ### 🎯 Principais Entregas
 
 #### 1. Documentação Completa (24KB)
+
 **Arquivo**: `MUTATION_TESTING_PLAN.md`
 
 Conteúdo:
+
 - ✅ Explicação detalhada de Mutation Testing
 - ✅ Análise de priorização de 11 módulos por complexidade
 - ✅ 6 tipos de mutantes com exemplos práticos em Java
@@ -25,15 +27,18 @@ Conteúdo:
 - ✅ Soluções alternativas para Gradle 9.2.1
 
 #### 2. Script de Execução Automatizado (6.2KB)
+
 **Arquivo**: `scripts/run-mutation-tests.sh`
 
 Funcionalidades:
+
 - ✅ 3 modos de execução: `--quick`, `--full`, `--module <nome>`
 - ✅ Validação automática de testes unitários antes de MBT
 - ✅ Output colorido e informativo
 - ✅ Detecção de erros e mensagens de ajuda
 
 Uso:
+
 ```bash
 # Módulos de alta prioridade apenas
 ./scripts/run-mutation-tests.sh --quick
@@ -46,10 +51,12 @@ Uso:
 ```
 
 #### 3. Configuração PITest Completa
+
 **Arquivo**: `backend/build.gradle.kts`
 
-Configuração preparada (comentada devido à limitação Gradle 9.x):
-- ✅ PITest versão 1.17.3
+Configuração pronta para uso com plugin versão **1.19.0-rc.2** (compatível com Gradle 9.x):
+
+- ✅ PITest versão compatível com Gradle 9.x
 - ✅ Mutadores: DEFAULTS, STRONGER, REMOVE_CONDITIONALS
 - ✅ Pacotes alvo: processo, subprocesso, mapa, atividade, comum
 - ✅ Exclusões inteligentes: DTOs, Mappers, Entidades, Config
@@ -59,9 +66,11 @@ Configuração preparada (comentada devido à limitação Gradle 9.x):
 - ✅ Relatórios HTML e XML
 
 #### 4. Documentação em Guias Existentes
+
 **Arquivos**: `README.md`, `guia-testes-junit.md`
 
 Atualizações:
+
 - ✅ Seção "Mutation Testing (PITest)" no README
 - ✅ Comandos de execução documentados
 - ✅ Seção completa "🧬 Mutation Testing" no guia de testes
@@ -88,36 +97,25 @@ Análise de complexidade e criticidade identificou **4 módulos de ALTA priorida
 
 ---
 
-## ⚠️ Limitação Técnica Identificada
+## ✅ Compatibilidade com Gradle 9.x Confirmada
 
-**Problema**: Plugin Gradle do PITest (`info.solidsoft.pitest`) incompatível com Gradle 9.2.1  
-**Issue**: https://github.com/szpak/gradle-pitest-plugin/issues/395
+**Atualização**: O plugin Gradle do PITest agora suporta Gradle 9.x!
 
-### Soluções Documentadas
+- **Versão do Plugin**: `1.19.0-rc.2` (lançada em 01 de outubro de 2025)
+- **Título da Release**: "Gradle 9 configuration cache compatibility"
+- **Fonte**: <https://plugins.gradle.org/plugin/info.solidsoft.pitest>
 
-#### Opção 1: Downgrade Temporário do Gradle (Recomendado)
-```bash
-# Editar gradle/wrapper/gradle-wrapper.properties
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+### Como Usar
 
-# Atualizar wrapper
-./gradlew wrapper --gradle-version 8.10.2
+```kotlin
+// backend/build.gradle.kts
+plugins {
+    id("info.solidsoft.pitest") version "1.19.0-rc.2"
+}
 
-# Descomentar configuração PITest em backend/build.gradle.kts
-# (Remover /* */ ao redor da configuração pitest{})
-
-# Descomentar plugin em plugins {}
-id("info.solidsoft.pitest") version "1.9.11"
-
-# Executar mutation testing
+// Executar mutation testing
 ./gradlew :backend:pitest
 ```
-
-#### Opção 2: Usar Maven (Alternativa)
-Configuração exemplo em `MUTATION_TESTING_PLAN.md`
-
-#### Opção 3: Aguardar Atualização
-Monitorar issue tracker do plugin para nova release
 
 ---
 
@@ -135,6 +133,7 @@ O plano documenta **6 tipos de mutantes** comuns com exemplos práticos:
 6. **Remove Conditionals**: Remoção completa de `if`/`while`
 
 Cada tipo inclui:
+
 - ✅ Código original
 - ✅ Exemplo de mutante
 - ✅ Testes que **NÃO matam** o mutante (fraco)
@@ -145,32 +144,40 @@ Cada tipo inclui:
 ## 🔄 Fluxo de Trabalho para Agentes de IA
 
 ### Passo 1: Executar MBT
+
 ```bash
 ./scripts/run-mutation-tests.sh --module processo
 ```
 
 ### Passo 2: Analisar Relatório
+
 Abrir: `backend/build/reports/pitest/index.html`
 
 Identificar:
+
 - ✅ **KILLED**: Mutantes mortos (bom)
 - ❌ **SURVIVED**: Mutantes sobreviventes (adicionar teste)
 - ⚠️ **NO_COVERAGE**: Código não testado (urgente)
 
 ### Passo 3: Priorizar Mutantes
+
 Focar em:
+
 1. Mutantes em lógica de negócio crítica
 2. Mutantes em módulos de alta prioridade
 3. Mutantes que afetam validações/segurança
 
 ### Passo 4: Criar Testes
+
 Usar exemplos do `MUTATION_TESTING_PLAN.md`:
+
 - Testar **ambos** os branches de condicionais
 - Usar **assertions específicas** (não apenas `assertNotNull`)
 - Validar **side effects** (eventos, salvamentos)
 - Testar **boundary values** (18, 19, 17 para idade ≥ 18)
 
 ### Passo 5: Re-executar MBT
+
 ```bash
 ./scripts/run-mutation-tests.sh --module processo
 ```
@@ -204,17 +211,20 @@ Verificar aumento do mutation score.
 ## 🎓 Próximos Passos Recomendados
 
 ### Imediato (Após Merge)
+
 1. ✅ Revisar `MUTATION_TESTING_PLAN.md` completo
 2. ✅ Escolher solução para limitação Gradle (downgrade ou aguardar)
 3. ✅ Executar baseline test no módulo `comum.erros`
 
 ### Curto Prazo (1-2 Semanas)
+
 1. ✅ Executar MBT nos 4 módulos de alta prioridade
 2. ✅ Documentar mutation scores baseline
 3. ✅ Identificar top 10 mutantes sobreviventes críticos
 4. ✅ Criar/melhorar testes para matar mutantes prioritários
 
 ### Médio Prazo (1-3 Meses)
+
 1. ✅ Alcançar 70% mutation score nos módulos core
 2. ✅ Integrar MBT no CI/CD pipeline
 3. ✅ Estabelecer quality gate com threshold mínimo
@@ -225,16 +235,18 @@ Verificar aumento do mutation score.
 ## 📖 Documentação de Referência
 
 ### Arquivos Principais
+
 - **MUTATION_TESTING_PLAN.md**: Guia completo e detalhado (leitura obrigatória)
 - **guia-testes-junit.md**: Seção de MBT com exemplos práticos
 - **README.md**: Comandos rápidos de execução
 - **scripts/run-mutation-tests.sh**: Script de automação
 
 ### Links Úteis
-- PITest Official: https://pitest.org/
-- Quick Start Guide: https://pitest.org/quickstart/
-- Mutators Documentation: https://pitest.org/quickstart/mutators/
-- Gradle Plugin Issue: https://github.com/szpak/gradle-pitest-plugin/issues/395
+
+- PITest Official: <https://pitest.org/>
+- Quick Start Guide: <https://pitest.org/quickstart/>
+- Mutators Documentation: <https://pitest.org/quickstart/mutators/>
+- Gradle Plugin: <https://plugins.gradle.org/plugin/info.solidsoft.pitest>
 
 ---
 
@@ -253,4 +265,4 @@ Verificar aumento do mutation score.
 
 **Implementação completa e pronta para uso!** 🎉
 
-Para ativar, basta aplicar uma das soluções documentadas para a limitação do Gradle 9.2.1.
+O plugin PITest versão 1.19.0-rc.2 é compatível com Gradle 9.x. Basta configurar e executar!

@@ -111,7 +111,7 @@ Ator: GESTOR e ADMIN
 
    A validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetida para análise por essa unidade. 
    
-   A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
    ```
 
    9.8. O sistema cria internamente um alerta com:

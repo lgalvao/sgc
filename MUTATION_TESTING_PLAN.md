@@ -1,74 +1,31 @@
 # Plano de Mutation-Based Testing (MBT) - SGC
 
-## ⚠️ Status Atual da Implementação
+## ✅ Status Atual da Implementação
 
 **Data**: 2025-12-24  
-**Status**: Configuração em andamento
+**Status**: Pronto para uso
 
-### Limitação Técnica Identificada
+### Compatibilidade com Gradle 9.x Confirmada
 
-O plugin Gradle do PITest (`info.solidsoft.pitest`) atualmente apresenta incompatibilidade com Gradle 9.2.1 (versão em uso no projeto). Este é um problema conhecido documentado em:
-- https://github.com/szpak/gradle-pitest-plugin/issues/395
+O plugin Gradle do PITest (`info.solidsoft.pitest`) versão **1.19.0-rc.2** agora suporta Gradle 9.x com compatibilidade de configuration cache.
 
-### Soluções Alternativas
+- **Versão do Plugin**: 1.19.0-rc.2 (lançada em 01 de outubro de 2025)
+- **Fonte**: <https://plugins.gradle.org/plugin/info.solidsoft.pitest>
+- **Release Notes**: <https://github.com/szpak/gradle-pitest-plugin/releases>
 
-Até que o plugin seja atualizado para suportar Gradle 9.x, existem duas opções:
+Para usar, adicione ao `backend/build.gradle.kts`:
 
-#### Opção 1: Downgrade Temporário do Gradle (Recomendado para MBT)
+```kotlin
+plugins {
+    id("info.solidsoft.pitest") version "1.19.0-rc.2"
+}
+```
+
+E execute:
 
 ```bash
-# No arquivo gradle/wrapper/gradle-wrapper.properties, alterar para:
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.10.2-bin.zip
-
-# Recarregar configuração
-./gradlew wrapper --gradle-version 8.10.2
-
-# Executar mutation tests
 ./gradlew :backend:pitest
 ```
-
-#### Opção 2: Usar PITest via Maven (Alternativa)
-
-Criar um `pom.xml` mínimo apenas para executar PITest:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>br.gov.sgc</groupId>
-    <artifactId>sgc-backend</artifactId>
-    <version>1.0.0</version>
-    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>1.17.3</version>
-                <configuration>
-                    <targetClasses>
-                        <param>sgc.processo.internal.service.*</param>
-                        <param>sgc.mapa.*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>sgc.processo.*</param>
-                        <param>sgc.mapa.*</param>
-                    </targetTests>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
-```
-
-```bash
-# Executar via Maven
-mvn clean test org.pitest:pitest-maven:mutationCoverage
-```
-
-#### Opção 3: Aguardar Atualização do Plugin
-
-Monitorar o issue tracker do plugin para nova release compatível com Gradle 9.x.
 
 ---
 
@@ -86,6 +43,7 @@ Mutation Testing (Teste de Mutação) é uma técnica que:
 4. **Calcula métricas** de qualidade baseadas na taxa de mutantes mortos
 
 **Exemplo:**
+
 ```java
 // Código Original
 if (saldo > 100) {
@@ -150,6 +108,7 @@ if (!(saldo > 100)) {  // Se testes não pegam isso, mutante sobrevive
 O projeto utiliza os seguintes grupos de mutadores:
 
 #### 1. DEFAULTS (Mutadores Padrão)
+
 - **Conditionals Boundary**: `<` → `<=`, `>` → `>=`
 - **Increments**: `++` → `--`, `x++` → `x--`
 - **Invert Negatives**: `-x` → `x`
@@ -159,10 +118,12 @@ O projeto utiliza os seguintes grupos de mutadores:
 - **Void Method Calls**: Remove chamadas a métodos void
 
 #### 2. STRONGER (Mutadores Mais Fortes)
+
 - **Remove Conditionals**: Remove completamente `if`, `while`, `for` conditions
 - **Experimental Switch**: Mutações em `switch` statements
 
 #### 3. REMOVE_CONDITIONALS (Foco Específico)
+
 - Remove condicionais para verificar se branches são realmente testados
 
 ### Mutantes Excluídos
@@ -183,6 +144,7 @@ Para evitar falsos positivos e focar em lógica de negócio:
 ### Classificação de Prioridade
 
 Os módulos foram classificados em **3 níveis de prioridade** baseados em:
+
 1. **Complexidade ciclomática** (número de branches e decisões)
 2. **Criticidade de negócio** (impacto de bugs)
 3. **Cobertura de testes atual**
@@ -193,18 +155,20 @@ Os módulos foram classificados em **3 níveis de prioridade** baseados em:
 ### 🔴 **Prioridade ALTA** (Críticos - Executar Primeiro)
 
 #### 1. `processo.internal.service.ProcessoService`
+
 - **LOC**: 443
 - **Complexidade**: MUITO ALTA
 - **Criticidade**: CRÍTICA (orquestrador central)
 - **Cobertura atual**: ~85%
 - **Razão**: Gerencia ciclo de vida de processos, publica eventos, controla permissões
 - **Mutation Score esperado inicial**: 65-75%
-- **Foco de melhoria**: 
+- **Foco de melhoria**:
   - Validações de estado (situações válidas/inválidas)
   - Lógica de permissões (checarAcesso)
   - Publicação de eventos (verificar side effects)
 
 #### 2. `subprocesso.internal.service.SubprocessoMapaWorkflowService`
+
 - **LOC**: 414
 - **Complexidade**: MUITO ALTA
 - **Criticidade**: CRÍTICA (máquina de estados)
@@ -217,6 +181,7 @@ Os módulos foram classificados em **3 níveis de prioridade** baseados em:
   - Validações de workflow (rejeitar, aprovar, submeter)
 
 #### 3. `mapa.MapaService`
+
 - **LOC**: 228
 - **Complexidade**: ALTA
 - **Criticidade**: CRÍTICA (domínio principal)
@@ -229,6 +194,7 @@ Os módulos foram classificados em **3 níveis de prioridade** baseados em:
   - Sanitização de inputs (segurança)
 
 #### 4. `mapa.internal.service.ImpactoMapaService`
+
 - **LOC**: 417
 - **Complexidade**: ALTA
 - **Criticidade**: ALTA (análise de impacto)
@@ -245,21 +211,25 @@ Os módulos foram classificados em **3 níveis de prioridade** baseados em:
 ### 🟡 **Prioridade MÉDIA** (Importantes - Executar em Segunda Fase)
 
 #### 5. `subprocesso.internal.service.SubprocessoCadastroWorkflowService`
+
 - **LOC**: 347
 - **Complexidade**: MÉDIA-ALTA
 - **Razão**: Workflow de cadastro, validações de etapas
 
 #### 6. `atividade.AtividadeService`
+
 - **LOC**: 281
 - **Complexidade**: MÉDIA
 - **Razão**: CRUD com validações, gestão de conhecimentos
 
 #### 7. `unidade.service.UnidadeService`
+
 - **LOC**: 293
 - **Complexidade**: MÉDIA
 - **Razão**: Hierarquia organizacional, consultas recursivas
 
 #### 8. `sgrh.SgrhService`
+
 - **LOC**: 431
 - **Complexidade**: MÉDIA
 - **Razão**: Integração externa, cache, autenticação
@@ -269,17 +239,20 @@ Os módulos foram classificados em **3 níveis de prioridade** baseados em:
 ### 🟢 **Prioridade BAIXA** (Executar em Terceira Fase)
 
 #### 9. `comum.erros.*` (Baseline Test)
+
 - **LOC**: ~50
 - **Complexidade**: BAIXA
 - **Razão**: **Módulo de teste inicial** para validar configuração PIT
 - **Mutation Score esperado**: 90%+ (código simples)
 
 #### 10. `painel.PainelService`
+
 - **LOC**: 255
 - **Complexidade**: BAIXA-MÉDIA
 - **Razão**: Agregações e estatísticas (menos crítico)
 
 #### 11. `alerta.AlertaService`, `analise.AnaliseService`, `notificacao.*`
+
 - **LOC**: 100-200 cada
 - **Complexidade**: BAIXA
 - **Razão**: Serviços de suporte, menos lógica complexa
@@ -404,6 +377,7 @@ Sobreviventes (15):
 Para cada mutante sobrevivente:
 
 #### Passo 1: Analisar o Mutante
+
 ```java
 // Exemplo de mutante sobrevivente
 // Original (linha 85 de ProcessoService):
@@ -418,6 +392,7 @@ if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
 ```
 
 #### Passo 2: Identificar Gap de Teste
+
 ```java
 // Teste atual (insuficiente):
 @Test
@@ -429,6 +404,7 @@ void deveIniciarProcesso() {
 ```
 
 #### Passo 3: Criar Teste que Mata o Mutante
+
 ```java
 // Teste melhorado (mata o mutante):
 @Test
@@ -464,6 +440,7 @@ void deveLancarExcecaoQuandoSituacaoInvalida() {
 ```
 
 #### Passo 4: Re-executar MBT
+
 ```bash
 ./gradlew :backend:mutationTestModule -Pmodule=processo
 # Verificar se mutation score aumentou
@@ -505,6 +482,7 @@ if (idade >= 18) {  // Mutante sobrevive se não temos teste com idade = 18
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void devePermitirAcessoQuandoIdadeMaiorQue18() {
@@ -540,6 +518,7 @@ if (!usuario.isAtivo() && usuario.temPermissao()) { }  // Mutante 2
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void deveRetornarTrueQuandoAtivoEComPermissao() {
@@ -579,6 +558,7 @@ public boolean isValid() {
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void deveRetornarTrueQuandoStatusAtivo() {
@@ -612,6 +592,7 @@ return quantidade - preco;  // Mutante 3
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void deveCalcularTotalCorretamente() {
@@ -649,6 +630,7 @@ public void processar(Pedido pedido) {
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void deveValidarPedidoAntesDeProcessar() {
@@ -693,6 +675,7 @@ public void aplicarDesconto(Pedido pedido) {
 ```
 
 **Como matar**:
+
 ```java
 @Test
 void deveAplicarDescontoQuandoTotalMaiorQue1000() {
@@ -868,11 +851,13 @@ Criar relatório em `/planejamento/mutation-testing-YYYY-MM.md` com:
 ## 📚 Recursos Adicionais
 
 ### Documentação PITest
-- **Site oficial**: https://pitest.org/
-- **Guia de Quick Start**: https://pitest.org/quickstart/
-- **Mutadores**: https://pitest.org/quickstart/mutators/
+
+- **Site oficial**: <https://pitest.org/>
+- **Guia de Quick Start**: <https://pitest.org/quickstart/>
+- **Mutadores**: <https://pitest.org/quickstart/mutators/>
 
 ### Artigos e Papers
+
 - "Are Mutants a Valid Substitute for Real Faults in Software Testing?" (SIGSOFT 2014)
 - "An Analysis and Survey of the Development of Mutation Testing" (IEEE TSE 2011)
 
