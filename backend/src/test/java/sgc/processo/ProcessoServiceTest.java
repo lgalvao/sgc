@@ -690,6 +690,215 @@ class ProcessoServiceTest {
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
         }
+
+        @Test
+        @DisplayName("Deve negar acesso quando authentication é null")
+        void deveNegarAcessoQuandoAuthenticationNull() {
+            // Act & Assert
+            assertThat(processoService.checarAcesso(null, 1L)).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso quando subprocesso não pertence à hierarquia do usuário")
+        void deveNegarAcessoQuandoSubprocessoForaDaHierarquia() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("gestor");
+
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder()
+                    .usuarioTitulo("gestor")
+                    .perfil("GESTOR")
+                    .unidadeCodigo(10L)
+                    .build();
+            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            // Subprocesso não pertence à hierarquia
+            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(false);
+
+            // Act & Assert
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso com ROLE_GESTOR mas sem ROLE_CHEFE quando precisaria de ambos")
+        void devePermitirAcessoApenasComRoleGestor() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("gestor");
+
+            // Apenas ROLE_GESTOR (sem ROLE_CHEFE)
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder()
+                    .usuarioTitulo("gestor")
+                    .perfil("GESTOR")
+                    .unidadeCodigo(10L)
+                    .build();
+            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
+
+            // Act & Assert - deve permitir apenas com GESTOR
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso quando usuário só tem ROLE_SERVIDOR")
+        void deveNegarAcessoQuandoApenasRoleServidor() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("servidor");
+
+            // Apenas ROLE_SERVIDOR (não é GESTOR nem CHEFE)
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_SERVIDOR"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            // Act & Assert - deve negar porque não é GESTOR nem CHEFE
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("Validações de Criação")
+    class ValidacoesCriacao {
+        @Test
+        @DisplayName("Deve lançar exceção ao criar processo com unidade INTERMEDIARIA")
+        void deveLancarExcecaoQuandoUnidadeIntermediaria() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(
+                            "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            Unidade unidadeIntermediaria = UnidadeFixture.unidadeComId(1L);
+            unidadeIntermediaria.setTipo(sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA);
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidadeIntermediaria));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("unidade não elegível");
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção ao criar REVISAO quando unidade não tem mapa")
+        void deveLancarExcecaoQuandoRevisaoSemMapa() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(
+                            "Revisao Teste", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = UnidadeFixture.unidadeComId(1L);
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(unidade));
+            when(unidadeMapaRepo.existsById(1L)).thenReturn(false); // Não tem mapa
+            when(unidadeRepo.findSiglasByCodigos(List.of(1L))).thenReturn(List.of("U1"));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("não possuem mapa vigente");
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção ao criar DIAGNOSTICO quando unidade não tem mapa")
+        void deveLancarExcecaoQuandoDiagnosticoSemMapa() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(
+                            "Diag Teste", TipoProcesso.DIAGNOSTICO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = UnidadeFixture.unidadeComId(1L);
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(unidade));
+            when(unidadeMapaRepo.existsById(1L)).thenReturn(false); // Não tem mapa
+            when(unidadeRepo.findSiglasByCodigos(List.of(1L))).thenReturn(List.of("U1"));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("não possuem mapa vigente");
+        }
+
+        @Test
+        @DisplayName("Deve criar REVISAO com sucesso quando unidade tem mapa")
+        void deveCriarRevisaoQuandoUnidadeTemMapa() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(
+                            "Revisao OK", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = UnidadeFixture.unidadeComId(1L);
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(unidade));
+            when(unidadeMapaRepo.existsById(1L)).thenReturn(true); // Tem mapa
+            when(processoRepo.saveAndFlush(any()))
+                    .thenAnswer(i -> {
+                        Processo p = i.getArgument(0);
+                        p.setCodigo(100L);
+                        return p;
+                    });
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            // Act
+            ProcessoDto resultado = processoService.criar(req);
+
+            // Assert
+            assertThat(resultado).isNotNull();
+            verify(processoRepo).saveAndFlush(argThat(p -> 
+                p.getTipo() == TipoProcesso.REVISAO
+            ));
+        }
+
+        @Test
+        @DisplayName("Deve criar MAPEAMENTO sem verificar mapa vigente")
+        void deveCriarMapeamentoSemVerificarMapa() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(
+                            "Mapeamento Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = UnidadeFixture.unidadeComId(1L);
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(processoRepo.saveAndFlush(any()))
+                    .thenAnswer(i -> {
+                        Processo p = i.getArgument(0);
+                        p.setCodigo(100L);
+                        return p;
+                    });
+            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
+
+            // Act
+            ProcessoDto resultado = processoService.criar(req);
+
+            // Assert
+            assertThat(resultado).isNotNull();
+            // Não deve verificar mapa para MAPEAMENTO
+            verify(unidadeMapaRepo, never()).existsById(anyLong());
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando descrição é null")
+        void deveLancarExcecaoQuandoDescricaoNull() {
+            // Arrange
+            CriarProcessoReq req =
+                    new CriarProcessoReq(null, TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ConstraintViolationException.class)
+                    .hasMessageContaining("descrição");
+        }
     }
     
     @Nested
