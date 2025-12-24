@@ -46,6 +46,10 @@ screenshots/
 output.txt
 e2e/server.log
 /dados/
+e2e_test_run.txt
+npm_install.txt
+playwright_install.txt
+frontend/npm_install_frontend.txt
 
 Reports de testes
 !backend/build/reports/tests/test/index.html
