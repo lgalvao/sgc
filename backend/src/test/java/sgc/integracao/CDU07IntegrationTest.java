@@ -146,7 +146,8 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
         chefe = usuarioRepo.save(chefe);
 
         // Associar como titular na Unidade também (para o DTO)
-        unidade.setTitular(chefe);
+        unidade.setTituloTitular(chefe.getTituloEleitoral());
+        unidade.setMatriculaTitular(chefe.getMatricula());
         unidadeRepo.save(unidade);
 
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()

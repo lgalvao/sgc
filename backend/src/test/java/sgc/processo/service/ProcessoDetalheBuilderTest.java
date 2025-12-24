@@ -77,7 +77,7 @@ class ProcessoDetalheBuilderTest {
       when(authentication.isAuthenticated()).thenReturn(true);
       // Simula autoridades usando wildcard para evitar problemas de tipos genéricos
       List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-      when(authentication.getAuthorities()).thenReturn((List) authorities);
+      when((List) authentication.getAuthorities()).thenReturn(authorities);
 
       // Act
       ProcessoDetalheDto dto = builder.build(processo);
@@ -100,7 +100,7 @@ class ProcessoDetalheBuilderTest {
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.isAuthenticated()).thenReturn(true);
       List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-      when(authentication.getAuthorities()).thenReturn((List) authorities);
+      when((List) authentication.getAuthorities()).thenReturn(authorities);
       when(authentication.getPrincipal()).thenReturn(new Object());
 
       // Act

@@ -75,6 +75,7 @@ class ProcessoControllerTest {
 
             // Assert
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            @SuppressWarnings("unchecked")
             Map<String, List<String>> body = (Map<String, List<String>>) response.getBody();
             assertEquals(List.of("Erro 1"), body.get("erros"));
         }
