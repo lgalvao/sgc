@@ -148,13 +148,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 descricao: desc,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'COORD_21', // Unidade do Gestor
+                unidade: 'COORD_22', // Unidade do Gestor COORD_22
                 expandir: ['SECRETARIA_2'],
                 iniciar: true
             });
             await page.getByTestId('btn-logout').click();
 
-            await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByText(desc)).toBeVisible();
             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});

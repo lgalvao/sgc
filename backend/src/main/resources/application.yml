@@ -32,7 +32,7 @@ spring:
     events:
       externalization:
         enabled: true
-      completion-mode: on-completion
+      completion-mode: DELETE
       delete-completion-after: 7d  # Apagar eventos completados após 7 dias
     # Observability - endpoints de monitoramento
     actuator:
