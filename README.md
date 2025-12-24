@@ -70,7 +70,7 @@ sgc/
 
 ## 🧪 Testes e Qualidade
 
-O projeto possui uma suite abrangente de testes e verificações de qualidade.
+O projeto possui uma suite abrangente de testes e verificações de qualidade, incluindo **Mutation Testing** para avaliar a eficácia dos testes.
 
 ### Execução de Testes
 
@@ -80,6 +80,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Unitários Frontend** | `cd frontend && npm run test:unit` | Vitest para componentes e lógica. |
 | **End-to-End (E2E)** | `npm run test:e2e` | Playwright simulando fluxos reais. |
 | **Type Check (Front)**| `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |
+| **Mutation Testing** | `./scripts/run-mutation-tests.sh` | PITest para avaliar qualidade dos testes. |
 
 ### Verificação de Qualidade (Quality Gate)
 
@@ -92,6 +93,34 @@ Para rodar todas as verificações (Checkstyle, PMD, SpotBugs, Testes, Lint, Typ
 Os relatórios são gerados em:
 *   Backend: `backend/build/reports/`
 *   Frontend: `frontend/coverage/`
+
+### Mutation Testing (PITest)
+
+O projeto utiliza **PITest** para avaliar a qualidade dos testes através de **mutation-based testing**. Esta técnica introduz pequenas mudanças (mutações) no código e verifica se os testes conseguem detectá-las.
+
+#### Executar Mutation Testing
+
+```bash
+# Modo rápido (apenas módulos de alta prioridade)
+./scripts/run-mutation-tests.sh --quick
+
+# Módulo específico
+./scripts/run-mutation-tests.sh --module processo
+
+# Completo (todos os módulos configurados)
+./scripts/run-mutation-tests.sh --full
+```
+
+#### Relatórios
+
+O relatório HTML é gerado em: `backend/build/reports/pitest/index.html`
+
+**Métricas principais:**
+- **Mutation Coverage**: Percentual de mutantes detectados pelos testes (meta: ≥70%)
+- **Test Strength**: Eficácia dos testes existentes (meta: ≥0.70)
+
+Para um guia detalhado sobre como interpretar relatórios e matar mutantes, consulte:
+*   **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano completo de Mutation Testing
 
 ### Guia de Testes JUnit
 
