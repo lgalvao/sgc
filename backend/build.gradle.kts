@@ -84,6 +84,7 @@ dependencies {
 
     // Testes
     testImplementation("org.awaitility:awaitility")
+    testImplementation("net.jqwik:jqwik:1.9.2")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -194,4 +195,23 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
+    dependsOn("propertyTest")
+}
+
+tasks.register<Test>("propertyTest") {
+    description = "Runs property-based tests."
+    group = "verification"
+    val testSourceSet = sourceSets.getByName("test")
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("pbt")
+    }
+    shouldRunAfter("test")
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        excludeTags("pbt")
+    }
 }
