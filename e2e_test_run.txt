@@ -1,0 +1,316 @@
+
+> sgc-e2e@1.0.0 test:e2e
+> playwright test
+
+[1A[2K[WebServer] Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 10
+
+[1A[2K[WebServer] %.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 20%.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 30%.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 40%.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 50%.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 60
+
+[1A[2K[WebServer] %.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 70%
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 80
+
+[1A[2K[WebServer] %.
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 90%
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] .
+
+[1A[2K[WebServer] 100%
+
+[1A[2K[WebServer] Welcome to Gradle 9.2.1!
+
+[1A[2K[WebServer] Here are the highlights of this release:
+
+[1A[2K[WebServer]  - Windows ARM support
+[WebServer]  - Improved publishing APIs
+
+[1A[2K[WebServer]  - Better guidance for dependency verification failures
+
+[1A[2K[WebServer] For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
+[1A[2K[WebServer] Calculating task graph as no cached configuration is available for tasks: bootRun --args=--spring.profiles.active=e2e
+
+[1A[2K[WebServer] Perfil Spring ativado: test
+[WebServer] Carregando configurações de: .env.test
+
+[1A[2K[WebServer] INFO  c.t.archunit.core.PluginLoader.get:68 - Detected Java version 21.0.9
+
+[1A[2K[WebServer] WARN  s.s.i.a.GerenciadorJwt.verificarSeguranca:41 - ⚠️ ALERTA DE SEGURANÇA: Usando secret JWT padrão inseguro. Isso é aceitável apenas para desenvolvimento/testes.
+
+[1A[2K[WebServer] INFO  o.a.c.core.StandardService.log:168 - Stopping service [Tomcat]
+
+[1A[2K[WebServer] ERROR o.s.b.d.LoggingFailureAnalysisReporter.report:40 - 
+[WebServer] ***************************
+[WebServer] APPLICATION FAILED TO START
+[WebServer] ***************************
+
+[1A[2K[WebServer] Description:
+[WebServer] Invalid value 'on-completion' for configuration property 'spring.modulith.events.completion-mode' (originating from 'class path resource [application.yml] - 35:24'). Validation failed for the following reason:
+[WebServer] Failed to convert to type org.springframework.modulith.events.support.CompletionMode
+[WebServer] Action:
+[WebServer] Review the value of the property with the provided reason.
+[WebServer] BUILD SUCCESSFUL in 1m 42s
+
+[1A[2K[WebServer] 4 actionable tasks: 4 executed
+[WebServer] Configuration cache entry stored.
+
+Error: Timed out waiting 300000ms from config.webServer.
+
+[1A[2K
