@@ -6,7 +6,7 @@
 
 [1A[2K[WebServer] WARN  s.s.i.a.GerenciadorJwt.verificarSeguranca:41 - ⚠️ ALERTA DE SEGURANÇA: Usando secret JWT padrão inseguro. Isso é aceitável apenas para desenvolvimento/testes.
 
-[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m326[22m[2m[0m ms[22m
+[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m319[22m[2m[0m ms[22m
 
 [1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
@@ -22,7 +22,7 @@ Running 149 tests using 1 worker
 
 [1A[2K[NETWORK ERROR] 404 POST http://localhost:10000/api/usuarios/autorizar
 
-[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"24-12-2025 00:24:32","traceId":"c7261494-d0f9-43bf-a5ac-d83e0c910dd5"}
+[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"24-12-2025 00:32:37","traceId":"e64ac82d-4189-4016-bcc3-662cfdfded8b"}
 
 [1A[2K[WebServer] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
 
@@ -31,41 +31,9 @@ Running 149 tests using 1 worker
 
 [1A[2K[3/149] [chromium] › e2e/captura-telas.spec.ts:142:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 2 criado.
-[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 2 iniciado para 2 unidade(s).
+[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 2 iniciado para 1 unidade(s).
 
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_211
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_212
-
-[1A[2K  1) [chromium] › e2e/captura-telas.spec.ts:142:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByText('Processo Gestor 1766535876896')
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByText('Processo Gestor 1766535876896')[22m
-
-
-      157 |             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
-      158 |             await expect(page.getByTestId('tbl-processos')).toBeVisible();
-    > 159 |             await expect(page.getByText(desc)).toBeVisible();
-          |                                                ^
-      160 |             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});
-      161 |         });
-      162 |
-        at /home/runner/work/sgc/sgc/e2e/captura-telas.spec.ts:159:48
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/captura-telas-Captura-de-T-ec051-cipal-Captura-painel-GESTOR-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results/captura-telas-Captura-de-T-ec051-cipal-Captura-painel-GESTOR-chromium/error-context.md
-
+[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
 [1A[2K[4/149] [chromium] › e2e/captura-telas.spec.ts:163:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 3 criado.
@@ -77,8 +45,7 @@ Running 149 tests using 1 worker
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 4 criado.
 
 [1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 4 iniciado para 1 unidade(s).
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_12
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_12
 
 [1A[2K[6/149] [chromium] › e2e/captura-telas.spec.ts:226:13 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário
 [1A[2K[7/149] [chromium] › e2e/captura-telas.spec.ts:260:13 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades
@@ -102,9 +69,9 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_121
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=7
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=6
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 7 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 6 atualizado e mapa disponibilizado.
 
 [1A[2K[10/149] [chromium] › e2e/captura-telas.spec.ts:539:13 › Captura de Telas - Sistema SGC › 06 - Navegação e Menus › Captura elementos de navegação
 [1A[2K[11/149] [chromium] › e2e/captura-telas.spec.ts:575:13 › Captura de Telas - Sistema SGC › 07 - Estados e Situações › Captura diferentes estados de processo
@@ -125,7 +92,7 @@ Running 149 tests using 1 worker
 
 [1A[2K[NETWORK ERROR] 404 POST http://localhost:10000/api/usuarios/autorizar
 
-[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"24-12-2025 00:25:11","traceId":"24e687e3-120a-4423-930f-66ef54a94517"}
+[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Usuário&#39; com codigo &#39;0&#39; não encontrado(a).","status":404,"timestamp":"24-12-2025 00:33:10","traceId":"d0229f02-dae1-4d97-8b62-dfe162dc5708"}
 
 [1A[2K[WebServer] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
 
@@ -173,9 +140,9 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_21
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=10
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=9
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 10 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 9 atualizado e mapa disponibilizado.
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
 [WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 16
@@ -190,7 +157,8 @@ Running 149 tests using 1 worker
 [1A[2K[WebServer] INFO  s.s.i.s.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade ASSESSORIA_21
 
 [1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de revisao 17 iniciado para 1 unidade(s).
-[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_21
+
+[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_21
 
 [1A[2K[33/149] [chromium] › e2e/cdu-06.spec.ts:16:9 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para ADMIN
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 18 criado.
@@ -201,10 +169,8 @@ Running 149 tests using 1 worker
 
 [1A[2K[34/149] [chromium] › e2e/cdu-06.spec.ts:60:9 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para GESTOR
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 19 criado.
-
-[1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 19 iniciado para 1 unidade(s).
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_111
+[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 19 iniciado para 1 unidade(s).
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_111
 
 [1A[2K[35/149] [chromium] › e2e/cdu-07.spec.ts:18:9 › CDU-07 - Detalhar subprocesso › Deve exibir detalhes do subprocesso para CHEFE
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 20 criado.
@@ -217,7 +183,8 @@ Running 149 tests using 1 worker
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 21 criado.
 
 [1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 21 iniciado para 1 unidade(s).
-[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_11
+
+[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_11
 
 [1A[2K[WebServer] INFO  s.atividade.AtividadeService.lambda$atualizar$4:149 - Atividade 11 atualizada
 
@@ -226,8 +193,7 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.s.i.s.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade ASSESSORIA_12
 [WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de revisao 22 iniciado para 1 unidade(s).
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_12
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade ASSESSORIA_12
 
 [1A[2K[WebServer] INFO  s.m.i.s.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=true, inseridas=1 removidas=0, alteradas=0
 
@@ -251,15 +217,17 @@ Running 149 tests using 1 worker
 [1A[2K[43/149] [chromium] › e2e/cdu-10.spec.ts:70:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
 [1A[2K[44/149] [chromium] › e2e/cdu-10.spec.ts:94:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 3: Admin homologa cadastro
 [1A[2K[45/149] [chromium] › e2e/cdu-10.spec.ts:110:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 4: Admin adiciona competências e disponibiliza mapa
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=18
-[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 18 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=17
+
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 17 atualizado e mapa disponibilizado.
 
 [1A[2K[46/149] [chromium] › e2e/cdu-10.spec.ts:157:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 5: Chefe valida mapa
 [1A[2K[47/149] [chromium] › e2e/cdu-10.spec.ts:171:9 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 24
-[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
 [WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 24 finalizado
 
 [1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
@@ -303,16 +271,17 @@ Running 149 tests using 1 worker
 [1A[2K[57/149] [chromium] › e2e/cdu-11.spec.ts:105:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada
 [1A[2K[58/149] [chromium] › e2e/cdu-11.spec.ts:154:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)
 [1A[2K[59/149] [chromium] › e2e/cdu-11.spec.ts:185:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 3: Visualizar processo finalizado
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=20
-[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 20 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=19
+[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 19 atualizado e mapa disponibilizado.
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 26
-[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
-[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 26 finalizado
 
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 26 finalizado
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
 
 [1A[2K[60/149] [chromium] › e2e/cdu-11.spec.ts:274:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza cadastro de processo finalizado
 [1A[2K[61/149] [chromium] › e2e/cdu-12.spec.ts:61:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
@@ -322,9 +291,9 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=21
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=20
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 21 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 20 atualizado e mapa disponibilizado.
 
 [1A[2K[chromium] › e2e/cdu-12.spec.ts:61:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
 [Browser Console] debug: [vite] connecting...
@@ -342,7 +311,8 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.s.i.s.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
 [WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de revisao 28 iniciado para 1 unidade(s).
-[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
 [1A[2K[63/149] [chromium] › e2e/cdu-12.spec.ts:202:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial)
 [1A[2K[WebServer] INFO  s.m.i.s.ImpactoMapaService.verificarImpactos:122 - Análise de impactos concluída: tem=false, inseridas=0 removidas=0, alteradas=0
@@ -365,8 +335,7 @@ Running 149 tests using 1 worker
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 29 criado.
 
 [1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 29 iniciado para 1 unidade(s).
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
 [1A[2K[69/149] [chromium] › e2e/cdu-13.spec.ts:79:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza
 [1A[2K[70/149] [chromium] › e2e/cdu-13.spec.ts:109:9 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
@@ -386,9 +355,9 @@ Running 149 tests using 1 worker
 
 [1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=24
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=23
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 24 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 23 atualizado e mapa disponibilizado.
 
 [1A[2K[chromium] › e2e/cdu-14.spec.ts:57:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0: Criar mapa vigente através de processo de mapeamento
 [Browser Console] debug: [vite] connecting...
@@ -396,19 +365,18 @@ Running 149 tests using 1 worker
 [1A[2K[Browser Console] debug: [vite] connected.
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
+[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 30
+[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
 
-[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 30
-
-[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
-[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 30 finalizado
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 30 finalizado
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
 
 [1A[2K[81/149] [chromium] › e2e/cdu-14.spec.ts:170:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de revisão
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 31 criado.
 
 [1A[2K[WebServer] INFO  s.s.i.s.SubprocessoFactory.criarParaRevisao:124 - Subprocesso para revisão criado para unidade SECAO_221
-[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de revisao 31 iniciado para 1 unidade(s).
+
+[1A[2K[WebServer] INFO  s.p.i.s.ProcessoInicializador.iniciar:97 - Processo de revisao 31 iniciado para 1 unidade(s).
 [WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailDeProcessoIniciado:354 - E-mail enviado para unidade SECAO_221
 
 [1A[2K[82/149] [chromium] › e2e/cdu-14.spec.ts:195:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 2: CHEFE revisa atividades e disponibiliza
@@ -446,12 +414,11 @@ Running 149 tests using 1 worker
 [1A[2K[97/149] [chromium] › e2e/cdu-15.spec.ts:153:9 › CDU-15 - Manter mapa de competências › CT-03: Editar Competência
 [1A[2K[98/149] [chromium] › e2e/cdu-15.spec.ts:169:9 › CDU-15 - Manter mapa de competências › CT-05: Validar Cancelamento da Exclusão
 [1A[2K[99/149] [chromium] › e2e/cdu-15.spec.ts:182:9 › CDU-15 - Manter mapa de competências › CT-04: Excluir Competência com Confirmação
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.removerCompetencia:118 - Situação do subprocesso 26 alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.removerCompetencia:118 - Situação do subprocesso 25 alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)
 
 [1A[2K[100/149] [chromium] › e2e/cdu-15.spec.ts:196:9 › CDU-15 - Manter mapa de competências › CT-06: Navegar para Disponibilização
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=26
-
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 26 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=25
+[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 25 atualizado e mapa disponibilizado.
 
 [1A[2K[101/149] [chromium] › e2e/cdu-16.spec.ts:63:9 › CDU-16 - Ajustar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 33 criado.
@@ -463,20 +430,18 @@ Running 149 tests using 1 worker
 [1A[2K[102/149] [chromium] › e2e/cdu-16.spec.ts:87:9 › CDU-16 - Ajustar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
 [1A[2K[103/149] [chromium] › e2e/cdu-16.spec.ts:111:9 › CDU-16 - Ajustar mapa de competências › Preparacao 3: Admin homologa cadastro
 [1A[2K[104/149] [chromium] › e2e/cdu-16.spec.ts:123:9 › CDU-16 - Ajustar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=27
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=26
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 27 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 26 atualizado e mapa disponibilizado.
 
 [1A[2K[105/149] [chromium] › e2e/cdu-16.spec.ts:141:9 › CDU-16 - Ajustar mapa de competências › Preparacao 5: Chefe valida mapa
 [1A[2K[106/149] [chromium] › e2e/cdu-16.spec.ts:156:9 › CDU-16 - Ajustar mapa de competências › Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.validarTodosSubprocessosHomologados:361 - Homologados 1 subprocessos.
-[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 33
 
-[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
-
-[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 33 finalizado
-
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 33
+[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 33 finalizado
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
 
 [1A[2K[107/149] [chromium] › e2e/cdu-16.spec.ts:181:9 › CDU-16 - Ajustar mapa de competências › Preparacao 7: Admin cria e inicia processo de revisão
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.criar:180 - Processo 34 criado.
@@ -512,9 +477,9 @@ Running 149 tests using 1 worker
 [1A[2K[119/149] [chromium] › e2e/cdu-17.spec.ts:152:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 2: ADMIN abre modal de disponibilização
 [1A[2K[120/149] [chromium] › e2e/cdu-17.spec.ts:171:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 3: ADMIN cancela disponibilização - permanece na tela
 [1A[2K[121/149] [chromium] › e2e/cdu-17.spec.ts:191:9 › CDU-17 - Disponibilizar mapa de competências › Cenario 4: ADMIN disponibiliza mapa com sucesso
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=29
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=28
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 29 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 28 atualizado e mapa disponibilizado.
 
 [1A[2K[122/149] [chromium] › e2e/cdu-18.spec.ts:23:9 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo
 [1A[2K[123/149] [chromium] › e2e/cdu-18.spec.ts:73:9 › CDU-18: Visualizar mapa de competências › Cenário 2: CHEFE visualiza mapa da própria unidade
@@ -528,9 +493,9 @@ Running 149 tests using 1 worker
 [1A[2K[125/149] [chromium] › e2e/cdu-19.spec.ts:64:9 › CDU-19 - Validar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
 [1A[2K[126/149] [chromium] › e2e/cdu-19.spec.ts:84:9 › CDU-19 - Validar mapa de competências › Preparacao 3: Admin homologa cadastro
 [1A[2K[127/149] [chromium] › e2e/cdu-19.spec.ts:96:9 › CDU-19 - Validar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=30
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=29
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 30 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 29 atualizado e mapa disponibilizado.
 
 [1A[2K[128/149] [chromium] › e2e/cdu-19.spec.ts:119:9 › CDU-19 - Validar mapa de competências › Cenario 1: CHEFE navega para visualização do mapa
 [1A[2K[129/149] [chromium] › e2e/cdu-19.spec.ts:143:9 › CDU-19 - Validar mapa de competências › Cenario 2: CHEFE cancela validação - permanece na tela
@@ -545,9 +510,9 @@ Running 149 tests using 1 worker
 [1A[2K[132/149] [chromium] › e2e/cdu-20.spec.ts:72:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
 [1A[2K[133/149] [chromium] › e2e/cdu-20.spec.ts:92:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 3: Admin homologa cadastro
 [1A[2K[134/149] [chromium] › e2e/cdu-20.spec.ts:104:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=31
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=30
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 31 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 30 atualizado e mapa disponibilizado.
 
 [1A[2K[135/149] [chromium] › e2e/cdu-20.spec.ts:121:9 › CDU-20 - Analisar validação de mapa de competências › Preparacao 5: Chefe valida o mapa
 [1A[2K[136/149] [chromium] › e2e/cdu-20.spec.ts:141:9 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado
@@ -564,9 +529,9 @@ Running 149 tests using 1 worker
 [1A[2K[141/149] [chromium] › e2e/cdu-21.spec.ts:72:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
 [1A[2K[142/149] [chromium] › e2e/cdu-21.spec.ts:92:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 3: Admin homologa cadastro
 [1A[2K[143/149] [chromium] › e2e/cdu-21.spec.ts:104:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 4: Admin cria competências e disponibiliza mapa
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=32
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:145 - Disponibilizando mapa do subprocesso: codSubprocesso=31
 
-[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 32 atualizado e mapa disponibilizado.
+[1A[2K[WebServer] INFO  s.s.i.s.SubprocessoMapaWorkflowService.disponibilizarMapa:186 - Subprocesso 31 atualizado e mapa disponibilizado.
 
 [1A[2K[144/149] [chromium] › e2e/cdu-21.spec.ts:121:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 5: Chefe valida o mapa
 [1A[2K[145/149] [chromium] › e2e/cdu-21.spec.ts:136:9 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 6: Gestor registra aceite do mapa
@@ -579,10 +544,8 @@ Running 149 tests using 1 worker
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:365 - Mapa vigente definido para o processo 38
 
 [1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.tornarMapasVigentes:386 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
-[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 38 finalizado
 
-[1A[2K[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
+[1A[2K[WebServer] INFO  s.p.i.service.ProcessoService.finalizar:312 - Processo 38 finalizado
+[WebServer] INFO  s.n.i.l.EventoProcessoListener.enviarEmailUnidadeFinal:240 - E-mail de finalização enviado para SECAO_221
 
-[1A[2K  1 failed
-    [chromium] › e2e/captura-telas.spec.ts:142:13 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR 
-  148 passed (4.8m)
+[1A[2K  149 passed (4.8m)
