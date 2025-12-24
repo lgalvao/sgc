@@ -68,14 +68,17 @@
               data-testid="cad-atribuicao__btn-criar-atribuicao"
               type="submit"
               variant="primary"
+              :disabled="isLoading"
           >
-            Criar
+            <BSpinner v-if="isLoading" small class="me-1" />
+            <span v-else>Criar</span>
           </BButton>
           <BButton
               class="ms-2"
               data-testid="btn-cancelar-atribuicao"
               type="button"
               variant="secondary"
+              :disabled="isLoading"
               @click="router.push(`/unidade/${codUnidade}`)"
           >
             Cancelar
@@ -117,6 +120,7 @@ import {
   BFormSelect,
   BFormSelectOption,
   BFormTextarea,
+  BSpinner,
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
@@ -139,6 +143,7 @@ const justificativa = ref("");
 const sucesso = ref(false);
 const erroUsuario = ref("");
 const erroApi = ref("");
+const isLoading = ref(false);
 
 onMounted(async () => {
   try {
@@ -159,6 +164,7 @@ async function criarAtribuicao() {
 
   erroApi.value = "";
   sucesso.value = false;
+  isLoading.value = true;
 
   try {
     await criarAtribuicaoTemporaria(unidade.value.codigo, {
@@ -174,6 +180,8 @@ async function criarAtribuicao() {
   } catch (error) {
     erroApi.value = "Falha ao criar atribuição. Tente novamente.";
     console.error(error);
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
