@@ -140,23 +140,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura painel GESTOR', async ({page}) => {
-            // Criar processo para o Gestor primeiro como ADMIN
+            // Utiliza o processo "Processo Seed 300" (MAPEAMENTO SECAO_111) já criado no seed
+            // O Gestor é de COORD_11 (Pai de SECAO_111), então deve ver o processo.
             await page.goto('/login');
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            const desc = `Processo Gestor ${Date.now()}`;
-            await criarProcesso(page, {
-                descricao: desc,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: 'COORD_21', // Unidade do Gestor
-                expandir: ['SECRETARIA_2'],
-                iniciar: true
-            });
-            await page.getByTestId('btn-logout').click();
-
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
-            await expect(page.getByText(desc)).toBeVisible();
+            // Verifica se o processo da unidade filha está visível
+            await expect(page.getByText('Processo Seed 300')).toBeVisible();
             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});
         });
 

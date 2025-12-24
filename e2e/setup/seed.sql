@@ -355,3 +355,30 @@ VALUES ('123456789012', 'CHEFE', 99);
 UPDATE sgc.vw_unidade
 SET titulo_titular = '123456789012', matricula_titular = '56789012', data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 99;
+
+-- Dados para teste de Painel Gestor (CDU-02)
+-- Mapa para SECAO_111 (Unidade 6) para permitir criação de processo de REVISÃO
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
+VALUES (300, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 300', 'FINALIZADO', 'MAPEAMENTO');
+
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
+VALUES (300, 6, 'CONCLUIDA');
+
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao)
+VALUES (300, 300, 6, 'MAPEAMENTO_MAPA_HOMOLOGADO');
+
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (300, 300, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+
+INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
+VALUES (6, 300);
+
+-- Atividade para SECAO_111
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (3001, 'Atividade 3001', 300);
+
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (300001, 'Competência 3001', 300);
+
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (3001, 300001);

@@ -193,6 +193,9 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
+        // Aguarda promises e o próximo tick
+        await new Promise(resolve => setImmediate(resolve));
+
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro no sistema",
             "Ocorreu um erro ao tentar realizar o login.",
@@ -237,8 +240,14 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
+        // Aguarda promises do passo 1
+        await new Promise(resolve => setImmediate(resolve));
+
         // Passo 2 - Tentar selecionar
         await wrapper.find('form').trigger('submit');
+
+        // Aguarda promises do passo 2
+        await new Promise(resolve => setImmediate(resolve));
 
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro",
@@ -263,15 +272,6 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
-
-        // Forçar parSelecionado a null para testar a validação
-        // Precisamos acessar a instancia do componente ou manipular via UI se possível.
-        // O watcher seleciona automaticamente o primeiro.
-        // Vamos tentar setar null diretamente na variável reativa interna se exposta ou mockar o watcher.
-        // Como é difícil via wrapper de integração, podemos simular que o watcher não rodou ou array veio vazio depois.
-        // Mas o watcher roda na mount.
-        // Alternativa: Setar perfisUnidadesDisponiveis para vazio momentaneamente?
-        // Ou melhor, apenas validar o else do "if (parSelecionado.value)".
 
         // Verifica se mudou para o passo 2
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
@@ -302,7 +302,7 @@ describe("LoginView.vue", () => {
         // Disparar evento nativo com mock do getModifierState
         const eventOn = new KeyboardEvent("keydown", { bubbles: true });
         Object.defineProperty(eventOn, "getModifierState", {
-            value: (key: string) => key === "CapsLock",
+            value: (_key: string) => _key === "CapsLock",
         });
         inputWrapper.element.dispatchEvent(eventOn);
         await wrapper.vm.$nextTick();
@@ -313,7 +313,7 @@ describe("LoginView.vue", () => {
         // Simula evento keyup com caps lock desativado
         const eventOff = new KeyboardEvent("keyup", { bubbles: true });
         Object.defineProperty(eventOff, "getModifierState", {
-            value: (key: string) => false,
+            value: (_key: string) => false,
         });
         inputWrapper.element.dispatchEvent(eventOff);
         await wrapper.vm.$nextTick();
