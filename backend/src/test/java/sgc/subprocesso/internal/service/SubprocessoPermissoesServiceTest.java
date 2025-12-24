@@ -155,6 +155,25 @@ class SubprocessoPermissoesServiceTest {
             // Act & Assert
             assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
         }
+
+        @Test
+        @DisplayName("Deve validar ajuste de mapa quando situação é REVISAO_MAPA_AJUSTADO")
+        void deveValidarAjusteMapaQuandoSituacaoRevisaoMapaAjustado() {
+            // Arrange
+            Subprocesso sub = mock(Subprocesso.class);
+            Unidade unidade = mock(Unidade.class);
+            when(unidade.getCodigo()).thenReturn(1L);
+            when(sub.getUnidade()).thenReturn(unidade);
+            when(sub.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sub.getMapa()).thenReturn(mapa);
+            when(atividadeRepo.countByMapaCodigo(10L)).thenReturn(1L); // Mapa não vazio
+
+            // Act & Assert
+            assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
+        }
     }
 
     @Nested
@@ -258,6 +277,26 @@ class SubprocessoPermissoesServiceTest {
 
             // Assert
             assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Gestor não deve ter acesso quando unidade não é subordinada na hierarquia")
+        void gestorNaoDeveAcessarUnidadeNaoSubordinadaComHierarquia() {
+            // Arrange - Hierarquia: avo -> pai -> filha
+            // Gestor está em 'tio' (irmão do pai) -> não é superior da filha
+            Unidade avo = criarUnidade(1L, null);
+            Unidade pai = criarUnidade(2L, avo);
+            Unidade tio = criarUnidade(4L, avo);
+            Unidade filha = criarUnidade(3L, pai);
+
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, tio);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, filha);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
         }
     }
 

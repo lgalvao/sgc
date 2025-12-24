@@ -56,27 +56,6 @@ if (saldo >= 100) { return true; }  // Se testes passam, mutante sobrevive!
 
 ---
 
-## � Baseline Atual (2025-12-24)
-
-| Métrica | Valor | Meta |
-|---------|-------|------|
-| **KILLED** | 535 (51.7%) | - |
-| **SURVIVED** | 242 (23.4%) | 0% |
-| **NO_COVERAGE** | 257 (24.9%) | 0% |
-| **Mutation Score** | ~52% | ≥ 70% |
-
-### Classes com mais mutantes sobreviventes
-
-| Classe | SURVIVED | NO_COVERAGE |
-|--------|----------|-------------|
-| ProcessoService | 38 | 25 |
-| ImpactoMapaService | 37 | 10 |
-| SubprocessoPermissoesService | 29 | 2 |
-| SubprocessoMapaWorkflowService | 26 | 3 |
-| SubprocessoDtoService | 18 | 26 |
-
----
-
 ## ⚠️ Padrões Problemáticos Encontrados
 
 ### 1. Cadeias de OR em validações de situação
