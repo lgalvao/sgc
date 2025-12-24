@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
@@ -19,6 +20,16 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      */
     @Query("SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao")
     List<Processo> findBySituacao(@Param("situacao") SituacaoProcesso situacao);
+
+    /**
+     * Busca processo por ID com participantes e suas unidades superiores inicializadas.
+     * Otimizado para evitar N+1 ao construir hierarquia.
+     */
+    @Query("SELECT DISTINCT p FROM Processo p " +
+            "LEFT JOIN FETCH p.participantes u " +
+            "LEFT JOIN FETCH u.unidadeSuperior " +
+            "WHERE p.codigo = :codigo")
+    Optional<Processo> findByIdWithParticipantes(@Param("codigo") Long codigo);
 
     Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
 
