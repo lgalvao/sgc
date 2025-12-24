@@ -742,7 +742,7 @@ spring:
     events:
       externalization:
         enabled: true
-      completion-mode: on-completion
+      completion-mode: DELETE
       delete-completion-after: 7d
 ```
 

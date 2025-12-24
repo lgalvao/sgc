@@ -606,8 +606,8 @@ spring:
       # Habilitar persistência de eventos
       externalization:
         enabled: true
-      # Modo de completude
-      completion-mode: on-completion
+      # Modo de completude (UPDATE, DELETE ou ARCHIVE)
+      completion-mode: DELETE
       # Cleanup de eventos completados (após 7 dias)
       delete-completion-after: 7d
 ```
