@@ -6,6 +6,9 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
+    // PITest plugin comentado devido à incompatibilidade com Gradle 9.2.1
+    // Veja MUTATION_TESTING_PLAN.md para soluções alternativas
+    // id("info.solidsoft.pitest") version "1.9.11"
 }
 
 java {
@@ -195,3 +198,131 @@ tasks.jacocoTestCoverageVerification {
 tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
+
+// ===== Mutation Testing (PIT) - CONFIGURAÇÃO PREPARADA =====
+// NOTA: A configuração abaixo está preparada mas comentada devido à incompatibilidade
+// do plugin Gradle PITest com Gradle 9.2.1. Consulte MUTATION_TESTING_PLAN.md para
+// soluções alternativas (downgrade temporário do Gradle ou uso via Maven).
+
+/*
+pitest {
+    // Versão do PITest
+    pitestVersion.set("1.17.3")
+    
+    // Versão do JUnit 5 Plugin
+    junit5PluginVersion.set("1.2.1")
+    
+    // Pacotes alvo para mutation testing (foco em lógica de negócio)
+    targetClasses.set(listOf(
+        "sgc.processo.internal.service.*",
+        "sgc.subprocesso.internal.service.*",
+        "sgc.mapa.*",
+        "sgc.mapa.internal.service.*",
+        "sgc.atividade.*",
+        "sgc.comum.erros.*",
+        "sgc.comum.json.*"
+    ))
+    
+    // Pacotes de teste correspondentes
+    targetTests.set(listOf(
+        "sgc.processo.*",
+        "sgc.subprocesso.*",
+        "sgc.mapa.*",
+        "sgc.atividade.*",
+        "sgc.comum.*"
+    ))
+    
+    // Mutadores (operadores de mutação)
+    mutators.set(listOf(
+        "DEFAULTS",           // Conjunto padrão de mutadores
+        "STRONGER",           // Mutadores mais fortes
+        "REMOVE_CONDITIONALS" // Remove condicionais para verificar se são testados
+    ))
+    
+    // Threads para execução paralela (ajuste conforme recursos disponíveis)
+    threads.set(Runtime.getRuntime().availableProcessors())
+    
+    // Output formats
+    outputFormats.set(listOf("HTML", "XML"))
+    
+    // Diretório de relatórios
+    reportDir.set(file("${layout.buildDirectory.get()}/reports/pitest"))
+    
+    // Timeout para cada teste (em milissegundos)
+    timeoutConstant.set(10000)
+    
+    // Mutation score threshold (percentual mínimo de mutantes mortos)
+    // Começamos com um valor baixo e aumentamos iterativamente
+    mutationThreshold.set(70)
+    
+    // Coverage threshold
+    coverageThreshold.set(80)
+    
+    // Histórico de execuções (melhora performance em execuções subsequentes)
+    enableDefaultIncrementalAnalysis.set(true)
+    
+    // Excluir classes geradas automaticamente
+    excludedClasses.set(listOf(
+        "sgc.*.internal.model.*",      // Entidades JPA (apenas getters/setters)
+        "sgc.*.api.*Dto",               // DTOs (apenas dados)
+        "sgc.*.api.*Request",           // Request objects
+        "sgc.*.api.*Response",          // Response objects
+        "sgc.*.internal.mappers.*",     // MapStruct mappers (gerados)
+        "sgc.*.*Mapper",                // MapStruct mappers
+        "sgc.*.*MapperImpl",            // MapStruct implementations
+        "sgc.*.internal.erros.Erro*",   // Exceções customizadas (apenas estrutura)
+        "sgc.comum.config.*",           // Configurações Spring
+        "sgc.Sgc",                      // Classe main
+        "sgc.e2e.*"                     // Endpoints de teste E2E
+    ))
+    
+    // Verbose output para debugging (desativar em produção)
+    verbose.set(false)
+    
+    // Detectar inline código (útil para Lombok)
+    detectInlinedCode.set(true)
+    
+    // Exportar dados históricos para análise incremental
+    historyInputLocation.set(file("${layout.buildDirectory.get()}/pitest-history"))
+    historyOutputLocation.set(file("${layout.buildDirectory.get()}/pitest-history"))
+    
+    // Features adicionais
+    features.set(listOf(
+        "+auto_threads",  // Detecção automática de threads disponíveis
+        "+EXPORT"         // Exportar resultados para análise
+    ))
+    
+    // Adicionar plugin do JUnit 5
+    testPlugin.set("junit5")
+    
+    // Avoid scanning test classes
+    avoidCallsTo.set(listOf(
+        "java.util.logging",
+        "org.apache.log4j",
+        "org.slf4j",
+        "org.apache.commons.logging",
+        "ch.qos.logback"
+    ))
+}
+
+// Task customizada para executar mutation testing em módulo específico
+tasks.register("mutationTestModule") {
+    group = "verification"
+    description = "Executa mutation testing em um módulo específico (use -Pmodule=nome)"
+    
+    doFirst {
+        val module = project.findProperty("module")?.toString()
+            ?: throw GradleException("Especifique o módulo com -Pmodule=nome (ex: -Pmodule=processo)")
+        
+        println("Executando mutation testing no módulo: $module")
+        
+        // Configurar PIT para o módulo específico
+        configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
+            targetClasses.set(listOf("sgc.$module.*"))
+            targetTests.set(listOf("sgc.$module.*"))
+        }
+    }
+    
+    finalizedBy("pitest")
+}
+*/

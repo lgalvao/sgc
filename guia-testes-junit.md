@@ -685,6 +685,202 @@ Este guia é um documento vivo, baseado nas lições aprendidas durante a refato
 
 ---
 
+## 🧬 Mutation Testing (Teste de Mutação)
+
+### O que é Mutation Testing?
+
+Mutation Testing é uma técnica avançada que **avalia a qualidade dos seus testes** ao introduzir pequenas modificações (mutações) no código-fonte e verificar se os testes conseguem detectá-las.
+
+**Cobertura de código não garante qualidade dos testes!**
+
+```java
+// Código com 100% de cobertura, mas teste fraco
+public boolean isAdulto(int idade) {
+    return idade >= 18;
+}
+
+// ❌ Teste com cobertura 100%, mas não mata mutantes
+@Test
+void deveVerificarIdade() {
+    assertTrue(isAdulto(25));  // Passa com idade >= 18 E idade > 18
+}
+
+// ✅ Testes que matam mutantes (>= mutado para >)
+@Test
+void deveRetornarTrueQuandoIdade18() {
+    assertTrue(isAdulto(18));  // Mata mutante >= → >
+}
+
+@Test
+void deveRetornarFalseQuandoIdade17() {
+    assertFalse(isAdulto(17));  // Garante a fronteira
+}
+```
+
+### Como Executar Mutation Testing
+
+O projeto usa **PITest** para mutation testing:
+
+```bash
+# Módulo específico (recomendado para desenvolvimento)
+./scripts/run-mutation-tests.sh --module processo
+
+# Apenas módulos de alta prioridade
+./scripts/run-mutation-tests.sh --quick
+
+# Completo (todos os módulos)
+./scripts/run-mutation-tests.sh --full
+```
+
+### Interpretando Relatórios
+
+Abra o relatório HTML: `backend/build/reports/pitest/index.html`
+
+**Estados de Mutantes:**
+- ✅ **KILLED**: Teste detectou a mutação → **BOM**
+- ❌ **SURVIVED**: Teste NÃO detectou → **RUIM** (adicionar teste)
+- ⚠️ **NO_COVERAGE**: Linha não testada → **MUITO RUIM** (adicionar teste)
+
+**Meta**: Mutation Score ≥ 70% (≥ 80% em módulos core)
+
+### Exemplos de Como Matar Mutantes
+
+#### 1. Mutante: Boundary Conditionals
+
+```java
+// Original
+if (saldo > 100) {
+    aplicarDesconto();
+}
+
+// Mutante sobrevivente: > mutado para >=
+if (saldo >= 100) {  // Se teste não verifica saldo=100, mutante sobrevive
+    aplicarDesconto();
+}
+
+// ✅ Testes que matam o mutante
+@Test
+void deveAplicarDescontoQuandoSaldoMaiorQue100() {
+    assertTrue(verificar(101));  // Mata ambos
+}
+
+@Test
+void naoDeveAplicarDescontoQuandoSaldoIgualA100() {
+    assertFalse(verificar(100));  // Mata o mutante >=
+}
+
+@Test
+void naoDeveAplicarDescontoQuandoSaldoMenorQue100() {
+    assertFalse(verificar(99));
+}
+```
+
+#### 2. Mutante: Negated Conditionals
+
+```java
+// Original
+if (usuario.isAtivo() && usuario.temPermissao()) {
+    return true;
+}
+
+// Mutantes
+if (usuario.isAtivo() || usuario.temPermissao()) { }  // AND → OR
+if (!usuario.isAtivo() && usuario.temPermissao()) { } // Negação
+
+// ✅ Testes que matam mutantes
+@Test
+void devePermitirQuandoAtivoEComPermissao() {
+    assertTrue(verificar(new Usuario(true, true)));
+}
+
+@Test
+void naoDevePermitirQuandoAtivoSemPermissao() {
+    assertFalse(verificar(new Usuario(true, false)));  // Mata OR
+}
+
+@Test
+void naoDevePermitirQuandoInativoComPermissao() {
+    assertFalse(verificar(new Usuario(false, true)));  // Mata OR
+}
+
+@Test
+void naoDevePermitirQuandoInativoSemPermissao() {
+    assertFalse(verificar(new Usuario(false, false)));
+}
+```
+
+#### 3. Mutante: Return Values
+
+```java
+// Original
+public boolean isValid() {
+    return this.status == Status.ACTIVE;
+}
+
+// Mutante: return value negado
+public boolean isValid() {
+    return false;  // Sempre retorna false
+}
+
+// ✅ Testes que matam o mutante
+@Test
+void deveRetornarTrueQuandoStatusAtivo() {
+    Entidade e = new Entidade(Status.ACTIVE);
+    assertTrue(e.isValid());  // Mata o mutante
+}
+
+@Test
+void deveRetornarFalseQuandoStatusInativo() {
+    Entidade e = new Entidade(Status.INACTIVE);
+    assertFalse(e.isValid());
+}
+```
+
+#### 4. Mutante: Void Method Calls Removed
+
+```java
+// Original
+public void processar(Pedido pedido) {
+    validar(pedido);
+    salvar(pedido);
+    notificar(pedido);
+}
+
+// Mutante: validar() removido
+public void processar(Pedido pedido) {
+    // validar(pedido);  // Chamada removida!
+    salvar(pedido);
+    notificar(pedido);
+}
+
+// ✅ Teste que mata o mutante
+@Test
+void deveLancarExcecaoQuandoPedidoInvalido() {
+    Pedido p = PedidoFixture.invalido();
+    
+    assertThatThrownBy(() -> processar(p))
+        .isInstanceOf(ErroValidacao.class);
+    
+    // Garante que salvar() NÃO foi chamado
+    verify(repo, never()).save(any());
+}
+```
+
+### Estratégia para Melhorar Mutation Score
+
+1. **Execute MBT no módulo**: `./scripts/run-mutation-tests.sh --module <nome>`
+2. **Analise o relatório HTML**: Identifique mutantes sobreviventes
+3. **Priorize mutantes críticos**: Foque em lógica de negócio
+4. **Crie testes que matam mutantes**: Use exemplos acima como guia
+5. **Re-execute MBT**: Valide que mutation score aumentou
+
+### Recursos Adicionais
+
+Para um guia completo de Mutation Testing no SGC, consulte:
+- **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano detalhado com estratégias e exemplos
+
+---
+
 **Última atualização**: Dezembro de 2025  
 **Versão**: 1.0  
 **Status das Sprints**: ✅ Todas concluídas (0-7)
