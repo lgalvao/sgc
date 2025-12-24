@@ -99,9 +99,10 @@ spring:
         enabled: true
       
       # Modo de completude dos eventos
-      # - on-completion: Marca como completo após processamento
-      # - on-transaction-commit: Marca como completo após commit da transação
-      completion-mode: on-completion
+      # - UPDATE: Marca como completo atualizando a data de conclusão (padrão)
+      # - DELETE: Remove o evento do banco após processamento
+      # - ARCHIVE: Move o evento para tabela de arquivamento
+      completion-mode: DELETE
       
       # Limpeza automática de eventos completados
       # Formato: <número><unidade> (d=dias, h=horas, m=minutos)
