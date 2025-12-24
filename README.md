@@ -117,22 +117,13 @@ O projeto utiliza **PITest** para avaliar a qualidade dos testes através de **m
 ./scripts/run-mutation-tests.sh --full
 ```
 
-#### Relatórios
+### Guia geral sobre mutation testing
 
-O relatório HTML é gerado em: `backend/build/reports/pitest/index.html`
-
-**Métricas principais:**
-
-* **Mutation Coverage**: Percentual de mutantes detectados pelos testes (meta: ≥70%)
-* **Test Strength**: Eficácia dos testes existentes (meta: ≥0.70)
-
-Para um guia detalhado sobre como interpretar relatórios e matar mutantes, consulte:
-
-* **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano completo de Mutation Testing
+Leia sobre os padrões para MBT, em [guia-mutation-testing.md](guia-mutation-testing.md)
 
 ### Guia de Testes JUnit
 
-Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
+Para saber como criar novos testes unitários e de integração seguindo as práticas recomendadas desse projeto, consulte:
 
 * **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
 
