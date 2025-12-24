@@ -389,6 +389,176 @@ class SubprocessoPermissoesServiceTest {
             // Assert
             assertThat(permissoes.isPodeVisualizarImpacto()).isFalse();
         }
+
+        @ParameterizedTest
+        @EnumSource(value = SituacaoSubprocesso.class, names = {
+            "MAPEAMENTO_CADASTRO_HOMOLOGADO",
+            "REVISAO_CADASTRO_EM_ANDAMENTO",
+            "REVISAO_CADASTRO_DISPONIBILIZADA",
+            "REVISAO_CADASTRO_HOMOLOGADA",
+            "REVISAO_MAPA_AJUSTADO"
+        })
+        @DisplayName("Deve permitir visualizar impacto para Admin em cada situação válida")
+        void devePermitirVisualizarImpactoEmCadaSituacaoValida(SituacaoSubprocesso situacao) {
+            // Arrange
+            Usuario admin = criarUsuarioComPerfil(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(situacao);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            // Assert
+            assertThat(permissoes.isPodeVisualizarImpacto()).isTrue();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SituacaoSubprocesso.class, names = {
+            "NAO_INICIADO",
+            "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+            "MAPEAMENTO_MAPA_CRIADO",
+            "MAPEAMENTO_MAPA_COM_SUGESTOES",
+            "MAPEAMENTO_MAPA_VALIDADO",
+            "MAPEAMENTO_MAPA_HOMOLOGADO"
+        })
+        @DisplayName("Não deve permitir visualizar impacto em situações inválidas para mapeamento")
+        void naoDevePermitirVisualizarImpactoEmSituacoesInvalidasMapeamento(SituacaoSubprocesso situacao) {
+            // Arrange
+            Usuario admin = criarUsuarioComPerfil(Perfil.ADMIN, null);
+            Subprocesso sub = criarSubprocesso(situacao);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, admin);
+
+            // Assert
+            assertThat(permissoes.isPodeVisualizarImpacto()).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("Hierarquia de Unidades (isSubordinada)")
+    class HierarquiaUnidades {
+
+        @Test
+        @DisplayName("Gestor não deve ter acesso quando sua unidade é null")
+        void gestorNaoDeveAcessarQuandoSuaUnidadeNull() {
+            // Arrange - Gestor com atribuição onde unidade é null
+            Usuario gestor = criarUsuarioComPerfilUnidadeNull(Perfil.GESTOR);
+            Unidade unidadeSubprocesso = criarUnidade(10L, null);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidadeSubprocesso);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Gestor não deve ter acesso quando código da sua unidade é null")
+        void gestorNaoDeveAcessarQuandoCodigoUnidadeNull() {
+            // Arrange - Gestor com unidade existente mas código null
+            Unidade unidadeSemCodigo = new Unidade();
+            unidadeSemCodigo.setCodigo(null);
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, unidadeSemCodigo);
+            Unidade unidadeSubprocesso = criarUnidade(10L, null);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidadeSubprocesso);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Gestor deve acessar unidade subordinada de 2 níveis")
+        void gestorDeveAcessarUnidadeSubordinadaDoisNiveis() {
+            // Arrange - Hierarquia: avo -> pai -> filha
+            Unidade avo = criarUnidade(1L, null);
+            Unidade pai = criarUnidade(2L, avo);
+            Unidade filha = criarUnidade(3L, pai);
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, avo);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, filha);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Gestor não deve acessar quando unidade do subprocesso não tem superior")
+        void gestorNaoDeveAcessarQuandoSubprocessoSemUnidadeSuperior() {
+            // Arrange - Duas unidades raiz sem relação
+            Unidade unidadeGestor = criarUnidade(1L, null);
+            Unidade unidadeSubprocesso = criarUnidade(99L, null); // Sem superior
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, unidadeGestor);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidadeSubprocesso);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Gestor da mesma unidade deve ter acesso mesmo com hierarquia complexa")
+        void gestorMesmaUnidadeDeveAcessarComHierarquia() {
+            // Arrange - Gestor é da mesma unidade (não precisa ser subordinada)
+            Unidade pai = criarUnidade(1L, null);
+            Unidade unidade = criarUnidade(10L, pai);
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, unidade);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidade);
+
+            // Act
+            SubprocessoPermissoesDto permissoes = service.calcularPermissoes(sub, gestor);
+
+            // Assert
+            assertThat(permissoes.isPodeEditarMapa()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("Permissões Devolver/Aceitar Cadastro")
+    class PermissoesDevolverAceitar {
+
+        @Test
+        @DisplayName("Apenas Admin e Gestor podem devolver cadastro")
+        void apenasAdminEGestorPodemDevolverCadastro() {
+            // Arrange
+            Unidade unidade = criarUnidade(10L, null);
+            Usuario admin = criarUsuarioComPerfil(Perfil.ADMIN, null);
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, unidade);
+            Usuario chefe = criarUsuarioComPerfil(Perfil.CHEFE, unidade);
+            Usuario servidor = criarUsuarioComPerfil(Perfil.SERVIDOR, unidade);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidade);
+
+            // Act & Assert
+            assertThat(service.calcularPermissoes(sub, admin).isPodeDevolverCadastro()).isTrue();
+            assertThat(service.calcularPermissoes(sub, gestor).isPodeDevolverCadastro()).isTrue();
+            assertThat(service.calcularPermissoes(sub, chefe).isPodeDevolverCadastro()).isFalse();
+            assertThat(service.calcularPermissoes(sub, servidor).isPodeDevolverCadastro()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Apenas Admin e Gestor podem aceitar cadastro")
+        void apenasAdminEGestorPodemAceitarCadastro() {
+            // Arrange
+            Unidade unidade = criarUnidade(10L, null);
+            Usuario admin = criarUsuarioComPerfil(Perfil.ADMIN, null);
+            Usuario gestor = criarUsuarioComPerfil(Perfil.GESTOR, unidade);
+            Usuario chefe = criarUsuarioComPerfil(Perfil.CHEFE, unidade);
+            Usuario servidor = criarUsuarioComPerfil(Perfil.SERVIDOR, unidade);
+            Subprocesso sub = criarSubprocessoComUnidade(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, unidade);
+
+            // Act & Assert
+            assertThat(service.calcularPermissoes(sub, admin).isPodeAceitarCadastro()).isTrue();
+            assertThat(service.calcularPermissoes(sub, gestor).isPodeAceitarCadastro()).isTrue();
+            assertThat(service.calcularPermissoes(sub, chefe).isPodeAceitarCadastro()).isFalse();
+            assertThat(service.calcularPermissoes(sub, servidor).isPodeAceitarCadastro()).isFalse();
+        }
     }
 
     // === Helper Methods ===
@@ -397,6 +567,14 @@ class SubprocessoPermissoesServiceTest {
         Usuario usuario = mock(Usuario.class);
         Set<UsuarioPerfil> atribuicoes = new HashSet<>();
         atribuicoes.add(UsuarioPerfil.builder().perfil(perfil).unidade(unidade).build());
+        when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
+        return usuario;
+    }
+
+    private Usuario criarUsuarioComPerfilUnidadeNull(Perfil perfil) {
+        Usuario usuario = mock(Usuario.class);
+        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
+        atribuicoes.add(UsuarioPerfil.builder().perfil(perfil).unidade(null).build());
         when(usuario.getTodasAtribuicoes()).thenReturn(atribuicoes);
         return usuario;
     }

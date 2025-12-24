@@ -16,16 +16,16 @@ O projeto segue uma arquitetura **Modular Monolith** no backend (com **Spring Mo
 |--------|------------------------|
 | **Backend** | Java 21, Spring Boot 4.0.1, Spring Modulith 2.0.1, Hibernate, H2/Oracle |
 | **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext |
-| **Testes** | JUnit 5, Mockito, Vitest, Playwright, ArchUnit |
+| **Testes** | JUnit 5, Mockito, Vitest, Playwright, ArchUnit, PITest |
 
 ### Documentação Detalhada
 
 A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação. Consulte os documentos abaixo para detalhes sobre padrões, arquitetura e regras:
 
-*   **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
-*   **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
-*   **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-*   **[regras/](regras/)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
+* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
+* **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
+* **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
+* **[regras/](regras/)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
 
 ---
 
@@ -47,23 +47,28 @@ sgc/
 ## 🚀 Como Executar
 
 ### Pré-requisitos
-*   JDK 21
-*   Node.js 22+
+
+* JDK 21
+* Node.js 22+
 
 ### Desenvolvimento
 
-1.  **Backend:**
+1. **Backend:**
+
     ```bash
     ./gradlew bootRun
     ```
+
     A API estará disponível em `http://localhost:10000`.
 
-2.  **Frontend:**
+2. **Frontend:**
+
     ```bash
     cd frontend
     npm install
     npm run dev
     ```
+
     Acesse em `http://localhost:5173`.
 
 ---
@@ -91,8 +96,9 @@ Para rodar todas as verificações (Checkstyle, PMD, SpotBugs, Testes, Lint, Typ
 ```
 
 Os relatórios são gerados em:
-*   Backend: `backend/build/reports/`
-*   Frontend: `frontend/coverage/`
+
+* Backend: `backend/build/reports/`
+* Frontend: `frontend/coverage/`
 
 ### Mutation Testing (PITest)
 
@@ -116,16 +122,19 @@ O projeto utiliza **PITest** para avaliar a qualidade dos testes através de **m
 O relatório HTML é gerado em: `backend/build/reports/pitest/index.html`
 
 **Métricas principais:**
-- **Mutation Coverage**: Percentual de mutantes detectados pelos testes (meta: ≥70%)
-- **Test Strength**: Eficácia dos testes existentes (meta: ≥0.70)
+
+* **Mutation Coverage**: Percentual de mutantes detectados pelos testes (meta: ≥70%)
+* **Test Strength**: Eficácia dos testes existentes (meta: ≥0.70)
 
 Para um guia detalhado sobre como interpretar relatórios e matar mutantes, consulte:
-*   **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano completo de Mutation Testing
+
+* **[MUTATION_TESTING_PLAN.md](MUTATION_TESTING_PLAN.md)**: Plano completo de Mutation Testing
 
 ### Guia de Testes JUnit
 
 Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
-*   **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
+
+* **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
 
 ---
 
@@ -133,9 +142,9 @@ Para aprender como criar novos testes unitários e de integração seguindo as m
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `reqs/`.
 
-*   **Processo de Mapeamento**: Criação e definição de mapas de competências.
-*   **Revisão**: Fluxo de aprovação e ajuste de mapas.
-*   **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
+* **Processo de Mapeamento**: Criação e definição de mapas de competências.
+* **Revisão**: Fluxo de aprovação e ajuste de mapas.
+* **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
 
 ---
 
