@@ -637,5 +637,112 @@ class ProcessoServiceTest {
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
         }
+        
+        @Test
+        @DisplayName("Deve negar acesso quando hierarquia de unidades está vazia")
+        void deveNegarAcessoQuandoHierarquiaVazia() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("gestor");
+
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder()
+                    .usuarioTitulo("gestor")
+                    .perfil("GESTOR")
+                    .unidadeCodigo(10L)
+                    .build();
+            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+            
+            // Retorna lista vazia de unidades - simula hierarquia vazia
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of());
+
+            // Act & Assert
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+        
+        @Test
+        @DisplayName("Deve permitir acesso quando CHEFE é da unidade participante")
+        void devePermitirAcessoQuandoChefeDeUnidadeParticipante() {
+            // Arrange
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("chefe");
+
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_CHEFE"));
+            doReturn(authorities).when(auth).getAuthorities();
+
+            PerfilDto perfil = PerfilDto.builder()
+                    .usuarioTitulo("chefe")
+                    .perfil("CHEFE")
+                    .unidadeCodigo(10L)
+                    .build();
+            when(sgrhService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
+
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
+
+            // Act & Assert
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+    }
+    
+    @Nested
+    @DisplayName("Mapas Vigentes")
+    class MapasVigentes {
+        @Test
+        @DisplayName("Deve falhar ao finalizar se subprocesso não tem mapa associado")
+        void deveFalharAoFinalizarSeSubprocessoSemMapa() {
+            // Arrange
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoEmAndamento();
+            processo.setCodigo(id);
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            sp.setMapa(null); // Sem mapa
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
+
+            // Act & Assert
+            assertThatThrownBy(() -> processoService.finalizar(id))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("sem mapa associado");
+        }
+        
+        @Test
+        @DisplayName("Deve criar UnidadeMapa quando não existe")
+        void deveCriarUnidadeMapaQuandoNaoExiste() {
+            // Arrange
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoEmAndamento();
+            processo.setCodigo(id);
+
+            Unidade u = UnidadeFixture.unidadeComId(1L);
+            Mapa m = MapaFixture.mapaPadrao(null);
+
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            sp.setMapa(m);
+
+            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty()); // Não existe
+
+            // Act
+            processoService.finalizar(id);
+
+            // Assert
+            verify(unidadeMapaRepo).save(argThat(um -> 
+                um.getUnidadeCodigo().equals(1L) && um.getMapaVigente() == m
+            ));
+        }
     }
 }

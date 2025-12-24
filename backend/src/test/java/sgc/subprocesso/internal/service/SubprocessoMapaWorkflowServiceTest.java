@@ -39,9 +39,13 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+
+import sgc.mapa.api.CompetenciaMapaDto;
+import sgc.mapa.api.MapaCompletoDto;
+import sgc.mapa.api.SalvarMapaRequest;
+import sgc.subprocesso.api.CompetenciaReq;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoMapaWorkflowService")
@@ -338,6 +342,312 @@ class SubprocessoMapaWorkflowServiceTest {
             // Assert
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaAjustadoSubmetido.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Salvar Mapa Subprocesso")
+    class SalvarMapaSubprocesso {
+        
+        @Test
+        @DisplayName("Deve alterar situação para MAPA_CRIADO quando mapa era vazio e receber competências")
+        void deveAlterarSituacaoQuandoMapaEraVazioEReceberCompetencias() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            
+            SalvarMapaRequest request = SalvarMapaRequest.builder()
+                    .competencias(List.of(new CompetenciaMapaDto()))
+                    .build();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of()); // Mapa vazio
+            when(mapaService.salvarMapaCompleto(anyLong(), any(), any()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.salvarMapaSubprocesso(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            verify(subprocessoRepo).save(sp);
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando mapa já tinha competências")
+        void deveManterSituacaoQuandoMapaJaTinhaCompetencias() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            
+            SalvarMapaRequest request = SalvarMapaRequest.builder()
+                    .competencias(List.of(new CompetenciaMapaDto()))
+                    .build();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of(new Competencia())); // Já tem competências
+            when(mapaService.salvarMapaCompleto(anyLong(), any(), any()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.salvarMapaSubprocesso(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            verify(subprocessoRepo, never()).save(sp);
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando request não tiver competências")
+        void deveManterSituacaoQuandoRequestSemCompetencias() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            
+            SalvarMapaRequest request = SalvarMapaRequest.builder()
+                    .competencias(List.of()) // Sem competências
+                    .build();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+            when(mapaService.salvarMapaCompleto(anyLong(), any(), any()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.salvarMapaSubprocesso(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            verify(subprocessoRepo, never()).save(sp);
+        }
+        
+        @Test
+        @DisplayName("Deve lançar exceção quando subprocesso em estado inválido para edição")
+        void deveLancarExcecaoQuandoEstadoInvalidoParaEdicao() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.NAO_INICIADO);
+            
+            SalvarMapaRequest request = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            
+            // Act & Assert
+            assertThatThrownBy(() -> service.salvarMapaSubprocesso(id, request, "Usuario"))
+                    .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
+        }
+        
+        @Test
+        @DisplayName("Deve lançar exceção quando subprocesso não tem mapa associado")
+        void deveLancarExcecaoQuandoSemMapaAssociado() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.setMapa(null); // Remove mapa
+            
+            SalvarMapaRequest request = SalvarMapaRequest.builder()
+                    .competencias(List.of())
+                    .build();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            
+            // Act & Assert
+            assertThatThrownBy(() -> service.salvarMapaSubprocesso(id, request, "Usuario"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+    }
+    
+    @Nested
+    @DisplayName("Adicionar Competência")
+    class AdicionarCompetencia {
+        
+        @Test
+        @DisplayName("Deve alterar situação para MAPA_CRIADO quando mapa era vazio")
+        void deveAlterarSituacaoQuandoMapaEraVazio() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            
+            CompetenciaReq request = new CompetenciaReq();
+            request.setDescricao("Nova competência");
+            request.setAtividadesIds(List.of(1L));
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of()); // Mapa vazio
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.adicionarCompetencia(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            verify(subprocessoRepo).save(sp);
+            verify(competenciaService).adicionarCompetencia(any(), eq("Nova competência"), eq(List.of(1L)));
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando mapa já tinha competências")
+        void deveManterSituacaoQuandoMapaJaTinhaCompetencias() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            
+            CompetenciaReq request = new CompetenciaReq();
+            request.setDescricao("Nova competência");
+            request.setAtividadesIds(List.of(1L));
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of(new Competencia()));
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.adicionarCompetencia(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            verify(subprocessoRepo, never()).save(sp);
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando situação não for CADASTRO_HOMOLOGADO")
+        void deveManterSituacaoQuandoSituacaoNaoForCadastroHomologado() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            
+            CompetenciaReq request = new CompetenciaReq();
+            request.setDescricao("Nova competência");
+            request.setAtividadesIds(List.of(1L));
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.adicionarCompetencia(id, request, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            verify(subprocessoRepo, never()).save(sp);
+        }
+    }
+    
+    @Nested
+    @DisplayName("Atualizar Competência")
+    class AtualizarCompetencia {
+        
+        @Test
+        @DisplayName("Deve atualizar competência com sucesso")
+        void deveAtualizarCompetenciaComSucesso() {
+            // Arrange
+            Long id = 1L;
+            Long codCompetencia = 10L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            
+            CompetenciaReq request = new CompetenciaReq();
+            request.setDescricao("Competência atualizada");
+            request.setAtividadesIds(List.of(1L, 2L));
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            MapaCompletoDto result = service.atualizarCompetencia(id, codCompetencia, request, "Usuario");
+            
+            // Assert
+            assertThat(result).isNotNull();
+            verify(competenciaService).atualizarCompetencia(eq(codCompetencia), eq("Competência atualizada"), eq(List.of(1L, 2L)));
+        }
+        
+        @Test
+        @DisplayName("Deve lançar exceção quando subprocesso em estado inválido")
+        void deveLancarExcecaoQuandoEstadoInvalido() {
+            // Arrange
+            Long id = 1L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+            
+            CompetenciaReq request = new CompetenciaReq();
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            
+            // Act & Assert
+            assertThatThrownBy(() -> service.atualizarCompetencia(id, 10L, request, "Usuario"))
+                    .isInstanceOf(ErroMapaEmSituacaoInvalida.class);
+        }
+    }
+    
+    @Nested
+    @DisplayName("Remover Competência")
+    class RemoverCompetencia {
+        
+        @Test
+        @DisplayName("Deve alterar situação para CADASTRO_HOMOLOGADO quando mapa ficar vazio")
+        void deveAlterarSituacaoQuandoMapaFicarVazio() {
+            // Arrange
+            Long id = 1L;
+            Long codCompetencia = 10L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of()); // Mapa ficou vazio
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.removerCompetencia(id, codCompetencia, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            verify(subprocessoRepo).save(sp);
+            verify(competenciaService).removerCompetencia(codCompetencia);
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando mapa ainda tiver competências")
+        void deveManterSituacaoQuandoMapaAindaTiverCompetencias() {
+            // Arrange
+            Long id = 1L;
+            Long codCompetencia = 10L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of(new Competencia())); // Ainda tem
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.removerCompetencia(id, codCompetencia, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            verify(subprocessoRepo, never()).save(sp);
+        }
+        
+        @Test
+        @DisplayName("Deve manter situação quando não estiver em MAPA_CRIADO")
+        void deveManterSituacaoQuandoNaoEstiverEmMapaCriado() {
+            // Arrange
+            Long id = 1L;
+            Long codCompetencia = 10L;
+            Subprocesso sp = criarSubprocessoComMapa(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            
+            when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
+            when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of()); // Vazio
+            when(mapaService.obterMapaCompleto(anyLong(), anyLong()))
+                    .thenReturn(MapaCompletoDto.builder().build());
+            
+            // Act
+            service.removerCompetencia(id, codCompetencia, "Usuario");
+            
+            // Assert
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            verify(subprocessoRepo, never()).save(sp);
         }
     }
 
