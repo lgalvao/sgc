@@ -116,7 +116,8 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
 
         // Associa titular à unidade
         // A entidade Unidade tem um campo 'titular' (Usuario).
-        unidadeLivre.setTitular(titular);
+        unidadeLivre.setTituloTitular(titular.getTituloEleitoral());
+        unidadeLivre.setMatriculaTitular(titular.getMatricula());
         unidadeRepo.save(unidadeLivre);
 
         // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo SgrhService

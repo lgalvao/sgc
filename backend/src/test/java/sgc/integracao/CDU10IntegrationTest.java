@@ -182,7 +182,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private void definirTitular(Unidade unidade, Usuario usuario) {
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
                 usuario.getTituloEleitoral(), unidade.getCodigo());
-        unidade.setTitular(usuario);
+        unidade.setTituloTitular(usuario.getTituloEleitoral());
+        unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
     private void autenticarUsuario(Usuario usuario) {

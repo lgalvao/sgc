@@ -161,8 +161,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         // Extrair ID
-        String codigoStr = objectMapper.readTree(responseJson).get("atividade").get("codigo").asText();
-        Long codigoAtividade = Long.valueOf(codigoStr);
+        Long codigoAtividade = objectMapper.readTree(responseJson).get("atividade").get("codigo").asLong();
 
         // Verificar DB
         assertThat(atividadeRepo.existsById(codigoAtividade)).isTrue();

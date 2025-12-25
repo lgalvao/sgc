@@ -189,7 +189,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 usuario.getTituloEleitoral(), unidade.getCodigo());
         // Remove entityManager.refresh(unidade) as it causes UnsupportedLockAttemptException for read-only entities
         // If we need the entity updated, we can detach and fetch again, or just manually set the field.
-        unidade.setTitular(usuario);
+        unidade.setTituloTitular(usuario.getTituloEleitoral());
+        unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
     private void autenticarUsuario(Usuario usuario) {
