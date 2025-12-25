@@ -1,3 +1,3 @@
-## 2024-05-23 - Review Feedback False Positive on Missing Method
-**Learning:** The code review bot flagged a "missing repository method" as a blocking issue, even though the method (`findByMapaCodigoWithConhecimentos`) was already present in `AtividadeRepo.java`. This happened because the review bot might not have re-read the repository file after I confirmed it existed, or it was checking a diff that didn't include the repository file (since I didn't modify it, I just used it).
-**Action:** When a review claims a file or method is missing, double-check the file content using `read_file`. If it exists, the review might be based on incomplete context (e.g., only seeing modified files). Proceed if you are certain the code compiles.
+## 2024-05-22 - Identifying N+1 in JPA
+**Learning:** Checking for N+1 queries manually is crucial when relying on ORMs. Even with 'LEFT JOIN FETCH' on the primary collection, nested associations (like 'unidadeSuperior' on 'Unidade') can still trigger secondary queries if not explicitly fetched or batch loaded.
+**Action:** Always verify the full depth of the object graph needed by the view/DTO and adjust JPQL queries to fetch all required levels or use EntityGraphs.

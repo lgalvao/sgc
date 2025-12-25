@@ -298,7 +298,8 @@ class ProcessoServiceTest {
             // Arrange
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
+            // Bolt: Updated mock to use the optimized method
+            when(processoRepo.findByIdWithParticipantes(id)).thenReturn(Optional.of(processo));
             when(processoDetalheBuilder.build(processo)).thenReturn(new ProcessoDetalheDto());
 
             // Act

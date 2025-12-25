@@ -250,7 +250,8 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
-        Processo processo = processoRepo.findById(codProcesso)
+        // Bolt: Use optimized query to fetch participants and their hierarchy in one go
+        Processo processo = processoRepo.findByIdWithParticipantes(codProcesso)
                         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         return processoDetalheBuilder.build(processo);
