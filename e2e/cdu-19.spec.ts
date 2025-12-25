@@ -3,7 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {
@@ -86,7 +86,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -98,7 +99,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
 
         // Criar competências cobrindo todas as atividades

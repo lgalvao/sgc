@@ -44,3 +44,29 @@ export async function verificarPaginaSubprocesso(
         : /\/processo\/\d+\/\w+$/;
     await expect(page).toHaveURL(regex);
 }
+
+// ============================================================================
+// Funções de Navegação
+// ============================================================================
+
+/**
+ * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
+ * Este é o padrão correto para navegar: clicar na célula, não na linha.
+ * 
+ * @param page - Instância da página do Playwright
+ * @param siglaUnidade - Sigla da unidade a clicar (ex: 'SECAO_221')
+ */
+export async function navegarParaSubprocesso(
+    page: Page,
+    siglaUnidade: string
+): Promise<void> {
+    const tabela = page.getByTestId('tbl-tree');
+    await expect(tabela).toBeVisible();
+    
+    const celula = tabela.getByRole('cell', {name: siglaUnidade}).first();
+    await expect(celula).toBeVisible();
+    await celula.click();
+    
+    await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${siglaUnidade}$`));
+}
+

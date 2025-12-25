@@ -3,7 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
@@ -92,7 +92,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -104,7 +105,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
 
         // Criar duas competências cobrindo todas as três atividades
@@ -136,7 +137,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Passo 2-3: Detalhes do processo, clica na unidade
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
         // Passo 4: Detalhes do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa criado/i);
@@ -155,7 +156,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Passo 7: ADMIN clica em Disponibilizar
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
@@ -174,7 +176,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
@@ -194,7 +197,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         // Usar helper para disponibilizar
         await disponibilizarMapa(page, '2030-12-31');
@@ -205,7 +209,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Verificar mudança de situação (Passo 14)
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa disponibilizado/i);
     });
 });

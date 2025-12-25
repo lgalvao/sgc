@@ -142,7 +142,7 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.info("Disponibilizando mapa do subprocesso: codSubprocesso={}", codSubprocesso);
+        log.debug("Disponibilizando mapa do subprocesso: codSubprocesso={}", codSubprocesso);
 
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(sp);
