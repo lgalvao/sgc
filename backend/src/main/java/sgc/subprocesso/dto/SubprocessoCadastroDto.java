@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import sgc.atividade.dto.ConhecimentoDto;
+import sgc.mapa.dto.ConhecimentoDto;
 
 import java.util.List;
 

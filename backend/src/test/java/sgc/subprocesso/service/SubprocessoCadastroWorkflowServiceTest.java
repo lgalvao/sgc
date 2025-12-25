@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
-import sgc.atividade.model.Atividade;
+import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.ImpactoMapaDto;

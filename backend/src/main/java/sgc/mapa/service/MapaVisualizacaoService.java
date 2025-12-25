@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.model.Atividade;
-import sgc.atividade.model.Conhecimento;
-import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.CompetenciaDto;
@@ -29,7 +30,7 @@ public class MapaVisualizacaoService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
-    private final sgc.atividade.model.AtividadeRepo atividadeRepo;
+    private final AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso subprocesso =

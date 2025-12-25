@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
-import sgc.atividade.model.AtividadeRepo;
+import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
