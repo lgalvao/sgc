@@ -8,7 +8,6 @@ import sgc.alerta.api.AlertaDto;
 import sgc.alerta.internal.AlertaMapper;
 import sgc.alerta.internal.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.internal.model.Processo;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.internal.model.Usuario;
 import sgc.sgrh.internal.model.UsuarioRepo;
@@ -48,7 +47,7 @@ public class AlertaService {
      */
     @Transactional
     public Alerta criarAlerta(
-            Processo processo,
+            Long processoCodigo,
             TipoAlerta tipoAlerta,
             Long codUnidadeDestino,
             String descricao) {
@@ -59,7 +58,7 @@ public class AlertaService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidadeDestino));
 
         Alerta alerta = new Alerta()
-                .setProcesso(processo)
+                .setProcessoCodigo(processoCodigo)
                 .setDataHora(LocalDateTime.now())
                 .setUnidadeOrigem(null) // SEDOC não tem registro como unidade
                 .setUnidadeDestino(unidadeDestino)
@@ -76,7 +75,7 @@ public class AlertaService {
      * - Interoperacional: Recebe os dois alertas
      */
     @Transactional
-    public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
+    public List<Alerta> criarAlertasProcessoIniciado(Long processoCodigo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
         List<Alerta> alertasCriados = new ArrayList<>();
 
         for (Long codUnidade : codigosUnidades) {
@@ -91,7 +90,7 @@ public class AlertaService {
             // Operacional ou Interoperacional: alerta de início do processo
             if (tipoUnidade == TipoUnidade.OPERACIONAL || tipoUnidade == TipoUnidade.INTEROPERACIONAL) {
                 Alerta alerta = criarAlerta(
-                        processo,
+                        processoCodigo,
                         PROCESSO_INICIADO_OPERACIONAL,
                         codUnidade,
                         "Início do processo");
@@ -101,7 +100,7 @@ public class AlertaService {
             // Intermediária ou Interoperacional: alerta de unidades subordinadas
             if (tipoUnidade == TipoUnidade.INTERMEDIARIA || tipoUnidade == TipoUnidade.INTEROPERACIONAL) {
                 Alerta alerta = criarAlerta(
-                        processo,
+                        processoCodigo,
                         PROCESSO_INICIADO_INTERMEDIARIA,
                         codUnidade,
                         "Início do processo em unidade(s) subordinada(s)");
@@ -109,7 +108,7 @@ public class AlertaService {
             }
         }
 
-        log.debug("Criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
+        log.debug("Criados {} alertas para o processo {}", alertasCriados.size(), processoCodigo);
         return alertasCriados;
     }
 
@@ -118,27 +117,27 @@ public class AlertaService {
      */
     @Transactional
     public void criarAlertaCadastroDisponibilizado(
-            Processo processo, Long codUnidadeOrigem, Long codUnidadeDestino) {
+            Long processoCodigo, String processoDescricao, Long codUnidadeOrigem, Long codUnidadeDestino) {
 
         Unidade unidadeOrigem = unidadeRepo.findById(codUnidadeOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de origem", codUnidadeOrigem));
 
         String descricao = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
-                .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
+                .formatted(unidadeOrigem.getSigla(), processoDescricao);
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao);
+        criarAlerta(processoCodigo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao);
     }
 
     /**
      * Cria alerta quando cadastro é devolvido para ajustes.
      */
     @Transactional
-    public void criarAlertaCadastroDevolvido(Processo processo, Long codUnidadeDestino, String motivo) {
+    public void criarAlertaCadastroDevolvido(Long processoCodigo, String processoDescricao, Long codUnidadeDestino, String motivo) {
 
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
-                .formatted(processo.getDescricao(), motivo);
+                .formatted(processoDescricao, motivo);
 
-        criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc);
+        criarAlerta(processoCodigo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc);
     }
 
     /**

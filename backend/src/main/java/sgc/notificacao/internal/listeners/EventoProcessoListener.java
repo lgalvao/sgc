@@ -138,9 +138,10 @@ public class EventoProcessoListener {
                 evento.getCodProcesso());
 
         // 1. Criar alertas diferenciados por tipo de unidade
+        // MODULITH: Passando ID do processo em vez da entidade para evitar ciclo alerta -> processo
         List<Alerta> alertas =
                 servicoAlertas.criarAlertasProcessoIniciado(
-                        processo, evento.getCodUnidades(), subprocessos);
+                        processo.getCodigo(), evento.getCodUnidades(), subprocessos);
         log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
         // 2. Enviar e-mails para cada subprocesso

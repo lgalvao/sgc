@@ -146,7 +146,7 @@ class EventoProcessoListenerTest {
             // Then
             verify(alertaService, times(1))
                     .criarAlertasProcessoIniciado(
-                            processo,
+                            processo.getCodigo(),
                             List.of(subprocessoOperacional.getUnidade().getCodigo()),
                             List.of(subprocessoOperacional));
 

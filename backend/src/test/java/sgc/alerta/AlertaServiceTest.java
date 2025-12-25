@@ -57,6 +57,7 @@ class AlertaServiceTest {
         void deveCriarAlertaComSucesso() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             Long unidadeId = 1L;
             Unidade u = new Unidade();
             u.setCodigo(unidadeId);
@@ -66,7 +67,7 @@ class AlertaServiceTest {
 
             // When
             Alerta resultado = service.criarAlerta(
-                    p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc");
+                    p.getCodigo(), TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc");
 
             // Then
             assertThat(resultado).isNotNull();
@@ -78,13 +79,14 @@ class AlertaServiceTest {
         void deveLancarErroSeUnidadeNaoExiste() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             Long unidadeId = 999L;
 
             when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.empty());
 
             // When / Then
             assertThatThrownBy(() ->
-                    service.criarAlerta(p, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc"))
+                    service.criarAlerta(p.getCodigo(), TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeId, "desc"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -97,6 +99,7 @@ class AlertaServiceTest {
         void deveCriarAlertaOperacional() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("Proc");
             Long unidadeId = 1L;
 
@@ -107,7 +110,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            service.criarAlertasProcessoIniciado(p.getCodigo(), List.of(unidadeId), List.of());
 
             // Then
             verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao())));
@@ -118,6 +121,7 @@ class AlertaServiceTest {
         void deveCriarAlertaIntermediaria() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("Proc");
             Long unidadeId = 1L;
 
@@ -128,7 +132,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            service.criarAlertasProcessoIniciado(p.getCodigo(), List.of(unidadeId), List.of());
 
             // Then
             verify(alertaRepo).save(argThat(a ->
@@ -140,6 +144,7 @@ class AlertaServiceTest {
         void deveCriarDoisAlertasInteroperacional() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("Proc");
             Long unidadeId = 1L;
 
@@ -150,7 +155,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            List<Alerta> resultado = service.criarAlertasProcessoIniciado(p.getCodigo(), List.of(unidadeId), List.of());
 
             // Then
             assertThat(resultado).hasSize(2);
@@ -166,6 +171,7 @@ class AlertaServiceTest {
         void deveCriarAlertaCadastroDisponibilizado() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("P");
             Long origem = 1L;
             Long destino = 2L;
@@ -177,7 +183,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertaCadastroDisponibilizado(p, origem, destino);
+            service.criarAlertaCadastroDisponibilizado(p.getCodigo(), p.getDescricao(), origem, destino);
 
             // Then
             verify(alertaRepo).save(any());
@@ -188,6 +194,7 @@ class AlertaServiceTest {
         void deveCriarAlertaCadastroDevolvido() {
             // Given
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("P");
             Long destino = 1L;
 
@@ -195,7 +202,7 @@ class AlertaServiceTest {
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertaCadastroDevolvido(p, destino, "motivo");
+            service.criarAlertaCadastroDevolvido(p.getCodigo(), p.getDescricao(), destino, "motivo");
 
             // Then
             verify(alertaRepo).save(any());

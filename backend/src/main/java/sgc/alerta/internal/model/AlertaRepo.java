@@ -15,10 +15,10 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     /**
      * Busca todos os alertas associados a um processo específico.
      *
-     * @param codProcesso O código do processo.
+     * @param processoCodigo O código do processo.
      * @return Uma lista de alertas.
      */
-    List<Alerta> findByProcessoCodigo(Long codProcesso);
+    List<Alerta> findByProcessoCodigo(Long processoCodigo);
 
     /**
      * Busca alertas destinados a um usuário específico, de forma paginada.
