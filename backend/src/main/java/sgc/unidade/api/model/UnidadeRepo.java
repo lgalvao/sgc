@@ -24,4 +24,18 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo);
 
     List<Unidade> findByTituloTitular(String tituloTitular);
+
+    @Query(value = """
+        WITH RECURSIVE hierarquia AS (
+            SELECT codigo
+            FROM sgc.vw_unidade
+            WHERE codigo = :codigo
+            UNION ALL
+            SELECT u.codigo
+            FROM sgc.vw_unidade u
+            INNER JOIN hierarquia h ON u.unidade_superior_codigo = h.codigo
+        )
+        SELECT codigo FROM hierarquia
+        """, nativeQuery = true)
+    List<Long> findCodigosDescendentes(@Param("codigo") Long codigo);
 }

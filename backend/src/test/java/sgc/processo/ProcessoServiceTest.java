@@ -485,7 +485,7 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao finalizar se houver subprocessos não homologados")
+        @DisplayName("Deve falhar ao finalizar se subprocessos não homologados")
         void deveFalharAoFinalizarSeSubprocessosNaoHomologados() {
             // Arrange
             Long id = 100L;
@@ -633,6 +633,8 @@ class ProcessoServiceTest {
                     .build();
             when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
+            // Bolt: updated mock
+            when(unidadeRepo.findCodigosDescendentes(10L)).thenReturn(List.of(10L));
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
 
             // Act & Assert
@@ -659,7 +661,8 @@ class ProcessoServiceTest {
             when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
             
             // Retorna lista vazia de unidades - simula hierarquia vazia
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of());
+            // Bolt: updated mock
+            when(unidadeRepo.findCodigosDescendentes(10L)).thenReturn(List.of());
 
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
@@ -684,8 +687,8 @@ class ProcessoServiceTest {
                     .build();
             when(sgrhService.buscarPerfisUsuario("chefe")).thenReturn(List.of(perfil));
 
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            // Bolt: updated mock
+            when(unidadeRepo.findCodigosDescendentes(10L)).thenReturn(List.of(10L));
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
 
             // Act & Assert
@@ -718,8 +721,8 @@ class ProcessoServiceTest {
                     .build();
             when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            // Bolt: updated mock
+            when(unidadeRepo.findCodigosDescendentes(10L)).thenReturn(List.of(10L));
             // Subprocesso não pertence à hierarquia
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(false);
 
@@ -746,6 +749,9 @@ class ProcessoServiceTest {
                     .unidadeCodigo(10L)
                     .build();
             when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+
+            // Bolt: updated mock
+            when(unidadeRepo.findCodigosDescendentes(10L)).thenReturn(List.of(10L));
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
 
             // Act & Assert - deve permitir apenas com GESTOR

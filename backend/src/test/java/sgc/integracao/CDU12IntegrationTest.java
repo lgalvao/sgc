@@ -135,7 +135,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
 
         mapaSubprocesso = new Mapa();
-        mapaSubprocesso.setSubprocesso(subprocessoRevisao);
+        mapaSubprocesso.setSubprocessoCodigo(subprocessoRevisao.getCodigo());
         mapaSubprocesso = mapaRepo.save(mapaSubprocesso);
 
         subprocessoRevisao.setMapa(mapaSubprocesso);

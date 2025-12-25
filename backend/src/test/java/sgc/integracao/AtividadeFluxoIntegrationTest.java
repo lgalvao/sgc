@@ -134,7 +134,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
         subprocesso = subprocessoRepo.save(subprocesso);
 
         mapa = new Mapa();
-        mapa.setSubprocesso(subprocesso);
+        mapa.setSubprocessoCodigo(subprocesso.getCodigo());
         mapa = mapaRepo.save(mapa);
 
         subprocesso.setMapa(mapa);

@@ -82,7 +82,7 @@ public class ProcessoService {
             return false;
         }
 
-        List<Long> codigosUnidadesHierarquia = buscarCodigosDescendentes(codUnidadeUsuario);
+        List<Long> codigosUnidadesHierarquia = unidadeRepo.findCodigosDescendentes(codUnidadeUsuario);
         log.debug("checarAcesso: usuário {} (unidade {}) tem acesso a {} unidades na hierarquia: {}",
                 username, codUnidadeUsuario, codigosUnidadesHierarquia.size(), codigosUnidadesHierarquia);
 
@@ -96,41 +96,6 @@ public class ProcessoService {
         log.debug("checarAcesso: usuário {} {} acesso ao processo {}",
                 username, temAcesso ? "TEM" : "NÃO TEM", codProcesso);
         return temAcesso;
-    }
-
-    private List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
-
-        Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
-        for (Unidade u : todasUnidades) {
-            if (u.getUnidadeSuperior() != null) {
-                mapaPorPai.computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>()).add(u);
-            }
-        }
-
-        List<Long> resultado = new ArrayList<>();
-        Queue<Long> fila = new LinkedList<>();
-        Set<Long> visitados = new HashSet<>();
-
-        fila.add(codUnidade);
-        visitados.add(codUnidade);
-
-        while (!fila.isEmpty()) {
-            Long atual = fila.poll();
-            resultado.add(atual);
-
-            List<Unidade> filhos = mapaPorPai.get(atual);
-            if (filhos != null) {
-                for (Unidade filho : filhos) {
-                    if (!visitados.contains(filho.getCodigo())) {
-                        visitados.add(filho.getCodigo());
-                        fila.add(filho.getCodigo());
-                    }
-                }
-            }
-        }
-
-        return resultado;
     }
 
     @Transactional

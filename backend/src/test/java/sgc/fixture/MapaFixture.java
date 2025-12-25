@@ -8,7 +8,9 @@ public class MapaFixture {
     public static Mapa mapaPadrao(Subprocesso subprocesso) {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        mapa.setSubprocesso(subprocesso);
+        if (subprocesso != null) {
+            mapa.setSubprocessoCodigo(subprocesso.getCodigo());
+        }
         return mapa;
     }
 }
