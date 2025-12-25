@@ -4,14 +4,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
 import sgc.subprocesso.api.SubprocessoDto;
 import sgc.subprocesso.internal.model.Subprocesso;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.

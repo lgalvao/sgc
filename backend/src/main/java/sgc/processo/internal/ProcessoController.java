@@ -155,11 +155,11 @@ public class ProcessoController {
             @PathVariable Long codigo, @RequestBody IniciarProcessoReq req) {
 
         List<String> erros;
-        if (req.tipo() == sgc.processo.internal.model.TipoProcesso.REVISAO) {
+        if (req.tipo() == sgc.processo.api.model.TipoProcesso.REVISAO) {
             erros = processoService.iniciarProcessoRevisao(codigo, req.unidades());
-        } else if (req.tipo() == sgc.processo.internal.model.TipoProcesso.MAPEAMENTO) {
+        } else if (req.tipo() == sgc.processo.api.model.TipoProcesso.MAPEAMENTO) {
             erros = processoService.iniciarProcessoMapeamento(codigo, req.unidades());
-        } else if (req.tipo() == sgc.processo.internal.model.TipoProcesso.DIAGNOSTICO) {
+        } else if (req.tipo() == sgc.processo.api.model.TipoProcesso.DIAGNOSTICO) {
             erros = processoService.iniciarProcessoDiagnostico(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();

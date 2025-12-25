@@ -11,7 +11,7 @@ import sgc.subprocesso.internal.model.Movimentacao;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 @Component
 @RequiredArgsConstructor

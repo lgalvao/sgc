@@ -22,22 +22,22 @@ import sgc.alerta.internal.model.AlertaRepo;
 import sgc.analise.internal.model.Analise;
 import sgc.analise.internal.model.AnaliseRepo;
 import sgc.analise.internal.model.TipoAcaoAnalise;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
-import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
+import sgc.sgrh.api.model.UsuarioRepo;
 import sgc.subprocesso.internal.model.*;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -69,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private sgc.mapa.internal.model.MapaRepo mapaRepo;
+    private sgc.mapa.api.model.MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
     @Autowired
@@ -140,14 +140,14 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         definirTitular(unidadeSuperior, usuarioSuperior);
 
         // 4. Criar Processo, Mapa e Subprocesso
-        sgc.processo.internal.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
+        sgc.processo.api.model.Processo processoRevisao = ProcessoFixture.processoPadrao();
         processoRevisao.setCodigo(null);
         processoRevisao.setTipo(TipoProcesso.REVISAO);
         processoRevisao.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processoRevisao.setDataLimite(LocalDateTime.now().plusDays(30));
         processoRevisao = processoRepo.save(processoRevisao);
 
-        var mapa = mapaRepo.save(new sgc.mapa.internal.model.Mapa());
+        var mapa = mapaRepo.save(new sgc.mapa.api.model.Mapa());
 
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);
@@ -206,7 +206,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            var conhecimento = new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade);
+            var conhecimento = new sgc.atividade.api.model.Conhecimento("Conhecimento de Teste", atividade);
             conhecimentoRepo.save(conhecimento);
             atividade.getConhecimentos().add(conhecimento);
 
@@ -314,7 +314,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
 
-            var conhecimento = new sgc.atividade.internal.model.Conhecimento("Conhecimento de Teste", atividade);
+            var conhecimento = new sgc.atividade.api.model.Conhecimento("Conhecimento de Teste", atividade);
             conhecimentoRepo.save(conhecimento);
             atividade.getConhecimentos().add(conhecimento);
 

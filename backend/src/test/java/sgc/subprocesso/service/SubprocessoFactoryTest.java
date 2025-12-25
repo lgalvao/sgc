@@ -20,7 +20,7 @@ import sgc.mapa.internal.model.Mapa;
 import sgc.mapa.internal.model.MapaRepo;
 import sgc.mapa.internal.service.CopiaMapaService;
 import sgc.processo.internal.erros.ErroProcesso;
-import sgc.processo.internal.model.Processo;
+import sgc.processo.api.model.Processo;
 import sgc.subprocesso.internal.model.Movimentacao;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;

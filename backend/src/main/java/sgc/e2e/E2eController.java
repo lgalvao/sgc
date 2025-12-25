@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.api.CriarProcessoReq;
 import sgc.processo.api.ProcessoDto;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.SgrhService;

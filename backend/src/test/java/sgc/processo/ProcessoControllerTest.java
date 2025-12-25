@@ -17,8 +17,8 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.api.*;
 import sgc.processo.internal.erros.ErroProcesso;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
 import tools.jackson.databind.ObjectMapper;
 

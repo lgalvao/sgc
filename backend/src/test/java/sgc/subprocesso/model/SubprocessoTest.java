@@ -10,7 +10,7 @@ import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.mapa.internal.model.Mapa;
-import sgc.processo.internal.model.Processo;
+import sgc.processo.api.model.Processo;
 import sgc.unidade.internal.model.Unidade;
 
 import java.time.LocalDateTime;

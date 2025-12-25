@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.api.AnaliseHistoricoDto;
 import sgc.analise.internal.AnaliseMapper;
 import sgc.analise.internal.model.TipoAnalise;
-import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.api.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.api.*;
 import sgc.subprocesso.internal.service.SubprocessoDtoService;
@@ -296,8 +296,8 @@ public class SubprocessoCadastroController {
 
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;
-        if (principal instanceof sgc.sgrh.internal.model.Usuario)
-            return ((sgc.sgrh.internal.model.Usuario) principal).getTituloEleitoral();
+        if (principal instanceof sgc.sgrh.api.model.Usuario)
+            return ((sgc.sgrh.api.model.Usuario) principal).getTituloEleitoral();
         return principal != null ? principal.toString() : null;
     }
 }

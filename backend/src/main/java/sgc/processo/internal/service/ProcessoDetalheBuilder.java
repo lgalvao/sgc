@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
 import sgc.processo.api.ProcessoDetalheDto;
-import sgc.processo.internal.model.Processo;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.processo.api.model.Processo;
+import sgc.sgrh.api.model.Usuario;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.*;
 

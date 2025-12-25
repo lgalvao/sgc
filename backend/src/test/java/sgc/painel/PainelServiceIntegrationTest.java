@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.processo.api.CriarProcessoReq;
 import sgc.processo.api.ProcessoDto;
 import sgc.processo.api.ProcessoResumoDto;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
 import sgc.sgrh.internal.model.Perfil;
 

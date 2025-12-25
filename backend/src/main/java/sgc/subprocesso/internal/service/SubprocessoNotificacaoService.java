@@ -8,11 +8,11 @@ import org.thymeleaf.context.Context;
 import sgc.alerta.internal.model.Alerta;
 import sgc.alerta.internal.model.AlertaRepo;
 import sgc.notificacao.NotificacaoEmailService;
-import sgc.processo.internal.model.Processo;
+import sgc.processo.api.model.Processo;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.unidade.internal.erros.ErroUnidadeNaoEncontrada;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 

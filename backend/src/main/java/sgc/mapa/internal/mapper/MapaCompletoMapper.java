@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import sgc.mapa.api.CompetenciaMapaDto;
 import sgc.mapa.api.MapaCompletoDto;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.Mapa;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,12 +29,12 @@ public interface MapaCompletoMapper {
     CompetenciaMapaDto toDto(Competencia competencia);
 
     @Named("mapAtividadesCodigos")
-    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.internal.model.Atividade> atividades) {
+    default List<Long> mapAtividadesCodigos(java.util.Set<sgc.atividade.api.model.Atividade> atividades) {
         if (atividades == null) return null;
 
         return atividades.stream()
                 .filter(Objects::nonNull)
-                .map(sgc.atividade.internal.model.Atividade::getCodigo)
+                .map(sgc.atividade.api.model.Atividade::getCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

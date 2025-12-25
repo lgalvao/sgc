@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.atividade.AtividadeService;
 import sgc.atividade.api.AtividadeDto;
 import sgc.atividade.api.ConhecimentoDto;
-import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.api.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.api.AtividadeOperacaoResponse;

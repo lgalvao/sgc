@@ -8,7 +8,7 @@ import sgc.mapa.api.MapaCompletoDto;
 import sgc.mapa.MapaService;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.api.UnidadeDto;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 import sgc.subprocesso.api.AtividadeVisualizacaoDto;
 import sgc.subprocesso.api.ContextoEdicaoDto;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;

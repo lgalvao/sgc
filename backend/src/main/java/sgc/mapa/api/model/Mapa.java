@@ -1,4 +1,4 @@
-package sgc.mapa.internal.model;
+package sgc.mapa.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

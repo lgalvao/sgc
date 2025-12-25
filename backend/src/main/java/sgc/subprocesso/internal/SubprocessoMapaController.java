@@ -16,7 +16,7 @@ import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.mapa.MapaService;
 import sgc.mapa.internal.service.MapaVisualizacaoService;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.api.AtividadeVisualizacaoDto;
 import sgc.subprocesso.api.CompetenciaReq;
@@ -57,7 +57,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.sgrh.internal.model.Perfil perfil,
+            @RequestParam(required = false) sgc.sgrh.api.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoContextoService.obterContextoEdicao(codigo, perfil, unidadeUsuario);
     }
@@ -266,8 +266,8 @@ public class SubprocessoMapaController {
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;
 
-        if (principal instanceof sgc.sgrh.internal.model.Usuario) {
-            return ((sgc.sgrh.internal.model.Usuario) principal).getTituloEleitoral();
+        if (principal instanceof sgc.sgrh.api.model.Usuario) {
+            return ((sgc.sgrh.api.model.Usuario) principal).getTituloEleitoral();
         }
 
         return principal != null ? principal.toString() : null;

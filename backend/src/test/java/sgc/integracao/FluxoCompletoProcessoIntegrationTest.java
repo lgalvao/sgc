@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.api.CriarProcessoReq;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.subprocesso.internal.service.SubprocessoDtoService;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -3,21 +3,21 @@ package sgc.unidade.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.mapa.api.model.MapaRepo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.UsuarioDto;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.SgrhMapper;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioRepo;
 import sgc.unidade.api.AtribuicaoTemporariaDto;
 import sgc.unidade.api.CriarAtribuicaoTemporariaReq;
-import sgc.unidade.internal.model.AtribuicaoTemporaria;
-import sgc.unidade.internal.model.AtribuicaoTemporariaRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.AtribuicaoTemporaria;
+import sgc.unidade.api.model.AtribuicaoTemporariaRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -26,7 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.internal.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.unidade.api.model.UnidadeMapaRepo unidadeMapaRepo;
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
@@ -71,7 +71,7 @@ public class UnidadeService {
             // Elegibilidade simples (não recursiva):
             // 3. NÃO está em outro processo ativo
             boolean isElegivel =
-                    u.getTipo() != sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA
+                    u.getTipo() != sgc.unidade.api.model.TipoUnidade.INTERMEDIARIA
                             && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 

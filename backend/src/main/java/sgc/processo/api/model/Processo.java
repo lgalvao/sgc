@@ -1,4 +1,4 @@
-package sgc.processo.internal.model;
+package sgc.processo.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

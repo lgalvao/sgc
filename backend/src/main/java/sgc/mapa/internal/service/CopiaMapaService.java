@@ -3,15 +3,15 @@ package sgc.mapa.internal.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
 
 import java.util.*;
 

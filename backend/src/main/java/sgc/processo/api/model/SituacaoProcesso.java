@@ -1,4 +1,4 @@
-package sgc.processo.internal.model;
+package sgc.processo.api.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

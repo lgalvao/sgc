@@ -76,7 +76,7 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     public SubprocessoDetalheDto obterPorCodigo(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.sgrh.internal.model.Perfil perfil,
+            @RequestParam(required = false) sgc.sgrh.api.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoDtoService.obterDetalhes(codigo, perfil, unidadeUsuario);
     }

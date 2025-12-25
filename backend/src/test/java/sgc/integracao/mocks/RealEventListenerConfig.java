@@ -12,7 +12,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.internal.services.NotificacaoModelosService;
 import sgc.processo.api.eventos.EventoProcessoFinalizado;
 import sgc.processo.api.eventos.EventoProcessoIniciado;
-import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.api.model.ProcessoRepo;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 

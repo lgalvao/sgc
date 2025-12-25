@@ -1,9 +1,9 @@
-package sgc.sgrh.internal.model;
+package sgc.sgrh.api.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.io.Serializable;
 import java.util.Objects;

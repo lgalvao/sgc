@@ -8,13 +8,13 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.internal.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.internal.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.api.eventos.EventoProcessoIniciado;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.subprocesso.internal.service.SubprocessoFactory;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static sgc.processo.internal.model.SituacaoProcesso.CRIADO;
+import static sgc.processo.api.model.SituacaoProcesso.CRIADO;
 
 /**
  * Serviço responsável pela inicialização de processos.
@@ -35,7 +35,7 @@ public class ProcessoInicializador {
 
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.internal.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.unidade.api.model.UnidadeMapaRepo unidadeMapaRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final SubprocessoFactory subprocessoFactory;
 

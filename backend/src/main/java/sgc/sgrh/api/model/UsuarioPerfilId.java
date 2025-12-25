@@ -1,4 +1,4 @@
-package sgc.sgrh.internal.model;
+package sgc.sgrh.api.model;
 
 import lombok.*;
 

@@ -4,20 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.internal.mapper.visualizacao.AtividadeDto;
 import sgc.mapa.internal.mapper.visualizacao.CompetenciaDto;
 import sgc.mapa.internal.mapper.visualizacao.ConhecimentoDto;
 import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class MapaVisualizacaoService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
-    private final sgc.atividade.internal.model.AtividadeRepo atividadeRepo;
+    private final sgc.atividade.api.model.AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso subprocesso =

@@ -9,13 +9,13 @@ import sgc.alerta.internal.AlertaMapper;
 import sgc.alerta.internal.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.api.UnidadeDto;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioRepo;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.internal.model.Subprocesso;
-import sgc.unidade.internal.model.TipoUnidade;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.TipoUnidade;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

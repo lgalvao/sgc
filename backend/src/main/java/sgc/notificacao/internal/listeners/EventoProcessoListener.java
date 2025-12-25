@@ -14,24 +14,24 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.internal.services.NotificacaoModelosService;
 import sgc.processo.api.eventos.EventoProcessoFinalizado;
 import sgc.processo.api.eventos.EventoProcessoIniciado;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.ResponsavelDto;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.UsuarioDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.TipoUnidade;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.TipoUnidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static sgc.unidade.internal.model.TipoUnidade.*;
+import static sgc.unidade.api.model.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.

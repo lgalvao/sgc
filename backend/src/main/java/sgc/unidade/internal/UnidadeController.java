@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.UsuarioDto;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.unidade.api.AtribuicaoTemporariaDto;

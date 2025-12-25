@@ -11,14 +11,14 @@ import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.api.*;
 import sgc.sgrh.internal.EntrarReq;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
-import sgc.sgrh.internal.model.UsuarioRepo;
-import sgc.unidade.internal.model.TipoUnidade;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
+import sgc.sgrh.api.model.UsuarioRepo;
+import sgc.unidade.api.model.TipoUnidade;
 import org.hibernate.Hibernate;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
 public class SgrhService {
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
-    private final sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private final sgc.sgrh.api.model.UsuarioPerfilRepo usuarioPerfilRepo;
     private final sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt;
 
     @Autowired(required = false)
@@ -59,7 +59,7 @@ public class SgrhService {
 
     public SgrhService(UnidadeRepo unidadeRepo,
                        UsuarioRepo usuarioRepo,
-                       sgc.sgrh.internal.model.UsuarioPerfilRepo usuarioPerfilRepo,
+                       sgc.sgrh.api.model.UsuarioPerfilRepo usuarioPerfilRepo,
                        sgc.sgrh.internal.autenticacao.GerenciadorJwt gerenciadorJwt) {
         this.unidadeRepo = unidadeRepo;
         this.usuarioRepo = usuarioRepo;
