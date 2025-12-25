@@ -11,18 +11,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.api.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.processo.api.model.Processo;
 import sgc.processo.api.model.TipoProcesso;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
 import sgc.subprocesso.api.SubprocessoPermissoesDto;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.HashSet;
 import java.util.Set;

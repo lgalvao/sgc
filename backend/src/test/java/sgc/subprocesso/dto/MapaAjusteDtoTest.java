@@ -14,12 +14,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import sgc.analise.internal.model.Analise;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.Mapa;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.Mapa;
 import sgc.subprocesso.internal.model.Subprocesso;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 class MapaAjusteDtoTest {
 

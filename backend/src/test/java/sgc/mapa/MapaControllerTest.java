@@ -15,7 +15,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.api.MapaDto;
 import sgc.mapa.internal.mapper.MapaMapper;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.mapa.MapaService;
 import tools.jackson.databind.ObjectMapper;
 

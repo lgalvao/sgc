@@ -17,15 +17,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.subprocesso.api.SubprocessoDto;
 import sgc.subprocesso.internal.mappers.SubprocessoMapper;
 import sgc.subprocesso.internal.model.Subprocesso;
@@ -116,7 +116,7 @@ class SubprocessoServiceTest {
             Atividade atividadeCom = new Atividade();
             atividadeCom.setCodigo(20L);
             // Mockando lista não vazia
-            atividadeCom.setConhecimentos(List.of(new sgc.atividade.internal.model.Conhecimento()));
+            atividadeCom.setConhecimentos(List.of(new sgc.atividade.api.model.Conhecimento()));
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L))

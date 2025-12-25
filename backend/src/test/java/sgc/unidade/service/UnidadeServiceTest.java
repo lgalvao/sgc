@@ -18,18 +18,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.processo.api.model.ProcessoRepo;
 import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.SgrhMapper;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioRepo;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioRepo;
 import sgc.unidade.api.CriarAtribuicaoTemporariaReq;
-import sgc.unidade.internal.model.AtribuicaoTemporariaRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.AtribuicaoTemporariaRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.UnidadeRepo;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço UnidadeService")
@@ -233,7 +233,7 @@ class UnidadeServiceTest {
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
             // Arrange
-            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.internal.model.Mapa()));
+            when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(new sgc.mapa.api.model.Mapa()));
 
             // Act & Assert
             assertThat(service.verificarMapaVigente(1L)).isTrue();

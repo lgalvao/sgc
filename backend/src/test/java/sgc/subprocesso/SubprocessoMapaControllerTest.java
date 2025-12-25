@@ -16,7 +16,7 @@ import sgc.mapa.api.ImpactoMapaDto;
 import sgc.mapa.api.MapaCompletoDto;
 import sgc.mapa.api.SalvarMapaRequest;
 import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.mapa.MapaService;
 import sgc.mapa.internal.service.MapaVisualizacaoService;

@@ -14,7 +14,7 @@ import sgc.processo.api.ProcessoDto;
 import sgc.processo.api.ProcessoResumoDto;
 import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
 import java.time.LocalDateTime;
 import java.util.List;

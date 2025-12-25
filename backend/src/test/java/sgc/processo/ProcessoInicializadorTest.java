@@ -20,9 +20,9 @@ import sgc.processo.api.model.SituacaoProcesso;
 import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoInicializador;
 import sgc.subprocesso.internal.service.SubprocessoFactory;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.util.HashSet;
 import java.util.List;

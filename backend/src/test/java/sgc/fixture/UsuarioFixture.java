@@ -1,9 +1,9 @@
 package sgc.fixture;
 
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
-import sgc.unidade.internal.model.Unidade;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -16,8 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.mapa.internal.service.CopiaMapaService;
 import sgc.processo.internal.erros.ErroProcesso;
 import sgc.processo.api.model.Processo;
@@ -26,10 +26,10 @@ import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.TipoUnidade;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeMapa;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.TipoUnidade;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeMapa;
+import sgc.unidade.api.model.UnidadeMapaRepo;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoFactoryTest {

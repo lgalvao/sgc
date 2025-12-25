@@ -17,9 +17,9 @@ import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.internal.AutenticacaoReq;
 import sgc.sgrh.internal.EntrarReq;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.sgrh.api.model.Perfil;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

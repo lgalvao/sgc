@@ -9,6 +9,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.api.model.*;
 import sgc.unidade.api.model.*;
+import sgc.unidade.internal.model.VinculacaoUnidade;
+import sgc.unidade.internal.model.VinculacaoUnidadeId;
+import sgc.unidade.internal.model.VinculacaoUnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;

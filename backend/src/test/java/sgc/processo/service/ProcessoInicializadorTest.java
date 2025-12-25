@@ -21,8 +21,8 @@ import sgc.processo.api.model.SituacaoProcesso;
 import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoInicializador;
 import sgc.subprocesso.internal.service.SubprocessoFactory;
-import sgc.unidade.internal.model.UnidadeRepo;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.UnidadeRepo;
+import sgc.unidade.api.model.UnidadeMapaRepo;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoInicializadorTest {
@@ -51,7 +51,7 @@ class ProcessoInicializadorTest {
             when(processo.getSituacao()).thenReturn(SituacaoProcesso.CRIADO);
             when(processo.getTipo()).thenReturn(TipoProcesso.REVISAO);
 
-            sgc.unidade.internal.model.Unidade u10 = mock(sgc.unidade.internal.model.Unidade.class);
+            sgc.unidade.api.model.Unidade u10 = mock(sgc.unidade.api.model.Unidade.class);
             when(u10.getCodigo()).thenReturn(10L);
             when(unidadeRepo.findAllById(unidades)).thenReturn(List.of(u10));
             when(unidadeMapaRepo.existsById(10L)).thenReturn(true); // Tem mapa, ok para revisão
@@ -80,7 +80,7 @@ class ProcessoInicializadorTest {
             when(processo.getSituacao()).thenReturn(SituacaoProcesso.CRIADO);
             when(processo.getTipo()).thenReturn(TipoProcesso.REVISAO);
 
-            sgc.unidade.internal.model.Unidade u10 = mock(sgc.unidade.internal.model.Unidade.class);
+            sgc.unidade.api.model.Unidade u10 = mock(sgc.unidade.api.model.Unidade.class);
             when(u10.getCodigo()).thenReturn(10L);
             when(unidadeRepo.findAllById(unidades)).thenReturn(List.of(u10));
             when(unidadeMapaRepo.existsById(10L)).thenReturn(false); // Não tem mapa

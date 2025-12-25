@@ -14,7 +14,7 @@ import sgc.sgrh.api.PerfilUnidade;
 import sgc.sgrh.api.ResponsavelDto;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.UsuarioDto;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
 import java.util.List;
 import java.util.Map;
