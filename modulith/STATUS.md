@@ -1,7 +1,7 @@
 # Status da Implementação Spring Modulith no SGC
 
 **Data**: 24/12/2025
-**Versão**: 2.1 - Teste de Verificação e Análise de Ciclos
+**Versão**: 2.2 - Quebra de Ciclo Alerta-Processo
 
 ## Resumo Executivo
 
@@ -10,7 +10,7 @@ A refatoração do projeto SGC para adotar o Spring Modulith revelou desafios es
 ### Status Geral
 
 ✅ **CONCLUÍDO** - Implementação do teste de verificação (`ModulithTests.java`)
-❌ **FALHA** - Verificação estrutural (`modules.verify()`) falha devido a ciclos complexos.
+❌ **FALHA** - Verificação estrutural (`modules.verify()`) falha devido a ciclos complexos (testes desabilitados).
 ⚠️ **EM PROGRESSO** - Refatoração para quebra de ciclos.
 
 ---
@@ -46,6 +46,10 @@ A execução do teste `verifyModulithStructure` identificou o seguinte ciclo pri
 ### 3. Ações Imediatas
 
 - **Refinamento de Pacotes**: Movimentação de classes de configuração de segurança para o módulo `sgrh`, onde semanticamente pertencem.
+- **Quebra de Ciclo Alerta -> Processo**:
+    - Refatoração da entidade `Alerta` para utilizar `processoCodigo` (Long) em vez da entidade `Processo`.
+    - Atualização do `AlertaService`, `AlertaRepo` e `AlertaMapper` para operar com IDs.
+    - Refatoração dos consumidores (`EventoProcessoListener`, `SubprocessoNotificacaoService`, `PainelService`) para passar IDs/DTOs.
 - **Transparência**: Atualização deste status para refletir que, embora a estrutura de pacotes (api/internal) exista, o acoplamento lógico impede a validação estrita do Modulith neste momento.
 
 ---
@@ -55,8 +59,8 @@ A execução do teste `verifyModulithStructure` identificou o seguinte ciclo pri
 ### Prioridade ALTA (Bloqueante para "Estrutura Verde")
 
 1.  **Refatoração de Entidades para DTOs**:
-    - Para quebrar o acesso a classes `internal`, os módulos devem se comunicar exclusivamente via DTOs ou Interfaces publicadas no pacote `api`.
-    - Exemplo: `AlertaService` não deve receber `Processo` (entidade interna), mas sim `ProcessoDto` ou apenas o ID.
+    - Continuar o trabalho iniciado em `Alerta`, quebrando o acesso a classes `internal` em outros módulos.
+    - Foco em `Analise -> Subprocesso` e `Unidade -> Processo`.
 
 2.  **Quebra de Ciclos de Domínio**:
     - Analisar a necessidade de referências bidirecionais fortes entre módulos (ex: `unidade <-> processo`).
@@ -74,4 +78,4 @@ A execução do teste `verifyModulithStructure` identificou o seguinte ciclo pri
 
 ## Conclusão
 
-A ferramenta de verificação do Spring Modulith cumpriu seu papel de expor o acoplamento oculto na arquitetura. Embora a organização de pastas sugira modularidade, o grafo de dependências real ainda é monolítico e cíclico. A solução requer uma refatoração profunda das interações entre os serviços de domínio, movendo-se de chamadas diretas de métodos/entidades para um modelo mais orientado a eventos ou interfaces segregadas.
+A ferramenta de verificação do Spring Modulith cumpriu seu papel de expor o acoplamento oculto na arquitetura. Foi dado um passo importante ao desacoplar `Alerta` de `Processo` no nível de entidade, mas o grafo de dependências ainda é complexo. A solução requer continuar a refatoração profunda das interações entre os serviços de domínio.

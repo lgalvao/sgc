@@ -39,7 +39,7 @@ public class SubprocessoNotificacaoService {
         Alerta alerta =
                 Alerta.builder()
                         .descricao(descricao)
-                        .processo(processo)
+                        .processoCodigo(processo.getCodigo())
                         .dataHora(LocalDateTime.now())
                         .unidadeOrigem(unidadeOrigem)
                         .unidadeDestino(unidadeDestino)

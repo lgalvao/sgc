@@ -12,7 +12,7 @@ public class AlertaFixture {
     public static Alerta alertaPadrao(Processo processo) {
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
-        alerta.setProcesso(processo);
+        alerta.setProcessoCodigo(processo.getCodigo());
         alerta.setDescricao("Alerta de Teste");
         alerta.setDataHora(LocalDateTime.now());
         return alerta;

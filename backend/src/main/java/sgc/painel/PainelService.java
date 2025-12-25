@@ -244,7 +244,7 @@ public class PainelService {
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
-                .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+                .codProcesso(alerta.getProcessoCodigo())
                 .descricao(alerta.getDescricao())
                 .dataHora(alerta.getDataHora())
                 .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
