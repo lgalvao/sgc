@@ -17,8 +17,8 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.api.AtualizarProcessoReq;
 import sgc.processo.api.CriarProcessoReq;
 import sgc.processo.api.model.TipoProcesso;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;

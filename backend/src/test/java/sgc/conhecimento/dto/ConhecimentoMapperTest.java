@@ -9,9 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgc.atividade.api.ConhecimentoDto;
 import sgc.atividade.internal.ConhecimentoMapper;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
 
 import java.util.Optional;
 

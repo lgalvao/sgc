@@ -6,8 +6,8 @@ import org.mapstruct.factory.Mappers;
 import sgc.sgrh.api.SgrhMapper;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.UsuarioDto;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.unidade.internal.model.Unidade;
+import sgc.sgrh.api.model.Usuario;
+import sgc.unidade.api.model.Unidade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

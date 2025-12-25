@@ -15,8 +15,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.mapa.internal.service.CopiaMapaService;
 import sgc.processo.api.*;
 import sgc.processo.internal.mappers.ProcessoMapper;
@@ -36,9 +36,9 @@ import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
@@ -534,7 +534,7 @@ class ProcessoServiceTest {
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(id)).thenReturn(List.of(sp));
-            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.internal.model.UnidadeMapa()));
+            when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(new sgc.unidade.api.model.UnidadeMapa()));
 
             // Act
             processoService.finalizar(id);
@@ -781,7 +781,7 @@ class ProcessoServiceTest {
                     new CriarProcessoReq(
                             "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
             Unidade unidadeIntermediaria = UnidadeFixture.unidadeComId(1L);
-            unidadeIntermediaria.setTipo(sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA);
+            unidadeIntermediaria.setTipo(sgc.unidade.api.model.TipoUnidade.INTERMEDIARIA);
 
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidadeIntermediaria));
 

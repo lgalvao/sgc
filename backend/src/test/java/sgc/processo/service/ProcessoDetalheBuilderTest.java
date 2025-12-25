@@ -33,14 +33,14 @@ import sgc.processo.api.model.Processo;
 import sgc.processo.api.model.SituacaoProcesso;
 import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoDetalheBuilder;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
-import sgc.mapa.internal.model.Mapa;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
+import sgc.mapa.api.model.Mapa;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoDetalheBuilderTest {

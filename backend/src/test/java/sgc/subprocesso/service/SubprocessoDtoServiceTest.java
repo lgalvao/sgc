@@ -31,17 +31,17 @@ import sgc.analise.internal.model.TipoAnalise;
 import sgc.atividade.internal.AtividadeMapper;
 import sgc.atividade.api.ConhecimentoDto;
 import sgc.atividade.internal.ConhecimentoMapper;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.sgrh.internal.model.UsuarioPerfil;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
+import sgc.sgrh.api.model.UsuarioPerfil;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.api.MapaAjusteDto;
 import sgc.subprocesso.api.SubprocessoDetalheDto;
@@ -55,7 +55,7 @@ import sgc.subprocesso.internal.model.MovimentacaoRepo;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários para SubprocessoDtoService")

@@ -3,7 +3,7 @@ package sgc.fixture;
 import sgc.processo.api.model.Processo;
 import sgc.processo.api.model.SituacaoProcesso;
 import sgc.processo.api.model.TipoProcesso;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 

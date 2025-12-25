@@ -1,0 +1,36 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava
+/app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:31: error: cannot find symbol
+    private VinculacaoUnidadeRepo vinculacaoUnidadeRepo;
+            ^
+  symbol:   class VinculacaoUnidadeRepo
+  location: class ViewEntitiesIntegrationTest
+1 error
+
+> Task :backend:compileTestJava FAILED
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /app/backend/src/test/java/sgc/integracao/ViewEntitiesIntegrationTest.java:31: error: cannot find symbol
+      private VinculacaoUnidadeRepo vinculacaoUnidadeRepo;
+              ^
+    symbol:   class VinculacaoUnidadeRepo
+    location: class ViewEntitiesIntegrationTest
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 7s
+3 actionable tasks: 1 executed, 2 up-to-date
+Configuration cache entry reused.

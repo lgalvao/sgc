@@ -9,22 +9,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
-import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.api.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.api.ImpactoMapaDto;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.processo.api.eventos.*;
 import sgc.processo.api.model.Processo;
 import sgc.processo.api.model.TipoProcesso;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.subprocesso.internal.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.util.Collections;
 import java.util.List;

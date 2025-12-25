@@ -9,12 +9,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.api.model.AtividadeRepo;
 import sgc.integracao.mocks.TestConfig;
-import sgc.mapa.internal.model.MapaRepo;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.processo.api.model.ProcessoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;

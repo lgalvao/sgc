@@ -7,12 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.processo.api.eventos.*;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.subprocesso.internal.model.Movimentacao;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.Optional;
 
