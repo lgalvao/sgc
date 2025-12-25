@@ -1,5 +1,5 @@
-import { describe, expect, it, vi} from "vitest";
-import { setupServiceTest, testErrorHandling } from "@/test-utils/serviceTestHelpers";
+import {describe, expect, it, vi} from "vitest";
+import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import * as alertaMappers from "@/mappers/alertas";
 import * as processoMappers from "@/mappers/processos";
 import * as service from "../painelService";

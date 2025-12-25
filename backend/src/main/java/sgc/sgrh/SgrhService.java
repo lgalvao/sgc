@@ -1,6 +1,7 @@
 package sgc.sgrh;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,6 @@ import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioPerfil;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
-import org.hibernate.Hibernate;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 

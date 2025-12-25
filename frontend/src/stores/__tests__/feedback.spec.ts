@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useFeedbackStore } from "@/stores/feedback";
-import { setupStoreTest } from "@/test-utils/storeTestHelpers";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {useFeedbackStore} from "@/stores/feedback";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 
 describe("Feedback Store", () => {
     const context = setupStoreTest(useFeedbackStore);

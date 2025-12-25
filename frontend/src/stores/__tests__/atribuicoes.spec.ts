@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as atribuicaoTemporariaService from "@/services/atribuicaoTemporariaService";
-import { setupStoreTest } from "../../test-utils/storeTestHelpers";
-import type { AtribuicaoTemporaria } from "@/types/tipos";
-import { useAtribuicaoTemporariaStore } from "../atribuicoes";
+import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import type {AtribuicaoTemporaria} from "@/types/tipos";
+import {useAtribuicaoTemporariaStore} from "../atribuicoes";
 
 const mockAtribuicoes: AtribuicaoTemporaria[] = [
     {

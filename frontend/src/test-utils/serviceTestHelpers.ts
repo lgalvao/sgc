@@ -1,4 +1,4 @@
-import { vi, it, expect, beforeEach, afterEach } from "vitest";
+import {afterEach, beforeEach, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
 
 // Mock padrão do axios

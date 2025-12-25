@@ -1,4 +1,4 @@
-import { SituacaoProcesso, TipoProcesso } from "@/types/tipos";
+import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 
 export function formatarSituacaoProcesso(situacao: SituacaoProcesso | string): string {
     switch (situacao) {

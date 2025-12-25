@@ -1,7 +1,7 @@
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
-import { mount } from "@vue/test-utils";
-import { BFormInput, BModal } from "bootstrap-vue-next";
-import { describe, expect, it } from "vitest";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {mount} from "@vue/test-utils";
+import {BFormInput, BModal} from "bootstrap-vue-next";
+import {describe, expect, it} from "vitest";
 import DisponibilizarMapaModal from "@/components/DisponibilizarMapaModal.vue";
 
 const BModalStub = {

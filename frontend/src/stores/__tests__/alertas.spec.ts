@@ -1,7 +1,7 @@
-import { describe, expect, it, type Mocked, vi, beforeEach } from "vitest";
-import { setupStoreTest } from "@/test-utils/storeTestHelpers";
-import type { Alerta } from "@/types/tipos";
-import { useAlertasStore } from "../alertas";
+import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
+import type {Alerta} from "@/types/tipos";
+import {useAlertasStore} from "../alertas";
 
 // Mock dos serviços
 vi.mock("@/services/painelService");

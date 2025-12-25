@@ -1,15 +1,5 @@
 package sgc.unidade.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,12 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.SgrhMapper;
+import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
@@ -30,6 +19,15 @@ import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço UnidadeService")

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
 import ModalConfirmacao from '../ModalConfirmacao.vue'
-import { BButton } from 'bootstrap-vue-next'
+import {BButton} from 'bootstrap-vue-next'
 
 describe('ModalConfirmacao.vue', () => {
   const defaultProps = {

@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,17 +21,14 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioPerfilRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.model.*;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -91,7 +87,9 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 85000");
             jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 95000");
             jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 95000");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
+        }
 
         // 1. Criar unidade e chefe
         unidade = new Unidade();
@@ -161,8 +159,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         // Extrair ID
-        String codigoStr = objectMapper.readTree(responseJson).get("atividade").get("codigo").asText();
-        Long codigoAtividade = Long.valueOf(codigoStr);
+        Long codigoAtividade = objectMapper.readTree(responseJson).get("atividade").get("codigo").asLong();
 
         // Verificar DB
         assertThat(atividadeRepo.existsById(codigoAtividade)).isTrue();

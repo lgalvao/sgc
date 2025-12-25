@@ -1,18 +1,7 @@
 package sgc.subprocesso.dto;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import sgc.analise.model.Analise;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.Conhecimento;
@@ -20,6 +9,12 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
+
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MapaAjusteDtoTest {
 

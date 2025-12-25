@@ -1,16 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { flushPromises, mount } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {flushPromises, mount} from "@vue/test-utils";
 import CadAtividades from "@/views/CadAtividades.vue";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useAtividadesStore } from "@/stores/atividades";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useAtividadesStore} from "@/stores/atividades";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as atividadeService from "@/services/atividadeService";
 import * as cadastroService from "@/services/cadastroService";
-import {
-    SituacaoSubprocesso,
-    TipoProcesso,
-} from "@/types/tipos";
-import { createTestingPinia } from "@pinia/testing";
+import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
+import {createTestingPinia} from "@pinia/testing";
 
 // Mocks
 const { pushMock, mockRoute } = vi.hoisted(() => {

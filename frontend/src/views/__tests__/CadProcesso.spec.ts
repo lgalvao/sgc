@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {nextTick} from 'vue';
 import CadProcesso from '@/views/CadProcesso.vue';
-import { useProcessosStore } from '@/stores/processos';
-import { useUnidadesStore } from '@/stores/unidades';
+import {useProcessosStore} from '@/stores/processos';
+import {useUnidadesStore} from '@/stores/unidades';
 import * as processoService from "@/services/processoService";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock router
 const { mockPush, mockRoute } = vi.hoisted(() => {

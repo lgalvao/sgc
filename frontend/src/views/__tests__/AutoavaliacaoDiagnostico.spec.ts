@@ -5,7 +5,7 @@ import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useFeedbackStore} from '@/stores/feedback';
 import {diagnosticoService} from '@/services/diagnosticoService';
-import {setupComponentTest, getCommonMountOptions} from '@/test-utils/componentTestHelpers';
+import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mocks
 const mockPush = vi.fn();

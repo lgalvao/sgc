@@ -1,9 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
-import { setupServiceTest, testErrorHandling, testPostEndpoint, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
-import { mapMapaCompletoDtoToModel } from "@/mappers/mapas";
-import { mapAtividadeVisualizacaoToModel } from "@/mappers/atividades";
+import {describe, expect, it, vi} from "vitest";
+import {
+    setupServiceTest,
+    testErrorHandling,
+    testGetEndpoint,
+    testPostEndpoint
+} from "../../test-utils/serviceTestHelpers";
+import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
+import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
 import * as subprocessoService from "@/services/subprocessoService";
-import type { Competencia } from "@/types/tipos";
+import type {Competencia} from "@/types/tipos";
 
 vi.mock("@/mappers/mapas");
 vi.mock("@/mappers/atividades");

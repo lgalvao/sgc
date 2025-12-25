@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint, testErrorHandling } from "../../test-utils/serviceTestHelpers";
-import { type AtualizarProcessoRequest, type CriarProcessoRequest, TipoProcesso } from "@/types/tipos";
+import {describe, expect, it} from "vitest";
+import {
+    setupServiceTest,
+    testErrorHandling,
+    testGetEndpoint,
+    testPostEndpoint
+} from "../../test-utils/serviceTestHelpers";
+import {type AtualizarProcessoRequest, type CriarProcessoRequest, TipoProcesso} from "@/types/tipos";
 import * as service from "../processoService";
 
 describe("processoService", () => {

@@ -1,7 +1,7 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 import CompetenciaCard from '@/components/CompetenciaCard.vue';
-import { Atividade, Competencia } from '@/types/tipos';
+import {Atividade, Competencia} from '@/types/tipos';
 
 // Stubs for BootstrapVueNext components
 const BCardStub = {

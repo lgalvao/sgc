@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { setupServiceTest, testErrorHandling, testGetEndpoint } from "../../test-utils/serviceTestHelpers";
+import {describe, expect, it} from "vitest";
+import {setupServiceTest, testErrorHandling, testGetEndpoint} from "../../test-utils/serviceTestHelpers";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,

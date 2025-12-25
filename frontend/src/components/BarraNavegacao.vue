@@ -43,7 +43,7 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
 import {BBreadcrumb, BBreadcrumbItem, BButton, vBTooltip} from "bootstrap-vue-next";
 import {computed} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import { useBreadcrumbs } from "@/composables/useBreadcrumbs";
+import {useBreadcrumbs} from "@/composables/useBreadcrumbs";
 
 const route = useRoute();
 const router = useRouter();

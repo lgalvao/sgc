@@ -6,7 +6,7 @@ import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
-import { setupComponentTest } from '@/test-utils/componentTestHelpers';
+import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mock child components
 const SubprocessoHeaderStub = {

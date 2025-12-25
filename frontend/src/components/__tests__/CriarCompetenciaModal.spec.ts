@@ -1,7 +1,7 @@
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
-import { mount, flushPromises } from "@vue/test-utils";
-import { BFormTextarea, BButton, BCard, BFormCheckbox, BModal } from "bootstrap-vue-next";
-import { describe, expect, it } from "vitest";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {flushPromises, mount} from "@vue/test-utils";
+import {BButton, BCard, BFormCheckbox, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {describe, expect, it} from "vitest";
 import CriarCompetenciaModal from "@/components/CriarCompetenciaModal.vue";
 
 const BModalStub = {

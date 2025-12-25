@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/CadAtribuicao.vue';
-import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService';
-import { buscarUnidadePorCodigo } from '@/services/unidadesService';
-import { buscarUsuariosPorUnidade } from '@/services/usuarioService';
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
+import {buscarUnidadePorCodigo} from '@/services/unidadesService';
+import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
 const { mockPush } = vi.hoisted(() => {

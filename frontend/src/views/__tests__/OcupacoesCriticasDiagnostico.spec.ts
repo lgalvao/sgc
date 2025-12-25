@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnostico.vue';
-import { diagnosticoService } from '@/services/diagnosticoService';
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {diagnosticoService} from '@/services/diagnosticoService';
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
 const { mockRouteParams } = vi.hoisted(() => {

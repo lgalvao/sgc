@@ -13,7 +13,7 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 ### Stack Principal
 
 | Camada | Tecnologias Principais |
-|--------|------------------------|
+| --- | --- |
 | **Backend** | Java 21, Spring Boot, Hibernate, H2/Oracle |
 | **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext |
 | **Testes** | JUnit 5, Mockito, Vitest, Playwright |
@@ -22,10 +22,10 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação. Consulte os documentos abaixo para detalhes sobre padrões, arquitetura e regras:
 
-*   **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
-*   **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
-*   **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-*   **[regras/](regras/)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
+* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
+* **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
+* **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
+* **[regras/](regras/)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
 
 ---
 
@@ -47,23 +47,28 @@ sgc/
 ## 🚀 Como Executar
 
 ### Pré-requisitos
-*   JDK 21
-*   Node.js 22+
+
+* JDK 21
+* Node.js 22+
 
 ### Desenvolvimento
 
-1.  **Backend:**
+1. **Backend:**
+
     ```bash
     ./gradlew bootRun
     ```
+
     A API estará disponível em `http://localhost:10000`.
 
-2.  **Frontend:**
+2. **Frontend:**
+
     ```bash
     cd frontend
     npm install
     npm run dev
     ```
+
     Acesse em `http://localhost:5173`.
 
 ---
@@ -75,11 +80,11 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 ### Execução de Testes
 
 | Tipo | Comando | Descrição |
-|------|---------|-----------|
+| --- | --- | --- |
 | **Unitários Backend** | `./gradlew :backend:test` | JUnit 5 com banco em memória (H2). |
 | **Unitários Frontend** | `cd frontend && npm run test:unit` | Vitest para componentes e lógica. |
 | **End-to-End (E2E)** | `npm run test:e2e` | Playwright simulando fluxos reais. |
-| **Type Check (Front)**| `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |
+| **Type Check (Front)** | `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |
 
 ### Verificação de Qualidade (Quality Gate)
 
@@ -90,13 +95,15 @@ Para rodar todas as verificações (Checkstyle, PMD, SpotBugs, Testes, Lint, Typ
 ```
 
 Os relatórios são gerados em:
-*   Backend: `backend/build/reports/`
-*   Frontend: `frontend/coverage/`
+
+* Backend: `backend/build/reports/`
+* Frontend: `frontend/coverage/`
 
 ### Guia de Testes JUnit
 
 Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
-*   **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
+
+* **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
 
 ---
 
@@ -104,9 +111,9 @@ Para aprender como criar novos testes unitários e de integração seguindo as m
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `reqs/`.
 
-*   **Processo de Mapeamento**: Criação e definição de mapas de competências.
-*   **Revisão**: Fluxo de aprovação e ajuste de mapas.
-*   **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
+* **Processo de Mapeamento**: Criação e definição de mapas de competências.
+* **Revisão**: Fluxo de aprovação e ajuste de mapas.
+* **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
 
 ---
 

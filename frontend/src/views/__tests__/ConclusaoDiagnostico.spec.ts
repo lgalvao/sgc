@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import ConclusaoDiagnostico from '@/views/ConclusaoDiagnostico.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {diagnosticoService} from '@/services/diagnosticoService';
-import {setupComponentTest, getCommonMountOptions} from '@/test-utils/componentTestHelpers';
+import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mocks
 const mockPush = vi.fn();

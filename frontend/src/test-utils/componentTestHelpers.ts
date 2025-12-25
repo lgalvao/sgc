@@ -1,6 +1,6 @@
-import { type VueWrapper, RouterLinkStub } from '@vue/test-utils';
-import { createTestingPinia } from "@pinia/testing";
-import { vi, afterEach } from "vitest";
+import {RouterLinkStub, type VueWrapper} from '@vue/test-utils';
+import {createTestingPinia} from "@pinia/testing";
+import {afterEach, vi} from "vitest";
 
 export interface ComponentTestContext {
     wrapper?: VueWrapper<any>;

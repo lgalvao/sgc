@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import MonitoramentoDiagnostico from '@/views/MonitoramentoDiagnostico.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {diagnosticoService} from '@/services/diagnosticoService';
-import {setupComponentTest, getCommonMountOptions} from '@/test-utils/componentTestHelpers';
+import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mocks
 const mockRouteParams = { value: { codSubprocesso: '10' } };

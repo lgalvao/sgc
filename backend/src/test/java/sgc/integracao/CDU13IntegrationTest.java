@@ -18,7 +18,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -52,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 @org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CDU13IntegrationTest extends BaseIntegrationTest {
+class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -110,7 +109,7 @@ public class CDU13IntegrationTest extends BaseIntegrationTest {
         gestorUser.setTituloEleitoral("202020202020");
         gestorUser.setNome("Gestor Mock");
         gestorUser.setUnidadeLotacao(unidadeSuperior);
-        gestorUser = usuarioRepo.save(gestorUser);
+        usuarioRepo.save(gestorUser);
 
         // Criar Processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();

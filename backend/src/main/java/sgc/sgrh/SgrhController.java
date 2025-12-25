@@ -3,17 +3,11 @@ package sgc.sgrh;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.sgrh.dto.AutenticacaoReq;
-import sgc.sgrh.dto.EntrarReq;
-import sgc.sgrh.dto.LoginResp;
-import sgc.sgrh.dto.PerfilUnidade;
+import sgc.sgrh.dto.*;
 import sgc.sgrh.model.Perfil;
-
 import sgc.sgrh.model.Usuario;
-import sgc.sgrh.dto.UsuarioDto;
 
 import java.util.List;
 

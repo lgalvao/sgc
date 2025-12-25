@@ -1,8 +1,8 @@
-import { mount } from "@vue/test-utils";
-import { describe, it, expect } from "vitest";
+import {mount} from "@vue/test-utils";
+import {describe, expect, it} from "vitest";
 import AtividadeItem from "@/components/AtividadeItem.vue";
-import { Atividade } from "@/types/tipos";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {Atividade} from "@/types/tipos";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("AtividadeItem.vue", () => {
   const context = setupComponentTest();

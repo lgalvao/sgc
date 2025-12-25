@@ -34,8 +34,6 @@ import sgc.unidade.model.UnidadeRepo;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -258,8 +256,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
-            Usuario usuario = setupSecurityContext("99005", unidadeRaiz, "CHEFE");
-
             // Alerta para Unidade Filha 1 (Subordinada à Raiz)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
             alerta.setCodigo(null);

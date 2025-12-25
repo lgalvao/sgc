@@ -142,7 +142,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
-import {TipoImpactoCompetencia, type ImpactoMapa} from "@/types/tipos";
+import {type ImpactoMapa, TipoImpactoCompetencia} from "@/types/tipos";
 
 interface Props {
   mostrar: boolean;

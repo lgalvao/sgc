@@ -2,7 +2,7 @@ import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {type Mapa, type SubprocessoPermissoes, TipoProcesso, type Unidade,} from "@/types/tipos";
 import SubprocessoCards from "../SubprocessoCards.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const pushMock = vi.fn();
 

@@ -207,7 +207,18 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BModal, BSpinner} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BContainer,
+  BForm,
+  BFormGroup,
+  BFormInput,
+  BFormInvalidFeedback,
+  BFormSelect,
+  BModal,
+  BSpinner
+} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";

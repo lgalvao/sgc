@@ -1,5 +1,5 @@
-import { describe } from "vitest";
-import { setupServiceTest, testPostEndpoint, testErrorHandling } from "@/test-utils/serviceTestHelpers";
+import {describe} from "vitest";
+import {setupServiceTest, testErrorHandling, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import * as AlertaService from "../alertaService";
 
 describe("AlertaService", () => {

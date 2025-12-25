@@ -6,7 +6,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import ProcessoView from "@/views/ProcessoView.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};

@@ -23,11 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioPerfilRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.model.Unidade;
@@ -46,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("CDU-07: Detalhar Subprocesso")
-public class CDU07IntegrationTest extends BaseIntegrationTest {
+class CDU07IntegrationTest extends BaseIntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL_TEST";
     private static final String OUTRO_CHEFE_TITULO = "333333333333";
 
@@ -78,7 +74,9 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 60000");
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 70000");
             jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
+        }
 
         // Unidade Principal
         unidade = UnidadeFixture.unidadePadrao();
@@ -146,7 +144,8 @@ public class CDU07IntegrationTest extends BaseIntegrationTest {
         chefe = usuarioRepo.save(chefe);
 
         // Associar como titular na Unidade também (para o DTO)
-        unidade.setTitular(chefe);
+        unidade.setTituloTitular(chefe.getTituloEleitoral());
+        unidade.setMatriculaTitular(chefe.getMatricula());
         unidadeRepo.save(unidade);
 
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()

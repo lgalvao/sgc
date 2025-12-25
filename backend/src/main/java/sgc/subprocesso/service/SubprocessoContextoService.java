@@ -11,7 +11,6 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Perfil;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
 

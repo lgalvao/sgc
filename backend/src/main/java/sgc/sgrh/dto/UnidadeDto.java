@@ -1,10 +1,10 @@
 package sgc.sgrh.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.AccessLevel;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-import { computed } from 'vue';
-import { type RouteLocationNamedRaw, type RouteLocationNormalizedLoaded } from 'vue-router';
-import { usePerfilStore } from '@/stores/perfil';
-import { useUnidadesStore } from '@/stores/unidades';
-import { Perfil } from '@/types/tipos';
+import {computed} from 'vue';
+import {type RouteLocationNamedRaw, type RouteLocationNormalizedLoaded} from 'vue-router';
+import {usePerfilStore} from '@/stores/perfil';
+import {useUnidadesStore} from '@/stores/unidades';
+import {Perfil} from '@/types/tipos';
 
 export interface Breadcrumb {
   label: string;

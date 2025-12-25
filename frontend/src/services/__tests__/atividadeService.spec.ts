@@ -1,6 +1,6 @@
-import {describe, expect, it, vi, beforeEach} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
-import { createPinia, setActivePinia } from "pinia";
+import {createPinia, setActivePinia} from "pinia";
 import * as mappers from "@/mappers/atividades";
 import type {Atividade, Conhecimento} from "@/types/tipos";
 import * as service from "../atividadeService";

@@ -1,7 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
-import { normalizeError, notifyError, shouldNotifyGlobally, existsOrFalse, getOrNull, type NormalizedError } from "../apiError";
-import { useFeedbackStore } from "@/stores/feedback";
-import { createPinia, setActivePinia } from "pinia";
+import {describe, expect, it, vi} from "vitest";
+import {
+    existsOrFalse,
+    getOrNull,
+    type NormalizedError,
+    normalizeError,
+    notifyError,
+    shouldNotifyGlobally
+} from "../apiError";
+import {useFeedbackStore} from "@/stores/feedback";
+import {createPinia, setActivePinia} from "pinia";
 
 // Mock axios error
 const createAxiosError = (status?: number, data?: any, noResponse = false) => {

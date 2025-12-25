@@ -3,7 +3,7 @@ import {BFormCheckbox} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import type {UnidadeSelecao} from "../ModalAcaoBloco.vue";
 import ModalAcaoBloco from "../ModalAcaoBloco.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("ModalAcaoBloco", () => {
     const context = setupComponentTest();

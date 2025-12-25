@@ -1,7 +1,6 @@
 package sgc.integracao;
 
 import jakarta.mail.internet.MimeMessage;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -86,8 +85,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
-    @Autowired
-    private EntityManager entityManager;
 
     @MockitoSpyBean
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -182,7 +179,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private void definirTitular(Unidade unidade, Usuario usuario) {
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
                 usuario.getTituloEleitoral(), unidade.getCodigo());
-        unidade.setTitular(usuario);
+        unidade.setTituloTitular(usuario.getTituloEleitoral());
+        unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
     private void autenticarUsuario(Usuario usuario) {

@@ -2,10 +2,10 @@ package sgc.analise;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 import sgc.analise.dto.CriarAnaliseApiRequest;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;

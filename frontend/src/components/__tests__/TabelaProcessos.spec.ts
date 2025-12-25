@@ -3,7 +3,7 @@ import {BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [

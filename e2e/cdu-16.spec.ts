@@ -9,14 +9,8 @@ import {
     removerAtividade
 } from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
-import {
-    aceitarCadastroMapeamento,
-    acessarSubprocessoAdmin,
-    acessarSubprocessoChefe,
-    homologarCadastroMapeamento,
-    homologarCadastroRevisao
-} from './helpers/helpers-analise';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefe} from './helpers/helpers-analise';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
 

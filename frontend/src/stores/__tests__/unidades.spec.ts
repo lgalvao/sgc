@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as unidadesService from "@/services/unidadesService";
-import { setupStoreTest } from "../../test-utils/storeTestHelpers";
-import type { Unidade } from "@/types/tipos";
-import { useUnidadesStore } from "../unidades";
+import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import type {Unidade} from "@/types/tipos";
+import {useUnidadesStore} from "../unidades";
 
 const mockUnidades: Unidade[] = [
     {

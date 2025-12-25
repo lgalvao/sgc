@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {
-    mapMapaDtoToModel,
-    mapMapaCompletoDtoToModel,
     mapImpactoMapaDtoToModel,
-    mapMapaAjusteDtoToModel
+    mapMapaAjusteDtoToModel,
+    mapMapaCompletoDtoToModel,
+    mapMapaDtoToModel
 } from '../mapas';
 
 describe('mappers/mapas.ts', () => {

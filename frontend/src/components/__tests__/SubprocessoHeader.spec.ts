@@ -2,7 +2,7 @@ import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
 import {badgeClass} from "@/utils";
 import SubprocessoHeader from "../SubprocessoHeader.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("SubprocessoHeader.vue", () => {
     const context = setupComponentTest();

@@ -1,14 +1,14 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
-import { createMemoryHistory, createRouter } from 'vue-router';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {createMemoryHistory, createRouter} from 'vue-router';
+import {createTestingPinia} from '@pinia/testing';
 import VisMapa from '@/views/VisMapa.vue';
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
-import { useProcessosStore } from "@/stores/processos";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useFeedbackStore } from "@/stores/feedback";
-import { SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
-import { setupComponentTest } from "@/test-utils/componentTestHelpers";
+import {useProcessosStore} from "@/stores/processos";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useFeedbackStore} from "@/stores/feedback";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const router = createRouter({
     history: createMemoryHistory(),

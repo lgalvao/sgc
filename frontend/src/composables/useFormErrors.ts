@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import type { NormalizedError } from '@/utils/apiError';
+import {ref} from 'vue';
+import type {NormalizedError} from '@/utils/apiError';
 
 export function useFormErrors(initialFields: string[] = []) {
   const errors = ref<Record<string, string>>(

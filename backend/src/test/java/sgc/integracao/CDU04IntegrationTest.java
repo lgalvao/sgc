@@ -27,11 +27,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioPerfilRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.model.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -55,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
-public class CDU04IntegrationTest extends BaseIntegrationTest {
+class CDU04IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -96,7 +92,9 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 30000");
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
             jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
+        }
 
         // Cria unidade programaticamente
         unidadeLivre = UnidadeFixture.unidadePadrao();
@@ -112,8 +110,8 @@ public class CDU04IntegrationTest extends BaseIntegrationTest {
         titular = usuarioRepo.save(titular);
 
         // Associa titular à unidade
-        // A entidade Unidade tem um campo 'titular' (Usuario).
-        unidadeLivre.setTitular(titular);
+        unidadeLivre.setTituloTitular(titular.getTituloEleitoral());
+        unidadeLivre.setMatriculaTitular(titular.getMatricula());
         unidadeRepo.save(unidadeLivre);
 
         // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo SgrhService

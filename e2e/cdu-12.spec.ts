@@ -12,7 +12,7 @@ import {
     removerAtividade,
     verificarBotaoImpacto
 } from './helpers/helpers-atividades';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {fazerLogout} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {

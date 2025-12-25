@@ -1,5 +1,5 @@
-import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, vi, it, expect } from "vitest";
+import {createPinia, setActivePinia} from "pinia";
+import {beforeEach, expect, it, vi} from "vitest";
 
 /**
  * Utilitário para configurar testes de Store com Pinia

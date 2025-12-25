@@ -1,13 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
-import { useUnidadesStore } from '@/stores/unidades';
-import { useAtribuicaoTemporariaStore } from '@/stores/atribuicoes';
-import { usePerfilStore } from '@/stores/perfil';
-import { useUsuariosStore } from '@/stores/usuarios';
-import { useMapasStore } from '@/stores/mapas';
-import { buscarUsuarioPorTitulo } from '@/services/usuarioService';
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {useUnidadesStore} from '@/stores/unidades';
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
+import {usePerfilStore} from '@/stores/perfil';
+import {useUsuariosStore} from '@/stores/usuarios';
+import {useMapasStore} from '@/stores/mapas';
+import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
 const { mockPush } = vi.hoisted(() => {

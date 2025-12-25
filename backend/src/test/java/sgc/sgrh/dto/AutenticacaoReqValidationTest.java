@@ -13,8 +13,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Testes de Validação: AutenticacaoReq")
 class AutenticacaoReqValidationTest {

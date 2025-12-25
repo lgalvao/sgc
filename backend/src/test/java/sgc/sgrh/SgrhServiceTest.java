@@ -9,11 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.dto.PerfilUnidade;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.dto.*;
 import sgc.sgrh.model.Perfil;
 
 import java.util.List;

@@ -116,7 +116,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BContainer, BModal,} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
-import {computed, onMounted, ref, defineAsyncComponent} from "vue";
+import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useFormErrors} from '@/composables/useFormErrors';

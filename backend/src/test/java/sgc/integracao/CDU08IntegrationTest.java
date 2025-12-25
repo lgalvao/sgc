@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
@@ -27,11 +26,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioPerfilRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.model.*;
 import sgc.subprocesso.dto.ImportarAtividadesReq;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -104,7 +99,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
             jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
             jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 90000");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
+        }
 
         // 1. Criar unidades
         unidadeOrigem = UnidadeFixture.unidadePadrao();

@@ -32,8 +32,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
-
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -63,8 +61,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     @Autowired private AtividadeRepo atividadeRepo;
     @Autowired private ConhecimentoRepo conhecimentoRepo;
 
-    @Autowired private UnidadeFixture unidadeFixture;
-    @Autowired private AtividadeFixture atividadeFixture;
 
     // Test data
     private Unidade unidade;

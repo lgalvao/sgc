@@ -18,6 +18,10 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
@@ -27,17 +31,14 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaReq;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;
-import sgc.fixture.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -266,8 +267,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
-            Competencia competenciaSolta =
-                    competenciaRepo.save(new Competencia("Competência Solta", mapa));
+            competenciaRepo.save(new Competencia("Competência Solta", mapa));
 
             DisponibilizarMapaReq request =
                     new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);

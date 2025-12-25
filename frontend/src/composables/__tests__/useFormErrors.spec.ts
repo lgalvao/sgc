@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { useFormErrors } from '../useFormErrors';
+import {describe, expect, it} from 'vitest';
+import {useFormErrors} from '../useFormErrors';
 
 describe('useFormErrors', () => {
   it('initializes with default values', () => {

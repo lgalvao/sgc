@@ -33,7 +33,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,8 +72,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     @Autowired private CompetenciaRepo competenciaRepo;
     @Autowired private JdbcTemplate jdbcTemplate;
 
-    @Autowired private UnidadeFixture unidadeFixture;
-    @Autowired private AtividadeFixture atividadeFixture;
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;

@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint } from "../../test-utils/serviceTestHelpers";
-import { diagnosticoService } from "../diagnosticoService";
+import {describe, expect, it} from "vitest";
+import {
+    setupServiceTest,
+    testErrorHandling,
+    testGetEndpoint,
+    testPostEndpoint
+} from "../../test-utils/serviceTestHelpers";
+import {diagnosticoService} from "../diagnosticoService";
 
 describe("diagnosticoService", () => {
     const { mockApi } = setupServiceTest();

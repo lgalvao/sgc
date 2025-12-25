@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
-import { setupComponentTest } from '@/test-utils/componentTestHelpers';
+import type {Unidade} from '@/types/tipos';
+import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 describe('ArvoreUnidades.vue', () => {
     const context = setupComponentTest();

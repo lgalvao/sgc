@@ -1,8 +1,8 @@
-import {beforeEach, afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import RelatoriosView from '@/views/RelatoriosView.vue';
 import {TipoProcesso} from '@/types/tipos';
-import {setupComponentTest, getCommonMountOptions} from '@/test-utils/componentTestHelpers';
+import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');

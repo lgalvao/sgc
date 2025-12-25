@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import BarraNavegacao from '@/components/BarraNavegacao.vue';
-import { useRoute, useRouter } from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 
-import { createTestingPinia } from '@pinia/testing';
-import { Perfil } from '@/types/tipos';
+import {createTestingPinia} from '@pinia/testing';
+import {Perfil} from '@/types/tipos';
 
 // Mocks
 vi.mock('vue-router', async (importOriginal) => {

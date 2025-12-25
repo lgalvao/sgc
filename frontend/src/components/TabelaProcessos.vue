@@ -2,7 +2,7 @@
 import {BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
-import { formatarSituacaoProcesso, formatarTipoProcesso } from "@/utils/formatters";
+import {formatarSituacaoProcesso, formatarTipoProcesso} from "@/utils/formatters";
 
 const props = defineProps<{
   processos: ProcessoResumo[];

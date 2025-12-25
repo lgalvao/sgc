@@ -22,8 +22,8 @@ import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 import tools.jackson.databind.ObjectMapper;
 

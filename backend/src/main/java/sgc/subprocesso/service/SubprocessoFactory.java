@@ -17,7 +17,8 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeMapa;
 import sgc.unidade.model.UnidadeMapaRepo;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 
 /**
  * Factory responsável pela criação de subprocessos para diferentes tipos de processo.

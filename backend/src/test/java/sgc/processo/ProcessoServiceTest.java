@@ -15,6 +15,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.fixture.MapaFixture;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.CopiaMapaService;
@@ -40,13 +44,11 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
 
-import sgc.fixture.MapaFixture;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
-
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

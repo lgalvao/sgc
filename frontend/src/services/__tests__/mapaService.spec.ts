@@ -1,8 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
-import { setupServiceTest, testGetEndpoint, testPostEndpoint, testErrorHandling } from "../../test-utils/serviceTestHelpers";
-import { mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel } from "@/mappers/mapas";
+import {describe, expect, it, vi} from "vitest";
+import {
+    setupServiceTest,
+    testErrorHandling,
+    testGetEndpoint,
+    testPostEndpoint
+} from "../../test-utils/serviceTestHelpers";
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import * as mapaService from "@/services/mapaService";
-import { AxiosError } from "axios";
+import {AxiosError} from "axios";
 
 vi.mock("@/mappers/mapas");
 

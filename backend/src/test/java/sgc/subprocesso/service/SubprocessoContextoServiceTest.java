@@ -1,19 +1,11 @@
 package sgc.subprocesso.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
-import java.util.Collections;
-import java.util.Optional;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Mapa;
@@ -21,10 +13,16 @@ import sgc.mapa.service.MapaService;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.model.Perfil;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoContextoServiceTest {

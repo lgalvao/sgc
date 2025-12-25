@@ -16,13 +16,13 @@ import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.SgrhService;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
-import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 
 import java.util.List;
 import java.util.Map;
@@ -295,9 +295,9 @@ public class SubprocessoCadastroController {
     }
 
     private String extractTituloUsuario(Object principal) {
-        if (principal instanceof String) return (String) principal;
-        if (principal instanceof sgc.sgrh.model.Usuario)
-            return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        if (principal instanceof String string) return string;
+        if (principal instanceof sgc.sgrh.model.Usuario usuario)
+            return usuario.getTituloEleitoral();
         return principal != null ? principal.toString() : null;
     }
 }

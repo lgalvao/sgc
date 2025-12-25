@@ -2,7 +2,7 @@ import {mount} from "@vue/test-utils";
 import {BButton} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import ProcessoAcoes from "../ProcessoAcoes.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("ProcessoAcoes.vue", () => {
     const context = setupComponentTest();

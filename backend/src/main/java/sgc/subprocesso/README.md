@@ -1,6 +1,5 @@
 # Módulo de Subprocesso
 
-
 ## Visão Geral
 
 Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma
@@ -57,27 +56,27 @@ graph TD
 ### Controladores REST
 
 - **`SubprocessoCrudController`**:
-    - `GET /api/subprocessos/{id}`: Detalhes do subprocesso.
-    - `GET /api/subprocessos`: Listagem geral.
+  - `GET /api/subprocessos/{id}`: Detalhes do subprocesso.
+  - `GET /api/subprocessos`: Listagem geral.
 
 - **`SubprocessoCadastroController`**: Lida com o workflow da etapa de cadastro.
-    - `POST /disponibilizar-cadastro`
-    - `POST /devolver-cadastro`
-    - `POST /aceitar-cadastro`
+  - `POST /disponibilizar-cadastro`
+  - `POST /devolver-cadastro`
+  - `POST /aceitar-cadastro`
 
 - **`SubprocessoValidacaoController`**: Lida com o workflow da etapa de validação.
-    - `POST /devolver-mapa`
-    - `POST /validar-mapa`
-    - `POST /homologar-mapa`
+  - `POST /devolver-mapa`
+  - `POST /validar-mapa`
+  - `POST /homologar-mapa`
 
 - **`SubprocessoMapaController`**: Gerencia o mapa de competências dentro do contexto do subprocesso.
-    - `GET /mapa-completo` e `GET /mapa-visualizacao`: Visualização do mapa.
-    - `POST /mapa-completo/atualizar`: Salva o mapa inteiro de uma vez.
-    - `GET /impactos-mapa`: Analisa diferenças entre versões.
-    - **CRUD de Competências (Exceção ao padrão POST):**
-        - `POST .../competencias`: Cria competência.
-        - `PUT .../competencias/{id}`: Atualiza competência.
-        - `DELETE .../competencias/{id}`: Remove competência.
+  - `GET /mapa-completo` e `GET /mapa-visualizacao`: Visualização do mapa.
+  - `POST /mapa-completo/atualizar`: Salva o mapa inteiro de uma vez.
+  - `GET /impactos-mapa`: Analisa diferenças entre versões.
+  - **CRUD de Competências (Exceção ao padrão POST):**
+    - `POST .../competencias`: Cria competência.
+    - `PUT .../competencias/{id}`: Atualiza competência.
+    - `DELETE .../competencias/{id}`: Remove competência.
 
 ### Serviços Especializados
 
@@ -119,10 +118,10 @@ stateDiagram-v2
 Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem
 fez o quê e quando.
 
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo:
+
 ```bash
 ./gradlew :backend:test --tests "sgc.subprocesso.*"
 ```

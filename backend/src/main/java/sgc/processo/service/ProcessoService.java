@@ -21,13 +21,13 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.SgrhService;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -37,7 +37,8 @@ import java.util.*;
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 
 @Service

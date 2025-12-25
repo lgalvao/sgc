@@ -1,9 +1,9 @@
-import { mount, RouterLinkStub } from "@vue/test-utils";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { ref } from "vue";
-import { getCommonMountOptions, setupComponentTest } from "@/test-utils/componentTestHelpers";
+import {mount, RouterLinkStub} from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {ref} from "vue";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import NavBar from "../MainNavbar.vue";
-import { usePerfil } from "@/composables/usePerfil";
+import {usePerfil} from "@/composables/usePerfil";
 
 // Mock usePerfil
 vi.mock("@/composables/usePerfil");

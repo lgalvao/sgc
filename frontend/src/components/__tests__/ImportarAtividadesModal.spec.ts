@@ -1,10 +1,10 @@
-import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
-import { BFormSelect } from "bootstrap-vue-next";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ref } from "vue";
-import { type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso } from "@/types/tipos";
+import {flushPromises, mount, type VueWrapper} from "@vue/test-utils";
+import {BFormSelect} from "bootstrap-vue-next";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {ref} from "vue";
+import {type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
-import { setupComponentTest, getCommonMountOptions } from "@/test-utils/componentTestHelpers";
+import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;

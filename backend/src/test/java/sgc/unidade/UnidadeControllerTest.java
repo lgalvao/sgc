@@ -11,8 +11,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.service.UnidadeService;
 

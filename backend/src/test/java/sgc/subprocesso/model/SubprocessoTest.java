@@ -22,7 +22,6 @@ class SubprocessoTest {
 
     private Processo processo;
     private Unidade unidade;
-    private Mapa mapa;
 
     @BeforeEach
     void setUp() {

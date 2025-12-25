@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Mapa;

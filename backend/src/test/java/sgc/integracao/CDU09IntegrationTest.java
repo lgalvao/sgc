@@ -1,7 +1,6 @@
 package sgc.integracao;
 
 import jakarta.mail.internet.MimeMessage;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,7 +22,10 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.fixture.*;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
+import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
@@ -86,8 +88,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
-    @Autowired
-    private EntityManager entityManager;
 
     @MockitoSpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -189,7 +189,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 usuario.getTituloEleitoral(), unidade.getCodigo());
         // Remove entityManager.refresh(unidade) as it causes UnsupportedLockAttemptException for read-only entities
         // If we need the entity updated, we can detach and fetch again, or just manually set the field.
-        unidade.setTitular(usuario);
+        unidade.setTituloTitular(usuario.getTituloEleitoral());
+        unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
     private void autenticarUsuario(Usuario usuario) {

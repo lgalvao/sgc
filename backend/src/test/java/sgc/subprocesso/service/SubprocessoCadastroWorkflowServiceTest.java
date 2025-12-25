@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
 import sgc.atividade.model.Atividade;
@@ -16,10 +15,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.processo.eventos.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Usuario;
-import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -33,7 +29,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

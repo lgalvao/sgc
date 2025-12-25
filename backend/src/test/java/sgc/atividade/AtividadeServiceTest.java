@@ -17,6 +17,7 @@ import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.fixture.*;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -26,12 +27,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-
-import sgc.fixture.AtividadeFixture;
-import sgc.fixture.MapaFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
-import sgc.fixture.UsuarioFixture;
 
 import java.util.List;
 import java.util.Optional;

@@ -10,11 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.autenticacao.GerenciadorJwt;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
-import sgc.sgrh.model.UsuarioPerfilRepo;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
