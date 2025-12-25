@@ -1,0 +1,64 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :frontend:compileJava NO-SOURCE
+> Task :backend:processResources UP-TO-DATE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:compileTestJava
+/app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:138: error: cannot find symbol
+        mapaSubprocesso.setSubprocesso(subprocessoRevisao);
+                       ^
+  symbol:   method setSubprocesso(Subprocesso)
+  location: variable mapaSubprocesso of type Mapa
+/app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:137: error: cannot find symbol
+        mapa.setSubprocesso(subprocesso);
+            ^
+  symbol:   method setSubprocesso(Subprocesso)
+  location: variable mapa of type Mapa
+/app/backend/src/test/java/sgc/fixture/MapaFixture.java:11: error: cannot find symbol
+        mapa.setSubprocesso(subprocesso);
+            ^
+  symbol:   method setSubprocesso(Subprocesso)
+  location: variable mapa of type Mapa
+3 errors
+
+> Task :backend:compileTestJava FAILED
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /app/backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java:138: error: cannot find symbol
+          mapaSubprocesso.setSubprocesso(subprocessoRevisao);
+                         ^
+    symbol:   method setSubprocesso(Subprocesso)
+    location: variable mapaSubprocesso of type Mapa
+  /app/backend/src/test/java/sgc/integracao/AtividadeFluxoIntegrationTest.java:137: error: cannot find symbol
+          mapa.setSubprocesso(subprocesso);
+              ^
+    symbol:   method setSubprocesso(Subprocesso)
+    location: variable mapa of type Mapa
+  /app/backend/src/test/java/sgc/fixture/MapaFixture.java:11: error: cannot find symbol
+          mapa.setSubprocesso(subprocesso);
+              ^
+    symbol:   method setSubprocesso(Subprocesso)
+    location: variable mapa of type Mapa
+  3 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 4s
+4 actionable tasks: 1 executed, 3 up-to-date
+Configuration cache entry reused.

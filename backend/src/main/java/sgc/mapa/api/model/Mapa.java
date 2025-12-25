@@ -28,7 +28,6 @@ public class Mapa extends EntidadeBase {
     @Column(name = "data_hora_homologado")
     private LocalDateTime dataHoraHomologado;
     
-    @OneToOne
-    @JoinColumn(name = "subprocesso_codigo", nullable = false)
-    private sgc.subprocesso.internal.model.Subprocesso subprocesso;
+    @Column(name = "subprocesso_codigo", nullable = false)
+    private Long subprocessoCodigo;
 }

@@ -93,9 +93,12 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         // Criar Subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
+
+        // Atualizar Mapa com Subprocesso
+        mapa.setSubprocessoCodigo(subprocesso.getCodigo());
+        mapa = mapaRepo.save(mapa);
 
         Atividade atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
         Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
