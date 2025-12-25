@@ -97,7 +97,8 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+        Long mapaId = mapaService.findMapaIdBySubprocesso(subprocesso.getCodigo());
+        return mapaService.obterMapaCompleto(mapaId, codigo);
     }
 
     /**
@@ -191,8 +192,9 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
+        Long mapaId = mapaService.findMapaIdBySubprocesso(subprocesso.getCodigo());
         MapaCompletoDto mapa =
-                mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+                mapaService.obterMapaCompleto(mapaId, codigo);
         return ResponseEntity.ok(mapa);
     }
 

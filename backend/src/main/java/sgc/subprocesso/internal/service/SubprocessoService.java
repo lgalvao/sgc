@@ -202,14 +202,10 @@ public class SubprocessoService {
         
         // 2. Criar mapa COM referência ao subprocesso
         Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaRepo.save(mapa);
+        mapa.setSubprocessoCodigo(subprocessoSalvo.getCodigo());
+        mapaRepo.save(mapa);
         
-        // 3. Atualizar subprocesso com o mapa
-        subprocessoSalvo.setMapa(mapaSalvo);
-        var salvo = repositorioSubprocesso.save(subprocessoSalvo);
-        
-        return subprocessoMapper.toDTO(salvo);
+        return subprocessoMapper.toDTO(subprocessoSalvo);
     }
 
     @Transactional

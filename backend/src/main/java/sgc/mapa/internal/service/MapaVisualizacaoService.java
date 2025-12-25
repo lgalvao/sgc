@@ -15,6 +15,7 @@ import sgc.mapa.internal.mapper.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.api.model.Competencia;
 import sgc.mapa.api.model.CompetenciaRepo;
 import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.api.model.Unidade;
@@ -30,6 +31,7 @@ public class MapaVisualizacaoService {
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
     private final sgc.atividade.api.model.AtividadeRepo atividadeRepo;
+    private final MapaRepo mapaRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso subprocesso =
@@ -38,7 +40,7 @@ public class MapaVisualizacaoService {
                         .orElseThrow(
                                 () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        Mapa mapa = subprocesso.getMapa();
+        Mapa mapa = mapaRepo.findBySubprocessoCodigo(codSubprocesso).orElse(null);
         if (mapa == null) {
             throw new ErroEntidadeNaoEncontrada(
                     "Subprocesso não possui mapa associado: ", codSubprocesso);

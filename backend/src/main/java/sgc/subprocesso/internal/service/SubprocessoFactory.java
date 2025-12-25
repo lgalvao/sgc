@@ -55,12 +55,8 @@ public class SubprocessoFactory {
         
         // 2. Criar mapa COM referência ao subprocesso
         Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaRepo.save(mapa);
-        
-        // 3. Atualizar subprocesso com o mapa
-        subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
+        mapa.setSubprocessoCodigo(subprocessoSalvo.getCodigo());
+        mapaRepo.save(mapa);
         
         // 4. Criar movimentação
         movimentacaoRepo.save(
@@ -108,16 +104,12 @@ public class SubprocessoFactory {
         }
         
         log.debug("Mapa copiado: codigo={}", mapaCopiado.getCodigo());
-        mapaCopiado.setSubprocesso(subprocesso);
-        Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
+        mapaCopiado.setSubprocessoCodigo(subprocesso.getCodigo());
+        mapaRepo.save(mapaCopiado);
         log.debug("Mapa salvo com associacao ao subprocesso");
         
-        // 3. Atualizar subprocesso local com o mapa e salvar
-        subprocesso.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocesso);
-        
         log.debug("Subprocesso associado ao mapa (local): mapaId={} unidade={}",
-                mapaSalvo != null ? mapaSalvo.getCodigo() : "null", unidade.getSigla());
+                mapaCopiado != null ? mapaCopiado.getCodigo() : "null", unidade.getSigla());
 
         // 4. Criar movimentação
         movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Processo de revisão iniciado", null));
@@ -147,13 +139,9 @@ public class SubprocessoFactory {
         
         // 2. Copiar mapa COM referência ao subprocesso
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        mapaCopiado.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
+        mapaCopiado.setSubprocessoCodigo(subprocessoSalvo.getCodigo());
+        mapaRepo.save(mapaCopiado);
         
-        // 3. Atualizar subprocesso com o mapa
-        subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
-
         // 4. Criar movimentação
         movimentacaoRepo.save(
                 new Movimentacao(subprocessoSalvo, null, unidade, "Processo de diagnóstico iniciado", null));

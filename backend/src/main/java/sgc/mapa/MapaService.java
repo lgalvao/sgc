@@ -87,6 +87,13 @@ public class MapaService {
         return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
     }
 
+    @Transactional(readOnly = true)
+    public Long findMapaIdBySubprocesso(Long subprocessoCodigo) {
+        return mapaRepo.findBySubprocessoCodigo(subprocessoCodigo)
+                .map(Mapa::getCodigo)
+                .orElse(null);
+    }
+
     public MapaCompletoDto salvarMapaCompleto(
             Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
