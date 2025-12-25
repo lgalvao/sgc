@@ -1,4 +1,4 @@
-package sgc.comum.config;
+package sgc.sgrh.api.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
