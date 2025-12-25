@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.internal.autenticacao.GerenciadorJwt;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 
 import java.io.IOException;
 

@@ -1,11 +1,11 @@
-package sgc.mapa.internal.model;
+package sgc.mapa.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.atividade.internal.model.Atividade;
+import sgc.atividade.api.model.Atividade;
 import sgc.comum.model.EntidadeBase;
 
 import java.util.HashSet;

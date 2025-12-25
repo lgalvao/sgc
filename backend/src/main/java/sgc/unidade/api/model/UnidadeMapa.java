@@ -1,11 +1,11 @@
-package sgc.unidade.internal.model;
+package sgc.unidade.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 
 @Entity
 @Table(name = "UNIDADE_MAPA", schema = "sgc")

@@ -16,7 +16,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.api.AtualizarProcessoReq;
 import sgc.processo.api.CriarProcessoReq;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.unidade.internal.model.Unidade;
 import sgc.unidade.internal.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;

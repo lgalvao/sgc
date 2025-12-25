@@ -11,9 +11,9 @@ import sgc.sgrh.internal.AutenticacaoReq;
 import sgc.sgrh.internal.EntrarReq;
 import sgc.sgrh.internal.LoginResp;
 import sgc.sgrh.api.PerfilUnidade;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.sgrh.api.UsuarioDto;
 
 import java.util.List;

@@ -12,7 +12,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sgc.atividade.internal.model.AtividadeRepo;
 import sgc.integracao.mocks.TestConfig;
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.internal.model.ProcessoRepo;
+import sgc.processo.api.model.ProcessoRepo;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.unidade.internal.model.UnidadeRepo;
 import tools.jackson.databind.ObjectMapper;

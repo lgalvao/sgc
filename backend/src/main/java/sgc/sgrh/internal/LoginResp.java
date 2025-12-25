@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
 /**
  * DTO para resposta de login.''

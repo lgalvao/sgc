@@ -10,16 +10,16 @@ import sgc.analise.internal.model.Analise;
 import sgc.analise.internal.model.TipoAnalise;
 import sgc.atividade.api.ConhecimentoDto;
 import sgc.atividade.internal.ConhecimentoMapper;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.api.*;
 import sgc.subprocesso.internal.mappers.MapaAjusteMapper;
@@ -29,7 +29,7 @@ import sgc.subprocesso.internal.model.Movimentacao;
 import sgc.subprocesso.internal.model.MovimentacaoRepo;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class SubprocessoDtoService {
         }
 
         private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
-                sgc.unidade.internal.model.Unidade atual = alvo;
+                sgc.unidade.api.model.Unidade atual = alvo;
                 while (atual != null) {
                         if (atual.getCodigo().equals(superior.getCodigo())) {
                                 return true;

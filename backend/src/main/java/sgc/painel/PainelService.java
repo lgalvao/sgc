@@ -15,12 +15,12 @@ import sgc.alerta.internal.model.AlertaUsuario;
 import sgc.alerta.internal.model.AlertaUsuarioRepo;
 import sgc.painel.internal.erros.ErroParametroPainelInvalido;
 import sgc.processo.api.ProcessoResumoDto;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.sgrh.api.model.Perfil;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;

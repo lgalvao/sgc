@@ -2,19 +2,19 @@ package sgc.subprocesso.internal.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.api.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.sgrh.internal.model.Perfil;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Perfil;
+import sgc.sgrh.api.model.Usuario;
 import sgc.subprocesso.api.SubprocessoPermissoesDto;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.util.EnumSet;
 import java.util.Objects;
 
-import static sgc.processo.internal.model.TipoProcesso.REVISAO;
+import static sgc.processo.api.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
 
 @Service

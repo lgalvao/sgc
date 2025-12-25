@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
-import sgc.sgrh.internal.model.Usuario;
-import sgc.unidade.internal.model.Unidade;
+import sgc.sgrh.api.model.Usuario;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 

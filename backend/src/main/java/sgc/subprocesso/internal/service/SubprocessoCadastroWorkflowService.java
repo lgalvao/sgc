@@ -12,15 +12,15 @@ import sgc.analise.internal.model.TipoAnalise;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.mapa.internal.service.ImpactoMapaService;
 import sgc.processo.api.eventos.*;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.subprocesso.internal.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
 

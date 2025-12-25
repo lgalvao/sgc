@@ -1,4 +1,4 @@
-package sgc.sgrh.internal.model;
+package sgc.sgrh.api.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,13 +16,13 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
 
     @Query(
             "SELECT DISTINCT u FROM Usuario u " +
-            "JOIN sgc.sgrh.internal.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
+            "JOIN sgc.sgrh.api.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
             "WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil = 'CHEFE'")
     Optional<Usuario> chefePorCodUnidade(@Param("codigoUnidade") Long codigoUnidade);
 
     @Query(
             "SELECT DISTINCT u FROM Usuario u " +
-            "JOIN sgc.sgrh.internal.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
+            "JOIN sgc.sgrh.api.model.UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral " +
             "WHERE up.unidadeCodigo IN :codigosUnidades AND up.perfil = 'CHEFE'")
     List<Usuario> findChefesByUnidadesCodigos(@Param("codigosUnidades") List<Long> codigosUnidades);
 }

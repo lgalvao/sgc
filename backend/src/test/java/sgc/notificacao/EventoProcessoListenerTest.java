@@ -15,16 +15,16 @@ import org.springframework.core.env.Environment;
 import sgc.alerta.AlertaService;
 import sgc.processo.api.eventos.EventoProcessoFinalizado;
 import sgc.processo.api.eventos.EventoProcessoIniciado;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.ResponsavelDto;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.UsuarioDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -457,7 +457,7 @@ class EventoProcessoListenerTest {
             Unidade unidade = new Unidade();
             unidade.setCodigo(100L);
             unidade.setSigla(UNID_OP);
-            unidade.setTipo(sgc.unidade.internal.model.TipoUnidade.OPERACIONAL);
+            unidade.setTipo(sgc.unidade.api.model.TipoUnidade.OPERACIONAL);
             processo.setParticipantes(java.util.Set.of(unidade));
 
             ResponsavelDto responsavelDto = new ResponsavelDto(100L, String.valueOf(T123), TITULAR_TESTE, null, null);

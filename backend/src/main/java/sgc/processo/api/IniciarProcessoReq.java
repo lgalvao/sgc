@@ -1,6 +1,6 @@
 package sgc.processo.api;
 
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 
 import java.util.List;
 

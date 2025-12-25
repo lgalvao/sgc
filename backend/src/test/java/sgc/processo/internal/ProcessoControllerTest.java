@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sgc.processo.api.IniciarProcessoReq;
 import sgc.processo.api.ProcessoDto;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.processo.internal.service.ProcessoService;
 
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package sgc.unidade.internal.model;
+package sgc.unidade.api.model;
 
 public enum TipoUnidade {
     OPERACIONAL,

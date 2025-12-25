@@ -1,4 +1,4 @@
-package sgc.unidade.internal.model;
+package sgc.unidade.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 
 import java.time.LocalDateTime;
 
@@ -45,10 +45,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     private Usuario usuario;
 
     @Transient
-    private sgc.sgrh.internal.model.Perfil perfil;
+    private sgc.sgrh.api.model.Perfil perfil;
 
-    public sgc.sgrh.internal.model.Perfil getPerfil() {
-        return perfil != null ? perfil : sgc.sgrh.internal.model.Perfil.SERVIDOR;
+    public sgc.sgrh.api.model.Perfil getPerfil() {
+        return perfil != null ? perfil : sgc.sgrh.api.model.Perfil.SERVIDOR;
     }
 
 }

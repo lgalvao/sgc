@@ -1,4 +1,4 @@
-package sgc.processo.internal.model;
+package sgc.processo.api.model;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -3,9 +3,9 @@ package sgc.subprocesso.internal.model;
 import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
-import sgc.mapa.internal.model.Mapa;
-import sgc.processo.internal.model.Processo;
-import sgc.unidade.internal.model.Unidade;
+import sgc.mapa.api.model.Mapa;
+import sgc.processo.api.model.Processo;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

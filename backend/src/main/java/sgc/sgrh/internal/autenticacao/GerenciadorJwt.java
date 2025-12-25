@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;

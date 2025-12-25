@@ -1,4 +1,4 @@
-package sgc.sgrh.internal.model;
+package sgc.sgrh.api.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import sgc.unidade.internal.model.AtribuicaoTemporaria;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.AtribuicaoTemporaria;
+import sgc.unidade.api.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

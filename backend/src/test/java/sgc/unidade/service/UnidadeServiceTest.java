@@ -19,8 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.UnidadeDto;
 import sgc.sgrh.api.SgrhMapper;
 import sgc.sgrh.internal.model.Usuario;

@@ -1,7 +1,7 @@
 package sgc.sgrh.api;
 
 import lombok.*;
-import sgc.sgrh.internal.model.Perfil;
+import sgc.sgrh.api.model.Perfil;
 
 @Getter
 @Setter

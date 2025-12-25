@@ -10,17 +10,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Mapa;
 import sgc.processo.api.*;
 import sgc.processo.internal.mappers.ProcessoMapper;
 import sgc.processo.internal.erros.ErroProcesso;
 import sgc.processo.internal.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.api.eventos.EventoProcessoCriado;
 import sgc.processo.api.eventos.EventoProcessoFinalizado;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.sgrh.api.PerfilDto;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.api.SubprocessoDto;
@@ -28,17 +28,17 @@ import sgc.subprocesso.internal.mappers.SubprocessoMapper;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static sgc.processo.internal.model.SituacaoProcesso.CRIADO;
-import static sgc.processo.internal.model.TipoProcesso.DIAGNOSTICO;
-import static sgc.processo.internal.model.TipoProcesso.REVISAO;
+import static sgc.processo.api.model.SituacaoProcesso.CRIADO;
+import static sgc.processo.api.model.TipoProcesso.DIAGNOSTICO;
+import static sgc.processo.api.model.TipoProcesso.REVISAO;
 import static sgc.subprocesso.internal.model.SituacaoSubprocesso.*;
-import static sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA;
+import static sgc.unidade.api.model.TipoUnidade.INTERMEDIARIA;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ import static sgc.unidade.internal.model.TipoUnidade.INTERMEDIARIA;
 public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.internal.model.UnidadeMapaRepo unidadeMapaRepo;
+    private final sgc.unidade.api.model.UnidadeMapaRepo unidadeMapaRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
@@ -374,8 +374,8 @@ public class ProcessoService {
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            sgc.unidade.internal.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                    .orElse(new sgc.unidade.internal.model.UnidadeMapa());
+            sgc.unidade.api.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
+                    .orElse(new sgc.unidade.api.model.UnidadeMapa());
             unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
             unidadeMapa.setMapaVigente(mapaDoSubprocesso);
             unidadeMapaRepo.save(unidadeMapa);

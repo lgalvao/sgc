@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.sgrh.internal.model.*;
-import sgc.unidade.internal.model.*;
+import sgc.sgrh.api.model.*;
+import sgc.unidade.api.model.*;
 
 import java.util.List;
 import java.util.Optional;

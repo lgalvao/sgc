@@ -11,25 +11,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
-import sgc.mapa.internal.model.MapaRepo;
-import sgc.processo.internal.model.Processo;
-import sgc.processo.internal.model.ProcessoRepo;
-import sgc.processo.internal.model.SituacaoProcesso;
-import sgc.processo.internal.model.TipoProcesso;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
+import sgc.mapa.api.model.MapaRepo;
+import sgc.processo.api.model.Processo;
+import sgc.processo.api.model.ProcessoRepo;
+import sgc.processo.api.model.SituacaoProcesso;
+import sgc.processo.api.model.TipoProcesso;
 import sgc.subprocesso.internal.model.SituacaoSubprocesso;
 import sgc.subprocesso.internal.model.Subprocesso;
 import sgc.subprocesso.internal.model.SubprocessoRepo;
-import sgc.unidade.internal.model.Unidade;
-import sgc.unidade.internal.model.UnidadeMapa;
-import sgc.unidade.internal.model.UnidadeMapaRepo;
-import sgc.unidade.internal.model.UnidadeRepo;
+import sgc.unidade.api.model.Unidade;
+import sgc.unidade.api.model.UnidadeMapa;
+import sgc.unidade.api.model.UnidadeMapaRepo;
+import sgc.unidade.api.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
@@ -333,6 +333,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     // Helper to insert User/Profile data for security checks that hit the DB (or View)
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
          jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), sgc.sgrh.internal.model.Perfil.CHEFE.name());
+                titulo, unidade.getCodigo(), sgc.sgrh.api.model.Perfil.CHEFE.name());
     }
 }

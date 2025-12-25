@@ -4,15 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
-import sgc.atividade.internal.model.ConhecimentoRepo;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
+import sgc.atividade.api.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.internal.model.Competencia;
-import sgc.mapa.internal.model.CompetenciaRepo;
-import sgc.mapa.internal.model.Mapa;
+import sgc.mapa.api.model.Competencia;
+import sgc.mapa.api.model.CompetenciaRepo;
+import sgc.mapa.api.model.Mapa;
 import sgc.subprocesso.api.AtividadeVisualizacaoDto;
 import sgc.subprocesso.api.ConhecimentoVisualizacaoDto;
 import sgc.subprocesso.api.SubprocessoDto;
@@ -38,7 +38,7 @@ public class SubprocessoService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
     private final SubprocessoMapper subprocessoMapper;
-    private final sgc.mapa.internal.model.MapaRepo mapaRepo;
+    private final sgc.mapa.api.model.MapaRepo mapaRepo;
 
     @Transactional(readOnly = true)
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {

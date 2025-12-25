@@ -5,9 +5,9 @@ import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sgc.atividade.api.ConhecimentoDto;
-import sgc.atividade.internal.model.Atividade;
-import sgc.atividade.internal.model.AtividadeRepo;
-import sgc.atividade.internal.model.Conhecimento;
+import sgc.atividade.api.model.Atividade;
+import sgc.atividade.api.model.AtividadeRepo;
+import sgc.atividade.api.model.Conhecimento;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")

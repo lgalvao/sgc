@@ -1,10 +1,10 @@
 package sgc.sgrh.api;
 
 import org.mapstruct.Mapper;
-import sgc.sgrh.internal.model.Usuario;
+import sgc.sgrh.api.model.Usuario;
 import sgc.unidade.api.AtribuicaoTemporariaDto;
-import sgc.unidade.internal.model.AtribuicaoTemporaria;
-import sgc.unidade.internal.model.Unidade;
+import sgc.unidade.api.model.AtribuicaoTemporaria;
+import sgc.unidade.api.model.Unidade;
 
 @Mapper(componentModel = "spring")
 public interface SgrhMapper {
