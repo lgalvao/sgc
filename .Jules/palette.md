@@ -13,3 +13,7 @@
 ## 2025-02-19 - Semantic Icon Mismatch
 **Learning:** The application used `bi-save` icons for "Add" actions (e.g., adding a new activity or knowledge). This creates a cognitive dissonance for users who expect a "Plus" icon for creation and a "Save" icon for persistence, and confuses the action's intent.
 **Action:** Replaced `bi-save` with `bi-plus-lg` for creation actions. Future implementations should strictly distinguish between "Add to list" (client-side or creation) and "Save to database" (persistence) actions in both iconography and labels.
+
+## 2025-12-25 - Explicit Required Field Indicators
+**Learning:** Users cannot distinguish required fields from optional ones until validation fails, leading to frustration.
+**Action:** Explicitly mark all required form fields with a visual indicator (red asterisk) and the `required` attribute for accessibility.

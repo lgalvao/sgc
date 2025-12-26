@@ -19,9 +19,11 @@
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <BFormGroup
           class="mb-3"
-          label="Descrição"
           label-for="descricao"
       >
+        <template #label>
+          Descrição <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormInput
             id="descricao"
             v-model="descricao"
@@ -29,6 +31,7 @@
             data-testid="inp-processo-descricao"
             placeholder="Descreva o processo"
             type="text"
+            required
         />
         <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
           {{ fieldErrors.descricao }}
@@ -37,15 +40,18 @@
 
       <BFormGroup
           class="mb-3"
-          label="Tipo"
           label-for="tipo"
       >
+        <template #label>
+          Tipo <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormSelect
             id="tipo"
             v-model="tipo"
             :options="tipoOptions"
             :state="fieldErrors.tipo ? false : null"
             data-testid="sel-processo-tipo"
+            required
         />
         <BFormInvalidFeedback :state="fieldErrors.tipo ? false : null">
           {{ fieldErrors.tipo }}
@@ -54,8 +60,10 @@
 
       <BFormGroup
           class="mb-3"
-          label="Unidades participantes"
       >
+        <template #label>
+          Unidades participantes <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <div class="border rounded p-3" :class="{ 'border-danger': fieldErrors.unidades }">
           <ArvoreUnidades
               v-if="!unidadesStore.isLoading"
@@ -77,15 +85,18 @@
 
       <BFormGroup
           class="mb-3"
-          label="Data limite"
           label-for="dataLimite"
       >
+        <template #label>
+          Data limite <span class="text-danger" aria-hidden="true">*</span>
+        </template>
         <BFormInput
             id="dataLimite"
             v-model="dataLimite"
             :state="fieldErrors.dataLimite ? false : null"
             data-testid="inp-processo-data-limite"
             type="date"
+            required
         />
         <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
           {{ fieldErrors.dataLimite }}
