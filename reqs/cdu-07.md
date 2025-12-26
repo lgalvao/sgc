@@ -26,11 +26,10 @@ Fluxo principal:
 
     - [Nome do responsável]
     - [Tipo da responsabilidade]: com valores possíveis:
-
-   ○ "Titular"
-   ○ "Substituição (até [DATA_TERMINO_SUBST)"
-   ○ "Atrib. temporária (até [DATA_TERMINO_ATRIB])"
-
+         - "Titular"
+         - "Substituição (até [DATA_TERMINO_SUBST)"
+         - "Atrib. temporária (até [DATA_TERMINO_ATRIB])"
+      
     - Ramal: [Ramal do servidor no SGRH]
     - E-mail: [Endereço de e-mail do servidor no SGRH]
 
