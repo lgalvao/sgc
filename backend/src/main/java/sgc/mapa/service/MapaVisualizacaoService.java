@@ -21,6 +21,8 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,6 +55,17 @@ public class MapaVisualizacaoService {
                         .nome(unidade.getNome())
                         .build();
 
+        // 1. Fetch all activities with their knowledge efficiently
+        List<Atividade> atividadesComConhecimentos =
+                atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
+
+        // 2. Map them to DTOs and index by ID for fast lookup
+        Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
+                .collect(Collectors.toMap(
+                        Atividade::getCodigo,
+                        this::mapAtividadeToDto
+                ));
+
         List<Competencia> competencias =
                 competenciaRepo.findByMapaCodigo(mapa.getCodigo());
 
@@ -60,12 +73,14 @@ public class MapaVisualizacaoService {
                 competencias.stream()
                         .map(
                                 competencia -> {
-                                    List<Atividade> atividades =
-                                            competencia.getAtividades().stream().toList();
-
+                                    // Competencia.atividades are loaded by findByMapaCodigo
+                                    // but they are "shallow" (lazy knowledge).
+                                    // Use the map to get the full DTO.
                                     List<AtividadeDto> atividadesDto =
-                                            atividades.stream()
-                                                    .map(this::mapAtividadeToDto)
+                                            competencia.getAtividades().stream()
+                                                    .map(a -> atividadeDtoMap.get(a.getCodigo()))
+                                                    // Handle case where activity might not be in the map (shouldn't happen if consistent)
+                                                    .filter(java.util.Objects::nonNull)
                                                     .toList();
 
                                     return CompetenciaDto.builder()
@@ -77,12 +92,10 @@ public class MapaVisualizacaoService {
                         .toList();
 
         // Buscar atividades sem competência (orphaned)
-        List<Atividade> todasAtividades =
-                atividadeRepo.findByMapaCodigo(mapa.getCodigo());
         List<AtividadeDto> atividadesSemCompetencia =
-                todasAtividades.stream()
+                atividadesComConhecimentos.stream()
                         .filter(a -> a.getCompetencias().isEmpty())
-                        .map(this::mapAtividadeToDto)
+                        .map(a -> atividadeDtoMap.get(a.getCodigo()))
                         .toList();
 
         return MapaVisualizacaoDto.builder()
@@ -94,8 +107,9 @@ public class MapaVisualizacaoService {
     }
 
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        List<Conhecimento> conhecimentos =
-                conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+        // Here atividade.getConhecimentos() is already fetched if passed from findByMapaCodigoWithConhecimentos
+        List<Conhecimento> conhecimentos = atividade.getConhecimentos();
+
         List<ConhecimentoDto> conhecimentosDto =
                 conhecimentos.stream()
                         .map(
