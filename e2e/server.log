@@ -32,3 +32,9 @@
 [BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_12
 [BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 9 iniciado para 1 unidade(s).
 [BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 10 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 11 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 12 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 13 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.atualizar:217 - Processo 13 atualizado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 14 criado.
