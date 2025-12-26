@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,13 +68,7 @@ public class SubprocessoServiceActionsTest {
     private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
-    private ApplicationEventPublisher eventPublisher;
-
-    @MockitoBean
     private ImpactoMapaService impactoMapaService;
-
-    @MockitoBean
-    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidade;
     private Usuario usuario;
@@ -138,9 +131,6 @@ public class SubprocessoServiceActionsTest {
             assertEquals(
                     "Cadastro de atividades e conhecimentos aceito",
                     movimentacoes.getFirst().getDescricao());
-
-            verify(subprocessoNotificacaoService, times(1))
-                    .notificarAceiteCadastro(any(Subprocesso.class), any(Unidade.class));
         }
     }
 
@@ -200,9 +190,6 @@ public class SubprocessoServiceActionsTest {
             assertEquals(
                     "Revisão do cadastro de atividades e conhecimentos aceita",
                     movimentacoes.getFirst().getDescricao());
-
-            verify(subprocessoNotificacaoService, times(1))
-                    .notificarAceiteRevisaoCadastro(any(Subprocesso.class), any(Unidade.class));
         }
 
         @Test

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
@@ -18,14 +17,12 @@ import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import tools.jackson.core.type.TypeReference;
@@ -34,7 +31,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,12 +59,6 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
-
-    @MockitoSpyBean
-    private SubprocessoNotificacaoService subprocessoNotificacaoService;
-
-    @MockitoSpyBean
-    private NotificacaoEmailService notificacaoEmailService;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -122,9 +112,6 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
     @WithMockChefe()
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
-        // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
-        doNothing().when(notificacaoEmailService).enviarEmail(any(), any(), any());
-
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(                        post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
@@ -169,7 +156,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasDevolucao).hasSize(1);
         assertThat(alertasDevolucao.getFirst().getDescricao())
                 .contains(
-                        "Cadastro de atividades e conhecimentos da unidade " + unidade.getSigla() + " devolvido para"
+                        "Validação do mapa da unidade " + unidade.getSigla() + " devolvida para"
                                 + " ajustes");
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
@@ -212,7 +199,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                         subprocesso.getCodigo());
         assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
         assertThat(movimentacoesAceite.getFirst().getDescricao())
-                .isEqualTo("Mapa de competências validado");
+                .isEqualTo("Validação do mapa aceita");
         assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla())
@@ -238,7 +225,7 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
                                                         + " encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
-                .contains("Validação do mapa de competências da " + unidade.getSigla() + " submetida para análise");
+                .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
     }
 
     @Test
@@ -272,13 +259,9 @@ public class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
+        // Homologação não gera alerta (por design)
         List<Alerta> alertas =
                 alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
-        assertThat(alertas).hasSize(1);
-        assertThat(alertas.getFirst().getDescricao())
-                .contains("Mapa de competências do processo Processo de Teste homologado");
-        assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
-
-        verify(subprocessoNotificacaoService, times(1)).notificarHomologacaoMapa(spAtualizado);
+        assertThat(alertas).isEmpty(); // MAPA_HOMOLOGADO não gera alerta
     }
 }

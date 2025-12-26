@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
 import sgc.mapa.model.Atividade;
@@ -40,7 +39,6 @@ import sgc.usuario.model.Usuario;
 import sgc.usuario.model.UsuarioPerfil;
 import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -88,9 +86,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
-
-    @MockitoSpyBean
-    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -250,11 +245,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                             "Cadastro de atividades/conhecimentos da unidade " + unidadeChefe.getSigla() + " disponibilizado"
                                     + " para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
-
-            verify(subprocessoNotificacaoService)
-                    .notificarDisponibilizacaoCadastro(
-                            org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                            org.mockito.ArgumentMatchers.any(Unidade.class));
         }
 
         @Test

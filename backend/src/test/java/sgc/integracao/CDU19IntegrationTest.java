@@ -177,7 +177,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             assertThat(alertas.getFirst().getDescricao())
-                    .contains("Validação do mapa de competências da " + unidade.getSigla() + " aguardando análise");
+                    .contains("Validação do mapa de competências da unidade " + unidade.getSigla() + " aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
                     .isEqualTo(unidadeSuperior.getSigla());
         }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
 import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroAccessoNegado;
@@ -14,7 +13,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.processo.eventos.*;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -29,6 +28,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +38,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private ApplicationEventPublisher publicadorDeEventos;
+    private SubprocessoTransicaoService transicaoService;
     @Mock
     private UnidadeRepo unidadeRepo;
     @Mock
@@ -77,8 +77,12 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(publicadorDeEventos)
-                .publishEvent(any(EventoSubprocessoCadastroDisponibilizado.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.CADASTRO_DISPONIBILIZADO),
+                any(Unidade.class),
+                any(),
+                eq(user));
     }
 
     @Test
@@ -146,8 +150,12 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(publicadorDeEventos)
-                .publishEvent(any(EventoSubprocessoRevisaoDisponibilizada.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA),
+                any(Unidade.class),
+                any(),
+                eq(user));
     }
 
     // --- Devolver Cadastro ---
@@ -172,7 +180,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         verify(analiseService).criarAnalise(any());
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroDevolvido.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.CADASTRO_DEVOLVIDO),
+                any(Unidade.class),
+                any(Unidade.class),
+                eq(user),
+                eq("obs"));
     }
 
     // --- Aceitar Cadastro ---
@@ -195,7 +209,13 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroAceito.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.CADASTRO_ACEITO),
+                eq(u),
+                eq(sup),
+                eq(user),
+                eq("obs"));
     }
 
     @Test
@@ -231,7 +251,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.homologarCadastro(id, "obs", user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoCadastroHomologado.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.CADASTRO_HOMOLOGADO),
+                eq(sedoc),
+                eq(sedoc),
+                eq(user),
+                eq("obs"));
     }
 
     @Test
@@ -272,7 +298,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.devolverRevisaoCadastro(id, "obs", user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoDevolvida.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA),
+                eq(sup),
+                eq(u),
+                eq(user),
+                eq("obs"));
     }
 
     // --- Aceitar Revisão Cadastro ---
@@ -300,7 +332,13 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoAceita.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.REVISAO_CADASTRO_ACEITA),
+                eq(sup),
+                any(),
+                eq(user),
+                eq("obs"));
     }
 
     // --- Homologar Revisão Cadastro ---
@@ -322,7 +360,13 @@ class SubprocessoCadastroWorkflowServiceTest {
         service.homologarRevisaoCadastro(id, "obs", user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoRevisaoHomologada.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA),
+                any(Unidade.class),
+                any(Unidade.class),
+                eq(user),
+                eq("obs"));
     }
 
     @Test

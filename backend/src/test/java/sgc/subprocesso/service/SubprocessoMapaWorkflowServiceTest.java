@@ -6,16 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.analise.AnaliseService;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
-import sgc.processo.eventos.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
@@ -33,6 +32,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +44,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AtividadeRepo atividadeRepo;
     @Mock private MapaService mapaService;
     @Mock private CompetenciaService competenciaService;
-    @Mock private ApplicationEventPublisher publicadorDeEventos;
+    @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeRepo unidadeRepo;
     @Mock private SubprocessoService subprocessoService;
@@ -88,7 +88,13 @@ class SubprocessoMapaWorkflowServiceTest {
         service.disponibilizarMapa(id, request, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDisponibilizado.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_DISPONIBILIZADO),
+                eq(sedoc),
+                eq(u),
+                eq(user),
+                eq("obs"));
     }
 
     @Test
@@ -131,7 +137,13 @@ class SubprocessoMapaWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         assertThat(sp.getMapa().getSugestoes()).isEqualTo("sug");
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaComSugestoes.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_SUGESTOES_APRESENTADAS),
+                any(Unidade.class),
+                any(Unidade.class),
+                eq(user),
+                eq("sug"));
     }
 
     // --- Validar Mapa ---
@@ -154,7 +166,12 @@ class SubprocessoMapaWorkflowServiceTest {
         service.validarMapa(id, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaValidado.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_VALIDADO),
+                any(Unidade.class),
+                any(),
+                eq(user));
     }
 
     // --- Devolver Validação ---
@@ -183,7 +200,13 @@ class SubprocessoMapaWorkflowServiceTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         verify(analiseService).criarAnalise(any());
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaDevolvido.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA),
+                eq(sup),
+                eq(u),
+                eq(user),
+                eq("justificativa"));
     }
 
     // --- Aceitar Validação ---
@@ -236,7 +259,12 @@ class SubprocessoMapaWorkflowServiceTest {
         service.aceitarValidacao(id, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaAceito.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_VALIDACAO_ACEITA),
+                eq(sup),
+                eq(sup2),
+                eq(user));
     }
 
     // --- Homologar Validação ---
@@ -260,7 +288,12 @@ class SubprocessoMapaWorkflowServiceTest {
         service.homologarValidacao(id, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaHomologado.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_HOMOLOGADO),
+                eq(sedoc),
+                eq(sedoc),
+                eq(user));
     }
 
     // --- Submeter Mapa Ajustado ---
@@ -287,6 +320,11 @@ class SubprocessoMapaWorkflowServiceTest {
         service.submeterMapaAjustado(id, req, user);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        verify(publicadorDeEventos).publishEvent(any(EventoSubprocessoMapaAjustadoSubmetido.class));
+        verify(transicaoService).registrar(
+                eq(sp),
+                eq(TipoTransicao.MAPA_DISPONIBILIZADO),
+                any(Unidade.class),
+                any(Unidade.class),
+                eq(user));
     }
 }

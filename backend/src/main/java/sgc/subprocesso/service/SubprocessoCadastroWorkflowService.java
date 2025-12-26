@@ -2,7 +2,6 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -14,7 +13,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.processo.eventos.*;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.Subprocesso;
@@ -29,7 +28,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 public class SubprocessoCadastroWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
-    private final ApplicationEventPublisher publicadorDeEventos;
+    private final SubprocessoTransicaoService transicaoService;
     private final UnidadeRepo unidadeRepo;
     private final AnaliseService analiseService;
     private final SubprocessoService subprocessoService;
@@ -40,22 +39,22 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
+        
+        Unidade origem = sp.getUnidade();
+        Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
+        
         sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
         analiseService.removerPorSubprocesso(sp.getCodigo());
 
-        Unidade unidadeSuperior =
-                sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
-
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoCadastroDisponibilizado.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade())
-                        .unidadeDestino(unidadeSuperior)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.CADASTRO_DISPONIBILIZADO,
+                origem,
+                destino,
+                usuario);
     }
 
     @Transactional
@@ -63,21 +62,22 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
         validarSubprocessoParaDisponibilizacao(sp, usuario, codSubprocesso);
+        
+        Unidade origem = sp.getUnidade();
+        Unidade destino = origem != null ? origem.getUnidadeSuperior() : null;
+        
         sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        Unidade unidadeSuperior =
-                sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
         analiseService.removerPorSubprocesso(sp.getCodigo());
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoRevisaoDisponibilizada.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade())
-                        .unidadeDestino(unidadeSuperior)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA,
+                origem,
+                destino,
+                usuario);
     }
 
     private void validarSubprocessoParaDisponibilizacao(
@@ -135,14 +135,13 @@ public class SubprocessoCadastroWorkflowService {
         sp.setDataFimEtapa1(null);
         repositorioSubprocesso.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoCadastroDevolvido.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(unidadeSuperior)
-                        .unidadeDestino(unidadeDevolucao)
-                        .observacoes(observacoes)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.CADASTRO_DEVOLVIDO,
+                unidadeSuperior,
+                unidadeDevolucao,
+                usuario,
+                observacoes);
     }
 
     @Transactional
@@ -170,14 +169,13 @@ public class SubprocessoCadastroWorkflowService {
         sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         repositorioSubprocesso.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoCadastroAceito.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(unidadeOrigem)
-                        .unidadeDestino(unidadeDestino)
-                        .observacoes(observacoes)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.CADASTRO_ACEITO,
+                unidadeOrigem,
+                unidadeDestino,
+                usuario,
+                observacoes);
     }
 
     @Transactional
@@ -201,14 +199,13 @@ public class SubprocessoCadastroWorkflowService {
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoCadastroHomologado.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sedoc)
-                        .unidadeDestino(sedoc)
-                        .observacoes(observacoes)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.CADASTRO_HOMOLOGADO,
+                sedoc,
+                sedoc,
+                usuario,
+                observacoes);
     }
 
     @Transactional
@@ -242,14 +239,14 @@ public class SubprocessoCadastroWorkflowService {
         sp.setDataFimEtapa1(null);
 
         repositorioSubprocesso.save(sp);
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoRevisaoDevolvida.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(unidadeAnalise)
-                        .unidadeDestino(unidadeDestino)
-                        .observacoes(observacoes)
-                        .build());
+        
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA,
+                unidadeAnalise,
+                unidadeDestino,
+                usuario,
+                observacoes);
     }
 
     @Transactional
@@ -287,14 +284,13 @@ public class SubprocessoCadastroWorkflowService {
         sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         repositorioSubprocesso.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoRevisaoAceita.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(unidadeAnalise)
-                        .unidadeDestino(unidadeDestino)
-                        .observacoes(observacoes)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.REVISAO_CADASTRO_ACEITA,
+                unidadeAnalise,
+                unidadeDestino,
+                usuario,
+                observacoes);
     }
 
     @Transactional
@@ -320,20 +316,19 @@ public class SubprocessoCadastroWorkflowService {
                                                             + " a homologação."));
 
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+            repositorioSubprocesso.save(sp);
 
-            publicadorDeEventos.publishEvent(
-                    EventoSubprocessoRevisaoHomologada.builder()
-                            .codSubprocesso(codSubprocesso)
-                            .usuario(usuario)
-                            .unidadeOrigem(sedoc)
-                            .unidadeDestino(sedoc)
-                            .observacoes(observacoes)
-                            .build());
+            transicaoService.registrar(
+                    sp,
+                    TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
+                    sedoc,
+                    sedoc,
+                    usuario,
+                    observacoes);
         } else {
             sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
+            repositorioSubprocesso.save(sp);
         }
-
-        repositorioSubprocesso.save(sp);
     }
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {

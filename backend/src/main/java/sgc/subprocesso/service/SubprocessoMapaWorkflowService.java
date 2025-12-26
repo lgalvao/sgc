@@ -2,7 +2,6 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseService;
@@ -18,8 +17,8 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
-import sgc.processo.eventos.*;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -44,7 +43,7 @@ public class SubprocessoMapaWorkflowService {
     private final AtividadeRepo atividadeRepo;
     private final MapaService mapaService;
     private final CompetenciaService competenciaService;
-    private final ApplicationEventPublisher publicadorDeEventos;
+    private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
     private final UnidadeRepo unidadeRepo;
     private final SubprocessoService subprocessoService;
@@ -174,14 +173,13 @@ public class SubprocessoMapaWorkflowService {
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
                 .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaDisponibilizado.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sedoc)
-                        .unidadeDestino(sp.getUnidade())
-                        .observacoes(request.getObservacoes())
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_DISPONIBILIZADO,
+                sedoc,
+                sp.getUnidade(),
+                usuario,
+                request.getObservacoes());
 
         log.info("Subprocesso {} atualizado e mapa disponibilizado.", codSubprocesso);
     }
@@ -237,14 +235,13 @@ public class SubprocessoMapaWorkflowService {
 
         analiseService.removerPorSubprocesso(sp.getCodigo());
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaComSugestoes.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade())
-                        .unidadeDestino(sp.getUnidade().getUnidadeSuperior())
-                        .observacoes(sugestoes)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_SUGESTOES_APRESENTADAS,
+                sp.getUnidade(),
+                sp.getUnidade().getUnidadeSuperior(),
+                usuario,
+                sugestoes);
     }
 
     @Transactional
@@ -260,13 +257,12 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaValidado.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade())
-                        .unidadeDestino(sp.getUnidade().getUnidadeSuperior())
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_VALIDADO,
+                sp.getUnidade(),
+                sp.getUnidade().getUnidadeSuperior(),
+                usuario);
     }
 
     @Transactional
@@ -295,14 +291,13 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa2(null);
         subprocessoRepo.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaDevolvido.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade().getUnidadeSuperior())
-                        .unidadeDestino(unidadeDevolucao)
-                        .motivo(justificativa)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
+                sp.getUnidade().getUnidadeSuperior(),
+                unidadeDevolucao,
+                usuario,
+                justificativa);
     }
 
     @Transactional
@@ -339,13 +334,12 @@ public class SubprocessoMapaWorkflowService {
             }
             subprocessoRepo.save(sp);
 
-            publicadorDeEventos.publishEvent(
-                    EventoSubprocessoMapaAceito.builder()
-                            .codSubprocesso(codSubprocesso)
-                            .usuario(usuario)
-                            .unidadeOrigem(unidadeSuperior)
-                            .unidadeDestino(proximaUnidade)
-                            .build());
+            transicaoService.registrar(
+                    sp,
+                    TipoTransicao.MAPA_VALIDACAO_ACEITA,
+                    unidadeSuperior,
+                    proximaUnidade,
+                    usuario);
         }
     }
 
@@ -369,13 +363,12 @@ public class SubprocessoMapaWorkflowService {
                                                 "Unidade 'SEDOC' não encontrada para registrar a"
                                                         + " homologação."));
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaHomologado.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sedoc)
-                        .unidadeDestino(sedoc)
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_HOMOLOGADO,
+                sedoc,
+                sedoc,
+                usuario);
     }
 
     @Transactional
@@ -395,13 +388,12 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        publicadorDeEventos.publishEvent(
-                EventoSubprocessoMapaAjustadoSubmetido.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .usuario(usuario)
-                        .unidadeOrigem(sp.getUnidade())
-                        .unidadeDestino(sp.getUnidade())
-                        .build());
+        transicaoService.registrar(
+                sp,
+                TipoTransicao.MAPA_DISPONIBILIZADO,
+                sp.getUnidade(),
+                sp.getUnidade(),
+                usuario);
     }
 
     private Subprocesso buscarSubprocesso(Long codSubprocesso) {

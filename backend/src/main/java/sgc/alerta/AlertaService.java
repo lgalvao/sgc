@@ -69,6 +69,41 @@ public class AlertaService {
     }
 
     /**
+     * Cria um alerta genérico a partir de uma transição de subprocesso.
+     * Usado pelo SubprocessoComunicacaoListener para processar eventos de transição.
+     *
+     * @param processo Processo associado ao alerta
+     * @param descricao Descrição do alerta (já formatada)
+     * @param unidadeOrigem Unidade de origem da transição
+     * @param unidadeDestino Unidade de destino (receberá o alerta)
+     * @return O alerta criado
+     */
+    @Transactional
+    public Alerta criarAlertaTransicao(
+            Processo processo,
+            String descricao,
+            Unidade unidadeOrigem,
+            Unidade unidadeDestino) {
+
+        log.debug("Criando alerta de transição: descricao='{}', destino={}",
+                descricao, unidadeDestino != null ? unidadeDestino.getSigla() : "null");
+
+        if (unidadeDestino == null) {
+            log.warn("Unidade destino é nula, alerta não será criado");
+            return null;
+        }
+
+        Alerta alerta = new Alerta()
+                .setProcesso(processo)
+                .setDataHora(LocalDateTime.now())
+                .setUnidadeOrigem(unidadeOrigem)
+                .setUnidadeDestino(unidadeDestino)
+                .setDescricao(descricao);
+
+        return repositorioAlerta.save(alerta);
+    }
+
+    /**
      * Cria alertas para todas as unidades participantes quando um processo é iniciado.
      * Conforme CDU-04/CDU-05:
      * - Operacional: "Início do processo"

@@ -48,13 +48,4 @@ class EventosTest {
         assertEquals(List.of(1L, 2L), evento.getCodUnidades());
     }
 
-    @Test
-    @DisplayName("Deve retornar valores corretos para EventoSubprocessoDisponibilizado")
-    void deveRetornarValoresCorretosParaEventoSubprocessoDisponibilizado() {
-        // Arrange
-        EventoSubprocessoDisponibilizado evento = new EventoSubprocessoDisponibilizado(1L);
-
-        // Act & Assert
-        assertEquals(1L, evento.getCodSubprocesso());
-    }
 }

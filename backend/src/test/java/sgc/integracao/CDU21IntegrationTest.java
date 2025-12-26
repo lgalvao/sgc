@@ -29,7 +29,6 @@ import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -66,9 +65,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
 
     @MockitoBean
     private UsuarioService usuarioService;
-
-    @MockitoBean
-    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;

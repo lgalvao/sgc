@@ -66,17 +66,11 @@ public class EventoProcessoListener {
     @Transactional
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
-        log.debug(
-                "Processando evento de processo iniciado: codProcesso={}, tipo={}",
-                evento.getCodProcesso(),
-                evento.getTipo());
+        log.debug("Processando evento de processo iniciado: codProcesso={}, tipo={}", evento.getCodProcesso(), evento.getTipo());
         try {
             processarInicioProcesso(evento);
         } catch (RuntimeException e) {
-            log.error(
-                    "Erro ao processar evento de processo iniciado: {}",
-                    e.getClass().getSimpleName(),
-                    e);
+            log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }
     }
 
@@ -88,29 +82,20 @@ public class EventoProcessoListener {
      */
     @EventListener
     @Transactional
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
         log.debug("Processando evento de processo finalizado: {}", evento.getCodProcesso());
         try {
             processarFinalizacaoProcesso(evento);
         } catch (RuntimeException e) {
-            log.error(
-                    "Erro ao processar evento de processo finalizado: {}",
-                    e.getClass().getSimpleName(),
-                    e);
+            log.error("Erro ao processar evento de processo finalizado: {}", e.getClass().getSimpleName(), e);
         }
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void processarInicioProcesso(EventoProcessoIniciado evento) {
         Processo processo =
                 processoRepo
                         .findById(evento.getCodProcesso())
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Processo não encontrado: ",
-                                                evento.getCodProcesso()));
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.getCodProcesso()));
 
         List<Subprocesso> subprocessos =
                 repoSubprocesso.findByProcessoCodigoWithUnidade(evento.getCodProcesso());
@@ -126,9 +111,7 @@ public class EventoProcessoListener {
                 evento.getCodProcesso());
 
         // 1. Criar alertas diferenciados por tipo de unidade
-        List<Alerta> alertas =
-                servicoAlertas.criarAlertasProcessoIniciado(
-                        processo, evento.getCodUnidades(), subprocessos);
+        List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(processo, evento.getCodUnidades(), subprocessos);
         log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
         // 2. Enviar e-mails para cada subprocesso
@@ -136,17 +119,12 @@ public class EventoProcessoListener {
             try {
                 enviarEmailDeProcessoIniciado(processo, subprocesso);
             } catch (RuntimeException e) {
-                log.error(
-                        "Erro ao enviar e-mail para o subprocesso {}: {}",
-                        subprocesso.getCodigo(),
-                        e.getClass().getSimpleName(),
-                        e);
+                log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
             }
         }
         log.debug("Processamento de evento concluído para o processo {}", processo.getCodigo());
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
         Processo processo = processoRepo.findById(evento.getCodProcesso())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", evento.getCodProcesso()));
@@ -154,20 +132,15 @@ public class EventoProcessoListener {
         List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
 
         if (unidadesParticipantes.isEmpty()) {
-            log.warn(
-                    "Nenhuma unidade participante encontrada para notificar na finalização do"
-                            + " processo {}",
-                    processo.getCodigo());
+            log.warn("Nenhuma unidade participante encontrada para notificar na finalização do processo {}", processo.getCodigo());
             return;
         }
 
-        List<Long> todosCodigosUnidades =
-                unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
-        Map<Long, ResponsavelDto> responsaveis =
-                usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
-        Map<String, UsuarioDto> usuarios =
-                usuarioService.buscarUsuariosPorTitulos(
-                        responsaveis.values().stream()
+        List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
+
+        Map<Long, ResponsavelDto> responsaveis = usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
+
+        Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                                 .map(ResponsavelDto::getTitularTitulo)
                                 .distinct()
                                 .toList());
@@ -176,54 +149,32 @@ public class EventoProcessoListener {
             try {
                 ResponsavelDto responsavel =
                         Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
-                                .orElseThrow(
-                                        () ->
-                                                new IllegalStateException(
-                                                        "Responsável não encontrado para a unidade %s"
-                                                                .formatted(unidade.getSigla())));
+                                .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
 
                 UsuarioDto titular =
                         Optional.ofNullable(usuarios.get(responsavel.getTitularTitulo()))
-                                .orElseThrow(
-                                        () ->
-                                                new IllegalStateException(
-                                                        "Usuário titular não encontrado: %s"
-                                                                .formatted(
-                                                                        responsavel
-                                                                                .getTitularTitulo())));
+                                .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.getTitularTitulo())));
 
                 String emailTitular =
                         Optional.ofNullable(titular.getEmail())
                                 .filter(e -> !e.isBlank())
-                                .orElseThrow(
-                                        () ->
-                                                new IllegalStateException(
-                                                        "E-mail não cadastrado para o titular %s"
-                                                                .formatted(titular.getNome())));
+                                .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.getNome())));
 
-                if (unidade.getTipo() == TipoUnidade.OPERACIONAL
-                        || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
+                if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
                     enviarEmailUnidadeFinal(processo, unidade, emailTitular);
                 } else if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
                     enviarEmailUnidadeIntermediaria(
                             processo, unidade, emailTitular, unidadesParticipantes);
                 }
             } catch (RuntimeException ex) {
-                log.error(
-                        "Falha ao preparar notificação para unidade {} no processo {}: {}",
-                        unidade.getSigla(),
-                        processo.getCodigo(),
-                        ex.getMessage(),
-                        ex);
+                log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", unidade.getSigla(), processo.getCodigo(), ex.getMessage(), ex);
             }
         }
     }
 
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
-        String html =
-                notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
-                        unidade.getSigla(), processo.getDescricao());
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(unidade.getSigla(), processo.getDescricao());
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
@@ -233,35 +184,21 @@ public class EventoProcessoListener {
             Unidade unidadeIntermediaria,
             String email,
             List<Unidade> todasUnidades) {
-        List<String> siglasSubordinadas =
-                todasUnidades.stream()
-                        .filter(
-                                u ->
-                                        u.getUnidadeSuperior() != null
-                                                && u.getUnidadeSuperior()
-                                                .getCodigo()
-                                                .equals(unidadeIntermediaria.getCodigo()))
+
+        List<String> siglasSubordinadas = todasUnidades.stream()
+                        .filter(u -> u.getUnidadeSuperior() != null 
+                                && u.getUnidadeSuperior().getCodigo().equals(unidadeIntermediaria.getCodigo()))
                         .map(Unidade::getSigla)
                         .sorted()
                         .toList();
 
         if (siglasSubordinadas.isEmpty()) {
-            log.warn(
-                    "Nenhuma unidade subordinada encontrada para notificar a unidade intermediária"
-                            + " {}",
-                    unidadeIntermediaria.getSigla());
+            log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}", unidadeIntermediaria.getSigla());
             return;
         }
 
-        String assunto =
-                String.format(
-                        "SGC: Conclusão do processo %s em unidades subordinadas",
-                        processo.getDescricao());
-        String html =
-                notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-                        unidadeIntermediaria.getSigla(),
-                        processo.getDescricao(),
-                        siglasSubordinadas);
+        String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(unidadeIntermediaria.getSigla(), processo.getDescricao(), siglasSubordinadas);
 
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {})", unidadeIntermediaria.getSigla());
@@ -281,19 +218,15 @@ public class EventoProcessoListener {
                 log.warn("Unidade {} não encontrada no SGRH.", codigoUnidade);
                 return;
             }
-            UnidadeDto unidade = unidadeOpt.get();
 
-            Optional<ResponsavelDto> responsavelOpt =
-                    usuarioService.buscarResponsavelUnidade(codigoUnidade);
+            UnidadeDto unidade = unidadeOpt.get();
+            Optional<ResponsavelDto> responsavelOpt = usuarioService.buscarResponsavelUnidade(codigoUnidade);
             if (responsavelOpt.isEmpty() || responsavelOpt.get().getTitularTitulo() == null) {
                 log.warn("Responsável não encontrado para a unidade {}.", unidade.getNome());
                 return;
             }
 
-            UsuarioDto titular =
-                    usuarioService
-                            .buscarUsuarioPorTitulo(responsavelOpt.get().getTitularTitulo())
-                            .orElse(null);
+            UsuarioDto titular = usuarioService.buscarUsuarioPorTitulo(responsavelOpt.get().getTitularTitulo()).orElse(null);
             if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) {
                 log.warn("E-mail não encontrado para o titular da unidade {}.", unidade.getNome());
                 return;
@@ -306,35 +239,15 @@ public class EventoProcessoListener {
 
             if (OPERACIONAL == tipoUnidade) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
-                corpoHtml =
-                        notificacaoModelosService.criarEmailDeProcessoIniciado(
-                                unidade.getNome(),
-                                processo.getDescricao(),
-                                tipoProcesso.name(),
-                                subprocesso.getDataLimiteEtapa1());
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(unidade.getNome(), processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
             } else if (INTERMEDIARIA == tipoUnidade) {
-                assunto =
-                        "Processo Iniciado em Unidades Subordinadas - %s"
-                                .formatted(processo.getDescricao());
-                corpoHtml =
-                        notificacaoModelosService.criarEmailDeProcessoIniciado(
-                                unidade.getNome(),
-                                processo.getDescricao(),
-                                tipoProcesso.name(),
-                                subprocesso.getDataLimiteEtapa1());
+                assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(unidade.getNome(), processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
             } else if (INTEROPERACIONAL == tipoUnidade) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
-                corpoHtml =
-                        notificacaoModelosService.criarEmailDeProcessoIniciado(
-                                unidade.getNome(),
-                                processo.getDescricao(),
-                                tipoProcesso.name(),
-                                subprocesso.getDataLimiteEtapa1());
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(unidade.getNome(), processo.getDescricao(), tipoProcesso.name(), subprocesso.getDataLimiteEtapa1());
             } else {
-                log.warn(
-                        "Tipo de unidade desconhecido: {} (unidade={})",
-                        tipoUnidade,
-                        codigoUnidade);
+                log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
                 return;
             }
 
@@ -342,39 +255,23 @@ public class EventoProcessoListener {
             log.info("E-mail enviado para unidade {}", unidade.getSigla());
 
             if (responsavelOpt.get().getSubstitutoTitulo() != null) {
-                enviarEmailParaSubstituto(
-                        responsavelOpt.get().getSubstitutoTitulo(),
-                        assunto,
-                        corpoHtml,
-                        unidade.getNome());
+                enviarEmailParaSubstituto(responsavelOpt.get().getSubstitutoTitulo(), assunto, corpoHtml, unidade.getNome());
             }
 
         } catch (RuntimeException e) {
-            log.error(
-                    "Erro ao enviar e-mail para a unidade {}: {}",
-                    codigoUnidade,
-                    e.getClass().getSimpleName(),
-                    e);
+            log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
-    private void enviarEmailParaSubstituto(
-            String tituloSubstituto, String assunto, String corpoHtml, String nomeUnidade) {
+    private void enviarEmailParaSubstituto(String tituloSubstituto, String assunto, String corpoHtml, String nomeUnidade) {
         try {
-            UsuarioDto substituto =
-                    usuarioService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
-            if (substituto != null
-                    && substituto.getEmail() != null
-                    && !substituto.getEmail().isBlank()) {
+            UsuarioDto substituto = usuarioService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
+            if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }
         } catch (RuntimeException e) {
-            log.warn(
-                    "Erro ao enviar e-mail para o substituto da unidade {}: {}",
-                    nomeUnidade,
-                    e.getClass().getSimpleName());
+            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getClass().getSimpleName());
         }
     }
 }

@@ -17,11 +17,7 @@ public class TestUtil {
                     StandardCharsets.UTF_8);
 
     public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        ObjectMapper mapper =
-                JsonMapper.builder()
-                        .changeDefaultPropertyInclusion(
-                                incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-                        .build();
+        ObjectMapper mapper = JsonMapper.builder().changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL)).build();
 
         return mapper.writeValueAsBytes(object);
     }

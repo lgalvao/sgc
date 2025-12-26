@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
@@ -85,9 +84,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
-
-    @MockitoSpyBean
-    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -238,14 +234,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             var alerta = alertas.getFirst();
             assertThat(alerta.getDescricao())
                     .isEqualTo(
-                            "Cadastro de atividades e conhecimentos da unidade SESEL"
-                                    + " disponibilizado para análise");
+                            "Revisão do cadastro da unidade SESEL"
+                                    + " disponibilizada para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
-
-            verify(subprocessoNotificacaoService)
-                    .notificarDisponibilizacaoRevisaoCadastro(
-                            org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                            org.mockito.ArgumentMatchers.any(Unidade.class));
         }
 
         @Test
