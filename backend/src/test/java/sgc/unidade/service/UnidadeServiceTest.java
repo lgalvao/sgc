@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
+import sgc.unidade.dto.AtribuicaoTemporariaDto;
 import sgc.usuario.mapper.UsuarioMapper;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.model.Usuario;
@@ -21,10 +22,12 @@ import sgc.unidade.model.UnidadeMapaRepo;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,6 +127,20 @@ class UnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve lançar exceção se unidade não encontrada ao buscar siglas subordinadas")
+        void deveLancarExcecaoSeUnidadeNaoEncontradaAoBuscarSiglasSubordinadas() {
+            // Arrange
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            u1.setSigla("U1");
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+
+            // Act & Assert
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> service.buscarSiglasSubordinadas("U2"));
+        }
+
+        @Test
         @DisplayName("Deve buscar sigla da unidade superior")
         void deveBuscarSiglaSuperior() {
             // Arrange
@@ -136,6 +153,19 @@ class UnidadeServiceTest {
 
             // Act & Assert
             assertThat(service.buscarSiglaSuperior("FILHO")).isEqualTo("PAI");
+        }
+
+        @Test
+        @DisplayName("Deve retornar null se unidade não tiver superior ao buscar sigla superior")
+        void deveRetornarNullSeSemSuperior() {
+            // Arrange
+            Unidade u = new Unidade();
+            u.setUnidadeSuperior(null);
+
+            when(unidadeRepo.findBySigla("RAIZ")).thenReturn(Optional.of(u));
+
+            // Act & Assert
+            assertThat(service.buscarSiglaSuperior("RAIZ")).isNull();
         }
     }
 
@@ -268,6 +298,20 @@ class UnidadeServiceTest {
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve buscar todas as atribuições")
+        void deveBuscarTodasAtribuicoes() {
+            // Arrange
+            when(atribuicaoTemporariaRepo.findAll()).thenReturn(List.of(new sgc.unidade.model.AtribuicaoTemporaria()));
+            when(usuarioMapper.toAtribuicaoTemporariaDto(any())).thenReturn(sgc.unidade.dto.AtribuicaoTemporariaDto.builder().build());
+
+            // Act
+            List<AtribuicaoTemporariaDto> result = service.buscarTodasAtribuicoes();
+
+            // Assert
+            assertThat(result).hasSize(1);
         }
     }
 }
