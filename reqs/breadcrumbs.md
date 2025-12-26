@@ -64,8 +64,6 @@ Rotas que exibem informações de uma unidade específica.
 | `/unidade/:codUnidade/mapa`       | Mapa                     | 🏠 > [SIGLA] > Mapa de competências  |
 | `/unidade/:codUnidade/atribuicao` | AtribuicaoTemporariaForm | 🏠 > [SIGLA] > Atribuição temporária |
 
-**Fallback**: Se a sigla da unidade não estiver carregada no store, exibe "Unidade X" onde X é o código.
-
 ### Outras Rotas
 
 Rotas que não se encaixam nas categorias acima usam a propriedade `meta.breadcrumb` definida no roteador. O breadcrumb
