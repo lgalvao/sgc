@@ -63,7 +63,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeFilha2;
     private Processo processoRaiz;
     private Processo processoFilha1;
-    private Processo processoCriado;
 
     @BeforeEach
     void setup() {
@@ -114,7 +113,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoFilha1.getParticipantes().add(unidadeFilha1);
         processoFilha1 = processoRepo.save(processoFilha1);
 
-        processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
+        Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);
         processoCriado.setDescricao("Processo Criado Teste");
         processoCriado.getParticipantes().add(unidadeRaiz);

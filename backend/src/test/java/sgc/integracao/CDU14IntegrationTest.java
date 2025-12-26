@@ -153,36 +153,36 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         entityManager.refresh(unidade);
 
         // Configuração do Mock UsuarioService
-        when(usuarioService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
+        when(usuarioService.buscarPerfisUsuario(admin.getTituloEleitoral()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
-                                        admin.getTituloEleitoral().toString(),
+                                        admin.getTituloEleitoral(),
                                         unidadeAdmin.getCodigo(),
                                         "SEDOC",
                                         Perfil.ADMIN.name())));
-        when(usuarioService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
+        when(usuarioService.buscarPerfisUsuario(gestor.getTituloEleitoral()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
-                                        gestor.getTituloEleitoral().toString(),
+                                        gestor.getTituloEleitoral(),
                                         unidadeGestor.getCodigo(),
                                         "DA-TEST",
                                         Perfil.GESTOR.name())));
-        when(usuarioService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString()))
+        when(usuarioService.buscarPerfisUsuario(chefe.getTituloEleitoral()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
-                                        chefe.getTituloEleitoral().toString(),
+                                        chefe.getTituloEleitoral(),
                                         unidade.getCodigo(),
                                         "SA-TEST",
                                         Perfil.CHEFE.name())));
 
-        when(usuarioService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(admin.getTituloEleitoral()))
                 .thenReturn(admin);
-        when(usuarioService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(gestor.getTituloEleitoral()))
                 .thenReturn(gestor);
-        when(usuarioService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(chefe.getTituloEleitoral()))
                 .thenReturn(chefe);
 
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);

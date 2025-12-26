@@ -1,7 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as usuarioService from "@/services/usuarioService";
-import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import {Perfil} from "@/types/tipos";
 import {usePerfilStore} from "../perfil";
 

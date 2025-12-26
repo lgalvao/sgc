@@ -88,8 +88,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
-    private Unidade unidadeOrigem;
-    private Unidade unidadeDestino;
 
     @BeforeEach
     void setUp() {
@@ -104,13 +102,13 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         }
 
         // 1. Criar unidades
-        unidadeOrigem = UnidadeFixture.unidadePadrao();
+        Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();
         unidadeOrigem.setCodigo(null);
         unidadeOrigem.setSigla("U_ORIG");
         unidadeOrigem.setNome("Unidade Origem");
         unidadeOrigem = unidadeRepo.save(unidadeOrigem);
 
-        unidadeDestino = UnidadeFixture.unidadePadrao();
+        Unidade unidadeDestino = UnidadeFixture.unidadePadrao();
         unidadeDestino.setCodigo(null);
         unidadeDestino.setSigla("U_DEST");
         unidadeDestino.setNome("Unidade Destino");

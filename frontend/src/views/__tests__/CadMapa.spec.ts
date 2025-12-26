@@ -123,7 +123,7 @@ const BFormCheckbox = defineComponent({
             return props.modelValue;
         });
         const handleChange = (e: any) => {
-            let newValue = props.modelValue;
+            let newValue: boolean | any[];
             if (Array.isArray(props.modelValue)) {
                 if (e.target.checked) {
                     newValue = [...props.modelValue, props.value];

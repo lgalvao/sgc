@@ -95,7 +95,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
     private Subprocesso subprocessoRevisao;
-    private Usuario usuarioChefe;
 
     @BeforeEach
     void setUp() {
@@ -123,7 +122,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         unidadeChefe = unidadeRepo.save(unidadeChefe);
 
         // 2. Criar Usuários
-        usuarioChefe = UsuarioFixture.usuarioComTitulo("333333333333");
+        Usuario usuarioChefe = UsuarioFixture.usuarioComTitulo("333333333333");
         usuarioChefe.setUnidadeLotacao(unidadeChefe);
         usuarioChefe = usuarioRepo.saveAndFlush(usuarioChefe);
 

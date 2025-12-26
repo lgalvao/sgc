@@ -118,6 +118,7 @@ class HtmlSanitizingDeserializerTest {
         assertThat(resultado).doesNotContain("alert");
     }
 
+    @SuppressWarnings("HttpUrlsUsage")
     @Test
     @DisplayName("Deve remover iframes maliciosos")
     void deveRemoverIframesMaliciosos() throws Exception {

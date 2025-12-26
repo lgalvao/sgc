@@ -418,15 +418,15 @@ explícitas.
 
 **Exemplos de Endpoints:**
 
-| Operação | Método | Endpoint | Descrição |
-|----------|--------|----------|-----------|
-| Listar | GET | `/api/processos` | Lista todos os processos |
-| Buscar | GET | `/api/processos/{id}` | Busca um processo específico |
-| Criar | POST | `/api/processos` | Cria novo processo |
-| Atualizar | POST | `/api/processos/{id}/atualizar` | Atualiza processo existente |
-| Excluir | POST | `/api/processos/{id}/excluir` | Remove processo |
-| Iniciar | POST | `/api/processos/{id}/iniciar` | Ação de workflow |
-| Finalizar | POST | `/api/processos/{id}/finalizar` | Ação de workflow |
+| Operação  | Método | Endpoint                        | Descrição                    |
+|-----------|--------|---------------------------------|------------------------------|
+| Listar    | GET    | `/api/processos`                | Lista todos os processos     |
+| Buscar    | GET    | `/api/processos/{id}`           | Busca um processo específico |
+| Criar     | POST   | `/api/processos`                | Cria novo processo           |
+| Atualizar | POST   | `/api/processos/{id}/atualizar` | Atualiza processo existente  |
+| Excluir   | POST   | `/api/processos/{id}/excluir`   | Remove processo              |
+| Iniciar   | POST   | `/api/processos/{id}/iniciar`   | Ação de workflow             |
+| Finalizar | POST   | `/api/processos/{id}/finalizar` | Ação de workflow             |
 
 **Justificativa da Convenção:**
 
@@ -514,14 +514,14 @@ graph TD
 
 **Exceções Customizadas (sgc.comum.erros):**
 
-| Exceção | HTTP Status | Uso |
-|---------|-------------|-----|
-| `ErroEntidadeNaoEncontrada` | 404 Not Found | Recurso não existe |
-| `ErroValidacao` | 400 Bad Request | Dados inválidos |
-| `ErroSituacaoInvalida` | 409 Conflict | Estado inconsistente |
-| `ErroAccessoNegado` | 403 Forbidden | Sem permissão |
-| `ErroRequisicaoSemCorpo` | 400 Bad Request | Body ausente |
-| `ErroNegocio` | 400 Bad Request | Regra de negócio violada |
+| Exceção                     | HTTP Status     | Uso                      |
+|-----------------------------|-----------------|--------------------------|
+| `ErroEntidadeNaoEncontrada` | 404 Not Found   | Recurso não existe       |
+| `ErroValidacao`             | 400 Bad Request | Dados inválidos          |
+| `ErroSituacaoInvalida`      | 409 Conflict    | Estado inconsistente     |
+| `ErroAccessoNegado`         | 403 Forbidden   | Sem permissão            |
+| `ErroRequisicaoSemCorpo`    | 400 Bad Request | Body ausente             |
+| `ErroNegocio`               | 400 Bad Request | Regra de negócio violada |
 
 **RestExceptionHandler:**
 
@@ -833,20 +833,20 @@ de idioma:
 
 ### 9.1. Stack Tecnológico
 
-| Categoria | Tecnologia | Versão | Propósito |
-|-----------|------------|--------|-----------|
-| Linguagem | Java | 25 | Linguagem de programação |
-| Framework | Spring Boot | 4.x | Framework web e DI |
-| ORM | Hibernate | 7.x | Mapeamento objeto-relacional |
-| Validação | Bean Validation | 3.x | Validação de entrada |
-| Mapeamento | MapStruct | Latest | Entity-DTO conversion |
-| Redução de Boilerplate | Lombok | Latest | Annotations para code generation |
-| Banco de Dados (Prod) | PostgreSQL | Latest | Banco relacional |
-| Banco de Dados (Dev/Test) | H2 | Latest | Banco em memória |
-| Documentação API | SpringDoc OpenAPI | Latest | Swagger UI |
-| Testes | JUnit 5 | Latest | Framework de testes |
-| Mocks | Mockito | Latest | Mocking em testes |
-| Build | Gradle | 8.x | Automação de build |
+| Categoria                 | Tecnologia        | Versão | Propósito                        |
+|---------------------------|-------------------|--------|----------------------------------|
+| Linguagem                 | Java              | 25     | Linguagem de programação         |
+| Framework                 | Spring Boot       | 4.x    | Framework web e DI               |
+| ORM                       | Hibernate         | 7.x    | Mapeamento objeto-relacional     |
+| Validação                 | Bean Validation   | 3.x    | Validação de entrada             |
+| Mapeamento                | MapStruct         | Latest | Entity-DTO conversion            |
+| Redução de Boilerplate    | Lombok            | Latest | Annotations para code generation |
+| Banco de Dados (Prod)     | PostgreSQL        | Latest | Banco relacional                 |
+| Banco de Dados (Dev/Test) | H2                | Latest | Banco em memória                 |
+| Documentação API          | SpringDoc OpenAPI | Latest | Swagger UI                       |
+| Testes                    | JUnit 5           | Latest | Framework de testes              |
+| Mocks                     | Mockito           | Latest | Mocking em testes                |
+| Build                     | Gradle            | 8.x    | Automação de build               |
 
 ### 9.2. Anotações Importantes
 

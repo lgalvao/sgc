@@ -34,14 +34,14 @@ esses arquivos.
 
 Os helpers estão organizados em arquivos especializados no diretório `e2e/helpers/`:
 
-| Arquivo | Responsabilidade |
-|---------|------------------|
-| `helpers-auth.ts` | Login, logout, credenciais de usuários (`USUARIOS`) |
-| `helpers-navegacao.ts` | Funções de navegação e verificação de páginas (`fazerLogout`, `verificarPaginaPainel`, `verificarPaginaSubprocesso`) |
-| `helpers-processos.ts` | Criar e verificar processos (`criarProcesso`, `calcularDataLimite`, `extrairProcessoId`) |
-| `helpers-atividades.ts` | Adicionar/editar atividades e conhecimentos |
-| `helpers-mapas.ts` | Criar competências e disponibilizar mapas |
-| `helpers-analise.ts` | Funções de análise de cadastro (aceite, devolução, homologação) |
+| Arquivo                 | Responsabilidade                                                                                                     |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `helpers-auth.ts`       | Login, logout, credenciais de usuários (`USUARIOS`)                                                                  |
+| `helpers-navegacao.ts`  | Funções de navegação e verificação de páginas (`fazerLogout`, `verificarPaginaPainel`, `verificarPaginaSubprocesso`) |
+| `helpers-processos.ts`  | Criar e verificar processos (`criarProcesso`, `calcularDataLimite`)                                                  |
+| `helpers-atividades.ts` | Adicionar/editar atividades e conhecimentos                                                                          |
+| `helpers-mapas.ts`      | Criar competências e disponibilizar mapas                                                                            |
+| `helpers-analise.ts`    | Funções de análise de cadastro (aceite, devolução, homologação)                                                      |
 
 **IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
 

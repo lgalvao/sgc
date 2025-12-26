@@ -126,13 +126,12 @@ public class AtividadeService {
      *
      * @param codigo       O código da atividade a ser atualizada.
      * @param atividadeDto O DTO com os novos dados da atividade.
-     * @return O {@link AtividadeDto} da atividade atualizada.
      * @throws ErroEntidadeNaoEncontrada se a atividade não for encontrada.
      */
-    public AtividadeDto atualizar(Long codigo, AtividadeDto atividadeDto) {
+    public void atualizar(Long codigo, AtividadeDto atividadeDto) {
         log.debug("Atualizando atividade com código: {}", codigo);
         try {
-            return atividadeRepo
+            atividadeRepo
                     .findById(codigo)
                     .map(existente -> {
                         log.debug("Atividade encontrada: {}, mapa: {}", existente.getCodigo(),
@@ -217,14 +216,13 @@ public class AtividadeService {
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
-     * @return O {@link ConhecimentoDto} do conhecimento atualizado.
      * @throws ErroEntidadeNaoEncontrada se o conhecimento não for encontrado ou não pertencer à
      *                                   atividade.
      */
-    public ConhecimentoDto atualizarConhecimento(
+    public void atualizarConhecimento(
             Long codAtividade, Long codConhecimento, ConhecimentoDto conhecimentoDto) {
 
-        return conhecimentoRepo.findById(codConhecimento)
+        conhecimentoRepo.findById(codConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
                 .map(existente -> {
                     atualizarSituacaoSubprocessoSeNecessario(existente.getAtividade().getMapa().getCodigo());

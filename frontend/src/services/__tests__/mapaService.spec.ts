@@ -4,7 +4,7 @@ import {
     testErrorHandling,
     testGetEndpoint,
     testPostEndpoint
-} from "../../test-utils/serviceTestHelpers";
+} from "@/test-utils/serviceTestHelpers";
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import * as mapaService from "@/services/mapaService";
 import {AxiosError} from "axios";

@@ -4,7 +4,7 @@ import {
     testErrorHandling,
     testGetEndpoint,
     testPostEndpoint
-} from "../../test-utils/serviceTestHelpers";
+} from "@/test-utils/serviceTestHelpers";
 import {diagnosticoService} from "../diagnosticoService";
 
 describe("diagnosticoService", () => {

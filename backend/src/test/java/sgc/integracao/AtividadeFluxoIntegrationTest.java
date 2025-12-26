@@ -77,7 +77,6 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     private Subprocesso subprocesso;
-    private Unidade unidade;
     private Mapa mapa;
 
     @BeforeEach
@@ -92,7 +91,7 @@ class AtividadeFluxoIntegrationTest extends BaseIntegrationTest {
         }
 
         // 1. Criar unidade e chefe
-        unidade = new Unidade();
+        Unidade unidade = new Unidade();
         unidade.setNome("Unidade Teste Fluxo");
         unidade.setSigla("U_FLUXO");
         unidade.setTipo(TipoUnidade.OPERACIONAL);

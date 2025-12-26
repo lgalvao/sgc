@@ -70,6 +70,9 @@ public class SubprocessoDtoService {
                 log.debug("Subprocesso encontrado: {}", sp.getCodigo());
 
                 var authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication == null || authentication.getName() == null) {
+                        throw new ErroAccessoNegado("Usuário não autenticado.");
+                }
                 String username = authentication.getName();
                 Usuario usuario = usuarioService.buscarUsuarioPorLogin(username);
 

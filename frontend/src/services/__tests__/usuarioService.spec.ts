@@ -4,7 +4,7 @@ import {
     testErrorHandling,
     testGetEndpoint,
     testPostEndpoint
-} from "../../test-utils/serviceTestHelpers";
+} from "@/test-utils/serviceTestHelpers";
 import * as mappers from "@/mappers/sgrh";
 import * as service from "../usuarioService";
 

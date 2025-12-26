@@ -226,11 +226,10 @@ describe("LoginView.vue", () => {
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockRejectedValue(new Error("Erro ao selecionar"));
-        const mockPerfis = [
+        perfilStore.perfisUnidades = [
             {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
             {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
         ];
-        perfilStore.perfisUnidades = mockPerfis;
 
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -253,11 +252,10 @@ describe("LoginView.vue", () => {
         const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        const mockPerfis = [
+        perfilStore.perfisUnidades = [
             {perfil: Perfil.ADMIN, unidade: {sigla: "SEDE", codigo: 1, nome: "Sede"}, siglaUnidade: "SEDE"},
             {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
         ];
-        perfilStore.perfisUnidades = mockPerfis;
 
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");

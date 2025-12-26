@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from "vitest";
 import * as cadastroService from "@/services/cadastroService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import {Perfil} from "@/types/tipos";
 import {usePerfilStore} from "../perfil";
 import {useProcessosStore} from "../processos";

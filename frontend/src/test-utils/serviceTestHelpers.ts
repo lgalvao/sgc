@@ -65,41 +65,6 @@ export function testPostEndpoint(
 }
 
 /**
- * Testa chamada PUT
- */
-export function testPutEndpoint(
-    action: () => Promise<any>,
-    url: string,
-    payload?: any,
-    response: any = {}
-) {
-    it(`deve fazer PUT em ${url}`, async () => {
-        mockApi.put.mockResolvedValue({ data: response });
-        await action();
-        if (payload !== undefined) {
-            expect(mockApi.put).toHaveBeenCalledWith(url, payload);
-        } else {
-            expect(mockApi.put).toHaveBeenCalledWith(url);
-        }
-    });
-}
-
-/**
- * Testa chamada DELETE
- */
-export function testDeleteEndpoint(
-    action: () => Promise<any>,
-    url: string,
-    response: any = {}
-) {
-    it(`deve fazer DELETE em ${url}`, async () => {
-        mockApi.delete.mockResolvedValue({ data: response });
-        await action();
-        expect(mockApi.delete).toHaveBeenCalledWith(url);
-    });
-}
-
-/**
  * Testa tratamento de erros comuns
  */
 export function testErrorHandling(

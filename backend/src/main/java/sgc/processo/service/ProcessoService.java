@@ -57,7 +57,9 @@ public class ProcessoService {
     private final ProcessoInicializador processoInicializador;
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
-        if (authentication == null || !authentication.isAuthenticated()) return false;
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
+            return false;
+        }
 
         String username = authentication.getName();
         boolean isGestorOuChefe =
@@ -399,6 +401,9 @@ public class ProcessoService {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            return List.of();
+        }
         String username = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream()
                         .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));

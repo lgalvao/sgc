@@ -14,6 +14,7 @@ import sgc.comum.erros.ErroAutenticacao;
 public class AcessoAdClient {
     private final RestClient acessoAdRestClient;
 
+    @SuppressWarnings("SameReturnValue")
     public boolean autenticar(String titulo, String senha) {
         try {
             AutenticarRequest request = new AutenticarRequest(titulo, senha);

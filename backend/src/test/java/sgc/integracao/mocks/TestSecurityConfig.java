@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @TestConfiguration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class TestSecurityConfig {
     @Bean
     @Primary

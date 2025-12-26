@@ -25,7 +25,7 @@ A documentação técnica foi desacoplada deste README para facilitar a manuten�
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-* **[regras/](regras/)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
+* **[regras/](/regras)**: Diretório contendo guias específicos de padrões (backend, frontend, E2E).
 
 ---
 
@@ -103,7 +103,7 @@ Os relatórios são gerados em:
 
 Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
 
-* **[guia-testes-junit.md](guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
+* **[guia-testes-junit.md](/regras/guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
 
 ---
 

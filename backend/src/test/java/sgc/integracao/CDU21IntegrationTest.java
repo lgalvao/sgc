@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -75,18 +74,13 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private NotificacaoEmailService notificacaoEmailService;
 
     private Processo processo;
-    private Unidade unidadeIntermediaria;
     private Unidade unidadeOperacional1;
-    private Unidade unidadeOperacional2;
-    private Usuario titularIntermediaria;
-    private Usuario titularOp1;
-    private Usuario titularOp2;
 
     @BeforeEach
     void setUp() {
         // Criar hierarquia de unidades via Fixture
         // Unidade intermediária
-        unidadeIntermediaria = UnidadeFixture.unidadePadrao();
+        Unidade unidadeIntermediaria = UnidadeFixture.unidadePadrao();
         unidadeIntermediaria.setCodigo(null);
         unidadeIntermediaria.setNome("Coordenadoria CDU-21");
         unidadeIntermediaria.setSigla("COORD21");
@@ -100,7 +94,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         unidadeOperacional1.setUnidadeSuperior(unidadeIntermediaria);
         unidadeOperacional1 = unidadeRepo.save(unidadeOperacional1);
 
-        unidadeOperacional2 = UnidadeFixture.unidadePadrao();
+        Unidade unidadeOperacional2 = UnidadeFixture.unidadePadrao();
         unidadeOperacional2.setCodigo(null);
         unidadeOperacional2.setNome("Seção Op2 CDU-21");
         unidadeOperacional2.setSigla("OP2-21");
@@ -108,17 +102,17 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         unidadeOperacional2 = unidadeRepo.save(unidadeOperacional2);
 
         // Criar Usuários via Fixture
-        titularIntermediaria = UsuarioFixture.usuarioComTitulo("111111111111");
+        Usuario titularIntermediaria = UsuarioFixture.usuarioComTitulo("111111111111");
         titularIntermediaria.setNome("Titular Intermediaria");
         titularIntermediaria.setEmail("titular.intermediaria@test.com");
         titularIntermediaria = usuarioRepo.save(titularIntermediaria);
 
-        titularOp1 = UsuarioFixture.usuarioComTitulo("222222222222");
+        Usuario titularOp1 = UsuarioFixture.usuarioComTitulo("222222222222");
         titularOp1.setNome("Titular Op1");
         titularOp1.setEmail("titular.op1@test.com");
         titularOp1 = usuarioRepo.save(titularOp1);
 
-        titularOp2 = UsuarioFixture.usuarioComTitulo("333333333333");
+        Usuario titularOp2 = UsuarioFixture.usuarioComTitulo("333333333333");
         titularOp2.setNome("Titular Op2");
         titularOp2.setEmail("titular.op2@test.com");
         titularOp2 = usuarioRepo.save(titularOp2);

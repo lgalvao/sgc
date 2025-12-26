@@ -6,9 +6,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Conhecimento;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
@@ -153,7 +150,7 @@ public class ImpactoMapaService {
 
     private boolean hasRole(Usuario usuario, String role) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal().equals(usuario)) {
+        if (auth != null && auth.getPrincipal() != null && auth.getPrincipal().equals(usuario)) {
             return auth.getAuthorities().stream()
                     .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_%s".formatted(role)));
         }

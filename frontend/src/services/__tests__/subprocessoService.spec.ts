@@ -4,7 +4,7 @@ import {
     testErrorHandling,
     testGetEndpoint,
     testPostEndpoint
-} from "../../test-utils/serviceTestHelpers";
+} from "@/test-utils/serviceTestHelpers";
 import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
 import * as subprocessoService from "@/services/subprocessoService";

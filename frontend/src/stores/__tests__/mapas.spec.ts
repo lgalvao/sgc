@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from "vitest";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
 import {useMapasStore} from "../mapas";
 

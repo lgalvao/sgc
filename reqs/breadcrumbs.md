@@ -39,13 +39,13 @@ unidade.
 
 Rotas que pertencem a um subprocesso específico de uma unidade.
 
-| Rota                                                | Nome                    | Breadcrumbs (ADMIN/GESTOR)                                     |
-|-----------------------------------------------------|-------------------------|----------------------------------------------------------------|
-| `/processo/:codProcesso/:siglaUnidade`              | Subprocesso             | 🏠 > Detalhes do processo > [SIGLA]                            |
-| `/processo/:codProcesso/:siglaUnidade/mapa`         | SubprocessoMapa         | 🏠 > Detalhes do processo > [SIGLA] > Mapa de competências     |
-| `/processo/:codProcesso/:siglaUnidade/vis-mapa`     | SubprocessoVisMapa      | 🏠 > Detalhes do processo > [SIGLA] > Visualizar mapa          |
-| `/processo/:codProcesso/:siglaUnidade/cadastro`     | SubprocessoCadastro     | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
-| `/processo/:codProcesso/:siglaUnidade/vis-cadastro` | SubprocessoVisCadastro  | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
+| Rota                                                | Nome                   | Breadcrumbs (ADMIN/GESTOR)                                       |
+|-----------------------------------------------------|------------------------|------------------------------------------------------------------|
+| `/processo/:codProcesso/:siglaUnidade`              | Subprocesso            | 🏠 > Detalhes do processo > [SIGLA]                              |
+| `/processo/:codProcesso/:siglaUnidade/mapa`         | SubprocessoMapa        | 🏠 > Detalhes do processo > [SIGLA] > Mapa de competências       |
+| `/processo/:codProcesso/:siglaUnidade/vis-mapa`     | SubprocessoVisMapa     | 🏠 > Detalhes do processo > [SIGLA] > Visualizar mapa            |
+| `/processo/:codProcesso/:siglaUnidade/cadastro`     | SubprocessoCadastro    | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
+| `/processo/:codProcesso/:siglaUnidade/vis-cadastro` | SubprocessoVisCadastro | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
 
 Para CHEFE e SERVIDOR, o "Detalhes do processo" é omitido:
 
@@ -58,11 +58,11 @@ Para CHEFE e SERVIDOR, o "Detalhes do processo" é omitido:
 
 Rotas que exibem informações de uma unidade específica.
 
-| Rota                             | Nome                     | Breadcrumbs                               |
-|----------------------------------|--------------------------|-------------------------------------------|
-| `/unidade/:codUnidade`           | Unidade                  | 🏠 > [SIGLA] > Minha unidade              |
-| `/unidade/:codUnidade/mapa`      | Mapa                     | 🏠 > [SIGLA] > Mapa de competências       |
-| `/unidade/:codUnidade/atribuicao`| AtribuicaoTemporariaForm | 🏠 > [SIGLA] > Atribuição temporária      |
+| Rota                              | Nome                     | Breadcrumbs                          |
+|-----------------------------------|--------------------------|--------------------------------------|
+| `/unidade/:codUnidade`            | Unidade                  | 🏠 > [SIGLA] > Minha unidade         |
+| `/unidade/:codUnidade/mapa`       | Mapa                     | 🏠 > [SIGLA] > Mapa de competências  |
+| `/unidade/:codUnidade/atribuicao` | AtribuicaoTemporariaForm | 🏠 > [SIGLA] > Atribuição temporária |
 
 **Fallback**: Se a sigla da unidade não estiver carregada no store, exibe "Unidade X" onde X é o código.
 

@@ -67,7 +67,7 @@ public interface SubprocessoDetalheMapper {
 
     default String mapLocalizacaoAtual(List<Movimentacao> movimentacoes) {
         if (movimentacoes != null && !movimentacoes.isEmpty()) {
-            Movimentacao movimentacaoRecente = movimentacoes.get(0);
+            Movimentacao movimentacaoRecente = movimentacoes.getFirst();
             if (movimentacaoRecente.getUnidadeDestino() != null) {
                 return movimentacaoRecente.getUnidadeDestino().getSigla();
             }

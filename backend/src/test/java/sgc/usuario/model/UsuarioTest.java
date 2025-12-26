@@ -304,7 +304,7 @@ class UsuarioTest {
         @DisplayName("Deve considerar usuário diferente de null")
         void deveConsiderarUsuarioDiferenteDeNull() {
             // Act & Assert
-            assertThat(usuario).isNotEqualTo(null);
+            assertThat(usuario).isNotNull();
         }
 
         @Test

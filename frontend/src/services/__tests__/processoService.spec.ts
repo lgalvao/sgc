@@ -4,7 +4,7 @@ import {
     testErrorHandling,
     testGetEndpoint,
     testPostEndpoint
-} from "../../test-utils/serviceTestHelpers";
+} from "@/test-utils/serviceTestHelpers";
 import {type AtualizarProcessoRequest, type CriarProcessoRequest, TipoProcesso} from "@/types/tipos";
 import * as service from "../processoService";
 

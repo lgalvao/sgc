@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-Este guia fornece recomendações e boas práticas para criar novos testes unitários e de integração com JUnit no Sistema de Gestão de Competências (SGC). É baseado no plano de refatoração completo executado nas Sprints 0-7, documentado em [`SPRINT_JUNIT_REFACTORING.md`](./SPRINT_JUNIT_REFACTORING.md).
+Este guia fornece recomendações e boas práticas para criar novos testes unitários e de integração com JUnit no Sistema de Gestão de Competências (SGC). 
 
 ## 🎯 Objetivos dos Testes
 
@@ -13,7 +13,7 @@ Este guia fornece recomendações e boas práticas para criar novos testes unit�
 
 ## 🛠️ Stack de Testes
 
-- **Framework**: JUnit 5 (Jupiter)
+- **Framework**: JUnit
 - **Mocking**: Mockito
 - **Assertions**: AssertJ (preferencial) e JUnit Assertions
 - **Spring Testing**: `@SpringBootTest`, `@Transactional`
@@ -634,25 +634,11 @@ Ao criar um novo teste, verifique:
 - [ ] Classe com >10 testes organizada com `@Nested`
 - [ ] Código roda com `./gradlew :backend:test`
 
-## 📖 Referências
-
-### Documentos de Sprint
-
-- [Sprint 0: Baseline e Guardrails](./sprint-00-baseline.md)
-- [Sprint 1: Remover Testes Boilerplate](./sprint-01-remocao-boilerplate.md)
-- [Sprint 2: Remover LENIENT](./sprint-02-remocao-lenient.md)
-- [Sprint 3: Fixtures/Builders](./sprint-03-fixtures.md)
-- [Sprint 4: Padronização Mecânica](./sprint-04-padronizacao.md)
-- [Sprint 5: Desacoplar Integração](./sprint-05-desacoplamento-integracao.md)
-- [Sprint 6: Cobertura e Visibilidade](./sprint-06-cobertura.md)
-- [Sprint 7: Qualidade Avançada](./sprint-07-qualidade-avancada.md)
-
 ### Documentos de Arquitetura
 
-- [Plano de Refatoração JUnit](./SPRINT_JUNIT_REFACTORING.md)
-- [Padrões Backend](./regras/backend-padroes.md)
-- [Backend README](./backend/README.md)
-- [AGENTS.md](./AGENTS.md)
+- [Padrões Backend](/regras/backend-padroes.md)
+- [Backend README](/backend/README.md)
+- [AGENTS.md](/AGENTS.md)
 
 ## 💡 Dicas Práticas
 
@@ -676,15 +662,3 @@ Ao criar um novo teste, verifique:
 2. **Mantenha testes rápidos**: Evite operações desnecessárias
 3. **Refatore testes**: Código de teste também precisa de manutenção
 4. **Documente casos especiais**: Use comentários para situações não-óbvias
-
-## 🎓 Conclusão
-
-Este guia é um documento vivo, baseado nas lições aprendidas durante a refatoração completa dos testes do SGC (Sprints 0-7). Siga estas práticas para manter a qualidade, confiabilidade e manutenibilidade dos testes.
-
-**Lembre-se**: Testes são a primeira linha de defesa contra bugs e a melhor documentação do comportamento esperado do sistema. Invista tempo em testes de qualidade!
-
----
-
-**Última atualização**: Dezembro de 2025  
-**Versão**: 1.0  
-**Status das Sprints**: ✅ Todas concluídas (0-7)

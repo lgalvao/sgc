@@ -55,8 +55,6 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     private UnidadeRepo unidadeRepo;
 
     private Unidade unidadeSENIC;
-    private Long codProcesso;
-    private Long codSubprocesso;
 
     @BeforeEach
     void setUp() {
@@ -80,7 +78,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                         .build();
 
         var processoCriado = processoService.criar(criarReq);
-        codProcesso = processoCriado.getCodigo();
+        Long codProcesso = processoCriado.getCodigo();
 
         // ============================================================
         // PASSO 2: Admin inicia processo
@@ -93,7 +91,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         // Buscar o subprocesso criado
         var subprocessos = processoService.listarTodosSubprocessos(codProcesso);
         assertThat(subprocessos).hasSize(1);
-        codSubprocesso = subprocessos.get(0).getCodigo();
+        Long codSubprocesso = subprocessos.getFirst().getCodigo();
 
         // ============================================================
         // PASSO 3-7: Simular transições de estado diretamente no repositório

@@ -54,16 +54,14 @@ public class WithMockCustomUserSecurityContextFactory
         final Unidade finalUnidade = unidade;
         Arrays.stream(customUser.perfis())
                 .forEach(
-                        p -> {
-                            principal
-                                    .getAtribuicoes()
-                                    .add(
-                                            sgc.usuario.model.UsuarioPerfil.builder()
-                                                    .usuario(principal)
-                                                    .unidade(finalUnidade)
-                                                    .perfil(Perfil.valueOf(p))
-                                                    .build());
-                        });
+                        p -> principal
+                                .getAtribuicoes()
+                                .add(
+                                        sgc.usuario.model.UsuarioPerfil.builder()
+                                                .usuario(principal)
+                                                .unidade(finalUnidade)
+                                                .perfil(Perfil.valueOf(p))
+                                                .build()));
 
         if (dbAvailable && usuarioRepo != null) {
             try {

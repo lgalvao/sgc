@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as usuarioService from "@/services/usuarioService";
-import {setupStoreTest} from "../../test-utils/storeTestHelpers";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import type {Usuario} from "@/types/tipos";
 import {useUsuariosStore} from "../usuarios";
 

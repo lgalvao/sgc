@@ -75,7 +75,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
-    private Competencia competenciaVigente1;
     private Subprocesso subprocessoRevisao;
     private Mapa mapaSubprocesso;
     private Unidade unidade;
@@ -119,8 +118,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         atividadeVigente2.setDescricao("Elaborar relatórios gerenciais.");
         atividadeVigente2 = atividadeRepo.save(atividadeVigente2);
 
-        competenciaVigente1 =
-                competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
+        Competencia competenciaVigente1 = competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
 
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);

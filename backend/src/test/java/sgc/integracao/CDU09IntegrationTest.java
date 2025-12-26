@@ -97,7 +97,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
-    private Usuario usuarioChefe;
     private Subprocesso subprocessoMapeamento;
 
     @BeforeEach
@@ -131,7 +130,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         // 2. Criar Usuários (Chefe e Superior para receber email)
         // Precisamos de flush para garantir que o Usuário exista antes do insert via JDBC na tabela de relacionamento
-        usuarioChefe = UsuarioFixture.usuarioComTitulo("998877665544");
+        Usuario usuarioChefe = UsuarioFixture.usuarioComTitulo("998877665544");
         usuarioChefe.setUnidadeLotacao(unidadeChefe);
         usuarioChefe = usuarioRepo.saveAndFlush(usuarioChefe);
 

@@ -56,15 +56,14 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
         @Autowired
         private MapaRepo mapaRepo;
 
-        private Unidade unidade;
-        private Processo processoEmAndamento;
+    private Processo processoEmAndamento;
         private Processo processoFinalizado;
 
         @BeforeEach
         void setUp() {
-                unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
+            Unidade unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 
-                // Processo em andamento
+            // Processo em andamento
                 processoEmAndamento = new Processo(
                                 "Processo em Andamento",
                                 TipoProcesso.MAPEAMENTO,
@@ -76,7 +75,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 var mapaEmAndamento = mapaRepo.save(new Mapa());
                 var subprocessoEmAndamento = new Subprocesso(
                                 processoEmAndamento,
-                                unidade,
+                        unidade,
                                 mapaEmAndamento,
                                 SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                                 processoEmAndamento.getDataLimite());
@@ -95,7 +94,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 var mapaFinalizado = mapaRepo.save(new Mapa());
                 var subprocessoFinalizado = new Subprocesso(
                                 processoFinalizado,
-                                unidade,
+                        unidade,
                                 mapaFinalizado,
                                 SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                                 processoFinalizado.getDataLimite());

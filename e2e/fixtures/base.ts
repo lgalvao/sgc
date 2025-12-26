@@ -13,7 +13,7 @@ export const test = base.extend({
             const type = msg.type();
 
             // Tenta expandir argumentos se forem objetos (ex: AxiosError)
-            let expandedArgs = '';
+            let expandedArgs: string;
             try {
                 const args = await Promise.all(msg.args().map(arg => arg.jsonValue().catch(() => null)));
                 expandedArgs = args.map(a => {
@@ -47,7 +47,7 @@ export const test = base.extend({
         // Listener para falhas de rede (4xx, 5xx)
         page.on('response', async response => {
             if (response.status() >= 400) {
-                let body = '';
+                let body: string;
                 try {
                     body = await response.text();
                 } catch (e) {

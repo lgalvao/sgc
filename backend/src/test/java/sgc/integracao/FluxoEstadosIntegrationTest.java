@@ -82,13 +82,13 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
     private ImpactoMapaService impactoMapaService;
 
     // Users and Units for Mapeamento (SENIC -> COSINF -> STIC)
-    private Long codUnidadeMapeamento = 11L; // SENIC
+    private final Long codUnidadeMapeamento = 11L; // SENIC
     private Usuario chefeMapeamento;
     private Usuario gestorMapeamento;
     private Usuario admin;
 
     // Users and Units for Revisão (SEDIA -> COSIS -> STIC)
-    private Long codUnidadeRevisao = 9L; // SEDIA
+    private final Long codUnidadeRevisao = 9L; // SEDIA
     private Usuario chefeRevisao;
     private Usuario gestorRevisao;
 
@@ -181,7 +181,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 autenticar(admin, "ROLE_ADMIN");
                 processoService.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
 
-                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).get(0);
+                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).getFirst();
                 Long codSubprocesso = subprocessoDto.getCodigo();
 
                 verificarSituacao(codSubprocesso, NAO_INICIADO);
@@ -225,7 +225,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 autenticar(admin, "ROLE_ADMIN");
 
                 // === CREATE COMPETENCY AND LINK (SEDOC WORK) ===
-                Long codMapa = subprocessoRepo.findById(codSubprocesso).get().getMapa().getCodigo();
+                Long codMapa = subprocessoRepo.findById(codSubprocesso).orElseThrow().getMapa().getCodigo();
                 Mapa mapaEntity = mapaRepo.findById(codMapa).orElseThrow();
 
                 Competencia comp = new Competencia("Competencia Mapeamento", mapaEntity);
@@ -265,7 +265,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 // 11. Finalizar Processo
                 autenticar(admin, "ROLE_ADMIN");
                 processoService.finalizar(codProcesso);
-                assertThat(processoService.obterPorId(codProcesso).get().getSituacao())
+                assertThat(processoService.obterPorId(codProcesso).orElseThrow().getSituacao())
                     .isEqualTo(sgc.processo.model.SituacaoProcesso.FINALIZADO);
             } catch (ErroValidacao e) {
                 log.error("VALIDATION ERROR Mapeamento: {}", e.getMessage());
@@ -290,8 +290,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                     .build();
             Long codProcesso = processoService.criar(req).getCodigo();
             processoService.iniciarProcessoMapeamento(codProcesso, List.of(codUnidadeMapeamento));
-            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).get(0).getCodigo();
-            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).get(0).getCodMapa();
+            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
+            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
 
             // Adicionar dados
             autenticar(chefeMapeamento, "ROLE_CHEFE");
@@ -347,7 +347,7 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
                 autenticar(admin, "ROLE_ADMIN");
                 processoService.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
 
-                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).get(0);
+                SubprocessoDto subprocessoDto = processoService.listarTodosSubprocessos(codProcesso).getFirst();
                 Long codSubprocesso = subprocessoDto.getCodigo();
                 Long codMapa = subprocessoDto.getCodMapa();
 
@@ -432,8 +432,8 @@ class FluxoEstadosIntegrationTest extends BaseIntegrationTest {
             // 2. Iniciar
             autenticar(admin, "ROLE_ADMIN");
             processoService.iniciarProcessoRevisao(codProcesso, List.of(codUnidadeRevisao));
-            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).get(0).getCodigo();
-            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).get(0).getCodMapa();
+            Long codSubprocesso = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodigo();
+            Long codMapa = processoService.listarTodosSubprocessos(codProcesso).getFirst().getCodMapa();
 
             // 3. Chefe faz alteração
             autenticar(chefeRevisao, "ROLE_CHEFE");

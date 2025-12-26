@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar createBootstrap e vBTooltip
 import {createPinia} from "pinia";
 import {createApp} from "vue";

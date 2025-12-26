@@ -34,7 +34,7 @@ public interface MapaAjusteMapper {
                 List<Conhecimento> conhecimentosDaAtividade =
                         conhecimentos.stream()
                                 .filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo()))
-                                .collect(Collectors.toList());
+                                .toList();
                 boolean isLinked = comp.getAtividades().contains(ativ);
                 List<ConhecimentoAjusteDto> conhecimentoDtos =
                         conhecimentosDaAtividade.stream()
