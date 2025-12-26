@@ -72,6 +72,21 @@ const rowClass = (item: ProcessoResumo | null, type: string) => {
   }
   return '';
 };
+
+const rowAttr = (item: ProcessoResumo | null, type: string) => {
+  if (item && type === 'row') {
+    return {
+      tabindex: '0',
+      onKeydown: (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelecionarProcesso(item);
+        }
+      }
+    };
+  }
+  return {};
+};
 </script>
 
 <template>
@@ -81,6 +96,7 @@ const rowClass = (item: ProcessoResumo | null, type: string) => {
         :items="processos"
         :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
         :sort-desc="[!direcaoOrdenacaoAsc]"
+        :tbody-tr-attr="rowAttr"
         :tbody-tr-class="rowClass"
         data-testid="tbl-processos"
         hover
