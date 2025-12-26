@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.dto.UsuarioDto;
 
 import java.time.LocalDateTime;
 

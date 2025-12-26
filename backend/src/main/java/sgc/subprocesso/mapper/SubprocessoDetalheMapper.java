@@ -2,7 +2,7 @@ package sgc.subprocesso.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;

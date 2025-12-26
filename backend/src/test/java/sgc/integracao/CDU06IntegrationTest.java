@@ -22,11 +22,11 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.PerfilDto;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioPerfil;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -66,7 +66,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @MockitoBean
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
 
     private Processo processo;
     private Unidade unidade;
@@ -117,7 +117,7 @@ public class CDU06IntegrationTest extends BaseIntegrationTest {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
 
-        when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
+        when(usuarioService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
                 new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
         return auth;
     }

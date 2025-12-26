@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 import sgc.unidade.model.Unidade;
 
 @Data

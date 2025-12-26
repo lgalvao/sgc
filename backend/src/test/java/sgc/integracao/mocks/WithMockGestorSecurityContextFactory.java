@@ -7,9 +7,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 
 import java.util.HashSet;
@@ -42,9 +42,9 @@ public class WithMockGestorSecurityContextFactory
             Unidade u = new Unidade("Unidade Mock", "UO_SUP");
             principal.setUnidadeLotacao(u);
 
-            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>();
+            Set<sgc.usuario.model.UsuarioPerfil> atribuicoes = new HashSet<>();
             atribuicoes.add(
-                            sgc.sgrh.model.UsuarioPerfil.builder()
+                            sgc.usuario.model.UsuarioPerfil.builder()
                                     .usuario(principal)
                                     .unidade(u)
                                     .perfil(Perfil.GESTOR)
@@ -52,12 +52,12 @@ public class WithMockGestorSecurityContextFactory
             principal.setAtribuicoes(atribuicoes);
 
         } else {
-            Set<sgc.sgrh.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
+            Set<sgc.usuario.model.UsuarioPerfil> atribuicoes = new HashSet<>(principal.getAtribuicoes());
             if (atribuicoes.stream()
                     .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
                 Unidade u = new Unidade("Unidade Mock", "UO_SUP");
                 atribuicoes.add(
-                                sgc.sgrh.model.UsuarioPerfil.builder()
+                                sgc.usuario.model.UsuarioPerfil.builder()
                                         .usuario(principal)
                                         .unidade(u)
                                         .perfil(Perfil.GESTOR)

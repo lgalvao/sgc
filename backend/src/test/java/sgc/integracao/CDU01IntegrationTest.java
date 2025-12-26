@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.AutenticacaoReq;
-import sgc.sgrh.dto.EntrarReq;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.UsuarioService;
+import sgc.autenticacao.dto.AutenticacaoReq;
+import sgc.autenticacao.dto.EntrarReq;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import sgc.util.TestUtil;
@@ -55,7 +55,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
     
     @Autowired
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
 
     private Unidade unidadeAdmin;
     private Unidade unidadeGestor;
@@ -198,7 +198,7 @@ public class CDU01IntegrationTest extends BaseIntegrationTest {
             String tituloEleitoral = "888888888888"; // Non-existent user
 
             // Autentica primeiro para permitir a chamada de autorizar
-            sgrhService.autenticar(tituloEleitoral, "senha-qualquer");
+            usuarioService.autenticar(tituloEleitoral, "senha-qualquer");
 
             // Act & Assert
             mockMvc.perform(post(BASE_URL + "/autorizar")

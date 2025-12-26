@@ -26,11 +26,11 @@ import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.dto.ProcessoDto;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.PerfilDto;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -97,7 +97,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
     @MockitoBean
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
 
     private Unidade unidade;
     private Usuario chefe;
@@ -152,8 +152,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
         entityManager.refresh(unidade);
 
-        // Configuração do Mock SgrhService
-        when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
+        // Configuração do Mock UsuarioService
+        when(usuarioService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
@@ -161,7 +161,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         unidadeAdmin.getCodigo(),
                                         "SEDOC",
                                         Perfil.ADMIN.name())));
-        when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
+        when(usuarioService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
@@ -169,7 +169,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         unidadeGestor.getCodigo(),
                                         "DA-TEST",
                                         Perfil.GESTOR.name())));
-        when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString()))
+        when(usuarioService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString()))
                 .thenReturn(
                         List.of(
                                 new PerfilDto(
@@ -178,11 +178,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         "SA-TEST",
                                         Perfil.CHEFE.name())));
 
-        when(sgrhService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(admin.getTituloEleitoral().toString()))
                 .thenReturn(admin);
-        when(sgrhService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(gestor.getTituloEleitoral().toString()))
                 .thenReturn(gestor);
-        when(sgrhService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
+        when(usuarioService.buscarUsuarioPorLogin(chefe.getTituloEleitoral().toString()))
                 .thenReturn(chefe);
 
         UsuarioFixture.adicionarPerfil(admin, unidadeAdmin, Perfil.ADMIN);

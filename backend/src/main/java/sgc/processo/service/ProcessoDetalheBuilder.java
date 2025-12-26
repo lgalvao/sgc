@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;

@@ -9,8 +9,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.sgrh.autenticacao.GerenciadorJwt;
-import sgc.sgrh.model.*;
+import sgc.autenticacao.GerenciadorJwt;
+import sgc.usuario.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 

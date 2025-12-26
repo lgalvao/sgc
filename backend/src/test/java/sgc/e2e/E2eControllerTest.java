@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.processo.service.ProcessoService;
-import sgc.sgrh.SgrhService;
+import sgc.usuario.UsuarioService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -35,14 +35,14 @@ class E2eControllerTest {
     private ProcessoService processoService;
 
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
 
     private E2eController controller;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new E2eController(jdbcTemplate, dataSource, processoService, sgrhService);
+        controller = new E2eController(jdbcTemplate, dataSource, processoService, usuarioService);
     }
 
     @Test

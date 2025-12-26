@@ -19,7 +19,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.sgrh.SgrhService;
+import sgc.usuario.UsuarioService;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
@@ -59,7 +59,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private SubprocessoConsultaService subprocessoConsultaService;
     @MockitoBean
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @MockitoBean
     private sgc.subprocesso.service.SubprocessoService subprocessoService;
     @MockitoBean

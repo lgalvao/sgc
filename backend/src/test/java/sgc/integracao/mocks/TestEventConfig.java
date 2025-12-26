@@ -10,7 +10,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.ProcessoRepo;
-import sgc.sgrh.SgrhService;
+import sgc.usuario.UsuarioService;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 /**
@@ -28,7 +28,7 @@ public class TestEventConfig {
             AlertaService servicoAlertas,
             NotificacaoEmailService notificacaoEmailService,
             NotificacaoModelosService notificacaoModelosService,
-            SgrhService sgrhService,
+            UsuarioService usuarioService,
             ProcessoRepo processoRepo,
             SubprocessoRepo repoSubprocesso) {
 
@@ -37,7 +37,7 @@ public class TestEventConfig {
                 servicoAlertas,
                 notificacaoEmailService,
                 notificacaoModelosService,
-                sgrhService,
+                usuarioService,
                 processoRepo,
                 repoSubprocesso) {
 

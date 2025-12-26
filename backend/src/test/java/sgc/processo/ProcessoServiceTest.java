@@ -33,8 +33,8 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.PerfilDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -79,7 +79,7 @@ class ProcessoServiceTest {
     @Mock
     private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
@@ -381,7 +381,7 @@ class ProcessoServiceTest {
             doReturn(authorities).when(auth).getAuthorities();
 
             PerfilDto perfil = PerfilDto.builder().unidadeCodigo(10L).build();
-            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
             Unidade u = UnidadeFixture.unidadeComId(10L);
             Subprocesso sp = SubprocessoFixture.subprocessoPadrao(null, u);
@@ -411,7 +411,7 @@ class ProcessoServiceTest {
             authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
             doReturn(authorities).when(auth).getAuthorities();
 
-            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(100L)).thenReturn(List.of());
 
             // Act
@@ -609,7 +609,7 @@ class ProcessoServiceTest {
             authorities.add(new SimpleGrantedAuthority("ROLE_GESTOR"));
             doReturn(authorities).when(auth).getAuthorities();
 
-            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of());
 
             // Act & Assert
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
@@ -632,7 +632,7 @@ class ProcessoServiceTest {
                     .perfil("GESTOR")
                     .unidadeCodigo(10L)
                     .build();
-            when(sgrhService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
+            when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(perfil));
 
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(anyLong(), anyList())).thenReturn(true);
 

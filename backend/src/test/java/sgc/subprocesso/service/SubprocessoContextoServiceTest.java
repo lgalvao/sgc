@@ -10,9 +10,9 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaService;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Perfil;
+import sgc.usuario.UsuarioService;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.model.Perfil;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -32,7 +32,7 @@ class SubprocessoContextoServiceTest {
     @Mock
     private SubprocessoConsultaService subprocessoConsultaService;
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @Mock
     private MapaService mapaService;
     @Mock
@@ -58,7 +58,7 @@ class SubprocessoContextoServiceTest {
 
         // Mock 2: Unidade
         UnidadeDto unidadeDto = UnidadeDto.builder().codigo(codUnidade).sigla("TESTE").build();
-        when(sgrhService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(unidadeDto));
+        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(unidadeDto));
 
         // Mock 3: Mapa
         Subprocesso subprocesso = new Subprocesso();
@@ -96,7 +96,7 @@ class SubprocessoContextoServiceTest {
         when(subprocessoDtoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario))
                 .thenReturn(detalheDto);
 
-        when(sgrhService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.empty());
+        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.empty());
 
         assertThrows(ErroEntidadeNaoEncontrada.class, () ->
             service.obterContextoEdicao(codSubprocesso, perfil, codUnidadeUsuario)
@@ -117,7 +117,7 @@ class SubprocessoContextoServiceTest {
         when(subprocessoDtoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario))
                 .thenReturn(detalheDto);
 
-        when(sgrhService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(UnidadeDto.builder().build()));
+        when(usuarioService.buscarUnidadePorSigla("TESTE")).thenReturn(Optional.of(UnidadeDto.builder().build()));
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setMapa(null);

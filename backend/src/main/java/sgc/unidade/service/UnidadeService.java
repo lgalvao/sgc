@@ -7,11 +7,11 @@ import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.SgrhMapper;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.mapper.UsuarioMapper;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.dto.UsuarioDto;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.dto.AtribuicaoTemporariaDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.model.AtribuicaoTemporaria;
@@ -31,7 +31,7 @@ public class UnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ProcessoRepo processoRepo;
-    private final SgrhMapper sgrhMapper;
+    private final UsuarioMapper usuarioMapper;
 
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
@@ -40,7 +40,7 @@ public class UnidadeService {
 
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
         return atribuicaoTemporariaRepo.findAll().stream()
-                .map(sgrhMapper::toAtribuicaoTemporariaDto)
+                .map(usuarioMapper::toAtribuicaoTemporariaDto)
                 .toList();
     }
 
@@ -75,7 +75,7 @@ public class UnidadeService {
                             && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                             && !unidadesEmProcessoAtivo.contains(u.getCodigo());
 
-            UnidadeDto dto = sgrhMapper.toUnidadeDto(u, isElegivel);
+            UnidadeDto dto = usuarioMapper.toUnidadeDto(u, isElegivel);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -149,7 +149,7 @@ public class UnidadeService {
         List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
 
         return usuarios.stream()
-                .map(sgrhMapper::toUsuarioDto)
+                .map(usuarioMapper::toUsuarioDto)
                 .toList();
     }
 
@@ -159,7 +159,7 @@ public class UnidadeService {
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            UnidadeDto dto = sgrhMapper.toUnidadeDto(u);
+            UnidadeDto dto = usuarioMapper.toUnidadeDto(u);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -209,7 +209,7 @@ public class UnidadeService {
                                         new ErroEntidadeNaoEncontrada(
                                                 "Unidade com sigla " + sigla + " não encontrada"));
 
-        return sgrhMapper.toUnidadeDto(unidade, false);
+        return usuarioMapper.toUnidadeDto(unidade, false);
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -223,7 +223,7 @@ public class UnidadeService {
                                                         + codigo
                                                         + " não encontrada"));
 
-        return sgrhMapper.toUnidadeDto(unidade, false);
+        return usuarioMapper.toUnidadeDto(unidade, false);
     }
 
     public UnidadeDto buscarArvore(Long codigo) {

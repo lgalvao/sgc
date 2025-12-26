@@ -18,7 +18,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.sgrh.model.Perfil;
+import sgc.usuario.model.Perfil;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 

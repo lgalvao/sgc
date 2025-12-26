@@ -20,7 +20,7 @@ import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
 import sgc.processo.eventos.*;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;

@@ -16,8 +16,8 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.*;
@@ -36,7 +36,7 @@ public class SubprocessoMapaController {
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoConsultaService subprocessoConsultaService;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoContextoService subprocessoContextoService;
 
@@ -53,7 +53,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
-            @RequestParam(required = false) sgc.sgrh.model.Perfil perfil,
+            @RequestParam(required = false) sgc.usuario.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoContextoService.obterContextoEdicao(codigo, perfil, unidadeUsuario);
     }
@@ -79,7 +79,7 @@ public class SubprocessoMapaController {
             throw new sgc.comum.erros.ErroAccessoNegado("Usuário não autenticado");
         }
 
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 
@@ -262,8 +262,8 @@ public class SubprocessoMapaController {
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String) return (String) principal;
 
-        if (principal instanceof sgc.sgrh.model.Usuario) {
-            return ((sgc.sgrh.model.Usuario) principal).getTituloEleitoral();
+        if (principal instanceof sgc.usuario.model.Usuario) {
+            return ((sgc.usuario.model.Usuario) principal).getTituloEleitoral();
         }
 
         return principal != null ? principal.toString() : null;

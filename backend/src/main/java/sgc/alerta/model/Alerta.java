@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;

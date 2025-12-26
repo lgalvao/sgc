@@ -10,10 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.dto.SgrhMapper;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.mapper.UsuarioMapper;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaReq;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
@@ -46,7 +46,7 @@ class UnidadeServiceTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
-    private SgrhMapper sgrhMapper;
+    private UsuarioMapper usuarioMapper;
 
     @InjectMocks
     private UnidadeService service;
@@ -62,7 +62,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarTodasUnidades();
@@ -76,7 +76,7 @@ class UnidadeServiceTest {
         void deveBuscarPorSigla() {
             // Arrange
             when(unidadeRepo.findBySigla("U1")).thenReturn(Optional.of(new Unidade()));
-            when(sgrhMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
+            when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
             assertThat(service.buscarPorSigla("U1")).isNotNull();
@@ -87,7 +87,7 @@ class UnidadeServiceTest {
         void deveBuscarPorCodigo() {
             // Arrange
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(new Unidade()));
-            when(sgrhMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
+            when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
             assertThat(service.buscarPorCodigo(1L)).isNotNull();
@@ -100,7 +100,7 @@ class UnidadeServiceTest {
             Unidade u1 = new Unidade();
             u1.setCodigo(1L);
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act & Assert
             assertThat(service.buscarArvore(1L)).isNotNull();
@@ -114,7 +114,7 @@ class UnidadeServiceTest {
             u1.setCodigo(1L);
             u1.setSigla("U1");
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
-            when(sgrhMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
+            when(usuarioMapper.toUnidadeDto(any())).thenReturn(UnidadeDto.builder().codigo(1L).sigla("U1").build());
 
             // Act
             List<String> result = service.buscarSiglasSubordinadas("U1");
@@ -152,7 +152,7 @@ class UnidadeServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
             when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
                     .thenReturn(new ArrayList<>());
-            when(sgrhMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
@@ -171,7 +171,7 @@ class UnidadeServiceTest {
             when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L));
             when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(any(), any()))
                     .thenReturn(new ArrayList<>());
-            when(sgrhMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, null);
@@ -194,14 +194,14 @@ class UnidadeServiceTest {
                     .thenReturn(new ArrayList<>());
 
             // Mock deve ser chamado com elegivel=false
-            when(sgrhMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.REVISAO, null);
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(sgrhMapper).toUnidadeDto(u1, false);
+            verify(usuarioMapper).toUnidadeDto(u1, false);
         }
 
         @Test
@@ -217,14 +217,14 @@ class UnidadeServiceTest {
                     .thenReturn(new ArrayList<>(List.of(1L)));
 
             // Mock deve ser chamado com elegivel=false
-            when(sgrhMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
+            when(usuarioMapper.toUnidadeDto(u1, false)).thenReturn(UnidadeDto.builder().codigo(1L).build());
 
             // Act
             List<UnidadeDto> result = service.buscarArvoreComElegibilidade(TipoProcesso.MAPEAMENTO, null);
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(sgrhMapper).toUnidadeDto(u1, false);
+            verify(usuarioMapper).toUnidadeDto(u1, false);
         }
 
         @Test
@@ -264,7 +264,7 @@ class UnidadeServiceTest {
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
             when(usuarioRepo.findByUnidadeLotacaoCodigo(1L)).thenReturn(List.of(new Usuario()));
-            when(sgrhMapper.toUsuarioDto(any())).thenReturn(sgc.sgrh.dto.UsuarioDto.builder().build());
+            when(usuarioMapper.toUsuarioDto(any())).thenReturn(sgc.usuario.dto.UsuarioDto.builder().build());
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);

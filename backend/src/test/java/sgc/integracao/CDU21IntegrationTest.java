@@ -21,11 +21,11 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.ResponsavelDto;
+import sgc.usuario.dto.UsuarioDto;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -66,7 +66,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @MockitoBean
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
 
     @MockitoBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
@@ -155,8 +155,8 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp2);
 
-        // Configurar mocks do SgrhService com dados dinâmicos
-        when(sgrhService.buscarResponsaveisUnidades(anyList()))
+        // Configurar mocks do UsuarioService com dados dinâmicos
+        when(usuarioService.buscarResponsaveisUnidades(anyList()))
                 .thenReturn(
                         Map.of(
                                 unidadeIntermediaria.getCodigo(),
@@ -180,7 +180,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                                         titularOp2.getNome(),
                                         null,
                                         null)));
-        when(sgrhService.buscarUsuariosPorTitulos(anyList()))
+        when(usuarioService.buscarUsuariosPorTitulos(anyList()))
                 .thenReturn(
                         Map.of(
                                 titularIntermediaria.getTituloEleitoral(),

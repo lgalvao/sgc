@@ -12,10 +12,10 @@ import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.UsuarioService;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
@@ -40,7 +40,7 @@ class AlertaServiceTest {
     @Mock
     private UnidadeRepo unidadeRepo;
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @Mock
     private UsuarioRepo usuarioRepo;
     @Mock
@@ -102,7 +102,7 @@ class AlertaServiceTest {
 
             UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.OPERACIONAL.name()).build();
 
-            when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
+            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
             when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
@@ -123,7 +123,7 @@ class AlertaServiceTest {
 
             UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTERMEDIARIA.name()).build();
 
-            when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
+            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
             when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
@@ -145,7 +145,7 @@ class AlertaServiceTest {
 
             UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTEROPERACIONAL.name()).build();
 
-            when(sgrhService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
+            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
             when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 

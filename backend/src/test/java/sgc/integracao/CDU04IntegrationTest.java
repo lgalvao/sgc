@@ -27,7 +27,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.*;
+import sgc.usuario.model.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -114,7 +114,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         unidadeLivre.setMatriculaTitular(titular.getMatricula());
         unidadeRepo.save(unidadeLivre);
 
-        // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo SgrhService
+        // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele seja encontrado pelo UsuarioService
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
                 .usuarioTitulo(titular.getTituloEleitoral())
                 .usuario(titular)

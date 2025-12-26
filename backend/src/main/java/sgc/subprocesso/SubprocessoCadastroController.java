@@ -16,8 +16,8 @@ import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoDtoService;
@@ -44,7 +44,7 @@ public class SubprocessoCadastroController {
     private final AnaliseMapper analiseMapper;
 
     private final SubprocessoMapaService subprocessoMapaService;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
 
     /**
      * Obtém o histórico de análises da fase de cadastro de um subprocesso.
@@ -75,7 +75,7 @@ public class SubprocessoCadastroController {
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         List<Atividade> faltando =
                 subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
         if (faltando != null && !faltando.isEmpty()) {
@@ -116,7 +116,7 @@ public class SubprocessoCadastroController {
     public ResponseEntity<RespostaDto> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (faltando != null && !faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -162,7 +162,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(codigo, sanitizedObservacoes, usuario);
@@ -184,7 +184,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -206,7 +206,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.homologarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -227,7 +227,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -247,7 +247,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -269,7 +269,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
-        Usuario usuario = sgrhService.buscarUsuarioPorLogin(tituloUsuario);
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -296,7 +296,7 @@ public class SubprocessoCadastroController {
 
     private String extractTituloUsuario(Object principal) {
         if (principal instanceof String string) return string;
-        if (principal instanceof sgc.sgrh.model.Usuario usuario)
+        if (principal instanceof sgc.usuario.model.Usuario usuario)
             return usuario.getTituloEleitoral();
         return principal != null ? principal.toString() : null;
     }

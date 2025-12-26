@@ -13,9 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.autenticacao.GerenciadorJwt;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.UsuarioService;
+import sgc.autenticacao.GerenciadorJwt;
+import sgc.usuario.model.Usuario;
 
 import java.io.IOException;
 
@@ -26,7 +26,7 @@ import java.io.IOException;
 public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     @Lazy
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +41,7 @@ public class FiltroAutenticacaoSimulado extends OncePerRequestFilter {
             String jwtToken = authHeader.substring(7);
             
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
-                Usuario usuario = sgrhService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
+                Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
                 
                 if (usuario != null) {
                     log.debug("Carregando authorities para usuário {}", claims.tituloEleitoral());

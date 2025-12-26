@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.service.MapaService;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Perfil;
+import sgc.usuario.UsuarioService;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.model.Perfil;
 import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
@@ -22,7 +22,7 @@ public class SubprocessoContextoService {
 
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoConsultaService subprocessoConsultaService;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
     private final MapaService mapaService;
     private final SubprocessoService subprocessoService;
 
@@ -33,7 +33,7 @@ public class SubprocessoContextoService {
 
         // 2. Obter Unidade
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
-        UnidadeDto unidadeDto = sgrhService.buscarUnidadePorSigla(siglaUnidade)
+        UnidadeDto unidadeDto = usuarioService.buscarUnidadePorSigla(siglaUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
         // 3. Obter Mapa Completo (se existir)

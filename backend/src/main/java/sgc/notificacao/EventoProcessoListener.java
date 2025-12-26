@@ -13,10 +13,10 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.ResponsavelDto;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
@@ -47,7 +47,7 @@ public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo repoSubprocesso;
 
@@ -164,9 +164,9 @@ public class EventoProcessoListener {
         List<Long> todosCodigosUnidades =
                 unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, ResponsavelDto> responsaveis =
-                sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
+                usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
         Map<String, UsuarioDto> usuarios =
-                sgrhService.buscarUsuariosPorTitulos(
+                usuarioService.buscarUsuariosPorTitulos(
                         responsaveis.values().stream()
                                 .map(ResponsavelDto::getTitularTitulo)
                                 .distinct()
@@ -276,7 +276,7 @@ public class EventoProcessoListener {
 
         Long codigoUnidade = subprocesso.getUnidade().getCodigo();
         try {
-            Optional<UnidadeDto> unidadeOpt = sgrhService.buscarUnidadePorCodigo(codigoUnidade);
+            Optional<UnidadeDto> unidadeOpt = usuarioService.buscarUnidadePorCodigo(codigoUnidade);
             if (unidadeOpt.isEmpty()) {
                 log.warn("Unidade {} não encontrada no SGRH.", codigoUnidade);
                 return;
@@ -284,14 +284,14 @@ public class EventoProcessoListener {
             UnidadeDto unidade = unidadeOpt.get();
 
             Optional<ResponsavelDto> responsavelOpt =
-                    sgrhService.buscarResponsavelUnidade(codigoUnidade);
+                    usuarioService.buscarResponsavelUnidade(codigoUnidade);
             if (responsavelOpt.isEmpty() || responsavelOpt.get().getTitularTitulo() == null) {
                 log.warn("Responsável não encontrado para a unidade {}.", unidade.getNome());
                 return;
             }
 
             UsuarioDto titular =
-                    sgrhService
+                    usuarioService
                             .buscarUsuarioPorTitulo(responsavelOpt.get().getTitularTitulo())
                             .orElse(null);
             if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) {
@@ -363,7 +363,7 @@ public class EventoProcessoListener {
             String tituloSubstituto, String assunto, String corpoHtml, String nomeUnidade) {
         try {
             UsuarioDto substituto =
-                    sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
+                    usuarioService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null
                     && substituto.getEmail() != null
                     && !substituto.getEmail().isBlank()) {

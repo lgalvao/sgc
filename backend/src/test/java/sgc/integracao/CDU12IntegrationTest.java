@@ -143,8 +143,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         // Note: WithMockChefe uses a default user or checks DB.
         // We might need to ensure user '121212121212' exists and is Chefe of 'unidade'.
         // For now, we rely on WithMockChefe mocking the Principal/Authorities,
-        // but if the service checks DB (SgrhService), we need data.
-        // Assuming test mocks SgrhService or we add data if it fails.
+        // but if the service checks DB (UsuarioService), we need data.
+        // Assuming test mocks UsuarioService or we add data if it fails.
     }
 
     private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {
@@ -331,6 +331,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     // Helper to insert User/Profile data for security checks that hit the DB (or View)
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
          jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), sgc.sgrh.model.Perfil.CHEFE.name());
+                titulo, unidade.getCodigo(), sgc.usuario.model.Perfil.CHEFE.name());
     }
 }

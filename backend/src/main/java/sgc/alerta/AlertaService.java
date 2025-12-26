@@ -9,10 +9,10 @@ import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.UsuarioService;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
@@ -39,7 +39,7 @@ public class AlertaService {
     private final AlertaRepo repositorioAlerta;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UnidadeRepo unidadeRepo;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
     private final UsuarioRepo usuarioRepo;
     private final AlertaMapper alertaMapper;
 
@@ -80,7 +80,7 @@ public class AlertaService {
         List<Alerta> alertasCriados = new ArrayList<>();
 
         for (Long codUnidade : codigosUnidades) {
-            Optional<UnidadeDto> unidadeDtoOptional = sgrhService.buscarUnidadePorCodigo(codUnidade);
+            Optional<UnidadeDto> unidadeDtoOptional = usuarioService.buscarUnidadePorCodigo(codUnidade);
             if (unidadeDtoOptional.isEmpty()) {
                 log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
                 continue;

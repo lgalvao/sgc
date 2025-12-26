@@ -18,9 +18,9 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
@@ -49,7 +49,7 @@ public class SubprocessoDtoService {
         private final ConhecimentoMapper conhecimentoMapper;
         private final SubprocessoMapper subprocessoMapper;
         private final SubprocessoPermissoesService subprocessoPermissoesService;
-        private final SgrhService sgrhService;
+        private final UsuarioService usuarioService;
         private final SubprocessoDetalheMapper subprocessoDetalheMapper;
         private final MapaAjusteMapper mapaAjusteMapper;
 
@@ -71,15 +71,15 @@ public class SubprocessoDtoService {
 
                 var authentication = SecurityContextHolder.getContext().getAuthentication();
                 String username = authentication.getName();
-                Usuario usuario = sgrhService.buscarUsuarioPorLogin(username);
+                Usuario usuario = usuarioService.buscarUsuarioPorLogin(username);
 
                 verificarPermissaoVisualizacao(sp, perfil, usuario);
-                Usuario responsavel = sgrhService.buscarResponsavelVigente(sp.getUnidade().getSigla());
+                Usuario responsavel = usuarioService.buscarResponsavelVigente(sp.getUnidade().getSigla());
 
                 Usuario titular = null;
                 if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
                         try {
-                                titular = sgrhService.buscarUsuarioPorLogin(sp.getUnidade().getTituloTitular());
+                                titular = usuarioService.buscarUsuarioPorLogin(sp.getUnidade().getTituloTitular());
                         } catch (Exception e) {
                                 log.warn("Erro ao buscar titular da unidade: {}", e.getMessage());
                         }
@@ -285,6 +285,6 @@ public class SubprocessoDtoService {
                         throw new ErroAccessoNegado("Usuário não autenticado.");
                 }
                 String username = authentication.getName();
-                return sgrhService.buscarUsuarioPorLogin(username);
+                return usuarioService.buscarUsuarioPorLogin(username);
         }
 }

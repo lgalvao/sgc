@@ -7,9 +7,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -58,7 +58,7 @@ public class WithMockCustomUserSecurityContextFactory
                             principal
                                     .getAtribuicoes()
                                     .add(
-                                            sgc.sgrh.model.UsuarioPerfil.builder()
+                                            sgc.usuario.model.UsuarioPerfil.builder()
                                                     .usuario(principal)
                                                     .unidade(finalUnidade)
                                                     .perfil(Perfil.valueOf(p))

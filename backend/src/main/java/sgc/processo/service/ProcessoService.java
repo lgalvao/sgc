@@ -21,8 +21,8 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.PerfilDto;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -53,7 +53,7 @@ public class ProcessoService {
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final SubprocessoMapper subprocessoMapper;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
     private final ProcessoInicializador processoInicializador;
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
@@ -71,11 +71,11 @@ public class ProcessoService {
             return false;
         }
 
-        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario =
                 perfis.stream()
                         .findFirst()
-                        .map(sgc.sgrh.dto.PerfilDto::getUnidadeCodigo)
+                        .map(sgc.usuario.dto.PerfilDto::getUnidadeCodigo)
                         .orElse(null);
 
         if (codUnidadeUsuario == null) {
@@ -412,7 +412,7 @@ public class ProcessoService {
                     .toList();
         }
 
-        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::getUnidadeCodigo).orElse(null);
 
         if (codUnidadeUsuario == null) return List.of();

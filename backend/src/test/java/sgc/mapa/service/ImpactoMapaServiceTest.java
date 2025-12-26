@@ -15,8 +15,8 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.MapaRepo;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -77,9 +77,9 @@ class ImpactoMapaServiceTest {
     }
 
     private void addAtribuicao(Usuario u, Perfil p) {
-        java.util.Set<sgc.sgrh.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
+        java.util.Set<sgc.usuario.model.UsuarioPerfil> attrs = new java.util.HashSet<>();
         attrs.add(
-                        sgc.sgrh.model.UsuarioPerfil.builder()
+                        sgc.usuario.model.UsuarioPerfil.builder()
                                 .usuario(u)
                                 .unidade(new Unidade())
                                 .perfil(p)

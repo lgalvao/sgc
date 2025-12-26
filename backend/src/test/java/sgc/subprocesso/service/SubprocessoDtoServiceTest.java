@@ -22,10 +22,10 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioPerfil;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.usuario.model.UsuarioPerfil;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -74,7 +74,7 @@ class SubprocessoDtoServiceTest {
     @Mock
     private SubprocessoPermissoesService subprocessoPermissoesService;
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
     @Mock
@@ -114,7 +114,7 @@ class SubprocessoDtoServiceTest {
             Usuario admin = criarUsuario("admin", Perfil.ADMIN, new Unidade());
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
+            when(usuarioService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
             when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -152,7 +152,7 @@ class SubprocessoDtoServiceTest {
             servidor.setUnidadeLotacao(u);
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+            when(usuarioService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
             when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -182,7 +182,7 @@ class SubprocessoDtoServiceTest {
             servidor.setUnidadeLotacao(u2);
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
+            when(usuarioService.buscarUsuarioPorLogin("servidor")).thenReturn(servidor);
 
             assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.SERVIDOR, null))
                     .isInstanceOf(ErroAccessoNegado.class)
@@ -209,7 +209,7 @@ class SubprocessoDtoServiceTest {
             gestor.setUnidadeLotacao(u);
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
+            when(usuarioService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
             when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))
@@ -239,7 +239,7 @@ class SubprocessoDtoServiceTest {
             gestor.setUnidadeLotacao(u2);
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
+            when(usuarioService.buscarUsuarioPorLogin("gestor")).thenReturn(gestor);
 
             assertThatThrownBy(() -> service.obterDetalhes(id, Perfil.GESTOR, 20L))
                     .isInstanceOf(ErroAccessoNegado.class)
@@ -262,7 +262,7 @@ class SubprocessoDtoServiceTest {
             Usuario admin = criarUsuario("admin", Perfil.ADMIN, new Unidade());
 
             when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-            when(sgrhService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
+            when(usuarioService.buscarUsuarioPorLogin("admin")).thenReturn(admin);
             when(subprocessoPermissoesService.calcularPermissoes(any(), any()))
                     .thenReturn(SubprocessoPermissoesDto.builder().build());
             when(subprocessoDetalheMapper.toDto(any(), any(), any(), any(), any()))

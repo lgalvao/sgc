@@ -15,8 +15,8 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.UnidadeDto;
+import sgc.usuario.UsuarioService;
+import sgc.unidade.dto.UnidadeDto;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -34,7 +34,7 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final ProcessoService processoService;
-    private final SgrhService sgrhService;
+    private final UsuarioService usuarioService;
 
     @PostMapping("/reset-database")
     public void resetDatabase() throws SQLException {
@@ -165,7 +165,7 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade =
-                sgrhService
+                usuarioService
                         .buscarUnidadePorSigla(request.unidadeSigla())
                         .orElseThrow(
                                 () ->

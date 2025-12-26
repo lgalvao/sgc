@@ -23,7 +23,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.*;
+import sgc.usuario.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.model.Unidade;
@@ -236,7 +236,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
             // Mas o teste usa mockMvc, então o filtro de segurança processa o token ou contexto.
             // Se usarmos @WithMockCustomUser, o contexto já vem preenchido.
 
-            // O controller verifica: sgrhService.usuarioTemPerfil(titulo, perfil, unidadeSubprocesso)
+            // O controller verifica: usuarioService.usuarioTemPerfil(titulo, perfil, unidadeSubprocesso)
             // Se o usuário logado (333...) tem perfil CHEFE na unidade X, e o subprocesso é da unidade Y.
 
             mockMvc.perform(

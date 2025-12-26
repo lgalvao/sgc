@@ -16,10 +16,10 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.dto.ResponsavelDto;
+import sgc.unidade.dto.UnidadeDto;
+import sgc.usuario.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -52,7 +52,7 @@ class EventoProcessoListenerTest {
     @Mock
     private NotificacaoModelosService notificacaoModelosService;
     @Mock
-    private SgrhService sgrhService;
+    private UsuarioService usuarioService;
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -106,7 +106,7 @@ class EventoProcessoListenerTest {
                     .tipo("OPERACIONAL")
                     .isElegivel(false)
                     .build();
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
 
             ResponsavelDto responsavelDto = new ResponsavelDto(
                     100L,
@@ -114,7 +114,7 @@ class EventoProcessoListenerTest {
                     TITULAR_TESTE,
                     String.valueOf(S456),
                     SUBSTITUTO_TESTE);
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
 
             UsuarioDto titular = UsuarioDto.builder()
                     .tituloEleitoral(String.valueOf(T123))
@@ -129,10 +129,10 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL_SUBSTITUTO)
                     .build();
 
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                     .thenReturn(Optional.of(titular));
 
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456)))
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(S456)))
                     .thenReturn(Optional.of(substituto));
 
             when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
@@ -210,9 +210,9 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                     .thenReturn(Optional.of(titular));
             when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                     .thenReturn("<html><body>Email Intermediaria</body></html>");
@@ -259,9 +259,9 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                     .thenReturn(Optional.of(titular));
             when(notificacaoModelosService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                     .thenReturn("<html><body>Email Interoperacional</body></html>");
@@ -292,7 +292,7 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
 
             // When
             ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -314,7 +314,7 @@ class EventoProcessoListenerTest {
             ouvinteDeEvento.aoIniciarProcesso(evento);
 
             // Then
-            verify(sgrhService, never()).buscarUnidadePorCodigo(anyLong());
+            verify(usuarioService, never()).buscarUnidadePorCodigo(anyLong());
             verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
 
@@ -334,8 +334,8 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.empty());
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.empty());
 
             // When
             ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -369,9 +369,9 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                     .thenReturn(Optional.of(titularSemEmail));
 
             // When
@@ -424,12 +424,12 @@ class EventoProcessoListenerTest {
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                     .thenReturn(List.of(subprocessoOperacional));
-            when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
-            when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123)))
+            when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
+            when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(T123)))
                     .thenReturn(Optional.of(titular));
 
-            when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(S456)))
+            when(usuarioService.buscarUsuarioPorTitulo(String.valueOf(S456)))
                     .thenThrow(new RuntimeException("Erro SGRH"));
 
             // When
@@ -466,8 +466,8 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL)
                     .build();
 
-            when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Map.of(100L, responsavelDto));
-            when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Map.of(String.valueOf(T123), titular));
+            when(usuarioService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Map.of(100L, responsavelDto));
+            when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Map.of(String.valueOf(T123), titular));
 
             when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any()))
                     .thenReturn("html-finalizacao");

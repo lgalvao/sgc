@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
-import sgc.sgrh.model.Usuario;
+import sgc.usuario.model.Usuario;
 
 import java.time.LocalDateTime;
 
@@ -45,10 +45,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     private Usuario usuario;
 
     @Transient
-    private sgc.sgrh.model.Perfil perfil;
+    private sgc.usuario.model.Perfil perfil;
 
-    public sgc.sgrh.model.Perfil getPerfil() {
-        return perfil != null ? perfil : sgc.sgrh.model.Perfil.SERVIDOR;
+    public sgc.usuario.model.Perfil getPerfil() {
+        return perfil != null ? perfil : sgc.usuario.model.Perfil.SERVIDOR;
     }
 
 }
