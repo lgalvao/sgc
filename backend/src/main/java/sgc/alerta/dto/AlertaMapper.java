@@ -14,13 +14,12 @@ import java.util.regex.Pattern;
 public abstract class AlertaMapper {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    @SuppressWarnings("SameReturnValue")
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
     @Mapping(source = "descricao", target = "mensagem")
     @Mapping(source = "dataHora", target = "dataHoraFormatada", qualifiedByName = "formatDataHora")
-    @Mapping(source = "descricao", target = "processo", qualifiedByName = "extractProcessoName")
+    @Mapping(source = "processo.descricao", target = "processo")
     @Mapping(source = "unidadeOrigem.sigla", target = "origem")
     @Mapping(target = "dataHoraLeitura", ignore = true)
     public abstract AlertaDto toDto(Alerta alerta);

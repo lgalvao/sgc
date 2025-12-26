@@ -1,19 +1,34 @@
-[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m836[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m281[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
 [BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 1 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_21
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 1 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para ASSESSORIA_21 - Transição: MAPA_DISPONIBILIZADO
-[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:184 - Subprocesso 1 atualizado e mapa disponibilizado.
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
-[BACKEND] INFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:364 - Homologados 1 subprocessos.
-[BACKEND] INFO  s.p.service.ProcessoService.tornarMapasVigentes:368 - Mapa vigente definido para o processo 1
-[BACKEND] INFO  s.p.service.ProcessoService.tornarMapasVigentes:389 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:179 - E-mail de finalização enviado para ASSESSORIA_21
-[BACKEND] INFO  s.p.service.ProcessoService.finalizar:315 - Processo 1 finalizado
 [BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 2 criado.
-[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:125 - Subprocesso para revisão criado para unidade ASSESSORIA_21
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_21
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 2 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 2 iniciado para 2 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 3 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 3 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 4 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 4 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 5 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 5 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_21 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 6 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 6 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 7 criado.
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 7 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:184 - Subprocesso 7 atualizado e mapa disponibilizado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 8 criado.
+[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 9 criado.
+[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:125 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 9 iniciado para 1 unidade(s).
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).

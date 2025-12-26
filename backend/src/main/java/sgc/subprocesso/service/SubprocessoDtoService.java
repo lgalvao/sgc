@@ -256,8 +256,7 @@ public class SubprocessoDtoService {
                                                         .tipo("ATIVIDADE_SEM_CONHECIMENTO")
                                                         .atividadeCodigo(atividade.getCodigo())
                                                         .descricaoAtividade(atividade.getDescricao())
-                                                        .mensagem("A atividade '" + atividade.getDescricao()
-                                                                        + "' não possui conhecimentos associados.")
+                                                        .mensagem("Esta atividade não possui conhecimentos associados.")
                                                         .build());
                                 }
                         }

@@ -9,8 +9,6 @@ import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
-import sgc.usuario.UsuarioService;
-import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.model.Usuario;
 import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.Subprocesso;
@@ -19,9 +17,7 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA;
 import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
@@ -39,7 +35,6 @@ public class AlertaService {
     private final AlertaRepo repositorioAlerta;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final UnidadeRepo unidadeRepo;
-    private final UsuarioService usuarioService;
     private final UsuarioRepo usuarioRepo;
     private final AlertaMapper alertaMapper;
 
@@ -109,39 +104,48 @@ public class AlertaService {
      * - Operacional: "Início do processo"
      * - Intermediária: "Início do processo em unidade(s) subordinada(s)"
      * - Interoperacional: Recebe os dois alertas
+     * - Unidades ancestrais: Recebem o alerta de "unidade(s) subordinada(s)"
      */
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Long> codigosUnidades, List<Subprocesso> subprocessos) {
+        Set<Long> unidadesOperacionais = new HashSet<>();
+        Set<Long> unidadesIntermediarias = new HashSet<>();
+
+        // Identificar unidades base (participantes)
+        List<Unidade> unidadesBase;
+        if (subprocessos != null && !subprocessos.isEmpty()) {
+            unidadesBase = subprocessos.stream().map(Subprocesso::getUnidade).toList();
+        } else {
+            unidadesBase = unidadeRepo.findAllById(codigosUnidades);
+        }
+
+        for (Unidade unidade : unidadesBase) {
+            // Unidades participantes sempre recebem o alerta operacional
+            unidadesOperacionais.add(unidade.getCodigo());
+
+            // Se for Interoperacional, também recebe o de intermediária conforme requisito
+            if (unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
+                unidadesIntermediarias.add(unidade.getCodigo());
+            }
+
+            // Notificar todos os ancestrais
+            Unidade pai = unidade.getUnidadeSuperior();
+            while (pai != null) {
+                unidadesIntermediarias.add(pai.getCodigo());
+                pai = pai.getUnidadeSuperior();
+            }
+        }
+
         List<Alerta> alertasCriados = new ArrayList<>();
 
-        for (Long codUnidade : codigosUnidades) {
-            Optional<UnidadeDto> unidadeDtoOptional = usuarioService.buscarUnidadePorCodigo(codUnidade);
-            if (unidadeDtoOptional.isEmpty()) {
-                log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
-                continue;
-            }
+        // Alertas operacionais
+        for (Long cod : unidadesOperacionais) {
+            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, cod, "Início do processo"));
+        }
 
-            TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().getTipo());
-
-            // Operacional ou Interoperacional: alerta de início do processo
-            if (tipoUnidade == TipoUnidade.OPERACIONAL || tipoUnidade == TipoUnidade.INTEROPERACIONAL) {
-                Alerta alerta = criarAlerta(
-                        processo,
-                        PROCESSO_INICIADO_OPERACIONAL,
-                        codUnidade,
-                        "Início do processo");
-                alertasCriados.add(alerta);
-            }
-
-            // Intermediária ou Interoperacional: alerta de unidades subordinadas
-            if (tipoUnidade == TipoUnidade.INTERMEDIARIA || tipoUnidade == TipoUnidade.INTEROPERACIONAL) {
-                Alerta alerta = criarAlerta(
-                        processo,
-                        PROCESSO_INICIADO_INTERMEDIARIA,
-                        codUnidade,
-                        "Início do processo em unidade(s) subordinada(s)");
-                alertasCriados.add(alerta);
-            }
+        // Alertas intermediários (consolidado por unidade)
+        for (Long cod : unidadesIntermediarias) {
+            alertasCriados.add(criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, cod, "Início do processo em unidade(s) subordinada(s)"));
         }
 
         log.debug("Criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());

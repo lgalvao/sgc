@@ -90,13 +90,13 @@
       <!-- Mensagem de erro inline -->
       <div
           v-if="erroValidacao"
-          class="alert alert-danger d-flex align-items-center mt-2 mb-0 py-2"
+          class="feedback-erro-inline d-flex align-items-center mt-2 px-2 py-1"
           data-testid="atividade-erro-validacao"
           role="alert"
       >
         <i
             aria-hidden="true"
-            class="bi bi-exclamation-triangle-fill me-2"
+            class="bi bi-exclamation-circle-fill me-2"
         />
         <span>{{ erroValidacao }}</span>
       </div>
@@ -316,12 +316,8 @@ function adicionarConhecimento() {
 }
 
 .atividade-com-erro {
-  border: 2px solid var(--bs-danger) !important;
-  box-shadow: 0 0 0 0.2rem rgba(var(--bs-danger-rgb), 0.25) !important;
-}
-
-.atividade-com-erro .atividade-titulo-card {
-  background-color: var(--bs-danger-bg-subtle);
+  border-left: 4px solid var(--bs-danger) !important;
+  box-shadow: 0 2px 8px 0 rgba(var(--bs-danger-rgb), 0.1) !important;
 }
 
 .botoes-acao-atividade {
@@ -399,5 +395,13 @@ function adicionarConhecimento() {
   margin-top: -0.5rem;
   border-top-left-radius: 0.375rem;
   border-top-right-radius: 0.375rem;
+}
+
+.feedback-erro-inline {
+  font-size: 0.875rem;
+  color: var(--bs-danger);
+  background-color: var(--bs-danger-bg-subtle);
+  border-radius: 4px;
+  border-left: 3px solid var(--bs-danger);
 }
 </style>

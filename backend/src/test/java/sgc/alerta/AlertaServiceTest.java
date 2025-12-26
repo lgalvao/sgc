@@ -12,8 +12,6 @@ import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
-import sgc.usuario.UsuarioService;
-import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.model.Usuario;
 import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
@@ -38,8 +36,6 @@ class AlertaServiceTest {
     private AlertaUsuarioRepo alertaUsuarioRepo;
     @Mock
     private UnidadeRepo unidadeRepo;
-    @Mock
-    private UsuarioService usuarioService;
     @Mock
     private UsuarioRepo usuarioRepo;
     @Mock
@@ -98,11 +94,13 @@ class AlertaServiceTest {
             Processo p = new Processo();
             p.setDescricao("Proc");
             Long unidadeId = 1L;
+            Unidade u = new Unidade();
+            u.setCodigo(unidadeId);
+            u.setTipo(TipoUnidade.OPERACIONAL);
 
-            UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.OPERACIONAL.name()).build();
-
-            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
+            when(unidadeRepo.findAllById(any())).thenReturn(List.of(u));
+            // findById ainda é usado internamente pelo criarAlerta (chamado pelo criarAlertasProcessoIniciado)
+            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -113,39 +111,48 @@ class AlertaServiceTest {
         }
 
         @Test
-        @DisplayName("Deve criar alerta intermediária com texto fixo")
-        void deveCriarAlertaIntermediaria() {
+        @DisplayName("Deve criar alerta para unidade participante e seus ancestrais")
+        void deveCriarAlertaParaAncestrais() {
             // Given
             Processo p = new Processo();
-            p.setDescricao("Proc");
-            Long unidadeId = 1L;
+            
+            Unidade root = Unidade.builder().nome("Root").tipo(TipoUnidade.INTEROPERACIONAL).build();
+            root.setCodigo(1L);
+            
+            Unidade filho = Unidade.builder().nome("Filho").tipo(TipoUnidade.OPERACIONAL).build();
+            filho.setCodigo(2L);
+            filho.setUnidadeSuperior(root);
 
-            UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTERMEDIARIA.name()).build();
-
-            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
+            when(unidadeRepo.findAllById(any())).thenReturn(List.of(filho));
+            // Mocks para o criarAlerta interno
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(root));
+            when(unidadeRepo.findById(2L)).thenReturn(Optional.of(filho));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
-            service.criarAlertasProcessoIniciado(p, List.of(unidadeId), List.of());
+            service.criarAlertasProcessoIniciado(p, List.of(2L), List.of());
 
             // Then
-            verify(alertaRepo).save(argThat(a ->
-                    "Início do processo em unidade(s) subordinada(s)".equals(a.getDescricao())));
+            // 1 alerta operacional para o filho
+            verify(alertaRepo).save(argThat(a -> "Início do processo".equals(a.getDescricao()) 
+                    && a.getUnidadeDestino().getCodigo().equals(2L)));
+            
+            // 1 alerta intermediário para o pai (root)
+            verify(alertaRepo).save(argThat(a -> "Início do processo em unidade(s) subordinada(s)".equals(a.getDescricao()) 
+                    && a.getUnidadeDestino().getCodigo().equals(1L)));
         }
 
         @Test
-        @DisplayName("Deve criar 2 alertas para interoperacional")
+        @DisplayName("Deve criar 2 alertas para interoperacional participante")
         void deveCriarDoisAlertasInteroperacional() {
             // Given
             Processo p = new Processo();
-            p.setDescricao("Proc");
             Long unidadeId = 1L;
+            Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
+            u.setCodigo(unidadeId);
 
-            UnidadeDto uDto = UnidadeDto.builder().tipo(TipoUnidade.INTEROPERACIONAL.name()).build();
-
-            when(usuarioService.buscarUnidadePorCodigo(unidadeId)).thenReturn(Optional.of(uDto));
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(new Unidade()));
+            when(unidadeRepo.findAllById(any())).thenReturn(List.of(u));
+            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
