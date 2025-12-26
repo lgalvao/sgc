@@ -33,8 +33,6 @@ backend/bin/
 /node_modules/
 /backend/target/
 .DS_Store
-/backend/.jqwik-database
-scripts/stats/node_modules/
 /.vscode/
 /frontend/bin/
 .env.hom
@@ -43,7 +41,7 @@ scripts/stats/node_modules/
 !test-results/
 !playwright-report/
 !screenshots/
-!e2e/server.log
+e2e/server.log
 /dados/
 
 Reports de testes
