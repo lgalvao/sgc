@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.autenticacao.dto.*;
+import sgc.seguranca.dto.*;
 import sgc.usuario.dto.*;
 import sgc.usuario.model.Perfil;
 import sgc.usuario.model.Usuario;

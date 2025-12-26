@@ -4,7 +4,7 @@
 # Uso: ./scripts/capturar-telas-categoria.sh <categoria>
 #
 # Categorias disponíveis:
-#   autenticacao    - Telas de login e autenticação
+#   seguranca    - Telas de login e autenticação
 #   painel          - Painel principal
 #   processo        - Criação e gerenciamento de processos
 #   subprocesso     - Dashboard e atividades
@@ -60,7 +60,7 @@ shift
 
 # Validar categoria
 case $CATEGORIA in
-    autenticacao|painel|processo|subprocesso|mapa|navegacao|estados|responsividade|all)
+    seguranca|painel|processo|subprocesso|mapa|navegacao|estados|responsividade|all)
         ;;
     *)
         echo -e "${RED}Erro: Categoria inválida '$CATEGORIA'${NC}"
@@ -81,7 +81,7 @@ mkdir -p "$SCREENSHOTS_DIR"
 
 # Mapear categoria para padrão de teste
 case $CATEGORIA in
-    autenticacao)
+    seguranca)
         TEST_PATTERN="01 - Autenticação"
         ;;
     painel)
@@ -169,7 +169,7 @@ if eval $PLAYWRIGHT_CMD; then
     else
         # Mapear categoria para prefixo de arquivo
         case $CATEGORIA in
-            autenticacao) PREFIX="01-autenticacao" ;;
+            seguranca) PREFIX="01-autenticacao" ;;
             painel) PREFIX="02-painel" ;;
             processo) PREFIX="03-processo" ;;
             subprocesso) PREFIX="04-subprocesso" ;;

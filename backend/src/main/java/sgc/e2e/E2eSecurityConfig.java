@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import sgc.comum.config.FiltroAutenticacaoSimulado;
+import sgc.seguranca.FiltroAutenticacaoSimulado;
 
 import java.util.List;
 

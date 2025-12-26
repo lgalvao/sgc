@@ -55,14 +55,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura telas de login', async ({page}) => {
             // Tela de login inicial
             await page.goto('/login');
-            await capturarTela(page, '01-autenticacao', '01-login-inicial');
+            await capturarTela(page, '01-seguranca', '01-login-inicial');
 
             // Erro de credenciais inválidas
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.INVALIDO.titulo);
             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
             await page.getByTestId('btn-login-entrar').click();
             await page.waitForTimeout(500);
-            await capturarTela(page, '01-autenticacao', '02-login-erro-credenciais');
+            await capturarTela(page, '01-seguranca', '02-login-erro-credenciais');
 
             // Limpar e fazer login com múltiplos perfis
             await page.goto('/login');
@@ -70,13 +70,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-login-senha').fill(USUARIOS.ADMIN_2_PERFIS.senha);
             await page.getByTestId('btn-login-entrar').click();
             await page.waitForTimeout(500);
-            await capturarTela(page, '01-autenticacao', '03-login-selecao-perfil');
+            await capturarTela(page, '01-seguranca', '03-login-selecao-perfil');
 
             // Login com perfil selecionado
             // Reiniciar a página para garantir estado limpo para a função helper
             await page.goto('/login');
             await loginComPerfil(page, USUARIOS.ADMIN_2_PERFIS.titulo, USUARIOS.ADMIN_2_PERFIS.senha, USUARIOS.ADMIN_2_PERFIS.perfil);
-            await capturarTela(page, '01-autenticacao', '04-painel-apos-login', {fullPage: true});
+            await capturarTela(page, '01-seguranca', '04-painel-apos-login', {fullPage: true});
         });
     });
 

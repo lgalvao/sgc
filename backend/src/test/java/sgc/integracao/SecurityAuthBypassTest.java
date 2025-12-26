@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.autenticacao.dto.EntrarReq;
+import sgc.seguranca.dto.EntrarReq;
 import sgc.usuario.model.Perfil;
 import sgc.usuario.model.Usuario;
 import sgc.usuario.model.UsuarioRepo;

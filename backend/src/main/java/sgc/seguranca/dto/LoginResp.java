@@ -1,4 +1,4 @@
-package sgc.autenticacao.dto;
+package sgc.seguranca.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

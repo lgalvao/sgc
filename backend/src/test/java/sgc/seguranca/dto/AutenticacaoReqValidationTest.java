@@ -1,4 +1,4 @@
-package sgc.autenticacao.dto;
+package sgc.seguranca.dto;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

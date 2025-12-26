@@ -1,4 +1,4 @@
-package sgc.comum.config;
+package sgc.seguranca;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
