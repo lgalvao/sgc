@@ -37,9 +37,7 @@ public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final GerenciadorJwt gerenciadorJwt;
-
-    @Autowired(required = false)
-    private AcessoAdClient acessoAdClient;
+    private final AcessoAdClient acessoAdClient;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -62,14 +60,17 @@ public class UsuarioService {
         return usuario;
     }
 
+    @Autowired
     public UsuarioService(UnidadeRepo unidadeRepo,
                        UsuarioRepo usuarioRepo,
                        UsuarioPerfilRepo usuarioPerfilRepo,
-                       GerenciadorJwt gerenciadorJwt) {
+                       GerenciadorJwt gerenciadorJwt,
+                       @Autowired(required = false) AcessoAdClient acessoAdClient) {
         this.unidadeRepo = unidadeRepo;
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;
         this.gerenciadorJwt = gerenciadorJwt;
+        this.acessoAdClient = acessoAdClient;
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
@@ -368,6 +369,14 @@ public class UsuarioService {
             throw new ErroAutenticacao("É necessário autenticar-se antes de consultar autorizações.");
         }
 
+        return buscarAutorizacoesInterno(tituloEleitoral);
+    }
+
+    /**
+     * Método interno para buscar autorizações sem verificação de autenticação prévia.
+     * Usado internamente pelo método entrar() para evitar chamada transacional via 'this'.
+     */
+    private List<PerfilUnidade> buscarAutorizacoesInterno(String tituloEleitoral) {
         log.debug("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo
                 .findById(tituloEleitoral)
@@ -408,7 +417,7 @@ public class UsuarioService {
             throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
         }
 
-        List<PerfilUnidade> autorizacoes = autorizar(request.getTituloEleitoral());
+        List<PerfilUnidade> autorizacoes = buscarAutorizacoesInterno(request.getTituloEleitoral());
         
         // Remove a autenticação do cache após usá-la (garante que só pode entrar uma vez por autenticação)
         autenticacoesRecentes.remove(request.getTituloEleitoral());

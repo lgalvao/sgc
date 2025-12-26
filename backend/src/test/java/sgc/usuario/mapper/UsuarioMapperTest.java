@@ -3,7 +3,6 @@ package sgc.usuario.mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.usuario.mapper.UsuarioMapper;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.dto.UsuarioDto;
 import sgc.usuario.model.Usuario;
