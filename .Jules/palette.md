@@ -1,19 +1,7 @@
-## 2024-05-22 - Missing Loading States in Forms
-**Learning:** Forms like `CadProcesso.vue` handle complex async actions (create, update, delete) but often lack visual feedback (loading spinners) on the action buttons, relying only on toast notifications after the fact. This can lead to double-submissions.
-**Action:** Standardize the pattern of using a local `isLoading` ref that wraps all async service calls in a `try/finally` block. Bind this ref to the `disabled` state of all action buttons and conditionally render a `<BSpinner small />` inside the button.
+## 2024-05-22 - [Numeric Inputs on Login]
+**Learning:** The "Título de Eleitor" field is purely numeric. Using `inputmode="numeric"` on this field significantly improves the mobile experience by triggering the numeric keypad, reducing friction for users on touch devices.
+**Action:** Identify other ID fields (like CPF, enrollment numbers) that are text-based but strictly numeric and apply `inputmode="numeric"` or `type="tel"` to them.
 
-## 2024-05-24 - Native Confirm Dialogs Break Immersion
-**Learning:** Critical actions like deletion in `CadAtividades.vue` relied on `window.confirm()`. This native browser dialog is blocking, visually inconsistent with the app's Bootstrap theme, and cannot be customized for accessibility or clarity.
-**Action:** Replace `window.confirm()` with a custom `ModalConfirmacao.vue` wrapper around `BModal`. This ensures visual consistency, allows for richer content (titles, better button labels), and maintains the non-blocking SPA experience.
-
-## 2025-02-18 - Skip Link for Keyboard Navigation
-**Learning:** The application lacked a mechanism for keyboard users to bypass the main navigation, forcing them to tab through all menu items to reach the main content. This is a critical WCAG requirement (Bypass Blocks).
-**Action:** Implemented a standard "Skip to Content" link using Bootstrap's `visually-hidden-focusable` class. Future layouts should always include a main content landmark with an ID for skipping.
-
-## 2025-02-19 - Semantic Icon Mismatch
-**Learning:** The application used `bi-save` icons for "Add" actions (e.g., adding a new activity or knowledge). This creates a cognitive dissonance for users who expect a "Plus" icon for creation and a "Save" icon for persistence, and confuses the action's intent.
-**Action:** Replaced `bi-save` with `bi-plus-lg` for creation actions. Future implementations should strictly distinguish between "Add to list" (client-side or creation) and "Save to database" (persistence) actions in both iconography and labels.
-
-## 2025-02-23 - Actionable Table Rows Accessibility
-**Learning:** Table rows in `TabelaProcessos.vue` were clickable via `@row-clicked` but lacked keyboard accessibility. Using `role="button"` on table rows destroys table semantics for screen readers.
-**Action:** Made table rows focusable by adding `tabindex="0"` and implemented an `onKeydown` handler for Enter/Space keys to replicate click behavior, preserving the native `tr` semantics.
+## 2024-05-22 - [Explicit Required Indicators]
+**Learning:** While `required` attribute handles browser validation and accessibility, explicit visual indicators (like a red asterisk) are crucial for scanning. Users shouldn't have to submit a form to find out which fields are mandatory.
+**Action:** Audit all forms to ensure required fields have both programmatic (`required`) and visual indicators.
