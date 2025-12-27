@@ -13,3 +13,7 @@
 ## 2025-02-19 - Semantic Icon Mismatch
 **Learning:** The application used `bi-save` icons for "Add" actions (e.g., adding a new activity or knowledge). This creates a cognitive dissonance for users who expect a "Plus" icon for creation and a "Save" icon for persistence, and confuses the action's intent.
 **Action:** Replaced `bi-save` with `bi-plus-lg` for creation actions. Future implementations should strictly distinguish between "Add to list" (client-side or creation) and "Save to database" (persistence) actions in both iconography and labels.
+
+## 2025-02-23 - Actionable Table Rows Accessibility
+**Learning:** Table rows in `TabelaProcessos.vue` were clickable via `@row-clicked` but lacked keyboard accessibility. Using `role="button"` on table rows destroys table semantics for screen readers.
+**Action:** Made table rows focusable by adding `tabindex="0"` and implemented an `onKeydown` handler for Enter/Space keys to replicate click behavior, preserving the native `tr` semantics.
