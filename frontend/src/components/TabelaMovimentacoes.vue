@@ -15,6 +15,8 @@
         :tbody-tr-attr="rowAttr"
         data-testid="tbl-movimentacoes"
         primary-key="codigo"
+        responsive
+        stacked="md"
         striped
     >
       <template #cell(dataHora)="data">
