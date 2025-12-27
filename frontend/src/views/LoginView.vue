@@ -37,7 +37,7 @@
                     aria-hidden="true"
                     class="bi bi-person-circle me-2"
                 />
-                Título eleitoral
+                Título eleitoral <span class="text-danger" aria-hidden="true">*</span>
               </label>
               <BFormInput
                   id="titulo"
@@ -47,6 +47,8 @@
                   :disabled="loginStep > 1"
                   placeholder="Digite seu título"
                   type="text"
+                  inputmode="numeric"
+                  required
               />
             </div>
             <div class="mb-3">
@@ -59,7 +61,7 @@
                     aria-hidden="true"
                     class="bi bi-key me-2"
                 />
-                Senha
+                Senha <span class="text-danger" aria-hidden="true">*</span>
               </label>
               <BInputGroup>
                 <BFormInput
@@ -70,6 +72,7 @@
                     :disabled="loginStep > 1"
                     placeholder="Digite sua senha"
                     :type="showPassword ? 'text' : 'password'"
+                    required
                     @keydown="verificarCapsLock"
                     @keyup="verificarCapsLock"
                 />
