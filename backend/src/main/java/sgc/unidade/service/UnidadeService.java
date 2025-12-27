@@ -2,6 +2,7 @@ package sgc.unidade.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.ProcessoRepo;
@@ -213,17 +214,44 @@ public class UnidadeService {
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
-        Unidade unidade =
-                unidadeRepo
-                        .findById(codigo)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Unidade com codigo "
-                                                        + codigo
-                                                        + " não encontrada"));
-
+        Unidade unidade = buscarEntidadePorId(codigo);
         return usuarioMapper.toUnidadeDto(unidade, false);
+    }
+
+    public Unidade buscarEntidadePorId(Long codigo) {
+        return unidadeRepo
+                .findById(codigo)
+                .orElseThrow(
+                        () ->
+                                new ErroEntidadeNaoEncontrada(
+                                        "Unidade com codigo "
+                                                + codigo
+                                                + " não encontrada"));
+    }
+
+    public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
+        return unidadeRepo.findAllById(codigos);
+    }
+
+    public List<Unidade> buscarTodasEntidadesComHierarquia() {
+        return unidadeRepo.findAllWithHierarquia();
+    }
+
+    public List<String> buscarSiglasPorIds(List<Long> codigos) {
+        return unidadeRepo.findSiglasByCodigos(codigos);
+    }
+
+    public boolean verificarExistenciaMapaVigente(Long codigoUnidade) {
+        return unidadeMapaRepo.existsById(codigoUnidade);
+    }
+
+    @Transactional
+    public void definirMapaVigente(Long codigoUnidade, sgc.mapa.model.Mapa mapa) {
+        sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade)
+                .orElse(new sgc.unidade.model.UnidadeMapa());
+        unidadeMapa.setUnidadeCodigo(codigoUnidade);
+        unidadeMapa.setMapaVigente(mapa);
+        unidadeMapaRepo.save(unidadeMapa);
     }
 
     public UnidadeDto buscarArvore(Long codigo) {
