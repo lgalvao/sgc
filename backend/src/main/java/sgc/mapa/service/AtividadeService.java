@@ -10,14 +10,15 @@ import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroSituacaoInvalida;
-import sgc.processo.model.TipoProcesso;
-import sgc.usuario.model.UsuarioRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.usuario.UsuarioService;
+import sgc.subprocesso.service.SubprocessoService;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
@@ -30,11 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AtividadeService {
     private final AtividadeRepo atividadeRepo;
+    private final MapaRepo mapaRepo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoRepo conhecimentoRepo;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final SubprocessoRepo subprocessoRepo;
-    private final UsuarioRepo usuarioRepo;
+    @Lazy
+    private final SubprocessoService subprocessoService;
+    private final UsuarioService usuarioService;
 
     /**
      * Retorna uma lista de todas as atividades.
@@ -87,14 +90,9 @@ public class AtividadeService {
             throw new ErroEntidadeNaoEncontrada("Mapa", "não informado");
         }
 
-        var subprocesso = subprocessoRepo
-                .findByMapaCodigo(atividadeDto.getMapaCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d"
-                        .formatted(atividadeDto.getMapaCodigo())));
+        var subprocesso = subprocessoService.obterEntidadePorCodigoMapa(atividadeDto.getMapaCodigo());
 
-        var usuario = usuarioRepo
-                .findById(tituloUsuario)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
+        var usuario = usuarioService.buscarEntidadePorId(tituloUsuario);
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
         if (subprocesso.getUnidade() == null) {
@@ -256,23 +254,70 @@ public class AtividadeService {
     }
 
     private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo
-                .findByMapaCodigo(mapaCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+        subprocessoService.atualizarSituacaoParaEmAndamento(mapaCodigo);
+    }
 
-        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
-            if (subprocesso.getProcesso() == null) {
-                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d"
-                        .formatted(subprocesso.getCodigo()));
+    /**
+     * Busca atividades de um mapa.
+     * Método público para uso por outros serviços (ex: SubprocessoService).
+     */
+    public List<Atividade> buscarPorMapaCodigo(Long mapaCodigo) {
+        return atividadeRepo.findByMapaCodigo(mapaCodigo);
+    }
+
+    /**
+     * Busca atividades de um mapa com conhecimentos fetchados.
+     * Método público para uso por outros serviços (ex: SubprocessoService).
+     */
+    public List<Atividade> buscarPorMapaCodigoComConhecimentos(Long mapaCodigo) {
+        return atividadeRepo.findByMapaCodigoWithConhecimentos(mapaCodigo);
+    }
+
+    /**
+     * Lista conhecimentos de uma atividade (Entidades).
+     */
+    public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
+        return conhecimentoRepo.findByAtividadeCodigo(codAtividade);
+    }
+
+    /**
+     * Lista conhecimentos de um mapa (Entidades).
+     */
+    public List<Conhecimento> listarConhecimentosPorMapa(Long codMapa) {
+        return conhecimentoRepo.findByMapaCodigo(codMapa);
+    }
+
+    /**
+     * Importa atividades de um mapa para outro.
+     */
+    public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
+        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(mapaOrigemId);
+        List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(mapaDestinoId).stream()
+                .map(Atividade::getDescricao)
+                .toList();
+
+        Mapa mapaDestino = mapaRepo.findById(mapaDestinoId)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", mapaDestinoId));
+
+        for (Atividade atividadeOrigem : atividadesOrigem) {
+            if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
+                continue;
             }
-            var tipoProcesso = subprocesso.getProcesso().getTipo();
-            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
+
+            Atividade novaAtividade = new Atividade();
+            novaAtividade.setDescricao(atividadeOrigem.getDescricao());
+            novaAtividade.setMapa(mapaDestino);
+            Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
+
+            List<Conhecimento> conhecimentosOrigem =
+                    conhecimentoRepo.findByAtividadeCodigo(atividadeOrigem.getCodigo());
+            if (conhecimentosOrigem != null) {
+                for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
+                    Conhecimento novoConhecimento = new Conhecimento();
+                    novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
+                    novoConhecimento.setAtividade(atividadeSalva);
+                    conhecimentoRepo.save(novoConhecimento);
+                }
             }
         }
     }

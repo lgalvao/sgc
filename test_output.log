@@ -1,0 +1,13 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+> Task :backend:test
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 16s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry reused.

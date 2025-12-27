@@ -11,14 +11,14 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoService;
 import sgc.usuario.UsuarioService;
 import sgc.usuario.dto.ResponsavelDto;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 
@@ -48,8 +48,8 @@ public class EventoProcessoListener {
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
     private final UsuarioService usuarioService;
-    private final ProcessoRepo processoRepo;
-    private final SubprocessoRepo repoSubprocesso;
+    private final ProcessoService processoService;
+    private final SubprocessoService subprocessoService;
 
     /**
      * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando um novo processo
@@ -92,13 +92,10 @@ public class EventoProcessoListener {
     }
 
     private void processarInicioProcesso(EventoProcessoIniciado evento) {
-        Processo processo =
-                processoRepo
-                        .findById(evento.getCodProcesso())
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.getCodProcesso()));
+        Processo processo = processoService.buscarEntidadePorId(evento.getCodProcesso());
 
         List<Subprocesso> subprocessos =
-                repoSubprocesso.findByProcessoCodigoWithUnidade(evento.getCodProcesso());
+                subprocessoService.listarEntidadesPorProcesso(evento.getCodProcesso());
 
         if (subprocessos.isEmpty()) {
             log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());
@@ -126,8 +123,7 @@ public class EventoProcessoListener {
     }
 
     private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
-        Processo processo = processoRepo.findById(evento.getCodProcesso())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", evento.getCodProcesso()));
+        Processo processo = processoService.buscarEntidadePorId(evento.getCodProcesso());
 
         List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
 

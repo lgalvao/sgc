@@ -235,6 +235,16 @@ public class ProcessoService {
         return processoRepo.findById(codigo).map(processoMapper::toDto);
     }
 
+    /**
+     * Busca a entidade Processo por ID.
+     * Método público para permitir uso por outros serviços (ex: EventoProcessoListener).
+     */
+    @Transactional(readOnly = true)
+    public Processo buscarEntidadePorId(Long codigo) {
+        return processoRepo.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+    }
+
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     public ProcessoContextoDto obterContextoCompleto(Long codigo) {

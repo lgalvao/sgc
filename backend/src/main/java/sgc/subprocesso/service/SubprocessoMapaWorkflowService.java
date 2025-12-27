@@ -9,12 +9,11 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
 import sgc.processo.model.TipoProcesso;
@@ -28,7 +27,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.util.stream.Collectors;
 
@@ -39,13 +38,12 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 public class SubprocessoMapaWorkflowService {
     private final SubprocessoRepo subprocessoRepo;
-    private final CompetenciaRepo competenciaRepo;
-    private final AtividadeRepo atividadeRepo;
-    private final MapaService mapaService;
     private final CompetenciaService competenciaService;
+    private final AtividadeService atividadeService;
+    private final MapaService mapaService;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseService analiseService;
-    private final UnidadeRepo unidadeRepo;
+    private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
@@ -53,7 +51,7 @@ public class SubprocessoMapaWorkflowService {
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
@@ -73,7 +71,7 @@ public class SubprocessoMapaWorkflowService {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
         Long codMapa = subprocesso.getMapa().getCodigo();
-        boolean eraVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
+        boolean eraVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
 
         competenciaService.adicionarCompetencia(
                 subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds()
@@ -110,7 +108,7 @@ public class SubprocessoMapaWorkflowService {
         competenciaService.removerCompetencia(codCompetencia);
 
         // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
-        boolean ficouVazio = competenciaRepo.findByMapaCodigo(codMapa).isEmpty();
+        boolean ficouVazio = competenciaService.buscarPorMapa(codMapa).isEmpty();
         if (ficouVazio && subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             subprocessoRepo.save(subprocesso);
@@ -170,8 +168,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+        Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
 
         transicaoService.registrar(
                 sp,
@@ -186,13 +183,15 @@ public class SubprocessoMapaWorkflowService {
 
     private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
-        var competencias = competenciaRepo.findByMapaCodigo(codMapa);
+        var competencias = competenciaService.buscarPorMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
             throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
         }
 
-        var atividadesDoSubprocesso = atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
+        // Recuperar atividades via mapa, já que não temos AtividadeRepo aqui e não há método findBySubprocessoCodigo no service
+        // (Assumindo que findBySubprocessoCodigo(codSubprocesso) é equivalente a findByMapaCodigo(sub.getMapa().getCodigo()))
+        var atividadesDoSubprocesso = atividadeService.buscarPorMapaCodigo(codMapa);
 
         var atividadesAssociadas = competencias.stream()
                 .flatMap(c -> c.getAtividades().stream())
@@ -355,14 +354,7 @@ public class SubprocessoMapaWorkflowService {
         }
         subprocessoRepo.save(sp);
 
-        Unidade sedoc =
-                unidadeRepo
-                        .findBySigla("SEDOC")
-                        .orElseThrow(
-                                () ->
-                                        new IllegalStateException(
-                                                "Unidade 'SEDOC' não encontrada para registrar a"
-                                                        + " homologação."));
+        Unidade sedoc = unidadeService.buscarEntidadePorId(unidadeService.buscarPorSigla("SEDOC").getCodigo());
 
         transicaoService.registrar(
                 sp,
