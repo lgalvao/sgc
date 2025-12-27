@@ -14,7 +14,8 @@ import sgc.usuario.model.UsuarioRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
+import sgc.usuario.UsuarioService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,8 +35,8 @@ import static sgc.alerta.model.TipoAlerta.PROCESSO_INICIADO_OPERACIONAL;
 public class AlertaService {
     private final AlertaRepo repositorioAlerta;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
-    private final UnidadeRepo unidadeRepo;
-    private final UsuarioRepo usuarioRepo;
+    private final UnidadeService unidadeService;
+    private final UsuarioService usuarioService;
     private final AlertaMapper alertaMapper;
 
     /**
@@ -50,8 +51,7 @@ public class AlertaService {
 
         log.debug("Criando alerta tipo={} para unidade {}.", tipoAlerta, codUnidadeDestino);
 
-        Unidade unidadeDestino = unidadeRepo.findById(codUnidadeDestino)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidadeDestino));
+        Unidade unidadeDestino = unidadeService.buscarEntidadePorId(codUnidadeDestino);
 
         Alerta alerta = new Alerta()
                 .setProcesso(processo)
@@ -116,7 +116,7 @@ public class AlertaService {
         if (subprocessos != null && !subprocessos.isEmpty()) {
             unidadesBase = subprocessos.stream().map(Subprocesso::getUnidade).toList();
         } else {
-            unidadesBase = unidadeRepo.findAllById(codigosUnidades);
+            unidadesBase = unidadeService.buscarEntidadesPorIds(codigosUnidades);
         }
 
         for (Unidade unidade : unidadesBase) {
@@ -159,8 +159,7 @@ public class AlertaService {
     public void criarAlertaCadastroDisponibilizado(
             Processo processo, Long codUnidadeOrigem, Long codUnidadeDestino) {
 
-        Unidade unidadeOrigem = unidadeRepo.findById(codUnidadeOrigem)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de origem", codUnidadeOrigem));
+        Unidade unidadeOrigem = unidadeService.buscarEntidadePorId(codUnidadeOrigem);
 
         String descricao = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
                 .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
@@ -204,8 +203,7 @@ public class AlertaService {
     @Transactional
     public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
         // Buscar usuário para obter sua unidade de lotação
-        Usuario usuario = usuarioRepo.findById(usuarioTitulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioTitulo));
+        Usuario usuario = usuarioService.buscarEntidadePorId(usuarioTitulo);
 
         if (usuario.getUnidadeLotacao() == null) {
             log.warn("Usuário {} sem unidade de lotação", usuarioTitulo);

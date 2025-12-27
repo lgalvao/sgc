@@ -21,6 +21,19 @@ public class CompetenciaService {
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
+    public List<Competencia> buscarPorMapa(Long mapaId) {
+        return competenciaRepo.findByMapaCodigo(mapaId);
+    }
+
+    public Competencia buscarPorId(Long id) {
+        return competenciaRepo.findById(id)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", id));
+    }
+
+    public void salvar(Competencia competencia) {
+        competenciaRepo.save(competencia);
+    }
+
     public void adicionarCompetencia(Mapa mapa, String descricao, List<Long> atividadesIds) {
         Competencia competencia = new Competencia(descricao, mapa);
         prepararCompetenciasAtividades(atividadesIds, competencia);

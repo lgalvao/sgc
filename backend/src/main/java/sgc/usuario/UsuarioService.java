@@ -78,6 +78,13 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
+    public Usuario buscarEntidadePorId(String titulo) {
+        return usuarioRepo
+                .findById(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
+    }
+
+    @Transactional(readOnly = true)
     public Usuario buscarUsuarioPorLogin(String login) {
         Usuario usuario = usuarioRepo
                 .findById(login)

@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -32,6 +32,8 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.unidade.model.Unidade;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +48,9 @@ import static java.util.Collections.emptyList;
 @Slf4j
 public class SubprocessoService {
     private final SubprocessoRepo repositorioSubprocesso;
-    private final AtividadeRepo atividadeRepo;
+    private final AtividadeService atividadeService;
     private final ConhecimentoRepo repositorioConhecimento;
-    private final CompetenciaRepo competenciaRepo;
+    private final CompetenciaService competenciaService;
     private final SubprocessoMapper subprocessoMapper;
     private final sgc.mapa.model.MapaRepo mapaRepo;
     private final MovimentacaoRepo repositorioMovimentacao;
@@ -111,7 +113,7 @@ public class SubprocessoService {
         }
 
         List<Atividade> todasAtividades =
-                atividadeRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
+                atividadeService.buscarPorMapaCodigo(subprocesso.getMapa().getCodigo());
 
         return todasAtividades.stream()
                 .map(this::mapAtividadeToDto)
@@ -186,7 +188,7 @@ public class SubprocessoService {
             return emptyList();
         }
 
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(sp.getMapa().getCodigo());
         if (atividades == null || atividades.isEmpty()) {
             return emptyList();
         }
@@ -217,7 +219,7 @@ public class SubprocessoService {
             throw new ErroValidacao("Subprocesso sem mapa associado.");
         }
 
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(sp.getMapa().getCodigo());
         if (atividades == null || atividades.isEmpty()) {
             throw new ErroValidacao(
                     "Pelo menos uma atividade deve ser cadastrada antes de disponibilizar.");
@@ -226,7 +228,7 @@ public class SubprocessoService {
 
 
     public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapaId);
+        List<Competencia> competencias = competenciaService.buscarPorMapa(mapaId);
         List<String> competenciasSemAssociacao = new ArrayList<>();
         for (Competencia competencia : competencias) {
             if (competencia.getAtividades().isEmpty()) {
@@ -239,7 +241,7 @@ public class SubprocessoService {
                     Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
         }
 
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(mapaId);
         List<String> atividadesSemAssociacao = new ArrayList<>();
         for (Atividade atividade : atividades) {
             if (atividade.getCompetencias().isEmpty()) {
@@ -390,7 +392,7 @@ public class SubprocessoService {
 
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
-            List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
+            List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
             if (atividades == null) atividades = emptyList();
 
             for (Atividade a : atividades) {
@@ -428,9 +430,9 @@ public class SubprocessoService {
                 .findFirst()
                 .orElse(null);
 
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
-        List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
+        List<Competencia> competencias = competenciaService.buscarPorMapa(codMapa);
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(codMapa);
+        List<Conhecimento> conhecimentos = atividadeService.listarConhecimentosPorMapa(codMapa);
 
         return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
     }
@@ -472,7 +474,7 @@ public class SubprocessoService {
                     .build();
         }
 
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
 
         if (atividades == null || atividades.isEmpty()) {
             erros.add(ErroValidacaoDto.builder()
@@ -507,5 +509,32 @@ public class SubprocessoService {
         }
         String username = authentication.getName();
         return usuarioService.buscarUsuarioPorLogin(username);
+    }
+
+    /**
+     * Atualiza a situação do subprocesso para EM_ANDAMENTO (cadastro ou revisão)
+     * quando há movimentação em atividades.
+     */
+    @Transactional
+    public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
+        var subprocesso = repositorioSubprocesso
+                .findByMapaCodigo(mapaCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado para o mapa com código %d".formatted(mapaCodigo)));
+
+        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            if (subprocesso.getProcesso() == null) {
+                throw new ErroEntidadeNaoEncontrada("Processo não associado ao Subprocesso %d"
+                        .formatted(subprocesso.getCodigo()));
+            }
+            var tipoProcesso = subprocesso.getProcesso().getTipo();
+            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
+                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                repositorioSubprocesso.save(subprocesso);
+            } else if (tipoProcesso == TipoProcesso.REVISAO) {
+                subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                repositorioSubprocesso.save(subprocesso);
+            }
+        }
     }
 }

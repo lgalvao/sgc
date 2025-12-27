@@ -5,11 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.CompetenciaService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
@@ -20,6 +19,10 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
+import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.mapper.AtividadeMapper;
+import sgc.mapa.mapper.ConhecimentoMapper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,9 +36,10 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class SubprocessoMapaService {
     private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
-    private final AtividadeRepo atividadeRepo;
-    private final ConhecimentoRepo conhecimentoRepo;
-    private final CompetenciaRepo competenciaRepo;
+    private final AtividadeService atividadeService;
+    private final CompetenciaService competenciaService;
+    private final AtividadeMapper atividadeMapper;
+    private final ConhecimentoMapper conhecimentoMapper;
 
     @Transactional
     public void salvarAjustesMapa(
@@ -58,24 +62,30 @@ public class SubprocessoMapaService {
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
         for (CompetenciaAjusteDto compDto : competencias) {
-            var competencia = competenciaRepo.findById(compDto.getCodCompetencia()).orElseThrow(
-                    () -> new ErroEntidadeNaoEncontrada(
-                            "Competência não encontrada: %d".formatted(compDto.getCodCompetencia()))
-            );
+            var competencia = competenciaService.buscarPorId(compDto.getCodCompetencia());
 
             competencia.setDescricao(compDto.getNome());
 
             Set<Atividade> atividades = new HashSet<>();
             for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                var atividade = atividadeRepo.findById(ativDto.getCodAtividade())
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                                "Atividade não encontrada: %d".formatted(ativDto.getCodAtividade())));
+                // Usando AtividadeService.atualizar -> mas preciso da Entidade para associar à competência
+                // Se AtividadeService não expõe entidade, tenho que mudar o service
+                // Mas AtividadeService expõe `obterEntidadePorCodigo`.
+                var atividade = atividadeService.obterEntidadePorCodigo(ativDto.getCodAtividade());
 
-                atividade.setDescricao(ativDto.getNome());
-                atividades.add(atividade);
+                // Atualizar descrição via service (para manter regras de negócio se houver)
+                // Ou apenas setar aqui já que é um "ajuste"?
+                // Melhor usar o service para atualizar.
+
+                AtividadeDto dto = atividadeMapper.toDto(atividade);
+                dto.setDescricao(ativDto.getNome());
+                atividadeService.atualizar(atividade.getCodigo(), dto);
+
+                // Recarrega entidade atualizada
+                atividades.add(atividadeService.obterEntidadePorCodigo(atividade.getCodigo()));
             }
             competencia.setAtividades(atividades);
-            competenciaRepo.save(competencia);
+            competenciaService.salvar(competencia);
         }
 
         sp.setSituacao(REVISAO_MAPA_AJUSTADO);
@@ -109,14 +119,14 @@ public class SubprocessoMapaService {
             throw new ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
         }
 
-        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());
+        List<Atividade> atividadesOrigem = atividadeService.buscarPorMapaCodigo(spOrigem.getMapa().getCodigo());
 
         if (atividadesOrigem == null || atividadesOrigem.isEmpty()) {
             return;
         }
 
         List<String> descricoesExistentes =
-                atividadeRepo.findByMapaCodigo(spDestino.getMapa().getCodigo()).stream()
+                atividadeService.buscarPorMapaCodigo(spDestino.getMapa().getCodigo()).stream()
                         .map(Atividade::getDescricao)
                         .toList();
 
@@ -125,22 +135,33 @@ public class SubprocessoMapaService {
                 continue;
             }
 
-            Atividade novaAtividade = new Atividade();
-            novaAtividade.setDescricao(atividadeOrigem.getDescricao());
-            novaAtividade.setMapa(spDestino.getMapa());
-            Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
+            // Usando AtividadeService.criar
+            AtividadeDto novaDto = new AtividadeDto();
+            novaDto.setDescricao(atividadeOrigem.getDescricao());
+            novaDto.setMapaCodigo(spDestino.getMapa().getCodigo());
 
-            List<Conhecimento> conhecimentosOrigem =
-                    conhecimentoRepo.findByAtividadeCodigo(atividadeOrigem.getCodigo());
-            if (conhecimentosOrigem != null) {
-                for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
-                    Conhecimento novoConhecimento = new Conhecimento();
-                    novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
-                    novoConhecimento.setAtividade(atividadeSalva);
-                    conhecimentoRepo.save(novoConhecimento);
-                }
-            }
+            // Precisamos de um usuário titular para criar atividade via service...
+            // O importador é um processo de sistema/usuário logado?
+            // `importarAtividades` não recebe usuarioTitulo.
+            // Mas `criar` exige validação de titularidade.
+            // Solução: Criar um método `duplicarAtividade(Atividade origem, Mapa destino)` no AtividadeService?
+            // Ou manter a lógica aqui, mas usando os métodos expostos pelo service que não exigem validação (se houver)
+            // Como AtividadeService.criar exige validação, e aqui é uma importação sistêmica,
+            // talvez devêssemos expor um método `importar` no AtividadeService.
+
+            // Por enquanto, vou usar o AtividadeRepo indiretamente via Service? Não, a ideia é não usar Repo de outro módulo.
+            // Então `AtividadeService` deve ter um método `duplicarAtividade`.
+
+            // Vou assumir que posso chamar um método novo no AtividadeService ou refatorar isso depois.
+            // Para simplificar agora, e dado que `importarAtividades` é um caso de uso específico,
+            // vou adicionar `importarAtividade` no `AtividadeService`.
         }
+
+        // REFAZENDO LOOP PARA CHAMAR NOVO METODO NO SERVICE
+        atividadeService.importarAtividadesDeOutroMapa(
+                spOrigem.getMapa().getCodigo(),
+                spDestino.getMapa().getCodigo()
+        );
 
         if (spDestino.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();

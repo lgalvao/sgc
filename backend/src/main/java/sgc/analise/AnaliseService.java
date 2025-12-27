@@ -10,9 +10,9 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,8 +25,8 @@ import java.util.List;
 @Slf4j
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
-    private final SubprocessoRepo codSubprocesso;
-    private final UnidadeRepo unidadeRepo;
+    private final SubprocessoService subprocessoService;
+    private final UnidadeService unidadeService;
 
     /**
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
@@ -38,9 +38,8 @@ public class AnaliseService {
      */
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
-        if (this.codSubprocesso.findById(codSubprocesso).isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso);
-        }
+        // Verifica existência (lança exceção se não encontrar)
+        subprocessoService.buscarSubprocesso(codSubprocesso);
 
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipoAnalise)
@@ -56,14 +55,23 @@ public class AnaliseService {
      */
     @Transactional
     public Analise criarAnalise(CriarAnaliseRequest req) {
-        Subprocesso sp = codSubprocesso
-                .findById(req.getCodSubprocesso())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", req.getCodSubprocesso()));
+        Subprocesso sp = subprocessoService.buscarSubprocesso(req.getCodSubprocesso());
 
         Unidade unidade = null;
         if (req.getSiglaUnidade() != null) {
-            unidade = unidadeRepo.findBySigla(req.getSiglaUnidade())
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", req.getSiglaUnidade()));
+            // Requer UnidadeService com método que retorne Entidade por Sigla
+            // Adicionar este método em UnidadeService ou usar buscarEntidadePorId se tivermos o ID
+            // Como temos sigla, UnidadeService precisa de buscarEntidadePorSigla
+            // Por enquanto, usamos buscarPorSigla(DTO) e depois buscarEntidadePorId(DTO.getId()) se necessário,
+            // ou melhor, UnidadeService.buscarEntidadePorSigla.
+            // Vou assumir que UnidadeService.buscarPorSigla retorna DTO.
+            // Para manter consistência com refatoração, UnidadeService deve expor entidade se necessário ou Analise deve usar DTO.
+            // Analise entity precisa de unidadeCodigo (Long). UnidadeDTO tem codigo.
+            // Mas o código antigo usava unidadeRepo.findBySigla -> Unidade Entity.
+            // Analise builder usa unidadeCodigo.
+
+            var unidadeDto = unidadeService.buscarPorSigla(req.getSiglaUnidade());
+            unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
         }
 
         Analise analise = Analise.builder()

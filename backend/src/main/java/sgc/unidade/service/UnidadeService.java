@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.MapaRepo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoConsultaService;
 import sgc.usuario.mapper.UsuarioMapper;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.dto.UsuarioDto;
@@ -31,7 +30,7 @@ public class UnidadeService {
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
-    private final ProcessoRepo processoRepo;
+    private final ProcessoConsultaService processoConsultaService;
     private final UsuarioMapper usuarioMapper;
 
     public List<UnidadeDto> buscarTodasUnidades() {
@@ -102,12 +101,7 @@ public class UnidadeService {
     }
 
     private Set<Long> getUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
-        // Bolt Optimization: Use JPQL projection to fetch only IDs instead of hydrating full entities
-        // and avoid N+1 queries from lazy loading participants
-        return new HashSet<>(
-                processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
-                        Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
-                        codProcessoIgnorar));
+        return processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
     }
 
     public void criarAtribuicaoTemporaria(

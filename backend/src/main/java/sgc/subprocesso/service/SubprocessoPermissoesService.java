@@ -2,7 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.usuario.model.Perfil;
 import sgc.usuario.model.Usuario;
@@ -23,7 +23,7 @@ public class SubprocessoPermissoesService {
     private static final String ACAO_ENVIAR_REVISAO = "ENVIAR_REVISAO";
     private static final String ACAO_AJUSTAR_MAPA = "AJUSTAR_MAPA";
 
-    private final AtividadeRepo atividadeRepo;
+    private final AtividadeService atividadeService;
 
     public void validar(Subprocesso subprocesso, Long unidadeCodigo, String acao) {
         if (!subprocesso.getUnidade().getCodigo().equals(unidadeCodigo)) {
@@ -56,7 +56,7 @@ public class SubprocessoPermissoesService {
             }
 
             if (subprocesso.getMapa() != null
-                    && atividadeRepo.countByMapaCodigo(subprocesso.getMapa().getCodigo()) == 0
+                    && atividadeService.buscarPorMapaCodigo(subprocesso.getMapa().getCodigo()).isEmpty()
                     && REVISAO_MAPA_AJUSTADO == situacaoSubprocesso) {
                 throw new ErroAccessoNegado(String.format(
                         "Não é possível realizar a ação '%s' pois o mapa do subprocesso '%s' está vazio.",
