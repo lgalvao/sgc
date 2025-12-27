@@ -93,7 +93,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 ? ex.getBindingResult().getFieldErrors().stream().map(
                         error -> new ErroSubApi(error.getObjectName(),
                                 error.getField(),
-                                null, // SENTINEL: Prevent sensitive data leak
                                 sanitizar(error.getDefaultMessage())))
                 .toList() : null;
 
@@ -122,7 +121,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                 new ErroSubApi(
                                         violation.getRootBeanClass().getSimpleName(),
                                         violation.getPropertyPath().toString(),
-                                        null, // SENTINEL: Prevent sensitive data leak
                                         sanitizar(violation.getMessage())))
                         .collect(Collectors.toList());
 
