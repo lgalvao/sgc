@@ -27,9 +27,9 @@ import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -46,9 +46,8 @@ import static sgc.unidade.model.TipoUnidade.INTERMEDIARIA;
 @Slf4j
 public class ProcessoService {
     private final ProcessoRepo processoRepo;
-    private final UnidadeRepo unidadeRepo;
-    private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final SubprocessoRepo subprocessoRepo;
+    private final UnidadeService unidadeService;
+    private final SubprocessoService subprocessoService;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
@@ -94,7 +93,7 @@ public class ProcessoService {
             return false;
         }
 
-        boolean temAcesso = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(
+        boolean temAcesso = subprocessoService.verificarAcessoUnidadeAoProcesso(
                 codProcesso, codigosUnidadesHierarquia);
         log.debug("checarAcesso: usuário {} {} acesso ao processo {}",
                 username, temAcesso ? "TEM" : "NÃO TEM", codProcesso);
@@ -102,7 +101,7 @@ public class ProcessoService {
     }
 
     private List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
 
         Map<Long, List<Unidade>> mapaPorPai = new HashMap<>();
         for (Unidade u : todasUnidades) {
@@ -150,8 +149,7 @@ public class ProcessoService {
 
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : req.getUnidades()) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
+            Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
 
             if (unidade.getTipo() == INTERMEDIARIA) {
                 log.error("ERRO INTERNO: Tentativa de criar processo com unidade INTERMEDIARIA: {}", unidade.getSigla());
@@ -208,8 +206,7 @@ public class ProcessoService {
 
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : requisicao.getUnidades()) {
-            participantes.add(unidadeRepo.findById(codigoUnidade)
-                            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
+            participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
         processo.setParticipantes(participantes);
 
@@ -321,15 +318,15 @@ public class ProcessoService {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             return Optional.empty();
         }
-        List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
+        List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
 
         List<Long> unidadesSemMapa = unidades.stream()
                         .map(Unidade::getCodigo)
-                        .filter(codigo -> !unidadeMapaRepo.existsById(codigo))
+                        .filter(codigo -> !unidadeService.verificarExistenciaMapaVigente(codigo))
                         .toList();
 
         if (!unidadesSemMapa.isEmpty()) {
-            List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
+            List<String> siglasUnidadesSemMapa = unidadeService.buscarSiglasPorIds(unidadesSemMapa);
             return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
                     + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }
@@ -346,7 +343,7 @@ public class ProcessoService {
     private void validarTodosSubprocessosHomologados(Processo processo) {
         log.debug("Validando homologação de subprocessos do processo {}", processo.getCodigo());
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
         List<String> pendentes = subprocessos.stream().filter(sp -> sp.getSituacao() != MAPEAMENTO_MAPA_HOMOLOGADO
                                                 && sp.getSituacao() != REVISAO_MAPA_HOMOLOGADO)
                         .map(sp -> {String identificador = sp.getUnidade() != null ? sp.getUnidade().getSigla() : String.format("Subprocesso %d", sp.getCodigo());
@@ -367,7 +364,7 @@ public class ProcessoService {
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
         List<Subprocesso> subprocessos =
-                subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+                subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
@@ -376,11 +373,7 @@ public class ProcessoService {
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            sgc.unidade.model.UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                    .orElse(new sgc.unidade.model.UnidadeMapa());
-            unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
-            unidadeMapa.setMapaVigente(mapaDoSubprocesso);
-            unidadeMapaRepo.save(unidadeMapa);
+            unidadeService.definirMapaVigente(unidade.getCodigo(), mapaDoSubprocesso);
 
             log.debug("Mapa vigente para unidade {} definido como mapa {}",
                     unidade.getCodigo(),
@@ -409,7 +402,7 @@ public class ProcessoService {
                         .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
 
         List<Subprocesso> subprocessos =
-                subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
+                subprocessoService.listarEntidadesPorProcesso(codProcesso);
         if (isAdmin) {
             return subprocessos.stream()
                     .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
@@ -433,7 +426,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso).stream()
+        return subprocessoService.listarEntidadesPorProcesso(codProcesso).stream()
                 .map(subprocessoMapper::toDTO)
                 .toList();
     }

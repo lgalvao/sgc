@@ -41,6 +41,16 @@ public class SubprocessoService {
     private final sgc.mapa.model.MapaRepo mapaRepo;
 
     @Transactional(readOnly = true)
+    public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
+        return repositorioSubprocesso.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
+        return repositorioSubprocesso.findByProcessoCodigoWithUnidade(codProcesso);
+    }
+
+    @Transactional(readOnly = true)
     public List<AtividadeVisualizacaoDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso
                 .findById(codSubprocesso)
