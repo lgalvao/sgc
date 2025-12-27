@@ -91,10 +91,19 @@ public class MapaVisualizacaoService {
                                 })
                         .toList();
 
-        // Buscar atividades sem competência (orphaned)
+        // ⚡ Bolt: Otimização para evitar consultas N+1.
+        // Em vez de chamar a.getCompetencias().isEmpty() (que dispara carregamento lazy para cada atividade),
+        // coletamos todos os IDs de atividades que JÁ ESTÃO associadas a uma competência (carregadas em 'competencias')
+        // e verificamos contra este conjunto.
+        var atividadesComCompetenciaIds = competencias.stream()
+                .flatMap(c -> c.getAtividades().stream())
+                .map(Atividade::getCodigo)
+                .collect(Collectors.toSet());
+
+        // Buscar atividades sem competência (órfãs)
         List<AtividadeDto> atividadesSemCompetencia =
                 atividadesComConhecimentos.stream()
-                        .filter(a -> a.getCompetencias().isEmpty())
+                        .filter(a -> !atividadesComCompetenciaIds.contains(a.getCodigo()))
                         .map(a -> atividadeDtoMap.get(a.getCodigo()))
                         .toList();
 
