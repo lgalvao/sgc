@@ -31,7 +31,7 @@ class RestExceptionHandlerSecurityTest {
                 .content(payload)
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                // FIX VERIFICATION: value should be null
-                .andExpect(jsonPath("$.subErrors[0].rejectedValue").value(nullValue()));
+                // SENTINEL: Field 'rejectedValue' was removed to enforce security
+                .andExpect(jsonPath("$.subErrors[0].rejectedValue").doesNotExist());
     }
 }
