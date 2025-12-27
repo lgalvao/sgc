@@ -15,7 +15,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -50,7 +50,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private SubprocessoDtoService subprocessoDtoService;
+    private SubprocessoService subprocessoService;
     @Autowired
     private UnidadeRepo unidadeRepo;
 
@@ -107,7 +107,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.saveAndFlush(subprocesso);
 
         // Verificar situação antes de finalizar via service
-        var subprocessoAntesFinalizar = subprocessoDtoService.obterPorProcessoEUnidade(
+        var subprocessoAntesFinalizar = subprocessoService.obterPorProcessoEUnidade(
                 codProcesso, unidadeSENIC.getCodigo());
 
         assertThat(subprocessoAntesFinalizar.getSituacao())

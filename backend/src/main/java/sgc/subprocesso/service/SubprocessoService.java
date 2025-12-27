@@ -13,13 +13,25 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
-import sgc.subprocesso.dto.ConhecimentoVisualizacaoDto;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.analise.AnaliseService;
+import sgc.analise.model.Analise;
+import sgc.analise.model.TipoAnalise;
+import sgc.mapa.dto.ConhecimentoDto;
+import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Perfil;
+import sgc.usuario.model.Usuario;
+import sgc.subprocesso.mapper.MapaAjusteMapper;
+import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.unidade.model.Unidade;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +51,44 @@ public class SubprocessoService {
     private final CompetenciaRepo competenciaRepo;
     private final SubprocessoMapper subprocessoMapper;
     private final sgc.mapa.model.MapaRepo mapaRepo;
+    private final MovimentacaoRepo repositorioMovimentacao;
+    private final AnaliseService analiseService;
+    private final ConhecimentoMapper conhecimentoMapper;
+    private final UsuarioService usuarioService;
+    private final SubprocessoPermissoesService subprocessoPermissoesService;
+    private final SubprocessoDetalheMapper subprocessoDetalheMapper;
+    private final MapaAjusteMapper mapaAjusteMapper;
+
+    /**
+     * Busca e retorna um subprocesso pelo seu código.
+     *
+     * @param codigo O código do subprocesso.
+     * @return A entidade {@link Subprocesso} correspondente.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
+     */
+    public Subprocesso buscarSubprocesso(Long codigo) {
+        return repositorioSubprocesso
+                .findById(codigo)
+                .orElseThrow(
+                        () -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
+    }
+
+    /**
+     * Busca e retorna um subprocesso pelo seu código, garantindo que ele possua um mapa de
+     * competências associado.
+     *
+     * @param codigo O código do subprocesso.
+     * @return A entidade {@link Subprocesso} correspondente.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado ou se não possuir um
+     *                                   mapa associado.
+     */
+    public Subprocesso buscarSubprocessoComMapa(Long codigo) {
+        Subprocesso subprocesso = buscarSubprocesso(codigo);
+        if (subprocesso.getMapa() == null) {
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+        }
+        return subprocesso;
+    }
 
     @Transactional(readOnly = true)
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
@@ -93,7 +143,7 @@ public class SubprocessoService {
      * @return DTO com informações básicas de status.
      */
     @Transactional(readOnly = true)
-    public SubprocessoSituacaoDto obterSituacao(Long codSubprocesso) {
+    public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso
                 .findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
@@ -258,5 +308,204 @@ public class SubprocessoService {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo);
         }
         repositorioSubprocesso.deleteById(codigo);
+    }
+
+    // --- Methods migrated from SubprocessoDtoService ---
+
+    @Transactional(readOnly = true)
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
+        log.debug("Obtendo detalhes para o subprocesso {}", codigo);
+        if (perfil == null) {
+            log.warn("Perfil inválido para acesso aos detalhes do subprocesso.");
+            throw new ErroAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
+        }
+
+        Subprocesso sp = buscarSubprocesso(codigo);
+        log.debug("Subprocesso encontrado: {}", sp.getCodigo());
+
+        Usuario usuario = obterUsuarioAutenticado();
+
+        verificarPermissaoVisualizacao(sp, perfil, usuario);
+        Usuario responsavel = usuarioService.buscarResponsavelVigente(sp.getUnidade().getSigla());
+
+        Usuario titular = null;
+        if (sp.getUnidade() != null && sp.getUnidade().getTituloTitular() != null) {
+            try {
+                titular = usuarioService.buscarUsuarioPorLogin(sp.getUnidade().getTituloTitular());
+            } catch (Exception e) {
+                log.warn("Erro ao buscar titular da unidade: {}", e.getMessage());
+            }
+        }
+
+        List<Movimentacao> movimentacoes = repositorioMovimentacao
+                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+
+        SubprocessoPermissoesDto permissoes = subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+        log.debug("Permissões calculadas: {}", permissoes);
+
+        return subprocessoDetalheMapper.toDto(sp, responsavel, titular, movimentacoes, permissoes);
+    }
+
+    private void verificarPermissaoVisualizacao(Subprocesso sp, Perfil perfil, Usuario usuario) {
+        boolean hasPerfil = usuario.getTodasAtribuicoes().stream().anyMatch(a -> a.getPerfil() == perfil);
+
+        if (!hasPerfil) {
+            log.warn("Usuário não possui o perfil sSolicitado.");
+            throw new ErroAccessoNegado("Perfil inválido para o usuário.");
+        }
+        if (perfil == Perfil.ADMIN) return;
+
+        Unidade unidadeAlvo = sp.getUnidade();
+        if (unidadeAlvo == null) throw new ErroAccessoNegado("Unidade não identificada.");
+
+        boolean hasPermission = usuario.getTodasAtribuicoes().stream()
+                .filter(a -> a.getPerfil() == perfil)
+                .anyMatch(a -> {
+                    Unidade unidadeUsuario = a.getUnidade();
+                    if (perfil == Perfil.GESTOR) {
+                        return isMesmaUnidadeOuSubordinada(unidadeAlvo, unidadeUsuario);
+                    } else if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
+                        return unidadeAlvo.getCodigo().equals(unidadeUsuario.getCodigo());
+                    }
+                    return false;
+                });
+
+        if (!hasPermission) throw new ErroAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
+    }
+
+    private boolean isMesmaUnidadeOuSubordinada(Unidade alvo, Unidade superior) {
+        sgc.unidade.model.Unidade atual = alvo;
+        while (atual != null) {
+            if (atual.getCodigo().equals(superior.getCodigo())) {
+                return true;
+            }
+            atual = atual.getUnidadeSuperior();
+        }
+        return false;
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
+        if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {
+            List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
+            if (atividades == null) atividades = emptyList();
+
+            for (Atividade a : atividades) {
+                List<Conhecimento> ks = a.getConhecimentos();
+                List<ConhecimentoDto> ksDto = ks == null ? emptyList() : ks.stream().map(conhecimentoMapper::toDto).toList();
+
+                atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
+                        .codigo(a.getCodigo())
+                        .descricao(a.getDescricao())
+                        .conhecimentos(ksDto)
+                        .build());
+            }
+        }
+
+        return SubprocessoCadastroDto.builder()
+                .subprocessoCodigo(sp.getCodigo())
+                .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
+                .atividades(atividadesComConhecimentos)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public SugestoesDto obterSugestoes(Long codSubprocesso) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        return SugestoesDto.of(sp);
+    }
+
+    @Transactional(readOnly = true)
+    public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
+        Subprocesso sp = buscarSubprocessoComMapa(codSubprocesso);
+
+        Long codMapa = sp.getMapa().getCodigo();
+
+        Analise analise = analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream()
+                .findFirst()
+                .orElse(null);
+
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
+        List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
+
+        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SubprocessoDto> listar() {
+        return repositorioSubprocesso.findAll().stream().map(subprocessoMapper::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
+        Subprocesso sp = repositorioSubprocesso
+                .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o processo %d e unidade %d".formatted(codProcesso, codUnidade)));
+        return subprocessoMapper.toDTO(sp);
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Usuario usuario = obterUsuarioAutenticado();
+        return subprocessoPermissoesService.calcularPermissoes(sp, usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
+        log.debug("Validando cadastro para disponibilização. Subprocesso: {}", codSubprocesso);
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
+        List<ErroValidacaoDto> erros = new ArrayList<>();
+
+        if (sp.getMapa() == null) {
+            return ValidacaoCadastroDto.builder()
+                    .valido(false)
+                    .erros(List.of(ErroValidacaoDto.builder()
+                            .tipo("MAPA_INEXISTENTE")
+                            .mensagem("O subprocesso não possui um mapa associado.")
+                            .build()))
+                    .build();
+        }
+
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigoWithConhecimentos(sp.getMapa().getCodigo());
+
+        if (atividades == null || atividades.isEmpty()) {
+            erros.add(ErroValidacaoDto.builder()
+                    .tipo("SEM_ATIVIDADES")
+                    .mensagem("O mapa não possui atividades cadastradas.")
+                    .build());
+        } else {
+            for (Atividade atividade : atividades) {
+                // Valida se tem conhecimentos
+                long qtdConhecimentos = atividade.getConhecimentos() == null ? 0 : atividade.getConhecimentos().size();
+                if (qtdConhecimentos == 0) {
+                    erros.add(ErroValidacaoDto.builder()
+                            .tipo("ATIVIDADE_SEM_CONHECIMENTO")
+                            .atividadeCodigo(atividade.getCodigo())
+                            .descricaoAtividade(atividade.getDescricao())
+                            .mensagem("Esta atividade não possui conhecimentos associados.")
+                            .build());
+                }
+            }
+        }
+
+        return ValidacaoCadastroDto.builder()
+                .valido(erros.isEmpty())
+                .erros(erros)
+                .build();
+    }
+
+    private Usuario obterUsuarioAutenticado() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new ErroAccessoNegado("Usuário não autenticado.");
+        }
+        String username = authentication.getName();
+        return usuarioService.buscarUsuarioPorLogin(username);
     }
 }

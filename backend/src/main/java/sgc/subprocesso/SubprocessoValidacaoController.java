@@ -14,7 +14,7 @@ import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.TipoAnalise;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    private final SubprocessoDtoService subprocessoDtoService;
+    private final SubprocessoService subprocessoService;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
 
@@ -102,7 +102,7 @@ public class SubprocessoValidacaoController {
     @GetMapping("/{codigo}/sugestoes")
     @PreAuthorize("isAuthenticated()")
     public SugestoesDto obterSugestoes(@PathVariable Long codigo) {
-        return subprocessoDtoService.obterSugestoes(codigo);
+        return subprocessoService.obterSugestoes(codigo);
     }
 
     /**

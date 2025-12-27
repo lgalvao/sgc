@@ -20,7 +20,6 @@ import sgc.usuario.UsuarioService;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
 
@@ -38,7 +37,6 @@ public class SubprocessoCadastroController {
     private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
     private final SubprocessoService subprocessoService;
-    private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoCadastroWorkflowService subprocessoWorkflowService;
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
@@ -142,7 +140,7 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/cadastro")
     @PreAuthorize("isAuthenticated()")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {
-        return subprocessoDtoService.obterCadastro(codigo);
+        return subprocessoService.obterCadastro(codigo);
     }
 
     /**

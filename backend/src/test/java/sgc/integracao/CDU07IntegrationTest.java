@@ -25,7 +25,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.usuario.model.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -55,7 +55,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
-    private SubprocessoDtoService subprocessoDtoService;
+    private SubprocessoService subprocessoService;
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
@@ -254,7 +254,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
         void falhaSubprocessoInexistente() {
             assertThrows(
                     ErroEntidadeNaoEncontrada.class,
-                    () -> subprocessoDtoService.obterDetalhes(99999L, Perfil.ADMIN, null));
+                    () -> subprocessoService.obterDetalhes(99999L, Perfil.ADMIN, null));
         }
     }
 }

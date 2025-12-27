@@ -24,8 +24,6 @@ import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 import tools.jackson.databind.ObjectMapper;
@@ -53,11 +51,7 @@ class SubprocessoMapaControllerTest {
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
     @MockitoBean
-    private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean
     private SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    @MockitoBean
-    private SubprocessoConsultaService subprocessoConsultaService;
     @MockitoBean
     private UsuarioService usuarioService;
     @MockitoBean
@@ -92,7 +86,7 @@ class SubprocessoMapaControllerTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
-        when(subprocessoConsultaService.getSubprocessoComMapa(1L)).thenReturn(sp);
+        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
@@ -131,7 +125,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("obterMapaParaAjuste")
     @WithMockUser
     void obterMapaParaAjuste() throws Exception {
-        when(subprocessoDtoService.obterMapaParaAjuste(1L))
+        when(subprocessoService.obterMapaParaAjuste(1L))
                 .thenReturn(MapaAjusteDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste")).andExpect(status().isOk());
@@ -160,7 +154,7 @@ class SubprocessoMapaControllerTest {
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
 
-        when(subprocessoConsultaService.getSubprocessoComMapa(1L)).thenReturn(sp);
+        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
         when(mapaService.obterMapaCompleto(10L, 1L)).thenReturn(new MapaCompletoDto());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());

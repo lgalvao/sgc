@@ -14,7 +14,6 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
 
@@ -33,8 +32,6 @@ class SubprocessoCrudControllerTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean
-    private SubprocessoDtoService subprocessoDtoService;
-    @MockitoBean
     private UnidadeService unidadeService;
 
     @Autowired
@@ -44,7 +41,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("listar deve retornar lista de subprocessos")
     @WithMockUser(roles = "ADMIN")
     void listar() throws Exception {
-        when(subprocessoDtoService.listar()).thenReturn(List.of(new SubprocessoDto()));
+        when(subprocessoService.listar()).thenReturn(List.of(new SubprocessoDto()));
 
         mockMvc.perform(get("/api/subprocessos"))
                 .andExpect(status().isOk())
@@ -56,7 +53,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("obterPorCodigo deve retornar detalhe")
     @WithMockUser
     void obterPorCodigo() throws Exception {
-        when(subprocessoDtoService.obterDetalhes(eq(1L), any(), any()))
+        when(subprocessoService.obterDetalhes(eq(1L), any(), any()))
                 .thenReturn(SubprocessoDetalheDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1")).andExpect(status().isOk());
@@ -69,7 +66,7 @@ class SubprocessoCrudControllerTest {
         UnidadeDto uDto = UnidadeDto.builder().codigo(10L).build();
 
         when(unidadeService.buscarPorSigla("U1")).thenReturn(uDto);
-        when(subprocessoDtoService.obterPorProcessoEUnidade(1L, 10L))
+        when(subprocessoService.obterPorProcessoEUnidade(1L, 10L))
                 .thenReturn(new SubprocessoDto());
 
         mockMvc.perform(

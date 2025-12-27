@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.service.UnidadeService;
 
@@ -22,7 +21,6 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCrudController {
     private final SubprocessoService subprocessoService;
-    private final SubprocessoDtoService subprocessoDtoService;
     private final UnidadeService unidadeService;
 
     /**
@@ -34,7 +32,7 @@ public class SubprocessoCrudController {
     @GetMapping("/{codigo}/permissoes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
-        SubprocessoPermissoesDto permissoes = subprocessoDtoService.obterPermissoes(codigo);
+        SubprocessoPermissoesDto permissoes = subprocessoService.obterPermissoes(codigo);
         return ResponseEntity.ok(permissoes);
     }
 
@@ -42,14 +40,14 @@ public class SubprocessoCrudController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoDtoService.validarCadastro(codigo));
+        return ResponseEntity.ok(subprocessoService.validarCadastro(codigo));
     }
 
     @GetMapping("/{codigo}/status")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoDtoService.obterStatus(codigo));
+        return ResponseEntity.ok(subprocessoService.obterStatus(codigo));
     }
 
     /**
@@ -61,7 +59,7 @@ public class SubprocessoCrudController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoDto> listar() {
-        return subprocessoDtoService.listar();
+        return subprocessoService.listar();
     }
 
     /**
@@ -78,7 +76,7 @@ public class SubprocessoCrudController {
             @PathVariable Long codigo,
             @RequestParam(required = false) sgc.usuario.model.Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoDtoService.obterDetalhes(codigo, perfil, unidadeUsuario);
+        return subprocessoService.obterDetalhes(codigo, perfil, unidadeUsuario);
     }
 
     /**
@@ -94,7 +92,7 @@ public class SubprocessoCrudController {
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
         SubprocessoDto dto =
-                subprocessoDtoService.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
+                subprocessoService.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(dto);
     }
 

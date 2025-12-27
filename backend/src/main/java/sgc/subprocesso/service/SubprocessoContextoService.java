@@ -20,8 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubprocessoContextoService {
 
-    private final SubprocessoDtoService subprocessoDtoService;
-    private final SubprocessoConsultaService subprocessoConsultaService;
     private final UsuarioService usuarioService;
     private final MapaService mapaService;
     private final SubprocessoService subprocessoService;
@@ -29,7 +27,7 @@ public class SubprocessoContextoService {
     @Transactional(readOnly = true)
     public ContextoEdicaoDto obterContextoEdicao(Long codSubprocesso, Perfil perfil, Long codUnidadeUsuario) {
         // 1. Obter Detalhes do Subprocesso (já inclui validação de permissão)
-        SubprocessoDetalheDto subprocessoDto = subprocessoDtoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario);
+        SubprocessoDetalheDto subprocessoDto = subprocessoService.obterDetalhes(codSubprocesso, perfil, codUnidadeUsuario);
 
         // 2. Obter Unidade
         String siglaUnidade = subprocessoDto.getUnidade().getSigla();
@@ -38,7 +36,7 @@ public class SubprocessoContextoService {
 
         // 3. Obter Mapa Completo (se existir)
         MapaCompletoDto mapaDto = null;
-        Subprocesso subprocesso = subprocessoConsultaService.getSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
         if (subprocesso.getMapa() != null) {
             mapaDto = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
         }

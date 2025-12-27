@@ -47,6 +47,8 @@ class SubprocessoCadastroWorkflowServiceTest {
     private SubprocessoService subprocessoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
+    @Mock
+    private SubprocessoWorkflowExecutor workflowExecutor;
 
     @InjectMocks
     private SubprocessoCadastroWorkflowService service;
@@ -177,16 +179,21 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.devolverCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao())
-                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        verify(analiseService).criarAnalise(any());
-        verify(transicaoService).registrar(
+        assertThat(sp.getDataFimEtapa1()).isNull();
+
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
                 eq(TipoTransicao.CADASTRO_DEVOLVIDO),
-                any(Unidade.class),
-                any(Unidade.class),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
                 eq(user),
-                eq("obs"));
+                eq("obs"),
+                eq(null)
+        );
     }
 
     // --- Aceitar Cadastro ---
@@ -207,15 +214,19 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.aceitarCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao())
-                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        verify(transicaoService).registrar(
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
                 eq(TipoTransicao.CADASTRO_ACEITO),
-                eq(u),
-                eq(sup),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
                 eq(user),
-                eq("obs"));
+                eq("obs"),
+                eq(null)
+        );
     }
 
     @Test
@@ -297,14 +308,21 @@ class SubprocessoCadastroWorkflowServiceTest {
         
         service.devolverRevisaoCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        verify(transicaoService).registrar(
+        assertThat(sp.getDataFimEtapa1()).isNull();
+
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO),
                 eq(TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA),
-                eq(sup),
-                eq(u),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
                 eq(user),
-                eq("obs"));
+                eq("obs"),
+                eq(null)
+        );
     }
 
     // --- Aceitar Revisão Cadastro ---
@@ -330,15 +348,19 @@ class SubprocessoCadastroWorkflowServiceTest {
         
         service.aceitarRevisaoCadastro(id, "obs", user);
 
-        assertThat(sp.getSituacao())
-                .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(transicaoService).registrar(
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA),
                 eq(TipoTransicao.REVISAO_CADASTRO_ACEITA),
-                eq(sup),
+                any(),
+                any(),
+                any(),
+                any(),
                 any(),
                 eq(user),
-                eq("obs"));
+                eq("obs"),
+                eq(null)
+        );
     }
 
     // --- Homologar Revisão Cadastro ---

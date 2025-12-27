@@ -109,39 +109,33 @@ public class SubprocessoCadastroWorkflowService {
         }
     }
 
+    private final SubprocessoWorkflowExecutor workflowExecutor;
+
     @Transactional
     public void devolverCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
-        if (unidadeSuperior == null) {
+        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeAnalise == null) {
             throw new IllegalStateException(
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
-        analiseService.criarAnalise(
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(observacoes)
-                        .tipo(TipoAnalise.CADASTRO)
-                        .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                        .siglaUnidade(unidadeSuperior.getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .build());
-
-        Unidade unidadeDevolucao = sp.getUnidade();
-
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
-        repositorioSubprocesso.save(sp);
 
-        transicaoService.registrar(
+        workflowExecutor.registrarAnaliseETransicao(
                 sp,
+                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 TipoTransicao.CADASTRO_DEVOLVIDO,
-                unidadeSuperior,
-                unidadeDevolucao,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                unidadeAnalise,
+                unidadeAnalise, // Origin: Superior
+                sp.getUnidade(), // Destination: Operational
                 usuario,
-                observacoes);
+                observacoes,
+                null
+        );
     }
 
     @Transactional
@@ -155,27 +149,19 @@ public class SubprocessoCadastroWorkflowService {
                     "Não foi possível identificar a unidade superior para enviar a análise.");
         }
 
-        analiseService.criarAnalise(
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(observacoes)
-                        .tipo(TipoAnalise.CADASTRO)
-                        .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                        .siglaUnidade(unidadeDestino.getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .motivo(null)
-                        .build());
-
-        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        repositorioSubprocesso.save(sp);
-
-        transicaoService.registrar(
+        workflowExecutor.registrarAnaliseETransicao(
                 sp,
+                MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                 TipoTransicao.CADASTRO_ACEITO,
-                unidadeOrigem,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                 unidadeDestino,
+                unidadeOrigem, // Origin: Operational
+                unidadeDestino, // Destination: Superior
                 usuario,
-                observacoes);
+                observacoes,
+                null
+        );
     }
 
     @Transactional
@@ -224,29 +210,21 @@ public class SubprocessoCadastroWorkflowService {
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
-        analiseService.criarAnalise(
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(observacoes)
-                        .tipo(TipoAnalise.CADASTRO)
-                        .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-                        .siglaUnidade(unidadeAnalise.getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .build());
-
-        Unidade unidadeDestino = sp.getUnidade();
-        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
 
-        repositorioSubprocesso.save(sp);
-        
-        transicaoService.registrar(
+        workflowExecutor.registrarAnaliseETransicao(
                 sp,
+                REVISAO_CADASTRO_EM_ANDAMENTO,
                 TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.DEVOLUCAO_REVISAO,
                 unidadeAnalise,
-                unidadeDestino,
+                unidadeAnalise, // Origin: Superior
+                sp.getUnidade(), // Destination: Operational
                 usuario,
-                observacoes);
+                observacoes,
+                null
+        );
     }
 
     @Transactional
@@ -265,32 +243,24 @@ public class SubprocessoCadastroWorkflowService {
                     "Unidade superior não encontrada para o subprocesso " + codSubprocesso);
         }
 
-        analiseService.criarAnalise(
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(observacoes)
-                        .tipo(TipoAnalise.CADASTRO)
-                        .acao(TipoAcaoAnalise.ACEITE_REVISAO)
-                        .siglaUnidade(unidadeAnalise.getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .motivo(null)
-                        .build());
-
         Unidade unidadeDestino =
                 unidadeAnalise.getUnidadeSuperior() != null
                         ? unidadeAnalise.getUnidadeSuperior()
                         : unidadeAnalise;
 
-        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
-        repositorioSubprocesso.save(sp);
-
-        transicaoService.registrar(
+        workflowExecutor.registrarAnaliseETransicao(
                 sp,
+                REVISAO_CADASTRO_DISPONIBILIZADA,
                 TipoTransicao.REVISAO_CADASTRO_ACEITA,
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.ACEITE_REVISAO,
                 unidadeAnalise,
-                unidadeDestino,
+                unidadeAnalise, // Origin: Superior (who accepted)
+                unidadeDestino, // Destination: Next Superior or same?
                 usuario,
-                observacoes);
+                observacoes,
+                null
+        );
     }
 
     @Transactional
