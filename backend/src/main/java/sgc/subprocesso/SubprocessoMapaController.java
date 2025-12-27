@@ -33,9 +33,7 @@ public class SubprocessoMapaController {
     private final MapaService mapaService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
-    private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
-    private final SubprocessoConsultaService subprocessoConsultaService;
     private final UsuarioService usuarioService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoContextoService subprocessoContextoService;
@@ -92,7 +90,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
     public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
+        Subprocesso subprocesso = subprocessoService.buscarSubprocessoComMapa(codigo);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
     }
 
@@ -155,7 +153,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-ajuste")
     @PreAuthorize("hasRole('ADMIN')")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
-        return subprocessoDtoService.obterMapaParaAjuste(codigo);
+        return subprocessoService.obterMapaParaAjuste(codigo);
     }
 
     /**
@@ -186,7 +184,7 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
+        Subprocesso subprocesso = subprocessoService.buscarSubprocessoComMapa(codigo);
         MapaCompletoDto mapa =
                 mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);

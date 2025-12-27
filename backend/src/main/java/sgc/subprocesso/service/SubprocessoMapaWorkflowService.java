@@ -265,46 +265,47 @@ public class SubprocessoMapaWorkflowService {
                 usuario);
     }
 
+    private final SubprocessoWorkflowExecutor workflowExecutor;
+
     @Transactional
     public void devolverValidacao(Long codSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        analiseService.criarAnalise(
-                CriarAnaliseRequest.builder()
-                        .codSubprocesso(codSubprocesso)
-                        .observacoes(justificativa)
-                        .tipo(TipoAnalise.VALIDACAO)
-                        .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                        .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
-                        .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
-                        .motivo(justificativa)
-                        .build());
-
-        Unidade unidadeDevolucao = sp.getUnidade();
-
-        if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-            sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        } else {
-            sp.setSituacao(REVISAO_MAPA_DISPONIBILIZADO);
-        }
+        SituacaoSubprocesso novaSituacao = sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO
+                ? MAPEAMENTO_MAPA_DISPONIBILIZADO
+                : REVISAO_MAPA_DISPONIBILIZADO;
 
         sp.setDataFimEtapa2(null);
-        subprocessoRepo.save(sp);
 
-        transicaoService.registrar(
+        workflowExecutor.registrarAnaliseETransicao(
                 sp,
+                novaSituacao,
                 TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
-                sp.getUnidade().getUnidadeSuperior(),
-                unidadeDevolucao,
+                TipoAnalise.VALIDACAO,
+                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                sp.getUnidade().getUnidadeSuperior(), // Analise
+                sp.getUnidade().getUnidadeSuperior(), // Origem da Transição
+                sp.getUnidade(), // Destino da Transição
                 usuario,
-                justificativa);
+                justificativa,
+                justificativa
+        );
     }
 
     @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
 
-        analiseService.criarAnalise(
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        Unidade proximaUnidade =
+                unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
+
+        // Se não tem próxima unidade (é o topo ou estrutura rasa), homologar direto
+
+        if (proximaUnidade == null) {
+            // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
+
+            analiseService.criarAnalise(
                 CriarAnaliseRequest.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
@@ -315,31 +316,31 @@ public class SubprocessoMapaWorkflowService {
                         .motivo(null)
                         .build());
 
-        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
-        Unidade proximaUnidade =
-                unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
-
-        if (proximaUnidade == null) {
             if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
                 sp.setSituacao(MAPEAMENTO_MAPA_HOMOLOGADO);
             } else {
                 sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
             }
             subprocessoRepo.save(sp);
+            // Sem transição registrada no código original para este caso.
         } else {
-            if (sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
-                sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
-            } else {
-                sp.setSituacao(REVISAO_MAPA_VALIDADO);
-            }
-            subprocessoRepo.save(sp);
+            SituacaoSubprocesso novaSituacao = sp.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO
+                    ? MAPEAMENTO_MAPA_VALIDADO
+                    : REVISAO_MAPA_VALIDADO;
 
-            transicaoService.registrar(
+            workflowExecutor.registrarAnaliseETransicao(
                     sp,
+                    novaSituacao,
                     TipoTransicao.MAPA_VALIDACAO_ACEITA,
-                    unidadeSuperior,
-                    proximaUnidade,
-                    usuario);
+                    TipoAnalise.VALIDACAO,
+                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                    unidadeSuperior, // Analise
+                    unidadeSuperior, // Origem
+                    proximaUnidade, // Destino
+                    usuario,
+                    "Aceite da validação",
+                    null
+            );
         }
     }
 

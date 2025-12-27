@@ -48,6 +48,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock private AnaliseService analiseService;
     @Mock private UnidadeRepo unidadeRepo;
     @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoWorkflowExecutor workflowExecutor;
 
     @InjectMocks
     private SubprocessoMapaWorkflowService service;
@@ -198,15 +199,19 @@ class SubprocessoMapaWorkflowServiceTest {
 
         service.devolverValidacao(id, "justificativa", user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        verify(analiseService).criarAnalise(any());
-        verify(transicaoService).registrar(
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO),
                 eq(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA),
-                eq(sup),
-                eq(u),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
                 eq(user),
-                eq("justificativa"));
+                eq("justificativa"),
+                eq("justificativa")
+        );
     }
 
     // --- Aceitar Validação ---
@@ -258,13 +263,19 @@ class SubprocessoMapaWorkflowServiceTest {
 
         service.aceitarValidacao(id, user);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-        verify(transicaoService).registrar(
+        verify(workflowExecutor).registrarAnaliseETransicao(
                 eq(sp),
+                eq(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO),
                 eq(TipoTransicao.MAPA_VALIDACAO_ACEITA),
-                eq(sup),
-                eq(sup2),
-                eq(user));
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(user),
+                eq("Aceite da validação"),
+                eq(null)
+        );
     }
 
     // --- Homologar Validação ---

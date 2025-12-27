@@ -226,7 +226,7 @@ public class AtividadeController {
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto status = subprocessoService.obterSituacao(codSubprocesso);
+        SubprocessoSituacaoDto status = subprocessoService.obterStatus(codSubprocesso);
         AtividadeVisualizacaoDto atividadeVis = null;
         if (incluirAtividade) {
             atividadeVis = subprocessoService.listarAtividadesSubprocesso(codSubprocesso)
