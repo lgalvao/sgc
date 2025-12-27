@@ -55,6 +55,7 @@ public class ConfigSeguranca {
                         .anyRequest()
                         .permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                // Desabilita CSRF pois a API é stateless e usa JWTs via header, sem cookies de sessão
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)

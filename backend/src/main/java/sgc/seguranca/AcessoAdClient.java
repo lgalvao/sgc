@@ -21,7 +21,7 @@ public class AcessoAdClient {
             
             log.debug("Autenticando usuário {} na API do AD", titulo);
             
-            String response = acessoAdRestClient.post()
+            acessoAdRestClient.post()
                     .uri("/auth/autenticar")
                     .body(request)
                     .retrieve()
@@ -33,7 +33,8 @@ public class AcessoAdClient {
                         })
                     .body(String.class);
 
-            log.info("Usuário {} autenticado com sucesso no AD. Resposta: {}", titulo, response);
+            // SENTINEL: Log apenas do sucesso, sem expor o corpo da resposta que pode conter dados sensíveis
+            log.info("Usuário {} autenticado com sucesso no AD.", titulo);
             return true;
         } catch (ErroAutenticacao e) {
             throw e;

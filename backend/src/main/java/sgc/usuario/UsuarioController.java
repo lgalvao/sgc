@@ -1,10 +1,12 @@
 package sgc.usuario;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sgc.seguranca.LimitadorTentativasLogin;
 import sgc.seguranca.dto.*;
 import sgc.usuario.dto.*;
 import sgc.usuario.model.Perfil;
@@ -18,6 +20,7 @@ import java.util.List;
 @Slf4j
 public class UsuarioController {
     private final UsuarioService usuarioService;
+    private final LimitadorTentativasLogin limitadorTentativasLogin;
 
     /**
      * Busca um usuário pelo título de eleitor.
@@ -40,7 +43,16 @@ public class UsuarioController {
      * false} caso contrário.
      */
     @PostMapping("/autenticar")
-    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request) {
+    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request, HttpServletRequest httpRequest) {
+        String ip = httpRequest.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = httpRequest.getRemoteAddr();
+        } else {
+            // Pega o primeiro IP da lista (client original)
+            ip = ip.split(",")[0].trim();
+        }
+
+        limitadorTentativasLogin.verificar(ip);
         boolean autenticado = usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
         return ResponseEntity.ok(autenticado);
     }
