@@ -177,7 +177,7 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
 
     // Evitar rodar em todo o projeto inicialmente (muito custoso)
     // Definiremos classes alvo via linha de comando ou perfis, mas aqui fica o padrão seguro
-    targetClasses.set(setOf("sgc.mapa.*"))
+    targetClasses.set(setOf("sgc.seguranca.*", "sgc.usuario.*"))
 
     // Excluir classes que não devem ser mutadas (Configurações, DTOs, Exceções, etc.)
     excludedClasses.set(setOf(
