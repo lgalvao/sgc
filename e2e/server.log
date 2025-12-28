@@ -1,4 +1,7 @@
-[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m360[22m[2m[0m ms[22m
+[BACKEND] Calculating task graph as no cached configuration is available for tasks: bootRun --args=--spring.profiles.active=e2e
+[BACKEND] Perfil Spring ativado: test
+[BACKEND] Carregando configurações de: .env.test
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m450[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
 [BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
