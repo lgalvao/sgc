@@ -41,6 +41,7 @@ playwright-report/
 screenshots/
 e2e/server.log
 /dados/
+accessibility-report.html
 
 Reports de testes
 backend/build/reports/tests/test/index.html
