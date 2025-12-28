@@ -56,6 +56,24 @@ class UsuarioServiceTest {
         }
 
         @Test
+        @DisplayName("Deve buscar entidade usuário por login garantindo inicialização")
+        void deveBuscarEntidadeUsuarioPorLogin() {
+            // Act
+            var usuario = usuarioService.buscarUsuarioPorLogin(TITULO_ADMIN);
+
+            // Assert
+            assertNotNull(usuario);
+            assertEquals(TITULO_ADMIN, usuario.getTituloEleitoral());
+
+            // Verifica se a coleção foi inicializada (não deve lançar LazyInitializationException)
+            assertDoesNotThrow(() -> {
+                 if (usuario.getAtribuicoesTemporarias() != null) {
+                     usuario.getAtribuicoesTemporarias().size();
+                 }
+            });
+        }
+
+        @Test
         @DisplayName("Deve buscar usuário por email")
         void deveBuscarUsuarioPorEmail() {
             // Act

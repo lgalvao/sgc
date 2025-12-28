@@ -62,4 +62,28 @@ class LimitadorTentativasLoginTest {
         // ip2 deve continuar livre
         assertDoesNotThrow(() -> limitador.verificar(ip2));
     }
+
+    @Test
+    void naoDeveBloquearSePerfilDeTesteEstiverAtivo() {
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
+
+        String ip = "192.168.1.4";
+
+        // Com perfil 'test', não deve bloquear nunca
+        IntStream.range(0, 10).forEach(i ->
+            assertDoesNotThrow(() -> limitador.verificar(ip))
+        );
+    }
+
+    @Test
+    void naoDeveBloquearSePerfilE2eEstiverAtivo() {
+        when(environment.getActiveProfiles()).thenReturn(new String[]{"e2e"});
+
+        String ip = "192.168.1.5";
+
+        // Com perfil 'e2e', não deve bloquear nunca
+        IntStream.range(0, 10).forEach(i ->
+            assertDoesNotThrow(() -> limitador.verificar(ip))
+        );
+    }
 }

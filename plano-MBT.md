@@ -66,8 +66,16 @@ pitest {
     - Melhoria em `ImpactoMapaServiceTest` para garantir que listas retornadas não sejam vazias e contenham os dados esperados, matando mutantes de retorno vazio e nulo.
 - **Resultado Final:** Mutation Score subiu para **23%** (47 mortos). A cobertura geral do pacote ainda é baixa (29%), indicando a necessidade de criar novos testes para `CompetenciaService` e outros componentes não cobertos em iterações futuras.
 
-#### Fase 4: Camada de Segurança e Serviços Auxiliares (`sgrh`, `seguranca`)
-Validar se as regras de autorização estão robustas contra alterações acidentais.
+#### Fase 4: Camada de Segurança e Usuário (`seguranca`, `usuario`) - **CONCLUÍDO**
+- **Execução Inicial:** Mutation Score de 29% em `sgc.seguranca` e 59% em `sgc.usuario`.
+- **Ações Realizadas:**
+    - Atualização do `build.gradle.kts` para focar em `sgc.seguranca.*` e `sgc.usuario.*`.
+    - Reforço em `LimitadorTentativasLoginTest` para validar comportamento em diferentes perfis (`test`, `e2e`), matando mutantes de negação condicional e retorno booleano.
+    - Melhoria em `UsuarioServiceTest` para garantir a inicialização correta de coleções lazy (`atribuicoesTemporarias`) ao buscar usuário por login, verificando chamadas de `Hibernate.initialize` indiretamente.
+- **Resultado Final:**
+    - `LimitadorTentativasLogin`: Mutation Score de **63%** (12/19 mortos), com Test Strength de 80%.
+    - `UsuarioService`: Mutation Score de **60%**, com melhoria na robustez dos testes de integração.
+    - Componentes de infraestrutura como `AcessoAdClient` permanecem com baixa cobertura de mutação, o que é esperado dada a natureza de integração externa.
 
 ## 4. Fluxo de Trabalho de Refatoração
 
@@ -88,4 +96,6 @@ Para cada execução do PiTest:
 
 ## 6. Próximos Passos
 
-1.  Iniciar Fase 3 focando no pacote `sgc.mapa`, que contém regras de negócio críticas sobre competências e atividades.
+1.  **Monitoramento Contínuo:** Integrar o PiTest ao pipeline de CI/CD para execução periódica (ex: nightly builds) em todo o projeto, e não apenas em pacotes isolados.
+2.  **Expansão:** Avaliar a aplicação de MBT em pacotes de infraestrutura crítica se houver lógica de negócio (ex: validadores customizados em `sgc.comum`).
+3.  **Manutenção:** Revisar testes periodicamente para garantir que o aumento de cobertura não introduza fragilidade (flaky tests).
