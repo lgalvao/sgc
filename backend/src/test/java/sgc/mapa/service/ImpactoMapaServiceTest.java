@@ -236,12 +236,20 @@ class ImpactoMapaServiceTest {
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
             when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSubprocesso));
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(anyLong())).thenReturn(List.of());
+            // Simulate differences to ensure lists are processed and not empty return mutants
+            sgc.mapa.model.Atividade a1 = new sgc.mapa.model.Atividade();
+            a1.setCodigo(100L);
+            a1.setDescricao("Ativ 1");
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(1L)).thenReturn(List.of(a1));
+            when(atividadeRepo.findByMapaCodigoWithConhecimentos(2L)).thenReturn(List.of());
             when(competenciaRepo.findByMapaCodigo(anyLong())).thenReturn(List.of());
 
             ImpactoMapaDto resultado = impactoMapaService.verificarImpactos(1L, chefe);
 
             assertNotNull(resultado);
+            // Killing NullReturnValsMutator
+            assertNotNull(resultado.getAtividadesInseridas());
+            assertNotNull(resultado.getAtividadesRemovidas());
         }
     }
 }
