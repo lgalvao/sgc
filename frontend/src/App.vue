@@ -54,15 +54,15 @@ const shouldShowNavBarExtras = computed(() => {
     Pular para o conteúdo principal
   </a>
   <BOrchestrator/>
-  <div class="fixed-top w-100 d-flex justify-content-center mt-3" style="z-index: 2000; pointer-events: none;">
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 2050; pointer-events: none; max-width: 450px;">
     <BAlert
         v-model="feedbackStore.currentFeedback.show"
         :fade="false"
         :variant="feedbackStore.currentFeedback.variant"
-        class="shadow-sm"
+        class="shadow"
         data-testid="global-alert"
         dismissible
-        style="pointer-events: auto; min-width: 300px; max-width: 600px;"
+        style="pointer-events: auto;"
         @closed="feedbackStore.close()"
     >
       <h6 v-if="feedbackStore.currentFeedback.title" class="alert-heading fw-bold mb-1">

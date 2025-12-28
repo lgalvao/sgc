@@ -98,6 +98,8 @@
               :disabled="isFormInvalid || isLoading"
               data-testid="btn-processo-iniciar"
               variant="success"
+              class="opacity-100"
+              :class="{ 'opacity-50 cursor-not-allowed': isFormInvalid || isLoading }"
               @click="abrirModalConfirmacao"
           >
             <i class="bi bi-play-fill me-1"/> Iniciar processo
