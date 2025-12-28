@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.alerta.service.AlertaService;
+import sgc.alerta.AlertaService;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;

@@ -1,40 +1,171 @@
-[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m281[22m[2m[0m ms[22m
-[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
-[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 1 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 2 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_212
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 2 iniciado para 2 unidade(s).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 3 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 3 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 4 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_12
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 4 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 5 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_211
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 5 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_21 - Transição: CADASTRO_DISPONIBILIZADO
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 6 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_212
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 6 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 7 criado.
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade SECAO_121
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de mapeamento 7 iniciado para 1 unidade(s).
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
-[BACKEND] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
-[BACKEND] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:184 - Subprocesso 7 atualizado e mapa disponibilizado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 8 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 9 criado.
-[BACKEND] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:125 - Subprocesso para revisão criado para unidade ASSESSORIA_12
-[BACKEND] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:255 - E-mail enviado para unidade ASSESSORIA_12
-[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:97 - Processo de revisao 9 iniciado para 1 unidade(s).
-[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:51 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 10 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 11 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 12 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 13 criado.
-[BACKEND] INFO  s.p.service.ProcessoService.atualizar:217 - Processo 13 atualizado.
-[BACKEND] INFO  s.p.service.ProcessoService.criar:183 - Processo 14 criado.
+[BACKEND] Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 10%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 20%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 30%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 40%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 50%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 60%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 70%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 80%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 90%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 100%
+[BACKEND] Welcome to Gradle 9.2.1!
+[BACKEND] Here are the highlights of this release:
+[BACKEND]  - Windows ARM support
+[BACKEND]  - Improved publishing APIs
+[BACKEND]  - Better guidance for dependency verification failures
+[BACKEND] For more details see https://docs.gradle.org/9.2.1/release-notes.html
+[BACKEND] Calculating task graph as no cached configuration is available for tasks: bootRun --args=--spring.profiles.active=e2e
+[BACKEND] Perfil Spring ativado: test
+[BACKEND] Carregando configurações de: .env.test
+[BACKEND] ERROR o.s.boot.SpringApplication.reportFailure:863 - Application run failed
+[BACKEND] org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [sgc.Sgc]
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:196)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:446)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:310)
+[BACKEND] 	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+[BACKEND] 	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+[BACKEND] 	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:794)
+[BACKEND] 	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:602)
+[BACKEND] 	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
+[BACKEND] 	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
+[BACKEND] 	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
+[BACKEND] 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
+[BACKEND] 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
+[BACKEND] 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+[BACKEND] 	at sgc.Sgc.main(Sgc.java:11)
+[BACKEND] 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+[BACKEND] 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+[BACKEND] 	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52)
+[BACKEND] Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 'alertaService' for bean class [sgc.alerta.service.AlertaService] conflicts with existing, non-compatible bean definition of same name and class [sgc.alerta.AlertaService]
+[BACKEND] 	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:360)
+[BACKEND] 	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:287)
+[BACKEND] 	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:347)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:283)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:206)
+[BACKEND] 	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:174)
+[BACKEND] 	... 16 common frames omitted
+[BACKEND] BUILD SUCCESSFUL in 1m 49s
+[BACKEND] 4 actionable tasks: 4 executed
+[BACKEND] Configuration cache entry stored.

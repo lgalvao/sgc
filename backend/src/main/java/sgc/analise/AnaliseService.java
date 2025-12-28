@@ -10,7 +10,7 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.service.UnidadeService;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoRepo subprocessoRepo;
     private final UnidadeService unidadeService;
 
     /**
@@ -39,7 +39,9 @@ public class AnaliseService {
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
         // Verifica existência (lança exceção se não encontrar)
-        subprocessoService.buscarSubprocesso(codSubprocesso);
+        if (!subprocessoRepo.existsById(codSubprocesso)) {
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codSubprocesso);
+        }
 
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipoAnalise)
@@ -55,7 +57,8 @@ public class AnaliseService {
      */
     @Transactional
     public Analise criarAnalise(CriarAnaliseRequest req) {
-        Subprocesso sp = subprocessoService.buscarSubprocesso(req.getCodSubprocesso());
+        Subprocesso sp = subprocessoRepo.findById(req.getCodSubprocesso())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", req.getCodSubprocesso()));
 
         Unidade unidade = null;
         if (req.getSiglaUnidade() != null) {

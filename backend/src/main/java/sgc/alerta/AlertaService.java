@@ -2,6 +2,8 @@ package sgc.alerta;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
@@ -244,5 +246,23 @@ public class AlertaService {
                     .origem(dto.getOrigem())
                     .build();
         }).toList();
+    }
+
+    public Page<Alerta> listarPorUsuario(String usuarioTitulo, Pageable pageable) {
+        return repositorioAlerta.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable);
+    }
+
+    public Page<Alerta> listarPorUnidades(List<Long> unidadeIds, Pageable pageable) {
+        return repositorioAlerta.findByUnidadeDestino_CodigoIn(unidadeIds, pageable);
+    }
+
+    public Page<Alerta> listarTodos(Pageable pageable) {
+        return repositorioAlerta.findAll(pageable);
+    }
+
+    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
+        return alertaUsuarioRepo
+                .findById(new AlertaUsuario.Chave(codigoAlerta, usuarioTitulo))
+                .map(AlertaUsuario::getDataHoraLeitura);
     }
 }

@@ -1,0 +1,49 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+
+> Task :backend:compileJava FAILED
+/app/backend/src/main/java/sgc/painel/PainelService.java:13: error: package sgc.alerta.service does not exist
+import sgc.alerta.service.AlertaService;
+                         ^
+/app/backend/src/main/java/sgc/painel/PainelService.java:33: error: cannot find symbol
+    private final AlertaService alertaService;
+                  ^
+  symbol:   class AlertaService
+  location: class PainelService
+/app/backend/src/main/java/sgc/painel/PainelService.java:28: error: cannot find symbol
+@RequiredArgsConstructor
+^
+  symbol:   class AlertaService
+  location: class PainelService
+3 errors
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileJava'.
+> Compilation failed; see the compiler output below.
+  /app/backend/src/main/java/sgc/painel/PainelService.java:33: error: cannot find symbol
+      private final AlertaService alertaService;
+                    ^
+    symbol:   class AlertaService
+    location: class PainelService
+  /app/backend/src/main/java/sgc/painel/PainelService.java:28: error: cannot find symbol
+  @RequiredArgsConstructor
+  ^
+    symbol:   class AlertaService
+    location: class PainelService
+  /app/backend/src/main/java/sgc/painel/PainelService.java:13: error: package sgc.alerta.service does not exist
+  import sgc.alerta.service.AlertaService;
+                           ^
+  3 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2s
+3 actionable tasks: 1 executed, 2 up-to-date
+Configuration cache entry reused.

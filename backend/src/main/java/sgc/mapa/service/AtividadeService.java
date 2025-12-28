@@ -17,8 +17,9 @@ import sgc.mapa.model.MapaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.usuario.UsuarioService;
-import sgc.subprocesso.service.SubprocessoService;
-import org.springframework.context.annotation.Lazy;
+import sgc.subprocesso.model.SubprocessoRepo;
+import org.springframework.context.ApplicationEventPublisher;
+import sgc.mapa.evento.EventoMapaAlterado;
 
 import java.util.List;
 
@@ -35,9 +36,9 @@ public class AtividadeService {
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoRepo conhecimentoRepo;
     private final ConhecimentoMapper conhecimentoMapper;
-    @Lazy
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoRepo subprocessoRepo;
     private final UsuarioService usuarioService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Retorna uma lista de todas as atividades.
@@ -90,7 +91,9 @@ public class AtividadeService {
             throw new ErroEntidadeNaoEncontrada("Mapa", "não informado");
         }
 
-        var subprocesso = subprocessoService.obterEntidadePorCodigoMapa(atividadeDto.getMapaCodigo());
+        var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.getMapaCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
+                        "Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo())));
 
         var usuario = usuarioService.buscarEntidadePorId(tituloUsuario);
 
@@ -254,7 +257,7 @@ public class AtividadeService {
     }
 
     private void atualizarSituacaoSubprocessoSeNecessario(Long mapaCodigo) {
-        subprocessoService.atualizarSituacaoParaEmAndamento(mapaCodigo);
+        eventPublisher.publishEvent(new EventoMapaAlterado(mapaCodigo));
     }
 
     /**

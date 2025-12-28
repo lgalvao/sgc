@@ -1,0 +1,39 @@
+
+> sgc@1.0.0 test:unit
+> vitest --run --reporter=dot --no-color
+
+
+ RUN  v4.0.16 /app/frontend
+
+··········································································································································stderr | src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve tratar erro genérico durante o login (catch block)
+Erro no login: Error: Erro de rede
+    at [90m/app/frontend/[39msrc/__tests__/views/LoginView.spec.ts:190:63
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///app/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///app/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+·····stderr | src/__tests__/views/LoginView.spec.ts > LoginView.vue > deve tratar erro genérico durante seleção de perfil (step 2)
+Erro ao selecionar perfil: Error: Erro ao selecionar
+    at [90m/app/frontend/[39msrc/__tests__/views/LoginView.spec.ts:228:73
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///app/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///app/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///app/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+··································································································································································································································································································································································································································································································································································································································································································································································································································································
+
+ Test Files  89 passed (89)
+      Tests  977 passed (977)
+   Start at  04:48:20
+   Duration  50.18s (transform 4.84s, setup 24.00s, import 21.09s, tests 17.53s, environment 66.39s)
