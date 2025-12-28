@@ -19,26 +19,11 @@ class UnidadeTest {
         usuario.setMatricula("12345678");
 
         // Act
-        unidade.setTitular(usuario);
+        unidade.setTituloTitular(usuario.getTituloEleitoral());
+        unidade.setMatriculaTitular(usuario.getMatricula());
 
         // Assert
         assertThat(unidade.getTituloTitular()).isEqualTo("123456789012");
         assertThat(unidade.getMatriculaTitular()).isEqualTo("12345678");
-    }
-
-    @Test
-    @DisplayName("Não deve atualizar matrícula e título do titular quando usuário for nulo")
-    void naoDeveAtualizarTitularQuandoUsuarioNulo() {
-        // Arrange
-        Unidade unidade = new Unidade();
-        unidade.setTituloTitular("ORIGINAL");
-        unidade.setMatriculaTitular("ORIGINAL");
-
-        // Act
-        unidade.setTitular(null);
-
-        // Assert
-        assertThat(unidade.getTituloTitular()).isEqualTo("ORIGINAL");
-        assertThat(unidade.getMatriculaTitular()).isEqualTo("ORIGINAL");
     }
 }
