@@ -33,9 +33,13 @@ public class UnidadeService {
     private final ProcessoConsultaService processoConsultaService;
     private final UsuarioMapper usuarioMapper;
 
-    public List<UnidadeDto> buscarTodasUnidades() {
+    public List<UnidadeDto> buscarArvoreHierarquica() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
         return montarHierarquia(todasUnidades);
+    }
+
+    public List<UnidadeDto> buscarTodasUnidades() {
+        return buscarArvoreHierarquica();
     }
 
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
@@ -221,6 +225,10 @@ public class UnidadeService {
                                         "Unidade com codigo "
                                                 + codigo
                                                 + " não encontrada"));
+    }
+
+    public List<Unidade> buscarSubordinadasDiretas(Long codigoPai) {
+        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai);
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
