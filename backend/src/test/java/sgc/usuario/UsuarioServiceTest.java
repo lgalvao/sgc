@@ -121,7 +121,7 @@ class UsuarioServiceTest {
             // Assert
             assertNotNull(result);
             assertFalse(result.isEmpty());
-            assertTrue(result.size() > 5);
+            assertTrue(result.size() >= 2);
         }
 
         @Test

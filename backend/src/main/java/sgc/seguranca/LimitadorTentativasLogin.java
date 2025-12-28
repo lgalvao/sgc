@@ -1,5 +1,6 @@
 package sgc.seguranca;
 
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sgc.comum.erros.ErroNegocioBase;
@@ -8,11 +9,14 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Component
 public class LimitadorTentativasLogin {
+
+    private final Environment environment;
 
     // Máximo de tentativas permitidas
     private static final int MAX_TENTATIVAS = 5;
@@ -21,8 +25,12 @@ public class LimitadorTentativasLogin {
 
     private final Map<String, Deque<LocalDateTime>> tentativasPorIp = new ConcurrentHashMap<>();
 
+    public LimitadorTentativasLogin(Environment environment) {
+        this.environment = environment;
+    }
+
     public void verificar(String ip) {
-        if (ip == null) return;
+        if (ip == null || isPerfilTesteAtivo()) return;
 
         limparTentativasAntigas(ip);
 
@@ -33,6 +41,11 @@ public class LimitadorTentativasLogin {
         }
 
         tentativas.add(LocalDateTime.now());
+    }
+
+    private boolean isPerfilTesteAtivo() {
+        return Arrays.stream(environment.getActiveProfiles())
+                .anyMatch(profile -> profile.equalsIgnoreCase("test") || profile.equalsIgnoreCase("e2e"));
     }
 
     private void limparTentativasAntigas(String ip) {

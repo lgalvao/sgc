@@ -7,8 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.service.MapaService;
@@ -21,8 +20,9 @@ import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.dto.UnidadeDto;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,13 +40,12 @@ import static org.mockito.Mockito.when;
 class SubprocessoMapaWorkflowServiceTest {
 
     @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private AtividadeRepo atividadeRepo;
     @Mock private MapaService mapaService;
+    @Mock private AtividadeService atividadeService;
     @Mock private CompetenciaService competenciaService;
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseService analiseService;
-    @Mock private UnidadeRepo unidadeRepo;
+    @Mock private UnidadeService unidadeService;
     @Mock private SubprocessoService subprocessoService;
     @Mock private SubprocessoWorkflowExecutor workflowExecutor;
 
@@ -74,6 +73,8 @@ class SubprocessoMapaWorkflowServiceTest {
 
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
+        sedoc.setCodigo(99L);
+        UnidadeDto sedocDto = UnidadeDto.builder().codigo(99L).build();
 
         DisponibilizarMapaRequest request = DisponibilizarMapaRequest.builder()
                 .dataLimite(LocalDate.now().plusDays(10))
@@ -81,10 +82,11 @@ class SubprocessoMapaWorkflowServiceTest {
                 .build();
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(sedocDto);
+        when(unidadeService.buscarEntidadePorId(99L)).thenReturn(sedoc);
         // Mocks para validação interna de mapa
-        when(competenciaRepo.findByMapaCodigo(10L)).thenReturn(Collections.emptyList());
-        when(atividadeRepo.findBySubprocessoCodigo(id)).thenReturn(Collections.emptyList());
+        when(competenciaService.buscarPorMapa(10L)).thenReturn(Collections.emptyList());
+        when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
 
         service.disponibilizarMapa(id, request, user);
 
@@ -292,9 +294,12 @@ class SubprocessoMapaWorkflowServiceTest {
 
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
+        sedoc.setCodigo(99L);
+        UnidadeDto sedocDto = UnidadeDto.builder().codigo(99L).build();
 
         when(subprocessoRepo.findById(id)).thenReturn(Optional.of(sp));
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(unidadeService.buscarPorSigla("SEDOC")).thenReturn(sedocDto);
+        when(unidadeService.buscarEntidadePorId(99L)).thenReturn(sedoc);
 
         service.homologarValidacao(id, user);
 
