@@ -2,20 +2,26 @@ package sgc.seguranca;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.env.Environment;
 import sgc.seguranca.LimitadorTentativasLogin.ErroMuitasTentativas;
 
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class LimitadorTentativasLoginTest {
 
     private LimitadorTentativasLogin limitador;
+    private Environment environment;
 
     @BeforeEach
     void setUp() {
-        limitador = new LimitadorTentativasLogin();
+        environment = mock(Environment.class);
+        when(environment.getActiveProfiles()).thenReturn(new String[]{});
+        limitador = new LimitadorTentativasLogin(environment);
     }
 
     @Test

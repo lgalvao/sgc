@@ -12,11 +12,11 @@ import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
+import sgc.usuario.UsuarioService;
 import sgc.usuario.model.Usuario;
-import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,9 +35,9 @@ class AlertaServiceTest {
     @Mock
     private AlertaUsuarioRepo alertaUsuarioRepo;
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeService unidadeService;
     @Mock
-    private UsuarioRepo usuarioRepo;
+    private UsuarioService usuarioService;
     @Mock
     private AlertaMapper alertaMapper;
 
@@ -56,7 +56,7 @@ class AlertaServiceTest {
             Unidade u = new Unidade();
             u.setCodigo(unidadeId);
 
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
+            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta().setCodigo(100L));
 
             // When
@@ -75,7 +75,7 @@ class AlertaServiceTest {
             Processo p = new Processo();
             Long unidadeId = 999L;
 
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.empty());
+            when(unidadeService.buscarEntidadePorId(unidadeId)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
 
             // When / Then
             assertThatThrownBy(() ->
@@ -98,9 +98,9 @@ class AlertaServiceTest {
             u.setCodigo(unidadeId);
             u.setTipo(TipoUnidade.OPERACIONAL);
 
-            when(unidadeRepo.findAllById(any())).thenReturn(List.of(u));
+            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
             // findById ainda é usado internamente pelo criarAlerta (chamado pelo criarAlertasProcessoIniciado)
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
+            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -123,10 +123,10 @@ class AlertaServiceTest {
             filho.setCodigo(2L);
             filho.setUnidadeSuperior(root);
 
-            when(unidadeRepo.findAllById(any())).thenReturn(List.of(filho));
+            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(filho));
             // Mocks para o criarAlerta interno
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(root));
-            when(unidadeRepo.findById(2L)).thenReturn(Optional.of(filho));
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(root);
+            when(unidadeService.buscarEntidadePorId(2L)).thenReturn(filho);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -151,8 +151,8 @@ class AlertaServiceTest {
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
             u.setCodigo(unidadeId);
 
-            when(unidadeRepo.findAllById(any())).thenReturn(List.of(u));
-            when(unidadeRepo.findById(unidadeId)).thenReturn(Optional.of(u));
+            when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u));
+            when(unidadeService.buscarEntidadePorId(unidadeId)).thenReturn(u);
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -178,8 +178,8 @@ class AlertaServiceTest {
             Unidade uOrigem = new Unidade();
             uOrigem.setSigla("UO");
 
-            when(unidadeRepo.findById(origem)).thenReturn(Optional.of(uOrigem));
-            when(unidadeRepo.findById(destino)).thenReturn(Optional.of(new Unidade()));
+            when(unidadeService.buscarEntidadePorId(origem)).thenReturn(uOrigem);
+            when(unidadeService.buscarEntidadePorId(destino)).thenReturn(new Unidade());
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -197,7 +197,7 @@ class AlertaServiceTest {
             p.setDescricao("P");
             Long destino = 1L;
 
-            when(unidadeRepo.findById(destino)).thenReturn(Optional.of(new Unidade()));
+            when(unidadeService.buscarEntidadePorId(destino)).thenReturn(new Unidade());
             when(alertaRepo.save(any())).thenReturn(new Alerta());
 
             // When
@@ -255,7 +255,7 @@ class AlertaServiceTest {
             alertaUsuarioCriado.setAlerta(alerta);
             alertaUsuarioCriado.setDataHoraLeitura(null);
 
-            when(usuarioRepo.findById(usuarioTitulo)).thenReturn(Optional.of(usuario));
+            when(usuarioService.buscarEntidadePorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
             when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.empty()); // Não existe ainda
             when(alertaUsuarioRepo.save(any())).thenReturn(alertaUsuarioCriado);
@@ -290,7 +290,7 @@ class AlertaServiceTest {
             alertaUsuarioExistente.setAlerta(alerta);
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
-            when(usuarioRepo.findById(usuarioTitulo)).thenReturn(Optional.of(usuario));
+            when(usuarioService.buscarEntidadePorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaRepo.findByUnidadeDestino_Codigo(codUnidade)).thenReturn(List.of(alerta));
             when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(alertaUsuarioExistente));
             when(alertaMapper.toDto(alerta)).thenReturn(AlertaDto.builder().codigo(100L).build());

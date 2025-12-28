@@ -8,8 +8,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.model.AtividadeRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroAccessoNegado;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -21,7 +22,9 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.unidade.model.Unidade;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +37,7 @@ import static org.mockito.Mockito.when;
 class SubprocessoPermissoesServiceTest {
 
     @Mock
-    private AtividadeRepo atividadeRepo;
+    private AtividadeService atividadeService;
 
     @InjectMocks
     private SubprocessoPermissoesService service;
@@ -98,7 +101,7 @@ class SubprocessoPermissoesServiceTest {
         when(mapa.getCodigo()).thenReturn(10L);
         when(sub.getMapa()).thenReturn(mapa);
         
-        when(atividadeRepo.countByMapaCodigo(10L)).thenReturn(0L);
+        when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"))
                 .isInstanceOf(ErroAccessoNegado.class)
@@ -119,7 +122,7 @@ class SubprocessoPermissoesServiceTest {
         when(mapa.getCodigo()).thenReturn(10L);
         when(sub.getMapa()).thenReturn(mapa);
         
-        when(atividadeRepo.countByMapaCodigo(10L)).thenReturn(5L);
+        when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(new Atividade()));
 
         assertDoesNotThrow(() -> service.validar(sub, 1L, "AJUSTAR_MAPA"));
     }

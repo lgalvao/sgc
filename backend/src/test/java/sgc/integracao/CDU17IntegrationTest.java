@@ -260,7 +260,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
                     // Adjusted expectation based on actual error message
-                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Existem atividades que não foram associadas a nenhuma competência.")));
+                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Todas as atividades devem estar associadas a pelo menos uma competência.")));
         }
 
         @Test

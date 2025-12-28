@@ -115,7 +115,8 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         atividade2.getCompetencias().add(c1);
         c1.getAtividades().add(atividade1);
         c1.getAtividades().add(atividade2);
-        atividadeRepo.saveAll(List.of(atividade1, atividade2));
+        List<Atividade> atividadesSalvas = atividadeRepo.saveAll(List.of(atividade1, atividade2));
+        atividade1 = atividadesSalvas.get(0);
         competenciaRepo.save(c1);
     }
 
@@ -149,7 +150,8 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")
         void deveSalvarAjustesComSucesso() throws Exception {
-            Competencia c1 = competenciaRepo.findAll().getFirst();
+            Competencia c1 = competenciaRepo.findAll().get(0);
+            Atividade a1 = atividadeRepo.findAll().stream().filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElseThrow();
 
             var request =
                     new SalvarAjustesReq(
@@ -161,7 +163,7 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
                                                     List.of(
                                                             AtividadeAjusteDto.builder()
                                                                     .codAtividade(
-                                                                            atividade1.getCodigo())
+                                                                            a1.getCodigo())
                                                                     .nome("Atividade 1 Ajustada")
                                                                     .conhecimentos(List.of())
                                                                     .build()))

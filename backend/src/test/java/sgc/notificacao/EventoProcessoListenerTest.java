@@ -14,14 +14,14 @@ import sgc.alerta.AlertaService;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoService;
 import sgc.usuario.UsuarioService;
 import sgc.usuario.dto.ResponsavelDto;
 import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
@@ -54,9 +54,9 @@ class EventoProcessoListenerTest {
     @Mock
     private UsuarioService usuarioService;
     @Mock
-    private ProcessoRepo processoRepo;
+    private ProcessoService processoService;
     @Mock
-    private SubprocessoRepo subprocessoRepo;
+    private SubprocessoService subprocessoService;
     @Mock
     private Environment environment;
 
@@ -94,8 +94,8 @@ class EventoProcessoListenerTest {
         @DisplayName("Deve processar evento completo para unidade operacional")
         void deveProcessarCompletoQuandoUnidadeOperacional() {
             // Given
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
 
             UnidadeDto unidadeDto = UnidadeDto.builder()
@@ -158,7 +158,7 @@ class EventoProcessoListenerTest {
         @DisplayName("Não deve fazer nada quando processo não encontrado")
         void naoDeveFazerNadaQuandoProcessoNaoEncontrado() {
             // Given
-            when(processoRepo.findById(1L)).thenReturn(Optional.empty());
+            when(processoService.buscarEntidadePorId(1L)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado"));
 
             // When
             ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -172,8 +172,8 @@ class EventoProcessoListenerTest {
         @DisplayName("Não deve enviar e-mails quando não houver subprocessos")
         void naoDeveEnviarEmailsQuandoNaoHouverSubprocessos() {
             // Given
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(Collections.emptyList());
 
             // When
@@ -207,8 +207,8 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL)
                     .build();
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
             when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
@@ -256,8 +256,8 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL)
                     .build();
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
             when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
@@ -289,8 +289,8 @@ class EventoProcessoListenerTest {
                             .tipo("DESCONHECIDO")
                             .isElegivel(false)
                             .build();
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
 
@@ -306,8 +306,8 @@ class EventoProcessoListenerTest {
         void naoDeveEnviarEmailQuandoSubprocessoSemUnidade() {
             // Given
             subprocessoOperacional.setUnidade(null);
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
 
             // When
@@ -331,8 +331,8 @@ class EventoProcessoListenerTest {
                             .tipo("OPERACIONAL")
                             .isElegivel(false)
                             .build();
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
             when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.empty());
@@ -352,7 +352,7 @@ class EventoProcessoListenerTest {
                     UnidadeDto.builder()
                             .codigo(100L)
                             .nome("Unidade Operacional")
-                            .sigla(UNID_OP)
+                            .sigla("UNID-OP")
                             .codigoPai(null)
                             .tipo("OPERACIONAL")
                             .isElegivel(false)
@@ -366,8 +366,8 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL)
                     .build();
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
             when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
@@ -385,13 +385,13 @@ class EventoProcessoListenerTest {
         @DisplayName("Deve capturar exception geral sem interromper execução")
         void deveCapturarExceptionGeral() {
             // Given
-            when(processoRepo.findById(1L)).thenThrow(new RuntimeException("Erro DB"));
+            when(processoService.buscarEntidadePorId(1L)).thenThrow(new RuntimeException("Erro DB"));
 
             // When
             ouvinteDeEvento.aoIniciarProcesso(evento);
 
             // Then
-            verify(subprocessoRepo, never()).findByProcessoCodigoWithUnidade(any());
+            verify(subprocessoService, never()).listarEntidadesPorProcesso(any());
         }
 
         @Test
@@ -402,7 +402,7 @@ class EventoProcessoListenerTest {
                     UnidadeDto.builder()
                             .codigo(100L)
                             .nome("Unidade Operacional")
-                            .sigla(UNID_OP)
+                            .sigla("UNID-OP")
                             .codigoPai(null)
                             .tipo("OPERACIONAL")
                             .isElegivel(false)
@@ -421,8 +421,8 @@ class EventoProcessoListenerTest {
                     .matricula(RAMAL)
                     .build();
 
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(subprocessoOperacional));
             when(usuarioService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
             when(usuarioService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
@@ -450,7 +450,7 @@ class EventoProcessoListenerTest {
         void deveEnviarEmailQuandoUnidadeOperacional() {
             // Given
             EventoProcessoFinalizado eventoFinalizado = new EventoProcessoFinalizado(1L, LocalDateTime.now());
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+            when(processoService.buscarEntidadePorId(1L)).thenReturn(processo);
 
             Unidade unidade = new Unidade();
             unidade.setCodigo(100L);
