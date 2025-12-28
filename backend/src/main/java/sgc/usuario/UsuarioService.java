@@ -5,6 +5,7 @@ import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.seguranca.AcessoAdClient;
@@ -15,6 +16,7 @@ import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.unidade.dto.UnidadeDto;
+import sgc.unidade.service.UnidadeService;
 import sgc.usuario.dto.*;
 import sgc.usuario.model.Perfil;
 import sgc.usuario.model.Usuario;
@@ -23,7 +25,6 @@ import sgc.usuario.model.UsuarioPerfilRepo;
 import sgc.usuario.model.UsuarioRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,11 +34,12 @@ import static java.util.stream.Collectors.toMap;
 @Service
 @Slf4j
 public class UsuarioService {
-    private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final GerenciadorJwt gerenciadorJwt;
     private final AcessoAdClient acessoAdClient;
+    @Lazy
+    private final UnidadeService unidadeService;
 
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
@@ -61,16 +63,16 @@ public class UsuarioService {
     }
 
     @Autowired
-    public UsuarioService(UnidadeRepo unidadeRepo,
-                       UsuarioRepo usuarioRepo,
+    public UsuarioService(UsuarioRepo usuarioRepo,
                        UsuarioPerfilRepo usuarioPerfilRepo,
                        GerenciadorJwt gerenciadorJwt,
-                       @Autowired(required = false) AcessoAdClient acessoAdClient) {
-        this.unidadeRepo = unidadeRepo;
+                       @Autowired(required = false) AcessoAdClient acessoAdClient,
+                       @Lazy UnidadeService unidadeService) {
         this.usuarioRepo = usuarioRepo;
         this.usuarioPerfilRepo = usuarioPerfilRepo;
         this.gerenciadorJwt = gerenciadorJwt;
         this.acessoAdClient = acessoAdClient;
+        this.unidadeService = unidadeService;
     }
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
@@ -100,12 +102,10 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelVigente(String sigla) {
-        Unidade unidade = unidadeRepo
-                .findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+        UnidadeDto unidadeDto = unidadeService.buscarPorSigla(sigla);
 
         Usuario usuario = usuarioRepo
-                .chefePorCodUnidade(unidade.getCodigo())
+                .chefePorCodUnidade(unidadeDto.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", sigla));
         
         carregarAtribuicoes(usuario);
@@ -147,55 +147,33 @@ public class UsuarioService {
     }
 
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        return unidadeRepo.findById(codigo).map(this::toUnidadeDto);
+        try {
+            return Optional.of(unidadeService.buscarPorCodigo(codigo));
+        } catch (ErroEntidadeNaoEncontrada e) {
+            return Optional.empty();
+        }
     }
 
     public Optional<UnidadeDto> buscarUnidadePorSigla(String sigla) {
-        return unidadeRepo.findBySigla(sigla).map(this::toUnidadeDto);
+        try {
+            return Optional.of(unidadeService.buscarPorSigla(sigla));
+        } catch (ErroEntidadeNaoEncontrada e) {
+            return Optional.empty();
+        }
     }
 
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        return unidadeRepo.findAll().stream().map(this::toUnidadeDto).toList();
+        return unidadeService.buscarTodasUnidades();
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai).stream()
+        return unidadeService.buscarSubordinadasDiretas(codigoPai).stream()
                 .map(this::toUnidadeDto)
                 .toList();
     }
 
     public List<UnidadeDto> construirArvoreHierarquica() {
-        List<Unidade> todas = unidadeRepo.findAll();
-        Map<Long, List<UnidadeDto>> subunidadesPorPai = new HashMap<>();
-        Map<Long, UnidadeDto> dtoMap = new HashMap<>();
-
-        // Primeiro cria todos os DTOs
-        for (Unidade u : todas) {
-            dtoMap.put(u.getCodigo(), toUnidadeDto(u));
-        }
-
-        // Organiza a hierarquia
-        for (Unidade u : todas) {
-            if (u.getUnidadeSuperior() != null) {
-                subunidadesPorPai
-                        .computeIfAbsent(u.getUnidadeSuperior().getCodigo(), k -> new ArrayList<>())
-                        .add(dtoMap.get(u.getCodigo()));
-            }
-        }
-
-        // Monta a árvore recursivamente (ou apenas associa os filhos já que temos o mapa)
-        for (UnidadeDto dto : dtoMap.values()) {
-            List<UnidadeDto> filhos = subunidadesPorPai.get(dto.getCodigo());
-            if (filhos != null) {
-                dto.setSubunidades(filhos);
-            }
-        }
-
-        // Retorna apenas as raízes
-        return todas.stream()
-                .filter(u -> u.getUnidadeSuperior() == null)
-                .map(u -> dtoMap.get(u.getCodigo()))
-                .toList();
+        return unidadeService.buscarArvoreHierarquica();
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
@@ -420,7 +398,9 @@ public class UsuarioService {
 
         Long codUnidade = request.getUnidadeCodigo();
 
-        if (!unidadeRepo.existsById(codUnidade)) {
+        try {
+            unidadeService.buscarEntidadePorId(codUnidade);
+        } catch (ErroEntidadeNaoEncontrada e) {
             throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
         }
 

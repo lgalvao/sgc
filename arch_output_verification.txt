@@ -1,0 +1,48 @@
+Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.2.1!
+
+Here are the highlights of this release:
+ - Windows ARM support
+ - Improved publishing APIs
+ - Better guidance for dependency verification failures
+
+For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.arquitetura.ArchConsistencyTest
+> Task :backend:processResources
+> Task :backend:processTestResources
+
+> Task :backend:compileJava
+/app/backend/src/main/java/sgc/usuario/UsuarioService.java:170: error: cannot find symbol
+        return unidadeService.buscarSubordinadasDiretas(codigoPai).stream()
+                             ^
+  symbol:   method buscarSubordinadasDiretas(Long)
+  location: variable unidadeService of type UnidadeService
+1 error
+
+> Task :backend:compileJava FAILED
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileJava'.
+> Compilation failed; see the compiler output below.
+  /app/backend/src/main/java/sgc/usuario/UsuarioService.java:170: error: cannot find symbol
+          return unidadeService.buscarSubordinadasDiretas(codigoPai).stream()
+                               ^
+    symbol:   method buscarSubordinadasDiretas(Long)
+    location: variable unidadeService of type UnidadeService
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2m 18s
+3 actionable tasks: 3 executed
+Configuration cache entry stored.
