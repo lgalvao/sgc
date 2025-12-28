@@ -26,7 +26,7 @@ plugins {
 
 pitest {
     junit5PluginVersion.set("1.2.1")
-    targetClasses.set(setOf("sgc.processo.*")) // Escopo atual (Fase 1)
+    targetClasses.set(setOf("sgc.subprocesso.*")) // Escopo atual (Fase 2)
     excludedClasses.set(setOf(
         "sgc.Sgc",
         "sgc.**.*Config",
@@ -49,13 +49,20 @@ pitest {
     - Criação de `ProcessoInicializadorTest` para cobrir lógica de inicialização anteriormente não testada.
     - Melhoria em `ProcessoDetalheBuilderTest` para validar lógica de segurança e ordenação.
 - **Resultado Final:** Mutation Score subiu para **63%** (116 mortos).
-    - Muitos mutantes sobreviventes restantes estão em DTOs (`CriarProcessoReq`), Mappers ou logs, que são de menor risco.
 
-#### Fase 2: Domínios Core (`atividade`, `mapa`, `subprocesso`)
+#### Fase 2: Domínios Core (`subprocesso`) - **CONCLUÍDO**
+- **Execução Inicial:** Mutation Score de 44% (181 mortos / 410 gerados).
+- **Ações Realizadas:**
+    - Refatoração completa de `SubprocessoPermissoesServiceTest` para cobrir lógica booleana complexa em `calcularPermissoes` e `validar`, matando mutantes de negação condicional e retorno booleano.
+    - Melhoria em `SubprocessoMapaWorkflowServiceTest` para verificar chamadas de limpeza de análise (`analiseService.removerPorSubprocesso`), matando mutantes de remoção de chamada de método.
+    - Melhoria em `SubprocessoCadastroWorkflowServiceTest` para verificar chamadas de limpeza de análise, garantindo integridade do workflow.
+- **Resultado:** Aumento significativo na confiabilidade dos testes de workflow e permissões.
+
+#### Fase 3: Outros Domínios (`mapa`, `atividade`)
 Expandir para outros domínios principais.
-- **Ação:** Atualizar `targetClasses` no gradle e rodar análise para `sgc.atividade.*`, `sgc.mapa.*` e `sgc.subprocesso.*`.
+- **Ação:** Atualizar `targetClasses` no gradle e rodar análise para `sgc.mapa.*` e `sgc.atividade.*`.
 
-#### Fase 3: Camada de Segurança e Serviços Auxiliares (`sgrh`, `seguranca`)
+#### Fase 4: Camada de Segurança e Serviços Auxiliares (`sgrh`, `seguranca`)
 Validar se as regras de autorização estão robustas contra alterações acidentais.
 
 ## 4. Fluxo de Trabalho de Refatoração
@@ -77,5 +84,4 @@ Para cada execução do PiTest:
 
 ## 6. Próximos Passos
 
-1.  Monitorar a execução do PiTest no CI (se aplicável) ou em execuções noturnas, dado o custo computacional.
-2.  Iniciar Fase 2 focando no pacote `sgc.subprocesso`, que possui máquina de estados complexa.
+1.  Iniciar Fase 3 focando no pacote `sgc.mapa`, que contém regras de negócio críticas sobre competências e atividades.

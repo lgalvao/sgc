@@ -79,6 +79,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        verify(analiseService).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.CADASTRO_DISPONIBILIZADO),
@@ -152,6 +153,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         assertThat(sp.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        verify(analiseService).removerPorSubprocesso(id);
         verify(transicaoService).registrar(
                 eq(sp),
                 eq(TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA),
