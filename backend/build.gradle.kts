@@ -6,6 +6,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
 
 java {
@@ -167,4 +168,32 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
+    // Integração com JUnit 5
+    junit5PluginVersion.set("1.2.1")
+
+    // Evitar rodar em todo o projeto inicialmente (muito custoso)
+    // Definiremos classes alvo via linha de comando ou perfis, mas aqui fica o padrão seguro
+    targetClasses.set(setOf("sgc.*"))
+
+    // Excluir classes que não devem ser mutadas (Configurações, DTOs, Exceções, etc.)
+    excludedClasses.set(setOf(
+        "sgc.Sgc",
+        "sgc.**.*Config",
+        "sgc.**.*Dto",
+        "sgc.**.*Exception",
+        "sgc.**.*Repo", // Repositórios são interfaces/Spring Data, mutação aqui é pouco útil
+        "sgc.**.*MapperImpl" // Classes geradas pelo MapStruct
+    ))
+
+    // Threads para paralelismo (ajustar conforme a máquina)
+    threads.set(4)
+
+    // Formatos de saída
+    outputFormats.set(setOf("XML", "HTML"))
+
+    // Fail-fast: para no primeiro mutante sobrevivente (útil para CI, opcional localmente)
+    // mutationThreshold.set(80) // Meta de 80% de mutantes mortos
 }
