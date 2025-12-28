@@ -77,9 +77,14 @@ public class AtividadeController {
         if (tituloUsuario == null || tituloUsuario.isBlank()) {
             throw new ErroAccessoNegado("Usuário não autenticado.");
         }
+
+        // 1. Validar permissão via SubprocessoService (que tem acesso à hierarquia)
+        subprocessoService.validarPermissaoEdicaoMapa(atividadeDto.getMapaCodigo(), tituloUsuario);
+
+        // 2. Criar a atividade
         var salvo = atividadeService.criar(atividadeDto, tituloUsuario);
 
-        // Buscar subprocesso e situação
+        // 3. Montar resposta
         AtividadeOperacaoResponse response = criarRespostaOperacaoPorMapaCodigo(atividadeDto.getMapaCodigo(), salvo.getCodigo(), true);
 
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));

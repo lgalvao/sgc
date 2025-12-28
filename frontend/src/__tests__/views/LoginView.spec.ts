@@ -311,7 +311,7 @@ describe("LoginView.vue", () => {
         // Simula evento keyup com caps lock desativado
         const eventOff = new KeyboardEvent("keyup", { bubbles: true });
         Object.defineProperty(eventOff, "getModifierState", {
-            value: (key: string) => false,
+            value: () => false,
         });
         inputWrapper.element.dispatchEvent(eventOff);
         await wrapper.vm.$nextTick();
