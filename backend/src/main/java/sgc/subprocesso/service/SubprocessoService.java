@@ -49,10 +49,9 @@ import static java.util.Collections.emptyList;
 public class SubprocessoService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final AtividadeService atividadeService;
-    private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaService competenciaService;
     private final SubprocessoMapper subprocessoMapper;
-    private final sgc.mapa.model.MapaRepo mapaRepo;
+    private final sgc.mapa.service.MapaService mapaService;
     private final MovimentacaoRepo repositorioMovimentacao;
     private final AnaliseService analiseService;
     private final ConhecimentoMapper conhecimentoMapper;
@@ -122,7 +121,7 @@ public class SubprocessoService {
 
     private AtividadeVisualizacaoDto mapAtividadeToDto(Atividade atividade) {
         List<Conhecimento> conhecimentos =
-                repositorioConhecimento.findByAtividadeCodigo(atividade.getCodigo());
+                atividadeService.listarConhecimentosPorAtividade(atividade.getCodigo());
 
         List<ConhecimentoVisualizacaoDto> conhecimentosDto = conhecimentos.stream()
                 .map(c -> ConhecimentoVisualizacaoDto.builder()
@@ -198,7 +197,7 @@ public class SubprocessoService {
                         a -> {
                             if (a.getCodigo() == null) return true;
                             List<Conhecimento> ks =
-                                    repositorioConhecimento.findByAtividadeCodigo(a.getCodigo());
+                                    atividadeService.listarConhecimentosPorAtividade(a.getCodigo());
                             return ks == null || ks.isEmpty();
                         })
                 .collect(Collectors.toList());
@@ -266,7 +265,7 @@ public class SubprocessoService {
         // 2. Criar mapa COM referência ao subprocesso
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoSalvo);
-        Mapa mapaSalvo = mapaRepo.save(mapa);
+        Mapa mapaSalvo = mapaService.salvar(mapa);
         
         // 3. Atualizar subprocesso com o mapa
         subprocessoSalvo.setMapa(mapaSalvo);

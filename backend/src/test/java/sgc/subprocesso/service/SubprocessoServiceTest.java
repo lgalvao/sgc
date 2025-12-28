@@ -12,16 +12,15 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.service.MapaService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -50,15 +49,13 @@ class SubprocessoServiceTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private AtividadeRepo atividadeRepo;
+    private AtividadeService atividadeService;
     @Mock
-    private ConhecimentoRepo repositorioConhecimento;
-    @Mock
-    private CompetenciaRepo competenciaRepo;
+    private CompetenciaService competenciaService;
     @Mock
     private SubprocessoMapper subprocessoMapper;
     @Mock
-    private MapaRepo mapaRepo;
+    private MapaService mapaService;
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
     @Mock
@@ -123,7 +120,7 @@ class SubprocessoServiceTest {
             subprocesso.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
+            when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(Collections.emptyList());
 
             List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
@@ -141,7 +138,7 @@ class SubprocessoServiceTest {
 
             when(subprocessoMapper.toEntity(dto)).thenReturn(entity);
             when(repositorioSubprocesso.save(any())).thenReturn(entity);
-            when(mapaRepo.save(any())).thenReturn(MapaFixture.mapaPadrao(null));
+            when(mapaService.salvar(any())).thenReturn(MapaFixture.mapaPadrao(null));
             when(subprocessoMapper.toDTO(any())).thenReturn(dto);
 
             assertThat(service.criar(dto)).isNotNull();
@@ -188,7 +185,7 @@ class SubprocessoServiceTest {
         void deveLancarExcecaoSeCompetenciaNaoEstiverAssociada() {
             Competencia competencia = new Competencia();
             competencia.setDescricao("Competencia de Teste");
-            when(competenciaRepo.findByMapaCodigo(1L))
+            when(competenciaService.buscarPorMapa(1L))
                     .thenReturn(Collections.singletonList(competencia));
 
             assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
@@ -209,7 +206,7 @@ class SubprocessoServiceTest {
             ativ.setConhecimentos(List.of(new sgc.mapa.model.Conhecimento()));
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(List.of(ativ));
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(ativ));
 
             ValidacaoCadastroDto result = service.validarCadastro(1L);
             assertThat(result.getValido()).isTrue();
@@ -238,7 +235,7 @@ class SubprocessoServiceTest {
             sp.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(Collections.emptyList());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
             ValidacaoCadastroDto result = service.validarCadastro(1L);
             assertThat(result.getValido()).isFalse();
@@ -418,7 +415,7 @@ class SubprocessoServiceTest {
             sp.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeRepo.findByMapaCodigoWithConhecimentos(10L)).thenReturn(Collections.emptyList());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
             SubprocessoCadastroDto result = service.obterCadastro(1L);
             assertThat(result).isNotNull();

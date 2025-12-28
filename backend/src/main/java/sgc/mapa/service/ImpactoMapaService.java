@@ -15,7 +15,7 @@ import sgc.mapa.model.*;
 import sgc.usuario.model.Usuario;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +43,7 @@ public class ImpactoMapaService {
              do cadastro disponibilizada', 'Revisão do cadastro homologada' ou 'Mapa\
              Ajustado'.""";
 
-    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoService subprocessoService;
     private final MapaRepo mapaRepo;
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
@@ -71,11 +71,7 @@ public class ImpactoMapaService {
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
         log.debug("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
 
-        Subprocesso subprocesso =
-                subprocessoRepo
-                        .findById(codSubprocesso)
-                        .orElseThrow(
-                                () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
 
         verificarAcesso(usuario, subprocesso);
 

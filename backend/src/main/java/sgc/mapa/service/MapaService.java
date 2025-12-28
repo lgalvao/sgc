@@ -47,6 +47,10 @@ public class MapaService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
     }
 
+    public Mapa salvar(Mapa mapa) {
+        return mapaRepo.save(mapa);
+    }
+
     public Mapa criar(Mapa mapa) {
         return mapaRepo.save(mapa);
     }
@@ -69,6 +73,14 @@ public class MapaService {
             throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
         mapaRepo.deleteById(codigo);
+    }
+
+    public java.util.Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
+        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade);
+    }
+
+    public java.util.Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
+        return mapaRepo.findBySubprocessoCodigo(codSubprocesso);
     }
 
     @Transactional(readOnly = true)

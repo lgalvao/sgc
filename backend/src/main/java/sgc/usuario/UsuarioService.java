@@ -79,6 +79,12 @@ public class UsuarioService {
         return usuarioRepo.findById(titulo).map(this::toUsuarioDto);
     }
 
+    public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
+        return usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade).stream()
+                .map(this::toUsuarioDto)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Usuario buscarEntidadePorId(String titulo) {
         return usuarioRepo
@@ -167,7 +173,7 @@ public class UsuarioService {
     }
 
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        return unidadeService.buscarSubordinadasDiretas(codigoPai).stream()
+        return unidadeService.listarSubordinadas(codigoPai).stream()
                 .map(this::toUnidadeDto)
                 .toList();
     }
