@@ -26,42 +26,43 @@
       </h1>
 
       <div class="d-flex gap-2">
-        <BButton
-            v-if="podeVerImpacto"
-            data-testid="cad-atividades__btn-impactos-mapa"
+        <BDropdown
+            v-if="codSubprocesso && (podeVerImpacto || isChefe)"
+            text="Mais ações"
             variant="outline-secondary"
-            @click="abrirModalImpacto"
+            class="me-2"
         >
-          <i
-              aria-hidden="true"
-              class="bi bi-arrow-right-circle me-2"
-          />Impacto no mapa
-        </BButton>
-        <BButton
-            v-if="isChefe && codSubprocesso"
-            data-testid="btn-cad-atividades-historico"
-            variant="outline-info"
-            @click="abrirModalHistorico"
-        >
-          Histórico de análise
-        </BButton>
-        <BButton
-            v-if="isChefe"
-            data-testid="btn-cad-atividades-importar"
-            title="Importar"
-            variant="outline-primary"
-            @click="mostrarModalImportar = true"
-        >
-          Importar atividades
-        </BButton>
+          <BDropdownItem
+              v-if="podeVerImpacto"
+              data-testid="cad-atividades__btn-impactos-mapa"
+              @click="abrirModalImpacto"
+          >
+            <i class="bi bi-arrow-right-circle me-2"/> Impacto no mapa
+          </BDropdownItem>
+          <BDropdownItem
+              v-if="isChefe"
+              data-testid="btn-cad-atividades-historico"
+              @click="abrirModalHistorico"
+          >
+            <i class="bi bi-clock-history me-2"/> Histórico de análise
+          </BDropdownItem>
+          <BDropdownItem
+              v-if="isChefe"
+              data-testid="btn-cad-atividades-importar"
+              @click="mostrarModalImportar = true"
+          >
+            <i class="bi bi-upload me-2"/> Importar atividades
+          </BDropdownItem>
+        </BDropdown>
+
         <BButton
             v-if="!!permissoes?.podeDisponibilizarCadastro"
             data-testid="btn-cad-atividades-disponibilizar"
             title="Disponibilizar"
-            variant="outline-success"
+            variant="success"
             @click="disponibilizarCadastro"
         >
-          Disponibilizar
+          <i class="bi bi-check-lg me-1"/> Disponibilizar
         </BButton>
       </div>
     </div>
@@ -108,6 +109,17 @@
         </BButton>
       </BCol>
     </BForm>
+
+    <!-- Empty State -->
+    <div
+        v-if="atividades.length === 0"
+        class="text-center py-5 border rounded bg-light mb-4 text-muted"
+        data-testid="cad-atividades-empty-state"
+    >
+      <i class="bi bi-list-check fs-1 d-block mb-3"/>
+      <p class="mb-0">Nenhuma atividade cadastrada.</p>
+      <small>Utilize o campo acima para adicionar novas atividades.</small>
+    </div>
 
     <div
         v-for="(atividade, idx) in atividades"

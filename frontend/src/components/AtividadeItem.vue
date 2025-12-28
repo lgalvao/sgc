@@ -197,6 +197,7 @@
             <BFormInput
                 v-model="novoConhecimento"
                 aria-label="Novo conhecimento"
+                :class="{ 'border-danger': !!erroValidacao }"
                 data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 size="sm"

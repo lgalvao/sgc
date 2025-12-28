@@ -19,7 +19,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
 
     let timeoutId: number | undefined;
 
-    function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 5000) {
+    function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
         currentFeedback.value = {
             title,
             message,
