@@ -19,7 +19,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +40,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeService unidadeService;
     @Mock
     private AnaliseService analiseService;
     @Mock
@@ -257,7 +257,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Unidade sedoc = new Unidade();
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
 
         service.homologarCadastro(id, "obs", user);
 
@@ -377,7 +377,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(sp));
         when(impactoMapaService.verificarImpactos(id, user)).thenReturn(impactoDto);
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(new Unidade()));
+        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
 
         service.homologarRevisaoCadastro(id, "obs", user);
 

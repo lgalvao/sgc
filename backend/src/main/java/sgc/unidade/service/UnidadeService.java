@@ -27,8 +27,8 @@ import java.util.*;
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final sgc.unidade.model.UnidadeMapaRepo unidadeMapaRepo;
-    private final MapaRepo mapaRepo;
-    private final UsuarioRepo usuarioRepo;
+    private final sgc.mapa.service.MapaService mapaService;
+    private final sgc.usuario.UsuarioService usuarioService;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ProcessoConsultaService processoConsultaService;
     private final UsuarioMapper usuarioMapper;
@@ -120,15 +120,7 @@ public class UnidadeService {
                                                         + codUnidade
                                                         + " não encontrada"));
 
-        Usuario usuario =
-                usuarioRepo
-                        .findById(request.tituloEleitoralUsuario())
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Usuário com título eleitoral "
-                                                        + request.tituloEleitoralUsuario()
-                                                        + " não encontrado"));
+        Usuario usuario = usuarioService.buscarEntidadePorId(request.tituloEleitoralUsuario());
 
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
         atribuicao.setUnidade(unidade);
@@ -141,15 +133,11 @@ public class UnidadeService {
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return mapaRepo.findMapaVigenteByUnidade(codigoUnidade).isPresent();
+        return mapaService.buscarMapaVigentePorUnidade(codigoUnidade).isPresent();
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        List<Usuario> usuarios = usuarioRepo.findByUnidadeLotacaoCodigo(codigoUnidade);
-
-        return usuarios.stream()
-                .map(usuarioMapper::toUsuarioDto)
-                .toList();
+        return usuarioService.buscarUsuariosPorUnidade(codigoUnidade);
     }
 
     private List<UnidadeDto> montarHierarquia(List<Unidade> unidades) {
@@ -200,15 +188,17 @@ public class UnidadeService {
     }
 
     public UnidadeDto buscarPorSigla(String sigla) {
-        Unidade unidade =
-                unidadeRepo
-                        .findBySigla(sigla)
-                        .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Unidade com sigla " + sigla + " não encontrada"));
-
+        Unidade unidade = buscarEntidadePorSigla(sigla);
         return usuarioMapper.toUnidadeDto(unidade, false);
+    }
+
+    public Unidade buscarEntidadePorSigla(String sigla) {
+        return unidadeRepo
+                .findBySigla(sigla)
+                .orElseThrow(
+                        () ->
+                                new ErroEntidadeNaoEncontrada(
+                                        "Unidade com sigla " + sigla + " não encontrada"));
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -227,7 +217,7 @@ public class UnidadeService {
                                                 + " não encontrada"));
     }
 
-    public List<Unidade> buscarSubordinadasDiretas(Long codigoPai) {
+    public List<Unidade> listarSubordinadas(Long codigoPai) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codigoPai);
     }
 

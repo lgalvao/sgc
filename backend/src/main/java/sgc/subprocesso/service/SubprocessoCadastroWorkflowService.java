@@ -19,7 +19,7 @@ import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.model.UnidadeRepo;
+import sgc.unidade.service.UnidadeService;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -29,7 +29,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class SubprocessoCadastroWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final SubprocessoTransicaoService transicaoService;
-    private final UnidadeRepo unidadeRepo;
+    private final UnidadeService unidadeService;
     private final AnaliseService analiseService;
     private final SubprocessoService subprocessoService;
     private final ImpactoMapaService impactoMapaService;
@@ -173,14 +173,7 @@ public class SubprocessoCadastroWorkflowService {
                     "Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
-        Unidade sedoc =
-                unidadeRepo
-                        .findBySigla("SEDOC")
-                        .orElseThrow(
-                                () ->
-                                        new IllegalStateException(
-                                                "Unidade 'SEDOC' não encontrada para registrar a"
-                                                        + " homologação."));
+        Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
@@ -276,14 +269,7 @@ public class SubprocessoCadastroWorkflowService {
         var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
 
         if (impactos.isTemImpactos()) {
-            Unidade sedoc =
-                    unidadeRepo
-                            .findBySigla("SEDOC")
-                            .orElseThrow(
-                                    () ->
-                                            new IllegalStateException(
-                                                    "Unidade 'SEDOC' não encontrada para registrar"
-                                                            + " a homologação."));
+            Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
             repositorioSubprocesso.save(sp);

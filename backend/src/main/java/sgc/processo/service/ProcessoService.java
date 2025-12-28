@@ -280,6 +280,16 @@ public class ProcessoService {
                 .toList();
     }
 
+    public org.springframework.data.domain.Page<Processo> listarTodos(org.springframework.data.domain.Pageable pageable) {
+        return processoRepo.findAll(pageable);
+    }
+
+    public org.springframework.data.domain.Page<Processo> listarPorParticipantesIgnorandoCriado(
+            List<Long> unidadeIds, org.springframework.data.domain.Pageable pageable) {
+        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+                unidadeIds, SituacaoProcesso.CRIADO, pageable);
+    }
+
     // ========== MÉTODOS DE INICIALIZAÇÃO (delegam para ProcessoInicializador) ==========
 
     @Transactional

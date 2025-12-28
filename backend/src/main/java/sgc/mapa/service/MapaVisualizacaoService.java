@@ -17,7 +17,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.unidade.model.Unidade;
 
 import java.util.List;
@@ -29,17 +29,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaVisualizacaoService {
-    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoService subprocessoService;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
     private final AtividadeRepo atividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
-        Subprocesso subprocesso =
-                subprocessoRepo
-                        .findById(codSubprocesso)
-                        .orElseThrow(
-                                () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
 
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
