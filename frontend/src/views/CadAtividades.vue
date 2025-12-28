@@ -2,12 +2,14 @@
   <BContainer class="mt-4">
     <div class="d-flex align-items-center mb-3">
       <BButton
+          aria-label="Voltar"
           class="p-0 me-3 text-decoration-none"
           data-testid="btn-cad-atividades-voltar"
+          title="Voltar"
           variant="link"
           @click="router.back()"
       >
-        <i class="bi bi-arrow-left fs-4"/>
+        <i aria-hidden="true" class="bi bi-arrow-left fs-4"/>
       </BButton>
       <div class="fs-5 d-flex align-items-center gap-2">
         <span>{{ sigla }} - {{ nomeUnidade }}</span>
