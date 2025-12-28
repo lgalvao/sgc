@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.AtividadeService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -25,6 +26,9 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
@@ -83,6 +87,67 @@ class SubprocessoServiceTest {
     @Nested
     @DisplayName("Cenários de Leitura")
     class LeituraTests {
+
+        @Test
+        @DisplayName("Deve verificar acesso da unidade ao processo")
+        void deveVerificarAcessoUnidadeAoProcesso() {
+            when(repositorioSubprocesso.existsByProcessoCodigoAndUnidadeCodigoIn(1L, List.of(10L, 20L)))
+                    .thenReturn(true);
+            assertThat(service.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L))).isTrue();
+
+            when(repositorioSubprocesso.existsByProcessoCodigoAndUnidadeCodigoIn(2L, List.of(10L)))
+                    .thenReturn(false);
+            assertThat(service.verificarAcessoUnidadeAoProcesso(2L, List.of(10L))).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve listar entidades por processo")
+        void deveListarEntidadesPorProcesso() {
+            when(repositorioSubprocesso.findByProcessoCodigoWithUnidade(1L))
+                    .thenReturn(List.of(new Subprocesso()));
+            assertThat(service.listarEntidadesPorProcesso(1L)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve listar atividades do subprocesso convertidas para DTO")
+        void deveListarAtividadesSubprocesso() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(100L);
+            sp.setMapa(mapa);
+            sp.setCodigo(1L);
+
+            Atividade ativ = new Atividade();
+            ativ.setCodigo(10L);
+            ativ.setDescricao("Atividade Teste");
+
+            Conhecimento con = new Conhecimento();
+            con.setCodigo(50L);
+            con.setDescricao("Conhecimento Teste");
+
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+            when(atividadeService.buscarPorMapaCodigo(100L)).thenReturn(List.of(ativ));
+            when(atividadeService.listarConhecimentosPorAtividade(10L)).thenReturn(List.of(con));
+
+            List<AtividadeVisualizacaoDto> result = service.listarAtividadesSubprocesso(1L);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getDescricao()).isEqualTo("Atividade Teste");
+            assertThat(result.get(0).getConhecimentos()).hasSize(1);
+            assertThat(result.get(0).getConhecimentos().get(0).getDescricao()).isEqualTo("Conhecimento Teste");
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia se subprocesso não tiver mapa")
+        void deveRetornarListaVaziaSeSemMapa() {
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setMapa(null);
+
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+
+            assertThat(service.listarAtividadesSubprocesso(1L)).isEmpty();
+        }
 
         @Test
         @DisplayName("Deve retornar situação quando subprocesso existe")
@@ -181,6 +246,96 @@ class SubprocessoServiceTest {
     @DisplayName("Cenários de Validação")
     class ValidacaoTests {
         @Test
+        @DisplayName("Deve validar permissão de edição do mapa - Sucesso")
+        void deveValidarPermissaoEdicaoMapaSucesso() {
+            Subprocesso sp = new Subprocesso();
+            Unidade u = new Unidade();
+            u.setTituloTitular("123456789012");
+            sp.setUnidade(u);
+
+            Usuario user = new Usuario();
+            user.setTituloEleitoral("123456789012");
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+            when(usuarioService.buscarUsuarioPorLogin("user")).thenReturn(user);
+
+            service.validarPermissaoEdicaoMapa(100L, "user");
+        }
+
+        @Test
+        @DisplayName("Deve validar permissão de edição do mapa - Falha não titular")
+        void deveValidarPermissaoEdicaoMapaFalha() {
+            Subprocesso sp = new Subprocesso();
+            Unidade u = new Unidade();
+            u.setTituloTitular("999999999999"); // Outro titular
+            sp.setUnidade(u);
+
+            Usuario user = new Usuario();
+            user.setTituloEleitoral("123456789012");
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+            when(usuarioService.buscarUsuarioPorLogin("user")).thenReturn(user);
+
+            assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(100L, "user"))
+                    .isInstanceOf(ErroAccessoNegado.class);
+        }
+
+        @Test
+        @DisplayName("Deve validar permissão de edição do mapa - Falha sem unidade")
+        void deveValidarPermissaoEdicaoMapaFalhaSemUnidade() {
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(null);
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+
+            assertThatThrownBy(() -> service.validarPermissaoEdicaoMapa(100L, "user"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Unidade não associada");
+        }
+
+        @Test
+        @DisplayName("Deve validar existência de atividades - Sucesso")
+        void deveValidarExistenciaAtividadesSucesso() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(10L);
+            sp.setMapa(mapa);
+
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(new Atividade()));
+
+            service.validarExistenciaAtividades(1L);
+        }
+
+        @Test
+        @DisplayName("Deve validar existência de atividades - Falha sem mapa")
+        void deveValidarExistenciaAtividadesFalhaSemMapa() {
+            Subprocesso sp = new Subprocesso();
+            sp.setMapa(null);
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+
+            assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("sem mapa");
+        }
+
+        @Test
+        @DisplayName("Deve validar existência de atividades - Falha lista vazia")
+        void deveValidarExistenciaAtividadesFalhaVazia() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(10L);
+            sp.setMapa(mapa);
+
+            when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
+            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
+
+            assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("Pelo menos uma atividade");
+        }
+
+        @Test
         @DisplayName("Deve lançar exceção se competência não estiver associada")
         void deveLancarExcecaoSeCompetenciaNaoEstiverAssociada() {
             Competencia competencia = new Competencia();
@@ -192,6 +347,21 @@ class SubprocessoServiceTest {
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("competência")
                     .hasNoCause();
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção se atividade não estiver associada")
+        void deveLancarExcecaoSeAtividadeNaoEstiverAssociada() {
+            when(competenciaService.buscarPorMapa(1L)).thenReturn(Collections.emptyList());
+
+            Atividade atividade = new Atividade();
+            atividade.setDescricao("Atividade Solta");
+            // Sem competencias
+            when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(List.of(atividade));
+
+            assertThatThrownBy(() -> service.validarAssociacoesMapa(1L))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("atividades");
         }
 
         @Test
@@ -240,6 +410,72 @@ class SubprocessoServiceTest {
             ValidacaoCadastroDto result = service.validarCadastro(1L);
             assertThat(result.getValido()).isFalse();
             assertThat(result.getErros().get(0).getTipo()).isEqualTo("SEM_ATIVIDADES");
+        }
+    }
+
+    @Nested
+    @DisplayName("Cenários de Transição de Estado")
+    class TransicaoEstadoTests {
+        @Test
+        @DisplayName("Deve atualizar situação para EM ANDAMENTO (Mapeamento)")
+        void deveAtualizarParaEmAndamentoMapeamento() {
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            sp.setProcesso(p);
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+
+            service.atualizarSituacaoParaEmAndamento(100L);
+
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            verify(repositorioSubprocesso).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar situação para EM ANDAMENTO (Revisão)")
+        void deveAtualizarParaEmAndamentoRevisao() {
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.REVISAO);
+            sp.setProcesso(p);
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+
+            service.atualizarSituacaoParaEmAndamento(100L);
+
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            verify(repositorioSubprocesso).save(sp);
+        }
+
+        @Test
+        @DisplayName("Não deve atualizar se situação não for NAO_INICIADO")
+        void naoDeveAtualizarSeJaIniciado() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+
+            service.atualizarSituacaoParaEmAndamento(100L);
+
+            verify(repositorioSubprocesso, never()).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro se processo não associado")
+        void deveLancarErroSeProcessoNaoAssociado() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            sp.setProcesso(null);
+
+            when(repositorioSubprocesso.findByMapaCodigo(100L)).thenReturn(Optional.of(sp));
+
+            assertThatThrownBy(() -> service.atualizarSituacaoParaEmAndamento(100L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
