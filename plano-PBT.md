@@ -35,7 +35,7 @@ A implementação será gradual, focando primeiro em utilitários puros e lógic
 | Categoria | Classe/Componente | Propriedade a Testar (Exemplo) | Prioridade |
 |-----------|-------------------|--------------------------------|------------|
 | **Utilitários** | `sgc.comum.util.FormatadorData` | Formatação de nulos retorna "-"; Data válida nunca retorna nulo/vazio. (Implementado) | Concluído |
-| **Domínio** | `sgc.mapa.model.Mapa` | Invariantes de estado (ex: não pode ter lista de competencias nula). | Alta |
+| **Domínio** | `sgc.mapa.mapper.MapaCompletoMapper` | Preservação de dados na conversão Entidade <-> DTO (Round Trip). (Implementado) | Concluído |
 | **Negócio** | `sgc.processo.service.ProcessoService` (Regras de Estado) | Transições de `SituacaoProcesso` inválidas devem sempre falhar, independente dos dados do processo. (POC Implementada) | Concluído |
 | **Segurança** | `sgc.seguranca.Sanitizacao` (HtmlPolicy) | Idempotência: `sanitizar(sanitizar(x)) == sanitizar(x)`; Tags proibidas nunca estão presentes na saída. | Alta |
 
@@ -62,10 +62,10 @@ No frontend, o foco será em validadores de formulário e helpers de exibição.
 2.  **Backend:** Criar teste de propriedade para `sgc.comum.util.FormatadorData`. (Feito)
 3.  **Frontend:** Criar teste de propriedade para `formatarCpf`. (Feito)
 
-### Fase 2: Domínio Crítico (Em Andamento)
+### Fase 2: Domínio Crítico (Concluído)
 1.  Identificar lógica de validação complexa nos Services de `Processo` e `Mapa`.
-2.  Implementar testes gerativos para transições de estado de `Processo` (POC feita em `ProcessoServicePropertyTest`).
-3.  **Próximo Passo:** Implementar teste de propriedade para Invariantes de `Mapa`.
+2.  Implementar testes gerativos para transições de estado de `Processo` (Feito em `ProcessoServicePropertyTest`).
+3.  Implementar teste de propriedade para invariantes de `Mapa` (Feito em `MapaCompletoMapperPropertyTest` cobrindo consistência de DTOs).
 
 ### Fase 3: Integração no CI/CD
 1.  Garantir que os testes de propriedade rodem com os comandos padrão (`./gradlew test`, `npm run test:unit`). (Verificado: ambos rodam com os comandos padrão)
@@ -78,5 +78,5 @@ No frontend, o foco será em validadores de formulário e helpers de exibição.
 3.  **Performance:** Testes de propriedade podem ser lentos se gerarem milhares de casos. Manter o número de execuções (samples) razoável para testes de CI (ex: 100 execuções).
 
 ## 7. Próximos Passos
-- Implementar PBT para `sgc.mapa.model.Mapa`.
+- Implementar PBT para `sgc.seguranca.Sanitizacao`.
 - Implementar PBT para validações de formulário no Frontend.
