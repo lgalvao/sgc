@@ -1,4 +1,4 @@
-## 2025-02-22 - Authorization Bypass in Login Flow
-**Vulnerability:** The `/autorizar` endpoint (step 2 of login) allowed retrieving user permissions without verifying that `/autenticar` (step 1) was completed.
-**Learning:** Multi-step workflows need state validation at EACH step. Don't assume the client will follow the sequence.
-**Prevention:** Use a short-lived state cache (like `autenticacoesRecentes`) to enforce sequence, or issue a temporary "pre-auth" token.
+## 2024-05-23 - Hardcoded CORS Configuration
+**Vulnerability:** The CORS configuration was hardcoded to `http://localhost:5173` in `ConfigSeguranca.java`.
+**Learning:** Hardcoding origins in code prevents flexible deployment to different environments (e.g., dev, staging, prod) and can lead to availability issues or insecure configurations if the code is deployed as-is.
+**Prevention:** Always externalize environment-specific configurations like allowed origins to property files (`application.yml`) and use environment variables for override.
