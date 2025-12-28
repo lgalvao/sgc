@@ -1,89 +1,41 @@
-# Módulo de Mapa
+# Pacote Mapa
 
 ## Visão Geral
 
-Este é um dos módulos centrais do sistema, responsável por toda a gestão do **Mapa de Competências**. Um "Mapa" é o
-artefato que agrega competências, atividades e conhecimentos de uma unidade organizacional.
+O pacote `mapa` é o coração do domínio do SGC. Ele encapsula toda a lógica relacionada à estruturação e gerenciamento das competências organizacionais. Este pacote centraliza não apenas o conceito de "Mapa", mas também seus componentes constituintes: **Competências**, **Atividades** e **Conhecimentos**.
 
-O pacote organiza a lógica de negócio em componentes coesos com responsabilidades únicas.
+## Estrutura de Domínio
 
-## Arquitetura de Serviços
+O modelo de dados é hierárquico:
 
-```mermaid
-graph TD
-    subgraph "Clientes"
-        ProcessoService
-        SubprocessoService
-        MapaController
-        AtividadeController
-    end
+1.  **Mapa**: Entidade raiz que agrupa as definições para uma unidade em um determinado ciclo.
+2.  **Competencia**: Habilidade ou capacidade necessária (ex: "Gestão de Projetos").
+3.  **Atividade**: Tarefas práticas que exigem a competência (ex: "Elaborar cronograma").
+4.  **Conhecimento**: Saberes específicos necessários para realizar a atividade (ex: "Ferramenta MS Project").
 
-    subgraph "Módulo Mapa"
-        subgraph "Serviços Principais"
-            MapaService
-            AtividadeService
-        end
+> **Nota:** Anteriormente, `conhecimento` e `atividade` eram módulos separados. Agora, eles foram consolidados neste pacote para garantir alta coesão, visto que são partes inseparáveis do domínio do Mapa.
 
-        subgraph "Serviços Especializados"
-            CopiaMapaService
-            ImpactoMapaService
-            MapaVisualizacaoService
-            CompetenciaService
-        end
+## Serviços Principais
 
-        subgraph "Entidades"
-            Mapa
-            Competencia
-            Atividade
-            Conhecimento
-        end
+### `MapaService`
+Gerencia o ciclo de vida da entidade `Mapa`. Responsável por criar, buscar e associar mapas a subprocessos.
 
-        Repos(Repositórios JPA)
-    end
+### `AtividadeService`
+Gerencia o cadastro e manutenção de atividades e seus conhecimentos associados.
 
-    ProcessoService & SubprocessoService --> MapaService
-    MapaController --> MapaService
-    AtividadeController --> AtividadeService
+### `CompetenciaService`
+Centraliza a lógica de CRUD para competências.
 
-    MapaService & AtividadeService --> Repos
-    CopiaMapaService & ImpactoMapaService & MapaVisualizacaoService & CompetenciaService --> Repos
-```
+### `ImpactoMapaService`
+Realiza a análise de impacto quando há alterações no mapa (ex: remoção de uma competência utilizada em múltiplos subprocessos). Calcula e retorna o `ImpactoMapaDto`.
 
-## Componentes Principais
+### `CopiaMapaService`
+Serviço especializado responsável por realizar a "deep copy" (cópia profunda) de um mapa. Essencial para iniciar novos ciclos de revisão baseados em mapas anteriores, duplicando toda a estrutura de competências, atividades e conhecimentos.
 
-### Serviços
+### `MapaVisualizacaoService`
+Otimizado para leitura, monta DTOs complexos (`MapaVisualizacaoDto`) para exibir a árvore completa de competências no frontend de forma performática.
 
-| Serviço | Responsabilidade |
-|---------|------------------|
-| **`MapaService`** | CRUD de mapas + salvamento completo com vínculos e validação de integridade |
-| **`AtividadeService`** | CRUD de atividades e conhecimentos |
-| **`CompetenciaService`** | Gerencia ciclo de vida das competências |
-| **`CopiaMapaService`** | Deep copy de mapas (usado em revisões) |
-| **`ImpactoMapaService`** | Análise de diferenças entre mapas (CDU-12) |
-| **`MapaVisualizacaoService`** | Constrói DTOs de visualização hierárquica |
+## Padrões Utilizados
 
-### Controllers
-
-- **`MapaController`**: Expõe a API REST para mapas (`/api/mapas`).
-- **`AtividadeController`**: Expõe a API REST para atividades e conhecimentos (`/api/atividades`).
-
-### Modelo de Dados (`model/`)
-
-| Entidade | Descrição |
-|----------|-----------|
-| **`Mapa`** | Entidade raiz do agregado |
-| **`Competencia`** | Competência técnica vinculada ao mapa |
-| **`Atividade`** | Atividade desempenhada, vinculada ao mapa |
-| **`Conhecimento`** | Conhecimento necessário para realizar uma atividade |
-
-### DTOs (`dto/`) e Mappers (`mapper/`)
-
-- DTOs para `Mapa`, `Competencia`, `Atividade`, `Conhecimento`
-- Mappers MapStruct para conversão Entidade ↔ DTO
-
-## Como Testar
-
-Para executar apenas os testes deste módulo:
-```bash
-./gradlew :backend:test --tests "sgc.mapa.*"
-```
+*   **DTOs de Visualização:** Separação clara entre entidades JPA e objetos retornados para a UI (pacote `dto.visualizacao`), evitando problemas de serialização cíclica e carregamento desnecessário de dados.
+*   **Mapper:** Uso de MapStruct para conversão eficiente entre Entidades e DTOs.

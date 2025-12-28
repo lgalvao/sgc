@@ -1,49 +1,38 @@
-# Services (Camada de Serviço)
+# Diretório de Serviços (Services)
 
-
-Este diretório contém os módulos responsáveis pela **comunicação com o Backend**.
-
-Os serviços atuam como uma camada de abstração sobre o protocolo HTTP. Os componentes e stores nunca devem chamar
-`axios.get` ou `axios.post` diretamente; eles devem invocar métodos semânticos nos serviços (ex:
-`processoService.criar(...)`).
+Este diretório contém a camada de abstração de API. Os arquivos aqui são responsáveis por realizar as chamadas HTTP para o backend.
 
 ## Padrão de Implementação
 
-Cada arquivo de serviço exporta um objeto ou classe contendo métodos que correspondem aos endpoints da API. Eles
-utilizam a instância configurada do Axios (`apiClient` de `src/axios-setup.ts`) para fazer as requisições.
+Os serviços exportam objetos ou funções que utilizam a instância configurada do Axios (`@/axios-setup`).
 
-### Arquivos Disponíveis
+```typescript
+import api from '@/axios-setup';
+import type { Processo } from '@/types';
 
-- **`alertaService.ts`**: Gerencia alertas do usuário (`/api/alertas`).
-- **`analiseService.ts`**: Busca e cria históricos de análise (`/api/subprocessos/.../analises`).
-- **`atividadeService.ts`**: CRUD de atividades e conhecimentos (`/api/atividades`).
-- **`atribuicaoTemporariaService.ts`**: Gerencia atribuições temporárias de chefia.
-- **`cadastroService.ts`**: Ações de workflow da etapa de cadastro.
-- **`mapaService.ts`**: Operações no mapa de competências (`/api/mapas`).
-- **`painelService.ts`**: Dados para o dashboard (`/api/painel`).
-- **`processoService.ts`**: Gestão de processos (`/api/processos`).
-- **`subprocessoService.ts`**: Gestão de subprocessos e workflow (`/api/subprocessos`).
-- **`unidadesService.ts`**: Consulta de unidades (`/api/unidades`).
-- **`usuarioService.ts`**: Autenticação e gestão de usuários (`/api/usuarios`).
+export default {
+  async listar(): Promise<Processo[]> {
+    const { data } = await api.get('/processos');
+    return data;
+  },
 
-## Tratamento de Erros
+  async criar(payload: CriarProcessoDto): Promise<Processo> {
+    const { data } = await api.post('/processos', payload);
+    return data;
+  }
+};
+```
 
-Os serviços devem repassar os erros do Axios para que possam ser tratados pelas camadas superiores (Stores ou
-Components), que decidirão como exibir a mensagem ao usuário (Toast, Modal, etc.).
+## Configuração do Axios (`axios-setup.ts`)
 
-## Referência Cruzada de API
+O cliente HTTP centralizado configura:
+1.  **Base URL**: Aponta para a API (ex: `/api` via proxy ou `http://localhost:10000`).
+2.  **Request Interceptor**: Injeta o cabeçalho `Authorization: Bearer <token>` se o usuário estiver logado.
+3.  **Response Interceptor**: Trata erros globais, como `401 Unauthorized` (redirecionando para login) ou `403 Forbidden`.
 
-| Frontend Service | Backend Controller | Prefixo URL |
-|------------------|--------------------|-------------|
-| `alertaService.ts` | `AlertaController` | `/api/alertas` |
-| `analiseService.ts` | `AnaliseController` | `/api/subprocessos/{id}` |
-| `atividadeService.ts` | `AtividadeController` | `/api/atividades` |
-| `atribuicaoTemporariaService.ts` | `UnidadeController` | `/api/unidades` |
-| `cadastroService.ts` | `SubprocessoCadastroController` | `/api/subprocessos` |
-| `mapaService.ts` | `MapaController` | `/api/mapas` |
-| `painelService.ts` | `PainelController` | `/api/painel` |
-| `processoService.ts` | `ProcessoController` | `/api/processos` |
-| `subprocessoService.ts` | `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController` | `/api/subprocessos` |
-| `unidadesService.ts` | `UnidadeController` | `/api/unidades` |
-| `usuarioService.ts` | `SgrhController` | `/api/usuarios` |
+## Serviços Principais
 
+*   **`authService`**: Login e troca de perfil.
+*   **`processoService`**: Operações de Processo.
+*   **`subprocessoService`**: Operações de Subprocesso e Workflow.
+*   **`mapaService`**: Operações específicas do Mapa (atividades, competências).

@@ -1,65 +1,37 @@
-# Stores (Gerenciamento de Estado - Pinia)
+# Diretório de Stores (Pinia)
 
+Este diretório contém as **Stores Pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
 
-Este diretório contém as **Stores do Pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
+## Padrão Arquitetural
 
-As stores atuam como a "fonte da verdade" para os dados que precisam ser compartilhados entre múltiplos componentes ou
-que precisam persistir durante a navegação.
+Utilizamos o padrão **Setup Stores** (similar à Composition API) para definição das stores.
 
-## Estrutura de uma Store
+```typescript
+export const useExemploStore = defineStore('exemplo', () => {
+  // State (ref)
+  const itens = ref<Item[]>([]);
 
-As stores são definidas usando a sintaxe `defineStore` utilizando o estilo **Setup Stores** (similar à Composition API).
+  // Getters (computed)
+  const itensAtivos = computed(() => itens.value.filter(i => i.ativo));
 
-```mermaid
-graph TD
-    subgraph Componente
-        A[View/Component]
-    end
-    subgraph Store
-        B[Action]
-        C[State]
-    end
-    subgraph Service
-        D[Service Function]
-    end
-    subgraph API
-        E[Backend API]
-    end
+  // Actions (function)
+  async function carregarItens() {
+    itens.value = await ExemploService.listar();
+  }
 
-    A -- Chama Action --> B
-    B -- Chama Service --> D
-    D -- Request HTTP --> E
-    E -- Response JSON --> D
-    D -- Retorna Dados --> B
-    B -- Atualiza --> C
-    C -- Reage e Atualiza --> A
+  return { itens, itensAtivos, carregarItens };
+});
 ```
 
-A função de setup deve retornar um objeto contendo:
+## Stores Principais
 
-- **State (`ref`, `reactive`):** Os dados em si.
-- **Getters (`computed`):** Propriedades derivadas ou calculadas a partir do estado.
-- **Actions (`function`):** Métodos para modificar o estado, muitas vezes invocando `services` para buscar dados da API.
-
-### Stores Disponíveis
-
-- **`alertas.ts`**: Lista de alertas do usuário e contagem de não lidos.
-- **`analises.ts`**: Histórico de análises do subprocesso atual.
-- **`atividades.ts`**: Cache ou gestão de atividades sendo editadas.
-- **`atribuicoes.ts`**: Gerencia o estado das atribuições temporárias de unidades.
-- **`configuracoes.ts`**: Preferências da aplicação.
-- **`mapas.ts`**: Estado do mapa de competências (atividades, conhecimentos) sendo visualizado ou editado. Fundamental
-  para a edição complexa de mapas.
-- **`notificacoes.ts`**: Gerencia notificações toast e modais globais.
-- **`perfil.ts`**: Dados do usuário logado, perfil selecionado e tokens de autenticação. Persiste dados no
-  `localStorage` para manter a sessão.
-- **`processos.ts`**: Lista de processos e filtros ativos.
-- **`subprocessos.ts`**: Dados do subprocesso atual selecionado.
-- **`unidades.ts`**: Árvore de unidades e dados organizacionais.
-- **`usuarios.ts`**: Gestão de usuários (para telas de administração e cache).
+*   **`useAuthStore`** (ou `usePerfilStore`): Gerencia a sessão do usuário, token JWT e perfil selecionado.
+*   **`useProcessoStore`**: Gerencia a lista e o estado do processo selecionado.
+*   **`useSubprocessoStore`**: Gerencia os dados do subprocesso, incluindo o mapa de competências em edição.
+*   **`useNotificacoesStore`**: Centraliza alertas e notificações do sistema (Toast).
 
 ## Boas Práticas
 
-- **Single Source of Truth:** Evite duplicar dados entre stores e componentes.
-- **Stores Pequenas e Focadas:** Prefira várias stores especializadas a uma store gigante.
-
+1.  **Acesso à API**: Stores nunca chamam `axios` diretamente. Elas delegam para a camada `services/`.
+2.  **Reset**: Implemente um método `$reset` ou uma action `limparEstado` se a store precisar ser resetada entre navegações.
+3.  **Persistência**: Dados sensíveis de sessão (token, usuário) são persistidos no `localStorage` para sobreviver ao refresh (F5).

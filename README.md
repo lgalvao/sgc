@@ -14,8 +14,8 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 | Camada | Tecnologias Principais |
 | --- | --- |
-| **Backend** | Java 21, Spring Boot, Hibernate, H2/Oracle |
-| **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext |
+| **Backend** | Java 21, Spring Boot 3.5.7, Hibernate, H2/PostgreSQL |
+| **Frontend** | Vue.js 3, TypeScript, Vite, Pinia, BootstrapVueNext |
 | **Testes** | JUnit 5, Mockito, Vitest, Playwright |
 
 ### Documentação Detalhada
@@ -56,7 +56,7 @@ sgc/
 1. **Backend:**
 
     ```bash
-    ./gradlew bootRun
+    cd /app && ./gradlew bootRun
     ```
 
     A API estará disponível em `http://localhost:10000`.
@@ -81,7 +81,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 | Tipo | Comando | Descrição |
 | --- | --- | --- |
-| **Unitários Backend** | `./gradlew :backend:test` | JUnit 5 com banco em memória (H2). |
+| **Unitários Backend** | `cd /app && ./gradlew :backend:test` | JUnit 5 com banco em memória (H2). |
 | **Unitários Frontend** | `cd frontend && npm run test:unit` | Vitest para componentes e lógica. |
 | **End-to-End (E2E)** | `npm run test:e2e` | Playwright simulando fluxos reais. |
 | **Type Check (Front)** | `cd frontend && npm run typecheck` | Verificação estática de tipos TypeScript. |
