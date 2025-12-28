@@ -96,27 +96,40 @@ public class CDU16IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar Mapa via Fixture
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(null);
-        mapa = mapaRepo.save(mapa);
-
-        // Criar Subprocesso via Fixture
+        // Criar Subprocesso via Fixture (Primeiro o subprocesso, pois Mapa depende dele)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
+        subprocesso.setMapa(null); // Importante: limpar mapa da fixture para evitar dependência circular errada
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
+        // Criar Mapa via Fixture (Ligado ao Subprocesso)
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
+
+        // Atualizar referência no subprocesso (para consistência do objeto em memória)
+        subprocesso.setMapa(mapa);
+
+        // Criar Competências e Atividades
         var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+
+        // As atividades devem ser salvas antes de serem associadas à competência
         atividade1 = new Atividade(mapa, "Atividade 1");
         var atividade2 = new Atividade(mapa, "Atividade 2");
-        atividade1.getCompetencias().add(c1);
-        atividade2.getCompetencias().add(c1);
-        c1.getAtividades().add(atividade1);
-        c1.getAtividades().add(atividade2);
+
         List<Atividade> atividadesSalvas = atividadeRepo.saveAll(List.of(atividade1, atividade2));
         atividade1 = atividadesSalvas.get(0);
+        var atividade2Salva = atividadesSalvas.get(1);
+
+        // Associar atividades à competência
+        atividade1.getCompetencias().add(c1);
+        atividade2Salva.getCompetencias().add(c1);
+        c1.getAtividades().add(atividade1);
+        c1.getAtividades().add(atividade2Salva);
+
+        // Salvar associações
+        atividadeRepo.saveAll(List.of(atividade1, atividade2Salva));
         competenciaRepo.save(c1);
     }
 
