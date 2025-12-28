@@ -58,9 +58,13 @@ pitest {
     - Melhoria em `SubprocessoCadastroWorkflowServiceTest` para verificar chamadas de limpeza de análise, garantindo integridade do workflow.
 - **Resultado:** Aumento significativo na confiabilidade dos testes de workflow e permissões.
 
-#### Fase 3: Outros Domínios (`mapa`, `atividade`)
-Expandir para outros domínios principais.
-- **Ação:** Atualizar `targetClasses` no gradle e rodar análise para `sgc.mapa.*` e `sgc.atividade.*`.
+#### Fase 3: Outros Domínios (`mapa`, `atividade`) - **CONCLUÍDO**
+- **Execução Inicial:** Mutation Score de 22% (45 mortos / 203 gerados).
+- **Ações Realizadas:**
+    - Atualização do `build.gradle.kts` para focar em `sgc.mapa.*`.
+    - Reforço em `MapaServiceTest` para validar retornos não nulos (`NullReturnValsMutator`).
+    - Melhoria em `ImpactoMapaServiceTest` para garantir que listas retornadas não sejam vazias e contenham os dados esperados, matando mutantes de retorno vazio e nulo.
+- **Resultado Final:** Mutation Score subiu para **23%** (47 mortos). A cobertura geral do pacote ainda é baixa (29%), indicando a necessidade de criar novos testes para `CompetenciaService` e outros componentes não cobertos em iterações futuras.
 
 #### Fase 4: Camada de Segurança e Serviços Auxiliares (`sgrh`, `seguranca`)
 Validar se as regras de autorização estão robustas contra alterações acidentais.

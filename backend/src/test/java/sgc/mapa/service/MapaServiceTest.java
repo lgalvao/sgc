@@ -73,9 +73,10 @@ class MapaServiceTest {
             when(mapaRepo.save(any())).thenReturn(new Mapa());
             when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
-            service.salvarMapaCompleto(id, req, "user");
+            MapaCompletoDto res = service.salvarMapaCompleto(id, req, "user");
 
             verify(mapaRepo).save(any());
+            assertThat(res).isNotNull();
         }
     }
 }
