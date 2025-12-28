@@ -16,44 +16,44 @@ Principais benefícios:
 ## 3. Estratégia de Implementação
 
 ### 3.1. Configuração do Build (Gradle)
-O primeiro passo é adicionar o plugin do PiTest ao arquivo `build.gradle.kts` do módulo backend.
+O plugin do PiTest foi adicionado ao arquivo `build.gradle.kts` do módulo backend.
 
-**Dependência:**
-Plugin: `info.solidsoft.pitest`
-
-**Configuração Inicial Sugerida:**
+**Configuração Atual:**
 ```kotlin
 plugins {
-    id("info.solidsoft.pitest") version "1.15.0" // Verificar versão mais recente compatível
+    id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
 
 pitest {
     junit5PluginVersion.set("1.2.1")
-    targetClasses.set(listOf("sgc.*")) // Define o escopo das classes a serem mutadas
-    excludedClasses.set(listOf(
-        "*.dto.*",
-        "*.model.*",
-        "*Config",
-        "*Application",
-        "*MapperImpl" // Ignorar implementações geradas pelo MapStruct
+    targetClasses.set(setOf("sgc.processo.*")) // Escopo atual (Fase 1)
+    excludedClasses.set(setOf(
+        "sgc.Sgc",
+        "sgc.**.*Config",
+        "sgc.**.*Dto",
+        "sgc.**.*Exception",
+        "sgc.**.*Repo",
+        "sgc.**.*MapperImpl"
     ))
-    threads.set(4) // Otimização de performance
-    outputFormats.set(listOf("HTML"))
-    timestampedReports.set(false)
+    threads.set(4)
+    outputFormats.set(setOf("XML", "HTML"))
 }
 ```
 
 ### 3.2. Escopo de Execução (Fases)
-Como o teste de mutação é computacionalmente custoso, não devemos rodá-lo em todo o projeto de uma vez inicialmente. A execução será dividida por pacotes de domínio críticos.
 
-#### Fase 1: Piloto (Pacote `processo`)
-O pacote `sgc.processo` contém a lógica de orquestração central. É o candidato ideal para validar a configuração.
-- **Ação:** Rodar PiTest apenas para `sgc.processo.*`.
-- **Meta:** Atingir > 70% de Mutation Score.
+#### Fase 1: Piloto (Pacote `processo`) - **CONCLUÍDO**
+- **Execução Inicial:** Mutation Score de 47% (86 mortos / 183 gerados).
+- **Ações Realizadas:**
+    - Reforço de asserções em `ProcessoServiceTest` (validação de mensagens de erro).
+    - Criação de `ProcessoInicializadorTest` para cobrir lógica de inicialização anteriormente não testada.
+    - Melhoria em `ProcessoDetalheBuilderTest` para validar lógica de segurança e ordenação.
+- **Resultado Final:** Mutation Score subiu para **63%** (116 mortos).
+    - Muitos mutantes sobreviventes restantes estão em DTOs (`CriarProcessoReq`), Mappers ou logs, que são de menor risco.
 
 #### Fase 2: Domínios Core (`atividade`, `mapa`, `subprocesso`)
-Após o sucesso do piloto, expandir para os outros domínios principais que contêm regras de negócio complexas.
-- **Ação:** Rodar e analisar `sgc.atividade.*`, `sgc.mapa.*` e `sgc.subprocesso.*`.
+Expandir para outros domínios principais.
+- **Ação:** Atualizar `targetClasses` no gradle e rodar análise para `sgc.atividade.*`, `sgc.mapa.*` e `sgc.subprocesso.*`.
 
 #### Fase 3: Camada de Segurança e Serviços Auxiliares (`sgrh`, `seguranca`)
 Validar se as regras de autorização estão robustas contra alterações acidentais.
@@ -64,22 +64,18 @@ Para cada execução do PiTest:
 
 1.  **Executar:** Rodar o comando Gradle (ex: `./gradlew pitest`).
 2.  **Analisar:** Abrir o relatório HTML gerado em `backend/build/reports/pitest/index.html`.
-3.  **Identificar Mutantes Sobreviventes:** Focar nos mutantes marcados como **SURVIVED**. Isso significa que o PiTest alterou o código (ex: mudou `if (x > 0)` para `if (x >= 0)`), mas nenhum teste falhou.
-4.  **Corrigir:**
-    *   Se o mutante revelar um bug no código: Corrigir o código.
-    *   Se o código estiver correto, mas o teste for fraco: Adicionar asserções ou novos casos de teste para cobrir o cenário.
-    *   Se for um falso positivo (código equivalente): Marcar para exclusão ou ignorar.
-5.  **Revalidar:** Rodar os testes unitários padrão e depois o PiTest novamente para confirmar a morte do mutante.
+3.  **Identificar Mutantes Sobreviventes:** Focar nos mutantes marcados como **SURVIVED**.
+4.  **Corrigir:** Melhorar testes ou corrigir código.
+5.  **Revalidar:** Rodar os testes unitários padrão e depois o PiTest novamente.
 
 ## 5. Métricas de Sucesso
 
 *   **Mutation Score:** Porcentagem de mutantes mortos pelos testes.
     *   *Mínimo Aceitável:* 60%
     *   *Ideal:* > 80%
-*   **Força do Teste (Test Strength):** Mede quão bons são os testes apenas nas linhas que eles cobrem. Devemos buscar 100% aqui.
+*   **Força do Teste (Test Strength):** Mede quão bons são os testes apenas nas linhas que eles cobrem.
 
-## 6. Próximos Passos Imediatos
+## 6. Próximos Passos
 
-1.  Atualizar o `backend/build.gradle.kts` com o plugin do PiTest.
-2.  Realizar a execução piloto no pacote `sgc.processo`.
-3.  Documentar os primeiros achados e ajustar a configuração de exclusão de classes (para ignorar DTOs e código boilerplate que geram ruído).
+1.  Monitorar a execução do PiTest no CI (se aplicável) ou em execuções noturnas, dado o custo computacional.
+2.  Iniciar Fase 2 focando no pacote `sgc.subprocesso`, que possui máquina de estados complexa.

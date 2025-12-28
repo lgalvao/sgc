@@ -107,4 +107,57 @@ class ProcessoDetalheBuilderTest {
         // Assert
         assertThat(dto.isPodeFinalizar()).isTrue();
     }
+
+    @Test
+    @DisplayName("Não deve permitir finalizar quando usuário não é admin")
+    void naoDevePermitirFinalizarQuandoUsuarioNaoAdmin() {
+        // Arrange
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setParticipantes(Set.of());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication auth = mock(Authentication.class);
+        when(auth.isAuthenticated()).thenReturn(true);
+        org.mockito.Mockito.doReturn(List.of(new SimpleGrantedAuthority("ROLE_USER"))).when(auth).getAuthorities();
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Assert
+        assertThat(dto.isPodeFinalizar()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve verificar ordenação das unidades")
+    void deveVerificarOrdenacaoDasUnidades() {
+        // Arrange
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSigla("B"); u1.setNome("Unidade B");
+        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSigla("A"); u2.setNome("Unidade A");
+
+        processo.setParticipantes(Set.of(u1, u2));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(null);
+        SecurityContextHolder.setContext(securityContext);
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo);
+
+        // Assert
+        assertThat(dto.getUnidades()).hasSize(2);
+        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("A");
+        assertThat(dto.getUnidades().get(1).getSigla()).isEqualTo("B");
+    }
 }

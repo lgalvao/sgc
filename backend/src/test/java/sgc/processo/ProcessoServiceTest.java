@@ -489,14 +489,19 @@ class ProcessoServiceTest {
             Processo processo = ProcessoFixture.processoEmAndamento();
             processo.setCodigo(id);
 
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = UnidadeFixture.unidadePadrao();
+            Subprocesso sp = SubprocessoFixture.subprocessoPadrao(processo, u);
+            Mapa m = MapaFixture.mapaPadrao(sp);
+            sp.setMapa(m);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO); // Não homologado
 
             when(processoRepo.findById(id)).thenReturn(Optional.of(processo));
             when(subprocessoService.listarEntidadesPorProcesso(id)).thenReturn(List.of(sp));
 
             // Act & Assert
-            assertThatThrownBy(() -> processoService.finalizar(id)).isInstanceOf(ErroProcesso.class);
+            assertThatThrownBy(() -> processoService.finalizar(id))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("pendentes de homologação");
         }
 
         @Test
