@@ -56,6 +56,8 @@ aplicacao:
   jwt:
     secret: ${JWT_SECRET:sgc-secret-key-change-this-in-production-minimum-32-chars}
     expiracao-minutos: 120
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
   email:
     remetente: sgc@tre-pe.jus.br
     remetente-nome: "Sistema de Gestão de Competências"
