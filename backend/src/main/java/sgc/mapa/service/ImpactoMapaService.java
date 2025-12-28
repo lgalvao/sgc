@@ -91,18 +91,25 @@ public class ImpactoMapaService {
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
 
+        // ⚡ Otimização: Carregar todas as competências e construir o mapa em memória
+        // Isso evita o N+1 ao acessar atividade.getCompetencias() dentro dos loops
+        List<Competencia> competenciasDoMapa =
+                competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
+
+        Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
+
         List<AtividadeImpactadaDto> inseridas =
                 detectarAtividadesInseridas(atividadesAtuais, atividadesVigentes);
 
         List<AtividadeImpactadaDto> removidas =
-                detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, mapaVigente);
+                detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias);
 
         List<AtividadeImpactadaDto> alteradas =
-                detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, mapaVigente);
+                detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, atividadeIdToCompetencias);
 
         List<CompetenciaImpactadaDto> competenciasImpactadas =
                 identificarCompetenciasImpactadas(
-                        mapaVigente, removidas, alteradas, atividadesVigentes);
+                        competenciasDoMapa, removidas, alteradas, atividadesVigentes);
 
         ImpactoMapaDto impactos =
                 ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
@@ -163,6 +170,16 @@ public class ImpactoMapaService {
                 .collect(Collectors.toMap(Atividade::getDescricao, atividade -> atividade));
     }
 
+    private Map<Long, List<Competencia>> construirMapaAtividadeCompetencias(List<Competencia> competencias) {
+        Map<Long, List<Competencia>> mapa = new HashMap<>();
+        for (Competencia comp : competencias) {
+            for (Atividade ativ : comp.getAtividades()) {
+                mapa.computeIfAbsent(ativ.getCodigo(), k -> new ArrayList<>()).add(comp);
+            }
+        }
+        return mapa;
+    }
+
     /**
      * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
      *
@@ -196,7 +213,9 @@ public class ImpactoMapaService {
     }
 
     private List<AtividadeImpactadaDto> detectarAtividadesRemovidas(
-            List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
+            List<Atividade> atuais,
+            List<Atividade> vigentes,
+            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
 
         List<AtividadeImpactadaDto> removidas = new ArrayList<>();
         Map<String, Atividade> atuaisMap = mapAtividadesByDescricao(atuais);
@@ -210,7 +229,7 @@ public class ImpactoMapaService {
                                 .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
                                 .descricaoAnterior(null)
                                 .competenciasVinculadas(
-                                        obterCompetenciasDaAtividade(vigente, mapaVigente))
+                                        obterNomesCompetencias(vigente.getCodigo(), atividadeIdToCompetencias))
                                 .build();
 
                 removidas.add(atividadeImpactadaDto);
@@ -220,7 +239,9 @@ public class ImpactoMapaService {
     }
 
     private List<AtividadeImpactadaDto> detectarAtividadesAlteradas(
-            List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
+            List<Atividade> atuais,
+            List<Atividade> vigentes,
+            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
         List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
         Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
 
@@ -241,7 +262,7 @@ public class ImpactoMapaService {
                                     .descricaoAnterior(
                                             "Descrição ou conhecimentos associados alterados.")
                                     .competenciasVinculadas(
-                                            obterCompetenciasDaAtividade(vigente, mapaVigente))
+                                            obterNomesCompetencias(vigente.getCodigo(), atividadeIdToCompetencias))
                                     .build());
                 }
             }
@@ -265,24 +286,15 @@ public class ImpactoMapaService {
     // ========================================================================================
 
     private List<CompetenciaImpactadaDto> identificarCompetenciasImpactadas(
-            Mapa mapaVigente,
+            List<Competencia> competenciasDoMapa,
             List<AtividadeImpactadaDto> removidas,
             List<AtividadeImpactadaDto> alteradas,
             List<Atividade> atividadesVigentes) {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
-        List<Competencia> competenciasDoMapa =
-                competenciaRepo.findByMapaCodigo(mapaVigente.getCodigo());
 
         // Indexar competências por ID da atividade (Invertendo o relacionamento para busca O(1))
-        Map<Long, List<Competencia>> atividadeIdToCompetencias = new HashMap<>();
-        for (Competencia comp : competenciasDoMapa) {
-            for (Atividade ativ : comp.getAtividades()) {
-                atividadeIdToCompetencias
-                        .computeIfAbsent(ativ.getCodigo(), k -> new ArrayList<>())
-                        .add(comp);
-            }
-        }
+        Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
 
         // Indexar IDs das atividades vigentes por descrição para lookup rápido
         Map<String, Long> descricaoToVigenteId =
@@ -356,12 +368,9 @@ public class ImpactoMapaService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private List<String> obterCompetenciasDaAtividade(Atividade atividade, Mapa mapaVigente) {
-        if (atividade == null) return Collections.emptyList();
-
-        // Otimização: Recebe a entidade já carregada para evitar busca redundante por ID
-        return atividade.getCompetencias().stream()
-                .filter(c -> c.getMapa().getCodigo().equals(mapaVigente.getCodigo()))
+    private List<String> obterNomesCompetencias(Long codigoAtividade, Map<Long, List<Competencia>> atividadeIdToCompetencias) {
+        return atividadeIdToCompetencias.getOrDefault(codigoAtividade, Collections.emptyList())
+                .stream()
                 .map(Competencia::getDescricao)
                 .toList();
     }
