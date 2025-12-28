@@ -1,233 +1,82 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
-
 ## Visão Geral
 
-Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A
-arquitetura é organizada em pacotes representando domínios específicos. Parte da comunicação entre os módulos centrais é
-realizada de forma reativa, através de eventos de domínio.
+Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos.
 
-## Diagrama de Arquitetura
+## 🏗️ Arquitetura e Stack
 
-O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências principais entre os pacotes.
+A aplicação segue uma arquitetura **Modular Monolith** construída com:
 
-```mermaid
-graph TD
-    subgraph "1. Frontend (Cliente)"
-        Frontend[Aplicação Vue.js]
-    end
+*   **Java 21**: Linguagem base.
+*   **Spring Boot 3.5.7**: Framework de aplicação.
+*   **Hibernate/JPA**: Persistência de dados.
+*   **PostgreSQL**: Banco de dados de produção.
+*   **H2 Database**: Banco de dados em memória para testes e desenvolvimento local rápido.
+*   **Gradle**: Ferramenta de build e gerenciamento de dependências.
 
-    subgraph "2. Camada de API"
-        API[Controladores REST]
-    end
+## 📦 Módulos Principais
 
-    subgraph "3. Camada de Serviço"
-        Servico[Serviços de Negócio]
-        Processo[Processo Orquestrador]
-    end
+O código está organizado em `src/main/java/sgc/` com os seguintes módulos principais:
 
-    subgraph "4. Camada de Domínio e Dados"
-        Dominio[Entidades JPA & Repositórios]
-        IntegracaoSGRH[SGRH & Unidade]
-    end
+*   **`processo`**: Orquestrador central de fluxos de alto nível.
+*   **`subprocesso`**: Máquina de estados para gerenciamento de tarefas por unidade.
+*   **`mapa`**: Núcleo do domínio (Mapas, Competências, Atividades, Conhecimentos).
+*   **`usuario`**: Gestão de usuários, perfis e autenticação.
+*   **`unidade`**: Modelagem da estrutura organizacional.
+*   **`alerta` / `notificacao`**: Módulos reativos para comunicação com o usuário.
+*   **`analise`**: Auditoria e histórico de revisões.
 
-    subgraph "5. Módulos Reativos & Suporte"
-        Eventos[Eventos de Domínio]
-        Notificacao[Notificação]
-        Alerta[Alerta]
-        Comum[Comum Utilitários]
-    end
+## 🚀 Como Executar
 
-    Frontend --> API
-    API --> Servico
-    Servico --> Dominio
-
-    Processo -- Publica --> Eventos
-    Eventos --> Notificacao
-    Eventos --> Alerta
-
-    IntegracaoSGRH -- Popula Dados --> Dominio
-
-    Comum -- Suporte Geral --> Servico & Dominio & Notificacao & Alerta
-```
-
-## Módulos Principais (`src/main/java/sgc/`)
-
-### 1. `processo` (Orquestrador)
-
-- **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "
-  Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros
-  módulos, mantendo o sistema desacoplado.
-
-### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
-
-- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma *
-  *máquina de estados**, transitando as tarefas entre diferentes situações e mantendo um histórico imutável de todas as
-  ações através da entidade `Movimentacao`. Para melhor organização, o controlador foi dividido em
-  `SubprocessoCrudController` (operações CRUD), `SubprocessoCadastroController` (ações de workflow da etapa de
-  cadastro), `SubprocessoMapaController` (operações relacionadas ao mapa) e `SubprocessoValidacaoController` (ações de
-  workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de
-  salvamento do mapa no contexto do workflow.
-
-### 3. `mapa` e `atividade` (Domínio Principal)
-
-- **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
-- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências. Contém a lógica para gerenciar
-  competências através do `CompetenciaService`.
-- **`atividade`:** Define as atividades associadas às competências. Este módulo também é responsável por gerenciar os *
-  *conhecimentos** vinculados a cada atividade.
-
-### 4. `analise` (Auditoria e Revisão)
-
-- **Responsabilidade:** Registra o histórico de todas as análises de "cadastro" e "validação" realizadas sobre um
-  subprocesso, fornecendo uma trilha de auditoria das revisões.
-
-### 5. `notificacao` e `alerta` (Comunicação Reativa)
-
-- **Responsabilidade:** Módulos reativos que "escutam" os eventos de domínio publicados pelo `processo`.
-- **`alerta`:** Cria alertas visíveis dentro da interface do sistema.
-- **`notificacao`:** Envia notificações externas (como e-mails) de forma assíncrona.
-
-### 6. `sgrh` e `unidade` (Estrutura e Integração)
-
-- **Responsabilidade:** Fornecem os dados sobre a estrutura organizacional e os usuários.
-- **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica
-  de negócio.
-- **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar
-  dados de um sistema de RH externo (atualmente simulado).
-
-### 7. `comum` e `util` (Componentes Transversais)
-
-- **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
-- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro customizadas e a
-  `EntidadeBase` para entidades JPA. Contém também configurações do Spring (`config`) e suporte para serialização JSON (
-  `json`).
-- **`util`**: Contém classes de utilidade diversas.
-
-## Como Construir e Executar
-
-Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da raiz do repositório:
+A partir da raiz do projeto (`/app`), execute:
 
 ```bash
-./gradlew :backend:build
+./gradlew bootRun
 ```
 
 A API estará disponível em `http://localhost:10000`.
 
-## Documentação da API (Swagger UI)
+### Perfis do Spring
 
-A documentação da API é gerada automaticamente com SpringDoc e está acessível em:
-[http://localhost:10000/swagger-ui.html](http://localhost:10000/swagger-ui.html)
+O sistema utiliza perfis para configurar o comportamento do ambiente:
 
-A especificação OpenAPI em formato JSON pode ser encontrada em:
-[http://localhost:10000/api-docs](http://localhost:10000/api-docs)
+*   `default`/`local`: Usa banco H2 em memória. Ideal para desenvolvimento.
+*   `prod`: Configurado para PostgreSQL.
+*   `test`: Ativado durante a execução de testes unitários/integração.
+*   `e2e`: Ativa endpoints auxiliares para testes end-to-end (reset de banco, fixtures).
 
 ## 🧪 Testes
 
-O backend possui uma suíte completa de testes (unitários e de integração) usando JUnit 5, Mockito e Spring Boot Test.
+### Execução
 
-### Executar Testes
-
-```bash
-# Todos os testes
-./gradlew :backend:test
-
-# Apenas testes de integração
-./gradlew :backend:test --tests "sgc.integracao.*"
-
-# Com relatório de cobertura
-./gradlew :backend:test :backend:jacocoTestReport
-```
-
-### Cobertura de Código (JaCoCo)
-
-O projeto utiliza **JaCoCo** para medir a cobertura de testes. Os relatórios são gerados automaticamente após a execução dos testes.
-
-#### Visualizar Relatório de Cobertura
-
-Após executar os testes, abra o relatório HTML:
+Para rodar todos os testes de backend:
 
 ```bash
-# Gerar relatório
-./gradlew :backend:test :backend:jacocoTestReport
-
-# Visualizar relatório HTML no navegador
-open backend/build/reports/jacoco/test/html/index.html
+cd /app && ./gradlew :backend:test
 ```
-
-#### Métricas de Cobertura (Baseline Atual)
-
-- **Linhas**: 85.9% (3848/4480)
-- **Branches**: 62.1% (845/1361)
-- **Instruções**: 84.6% (15861/18759)
-- **Métodos**: 83.5% (664/795)
-- **Classes**: 91.3% (126/138)
-
-#### Quality Gate
-
-O projeto possui verificações automáticas de cobertura mínima:
-
-- **Branches**: 60% mínimo
-- **Linhas**: 80% mínimo
-
-```bash
-# Verificar quality gate
-./gradlew :backend:jacocoTestCoverageVerification
-```
-
-**Observação**: O quality gate é executado automaticamente durante o `./gradlew :backend:check`.
 
 ### Estrutura de Testes
 
-```
-backend/src/test/java/sgc/
-├── fixture/              # Builders reutilizáveis para entidades de teste
-│   ├── ProcessoFixture.java
-│   ├── SubprocessoFixture.java
-│   ├── MapaFixture.java
-│   ├── AtividadeFixture.java
-│   ├── UnidadeFixture.java
-│   └── UsuarioFixture.java
-├── integracao/           # Testes de integração (CDU01-CDU21)
-└── [módulos]/            # Testes unitários por módulo
-```
+Os testes estão localizados em `src/test/java/sgc/`:
 
-## 🛡️ Verificações de Qualidade
+*   **`integracao/`**: Testes de integração cobrindo os Casos de Uso (CDU-XX).
+*   **`[pacote]/`**: Testes unitários específicos de cada módulo.
+*   **`architecture/`**: Testes ArchUnit garantindo a integridade arquitetural.
 
-O backend utiliza um conjunto de ferramentas de análise estática para garantir a qualidade do código. As verificações
-são não-bloqueantes (warnings only).
+## 🛡️ Qualidade de Código
 
-### Ferramentas Configuradas
+O projeto utiliza ferramentas de análise estática configuradas no Gradle:
 
-- **Checkstyle**: Verifica a aderência ao padrão de código (Google Checks).
-- **PMD**: Analisa o código em busca de más práticas e código morto.
-- **SpotBugs**: Detecta bugs potenciais através de análise de bytecode.
-- **JaCoCo**: Mede a cobertura de testes unitários e de integração.
+*   **Checkstyle**: Estilo de código.
+*   **PMD**: Boas práticas e detecção de erros.
+*   **SpotBugs**: Análise de bugs potenciais.
+*   **JaCoCo**: Relatórios de cobertura de testes.
 
-### Como Executar
-
-Na raiz do projeto:
+Para rodar as verificações:
 
 ```bash
-./gradlew :backend:qualityCheck
+cd /app && ./gradlew :backend:check
 ```
 
-### Relatórios
-
-Os relatórios HTML são gerados em `backend/build/reports/`:
-
-- `checkstyle/main.html`
-- `pmd/main.html`
-- `spotbugs/main.html`
-- `jacoco/test/html/index.html`
-
-## Padrões de Design e Boas Práticas
-
-- **Lombok:** Utilizado para reduzir código repetitivo.
-- **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
-- **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos
-  `processo`, `alerta` e `notificacao`.
-- **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService`
-  vs. `ImpactoMapaService`).
-- **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.
-
+Os relatórios são gerados em `backend/build/reports/`.

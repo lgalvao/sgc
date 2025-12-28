@@ -1,24 +1,19 @@
 # Módulo de Processo
 
-
 ## Visão Geral
 
-O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que
-representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências" ou "Revisão de Mapas".
+O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências" ou "Revisão de Mapas".
 
-Este módulo inicia e finaliza os fluxos de trabalho, coordena a criação de `Subprocessos` para cada unidade participante
-e **publica eventos de domínio** para comunicar-se de forma desacoplada com outros módulos, como `alerta` e
-`notificacao`.
+Este módulo inicia e finaliza os fluxos de trabalho, coordena a criação de `Subprocessos` para cada unidade participante e **publica eventos de domínio** para comunicar-se de forma desacoplada com outros módulos, como `alerta` e `notificacao`.
 
 ## Arquitetura de Serviços (Padrão Fachada)
 
-O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as
-operações principais.
+O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as operações principais.
 
 ```mermaid
 graph TD
     subgraph "Clientes do Módulo"
-        Controle(ProcessoController)
+        Controle(ProcessoControle)
     end
 
     subgraph "Módulo Processo"
@@ -47,7 +42,7 @@ graph TD
     - Iniciar processos (criando subprocessos e mapas).
     - Finalizar processos (homologando mapas vigentes).
     - Publicar eventos de domínio (`EventoProcessoIniciado`, `EventoProcessoFinalizado`).
-- **`ProcessoController`**: Expõe a API REST.
+- **`ProcessoControle`**: Expõe a API REST.
     - `GET /api/processos/ativos`: Lista processos em andamento.
     - `GET /api/processos/{id}/detalhes`: Visão completa do processo e seus subprocessos.
     - `POST /api/processos/{id}/iniciar`: Dispara o início do processo (CDU-03).
@@ -66,18 +61,15 @@ graph TD
 
 ## Fluxo de Iniciação de um Processo
 
-1. O `ProcessoController` recebe a requisição `POST /iniciar`.
+1. O `ProcessoControle` recebe a requisição `POST /iniciar`.
 2. O `ProcessoService` inicia uma transação.
 3. Para cada unidade participante, o serviço cria um `Subprocesso`.
-4. Se for um processo de **REVISAO**, o `CopiaMapaService` (do módulo `mapa`) é invocado para duplicar o mapa vigente da
-   unidade.
-5. Ao final, um `EventoProcessoIniciado` é publicado, disparando alertas e e-mails através dos listeners no pacote
-   `notificacao`.
-
+4. Se for um processo de **REVISAO**, o `CopiaMapaService` (do módulo `mapa`) é invocado para duplicar o mapa vigente da unidade.
+5. Ao final, um `EventoProcessoIniciado` é publicado, disparando alertas e e-mails através dos listeners no pacote `notificacao`.
 
 ## Como Testar
 
 Para executar apenas os testes deste módulo:
 ```bash
-./gradlew :backend:test --tests "sgc.processo.*"
+cd /app && ./gradlew :backend:test --tests "sgc.processo.*"
 ```

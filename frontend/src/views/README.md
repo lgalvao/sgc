@@ -1,69 +1,28 @@
-# Views (Páginas da Aplicação)
+# Diretório de Views
 
+Este diretório contém os componentes de página (Views) do Vue Router. Cada arquivo aqui representa uma tela completa da aplicação.
 
-Este diretório contém os componentes de **página** (Views) do Vue.js. As views são os componentes de nível superior que
-são carregados diretamente pelo Vue Router.
+## Organização
 
-## Responsabilidades de uma View
+As views são organizadas por domínio funcional ou fluxo de trabalho.
 
-Diferente dos componentes "burros" (`src/components`), as views são "inteligentes":
+### Autenticação
+*   `Login.vue`: Tela de login inicial.
+*   `SelecaoPerfil.vue`: Tela intermediária para escolha de perfil/unidade (se o usuário tiver múltiplos).
 
-1. **Orquestração:** Conectam o estado global (`stores`) aos componentes de UI.
-2. **Ciclo de Vida:** Gerenciam o carregamento inicial de dados (geralmente no `onMounted`).
-3. **Layout:** Definem a estrutura macro da página (títulos, disposição dos componentes).
+### Processos
+*   `PainelProcessos.vue`: Dashboard principal listando processos ativos.
+*   `DetalheProcesso.vue`: Visão geral de um processo específico.
 
-```mermaid
-graph TD
-    subgraph "View (Smart Component)"
-        V[View Principal]
-        V -- Usa --> S[Pinia Store]
-        V -- Usa --> R[Vue Router]
-    end
+### Subprocessos (Fluxo da Unidade)
+*   `WorkflowSubprocesso.vue`: Container principal para o fluxo de trabalho de uma unidade. Gerencia a navegação entre as etapas (Cadastro, Mapa, Validação).
+*   `CadAtividades.vue`: Tela de cadastro de atividades e conhecimentos.
+*   `MapaCompetencias.vue`: Tela de edição do mapa de competências.
 
-    subgraph "Components (Dumb Components)"
-        C1[Componente de UI]
-        C2[Componente de UI]
-    end
+## Padrão de Implementação
 
-    V -- Passa Props --> C1
-    V -- Passa Props --> C2
-    C1 -- Emite Eventos --> V
-    C2 -- Emite Eventos --> V
-
-    S -- Fornece Dados --> V
-```
-
-## Views Principais
-
-### Autenticação e Painel
-
-- **`LoginView.vue`**: Tela de login.
-- **`PainelView.vue`**: Dashboard principal do usuário, exibindo alertas e movimentações recentes.
-
-### Processos e Subprocessos
-
-- **`ProcessoView.vue`**: Listagem de processos.
-- **`CadProcesso.vue`**: Formulário para criação de novos processos.
-- **`SubprocessoView.vue`**: Tela de detalhes de um subprocesso específico. É o hub central para as ações de uma
-  unidade (ver mapa, diagnósticos, etc.).
-
-### Gestão de Mapas e Atividades
-
-- **`CadMapa.vue`**: Tela para edição do mapa de competências.
-- **`VisMapa.vue`**: Tela para visualização (leitura) do mapa de competências.
-- **`CadAtividades.vue`**: Tela para cadastro e edição de atividades e conhecimentos.
-- **`VisAtividades.vue`**: Visualização de atividades e conhecimentos.
-
-### Diagnóstico
-
-- **`DiagnosticoEquipe.vue`**: Tela para realizar o diagnóstico da equipe.
-- **`OcupacoesCriticas.vue`**: Tela para identificação de ocupações críticas.
-
-### Outros
-
-- **`CadAtribuicao.vue`**: Tela para cadastro de atribuições temporárias.
-- **`UnidadeView.vue`**: Visualização de detalhes de uma unidade organizacional.
-- **`HistoricoView.vue`**: Visualização de históricos.
-- **`RelatoriosView.vue`**: Geração e visualização de relatórios gerenciais.
-- **`ConfiguracoesView.vue`**: Configurações do sistema (acesso restrito a administradores).
-
+As Views devem ser **"Smart Components"**:
+1.  Conectam-se às **Stores** (Pinia) para buscar e modificar dados.
+2.  Passam dados para **Componentes** (pasta `src/components/`) via props.
+3.  Respondem a eventos emitidos pelos componentes filhos.
+4.  Não devem conter lógica de negócio complexa ou chamadas diretas à API (use Stores/Services).

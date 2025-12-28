@@ -1,85 +1,41 @@
-# Pacote SGRH e Usuário
-
+# Pacote Usuario
 
 ## Visão Geral
 
-Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
+O pacote `usuario` é responsável pelo gerenciamento de usuários, perfis de acesso, autenticação e autorização dentro do SGC. Ele atua como o ponto central para informações de identidade e estrutura organizacional do usuário.
 
-1. **Gestão de Usuários e Autenticação:** Define e gerencia a entidade `Usuario` do próprio SGC. Esta entidade é usada
-   pelo Spring Security para autenticação e para armazenar os perfis de acesso (`Perfil`) do usuário no sistema.
-2. **Fachada para o Sistema de RH Externo:** Através do `SgrhService`, atua como uma camada de abstração (uma fachada)
-   para buscar dados complementares de um sistema de RH externo, como a estrutura de unidades e os responsáveis por
-   elas.
+## Responsabilidades Principais
 
-**Status da Integração:** A fachada (`SgrhService`) está implementada com **dados simulados (mock)**. Ela está pronta
-para ser conectada a uma fonte de dados real, mas atualmente não realiza chamadas externas.
+1.  **Autenticação e Autorização:** Gerencia o processo de login (`entrar`, `autenticar`) e verifica permissões de acesso baseadas em **Perfis** (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) e **Unidades**.
+2.  **Gestão de Identidade:** Mantém os dados dos usuários (título eleitoral, nome, e-mail) e seus vínculos com unidades.
+3.  **Fachada de Integração:** O `UsuarioService` atua como uma fachada para o sistema, fornecendo dados de usuários e hierarquia de unidades para outros módulos, abstraindo a complexidade de consultas e integrações (como o mock de SGRH/AD).
 
-## Arquitetura Híbrida
+## Componentes Chave
 
-O pacote gerencia uma entidade interna (`Usuario`) e, ao mesmo tempo, consulta um serviço externo, como ilustrado
-abaixo.
+### `UsuarioService`
 
-```mermaid
-graph TD
-    subgraph "Aplicação SGC"
-        direction LR
-        SpringSecurity
-        OutrosServicos
-    end
+A classe principal do módulo.
 
-    subgraph "Pacote SGRH (este pacote)"
-        direction LR
-        SgrhController
-        SgrhService
-        UsuarioRepo
-    end
+*   **Autenticação:** Valida credenciais (via `AcessoAdClient` ou mock em testes).
+*   **Autorização:** Recupera e valida as atribuições (`UsuarioPerfil`) do usuário para uma determinada unidade.
+*   **Fornecimento de Dados:** Métodos como `buscarUsuarioPorTitulo`, `buscarResponsavelUnidade`, e `construirArvoreHierarquica` são amplamente utilizados por outros serviços (`Processo`, `Notificacao`) para obter contexto.
 
-    subgraph "Fontes de Dados"
-        direction LR
-        DB_SGC(Banco de Dados SGC)
-        SGRH_Externo(Sistema Externo de RH)
-    end
+### `Usuario` (Entidade)
 
-    SpringSecurity -- Usa --> UsuarioRepo
-    SgrhController -- Usa --> SgrhService
-    SgrhService -- Usa --> UsuarioRepo
-    UsuarioRepo -- Gerencia entidade Usuario em --> DB_SGC
+Representa o usuário do sistema.
+*   **ID:** Título Eleitoral (String).
+*   **Relacionamentos:** Possui uma coleção de `UsuarioPerfil` que define seus papéis em diferentes unidades.
 
-    OutrosServicos -- Consultam --> SgrhService
-    SgrhService -- Busca dados em --> SGRH_Externo
+### `Perfil` (Enum)
 
-    subgraph "Estado Atual"
-       SGRH_Externo(Atualmente simulado/mockado)
-    end
-```
+Define os níveis de acesso:
+*   `ADMIN`: Acesso total ao sistema.
+*   `GESTOR`: Gestão de processos e configurações da unidade.
+*   `CHEFE`: Aprovação e validação.
+*   `SERVIDOR`: Execução de tarefas operacionais.
 
-## Componentes Principais
+## Integração com Segurança
 
-### Controladores e Serviços (`service`)
-
-- **`SgrhService`**: Serviço unificado que gerencia autenticação/autorização de usuários e atua como fachada para o sistema de RH externo. Outros módulos do SGC utilizam este serviço para obter informações organizacionais.
-- **`SgrhController`**: Expõe a API REST (`/api/usuarios`) para autenticação, autorização e finalização de login.
-
-### Modelo de Dados (`model`)
-
-- **`Usuario`**: Entidade JPA que representa o usuário do SGC. Implementa a interface `UserDetails` do Spring Security.
-- **`Perfil`**: Enum que define os perfis de acesso (`ADMIN`, `CHEFE`, `GESTOR`, `SERVIDOR`).
-- **`UsuarioRepo`**: Repositório para persistência de usuários.
-
-### DTOs (`dto`)
-
-- **`AutenticacaoReq`**, **`EntrarReq`**: Requisições de login.
-- **`LoginResp`**: Resposta de login contendo token (simulado).
-
-## Propósito e Uso
-
-- **Para autenticação e autorização**, o Spring Security interage com o `UsuarioRepo` para carregar os dados do usuário.
-- **Para obter dados de RH (unidades, responsáveis, etc.)**, outros serviços devem injetar e utilizar o `SgrhService`.
-
-
-## Como Testar
-
-Para executar apenas os testes deste módulo:
-```bash
-./gradlew :backend:test --tests "sgc.sgrh.*"
-```
+O módulo trabalha em conjunto com o pacote `seguranca` para:
+*   Gerar tokens JWT (`GerenciadorJwt`).
+*   Validar requisições via filtros de segurança.
