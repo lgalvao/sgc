@@ -10,18 +10,18 @@
             class="shadow-lg p-4"
             no-body
         >
-          <h2
-              class="mb-2 text-center"
+          <h1
+              class="h2 mb-2 text-center"
               data-testid="txt-login-titulo"
           >
             SGC
-          </h2>
-          <h5
-              class="mb-4 text-center text-muted"
+          </h1>
+          <p
+              class="h5 mb-4 text-center text-muted"
               data-testid="txt-login-subtitulo"
           >
             Sistema de Gestão de Competências
-          </h5>
+          </p>
           <BForm
               class="p-0"
               data-testid="form-login"

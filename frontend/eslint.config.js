@@ -5,6 +5,7 @@ import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
 import eslintConfigPrettier from "eslint-config-prettier";
+import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
 export default [
     // 1. Ignore files
@@ -53,6 +54,7 @@ export default [
 
     // 5. Vue-specific configuration
     ...pluginVue.configs["flat/recommended"],
+    ...pluginVueA11y.configs["flat/recommended"],
     {
         files: ["**/*.vue"],
         languageOptions: {
@@ -66,6 +68,24 @@ export default [
         },
         rules: {
             "vue/multi-word-component-names": "off",
+            "vuejs-accessibility/label-has-for": [
+                "error",
+                {
+                    components: ["Label"],
+                    controlComponents: [
+                        "BFormInput",
+                        "BFormSelect",
+                        "BFormTextarea",
+                        "BFormCheckbox",
+                        "BFormDatepicker",
+                        "BFormSpinbutton",
+                        "BFormTags"
+                    ],
+                    required: {
+                        some: ["nesting", "id"],
+                    },
+                },
+            ],
         },
     },
 
