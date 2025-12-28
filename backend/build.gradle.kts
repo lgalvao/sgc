@@ -61,6 +61,7 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("net.jqwik:jqwik:1.9.2")
 
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
