@@ -8,9 +8,7 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.service.UnidadeService;
 
@@ -25,7 +23,6 @@ import java.util.List;
 @Slf4j
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
-    private final SubprocessoRepo subprocessoRepo;
     private final UnidadeService unidadeService;
 
     /**
@@ -34,15 +31,10 @@ public class AnaliseService {
      * @param codSubprocesso O código do subprocesso.
      * @param tipoAnalise    O tipoAnalise de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
      * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
-        // Verifica existência (lança exceção se não encontrar)
-        if (!subprocessoRepo.existsById(codSubprocesso)) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codSubprocesso);
-        }
-
+        // Validação de existência do subprocesso movida para o Controller/Caller.
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipoAnalise)
                 .toList();
@@ -51,34 +43,20 @@ public class AnaliseService {
     /**
      * Cria e persiste uma nova análise com base nos dados fornecidos.
      *
+     * @param subprocesso A entidade do subprocesso.
      * @param req O DTO contendo todas as informações necessárias para criar a análise.
      * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso associado à análise não for encontrado.
      */
     @Transactional
-    public Analise criarAnalise(CriarAnaliseRequest req) {
-        Subprocesso sp = subprocessoRepo.findById(req.getCodSubprocesso())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", req.getCodSubprocesso()));
-
+    public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseRequest req) {
         Unidade unidade = null;
         if (req.getSiglaUnidade() != null) {
-            // Requer UnidadeService com método que retorne Entidade por Sigla
-            // Adicionar este método em UnidadeService ou usar buscarEntidadePorId se tivermos o ID
-            // Como temos sigla, UnidadeService precisa de buscarEntidadePorSigla
-            // Por enquanto, usamos buscarPorSigla(DTO) e depois buscarEntidadePorId(DTO.getId()) se necessário,
-            // ou melhor, UnidadeService.buscarEntidadePorSigla.
-            // Vou assumir que UnidadeService.buscarPorSigla retorna DTO.
-            // Para manter consistência com refatoração, UnidadeService deve expor entidade se necessário ou Analise deve usar DTO.
-            // Analise entity precisa de unidadeCodigo (Long). UnidadeDTO tem codigo.
-            // Mas o código antigo usava unidadeRepo.findBySigla -> Unidade Entity.
-            // Analise builder usa unidadeCodigo.
-
             var unidadeDto = unidadeService.buscarPorSigla(req.getSiglaUnidade());
             unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
         }
 
         Analise analise = Analise.builder()
-                .subprocesso(sp)
+                .subprocesso(subprocesso)
                 .dataHora(LocalDateTime.now())
                 .observacoes(req.getObservacoes())
                 .tipo(req.getTipo())

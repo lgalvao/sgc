@@ -17,7 +17,6 @@ import sgc.mapa.model.MapaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.usuario.UsuarioService;
-import sgc.subprocesso.model.SubprocessoRepo;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.evento.EventoMapaAlterado;
 
@@ -36,7 +35,6 @@ public class AtividadeService {
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoRepo conhecimentoRepo;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final SubprocessoRepo subprocessoRepo;
     private final UsuarioService usuarioService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -84,16 +82,21 @@ public class AtividadeService {
      * @return O {@link AtividadeDto} da atividade criada.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou o usuário não forem encontrados.
      * @throws ErroAccessoNegado         se o usuário não for o titular da unidade do subprocesso.
-     * @throws ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
+     * @throws sgc.comum.erros.ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
         if (atividadeDto.getMapaCodigo() == null) {
             throw new ErroEntidadeNaoEncontrada("Mapa", "não informado");
         }
 
-        var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.getMapaCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo())));
+        Mapa mapa = mapaRepo.findById(atividadeDto.getMapaCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", atividadeDto.getMapaCodigo()));
+
+        var subprocesso = mapa.getSubprocesso();
+        if (subprocesso == null) {
+             throw new ErroEntidadeNaoEncontrada(
+                    "Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo()));
+        }
 
         var usuario = usuarioService.buscarEntidadePorId(tituloUsuario);
 
@@ -109,13 +112,8 @@ public class AtividadeService {
 
         atualizarSituacaoSubprocessoSeNecessario(atividadeDto.getMapaCodigo());
 
-        if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada(
-                    "Mapa não associado ao subprocesso %d".formatted(subprocesso.getCodigo()));
-        }
-
         var entidade = atividadeMapper.toEntity(atividadeDto);
-        entidade.setMapa(subprocesso.getMapa());
+        entidade.setMapa(mapa);
 
         var salvo = atividadeRepo.save(entidade);
 

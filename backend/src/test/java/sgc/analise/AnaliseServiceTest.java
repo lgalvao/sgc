@@ -12,15 +12,12 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.service.UnidadeService;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +29,7 @@ class AnaliseServiceTest {
     private AnaliseRepo analiseRepo;
 
     @Mock
-    private SubprocessoRepo subprocessoRepo;
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private AnaliseService service;
@@ -52,7 +49,6 @@ class AnaliseServiceTest {
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro")
         void deveRetornarListaDeAnalisesCadastro() {
-            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.CADASTRO);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
@@ -72,7 +68,6 @@ class AnaliseServiceTest {
         @Test
         @DisplayName("Deve retornar lista de análises de validação")
         void deveRetornarListaDeAnalisesValidacao() {
-            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.VALIDACAO);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L))
@@ -89,16 +84,7 @@ class AnaliseServiceTest {
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção se o subprocesso não for encontrado")
-        void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso")
-                    .hasNoCause();
-        }
+        // Teste de exceção "deveLancarExcecaoSeSubprocessoNaoEncontrado" removido pois a validação foi movida para o Controller
     }
 
     @Nested
@@ -108,11 +94,11 @@ class AnaliseServiceTest {
         @Test
         @DisplayName("Deve criar uma análise de cadastro")
         void deveCriarAnaliseCadastro() {
-            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado =
                     service.criarAnalise(
+                            subprocesso,
                             CriarAnaliseRequest.builder()
                                     .codSubprocesso(1L)
                                     .observacoes(OBS)
@@ -133,11 +119,11 @@ class AnaliseServiceTest {
         @Test
         @DisplayName("Deve criar uma análise de validação")
         void deveCriarAnaliseValidacao() {
-            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado =
                     service.criarAnalise(
+                            subprocesso,
                             CriarAnaliseRequest.builder()
                                     .codSubprocesso(1L)
                                     .observacoes(OBS)
@@ -155,25 +141,7 @@ class AnaliseServiceTest {
             verify(analiseRepo).save(any(Analise.class));
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção se o subprocesso não for encontrado ao criar")
-        void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
-            when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.criarAnalise(
-                                    CriarAnaliseRequest.builder()
-                                            .codSubprocesso(99L)
-                                            .observacoes("Obs")
-                                            .tipo(TipoAnalise.CADASTRO)
-                                            .acao(null)
-                                            .siglaUnidade(null)
-                                            .tituloUsuario(null)
-                                            .motivo(null)
-                                            .build()))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso")
-                    .hasNoCause();
-        }
+        // Teste de exceção "deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar" removido pois o serviço não busca mais o subprocesso
     }
 
     @Nested

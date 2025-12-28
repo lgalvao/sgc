@@ -39,6 +39,7 @@ public class SubprocessoWorkflowExecutor {
     ) {
         // 1. Criar Análise
         analiseService.criarAnalise(
+                sp,
                 CriarAnaliseRequest.builder()
                         .codSubprocesso(sp.getCodigo())
                         .observacoes(observacoes)

@@ -305,6 +305,7 @@ public class SubprocessoMapaWorkflowService {
             // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
 
             analiseService.criarAnalise(
+                sp,
                 CriarAnaliseRequest.builder()
                         .codSubprocesso(codSubprocesso)
                         .observacoes("Aceite da validação")
