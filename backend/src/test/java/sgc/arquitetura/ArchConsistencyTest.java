@@ -9,7 +9,6 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import com.tngtech.archunit.library.freeze.FreezingArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -63,7 +62,7 @@ public class ArchConsistencyTest {
 
     @ArchTest
     static final ArchRule services_should_not_access_other_modules_repositories =
-            FreezingArchRule.freeze(classes()
+            classes()
                     .that()
                     .haveSimpleNameEndingWith("Service")
                     .should(new ArchCondition<JavaClass>("only access repositories of their own module") {
@@ -96,5 +95,5 @@ public class ArchConsistencyTest {
                             if (parts.length < 2) return null;
                             return parts[1];
                         }
-                    }));
+                    });
 }
