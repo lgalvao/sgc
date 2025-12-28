@@ -40,6 +40,7 @@ test-results/
 playwright-report/
 screenshots/
 e2e/server.log
+accessibility-report.html
 /dados/
 
 Reports de testes
