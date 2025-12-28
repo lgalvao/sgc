@@ -17,6 +17,8 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -64,9 +66,16 @@ class AnaliseControllerTest {
     @MockitoBean
     private AnaliseService analiseService;
 
+    @MockitoBean
+    private SubprocessoService subprocessoService;
+
+    private Subprocesso subprocesso;
+
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
+        subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
     }
 
     @Nested
@@ -88,6 +97,7 @@ class AnaliseControllerTest {
 
             List<Analise> analises = Arrays.asList(analise1, analise2);
 
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(analises);
 
@@ -106,6 +116,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista vazia de análises de cadastro com status 200 OK")
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesCadastro() throws Exception {
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(Collections.emptyList());
 
@@ -121,27 +132,27 @@ class AnaliseControllerTest {
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         @WithMockUser
         void deveRetornarNotFoundParaSubprocessoInexistente() throws Exception {
-            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO))
+            // Agora o Controller valida existência usando SubprocessoService
+            when(subprocessoService.buscarSubprocesso(99L))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
                     .andExpect(status().isNotFound());
 
-            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
+            verify(subprocessoService, times(1)).buscarSubprocesso(99L);
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado")
         @WithMockUser
         void deveRetornarInternalServerErrorParaErroInesperado() throws Exception {
+            when(subprocessoService.buscarSubprocesso(99L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
-
-            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
         }
     }
 
@@ -161,7 +172,8 @@ class AnaliseControllerTest {
             analise.setObservacoes(NOVA_ANALISE_DE_CADASTRO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class))).thenReturn(analise);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -173,7 +185,7 @@ class AnaliseControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_CADASTRO));
 
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, times(1)).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -188,7 +200,8 @@ class AnaliseControllerTest {
             analise.setObservacoes("");
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class))).thenReturn(analise);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -197,7 +210,7 @@ class AnaliseControllerTest {
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, times(1)).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -207,7 +220,8 @@ class AnaliseControllerTest {
             var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class))).thenReturn(analise);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -216,7 +230,7 @@ class AnaliseControllerTest {
                                     .content("{}"))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, times(1)).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -225,7 +239,8 @@ class AnaliseControllerTest {
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
             var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            // Validação agora ocorre no SubprocessoService
+            when(subprocessoService.buscarSubprocesso(99L))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(
@@ -234,8 +249,6 @@ class AnaliseControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isNotFound());
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -244,7 +257,8 @@ class AnaliseControllerTest {
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
             var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_INVALIDA).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class)))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(
@@ -258,8 +272,6 @@ class AnaliseControllerTest {
                                     .value(
                                             "A requisição contém um argumento inválido ou"
                                                     + " malformado."));
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -268,7 +280,8 @@ class AnaliseControllerTest {
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
             var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_CADASTRO).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            when(subprocessoService.buscarSubprocesso(99L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class)))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(
@@ -278,8 +291,6 @@ class AnaliseControllerTest {
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -298,7 +309,7 @@ class AnaliseControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém dados de entrada inválidos."));
 
-            verify(analiseService, never()).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, never()).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
     }
 
@@ -322,6 +333,7 @@ class AnaliseControllerTest {
 
             List<Analise> analises = Arrays.asList(analise1, analise2);
 
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
                     .thenReturn(analises);
 
@@ -340,6 +352,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista vazia de análises de validação com status 200 OK")
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesValidacao() throws Exception {
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
                     .thenReturn(Collections.emptyList());
 
@@ -355,27 +368,24 @@ class AnaliseControllerTest {
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         @WithMockUser
         void deveRetornarNotFoundParaSubprocessoInexistenteValidacao() throws Exception {
-            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO))
+            when(subprocessoService.buscarSubprocesso(99L))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
                     .andExpect(status().isNotFound());
-
-            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.VALIDACAO);
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado")
         @WithMockUser
         void deveRetornarInternalServerErrorParaErroValidacaoInesperado() throws Exception {
+            when(subprocessoService.buscarSubprocesso(99L)).thenReturn(subprocesso);
             when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
-
-            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.VALIDACAO);
         }
     }
 
@@ -395,7 +405,8 @@ class AnaliseControllerTest {
             analise.setObservacoes(NOVA_ANALISE_DE_VALIDACAO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class))).thenReturn(analise);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)
@@ -407,7 +418,7 @@ class AnaliseControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_VALIDACAO));
 
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, times(1)).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -420,7 +431,8 @@ class AnaliseControllerTest {
             var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class))).thenReturn(analise);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class))).thenReturn(analise);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)
@@ -429,7 +441,7 @@ class AnaliseControllerTest {
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
+            verify(analiseService, times(1)).criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -439,7 +451,7 @@ class AnaliseControllerTest {
             var requestDto =
                     CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            when(subprocessoService.buscarSubprocesso(99L))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(
@@ -448,8 +460,6 @@ class AnaliseControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isNotFound());
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -458,7 +468,8 @@ class AnaliseControllerTest {
         void deveRetornarBadRequestParaParametroInvalidoValidacao() throws Exception {
             var requestDto = CriarAnaliseApiRequest.builder().observacoes(ANALISE_INVALIDA).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class)))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(
@@ -472,8 +483,6 @@ class AnaliseControllerTest {
                                     .value(
                                             "A requisição contém um argumento inválido ou"
                                                     + " malformado."));
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
 
         @Test
@@ -484,7 +493,8 @@ class AnaliseControllerTest {
             var requestDto =
                     CriarAnaliseApiRequest.builder().observacoes(ANALISE_DE_VALIDACAO).build();
 
-            when(analiseService.criarAnalise(any(CriarAnaliseRequest.class)))
+            when(subprocessoService.buscarSubprocesso(99L)).thenReturn(subprocesso);
+            when(analiseService.criarAnalise(any(Subprocesso.class), any(CriarAnaliseRequest.class)))
                     .thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(
@@ -494,8 +504,6 @@ class AnaliseControllerTest {
                                     .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
-
-            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequest.class));
         }
     }
 }

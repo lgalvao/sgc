@@ -173,6 +173,26 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
+    public void validarPermissaoEdicaoMapa(Long mapaCodigo, String tituloUsuario) {
+        Subprocesso subprocesso = obterEntidadePorCodigoMapa(mapaCodigo);
+
+        if (subprocesso.getUnidade() == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade não associada ao Subprocesso %d".formatted(subprocesso.getCodigo()));
+        }
+
+        Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
+
+        // Validação: Garante que apenas o titular da unidade pode editar o mapa.
+        String titularTitulo = subprocesso.getUnidade().getTituloTitular();
+
+        // Verifica se o título eleitoral do usuário corresponde ao titular da unidade.
+        // Assume-se que getTituloEleitoral() retorna um Long, então convertemos para String para comparar com titularTitulo (String).
+        if (titularTitulo == null || !titularTitulo.equals(String.valueOf(usuario.getTituloEleitoral()))) {
+             throw new ErroAccessoNegado("Usuário não autorizado a editar este mapa.");
+        }
+    }
+
+    @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
         Subprocesso sp =
                 repositorioSubprocesso

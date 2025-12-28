@@ -10,6 +10,8 @@ import sgc.analise.dto.CriarAnaliseApiRequest;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ import java.util.List;
 @Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
 public class AnaliseController {
     private final AnaliseService analiseService;
+    private final SubprocessoService subprocessoService;
 
     /**
      * Recupera o histórico de análises associadas à fase de cadastro de um subprocesso.
@@ -35,6 +38,7 @@ public class AnaliseController {
     @GetMapping("/analises-cadastro")
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<Analise> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
+        subprocessoService.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
         return analiseService.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO);
     }
 
@@ -67,6 +71,7 @@ public class AnaliseController {
     @GetMapping("/analises-validacao")
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<Analise> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
+        subprocessoService.buscarSubprocesso(codSubprocesso); // Valida existência
         return analiseService.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
@@ -91,6 +96,8 @@ public class AnaliseController {
     }
 
     private Analise criarAnaliseInterna(Long codSubprocesso, CriarAnaliseApiRequest request, TipoAnalise tipo) {
+        Subprocesso subprocesso = subprocessoService.buscarSubprocesso(codSubprocesso);
+
         String observacoes = request.observacoes() != null ? request.observacoes() : "";
 
         CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
@@ -103,6 +110,6 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        return analiseService.criarAnalise(criarAnaliseRequest);
+        return analiseService.criarAnalise(subprocesso, criarAnaliseRequest);
     }
 }
