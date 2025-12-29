@@ -20,8 +20,7 @@ export async function fazerLogout(page: Page): Promise<void> {
     await expect(btnLogout).toBeVisible();
     await btnLogout.click();
 
-    // Explicitly wait for the login URL with a longer timeout
-    await expect(page).toHaveURL(/\/login/, {timeout: 15000});
+    await expect(page).toHaveURL(/\/login/);
 }
 
 // ============================================================================

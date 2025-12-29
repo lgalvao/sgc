@@ -28,13 +28,12 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
 
 export async function login(page: Page, usuario: string, senha: string) {
     await autenticar(page, usuario, senha);
-    // Increased timeout for slower environments/first load
-    await page.waitForURL('/painel', {timeout: 30000});
+    await page.waitForURL('/painel');
 }
 
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
     await page.getByTestId('btn-login-entrar').click();
-    await page.waitForURL('/painel', {timeout: 30000});
+    await page.waitForURL('/painel');
 }
