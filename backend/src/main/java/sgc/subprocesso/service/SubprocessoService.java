@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.AtividadeService;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.Mapa;
@@ -207,41 +207,70 @@ public class SubprocessoService {
             return emptyList();
         }
 
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(sp.getMapa().getCodigo());
+        // --- OTIMIZAÇÃO APLICADA AQUI ---
+        // Utiliza o método que faz JOIN FETCH de conhecimentos para evitar N+1 queries.
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+
         if (atividades == null || atividades.isEmpty()) {
             return emptyList();
         }
 
         return atividades.stream()
-                .filter(
-                        a -> {
-                            if (a.getCodigo() == null) return true;
-                            List<Conhecimento> ks =
-                                    atividadeService.listarConhecimentosPorAtividade(a.getCodigo());
-                            return ks == null || ks.isEmpty();
-                        })
+                .filter(a -> a.getConhecimentos() == null || a.getConhecimentos().isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    // Método auxiliar para uso interno quando já temos o Mapa
+    @Transactional(readOnly = true)
+    public List<Atividade> obterAtividadesSemConhecimento(Mapa mapa) {
+        if (mapa == null || mapa.getCodigo() == null) {
+            return emptyList();
+        }
+
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
+
+        if (atividades == null || atividades.isEmpty()) {
+            return emptyList();
+        }
+
+        return atividades.stream()
+                .filter(a -> a.getConhecimentos() == null || a.getConhecimentos().isEmpty())
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public void validarExistenciaAtividades(Long codSubprocesso) {
-        Subprocesso sp =
+        log.info("Validando existência de atividades para o subprocesso: {}", codSubprocesso);
+        Subprocesso subprocesso =
                 repositorioSubprocesso
                         .findById(codSubprocesso)
                         .orElseThrow(
-                                () ->
-                                        new ErroEntidadeNaoEncontrada(
-                                                "Subprocesso não encontrado: %d"
-                                                        .formatted(codSubprocesso)));
+                                () -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            throw new ErroValidacao("Subprocesso sem mapa associado.");
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
+            throw new ErroValidacao("Mapa não encontrado para o subprocesso.");
         }
 
-        List<Atividade> atividades = atividadeService.buscarPorMapaCodigo(sp.getMapa().getCodigo());
+        // --- OTIMIZAÇÃO APLICADA AQUI ---
+        List<Atividade> atividades = atividadeService.buscarPorMapaCodigoComConhecimentos(mapa.getCodigo());
+
         if (atividades == null || atividades.isEmpty()) {
             throw new ErroValidacao(
-                    "Pelo menos uma atividade deve ser cadastrada antes de disponibilizar.");
+                    "O mapa de competências deve ter ao menos uma atividade cadastrada.");
+        }
+
+        List<Atividade> atividadesSemConhecimento = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (atividade.getConhecimentos() == null || atividade.getConhecimentos().isEmpty()) {
+                atividadesSemConhecimento.add(atividade);
+            }
+        }
+
+        if (!atividadesSemConhecimento.isEmpty()) {
+            throw new ErroValidacao(
+                    "Todas as atividades devem possuir conhecimentos vinculados. Verifique as"
+                            + " atividades pendentes.");
         }
     }
 
@@ -555,5 +584,14 @@ public class SubprocessoService {
                 repositorioSubprocesso.save(subprocesso);
             }
         }
+    }
+
+    /**
+     * Recupera a lista de subprocessos em revisão de cadastro que já foram homologados.
+     *
+     * @return Lista de subprocessos na situação REVISAO_CADASTRO_HOMOLOGADA.
+     */
+    public List<Subprocesso> listarSubprocessosHomologados() {
+        return repositorioSubprocesso.findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 }

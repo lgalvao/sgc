@@ -31,10 +31,4 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
         log.debug("[MOCK] E-mail HTML NÃO enviado - Para: {}, Assunto: {}", para, assunto);
     }
-
-    @Override
-    public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
-        log.debug("[MOCK] E-mail assíncrono NÃO enviado - Para: {}", emailDto.getDestinatario());
-        return CompletableFuture.completedFuture(true);
-    }
 }
