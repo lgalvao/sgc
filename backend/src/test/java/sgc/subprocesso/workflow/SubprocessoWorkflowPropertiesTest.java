@@ -99,7 +99,7 @@ class SubprocessoWorkflowPropertiesTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
 
             doNothing().when(subprocessoService).validarExistenciaAtividades(any());
-            when(subprocessoService.obterAtividadesSemConhecimento(any())).thenReturn(Collections.emptyList());
+            when(subprocessoService.obterAtividadesSemConhecimento(any(Long.class))).thenReturn(Collections.emptyList());
 
             usuarioAtual = new Usuario();
             usuarioAtual.setTituloEleitoral("123456789012");

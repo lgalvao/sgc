@@ -12,11 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.util.ReflectionTestUtils;
+import sgc.notificacao.dto.EmailDto;
 import sgc.notificacao.model.Notificacao;
 import sgc.notificacao.model.NotificacaoRepo;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +37,9 @@ class NotificacaoEmailServiceTest {
     @Mock
     private NotificacaoRepo repositorioNotificacao;
 
+    @Mock
+    private NotificacaoEmailAsyncExecutor emailExecutor;
+
     @InjectMocks
     private NotificacaoEmailService notificacaoServico;
 
@@ -42,9 +47,15 @@ class NotificacaoEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(notificacaoServico, "remetente", "test@sender.com");
-        ReflectionTestUtils.setField(notificacaoServico, "nomeRemetente", "Test Sender");
-        ReflectionTestUtils.setField(notificacaoServico, "prefixoAssunto", "[SGC]");
+        // NotificacaoEmailService no longer has these fields, they moved to executor.
+        // But the service uses them only indirectly via executor.
+        // Wait, the service validation logic is still inside the service, but the sending logic is in executor.
+        // The test was testing full sending flow including properties injection.
+        // Now the service delegates to executor. We should mock the executor.
+
+        // ReflectionTestUtils.setField(notificacaoServico, "remetente", "test@sender.com");
+        // ReflectionTestUtils.setField(notificacaoServico, "nomeRemetente", "Test Sender");
+        // ReflectionTestUtils.setField(notificacaoServico, "prefixoAssunto", "[SGC]");
 
         JavaMailSenderImpl senderReal = new JavaMailSenderImpl();
         mimeMessageReal = senderReal.createMimeMessage();
@@ -53,8 +64,8 @@ class NotificacaoEmailServiceTest {
     @Test
     @DisplayName("Deve enviar e-mail HTML")
     void enviarEmailHtml_deveEnviarComSucesso() throws Exception {
-        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test Subject";
@@ -62,19 +73,14 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        ArgumentCaptor<MimeMessage> captorMimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
-        verify(enviadorDeEmail).send(captorMimeMessage.capture());
+        ArgumentCaptor<EmailDto> captorEmailDto = ArgumentCaptor.forClass(EmailDto.class);
+        verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
 
-        MimeMessage mensagemCapturada = captorMimeMessage.getValue();
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        mensagemCapturada.writeTo(os);
-        String conteudo = os.toString(StandardCharsets.UTF_8);
-
-        assertEquals(para, mensagemCapturada.getAllRecipients()[0].toString());
-        assertEquals("[SGC] Test Subject", mensagemCapturada.getSubject());
-        assertTrue(conteudo.contains(corpoHtml), "O corpo do e-mail não contém o HTML esperado.");
-        assertEquals("Test Sender <test@sender.com>", mensagemCapturada.getFrom()[0].toString());
+        EmailDto emailCapturado = captorEmailDto.getValue();
+        assertEquals(para, emailCapturado.getDestinatario());
+        assertEquals(assunto, emailCapturado.getAssunto());
+        assertTrue(emailCapturado.isHtml());
+        assertEquals(corpoHtml, emailCapturado.getCorpo());
 
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
@@ -88,8 +94,7 @@ class NotificacaoEmailServiceTest {
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        verify(enviadorDeEmail, never()).createMimeMessage();
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
+        verify(emailExecutor, never()).enviarEmailAssincrono(any());
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
     }
 
@@ -97,8 +102,8 @@ class NotificacaoEmailServiceTest {
     @DisplayName("Deve enviar e-mail de texto simples")
     void deveEnviarEmailTextoSimples() throws Exception {
         // Arrange
-        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test Subject Plain";
@@ -108,12 +113,15 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        ArgumentCaptor<MimeMessage> captorMimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
-        verify(enviadorDeEmail).send(captorMimeMessage.capture());
+        ArgumentCaptor<EmailDto> captorEmailDto = ArgumentCaptor.forClass(EmailDto.class);
+        verify(emailExecutor).enviarEmailAssincrono(captorEmailDto.capture());
 
-        MimeMessage mensagemCapturada = captorMimeMessage.getValue();
-        assertEquals(para, mensagemCapturada.getAllRecipients()[0].toString());
-        assertEquals("[SGC] Test Subject Plain", mensagemCapturada.getSubject());
+        EmailDto emailCapturado = captorEmailDto.getValue();
+        assertEquals(para, emailCapturado.getDestinatario());
+        assertEquals(assunto, emailCapturado.getAssunto());
+        org.junit.jupiter.api.Assertions.assertFalse(emailCapturado.isHtml());
+        assertEquals(corpo, emailCapturado.getCorpo());
+
         verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
     }
 
@@ -129,8 +137,7 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        verify(enviadorDeEmail, never()).createMimeMessage();
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
+        verify(emailExecutor, never()).enviarEmailAssincrono(any());
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
     }
 
@@ -146,8 +153,7 @@ class NotificacaoEmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         // Assert
-        verify(enviadorDeEmail, never()).createMimeMessage();
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
+        verify(emailExecutor, never()).enviarEmailAssincrono(any());
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));
     }
 
@@ -155,8 +161,8 @@ class NotificacaoEmailServiceTest {
     @DisplayName("Deve truncar conteúdo longo da notificação")
     void deveTruncarConteudoLongoDaNotificacao() throws Exception {
         // Arrange
-        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(emailExecutor.enviarEmailAssincrono(any(EmailDto.class))).thenReturn(CompletableFuture.completedFuture(true));
 
         String para = "recipient@test.com";
         String assunto = "Test";
