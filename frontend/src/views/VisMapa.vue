@@ -191,8 +191,12 @@
         title="Sugestões"
     >
       <div class="mb-3">
-        <label class="form-label">Sugestões registradas para o mapa de competências:</label>
+        <label
+            class="form-label"
+            for="sugestoesVisualizacao"
+        >Sugestões registradas para o mapa de competências:</label>
         <BFormTextarea
+            id="sugestoesVisualizacao"
             v-model="sugestoesVisualizacao"
             data-testid="txt-ver-sugestoes-mapa"
             readonly

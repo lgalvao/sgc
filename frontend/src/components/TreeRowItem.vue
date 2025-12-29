@@ -3,6 +3,8 @@
       :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
       :data-testid="'tree-table-row-' + item.codigo"
       @click="handleRowClick"
+      @keydown.enter="handleRowClick"
+      @keydown.space="handleRowClick"
   >
     <td
         v-for="(column, index) in columns"
@@ -13,7 +15,13 @@
           v-if="index === 0 && item.children && item.children.length > 0"
           :data-testid="`btn-toggle-expand-${item.codigo}`"
           class="toggle-icon"
+          tabindex="0"
+          role="button"
+          :aria-expanded="item.expanded"
+          :aria-label="item.expanded ? 'Recolher' : 'Expandir'"
           @click.stop="toggleExpand(item.codigo)"
+          @keydown.enter.stop="toggleExpand(item.codigo)"
+          @keydown.space.stop="toggleExpand(item.codigo)"
       >
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
       </span>
