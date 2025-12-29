@@ -52,18 +52,6 @@ public class Unidade extends EntidadeBase {
     @Builder.Default
     private Set<Processo> processos = new HashSet<>();
 
-    /**
-     * Método temporário para testes. Como Unidade agora é VIEW imutável,
-     * este setter apenas atualiza o campo em memória para testes unitários.
-     */
-    @Deprecated
-    public void setTitular(Usuario usuario) {
-        if (usuario != null) {
-            this.tituloTitular = usuario.getTituloEleitoral();
-            this.matriculaTitular = usuario.getMatricula();
-        }
-    }
-
     public Unidade(String nome, String sigla) {
         super();
         this.nome = nome;
