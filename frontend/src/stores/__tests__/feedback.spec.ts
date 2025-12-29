@@ -30,7 +30,7 @@ describe("Feedback Store", () => {
             message: "Operação realizada",
             variant: "success",
             show: true,
-            autoHideDelay: 5000,
+            autoHideDelay: 3000,
         });
     });
 
