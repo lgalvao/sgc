@@ -3,8 +3,6 @@ package sgc.comum.erros;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import sgc.seguranca.SanitizacaoUtil;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,10 +28,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
-    private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
     private String sanitizar(String texto) {
-        return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
+        return SanitizacaoUtil.sanitizar(texto);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {

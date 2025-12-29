@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,14 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
-import sgc.mapa.model.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.usuario.UsuarioService;
-import sgc.usuario.model.Usuario;
+import sgc.mapa.model.Atividade;
+import sgc.seguranca.SanitizacaoUtil;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.SubprocessoMapaService;
 import sgc.subprocesso.service.SubprocessoService;
+import sgc.usuario.UsuarioService;
+import sgc.usuario.model.Usuario;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,6 @@ import java.util.Map;
         name = "Subprocessos",
         description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCadastroController {
-
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
     private final SubprocessoService subprocessoService;
     private final SubprocessoCadastroWorkflowService subprocessoWorkflowService;
@@ -161,7 +158,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -183,7 +180,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -205,7 +202,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -226,7 +223,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -246,7 +243,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -268,7 +265,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal Object principal) {
         String tituloUsuario = extractTituloUsuario(principal);
         Usuario usuario = usuarioService.buscarUsuarioPorLogin(tituloUsuario);
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }

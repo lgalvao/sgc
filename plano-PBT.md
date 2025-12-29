@@ -37,7 +37,7 @@ A implementação será gradual, focando primeiro em utilitários puros e lógic
 | **Utilitários** | `sgc.comum.util.FormatadorData` | Formatação de nulos retorna "-"; Data válida nunca retorna nulo/vazio. (Implementado) | Concluído |
 | **Domínio** | `sgc.mapa.mapper.MapaCompletoMapper` | Preservação de dados na conversão Entidade <-> DTO (Round Trip). (Implementado) | Concluído |
 | **Negócio** | `sgc.processo.service.ProcessoService` (Regras de Estado) | Transições de `SituacaoProcesso` inválidas devem sempre falhar, independente dos dados do processo. (POC Implementada) | Concluído |
-| **Segurança** | `sgc.seguranca.Sanitizacao` (HtmlPolicy) | Idempotência: `sanitizar(sanitizar(x)) == sanitizar(x)`; Tags proibidas nunca estão presentes na saída. | Alta |
+| **Segurança** | `sgc.seguranca.Sanitizacao` (HtmlPolicy) | Idempotência: `sanitizar(sanitizar(x)) == sanitizar(x)`; Tags proibidas nunca estão presentes na saída. (Implementado em `SanitizacaoUtilPropertyTest`) | Concluído |
 
 ---
 
@@ -50,7 +50,7 @@ No frontend, o foco será em validadores de formulário e helpers de exibição.
 | Categoria | Componente/Função | Propriedade a Testar | Prioridade |
 |-----------|-------------------|----------------------|------------|
 | **Helpers** | Formatação de CPF/CNPJ | `format(strip(x)) == format(x)`; Strings aleatórias não quebram o formatter. (Implementado) | Concluído |
-| **Validação** | Regras de validação customizadas | Entradas inválidas (ex: emails malformados gerados) sempre retornam `false`. | Alta |
+| **Validação** | `validarEmail`, `validarSenha` (validators.ts) | Entradas inválidas (ex: emails malformados gerados) sempre retornam `false`. (Implementado) | Concluído |
 | **Componentes** | Componentes de Tabela/Lista | Renderização com arrays de tamanhos variados (0 a 1000 itens) não quebra a UI. | Média |
 
 ---
@@ -67,7 +67,11 @@ No frontend, o foco será em validadores de formulário e helpers de exibição.
 2.  Implementar testes gerativos para transições de estado de `Processo` (Feito em `ProcessoServicePropertyTest`).
 3.  Implementar teste de propriedade para invariantes de `Mapa` (Feito em `MapaCompletoMapperPropertyTest` cobrindo consistência de DTOs).
 
-### Fase 3: Integração no CI/CD
+### Fase 3: Segurança e Validação (Concluído)
+1.  **Backend:** Implementar PBT para `sgc.seguranca.SanitizacaoUtil`. (Feito)
+2.  **Frontend:** Implementar PBT para validadores (`validators.ts`). (Feito)
+
+### Fase 4: Integração no CI/CD
 1.  Garantir que os testes de propriedade rodem com os comandos padrão (`./gradlew test`, `npm run test:unit`). (Verificado: ambos rodam com os comandos padrão)
 2.  Configurar o "Seed" do gerador aleatório nos logs de falha para permitir reprodução determinística de erros encontrados.
 
@@ -76,7 +80,3 @@ No frontend, o foco será em validadores de formulário e helpers de exibição.
 1.  **Separação:** Testes de propriedade podem ficar na mesma pasta dos testes unitários, mas recomenda-se o sufixo `PropertyTest` (Java) ou `.prop.spec.ts` (JS) se forem muito extensos.
 2.  **Determinismo:** Sempre logar a semente (seed) usada na geração para reproduzir falhas.
 3.  **Performance:** Testes de propriedade podem ser lentos se gerarem milhares de casos. Manter o número de execuções (samples) razoável para testes de CI (ex: 100 execuções).
-
-## 7. Próximos Passos
-- Implementar PBT para `sgc.seguranca.Sanitizacao`.
-- Implementar PBT para validações de formulário no Frontend.

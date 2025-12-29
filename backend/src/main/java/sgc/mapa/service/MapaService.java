@@ -2,8 +2,6 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
@@ -17,6 +15,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.seguranca.SanitizacaoUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaService {
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
@@ -110,7 +108,7 @@ public class MapaService {
                                         new ErroEntidadeNaoEncontrada(
                                                 "Mapa não encontrado: %d".formatted(codMapa)));
 
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
+        var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapa = mapaRepo.save(mapa);
 

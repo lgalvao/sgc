@@ -1,7 +1,6 @@
 package sgc.comum.json;
 
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
+import sgc.seguranca.SanitizacaoUtil;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;
@@ -11,7 +10,6 @@ import tools.jackson.databind.deser.std.StdDeserializer;
  * removing potentially malicious HTML/JavaScript.
  */
 public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
-    private static final PolicyFactory HTML_POLICY = new HtmlPolicyBuilder().toFactory();
 
     public HtmlSanitizingDeserializer() {
         super(String.class);
@@ -23,6 +21,6 @@ public class HtmlSanitizingDeserializer extends StdDeserializer<String> {
         if (value == null || value.isBlank()) {
             return value;
         }
-        return HTML_POLICY.sanitize(value);
+        return SanitizacaoUtil.sanitizar(value);
     }
 }
