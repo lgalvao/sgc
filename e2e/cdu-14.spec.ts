@@ -22,7 +22,7 @@ import {
     fazerLogout,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
-    homologarCadastroRevisao,
+    homologarCadastroRevisaoComImpacto,
     verificarPaginaPainel
 } from './helpers/helpers-analise';
 
@@ -395,6 +395,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Homologar
-        await homologarCadastroRevisao(page);
+        // Como o CHEFE adicionou atividades na Preparacao 2, deve haver impactos
+        await homologarCadastroRevisaoComImpacto(page);
     });
 });

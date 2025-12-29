@@ -15,12 +15,8 @@ import {expect, type Page} from '@playwright/test';
  * Faz logout do sistema e aguarda redirecionamento para página de login.
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    // Aguarda que alertas obstrutivos sumam (melhor que forçar clique)
-    await expect(page.locator('.alert.position-fixed')).toBeHidden({ timeout: 5000 }).catch(() => {});
-    await expect(page.locator('.b-toast')).toBeHidden({ timeout: 5000 }).catch(() => {});
-
-    // Clica no botão de logout
-    await page.getByTestId('btn-logout').click();
+    // Clica no botão de logout ignorando sobreposições (como toasts)
+    await page.getByTestId('btn-logout').click({force: true});
     await expect(page).toHaveURL(/\/login/);
 }
 

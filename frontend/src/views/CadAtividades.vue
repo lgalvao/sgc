@@ -30,6 +30,7 @@
       <div class="d-flex gap-2">
         <BDropdown
             v-if="codSubprocesso && (podeVerImpacto || isChefe)"
+            data-testid="btn-mais-acoes"
             text="Mais ações"
             variant="outline-secondary"
             class="me-2"

@@ -12,7 +12,7 @@ import {expect, type Page} from '@playwright/test';
  * Faz logout do sistema
  */
 export async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click();
+    await page.getByTestId('btn-logout').click({force: true});
     await expect(page).toHaveURL(/\/login/);
 }
 
@@ -77,7 +77,13 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
  * Abre modal de histórico de análise (tela de edição - CadAtividades)
  */
 export async function abrirHistoricoAnalise(page: Page) {
-    await page.getByTestId('btn-cad-atividades-historico').click();
+    // Dropdown "Mais ações" deve ser aberto primeiro
+    await page.getByTestId('btn-mais-acoes').click();
+    // Aguardar o item do menu estar visível
+    const itemHistorico = page.getByTestId('btn-cad-atividades-historico');
+    await expect(itemHistorico).toBeVisible();
+    await itemHistorico.click();
+
     const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
     await expect(modal).toBeVisible();
     return modal;
@@ -224,40 +230,43 @@ export async function homologarCadastroMapeamento(page: Page) {
 /**
  * Homologa revisão (ADMIN) - Detecta automaticamente se há impactos ou não
  */
-export async function homologarCadastroRevisao(page: Page) {
+export async function homologarCadastroRevisaoSemImpacto(page: Page) {
     await page.getByTestId('btn-acao-analisar-principal').click();
 
     // Aguardar modal aparecer
     await expect(page.getByRole('dialog')).toBeVisible();
 
-    // Detectar qual tipo de modal foi aberto
-    const temMensagemSemImpactos = await page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i).isVisible();
+    // Caminho SEM impactos (CDU-14 passo 12.2)
+    await expect(page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i)).toBeVisible();
+    await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
+    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
 
-    if (temMensagemSemImpactos) {
-        // Caminho SEM impactos (CDU-14 passo 12.2)
-        await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+    // Verifica redirecionamento para tela de detalhes do subprocesso
+    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
-        // Verifica redirecionamento para tela de detalhes do subprocesso
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+    // Verificar situação após homologação
+    await expect(page.getByTestId('subprocesso-header__txt-situacao'))
+        .toHaveText(/Mapa homologado/i);
+}
 
-        // Verificar situação após homologação
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa homologado/i);
-    } else {
-        // Caminho COM impactos (CDU-14 passo 12.3)
-        await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+export async function homologarCadastroRevisaoComImpacto(page: Page) {
+    await page.getByTestId('btn-acao-analisar-principal').click();
 
-        // Verifica redirecionamento para tela de detalhes do subprocesso
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+    // Aguardar modal aparecer
+    await expect(page.getByRole('dialog')).toBeVisible();
 
-        // Verificar situação após homologação
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Revisão de Cadastro Homologada/i);
-    }
+    // Caminho COM impactos (CDU-14 passo 12.3)
+    await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
+    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+
+    // Verifica redirecionamento para tela de detalhes do subprocesso
+    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+
+    // Verificar situação após homologação
+    await expect(page.getByTestId('subprocesso-header__txt-situacao'))
+        .toHaveText(/Revisão de Cadastro Homologada/i);
 }
 
 /**
