@@ -418,9 +418,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Modal de confirmação deve aparecer
             const modalConfirmacao = page.locator('.modal-content').filter({hasText: 'Disponibilização do cadastro'});
-            if (await modalConfirmacao.isVisible()) {
-                await capturarTela(page, '04-subprocesso', '28-modal-confirmacao-disponibilizacao');
-            }
+
+            // Garantir que a modal está visível antes de capturar
+            await expect(modalConfirmacao).toBeVisible();
+            await capturarTela(page, '04-subprocesso', '28-modal-confirmacao-disponibilizacao');
         });
     });
 

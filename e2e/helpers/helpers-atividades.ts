@@ -107,13 +107,12 @@ export async function verificarSituacaoSubprocesso(page: Page, situacao: string)
     await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'), {timeout: 15000});
 }
 
-export async function verificarBotaoImpacto(page: Page, visivel: boolean) {
-    const btn = page.getByTestId('cad-atividades__btn-impactos-mapa');
-    if (visivel) {
-        await expect(btn).toBeVisible();
-    } else {
-        await expect(btn).toBeHidden();
-    }
+export async function verificarBotaoImpactoPresente(page: Page) {
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
+}
+
+export async function verificarBotaoImpactoAusente(page: Page) {
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeHidden();
 }
 
 export async function abrirModalImpacto(page: Page) {

@@ -15,9 +15,13 @@ import {expect, type Page} from '@playwright/test';
  * Faz logout do sistema e aguarda redirecionamento para página de login.
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    // Clica no botão de logout ignorando sobreposições (como toasts)
-    await page.getByTestId('btn-logout').click({force: true});
-    await expect(page).toHaveURL(/\/login/);
+    // Wait for the button to be stable and visible
+    const btnLogout = page.getByTestId('btn-logout');
+    await expect(btnLogout).toBeVisible();
+    await btnLogout.click();
+
+    // Explicitly wait for the login URL with a longer timeout
+    await expect(page).toHaveURL(/\/login/, {timeout: 15000});
 }
 
 // ============================================================================
@@ -70,4 +74,3 @@ export async function navegarParaSubprocesso(
     
     await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${siglaUnidade}$`));
 }
-

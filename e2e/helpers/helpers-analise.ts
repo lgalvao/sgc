@@ -44,15 +44,22 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
 }
 
 /**
- * Acessa subprocesso como CHEFE (vai direto ou via lista)
+ * Acessa subprocesso como CHEFE (vai direto ao subprocesso)
  */
-export async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
+export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string) {
     await page.getByText(descricaoProcesso).click();
+    // Aguardar navegação direta para a página do subprocesso
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+}
 
-    // Se cair na lista de unidades (caso múltiplas), clica na unidade
-    if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: /SECAO_221/i}).click();
-    }
+/**
+ * Acessa subprocesso como CHEFE (selecionando unidade na lista)
+ */
+export async function acessarSubprocessoChefeComSelecao(page: Page, descricaoProcesso: string, siglaUnidade: string = 'SECAO_221') {
+    await page.getByText(descricaoProcesso).click();
+    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+    await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
 }
 
 /**
@@ -114,7 +121,7 @@ export async function fecharHistoricoAnalise(page: Page) {
 /**
  * Devolve cadastro de mapeamento para ajustes (CDU-13)
  */
-export async function devolverCadastroMapeamento(page: Page, observacao?: string) {
+export async function devolverCadastroMapeamento(page: Page, observacao: string = '') {
     await page.getByTestId('btn-acao-devolver').click();
 
     // Verificar modal de devolução
@@ -133,7 +140,7 @@ export async function devolverCadastroMapeamento(page: Page, observacao?: string
 /**
  * Devolve revisão para ajustes (CDU-14)
  */
-export async function devolverRevisao(page: Page, observacao?: string) {
+export async function devolverRevisao(page: Page, observacao: string = '') {
     await page.getByTestId('btn-acao-devolver').click();
 
     // Verificar modal de devolução
@@ -171,7 +178,7 @@ export async function cancelarDevolucao(page: Page) {
 /**
  * Aceita cadastro de mapeamento (GESTOR - CDU-13)
  */
-export async function aceitarCadastroMapeamento(page: Page, observacao?: string) {
+export async function aceitarCadastroMapeamento(page: Page, observacao: string = '') {
     await page.getByTestId('btn-acao-analisar-principal').click();
 
     // Verificar modal de aceite
@@ -190,7 +197,7 @@ export async function aceitarCadastroMapeamento(page: Page, observacao?: string)
 /**
  * Aceita revisão (GESTOR - CDU-14)
  */
-export async function aceitarRevisao(page: Page, observacao?: string) {
+export async function aceitarRevisao(page: Page, observacao: string = '') {
     await page.getByTestId('btn-acao-analisar-principal').click();
 
     // Verificar modal de aceite

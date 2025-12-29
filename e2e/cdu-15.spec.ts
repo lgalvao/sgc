@@ -4,7 +4,7 @@ import {criarProcesso} from './helpers/helpers-processos';
 import {
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
-    acessarSubprocessoChefe,
+    acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise';
@@ -18,7 +18,8 @@ import {
     criarCompetencia,
     disponibilizarMapa,
     editarCompetencia,
-    excluirCompetencia,
+    excluirCompetenciaCancelando,
+    excluirCompetenciaConfirmando,
     navegarParaMapa,
     verificarCompetenciaNoMapa,
     verificarSituacaoSubprocesso
@@ -82,7 +83,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, ATIVIDADE_1);
@@ -174,7 +175,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         const compDesc = `Competência 1 Editada ${timestamp}`;
 
-        await excluirCompetencia(page, compDesc, false); // false = cancelar
+        await excluirCompetenciaCancelando(page, compDesc);
 
         await expect(page.getByText(compDesc)).toBeVisible();
     });
@@ -187,7 +188,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         const compDesc = `Competência 1 Editada ${timestamp}`;
 
-        await excluirCompetencia(page, compDesc, true); // true = confirmar
+        await excluirCompetenciaConfirmando(page, compDesc);
 
         // Lista deve estar vazia agora, botão disponibilizar deve desabilitar
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();

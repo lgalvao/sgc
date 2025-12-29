@@ -10,26 +10,11 @@ import {
     fecharModalImpacto,
     navegarParaAtividades,
     removerAtividade,
-    verificarBotaoImpacto
+    verificarBotaoImpactoPresente
 } from './helpers/helpers-atividades';
 import {fazerLogout} from './helpers/helpers-navegacao';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
-
-async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
-    const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
-    await expect(linhaProcesso).toBeVisible();
-    await linhaProcesso.click({force: true});
-    await expect(page).toHaveURL(/\/processo\/\d+/);
-    
-    // Se cair na lista de unidades, clica na unidade do Chefe
-    if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
-    }
-
-    // Garantir que estamos no dashboard do subprocesso correto
-    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
-    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText('SECAO_221');
-}
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -83,7 +68,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 2. Chefe preenche atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
         // Atividade 1
@@ -150,7 +135,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 5. Chefe Valida e Admin Homologa (Finalizar Mapeamento)
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -203,12 +188,12 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
 
         await navegarParaAtividades(page);
 
         // 1. Verificar presença do botão
-        await verificarBotaoImpacto(page, true);
+        await verificarBotaoImpactoPresente(page);
 
         // 2. Clicar no botão
         await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
@@ -218,7 +203,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Adicionar nova atividade
@@ -241,7 +226,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Editar atividade existente (Atividade Base 2)
@@ -267,7 +252,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Remover atividade (Atividade Base 3)
@@ -294,7 +279,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Chefe disponibiliza a revisão
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -310,7 +295,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Verificar botão de impacto
-        await verificarBotaoImpacto(page, true);
+        await verificarBotaoImpactoPresente(page);
 
         // Abrir e verificar conteúdo (deve ter os acumulados dos cenários anteriores)
         await abrirModalImpacto(page);
