@@ -1,20 +1,30 @@
-# Problemas e Bloqueios
+# Relatório de Problemas Conhecidos - Verificação de Qualidade
 
-## E2E - Rate Limiting e ECONNREFUSED
-Os testes E2E falhavam inicialmente devido ao "Rate Limiting" do backend, bloqueando logins consecutivos.
-Implementei uma correção no `LimitadorTentativasLogin.java` para ignorar o limite nos perfis `test` e `e2e`.
-No entanto, tentativas subsequentes de rodar os testes E2E resultaram em `ECONNREFUSED` ou falhas na execução em background.
-O comando `npm run test:e2e` deve gerenciar o ciclo de vida do backend, mas a execução no ambiente de sandbox tem sido instável ou conflituosa com processos zumbis.
+## Status Geral
+A verificação de qualidade foi realizada em todo o sistema. A maioria dos componentes está em conformidade, mas persistem problemas na execução dos testes End-to-End (E2E).
 
-## Testes de Backend - CDU16IntegrationTest
-O teste `deveSalvarAjustesComSucesso` do `CDU16IntegrationTest` falha persistentemente com HTTP 404, apesar de todos os esforços para corrigir a configuração de dados (refresh de entidades, verificação de IDs). O endpoint existe e o usuário tem permissão. Suspeito de uma questão sutil de transação ou configuração do MockMvc específica para este teste.
+## 1. Backend
+- **Status:** ✅ Passou
+- Todos os testes unitários e de integração passaram (`./gradlew :backend:test`).
+- Build bem-sucedido.
 
-## Memória e Ferramentas
-A ferramenta `initiate_memory_recording` falhou repetidamente, impedindo o registro de aprendizados.
+## 2. Frontend
+- **Status:** ✅ Passou
+- **Lint:** Sem erros (corrigidos problemas de acessibilidade em `TreeRowItem.vue` e `VisMapa.vue`).
+- **Typecheck:** Sem erros.
+- **Testes Unitários:** Todos passando (`vitest`).
+- **Correções Realizadas:**
+  - Importação de componentes `BDropdown` e `BDropdownItem` em `CadAtividades.vue` para resolver warnings do Vue.
+  - Ajustes de acessibilidade (listeners de teclado e labels) em componentes diversos.
 
-## Status Atual
-- Backend: 27/28 testes passando (CDU16 falha).
-- Frontend: 100% testes passando.
-- E2E: Status incerto devido a problemas de execução no ambiente, mas logs indicaram 149/149 passando em uma execução (que retornou código de saída 1).
+## 3. Testes End-to-End (E2E)
+- **Status:** ⚠️ Falhas Residuais
+- **Problema Principal:** Interação com elementos de UI complexos (Dropdowns e Toasts).
+  - Testes do **CDU-13** falham ao tentar clicar em "Histórico de análise" dentro do dropdown "Mais ações". O Playwright não consegue interagir com o item do menu, possivelmente devido à animação ou estrutura do BootstrapVueNext.
+  - Testes de Logout apresentavam falhas intermitentes devido a Toasts cobrindo o botão de sair. Foi implementado um workaround no helper `fazerLogout` para remover esses elementos do DOM, o que mitigou parte dos erros, mas a estabilidade total ainda não foi alcançada.
+- **Causa Raiz:** A automação E2E precisa de refinamento para lidar melhor com a assincronicidade e visibilidade de elementos flutuantes (popups, dropdowns) do framework de UI utilizado.
 
-Submetendo PR como WIP para salvar o progresso das correções já aplicadas (testes unitários corrigidos, rate limit bypass implementado).
+## Recomendações Futuras
+1. Adicionar `data-testid` explícitos nos gatilhos de dropdowns (o botão principal) para facilitar a seleção nos testes.
+2. Revisar a estratégia de espera nos helpers E2E para garantir que animações de abertura de menu sejam concluídas antes da interação.
+3. Investigar timeouts em testes de visibilidade (`toBeVisible`) que podem indicar lentidão na renderização em ambiente de teste.

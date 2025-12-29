@@ -46,7 +46,6 @@
           <th
               v-for="column in columns"
               :key="column.key"
-              role="columnheader"
           >
             {{ column.label }}
           </th>
