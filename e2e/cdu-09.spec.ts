@@ -2,19 +2,12 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {acessarSubprocessoChefeDireto, fazerLogout, verificarPaginaPainel} from './helpers/helpers-analise';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);
-}
-
-async function acessarSubprocessoChefe(page: Page, descricaoProcesso: string) {
-    await page.getByText(descricaoProcesso).click();
-    // Se cair na lista de unidades, clica na unidade do Chefe
-    if (await page.getByRole('heading', {name: /Unidades participantes/i}).isVisible()) {
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();    }
 }
 
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
@@ -69,7 +62,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Navegar para o subprocesso (CHEFE vai direto para o subprocesso)
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
 
         await verificarPaginaSubprocesso(page);
 
@@ -102,18 +95,18 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         // Garantir que temos dados validos
         const atividadeDesc = `Atividade Validada ${timestamp}`;
 
-        // Verificar se existe, se nao existir adicionar
-        const count = await page.getByText(atividadeDesc).count();
-        if (count === 0) {
-            await adicionarAtividade(page, atividadeDesc);
-            await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
-        }
+        // Como o teste é serial, podemos assumir que o Cenario 1 limpou ou estamos em um estado conhecido.
+        // Mas para garantir determinismo, vamos adicionar a atividade sempre.
+        // Se ela já existisse, o teste falharia, então assumimos que o estado é limpo ou controlado.
+        // O Cenario 1 adicionou "Atividade Incompleta...", esta é nova.
+        await adicionarAtividade(page, atividadeDesc);
+        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
 
         // Disponibilizar
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
@@ -124,7 +117,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await verificarPaginaPainel(page);
 
         // Verificar status no subprocesso
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
@@ -134,7 +127,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await page.getByText(descProcesso).click();
-                    await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: 'SECAO_221'}).click();
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
@@ -152,7 +145,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
 
         // Verificar situação 'Cadastro em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);

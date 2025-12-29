@@ -69,7 +69,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
-            await AtividadeHelpers.verificarBotaoImpacto(page, false);
+            await AtividadeHelpers.verificarBotaoImpactoAusente(page);
         });
 
         await test.step('7. Disponibilizar', async () => {
@@ -111,7 +111,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Adicionar uma atividade para garantir que o status mude para EM_ANDAMENTO e o botão apareça
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade Trigger');
-            await AtividadeHelpers.verificarBotaoImpacto(page, true);
+            await AtividadeHelpers.verificarBotaoImpactoPresente(page);
             await AtividadeHelpers.abrirModalImpacto(page);
             await AtividadeHelpers.fecharModalImpacto(page);
         });

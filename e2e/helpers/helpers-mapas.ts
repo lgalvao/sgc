@@ -65,7 +65,10 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
 
-export async function excluirCompetencia(page: Page, descricao: string, confirmar: boolean = true) {
+/**
+ * Exclui competência confirmando a ação no modal
+ */
+export async function excluirCompetenciaConfirmando(page: Page, descricao: string) {
     const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
     await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
@@ -74,15 +77,26 @@ export async function excluirCompetencia(page: Page, descricao: string, confirma
     await expect(modal).toBeVisible();
     await expect(modal).toContainText(descricao);
 
-    if (confirmar) {
-        await page.getByRole('button', {name: 'Confirmar'}).click();
-        await expect(modal).toBeHidden();
-        await expect(page.getByText(descricao, {exact: true})).toBeHidden();
-    } else {
-        await page.getByRole('button', {name: 'Cancelar'}).click();
-        await expect(modal).toBeHidden();
-        await expect(page.getByText(descricao, {exact: true})).toBeVisible();
-    }
+    await page.getByRole('button', {name: 'Confirmar'}).click();
+    await expect(modal).toBeHidden();
+    await expect(page.getByText(descricao, {exact: true})).toBeHidden();
+}
+
+/**
+ * Exclui competência cancelando a ação no modal
+ */
+export async function excluirCompetenciaCancelando(page: Page, descricao: string) {
+    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    await card.hover();
+    await card.getByTestId('btn-excluir-competencia').click();
+
+    const modal = page.getByTestId('mdl-excluir-competencia');
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText(descricao);
+
+    await page.getByRole('button', {name: 'Cancelar'}).click();
+    await expect(modal).toBeHidden();
+    await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
 
 export async function verificarCompetenciaNoMapa(page: Page, descricao: string, atividades: string[]) {
