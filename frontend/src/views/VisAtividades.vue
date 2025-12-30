@@ -319,28 +319,23 @@ async function confirmarValidacao() {
     observacoes: observacaoValidacao.value,
   };
 
+  let sucesso = false;
+
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = {
       observacoes: observacaoValidacao.value,
     };
-    try {
-      if (isRevisao.value) {
-        await subprocessosStore.homologarRevisaoCadastro(
-            codSubprocesso.value,
-            req,
-        );
-      } else {
-        await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
-      }
-
-      feedbackStore.show(
-          "Homologação efetivada",
-          "O cadastro foi homologado com sucesso.",
-          "success",
+    if (isRevisao.value) {
+      sucesso = await subprocessosStore.homologarRevisaoCadastro(
+          codSubprocesso.value,
+          req,
       );
+    } else {
+      sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
+    }
 
+    if (sucesso) {
       fecharModalValidar();
-
       // Redirecionar para Detalhes do subprocesso (CDU-13 passo 11.7 e CDU-14 passo 12.4)
       await router.push({
         name: "Subprocesso",
@@ -349,32 +344,18 @@ async function confirmarValidacao() {
           siglaUnidade: props.sigla
         }
       });
-    } catch (error) {
-      console.error(error);
-      feedbackStore.show(
-          "Erro ao homologar cadastro",
-          "Não foi possível homologar o cadastro.",
-          "danger",
-      );
     }
   } else {
     const req: AceitarCadastroRequest = {...commonRequest};
-    try {
-      if (isRevisao.value) {
-        await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
-      } else {
-        await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
-      }
+    if (isRevisao.value) {
+      sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
+    } else {
+      sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
+    }
 
+    if (sucesso) {
       fecharModalValidar();
       await router.push({name: "Painel"});
-    } catch (error) {
-      console.error(error);
-      feedbackStore.show(
-          "Erro ao aceitar cadastro",
-          "Não foi possível aceitar o cadastro.",
-          "danger",
-      );
     }
   }
 }
@@ -385,14 +366,17 @@ async function confirmarDevolucao() {
     observacoes: observacaoDevolucao.value,
   };
 
+  let sucesso = false;
   if (isRevisao.value) {
-    await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
+    sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
   } else {
-    await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
+    sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
   }
 
-  fecharModalDevolver();
-  await router.push("/painel");
+  if (sucesso) {
+    fecharModalDevolver();
+    await router.push("/painel");
+  }
 }
 
 function fecharModalValidar() {
