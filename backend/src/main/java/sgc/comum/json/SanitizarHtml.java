@@ -1,6 +1,7 @@
 package sgc.comum.json;
 
 import tools.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,6 +14,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
+@JacksonAnnotationsInside
 @JsonDeserialize(using = HtmlSanitizingDeserializer.class)
 public @interface SanitizarHtml {
 }
