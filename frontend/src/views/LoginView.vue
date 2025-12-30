@@ -240,9 +240,13 @@ const handleLogin = async () => {
       } else {
         feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro no login:", error);
-      feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
+      if (error.response?.status === 404 || error.response?.status === 401) {
+        feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
+      } else {
+        feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
+      }
     } finally {
       isLoading.value = false;
     }

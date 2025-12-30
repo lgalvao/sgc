@@ -241,7 +241,7 @@ export async function homologarCadastroMapeamento(page: Page) {
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+    await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
 
     // Sistema redireciona para Detalhes do subprocesso após homologação (CDU-13 passo 11.7)
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
@@ -260,7 +260,7 @@ export async function homologarCadastroRevisaoSemImpacto(page: Page) {
     await expect(page.getByText(/A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade/i)).toBeVisible();
     await expect(page.getByText(/Confirma a manutenção do mapa de competências vigente/i)).toBeVisible();
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+    await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
 
     // Verifica redirecionamento para tela de detalhes do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
@@ -279,7 +279,7 @@ export async function homologarCadastroRevisaoComImpacto(page: Page) {
     // Caminho COM impactos (CDU-14 passo 12.3)
     await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Homologação efetivada/i)).toBeVisible();
+    await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
 
     // Verifica redirecionamento para tela de detalhes do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
