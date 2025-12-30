@@ -1,58 +1,32 @@
-# CDU-23 - Disponibilizar mapas de competências em bloco
+# CDU-23 - Homologar cadastros em bloco
 
 **Ator:** ADMIN
 
-**Pré-condições:**
+## Pré-condições
 
-- Usuário logado com perfil ADMIN.
-- Processo de mapeamento com ao menos uma unidade com subprocesso na situação ‘Mapa criado’ ou processo de revisão com ao menos uma unidade com subprocesso na situação ‘Mapa ajustado’.
-**Fluxo principal:**
+- Usuário logado com perfil ADMIN
+- Existência de processo de mapeamento ou revisão em andamento com pelo menos uma unidade subordinada cujo subprocesso tenha localização atual na unidade do usuário e a situação:
+  - 'Cadastro disponibilizado', para processos de mapeamento; ou
+  - 'Revisão do cadastro disponibilizada', para processos de revisão.
 
-- No Painel, ADMIN acessa um processo de mapeamento ou revisão em andamento.
-- O sistema mostra tela Detalhes do processo.
-- O sistema identifica que existem unidades com subprocessos com mapas criados ou ajustados mas ainda não disponibilizados.
-- Na seção de unidades participantes, abaixo da árvore de unidades, o sistema mostra o botão Disponibilizar mapas de competência em bloco.
-- O sistema abre modal de confirmação, com os elementos a seguir:
-- Título "Disponibilização de mapa em bloco";
-- Texto “Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:”;
-- Lista das unidades operacionais ou interoperacionais cujos mapas de competências poderão ser disponibilizados, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
-- Campo de data, de preenchimento obrigatório, para armazenar a Data limite para a validação dos mapas de competências; e
-- Botões Cancelar e Disponibilizar.
-- Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação, permanecendo na tela Detalhes do processo.
-- O usuário clica em Disponibilizar.
-- O sistema verifica se todas as competências dos mapas de competências dos subprocessos das unidades selecionadas estão associadas a pelo menos uma atividade dos cadastros das unidades, e, em sentido oposto, se todas as atividades foram associadas a pelo menos uma competência do mapa da unidade.
-- Caso negativo, o sistema interrompe a operação de disponibilização em bloco, permanece na tela Detalhes do processo e informa a mensagem de erro: “Não é possível realizar a disponibilização em bloco dos mapas de competências das unidades [LISTA_UNIDADES_SELECIONADAS]. Realize a disponibilização individual do mapa de cada unidade para obter maiores detalhes.”
-- Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:
-- O sistema registra a informação “Mapa disponibilizado em bloco” na observação de disponibilização do mapa do subprocesso e a informação do campo Data limite para a validação dos mapas de competências na data limite da etapa 2 do subprocesso da unidade.
-- O sistema altera a situação do subprocesso da unidade para ‘Mapa disponibilizado’.
-- O sistema registra uma movimentação para o subprocesso com os campos:
-- Data/hora: Data/hora atual
-- Unidade origem: SEDOC
-- Unidade destino: [SIGLA_UNIDADE_SUBPROCESSO]
-- Descrição: ‘Disponibilização do mapa de competências’
-- O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
-Assunto: SGC: Mapa de competências disponibilizado
+## Fluxo principal
 
-Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
-
-O mapa de competências de sua unidade foi disponibilizado no contexto do processo [DESCRIÇÃO_PROCESSO].
-
-A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
-
-- O sistema cria internamente um alerta:
-- Descrição: “Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise”
-- Processo: [DESCRIÇÃO DO PROCESSO]
-- Data/hora: Data/hora atual
-- Unidade de origem: SEDOC
-- Unidade de destino: [SIGLA_UNIDADE_SUBPROCESSO].
-- O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da unidade.
-- O sistema agrupa as unidades selecionadas com suas unidades superiores em todos os níveis da hierarquia, notificando estas unidades superiores, com e-mail no modelo abaixo:
-Assunto: SGC: Mapas de competências disponibilizados
-
-Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-
-Os mapas de competências das unidades [LISTA_UNIDADE_SUBORDINADAS_SELECIONADAS] foram disponibilizados no contexto do processo [DESCRIÇÃO DO PROCESSO].
-
-A validação destes mapas já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
-
-- O sistema mostra a mensagem de confirmação: "Mapas de competências disponibilizados em bloco" e redireciona para o Painel.
+1. No Painel, o usuário acessa um processo de mapeamento ou revisão em andamento.
+2. O sistema mostra a tela Detalhes do processo.
+3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do cadastro de atividades (de acordo com as pré-condições do caso de uso) e exibe, na seção Unidades Participantes, abaixo da árvore de unidades, o botão `Homologar cadastro em bloco`.
+4. O usuário clica no botão `Homologar cadastro em bloco`.
+5. O sistema abre modal de confirmação, com os elementos a seguir:
+   - Título "Homologação de cadastro em bloco";
+   - Texto "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+   - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser homologados, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome; e
+   - Botões `Cancelar` e `Homologar`.
+6. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do processo.
+7. O usuário clica em `Homologar`.
+8. O sistema atua, para cada unidade selecionada, da seguinte forma:
+   8.1. O sistema registra uma movimentação para o subprocesso:
+        - `Data/hora`: [Data/hora atual]
+        - `Unidade origem`: "SEDOC"
+        - `Unidade destino`: "SEDOC"
+        - `Descrição`: "Cadastro de atividades e conhecimentos homologado"
+   8.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
+9. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela Detalhes do processo.

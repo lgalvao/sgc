@@ -1,9 +1,12 @@
-# CDU-31 - Reabrir revisão de cadastro
+# CDU-31 - Configurar sistema
 
-Se durante as etapas de ajuste e de validação do mapa de competências ajustado, alguma unidade indicar a necessidade tardia de revisão do cadastro de atividades e conhecimentos, a SEDOC poderá, mediante solicitação dessa unidade, retorná-la para a etapa de revisão do cadastro a fim de que a mesma possa realizar as alterações necessárias.
+**Ator:** ADMIN
 
-- A reabertura da revisão do cadastro de atividades e conhecimentos da unidade será notificada para todas unidades hierarquicamente superiores.
-- Após os ajustes realizados, a revisão do cadastro de atividades e conhecimentos da unidade precisará passar por nova análise por todas as unidades superiores na hierarquia.
-O processo de revisão poderá ser concluído quando todas as unidades participantes concluírem a validação do mapa de competência.
+## Fluxo principal
 
-As etapas de ajuste do mapa, e de validação do mapa ajustado, deverão ser realizadas apenas para as unidades que efetuarem alterações no cadastro de atividades e conhecimentos. As unidades que não identificarem necessidades de alteração poderão indicar a validação do mapa de competências já na primeira etapa do processo.
+1. ADMIN clica no botão de configurações ('engrenagem') na barra de navegação
+2. O sistema mostra a tela Configurações com o valor atual das seguintes configurações, permitindo edição.
+   - Dias para inativação de processos (referenciado neste documento como DIAS_INATIVACAO_PROCESSO): Dias depois da finalização de um processo para que seja considerado inativo. Valor inteiro, 1 ou mais.
+   - Dias para indicação de alerta como novo (referenciado neste documento como DIAS_ALERTA_NOVO): Dias depois depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.
+3. ADMIN altera os valores das configurações e clica em `Salvar`.
+4. O sistema mostra mensagem de confirmação e guarda as configurações internamente. O efeito das configurações deve ser imediato.
