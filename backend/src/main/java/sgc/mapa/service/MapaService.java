@@ -194,6 +194,9 @@ public class MapaService {
         for (Atividade atividade : atividadesAtuais) {
             Set<Competencia> novasCompetencias = mapAtividadeCompetencias.get(atividade.getCodigo());
             atividade.setCompetencias(novasCompetencias);
+            for (Competencia competencia : novasCompetencias) {
+                competencia.getAtividades().add(atividade);
+            }
         }
 
         atividadeRepo.saveAll(atividadesAtuais);

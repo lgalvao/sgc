@@ -12,6 +12,10 @@ import java.util.List;
  */
 @Repository
 public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
+    @Override
+    @Query("SELECT a FROM Atividade a LEFT JOIN FETCH a.mapa")
+    List<Atividade> findAll();
+
     /**
      * Recupera as atividades vinculadas a um mapa.
      *

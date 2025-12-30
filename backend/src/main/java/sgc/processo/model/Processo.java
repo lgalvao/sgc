@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
 import sgc.unidade.model.Unidade;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ public class Processo extends EntidadeBase {
             schema = "sgc",
             joinColumns = @JoinColumn(name = "processo_codigo"),
             inverseJoinColumns = @JoinColumn(name = "unidade_codigo"))
+    @BatchSize(size = 50)
     private Set<Unidade> participantes = new HashSet<>();
 
     public Processo(
