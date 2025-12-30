@@ -189,15 +189,22 @@ describe("LoginView.vue", () => {
         // Simula erro na chamada do store
         perfilStore.loginCompleto = vi.fn().mockRejectedValue(new Error("Erro de rede"));
 
+        // Precisamos mockar console.error para não poluir o output do teste
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
+
+        // Aguarda a promise rejeitada ser processada
+        await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro no sistema",
             "Ocorreu um erro ao tentar realizar o login.",
             "danger"
         );
+        consoleSpy.mockRestore();
     });
 
     it("deve exibir erro se nenhum perfil estiver disponível (array vazio)", async () => {
@@ -231,6 +238,9 @@ describe("LoginView.vue", () => {
             {perfil: Perfil.SERVIDOR, unidade: {sigla: "FILIAL", codigo: 2, nome: "Filial"}, siglaUnidade: "FILIAL"}
         ];
 
+        // Precisamos mockar console.error para não poluir o output do teste
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -239,11 +249,15 @@ describe("LoginView.vue", () => {
         // Passo 2 - Tentar selecionar
         await wrapper.find('form').trigger('submit');
 
+        // Aguarda a promise rejeitada ser processada
+        await new Promise(resolve => setTimeout(resolve, 0));
+
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro",
             "Falha ao selecionar o perfil.",
             "danger"
         );
+        consoleSpy.mockRestore();
     });
 
     it("deve exibir erro se tentar submeter passo 2 sem seleção (caso edge)", async () => {
