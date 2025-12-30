@@ -122,6 +122,21 @@ export async function verificarBotaoImpactoDireto(page: Page) {
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
 }
 
+export async function verificarBotaoImpactoAusente(page: Page) {
+    const btnImpacto = page.getByTestId('cad-atividades__btn-impactos-mapa');
+    
+    // Se o botão for um item de menu (dentro de Mais ações)
+    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
+    if (await btnMaisAcoes.isVisible()) {
+        await btnMaisAcoes.click();
+        await expect(btnImpacto).toBeHidden();
+        await page.keyboard.press('Escape');
+    } else {
+        // Se for um botão direto
+        await expect(btnImpacto).toBeHidden();
+    }
+}
+
 export async function abrirModalImpacto(page: Page) {
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     if (await btnMaisAcoes.isVisible()) {
