@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -17,8 +18,12 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.seguranca.SanitizacaoUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -110,50 +115,88 @@ public class MapaService {
 
         var sanitizedObservacoes = SanitizacaoUtil.sanitizar(request.getObservacoes());
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
-        mapa = mapaRepo.save(mapa);
+        mapaRepo.save(mapa);
 
+        // 1. Fetch current state
         List<Competencia> competenciasAtuais = competenciaRepo.findByMapaCodigo(codMapa);
-        Set<Long> idsAtuais =
-                competenciasAtuais.stream().map(Competencia::getCodigo).collect(Collectors.toSet());
+        List<Atividade> atividadesAtuais = atividadeRepo.findByMapaCodigo(codMapa);
+        Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
+                .map(Atividade::getCodigo)
+                .collect(Collectors.toSet());
 
-        Set<Long> idsNovos =
-                request.getCompetencias().stream()
-                        .map(CompetenciaMapaDto::getCodigo)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
+        // 2. Identify and Process Deletions
+        Set<Long> idsNovos = request.getCompetencias().stream()
+                .map(CompetenciaMapaDto::getCodigo)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-        Set<Long> codsParaRemover = new HashSet<>(idsAtuais);
-        codsParaRemover.removeAll(idsNovos);
+        List<Competencia> paraRemover = competenciasAtuais.stream()
+                .filter(c -> !idsNovos.contains(c.getCodigo()))
+                .toList();
 
-        for (Long codParaRemover : codsParaRemover) {
-            competenciaRepo.deleteById(codParaRemover);
-            log.debug("Competência {} removida do mapa {}", codParaRemover, codMapa);
+        // Remove relationships from the owning side (Atividade)
+        if (!paraRemover.isEmpty()) {
+            for (Atividade atividade : atividadesAtuais) {
+                atividade.getCompetencias().removeAll(paraRemover);
+            }
+            competenciaRepo.deleteAll(paraRemover);
+            competenciasAtuais.removeAll(paraRemover);
+            log.debug("Removidas {} competências.", paraRemover.size());
         }
+
+        // 3. Process Upserts (Insert/Update Competencies)
+        Map<Long, Competencia> mapaCompetenciasExistentes = competenciasAtuais.stream()
+                .collect(Collectors.toMap(Competencia::getCodigo, c -> c));
+
+        List<Competencia> competenciasParaSalvar = new ArrayList<>();
 
         for (CompetenciaMapaDto compDto : request.getCompetencias()) {
             Competencia competencia;
             if (compDto.getCodigo() == null) {
-                competencia = new Competencia();
-                competencia.setMapa(mapa);
-                competencia.setDescricao(compDto.getDescricao());
-                competencia = competenciaRepo.save(competencia);
-                log.debug("Nova competência criada: {}", competencia.getCodigo());
+                competencia = new Competencia(compDto.getDescricao(), mapa);
+                log.debug("Criando nova competência: {}", compDto.getDescricao());
             } else {
-                competencia =
-                        competenciaRepo
-                                .findById(compDto.getCodigo())
-                                .orElseThrow(
-                                        () ->
-                                                new ErroEntidadeNaoEncontrada(
-                                                        "Competência não encontrada: %d"
-                                                                .formatted(compDto.getCodigo())));
-
+                competencia = mapaCompetenciasExistentes.get(compDto.getCodigo());
+                if (competencia == null) {
+                    throw new ErroEntidadeNaoEncontrada("Competência não encontrada: " + compDto.getCodigo());
+                }
                 competencia.setDescricao(compDto.getDescricao());
-                competencia = competenciaRepo.save(competencia);
-                log.debug("Competência atualizada: {}", competencia.getCodigo());
             }
-            atualizarVinculosAtividades(competencia.getCodigo(), compDto.getAtividadesCodigos());
+            competenciasParaSalvar.add(competencia);
         }
+
+        List<Competencia> competenciasSalvas = competenciaRepo.saveAll(competenciasParaSalvar);
+
+        // 4. Update Relationships (Atividade -> Competencia)
+        Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
+
+        // Initialize with empty sets for all activities to handle clearing
+        for (Long ativId : atividadesDoMapaIds) {
+            mapAtividadeCompetencias.put(ativId, new HashSet<>());
+        }
+
+        for (int i = 0; i < request.getCompetencias().size(); i++) {
+            CompetenciaMapaDto dto = request.getCompetencias().get(i);
+            Competencia competencia = competenciasSalvas.get(i);
+
+            if (dto.getAtividadesCodigos() != null) {
+                for (Long ativId : dto.getAtividadesCodigos()) {
+                    if (!atividadesDoMapaIds.contains(ativId)) {
+                        throw new ErroValidacao(
+                                "Atividade %d não pertence ao mapa %d".formatted(ativId, codMapa));
+                    }
+                    mapAtividadeCompetencias.get(ativId).add(competencia);
+                }
+            }
+        }
+
+        // Apply changes to Atividade entities
+        for (Atividade atividade : atividadesAtuais) {
+            Set<Competencia> novasCompetencias = mapAtividadeCompetencias.get(atividade.getCodigo());
+            atividade.setCompetencias(novasCompetencias);
+        }
+
+        atividadeRepo.saveAll(atividadesAtuais);
 
         validarIntegridadeMapa(codMapa);
 
@@ -163,55 +206,11 @@ public class MapaService {
     }
 
     // ========================================================================================
-    // Métodos auxiliares (anteriormente em MapaVinculoService e MapaIntegridadeService)
+    // Métodos auxiliares
     // ========================================================================================
 
     /**
-     * Sincroniza os vínculos entre uma competência e uma lista de atividades.
-     *
-     * <p>O método compara a lista de IDs de atividades fornecida com os vínculos existentes para a
-     * competência e realiza as seguintes operações:
-     *
-     * <ul>
-     *   <li>Remove vínculos com atividades que não estão na nova lista.
-     *   <li>Cria novos vínculos para atividades que estão na nova lista mas não nos vínculos
-     *       atuais.
-     * </ul>
-     *
-     * @param codCompetencia      O código da competência a ser atualizada.
-     * @param novosCodsAtividades A lista completa de IDs de atividades que devem estar vinculadas à
-     *                            competência.
-     */
-    private void atualizarVinculosAtividades(Long codCompetencia, List<Long> novosCodsAtividades) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow();
-
-        Set<Atividade> novasAtividades =
-                new HashSet<>(atividadeRepo.findAllById(novosCodsAtividades));
-
-        competencia.setAtividades(novasAtividades);
-        competenciaRepo.save(competencia);
-
-        log.debug(
-                "Atualizados {} vínculos para competência {}",
-                novosCodsAtividades.size(),
-                codCompetencia);
-    }
-
-    /**
      * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
-     *
-     * <p>Este método loga avisos (warnings) para:
-     *
-     * <ul>
-     *   <li>Atividades que não estão vinculadas a nenhuma competência.
-     *   <li>Competências que não estão vinculadas a nenhuma atividade.
-     * </ul>
-     *
-     * <p>Nota: Esta é uma validação defensiva. Em operação normal, não deve haver atividades ou
-     * competências órfãs se as camadas de negócio estiverem corretamente configuradas. Serve como
-     * proteção contra dados inconsistentes e para diagnosticar problemas.
-     *
-     * @param codMapa O código do mapa a ser validado.
      */
     private void validarIntegridadeMapa(Long codMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);

@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -39,6 +40,9 @@ class MapaServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
+
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     @Mock
     private MapaCompletoMapper mapaCompletoMapper;
@@ -191,7 +195,15 @@ class MapaServiceTest {
             req.setCompetencias(List.of(cDto1));
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-            when(competenciaRepo.findById(99L)).thenReturn(Optional.empty());
+            // Fixed: Mocking findByMapaCodigo which is called in the new implementation
+            // The service now loads all competencies upfront.
+            // If the request contains a competency ID (99L) that is NOT in the loaded list,
+            // it will try to find it in the map and fail.
+            // So we return an empty list here to simulate that the map has no competencies.
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of());
+
+            // Also need to mock atividadeRepo as it is called in the service
+            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of());
 
             assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
