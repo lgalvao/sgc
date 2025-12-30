@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.AtividadeRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -39,6 +40,9 @@ class MapaServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
+
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     @Mock
     private MapaCompletoMapper mapaCompletoMapper;
@@ -191,10 +195,17 @@ class MapaServiceTest {
             req.setCompetencias(List.of(cDto1));
 
             when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
-            when(competenciaRepo.findById(99L)).thenReturn(Optional.empty());
+            // Precisamos simular as competências existentes, que não incluem o 99L
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
+            // E as atividades
+            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of());
+
+            // A lógica agora busca do mapa de competências carregado em memória, não via findById.
+            // Como 99L não está em List.of(competencia), deve falhar.
 
             assertThatThrownBy(() -> mapaService.salvarMapaCompleto(1L, req, "user"))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                    .hasMessageContaining("Competência não encontrada");
         }
     }
 }

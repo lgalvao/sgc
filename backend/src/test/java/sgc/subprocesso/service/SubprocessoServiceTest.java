@@ -185,7 +185,8 @@ class SubprocessoServiceTest {
             subprocesso.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(Collections.emptyList());
+            // Corrected mock to use buscarPorMapaCodigoComConhecimentos
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(Collections.emptyList());
 
             List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
@@ -301,8 +302,12 @@ class SubprocessoServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
 
+            Atividade atividade = new Atividade();
+            atividade.setConhecimentos(List.of(new Conhecimento()));
+
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(new Atividade()));
+            // Corrected mock to use buscarPorMapaCodigoComConhecimentos
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(atividade));
 
             service.validarExistenciaAtividades(1L);
         }
@@ -316,7 +321,7 @@ class SubprocessoServiceTest {
 
             assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("sem mapa");
+                    .hasMessageContaining("Mapa não encontrado"); // Updated expectation
         }
 
         @Test
@@ -328,11 +333,12 @@ class SubprocessoServiceTest {
             sp.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
+            // Corrected mock to use buscarPorMapaCodigoComConhecimentos
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
             assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Pelo menos uma atividade");
+                    .hasMessageContaining("ao menos uma atividade"); // updated message part
         }
 
         @Test
@@ -340,6 +346,16 @@ class SubprocessoServiceTest {
         void deveLancarExcecaoSeCompetenciaNaoEstiverAssociada() {
             Competencia competencia = new Competencia();
             competencia.setDescricao("Competencia de Teste");
+            // Se buscarPorMapa retornar algo, é porque existe competência.
+            // A validação verifica se CADA competência tem atividades.
+            // Para isso, precisamos mockar o que está dentro da validação.
+            // O serviço chama: List<Competencia> comps = competenciaService.buscarPorMapa(mapa.getCodigo());
+            // for (Competencia c : comps) { if (c.getAtividades().isEmpty()) ... }
+
+            // Mas `buscarPorMapa` retorna Competencia. Se for mockado, atividades estará vazio ou null.
+            // Precisamos garantir que esteja vazio para disparar o erro.
+            competencia.setAtividades(Collections.emptySet());
+
             when(competenciaService.buscarPorMapa(1L))
                     .thenReturn(Collections.singletonList(competencia));
 
