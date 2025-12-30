@@ -185,7 +185,7 @@ class SubprocessoServiceTest {
             subprocesso.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeService.buscarPorMapaCodigo(1L)).thenReturn(Collections.emptyList());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(1L)).thenReturn(Collections.emptyList());
 
             List<Atividade> result = service.obterAtividadesSemConhecimento(1L);
             assertThat(result).isEmpty();
@@ -301,8 +301,10 @@ class SubprocessoServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
 
+            Atividade atividade = new Atividade();
+            atividade.setConhecimentos(List.of(new Conhecimento()));
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(List.of(new Atividade()));
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(List.of(atividade));
 
             service.validarExistenciaAtividades(1L);
         }
@@ -316,7 +318,7 @@ class SubprocessoServiceTest {
 
             assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("sem mapa");
+                    .hasMessageContaining("Mapa não encontrado");
         }
 
         @Test
@@ -328,11 +330,11 @@ class SubprocessoServiceTest {
             sp.setMapa(mapa);
 
             when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(sp));
-            when(atividadeService.buscarPorMapaCodigo(10L)).thenReturn(Collections.emptyList());
+            when(atividadeService.buscarPorMapaCodigoComConhecimentos(10L)).thenReturn(Collections.emptyList());
 
             assertThatThrownBy(() -> service.validarExistenciaAtividades(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Pelo menos uma atividade");
+                    .hasMessageContaining("ao menos uma atividade");
         }
 
         @Test

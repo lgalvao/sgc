@@ -84,6 +84,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -143,10 +145,13 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);
-        subprocessoRevisao.setMapa(mapa);
         subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
         subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
+
+        mapa.setSubprocesso(subprocessoRevisao);
+        mapa = mapaRepo.save(mapa);
+        subprocessoRevisao.setMapa(mapa);
 
         // 5. Autenticar
         autenticarUsuario(usuarioChefe);
@@ -200,6 +205,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
             conhecimentoRepo.save(new sgc.mapa.model.Conhecimento("Conhecimento de Teste", atividade));
 
+            entityManager.flush();
+            entityManager.clear();
+
             mockMvc.perform(
                             post(
                                     "/api/subprocessos/{id}/disponibilizar-revisao",
@@ -236,7 +244,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                     .isEqualTo(
                             "Revisão do cadastro da unidade SESEL"
                                     + " disponibilizada para análise");
-            assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            // assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            // Relaxing assertion to compare IDs
+            assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
         }
 
         @Test
@@ -301,6 +311,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
             conhecimentoRepo.save(new sgc.mapa.model.Conhecimento("Conhecimento de Teste", atividade));
 
+            entityManager.flush();
+            entityManager.clear();
+
             Long subprocessoId = subprocessoRevisao.getCodigo();
 
             // 1. Primeira disponibilização
@@ -325,9 +338,11 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
             analiseRepo.saveAndFlush(analiseDevolucao);
 
             // 4. Simular devolução
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRevisao.setDataFimEtapa1(null);
-            subprocessoRepo.saveAndFlush(subprocessoRevisao);
+            // We need to fetch again because entity manager was cleared
+            Subprocesso sp = subprocessoRepo.findById(subprocessoId).get();
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setDataFimEtapa1(null);
+            subprocessoRepo.saveAndFlush(sp);
 
             // 5. Nova disponibilização
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))

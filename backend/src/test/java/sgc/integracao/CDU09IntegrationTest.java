@@ -86,6 +86,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
@@ -145,13 +147,17 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        sgc.mapa.model.Mapa mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
-
         subprocessoMapeamento = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
         subprocessoMapeamento.setCodigo(null);
-        subprocessoMapeamento.setMapa(mapa);
         subprocessoMapeamento.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoMapeamento = subprocessoRepo.save(subprocessoMapeamento);
+
+        sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
+        mapa.setSubprocesso(subprocessoMapeamento);
+        mapa = mapaRepo.save(mapa);
+
+        subprocessoMapeamento.setMapa(mapa);
+        // No need to save subprocesso again as it is the inverse side, but updating the object is good for consistency.
 
         // 5. Autenticar
         autenticarUsuario(usuarioChefe);
@@ -209,6 +215,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
             competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
+            entityManager.flush();
+            entityManager.clear();
+
             mockMvc.perform(
                             post(
                                     "/api/subprocessos/{id}/cadastro/disponibilizar",
@@ -244,7 +253,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                     .isEqualTo(
                             "Cadastro de atividades/conhecimentos da unidade " + unidadeChefe.getSigla() + " disponibilizado"
                                     + " para análise");
-            assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            // assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            // Relaxing assertion to compare IDs instead of full objects to avoid equality issues with detached/lazy objects
+            assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
         }
 
         @Test
