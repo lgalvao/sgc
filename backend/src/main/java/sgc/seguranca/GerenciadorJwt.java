@@ -3,8 +3,11 @@ package sgc.seguranca;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 import sgc.usuario.model.Perfil;
 
@@ -20,6 +23,24 @@ import java.util.Optional;
 @Slf4j
 public class GerenciadorJwt {
     private final JwtProperties jwtProperties;
+    private final Environment environment;
+
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+
+    @PostConstruct
+    public void verificarSegurancaChave() {
+        if (DEFAULT_SECRET.equals(jwtProperties.getSecret())) {
+            if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local"))) {
+                log.warn("⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão. " +
+                        "Isso é aceitável APENAS para ambientes de desenvolvimento/teste (test, e2e, local).");
+            } else {
+                log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente produtivo com o segredo JWT padrão.");
+                throw new IllegalStateException(
+                        "FALHA DE SEGURANÇA: A propriedade 'aplicacao.jwt.secret' não foi alterada do padrão inseguro. " +
+                        "Configure a variável de ambiente JWT_SECRET com um valor seguro.");
+            }
+        }
+    }
     
     private SecretKey getSigningKey() {
         // Garante que a chave tenha tamanho adequado (mínimo 256 bits para HS256)
