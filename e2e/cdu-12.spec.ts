@@ -15,6 +15,7 @@ import {
 } from './helpers/helpers-atividades';
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
+import {criarCompetencia} from './helpers/helpers-mapas';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
@@ -113,24 +114,15 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
 
         // Competência 1 ligada a Atividade 1
-        await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
-        await page.getByText(`Atividade Base 1 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
+        await criarCompetencia(page, `Competência 1 ${timestamp}`, [`Atividade Base 1 ${timestamp}`]);
         await limparNotificacoes(page);
 
         // Competência 2 ligada a Atividade 2
-        await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 2 ${timestamp}`);
-        await page.getByText(`Atividade Base 2 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
+        await criarCompetencia(page, `Competência 2 ${timestamp}`, [`Atividade Base 2 ${timestamp}`]);
         await limparNotificacoes(page);
 
         // Competência 3 ligada a Atividade 3
-        await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 3 ${timestamp}`);
-        await page.getByText(`Atividade Base 3 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
+        await criarCompetencia(page, `Competência 3 ${timestamp}`, [`Atividade Base 3 ${timestamp}`]);
         await limparNotificacoes(page);
 
         // Disponibilizar Mapa
