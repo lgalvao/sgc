@@ -98,11 +98,9 @@
               :disabled="isFormInvalid || isLoading"
               data-testid="btn-processo-iniciar"
               variant="success"
-              class="opacity-100"
-              :class="{ 'opacity-50 cursor-not-allowed': isFormInvalid || isLoading }"
               @click="abrirModalConfirmacao"
           >
-            <i class="bi bi-play-fill me-1"/> Iniciar processo
+            <i aria-hidden="true" class="bi bi-play-fill me-1"/> Iniciar processo
           </BButton>
           <BButton
               :disabled="isFormInvalid || isLoading"
@@ -113,7 +111,7 @@
               @click="salvarProcesso"
           >
             <BSpinner v-if="isLoading" small class="me-1" />
-            <i v-else class="bi bi-save me-1"/> Salvar
+            <i v-else aria-hidden="true" class="bi bi-save me-1"/> Salvar
           </BButton>
           <BButton
               v-if="processoEditando"
@@ -123,7 +121,7 @@
               variant="outline-danger"
               @click="abrirModalRemocao"
           >
-            <i class="bi bi-trash me-1"/> Remover
+            <i aria-hidden="true" class="bi bi-trash me-1"/> Remover
           </BButton>
         </div>
         <BButton
