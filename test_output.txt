@@ -1,0 +1,152 @@
+[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m260[22m[2m[0m ms[22m
+
+[1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+
+Running 28 tests using 1 worker
+
+[1A[2K[WebServer] >>> Frontend e Backend no ar!
+
+[1A[2K[1/28] [chromium] › e2e/cdu-12.spec.ts:47:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[1A[2K[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.autorizar levou 71 ms
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.criar:181 - Processo 1 criado.
+
+[1A[2K[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.notificacao.NotificacaoModelosService.criarEmailDeProcessoIniciado levou 114 ms
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:265 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:103 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[WebServer] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.processo.service.ProcessoService.iniciarProcessoMapeamento levou 139 ms
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:181 - Subprocesso 1 atualizado e mapa disponibilizado.
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+
+[1A[2K[chromium] › e2e/cdu-12.spec.ts:47:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2/28] [chromium] › e2e/cdu-12.spec.ts:169:9 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 2: Iniciar Processo de Revisão
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:381 - Homologados 1 subprocessos.
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.tornarMapasVigentes:385 - Mapa vigente definido para o processo 1
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.tornarMapasVigentes:402 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:189 - E-mail de finalização enviado para SECAO_221
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.finalizar:332 - Processo 1 finalizado
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.criar:181 - Processo 2 criado.
+
+[1A[2K[3/28] [chromium] › e2e/cdu-12.spec.ts:195:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial)
+[1A[2K[WebServer] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:118 - Subprocesso para revisão criado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:265 - E-mail enviado para unidade SECAO_221
+[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:103 - Processo de revisao 2 iniciado para 1 unidade(s).
+
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=false, inseridas=0 removidas=0, alteradas=0
+
+[1A[2K[4/28] [chromium] › e2e/cdu-12.spec.ts:211:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 2: Verificar Impacto de Inclusão de Atividade
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=true, inseridas=1 removidas=0, alteradas=0
+
+[1A[2K[5/28] [chromium] › e2e/cdu-12.spec.ts:234:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)
+[1A[2K[WebServer] INFO  s.m.service.AtividadeService.lambda$atualizar$3:147 - Atividade 5 atualizada
+
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=true, inseridas=2 removidas=1, alteradas=0
+
+[1A[2K[6/28] [chromium] › e2e/cdu-12.spec.ts:260:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[7/28] [chromium] › e2e/cdu-12.spec.ts:286:9 › CDU-12 - Verificar impactos no mapa de competências › Cenario 5: Verificar visualização pelo Admin (Somente Leitura)
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=true, inseridas=2 removidas=2, alteradas=0
+
+[1A[2K[8/28] [chromium] › e2e/cdu-14.spec.ts:59:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.1: ADMIN cria e inicia processo de mapeamento
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.criar:181 - Processo 3 criado.
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:265 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:103 - Processo de mapeamento 3 iniciado para 1 unidade(s).
+
+[1A[2K[9/28] [chromium] › e2e/cdu-14.spec.ts:80:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[10/28] [chromium] › e2e/cdu-14.spec.ts:97:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.3: GESTOR aceita cadastro
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: CADASTRO_ACEITO
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:66 - Workflow executado: Subprocesso 3 -> MAPEAMENTO_CADASTRO_DISPONIBILIZADO, Transição CADASTRO_ACEITO
+
+[1A[2K[11/28] [chromium] › e2e/cdu-14.spec.ts:107:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.4: ADMIN homologa cadastro
+[1A[2K[12/28] [chromium] › e2e/cdu-14.spec.ts:117:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.5: ADMIN cria competências e disponibiliza mapa
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoMapaWorkflowService.disponibilizarMapa:181 - Subprocesso 3 atualizado e mapa disponibilizado.
+
+[1A[2K[13/28] [chromium] › e2e/cdu-14.spec.ts:130:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.6: CHEFE valida mapa
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+
+[1A[2K[14/28] [chromium] › e2e/cdu-14.spec.ts:148:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.7: ADMIN homologa mapa
+[1A[2K[15/28] [chromium] › e2e/cdu-14.spec.ts:162:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.8: ADMIN finaliza o processo
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.validarTodosSubprocessosHomologados:381 - Homologados 1 subprocessos.
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.tornarMapasVigentes:385 - Mapa vigente definido para o processo 3
+[WebServer] INFO  s.p.service.ProcessoService.tornarMapasVigentes:402 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailUnidadeFinal:189 - E-mail de finalização enviado para SECAO_221
+
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.finalizar:332 - Processo 3 finalizado
+
+[1A[2K[16/28] [chromium] › e2e/cdu-14.spec.ts:179:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de revisão
+[1A[2K[WebServer] INFO  s.p.service.ProcessoService.criar:181 - Processo 4 criado.
+
+[1A[2K[WebServer] INFO  s.s.service.SubprocessoFactory.criarParaRevisao:118 - Subprocesso para revisão criado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.n.EventoProcessoListener.enviarEmailDeProcessoIniciado:265 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:103 - Processo de revisao 4 iniciado para 1 unidade(s).
+
+[1A[2K[17/28] [chromium] › e2e/cdu-14.spec.ts:204:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 2: CHEFE revisa atividades e disponibiliza
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+
+[1A[2K[18/28] [chromium] › e2e/cdu-14.spec.ts:234:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[19/28] [chromium] › e2e/cdu-14.spec.ts:250:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível
+[1A[2K[20/28] [chromium] › e2e/cdu-14.spec.ts:261:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 3: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_221 - Transição: REVISAO_CADASTRO_DEVOLVIDA
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:66 - Workflow executado: Subprocesso 4 -> REVISAO_CADASTRO_EM_ANDAMENTO, Transição REVISAO_CADASTRO_DEVOLVIDA
+
+[1A[2K[21/28] [chromium] › e2e/cdu-14.spec.ts:272:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+
+[1A[2K[22/28] [chromium] › e2e/cdu-14.spec.ts:298:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 5: GESTOR cancela devolução
+[1A[2K[23/28] [chromium] › e2e/cdu-14.spec.ts:312:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 6: GESTOR registra aceite COM observação
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECRETARIA_2 - Transição: REVISAO_CADASTRO_ACEITA
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:66 - Workflow executado: Subprocesso 4 -> REVISAO_CADASTRO_DISPONIBILIZADA, Transição REVISAO_CADASTRO_ACEITA
+
+[1A[2K[24/28] [chromium] › e2e/cdu-14.spec.ts:323:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 7: ADMIN devolve para nova rodada de aceite
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECAO_221 - Transição: REVISAO_CADASTRO_DEVOLVIDA
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:66 - Workflow executado: Subprocesso 4 -> REVISAO_CADASTRO_EM_ANDAMENTO, Transição REVISAO_CADASTRO_DEVOLVIDA
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para COORD_22 - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+
+[1A[2K[25/28] [chromium] › e2e/cdu-14.spec.ts:345:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 8: GESTOR registra aceite SEM observação
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoEmailService.enviarEmailTransicao:58 - E-mail enviado para SECRETARIA_2 - Transição: REVISAO_CADASTRO_ACEITA
+
+[1A[2K[WebServer] INFO  s.s.s.SubprocessoWorkflowExecutor.registrarAnaliseETransicao:66 - Workflow executado: Subprocesso 4 -> REVISAO_CADASTRO_DISPONIBILIZADA, Transição REVISAO_CADASTRO_ACEITA
+
+[1A[2K[26/28] [chromium] › e2e/cdu-14.spec.ts:356:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 9: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[27/28] [chromium] › e2e/cdu-14.spec.ts:385:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 10: ADMIN cancela homologação
+[1A[2K[28/28] [chromium] › e2e/cdu-14.spec.ts:399:9 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 11: ADMIN homologa cadastro de revisão
+[1A[2K[WebServer] INFO  s.m.service.ImpactoMapaService.verificarImpactos:117 - Análise de impactos concluída: tem=true, inseridas=3 removidas=0, alteradas=0
+
+[1A[2K  28 passed (55.4s)

@@ -99,23 +99,34 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
 export async function disponibilizarCadastro(page: Page) {
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-    await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-    await page.getByTestId('btn-confirmar-disponibilizacao').click();
+    
+    // Garantir que o modal apareça e o botão de confirmação esteja pronto
+    const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
+    await expect(btnConfirmar).toBeVisible();
+    await btnConfirmar.click();
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {
     await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'), {timeout: 15000});
 }
 
-export async function verificarBotaoImpactoPresente(page: Page) {
+export async function verificarBotaoImpactoDropdown(page: Page) {
+    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
+    await expect(btnMaisAcoes).toBeVisible();
+    await btnMaisAcoes.click();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
+    await page.keyboard.press('Escape'); // Fecha o dropdown
+}
+
+export async function verificarBotaoImpactoDireto(page: Page) {
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
 }
 
-export async function verificarBotaoImpactoAusente(page: Page) {
-    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeHidden();
-}
-
 export async function abrirModalImpacto(page: Page) {
+    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
+    if (await btnMaisAcoes.isVisible()) {
+        await btnMaisAcoes.click();
+    }
     await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }

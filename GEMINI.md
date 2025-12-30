@@ -2,7 +2,7 @@
 
 Este arquivo contém as diretrizes operacionais para assistentes de IA no projeto SGC.
 
-1. **Leia o [AGENTS.md](file:///c:/sgc/AGENTS.md)**: Contém as regras de codificação, idioma e arquitetura.
+1. **Leia o [AGENTS.md](./AGENTS.md)**: Contém as regras de codificação, idioma e arquitetura.
 
 2. **Explore os READMEs**:
    - Raiz: Visão geral.

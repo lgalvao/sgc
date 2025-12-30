@@ -2,15 +2,17 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import * as AtividadeHelpers from './helpers/helpers-atividades';
+import {fazerLogout} from './helpers/helpers-navegacao';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
+import {resetDatabase} from './hooks/hooks-limpeza';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test.beforeAll(async ({request}) => {
-        const response = await request.post('http://localhost:10000/e2e/reset-database');
-        expect(response.ok()).toBeTruthy();
+    test.beforeEach(async ({request}) => {
+        await resetDatabase(request);
     });
 
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page}) => {
@@ -28,18 +30,15 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
         });
 
         await test.step('2. Acessar tela de Atividades', async () => {
+            await page.goto('/login');
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-            await page.waitForLoadState('networkidle');
-
-            // Clica no processo no painel
-            await page.getByText(descricaoProcesso).click();
-
-            // CHEFE tem acesso direto apenas à sua unidade, então vai direto para Detalhes do subprocesso
-            await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+            
+            // Navega para o subprocesso usando helper robusto
+            await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
 
             // Agora navega para atividades
             await AtividadeHelpers.navegarParaAtividades(page);
@@ -100,13 +99,16 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
         });
 
         await test.step('Verificar Botão Impacto', async () => {
+            await page.goto('/login');
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
-            await page.waitForLoadState('networkidle');
-            await page.getByText(descricao).click();
+            
+            // Navega para o subprocesso usando helper robusto
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_REVISAO);
+            
             await AtividadeHelpers.navegarParaAtividades(page);
 
             // Adicionar uma atividade para garantir que o status mude para EM_ANDAMENTO e o botão apareça

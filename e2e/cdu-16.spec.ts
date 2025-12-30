@@ -9,7 +9,7 @@ import {
     removerAtividade
 } from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefe} from './helpers/helpers-analise';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
@@ -82,7 +82,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
         // Três atividades para criar três competências
@@ -136,7 +136,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-mapa-validar').click();
@@ -200,7 +200,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
         // Verificar atividades do mapeamento foram copiadas

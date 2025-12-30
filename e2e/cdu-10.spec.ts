@@ -1,7 +1,8 @@
 import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, disponibilizarCadastro} from './helpers/helpers-atividades';
+import {abrirHistoricoAnalise, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
@@ -353,21 +354,16 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        // Chefe vai direto
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        // Chefe vai direto para o subprocesso
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
 
         // Verificar situação voltou para 'em andamento'
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
 
         await navegarParaAtividades(page);
 
-        // Verificar botão Histórico de Análise está visível (CDU-10 passo 5)
-        await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-        await page.getByTestId('btn-cad-atividades-historico').click();
-
-        // Verificar conteúdo do modal de histórico
-        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
-        await expect(modal).toBeVisible();
+        // Abrir modal de histórico de análise (via dropdown "Mais ações")
+        const modal = await abrirHistoricoAnalise(page);
 
         // Verificar dados da análise (CDU-10 passo 5.1)
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
@@ -381,14 +377,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByRole('button', {name: 'Fechar'}).click();
 
         // 3. Disponibilizar novamente
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await disponibilizarCadastro(page);
 
         await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 4: Verificar que histórico foi excluído após nova disponibilização', async ({page}) => {
+    test('Cenario 4: Devolução e nova disponibilização adicional', async ({page}) => {
         // Admin devolve a revisão (primeira devolução)
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
@@ -412,26 +407,26 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await disponibilizarCadastro(page);
         await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
         await verificarPaginaPainel(page);
+    });
 
+    test('Cenario 5: Segunda devolução e disponibilização que limpa o histórico', async ({page}) => {
         // Admin faz segunda devolução
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        // Verificar que o processo de revisão está visível no painel (deveria estar na tabela de processos)
+        // Verificar que o processo de revisão está visível no painel
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         
         // Navegar diretamente para evitar erros de seleção na tabela
         await page.goto(`/processo/${processoRevisaoId}`);
         await expect(page.getByRole('table')).toBeVisible();
 
-        // CDU-14 Passo 3: Admin clica na unidade subordinada
         // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
         await page.getByRole('row', {name: 'SECAO_221'}).click();
@@ -448,30 +443,28 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
-        // Disponibilizar novamente
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        // Disponibilizar novamente - ISSO DEVE LIMPAR O HISTÓRICO DAS ANÁLISES ANTERIORES
+        await disponibilizarCadastro(page);
 
         await expect(page.getByRole('heading', {name: /Revisão disponibilizada/i})).toBeVisible();
         await verificarPaginaPainel(page);
+    });
 
+    test('Cenario 6: Verificar que histórico foi excluído após nova disponibilização', async ({page}) => {
         // Agora Admin devolve mais uma vez (terceira devolução)
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.goto(`/processo/${processoRevisaoId}`);
         await expect(page.getByRole('table')).toBeVisible();
 
-        // CDU-14 Passo 3: Admin clica na unidade subordinada
-        // CDU-14 Passo 3: Admin clica na unidade subordinada
         await expect(page.getByRole('row', {name: 'SECAO_221'})).toBeVisible();
         await page.getByRole('row', {name: 'SECAO_221'}).click();
 
-        // CDU-14 Passo 5: Usuário clica no card Atividades e conhecimentos
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
 
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -484,29 +477,27 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        // Chefe vai direto
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
-
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
-        await page.getByTestId('btn-cad-atividades-historico').click();
+        
+        const modal = await abrirHistoricoAnalise(page);
 
-        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
-        await expect(modal).toBeVisible();
-
-        // Deve ter apenas uma linha (a última devolução, após a disponibilização que excluiu o histórico anterior)
+        // Deve ter apenas uma linha (a última devolução)
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
 
-        // Não deve ter segunda linha (histórico anterior foi excluído pela disponibilização)
+        // Não deve ter segunda linha
         await expect(modal.getByTestId('cell-resultado-1')).toBeHidden();
+        
+        await page.getByRole('button', {name: 'Fechar'}).click();
     });
 
-    test('Cenario 5: Cancelar disponibilização mantém na mesma tela', async ({page}) => {
+    test('Cenario 7: Cancelar disponibilização mantém na mesma tela', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         // Chefe vai direto
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
 
         await navegarParaAtividades(page);
 

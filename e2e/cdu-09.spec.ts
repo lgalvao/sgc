@@ -2,7 +2,8 @@ import {expect, test} from './fixtures/base';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
-import {acessarSubprocessoChefeDireto, fazerLogout, verificarPaginaPainel} from './helpers/helpers-analise';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto, abrirHistoricoAnalise} from './helpers/helpers-analise';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
 
@@ -126,8 +127,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.goto('/login');
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-        await page.getByText(descProcesso).click();
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
@@ -152,12 +152,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await navegarParaAtividades(page);
 
-        // Verificar botão Histórico de Análise
-        await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-        await page.getByTestId('btn-cad-atividades-historico').click();
-
-        // Verificar conteúdo do modal
-        const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+        // Abrir modal de histórico de análise (via dropdown "Mais ações")
+        const modal = await abrirHistoricoAnalise(page);
         await expect(modal).toBeVisible();
 
         // Assumindo que é a primeira linha ou única

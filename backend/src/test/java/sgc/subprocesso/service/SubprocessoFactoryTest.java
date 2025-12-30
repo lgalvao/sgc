@@ -18,7 +18,6 @@ import sgc.unidade.model.UnidadeMapa;
 import sgc.unidade.model.UnidadeMapaRepo;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -54,7 +53,7 @@ class SubprocessoFactoryTest {
 
         factory.criarParaMapeamento(processo, unidade);
 
-        verify(subprocessoRepo, times(2)).save(any(Subprocesso.class));
+        verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
         verify(mapaRepo).save(any(Mapa.class));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
@@ -85,7 +84,6 @@ class SubprocessoFactoryTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapaVigente);
 
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
         Mapa mapaCopiado = new Mapa();
@@ -93,9 +91,9 @@ class SubprocessoFactoryTest {
         when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
-        factory.criarParaRevisao(processo, unidade);
+        factory.criarParaRevisao(processo, unidade, unidadeMapa);
 
-        verify(subprocessoRepo, times(2)).save(any(Subprocesso.class));
+        verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
         verify(mapaRepo).save(any(Mapa.class));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
@@ -108,9 +106,7 @@ class SubprocessoFactoryTest {
         unidade.setCodigo(1L);
         unidade.setSigla("U1");
 
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade));
+        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, null));
     }
 
     @Test
@@ -126,12 +122,11 @@ class SubprocessoFactoryTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapaVigente);
 
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
         when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(null);
 
-        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade));
+        assertThrows(ErroProcesso.class, () -> factory.criarParaRevisao(processo, unidade, unidadeMapa));
     }
 
     @Test
@@ -148,7 +143,6 @@ class SubprocessoFactoryTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapaVigente);
 
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> i.getArgument(0));
 
         Mapa mapaCopiado = new Mapa();
@@ -156,7 +150,7 @@ class SubprocessoFactoryTest {
         when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
         when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
-        factory.criarParaDiagnostico(processo, unidade);
+        factory.criarParaDiagnostico(processo, unidade, unidadeMapa);
 
         // Verifica situacao inicial
         verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));

@@ -54,7 +54,7 @@ const shouldShowNavBarExtras = computed(() => {
     Pular para o conteúdo principal
   </a>
   <BOrchestrator/>
-  <div class="position-fixed top-0 end-0 p-3" style="z-index: 2050; pointer-events: none; max-width: 450px;">
+  <div class="position-fixed end-0 p-3" style="top: 4.5rem; z-index: 2050; pointer-events: none; max-width: 450px;">
     <BAlert
         v-model="feedbackStore.currentFeedback.show"
         :fade="false"

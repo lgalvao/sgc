@@ -13,16 +13,15 @@ import {
     abrirHistoricoAnaliseVisualizacao,
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
-    acessarSubprocessoChefe,
+    acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     cancelarDevolucao,
     cancelarHomologacao,
     devolverCadastroMapeamento,
-    fazerLogout,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
-    verificarPaginaPainel
 } from './helpers/helpers-analise';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -80,7 +79,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         // Adicionar 3 atividades com conhecimentos
@@ -138,7 +137,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
 
         // Verificar situação
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
@@ -199,7 +198,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();

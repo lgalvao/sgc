@@ -33,19 +33,14 @@ backend/bin/
 .DS_Store
 /.vscode/
 /frontend/bin/
-.env.hom
 
-# E2E
-test-results/
-playwright-report/
-screenshots/
-e2e/server.log
-accessibility-report.html
+# Privacidade/segurança 
+.env.hom
 /dados/
 
-Reports de testes
-backend/build/reports/tests/test/index.html
-frontend/coverage/coverage-final.json
+# Reports de testes
+!backend/build/reports/tests/test/index.html
+!frontend/coverage/coverage-final.json
 
 # Jqwik
 .jqwik-database

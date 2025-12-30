@@ -240,7 +240,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public void validarExistenciaAtividades(Long codSubprocesso) {
-        log.info("Validando existência de atividades para o subprocesso: {}", codSubprocesso);
+        log.debug("Validando existência de atividades para o subprocesso: {}", codSubprocesso);
         Subprocesso subprocesso =
                 repositorioSubprocesso
                         .findById(codSubprocesso)

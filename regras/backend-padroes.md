@@ -344,7 +344,7 @@ graph TD
     end
     
     subgraph "Infraestrutura"
-        DB[(PostgreSQL/H2)]
+        DB[(Oracle/H2)]
     end
     
     C --> SF
@@ -841,7 +841,7 @@ de idioma:
 | Validação                 | Bean Validation   | 3.x    | Validação de entrada             |
 | Mapeamento                | MapStruct         | Latest | Entity-DTO conversion            |
 | Redução de Boilerplate    | Lombok            | Latest | Annotations para code generation |
-| Banco de Dados (Prod)     | PostgreSQL        | Latest | Banco relacional                 |
+| Banco de Dados (Prod)     | Oracle            | Latest | Banco relacional                 |
 | Banco de Dados (Dev/Test) | H2                | Latest | Banco em memória                 |
 | Documentação API          | SpringDoc OpenAPI | Latest | Swagger UI                       |
 | Testes                    | JUnit 5           | Latest | Framework de testes              |

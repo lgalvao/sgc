@@ -7,17 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.eventos.EventoProcessoCriado;
+import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFactory;
 import sgc.unidade.model.Unidade;
-import sgc.unidade.service.UnidadeService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +71,7 @@ class ProcessoInicializadorTest {
         verify(processoRepo).save(processo);
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
         verify(subprocessoFactory).criarParaMapeamento(eq(processo), any());
-        verify(publicadorEventos).publishEvent(any(sgc.processo.eventos.EventoProcessoIniciado.class));
+        verify(publicadorEventos).publishEvent(any(EventoProcessoIniciado.class));
     }
 
     @Test
@@ -140,10 +137,11 @@ class ProcessoInicializadorTest {
 
         when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
 
-        // Mock para unidadeRepo.findAllById
-        when(unidadeRepo.findAllById(any())).thenReturn(List.of(u1));
-        // Mock para unidadeMapaRepo.existsById
-        when(unidadeMapaRepo.existsById(10L)).thenReturn(true);
+        // Mock para unidadeMapaRepo.findAllById
+        sgc.unidade.model.UnidadeMapa um1 = new sgc.unidade.model.UnidadeMapa();
+        um1.setUnidadeCodigo(10L);
+        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um1));
+        
         // Mock para processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), anyList())).thenReturn(List.of());
 
@@ -155,7 +153,7 @@ class ProcessoInicializadorTest {
 
         // Assert
         assertThat(erros).isEmpty();
-        verify(subprocessoFactory).criarParaRevisao(eq(processo), any());
+        verify(subprocessoFactory).criarParaRevisao(eq(processo), any(), any());
     }
 
     @Test
@@ -172,10 +170,8 @@ class ProcessoInicializadorTest {
 
         when(processoRepo.findById(codProcesso)).thenReturn(java.util.Optional.of(processo));
 
-        // Mock para unidadeRepo.findAllById
-        when(unidadeRepo.findAllById(any())).thenReturn(List.of(u1));
-        // Mock para unidadeMapaRepo.existsById - retorna false para simular erro
-        when(unidadeMapaRepo.existsById(10L)).thenReturn(false);
+        // Mock para unidadeMapaRepo.findAllById - retorna lista vazia para simular que a unidade 10L não tem mapa
+        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of());
         // Mock para unidadeRepo.findSiglasByCodigos
         when(unidadeRepo.findSiglasByCodigos(List.of(10L))).thenReturn(List.of("U1"));
 

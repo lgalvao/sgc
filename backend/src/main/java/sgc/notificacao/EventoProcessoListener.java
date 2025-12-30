@@ -15,7 +15,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 import sgc.usuario.UsuarioService;
 import sgc.usuario.dto.ResponsavelDto;
-import sgc.unidade.dto.UnidadeDto;
 import sgc.usuario.dto.UsuarioDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
@@ -111,10 +110,25 @@ public class EventoProcessoListener {
         List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(processo, evento.getCodUnidades(), subprocessos);
         log.debug("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
-        // 2. Enviar e-mails para cada subprocesso
+        // 2. Pré-carregar responsáveis e usuários para evitar N+1
+        List<Long> todosCodigosUnidades = subprocessos.stream()
+                .map(s -> s.getUnidade().getCodigo())
+                .toList();
+
+        Map<Long, ResponsavelDto> responsaveis = usuarioService.buscarResponsaveisUnidades(todosCodigosUnidades);
+
+        List<String> todosTitulos = new ArrayList<>();
+        responsaveis.values().forEach(r -> {
+            if (r.getTitularTitulo() != null) todosTitulos.add(r.getTitularTitulo());
+            if (r.getSubstitutoTitulo() != null) todosTitulos.add(r.getSubstitutoTitulo());
+        });
+
+        Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(todosTitulos);
+
+        // 3. Enviar e-mails para cada subprocesso
         for (Subprocesso subprocesso : subprocessos) {
             try {
-                enviarEmailDeProcessoIniciado(processo, subprocesso);
+                enviarEmailDeProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
             } catch (RuntimeException e) {
                 log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
             }
@@ -201,28 +215,28 @@ public class EventoProcessoListener {
     }
 
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
-    private void enviarEmailDeProcessoIniciado(Processo processo, Subprocesso subprocesso) {
+    private void enviarEmailDeProcessoIniciado(
+            Processo processo, 
+            Subprocesso subprocesso,
+            Map<Long, ResponsavelDto> responsaveis,
+            Map<String, UsuarioDto> usuarios) {
+        
         if (subprocesso.getUnidade() == null) {
             log.warn("Subprocesso {} sem unidade associada", subprocesso.getCodigo());
             return;
         }
 
-        Long codigoUnidade = subprocesso.getUnidade().getCodigo();
-        try {
-            Optional<UnidadeDto> unidadeOpt = usuarioService.buscarUnidadePorCodigo(codigoUnidade);
-            if (unidadeOpt.isEmpty()) {
-                log.warn("Unidade {} não encontrada no SGRH.", codigoUnidade);
-                return;
-            }
+        Unidade unidade = subprocesso.getUnidade();
+        Long codigoUnidade = unidade.getCodigo();
 
-            UnidadeDto unidade = unidadeOpt.get();
-            Optional<ResponsavelDto> responsavelOpt = usuarioService.buscarResponsavelUnidade(codigoUnidade);
-            if (responsavelOpt.isEmpty() || responsavelOpt.get().getTitularTitulo() == null) {
+        try {
+            ResponsavelDto responsavel = responsaveis.get(codigoUnidade);
+            if (responsavel == null || responsavel.getTitularTitulo() == null) {
                 log.warn("Responsável não encontrado para a unidade {}.", unidade.getNome());
                 return;
             }
 
-            UsuarioDto titular = usuarioService.buscarUsuarioPorTitulo(responsavelOpt.get().getTitularTitulo()).orElse(null);
+            UsuarioDto titular = usuarios.get(responsavel.getTitularTitulo());
             if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) {
                 log.warn("E-mail não encontrado para o titular da unidade {}.", unidade.getNome());
                 return;
@@ -230,7 +244,7 @@ public class EventoProcessoListener {
 
             String assunto;
             String corpoHtml;
-            TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidade.getTipo());
+            TipoUnidade tipoUnidade = unidade.getTipo();
             TipoProcesso tipoProcesso = processo.getTipo();
 
             if (OPERACIONAL == tipoUnidade) {
@@ -250,8 +264,8 @@ public class EventoProcessoListener {
             notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
             log.info("E-mail enviado para unidade {}", unidade.getSigla());
 
-            if (responsavelOpt.get().getSubstitutoTitulo() != null) {
-                enviarEmailParaSubstituto(responsavelOpt.get().getSubstitutoTitulo(), assunto, corpoHtml, unidade.getNome());
+            if (responsavel.getSubstitutoTitulo() != null) {
+                enviarEmailParaSubstituto(responsavel.getSubstitutoTitulo(), usuarios, assunto, corpoHtml, unidade.getNome());
             }
 
         } catch (RuntimeException e) {
@@ -259,9 +273,9 @@ public class EventoProcessoListener {
         }
     }
 
-    private void enviarEmailParaSubstituto(String tituloSubstituto, String assunto, String corpoHtml, String nomeUnidade) {
+    private void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto, String corpoHtml, String nomeUnidade) {
         try {
-            UsuarioDto substituto = usuarioService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
+            UsuarioDto substituto = usuarios.get(tituloSubstituto);
             if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);

@@ -5,7 +5,8 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     navegarParaAtividades,
-    navegarParaAtividadesVisualizacao
+    navegarParaAtividadesVisualizacao,
+    verificarBotaoImpactoDireto
 } from './helpers/helpers-atividades';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {
@@ -14,17 +15,17 @@ import {
     aceitarCadastroMapeamento,
     aceitarRevisao,
     acessarSubprocessoAdmin,
-    acessarSubprocessoChefe,
+    acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     cancelarDevolucao,
     cancelarHomologacao,
     devolverRevisao,
-    fazerLogout,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento,
     homologarCadastroRevisaoComImpacto,
-    verificarPaginaPainel
 } from './helpers/helpers-analise';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 
 test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -37,6 +38,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-14 ${timestamp}`;
+    const descMapeamento = `Mapeamento para CDU-14 ${timestamp}`;
     let processoId: number;
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
@@ -54,9 +56,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 0: Criar mapa vigente através de processo de mapeamento', async ({page}) => {
-        const descMapeamento = `Mapeamento para CDU-14 ${timestamp}`;
-
+    test('Preparacao 0.1: ADMIN cria e inicia processo de mapeamento', async ({page}) => {
         // Passo 1: ADMIN cria e inicia processo de mapeamento
         await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
@@ -75,12 +75,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('btn-iniciar-processo-confirmar').waitFor({state: 'visible'});
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
+    });
 
+    test('Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro', async ({page}) => {
         // Passo 2: CHEFE adiciona atividades e disponibiliza cadastro
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByText(descMapeamento).click();
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, `Atividade Map 1 ${timestamp}`);
@@ -90,46 +92,48 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
         await expect(page.getByRole('heading', {name: /Cadastro de atividades disponibilizado/i})).toBeVisible();
         await verificarPaginaPainel(page);
+    });
 
+    test('Preparacao 0.3: GESTOR aceita cadastro', async ({page}) => {
         // Passo 3: GESTOR aceita cadastro
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_GESTOR, SENHA_GESTOR);
 
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
+    });
 
+    test('Preparacao 0.4: ADMIN homologa cadastro', async ({page}) => {
         // Passo 4: ADMIN homologa cadastro
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
+    });
 
+    test('Preparacao 0.5: ADMIN cria competências e disponibiliza mapa', async ({page}) => {
         // Passo 5: ADMIN cria competências e disponibiliza mapa
-        // Após homologação, já está na tela de Detalhes do subprocesso
-        await page.getByTestId('card-subprocesso-mapa').click();
+        // Após homologação, precisamos de um login se o teste for isolado (mas aqui é serial)
+        // No entanto, cada bloco test() inicia uma nova página limpa por padrão se não configurado
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        
+        await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await criarCompetencia(page, `Competência Map ${timestamp}`, [`Atividade Map 1 ${timestamp}`]);
+        await disponibilizarMapa(page, '2030-12-31');
+    });
 
-        await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Map ${timestamp}`);
-        await page.getByText(`Atividade Map 1 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
-        await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
-
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
-        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-        await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
-
-
-
+    test('Preparacao 0.6: CHEFE valida mapa', async ({page}) => {
         // Passo 6: CHEFE valida mapa
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await page.getByText(descMapeamento).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         
@@ -137,24 +141,29 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
         
         // Navegar novamente ao subprocesso para verificar situação
-        await page.getByText(descMapeamento).click();
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
+    });
 
+    test('Preparacao 0.7: ADMIN homologa mapa', async ({page}) => {
         // Passo 7: ADMIN homologa mapa
-        await fazerLogout(page);
+        await page.goto('/login');
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         
         // Validação: confirmar redirecionamento para Painel (CDU-20 passo 10.6)
         await verificarPaginaPainel(page);
+    });
 
+    test('Preparacao 0.8: ADMIN finaliza o processo', async ({page}) => {
         // Passo 8: ADMIN finaliza o processo
-        await page.goto('/painel');
+        await page.goto('/login');
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+
         await page.locator('tr').filter({has: page.getByText(descMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
@@ -196,7 +205,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         // Adicionar 3 atividades com conhecimentos
@@ -246,7 +255,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaAtividadesVisualizacao(page);
 
         // Verificar que o botão "Impactos no mapa" está visível
-        await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
+        await verificarBotaoImpactoDireto(page);
     });
 
     test('Cenario 3: GESTOR devolve cadastro para ajustes COM observação', async ({page}) => {
@@ -264,7 +273,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
 
         // Verificar situação
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
@@ -325,7 +334,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();

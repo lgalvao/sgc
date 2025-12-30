@@ -1,4 +1,8 @@
 import {expect, type Page} from '@playwright/test';
+import {fazerLogout, verificarPaginaPainel} from './helpers-navegacao';
+
+// Re-exportar para manter compatibilidade com imports existentes
+export {fazerLogout, verificarPaginaPainel};
 
 /**
  * Helpers para análise de cadastro de atividades (CDU-13 e CDU-14)
@@ -9,28 +13,15 @@ import {expect, type Page} from '@playwright/test';
 // ============================================================================
 
 /**
- * Faz logout do sistema
- */
-export async function fazerLogout(page: Page) {
-    await page.getByTestId('btn-logout').click({force: true});
-    await expect(page).toHaveURL(/\/login/);
-}
-
-/**
- * Verifica que está na página do painel
- */
-export async function verificarPaginaPainel(page: Page) {
-    await expect(page).toHaveURL(/\/painel/);
-}
-
-/**
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     // Garantir que estamos no painel e que carregou
     await expect(page).toHaveURL(/\/painel$/);
-    await page.waitForLoadState('networkidle');
 
+    // Aguardar o processo aparecer na tabela antes de clicar
+    await expect(page.getByText(descricaoProcesso)).toBeVisible();
+    
     await page.getByText(descricaoProcesso).click();
 
     // GESTOR sempre vê lista de unidades participantes
@@ -46,10 +37,32 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
 /**
  * Acessa subprocesso como CHEFE (vai direto ao subprocesso)
  */
-export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string) {
-    await page.getByText(descricaoProcesso).click();
-    // Aguardar navegação direta para a página do subprocesso
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string = '') {
+    // Garantir que estamos no painel e que carregou
+    await expect(page).toHaveURL(/\/painel$/);
+    
+    // Aguardar o processo aparecer na tabela antes de clicar
+    const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
+    await expect(linhaProcesso).toBeVisible();
+    
+    // Clicar na linha da tabela que contém o processo
+    await linhaProcesso.click();
+    
+    // Aguardar navegação para uma página de processo
+    await expect(page).toHaveURL(/\/processo\/\d+/);
+
+    // Se não redirecionou direto para o subprocesso (a URL não termina com a sigla da unidade)
+    if (siglaUnidade && !page.url().endsWith(siglaUnidade)) {
+        // Clicar na linha da unidade para acessar o subprocesso
+        await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+    }
+    
+    // Agora deve estar na página do subprocesso
+    if (siglaUnidade) {
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    } else {
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+    }
 }
 
 /**

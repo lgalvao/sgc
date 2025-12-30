@@ -62,7 +62,7 @@ public class ProcessoInicializador {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = null; // Será buscado individualmente
+            unidadesParaProcessar = null; // Será buscado individualmente via Repo se necessário
         } else {
             // Mapeamento e Diagnóstico usam participantes do processo
             Set<Unidade> participantes = processo.getParticipantes();
@@ -73,14 +73,20 @@ public class ProcessoInicializador {
             unidadesParaProcessar = participantes;
         }
 
-        // Validar unidades
+        // Validar unidades (Batch)
         List<String> erros = validarUnidades(tipo, codigosUnidades);
         if (!erros.isEmpty()) {
             return erros;
         }
 
+        // Se for REVISAO ou DIAGNOSTICO, precisamos carregar os mapas vigentes em lote para passar para a factory
+        List<sgc.unidade.model.UnidadeMapa> unidadesMapas = List.of();
+        if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
+            unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
+        }
+
         // Criar subprocessos
-        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar);
+        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas);
 
         // Atualizar situação e salvar
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -121,7 +127,12 @@ public class ProcessoInicializador {
     }
 
     private void criarSubprocessos(Processo processo, TipoProcesso tipo, 
-                                    List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar) {
+                                    List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
+                                    List<sgc.unidade.model.UnidadeMapa> unidadesMapas) {
+        
+        java.util.Map<Long, sgc.unidade.model.UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
+                .collect(java.util.stream.Collectors.toMap(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo, m -> m));
+
         switch (tipo) {
             case MAPEAMENTO -> {
                 for (Unidade unidade : unidadesParaProcessar) {
@@ -132,12 +143,14 @@ public class ProcessoInicializador {
                 for (Long codUnidade : codigosUnidades) {
                     Unidade unidade = unidadeRepo.findById(codUnidade)
                             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidade));
-                    subprocessoFactory.criarParaRevisao(processo, unidade);
+                    sgc.unidade.model.UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
+                    subprocessoFactory.criarParaRevisao(processo, unidade, um);
                 }
             }
             case DIAGNOSTICO -> {
                 for (Unidade unidade : unidadesParaProcessar) {
-                    subprocessoFactory.criarParaDiagnostico(processo, unidade);
+                    sgc.unidade.model.UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
+                    subprocessoFactory.criarParaDiagnostico(processo, unidade, um);
                 }
             }
         }
@@ -162,11 +175,13 @@ public class ProcessoInicializador {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
             return Optional.empty();
         }
-        List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
 
-        List<Long> unidadesSemMapa = unidades.stream()
-                .map(Unidade::getCodigo)
-                .filter(codigo -> !unidadeMapaRepo.existsById(codigo))
+        List<Long> codigosComMapa = unidadeMapaRepo.findAllById(codigosUnidades).stream()
+                .map(sgc.unidade.model.UnidadeMapa::getUnidadeCodigo)
+                .toList();
+        
+        List<Long> unidadesSemMapa = codigosUnidades.stream()
+                .filter(codigo -> !codigosComMapa.contains(codigo))
                 .toList();
 
         if (!unidadesSemMapa.isEmpty()) {

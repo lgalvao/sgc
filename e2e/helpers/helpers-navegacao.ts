@@ -12,16 +12,42 @@ import {expect, type Page} from '@playwright/test';
 // ============================================================================
 
 /**
+ * Limpa notificações (toasts e alertas) da tela.
+ * Tenta clicar no botão de fechar (.btn-close) ou pressionar ESC.
+ * Essencial para evitar que toasts interceptem cliques em botões.
+ */
+export async function limparNotificacoes(page: Page): Promise<void> {
+    const notificacao = page.locator('.toast, [data-testid="global-alert"]');
+    
+    if (await notificacao.count() > 0) {
+        // Tentar clicar no botão de fechar se estiver visível
+        const btnFechar = notificacao.locator('.btn-close').first();
+        if (await btnFechar.isVisible()) {
+            await btnFechar.click();
+        } else {
+            await page.keyboard.press('Escape');
+        }
+    }
+
+    // Aguardar que fiquem ocultos (autoHideDelay padrão é 3000ms)
+    await notificacao.waitFor({state: 'hidden', timeout: 5000}).catch(() => {
+        // Ignorar se não sumir no tempo previsto
+    });
+}
+
+/**
  * Faz logout do sistema e aguarda redirecionamento para página de login.
+ * Limpa notificações antes de clicar para evitar intercepção.
  */
 export async function fazerLogout(page: Page): Promise<void> {
+    await limparNotificacoes(page);
+
     // Wait for the button to be stable and visible
     const btnLogout = page.getByTestId('btn-logout');
     await expect(btnLogout).toBeVisible();
     await btnLogout.click();
 
-    // Explicitly wait for the login URL with a longer timeout
-    await expect(page).toHaveURL(/\/login/, {timeout: 15000});
+    await expect(page).toHaveURL(/\/login/);
 }
 
 // ============================================================================
@@ -65,8 +91,11 @@ export async function navegarParaSubprocesso(
     page: Page,
     siglaUnidade: string
 ): Promise<void> {
+    // Aguardar o cabeçalho do processo (v-if="processo") para garantir carregamento inicial
+    await expect(page.getByTestId('processo-info')).toBeVisible({timeout: 10000});
+
     const tabela = page.getByTestId('tbl-tree');
-    await expect(tabela).toBeVisible();
+    await expect(tabela).toBeVisible({timeout: 10000});
     
     const celula = tabela.getByRole('cell', {name: siglaUnidade}).first();
     await expect(celula).toBeVisible();

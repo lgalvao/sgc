@@ -67,7 +67,7 @@ public class NotificacaoModelosService {
      * @param nomeProcesso         O nome do processo associado.
      * @param quantidadeAtividades O número de atividades registradas.
      */
-    public void criarEmailCadastroDisponibilizado(
+    public String criarEmailCadastroDisponibilizado(
             String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
 
         Context context = new Context();
@@ -76,7 +76,7 @@ public class NotificacaoModelosService {
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("quantidadeAtividades", quantidadeAtividades);
 
-        templateEngine.process("cadastro-disponibilizado", context);
+        return templateEngine.process("cadastro-disponibilizado", context);
     }
 
     /**
@@ -89,7 +89,7 @@ public class NotificacaoModelosService {
      * @param motivo       O motivo da devolução.
      * @param observacoes  Detalhes ou observações adicionais.
      */
-    public void criarEmailCadastroDevolvido(
+    public String criarEmailCadastroDevolvido(
             String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
 
         Context context = new Context();
@@ -99,7 +99,7 @@ public class NotificacaoModelosService {
         context.setVariable("motivo", motivo);
         context.setVariable("observacoes", observacoes);
 
-        templateEngine.process("cadastro-devolvido", context);
+        return templateEngine.process("cadastro-devolvido", context);
     }
 
     /**
@@ -111,7 +111,7 @@ public class NotificacaoModelosService {
      * @param nomeProcesso        O nome do processo associado.
      * @param dataLimiteValidacao A data limite para a validação do mapa.
      */
-    public void criarEmailMapaDisponibilizado(
+    public String criarEmailMapaDisponibilizado(
             String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
 
         Context context = new Context();
@@ -120,7 +120,7 @@ public class NotificacaoModelosService {
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
 
-        templateEngine.process("mapa-disponibilizado", context);
+        return templateEngine.process("mapa-disponibilizado", context);
     }
 
     /**
@@ -131,13 +131,13 @@ public class NotificacaoModelosService {
      * @param nomeUnidade  O nome da unidade que validou o mapa.
      * @param nomeProcesso O nome do processo associado.
      */
-    public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
+    public String criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable("titulo", TITULO_MAPA_VALIDADO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
-        templateEngine.process("mapa-validado", context);
+        return templateEngine.process("mapa-validado", context);
     }
 
     /**
@@ -149,7 +149,7 @@ public class NotificacaoModelosService {
      * @param dataFinalizacao A data em que o processo foi finalizado.
      * @param quantidadeMapas O número de mapas que se tornaram vigentes.
      */
-    public void criarEmailProcessoFinalizado(
+    public String criarEmailProcessoFinalizado(
             String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         Context context = new Context();
         context.setVariable("titulo", TITULO_PROCESSO_FINALIZADO);
@@ -157,7 +157,7 @@ public class NotificacaoModelosService {
         context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
         context.setVariable("quantidadeMapas", quantidadeMapas);
 
-        templateEngine.process("processo-finalizado", context);
+        return templateEngine.process("processo-finalizado", context);
     }
 
     /**

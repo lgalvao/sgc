@@ -35,7 +35,7 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     }
 
     @Override
-    public void criarEmailCadastroDisponibilizado(
+    public String criarEmailCadastroDisponibilizado(
             String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
         log.debug(
                 "[MOCK] Criando e-mail de cadastro disponibilizado (mock): Unidade={}, Processo={},"
@@ -43,10 +43,11 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
                 nomeUnidade,
                 nomeProcesso,
                 quantidadeAtividades);
+        return "<html><body>Mock Email de Cadastro Disponibilizado</body></html>";
     }
 
     @Override
-    public void criarEmailCadastroDevolvido(
+    public String criarEmailCadastroDevolvido(
             String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
         log.debug(
                 "[MOCK] Criando e-mail de cadastro devolvido (mock): Unidade={}, Processo={},"
@@ -55,10 +56,11 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
                 nomeProcesso,
                 motivo,
                 observacoes);
+        return "<html><body>Mock Email de Cadastro Devolvido</body></html>";
     }
 
     @Override
-    public void criarEmailMapaDisponibilizado(
+    public String criarEmailMapaDisponibilizado(
             String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
         log.debug(
                 "[MOCK] Criando e-mail de mapa disponibilizado (mock): Unidade={}, Processo={},"
@@ -66,18 +68,20 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
                 nomeUnidade,
                 nomeProcesso,
                 dataLimiteValidacao);
+        return "<html><body>Mock Email de Mapa Disponibilizado</body></html>";
     }
 
     @Override
-    public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
+    public String criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
         log.debug(
                 "[MOCK] Criando e-mail de mapa validado (mock): Unidade={}, Processo={}",
                 nomeUnidade,
                 nomeProcesso);
+        return "<html><body>Mock Email de Mapa Validado</body></html>";
     }
 
     @Override
-    public void criarEmailProcessoFinalizado(
+    public String criarEmailProcessoFinalizado(
             String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         log.debug(
                 "[MOCK] Criando e-mail de processo finalizado (mock): Processo={},"
@@ -85,6 +89,7 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
                 nomeProcesso,
                 dataFinalizacao,
                 quantidadeMapas);
+        return "<html><body>Mock Email de Processo Finalizado</body></html>";
     }
 
     @Override

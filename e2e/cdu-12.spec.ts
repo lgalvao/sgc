@@ -10,9 +10,10 @@ import {
     fecharModalImpacto,
     navegarParaAtividades,
     removerAtividade,
-    verificarBotaoImpactoPresente
+    verificarBotaoImpactoDropdown,
+    verificarBotaoImpactoDireto
 } from './helpers/helpers-atividades';
-import {fazerLogout} from './helpers/helpers-navegacao';
+import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
@@ -64,11 +65,12 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await limparNotificacoes(page);
 
         // 2. Chefe preenche atividades
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         // Atividade 1
@@ -92,10 +94,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
         await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await limparNotificacoes(page);
 
         // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
@@ -114,18 +117,21 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
         await page.getByText(`Atividade Base 1 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
+        await limparNotificacoes(page);
 
         // Competência 2 ligada a Atividade 2
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 2 ${timestamp}`);
         await page.getByText(`Atividade Base 2 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
+        await limparNotificacoes(page);
 
         // Competência 3 ligada a Atividade 3
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 3 ${timestamp}`);
         await page.getByText(`Atividade Base 3 ${timestamp}`).click();
         await page.getByTestId('btn-criar-competencia-salvar').click();
+        await limparNotificacoes(page);
 
         // Disponibilizar Mapa
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
@@ -135,8 +141,9 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 5. Chefe Valida e Admin Homologa (Finalizar Mapeamento)
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-mapa').click();
+        await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
@@ -145,8 +152,9 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
         await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await page.getByTestId('card-subprocesso-mapa').click();
+        await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -188,22 +196,22 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
 
         await navegarParaAtividades(page);
 
         // 1. Verificar presença do botão
-        await verificarBotaoImpactoPresente(page);
+        await verificarBotaoImpactoDropdown(page);
 
-        // 2. Clicar no botão
-        await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
+        // 2. Abrir modal
+        await abrirModalImpacto(page);
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
     test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         // Adicionar nova atividade
@@ -226,7 +234,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         // Editar atividade existente (Atividade Base 2)
@@ -252,7 +260,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page}) => {
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         // Remover atividade (Atividade Base 3)
@@ -279,7 +287,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Chefe disponibiliza a revisão
         await page.goto('/login');
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -290,12 +298,13 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await limparNotificacoes(page); // Limpar possível toast de "Sucesso ao criar/iniciar"
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         // Acessar visualização
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
         // Verificar botão de impacto
-        await verificarBotaoImpactoPresente(page);
+        await verificarBotaoImpactoDireto(page);
 
         // Abrir e verificar conteúdo (deve ter os acumulados dos cenários anteriores)
         await abrirModalImpacto(page);

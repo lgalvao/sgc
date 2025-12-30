@@ -308,7 +308,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '04-subprocesso', '05-cadastro-conhecimento-preenchendo');
             await adicionarConhecimento(page, atividadeDesc, 'Java');
             await adicionarConhecimento(page, atividadeDesc, 'Spring Boot');
-            await adicionarConhecimento(page, atividadeDesc, 'PostgreSQL');
+            await adicionarConhecimento(page, atividadeDesc, 'Oracle');
             await capturarTela(page, '04-subprocesso', '06-cadastro-atividade-completa', {fullPage: true});
 
             // Hover na atividade para ver ações

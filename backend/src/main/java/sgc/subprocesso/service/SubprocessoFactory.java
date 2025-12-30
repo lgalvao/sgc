@@ -15,7 +15,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.unidade.model.TipoUnidade;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeMapa;
-import sgc.unidade.model.UnidadeMapaRepo;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
@@ -33,7 +32,6 @@ public class SubprocessoFactory {
     private final MapaRepo mapaRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
-    private final UnidadeMapaRepo unidadeMapaRepo;
 
     /**
      * Cria subprocesso para processo de mapeamento.
@@ -59,31 +57,27 @@ public class SubprocessoFactory {
         mapa.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapa);
         
-        // 3. Atualizar subprocesso com o mapa
+        // 3. Atualizar subprocesso com o mapa (apenas em memória, save é redundante se for mappedBy)
         subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
         
         // 4. Criar movimentação
         movimentacaoRepo.save(
                 new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
         
-        log.debug("Subprocesso para mapeamento criado para unidade {}", unidade.getSigla());
+        log.debug("Subprocesso for mapping created for unit {}", unidade.getSigla());
     }
 
     /**
      * Cria subprocesso para processo de revisão.
      * Copia o mapa vigente da unidade.
      */
-    public void criarParaRevisao(Processo processo, Unidade unidade) {
+    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
         log.debug("Criando subprocesso de revisão para unidade: {}", unidade.getCodigo());
         
-        // Buscar mapa vigente da unidade
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                .orElseThrow(() -> {
-                    log.error("ERRO CRITICO: Unidade {} nao possui mapa vigente, mas passou pela validacao.", unidade.getCodigo());
-                    return new ErroProcesso(
-                        "Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
-                });
+        if (unidadeMapa == null) {
+            log.error("ERRO CRITICO: Unidade {} nao possui mapa vigente.", unidade.getCodigo());
+            throw new ErroProcesso("Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
+        }
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         log.debug("Mapa vigente da unidade {}: codigo={}", unidade.getSigla(), codMapaVigente);
@@ -96,7 +90,7 @@ public class SubprocessoFactory {
                 .situacao(NAO_INICIADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
-        subprocessoRepo.save(subprocesso);
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
         log.debug("Subprocesso criado");
         
         // 2. Copiar mapa COM referência ao subprocesso
@@ -109,19 +103,18 @@ public class SubprocessoFactory {
         }
         
         log.debug("Mapa copiado: codigo={}", mapaCopiado.getCodigo());
-        mapaCopiado.setSubprocesso(subprocesso);
+        mapaCopiado.setSubprocesso(subprocessoSalvo);
         Mapa mapaSalvo = mapaRepo.save(mapaCopiado);
         log.debug("Mapa salvo com associacao ao subprocesso");
         
-        // 3. Atualizar subprocesso local com o mapa e salvar
-        subprocesso.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocesso);
+        // 3. Atualizar subprocesso local com o mapa
+        subprocessoSalvo.setMapa(mapaSalvo);
         
         log.debug("Subprocesso associado ao mapa (local): mapaId={} unidade={}",
                 mapaSalvo != null ? mapaSalvo.getCodigo() : "null", unidade.getSigla());
 
         // 4. Criar movimentação
-        movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Processo de revisão iniciado", null));
+        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
     }
 
@@ -129,10 +122,11 @@ public class SubprocessoFactory {
      * Cria subprocesso para processo de diagnóstico.
      * Copia o mapa vigente e inicia com autoavaliação em andamento.
      */
-    public void criarParaDiagnostico(Processo processo, Unidade unidade) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo())
-                .orElseThrow(() -> new ErroProcesso(
-                        "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla())));
+    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
+        if (unidadeMapa == null) {
+            throw new ErroProcesso(
+                    "Unidade %s não possui mapa vigente para iniciar diagnóstico.".formatted(unidade.getSigla()));
+        }
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         
@@ -153,7 +147,6 @@ public class SubprocessoFactory {
         
         // 3. Atualizar subprocesso com o mapa
         subprocessoSalvo.setMapa(mapaSalvo);
-        subprocessoRepo.save(subprocessoSalvo);
 
         // 4. Criar movimentação
         movimentacaoRepo.save(
