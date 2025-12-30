@@ -12,7 +12,6 @@ import sgc.mapa.model.Mapa;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +49,9 @@ public class CompetenciaService {
 
         competencia.setDescricao(descricao);
 
-        Set<Atividade> atividadesAntigas = new HashSet<>(competencia.getAtividades());
+        // ⚡ Bolt: Otimização N+1.
+        // Busca atividades com suas competências já carregadas para evitar queries no loop de remoção.
+        List<Atividade> atividadesAntigas = atividadeRepo.listarPorCompetencia(competencia);
         for (Atividade atividade : atividadesAntigas) {
             atividade.getCompetencias().remove(competencia);
         }
@@ -70,9 +71,16 @@ public class CompetenciaService {
                 .findById(codCompetencia)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
-        for (Atividade atividade : competencia.getAtividades()) {
+        // ⚡ Bolt: Otimização N+1.
+        // Busca atividades com suas competências já carregadas.
+        List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
+
+        for (Atividade atividade : atividadesAssociadas) {
             atividade.getCompetencias().remove(competencia);
         }
+        // É importante salvar as atividades se a cascata não for automática, mas JPA gerencia a coleção.
+        // Explicitamente salvando para garantir sincronia.
+        atividadeRepo.saveAll(atividadesAssociadas);
 
         competenciaRepo.delete(competencia);
     }

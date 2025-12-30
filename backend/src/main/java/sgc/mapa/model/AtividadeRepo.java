@@ -38,4 +38,13 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
     List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     long countByMapaCodigo(Long mapaCodigo);
+
+    /**
+     * Recupera atividades associadas a uma competência, com as coleções de competências carregadas
+     * para evitar N+1 na remoção.
+     */
+    @Query(
+            "SELECT DISTINCT a FROM Atividade a JOIN FETCH a.competencias WHERE :competencia MEMBER"
+                    + " OF a.competencias")
+    List<Atividade> listarPorCompetencia(@Param("competencia") Competencia competencia);
 }
