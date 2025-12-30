@@ -1,0 +1,10 @@
+[FRONTEND]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m364[22m[2m[0m ms[22m
+[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: org.springframework.data.repository.CrudRepository.findById levou 73 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.autorizar levou 78 ms
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:49 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Usuário' com codigo '0' não encontrado(a).
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.model.UsuarioPerfilRepo.findByUsuarioTitulo levou 93 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.autorizar levou 121 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.usuario.UsuarioService.entrar levou 155 ms
+[BACKEND] WARN  s.i.m.MonitoramentoAspect.monitorarExecucao:30 - EXECUCAO LENTA: sgc.painel.PainelService.listarProcessos levou 59 ms
